@@ -14,6 +14,7 @@ export interface Diagnostic {
     code: string;
     message: string;
     position: SourcePosition;
+    end: SourcePosition | null;
 }
 
 export function createPosition(line: number, column: number, offset: number): SourcePosition {
@@ -26,8 +27,9 @@ export function createDiagnostic(
     message: string,
     position: SourcePosition,
     severity: DiagnosticSeverity = 'error',
+    end: SourcePosition | null = null,
 ): Diagnostic {
-    return { stage, severity, code, message, position };
+    return { stage, severity, code, message, position, end };
 }
 
 export function formatDiagnostic(diagnostic: Diagnostic): string {

@@ -7,7 +7,8 @@ import { isDirectiveStart, parseDirective } from './directives';
 import { parseExpression, parseSuffixed } from './expression';
 import { parseFunctionDeclaration } from './function-expression';
 import { ASSIGNMENT_OPERATORS } from './precedence';
-import type { TokenStream } from './token-stream';
+import { recoverInBlock } from './recovery';
+import { ParserError, type TokenStream } from './token-stream';
 import { parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
 
 const BLOCK_END: ReadonlySet<string> = new Set(['end', 'else', 'elseif', 'until']);
@@ -191,6 +192,20 @@ export function parseStatement(stream: TokenStream): Statement {
     return parseExpressionStatement(stream);
 }
 
+function parseBlockStatement(stream: TokenStream): Statement | null {
+    try {
+        return parseStatement(stream);
+    } catch (error) {
+        if (!(error instanceof ParserError)) {
+            throw error;
+        }
+
+        recoverInBlock(stream, error);
+
+        return null;
+    }
+}
+
 export function parseBraceBlock(stream: TokenStream): Statement[] {
     const body: Statement[] = [];
 
@@ -201,7 +216,11 @@ export function parseBraceBlock(stream: TokenStream): Statement[] {
             continue;
         }
 
-        const statement = parseStatement(stream);
+        const statement = parseBlockStatement(stream);
+
+        if (statement === null) {
+            continue;
+        }
 
         body.push(statement);
 

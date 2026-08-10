@@ -12,8 +12,9 @@ import type {
 } from './declaration-nodes';
 import { parseExpression } from './expression';
 import { parseParameters } from './function-expression';
+import { recoverInBlock } from './recovery';
 import { parseBraceBlock } from './statement';
-import type { TokenStream } from './token-stream';
+import { ParserError, type TokenStream } from './token-stream';
 import { parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
 
 const DECLARATION_NAMES: ReadonlySet<string> = new Set(['class', 'interface', 'enum']);
@@ -94,7 +95,15 @@ function parseClassDeclaration(stream: TokenStream): ClassDeclaration {
             continue;
         }
 
-        declaration.members.push(parseClassMember(stream));
+        try {
+            declaration.members.push(parseClassMember(stream));
+        } catch (error) {
+            if (!(error instanceof ParserError)) {
+                throw error;
+            }
+
+            recoverInBlock(stream, error);
+        }
     }
 
     stream.expect('punctuation', '}');
@@ -129,7 +138,15 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
             continue;
         }
 
-        members.push(parseInterfaceMember(stream));
+        try {
+            members.push(parseInterfaceMember(stream));
+        } catch (error) {
+            if (!(error instanceof ParserError)) {
+                throw error;
+            }
+
+            recoverInBlock(stream, error);
+        }
     }
 
     stream.expect('punctuation', '}');

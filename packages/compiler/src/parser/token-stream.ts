@@ -86,7 +86,9 @@ export class TokenStream {
     }
 
     error(message: string, code = 'parse-error'): ParserError {
-        return new ParserError(createDiagnostic('parser', code, message, this.current().position));
+        const token = this.current();
+
+        return new ParserError(createDiagnostic('parser', code, message, token.position, 'error', token.end));
     }
 
     report(code: string, message: string, position: SourcePosition): void {
