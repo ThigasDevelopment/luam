@@ -175,6 +175,6 @@ describe('emitter', () => {
 
     it('emits nothing for an empty program', () => {
         expect(emit('')).toBe('');
-        expect(emit('-- only a comment\n')).toBe('');
+        expect(emit('# only a comment\n')).toBe('');
     });
 });

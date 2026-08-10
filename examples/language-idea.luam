@@ -1,4 +1,4 @@
--- Nosso runtime:
+# Nosso runtime:
 local text: string = 'Thigas';
 
 function example (foo: string): void
@@ -6,7 +6,7 @@ function example (foo: string): void
 end
 
 local object: any[] = {};
-print (object.count); -- 0
+print (object.count); # 0
 
 interface IPlayer {
 
@@ -19,7 +19,7 @@ class Player {
 	}
 }
 
--- Buildado para o Lua 5.1 do MTA:
+# Buildado para o Lua 5.1 do MTA:
 local text = 'Thigas';
 
 function example (foo)
@@ -27,9 +27,9 @@ function example (foo)
 end
 
 local object = { };
-print (table.size (object)); -- 0
+print (table.size (object)); # 0
 
--- Sistema de classes: github.com/ThigasDevelopment/lua-class (Refatorar algumas coisas dentro da Lib, como por exemplo `interface` nao tem mais pq existir se vai rodar Runtime)
+# Sistema de classes: github.com/ThigasDevelopment/lua-class (Refatorar algumas coisas dentro da Lib, como por exemplo `interface` nao tem mais pq existir se vai rodar Runtime)
 class 'Player' {
 	constructor = function (self)
 		return self;

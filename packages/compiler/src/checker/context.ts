@@ -58,7 +58,7 @@ function nilHint(source: Type, target: Type, mode: StrictMode): string {
         return '';
     }
 
-    return ` Annotate it "${typeToString(target)}?" to allow "nil", or put "--!nonstrict" at the top of the file.`;
+    return ` Annotate it "${typeToString(target)}?" to allow "nil", or put "#!nonstrict" at the top of the file.`;
 }
 
 export class CheckContext {

@@ -7,7 +7,7 @@ TextMate grammar that highlights Luam source.
 
 - Diagnostics, completion, hover, go to definition, find references, and rename
   through the language server.
-- Syntax highlighting for Lua blocks, `--` and `--[[ ]]` comments, `--!`
+- Syntax highlighting for Lua blocks, `#` and `#* *#` comments, `#!`
   directives, template strings with `${}` interpolation, type annotations, and
   the `class`, `interface`, `enum`, `type`, and `new` declarations.
 - Bracket matching, comment toggling, and indentation rules for `end` and `}`.

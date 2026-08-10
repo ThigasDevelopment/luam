@@ -1,18 +1,18 @@
---[[
+#*
 	O LSP deve ser capaz de reconhecer classes e funcoes/eventos nativos do MTA.
 		- Reconhecer sides de scripts (server, client e shared)
 		- Reconhecer variaveis de ambiente do proprio MTA.
-]]
+*#
 addEventHandler ('onPlayerWasted', root,
 	function (attacker: Player): void
 		
 	end
 );
 
---[[
+#*
 	No client-side do MTA, por exemplo, nos temos a variavel:
 		localPlayer - ela e o Objeto Literal do player no client-side.
-]]
+*#
 
 interface IExample {
 	name: string;

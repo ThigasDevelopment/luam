@@ -1,4 +1,4 @@
---!strict
+#!strict
 local name: string = 'Thigas'
 local user: table = { name = 'Thigas' }
 

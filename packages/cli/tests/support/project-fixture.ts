@@ -12,7 +12,7 @@ export interface ProjectFixture {
 }
 
 export const VALID_SHARED = [
-    '--!shared',
+    '#!shared',
     '',
     "RESOURCE_NAME = 'luam-demo'",
     '',

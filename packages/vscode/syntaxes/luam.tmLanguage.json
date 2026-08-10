@@ -21,7 +21,7 @@
     ],
     "repository": {
         "directive": {
-            "match": "^\\s*(--!)(strict|nonstrict|nocheck|server|client|shared)\\b",
+            "match": "^\\s*(#!)(strict|nonstrict|nocheck|server|client|shared)\\b",
             "captures": {
                 "1": { "name": "punctuation.definition.comment.luam" },
                 "2": { "name": "keyword.control.directive.luam" }
@@ -42,12 +42,12 @@
             "patterns": [
                 {
                     "name": "comment.block.luam",
-                    "begin": "--\\[(=*)\\[",
-                    "end": "\\]\\1\\]"
+                    "begin": "#\\*",
+                    "end": "\\*#"
                 },
                 {
-                    "name": "comment.line.double-dash.luam",
-                    "begin": "--",
+                    "name": "comment.line.number-sign.luam",
+                    "begin": "#(?=\\s|!|$)",
                     "end": "$"
                 }
             ]

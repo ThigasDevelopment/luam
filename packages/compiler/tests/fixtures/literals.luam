@@ -1,4 +1,4 @@
---!strict
+#!strict
 local name: string = 'Thigas'
 local escaped: string = 'line\nbreak'
 local quoted: string = "double"

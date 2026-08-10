@@ -47,7 +47,7 @@ describe('indentation rules', () => {
         expect(increase.test('outputChatBox("hi", root)')).toBe(false);
         expect(increase.test('local config = { name = "a" }')).toBe(false);
         expect(increase.test('if ready then return end')).toBe(false);
-        expect(increase.test('-- function greet()')).toBe(false);
+        expect(increase.test('# function greet()')).toBe(false);
     });
 
     it('outdents a closing line', () => {

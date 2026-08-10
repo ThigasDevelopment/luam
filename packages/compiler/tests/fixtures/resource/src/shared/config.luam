@@ -1,4 +1,4 @@
---!shared
+#!shared
 
 RESOURCE_NAME = 'luam-demo'
 

@@ -25,7 +25,7 @@ members, and the native extensions that apply to the receiver's type.
 ## Environments
 
 Every document resolves its environment (`server`, `client`, or `shared`) from
-its path or a `--!` directive before anything else runs. The environment decides
+its path or a `#!` directive before anything else runs. The environment decides
 which MTA APIs the file sees, so `dxDrawText` never completes in a server file
 and `kickPlayer` never completes in a client file. A `shared` file sees only
 shared declarations.

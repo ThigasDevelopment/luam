@@ -23,7 +23,7 @@ function endsStatement(cursor: Cursor): boolean {
 
     const character = cursor.peek(offset);
 
-    if (character === '-' && cursor.peek(offset + 1) === '-') {
+    if (character === '#') {
         return true;
     }
 

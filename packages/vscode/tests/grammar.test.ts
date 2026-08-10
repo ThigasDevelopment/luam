@@ -62,11 +62,11 @@ describe('grammar', () => {
         }
     });
 
-    it('highlights lua comments and environment directives', () => {
-        expect(matchesAny('comment', '-- a note')).toBe(true);
-        expect(matchesAny('comment', '--[[ block ]]')).toBe(true);
-        expect(matchesAny('directive', '--!server')).toBe(true);
-        expect(matchesAny('directive', '--!strict')).toBe(true);
+    it('highlights comments and environment directives', () => {
+        expect(matchesAny('comment', '# a note')).toBe(true);
+        expect(matchesAny('comment', '#* block *#')).toBe(true);
+        expect(matchesAny('directive', '#!server')).toBe(true);
+        expect(matchesAny('directive', '#!strict')).toBe(true);
     });
 
     it('highlights strings and template literals', () => {

@@ -1,4 +1,4 @@
---!strict
+#!strict
 local base: number = 1 + 2 - 3 * 4 / 5 % 6 ^ 2
 local negated: number = -base
 local joined: string = 'x' .. 'y' .. 'z'
@@ -15,7 +15,7 @@ local slots: number[] = { 1, 2 }
 
 counter++
 counter--
-counter-- -- back to zero
+counter-- # back to zero
 slots[1]++
 
 print(counter, slots)

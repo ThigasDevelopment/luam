@@ -58,7 +58,7 @@ describe('signature help', () => {
 
     it('offers nothing outside a call and nothing inside a comment', () => {
         expect(helpFor('local value = 1\n', 'local value')).toBeNull();
-        expect(helpFor('-- outputChatBox(\n', 'outputChatBox(')).toBeNull();
+        expect(helpFor('# outputChatBox(\n', 'outputChatBox(')).toBeNull();
     });
 
     it('offers nothing for a grouping paren that is not a call', () => {

@@ -45,15 +45,15 @@ describe('lexer', () => {
     });
 
     it('skips line and block comments', () => {
-        expect(describeTokens('-- line\n--[[ block\ncomment ]]\nlocal a')).toEqual(['keyword "local" 4:1', 'identifier "a" 4:7']);
+        expect(describeTokens('# line\n#* block\ncomment *#\nlocal a')).toEqual(['keyword "local" 4:1', 'identifier "a" 4:7']);
     });
 
     it('collects directive comments', () => {
-        expect(scan('--!strict\n--!server\nlocal a').directives).toEqual(['strict', 'server']);
+        expect(scan('#!strict\n#!server\nlocal a').directives).toEqual(['strict', 'server']);
     });
 
     it('scans Lua operators including the inequality operator', () => {
-        expect(scan('~= == .. # % ^ ... ..=').tokens.map((token) => token.value)).toEqual(['~=', '==', '..', '#', '%', '^', '...', '..=', '']);
+        expect(scan('~= == .. % ^ ... ..=').tokens.map((token) => token.value)).toEqual(['~=', '==', '..', '%', '^', '...', '..=', '']);
     });
 
     it('scans a function type annotation as ordinary keyword and punctuation tokens', () => {
@@ -76,14 +76,14 @@ describe('lexer', () => {
         expect(scan('count--').tokens.map((token) => token.value)).toEqual(['count', '--', '']);
         expect(scan('count--;').tokens.map((token) => token.value)).toEqual(['count', '--', ';', '']);
         expect(scan('items[1]--\n').tokens.map((token) => token.value)).toEqual(['items', '[', '1', ']', '--', '']);
-        expect(scan('count-- -- note').tokens.map((token) => token.value)).toEqual(['count', '--', '']);
+        expect(scan('count-- # note').tokens.map((token) => token.value)).toEqual(['count', '--', '']);
     });
 
-    it('keeps reading -- as a comment when it does not close a statement', () => {
-        expect(scan('count -- note').tokens.map((token) => token.value)).toEqual(['count', '']);
-        expect(scan('count--note').tokens.map((token) => token.value)).toEqual(['count', '']);
-        expect(scan('count--[[ block ]]').tokens.map((token) => token.value)).toEqual(['count', '']);
-        expect(scan('--!strict\ncount').directives).toEqual(['strict']);
+    it('keeps the length operator distinct from comments', () => {
+        expect(scan('#items').tokens.map((token) => token.value)).toEqual(['#', 'items', '']);
+        expect(scan('# items').tokens.map((token) => token.value)).toEqual(['']);
+        expect(scan('local size = #items # note').tokens.map((token) => token.value)).toEqual(['local', 'size', '=', '#', 'items', '']);
+        expect(scan('#!strict\ncount').directives).toEqual(['strict']);
     });
 
     it('reports != as a lexical error and recovers as ~=', () => {
@@ -97,6 +97,8 @@ describe('lexer', () => {
     it('reports foreign comment syntax', () => {
         expect(codes('// comment')).toEqual(['lex-foreign-comment']);
         expect(codes('/* comment */')).toEqual(['lex-foreign-comment']);
+        expect(codes('-- comment')).toEqual(['lex-foreign-comment']);
+        expect(codes('--[[ comment ]]')).toEqual(['lex-foreign-comment']);
     });
 
     it('reports an unterminated string with a position', () => {
@@ -107,7 +109,7 @@ describe('lexer', () => {
     });
 
     it('reports an unterminated block comment with a position', () => {
-        const [diagnostic] = scan('--[[ open').diagnostics;
+        const [diagnostic] = scan('#* open').diagnostics;
 
         expect(diagnostic?.code).toBe('lex-unterminated-comment');
         expect(diagnostic?.position).toEqual({ line: 1, column: 1, offset: 0 });
@@ -134,7 +136,7 @@ describe('lexer', () => {
     });
 
     it('matches the token snapshot for a typed program', () => {
-        const source = "--!strict\nlocal total: number = 0\nfor index = 1, 10 do\n    total += index\nend\n";
+        const source = "#!strict\nlocal total: number = 0\nfor index = 1, 10 do\n    total += index\nend\n";
 
         expect(describeTokens(source)).toMatchSnapshot();
     });

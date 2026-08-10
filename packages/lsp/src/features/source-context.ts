@@ -79,24 +79,23 @@ function looksLikeCall(text: string, open: number): boolean {
 }
 
 function advanceComment(text: string, state: ScanState, index: number): number {
-    const level = longOpener(text, index + 2);
-
-    if (level === null) {
+    if (text[index + 1] !== '*') {
         state.mode = 'line-comment';
 
-        return index + 2;
+        return index + 1;
     }
 
     state.mode = 'block-comment';
-    state.level = level;
 
-    return index + 3 + level;
+    return index + 2;
 }
 
 function advanceCode(text: string, state: ScanState, index: number): number {
     const char = text[index] ?? '';
 
-    if (char === '-' && text[index + 1] === '-') {
+    const next = text[index + 1] ?? '';
+
+    if (char === '#' && (next === '*' || next === '!' || next === '' || /\s/.test(next))) {
         return advanceComment(text, state, index);
     }
 
@@ -152,7 +151,17 @@ function advance(text: string, state: ScanState, index: number): number {
         return index + 1;
     }
 
-    if (state.mode === 'block-comment' || state.mode === 'long-string') {
+    if (state.mode === 'block-comment') {
+        if (char !== '*' || text[index + 1] !== '#') {
+            return index + 1;
+        }
+
+        state.mode = 'code';
+
+        return index + 2;
+    }
+
+    if (state.mode === 'long-string') {
         const closed = longCloser(text, index, state.level);
 
         if (closed === null) {

@@ -53,7 +53,7 @@ describe('environment resolution', () => {
 
         expect(diagnostic?.code).toBe('env-conflicting-directive');
         expect(diagnostic?.severity).toBe('error');
-        expect(compile('--!server\n--!client\nlocal a = 1\n').code).toBeNull();
+        expect(compile('#!server\n#!client\nlocal a = 1\n').code).toBeNull();
     });
 
     it('accepts the same directive twice', () => {
@@ -126,7 +126,7 @@ describe('environment API validation', () => {
 
     it('reports the environment on the compile result', () => {
         expect(compile('local a = 1', { filePath: 'src/client/hud.luam' }).environment).toBe('client');
-        expect(compile('--!server\nlocal a = 1').environment).toBe('server');
+        expect(compile('#!server\nlocal a = 1').environment).toBe('server');
         expect(compile('local a = 1', { environment: 'server' }).environment).toBe('server');
     });
 });

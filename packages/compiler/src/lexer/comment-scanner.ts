@@ -1,8 +1,7 @@
 import { createDiagnostic, type Diagnostic } from '@compiler/diagnostics/diagnostic';
 
-import { isLineBreak } from './char';
+import { isLineBreak, isWhitespace } from './char';
 import type { Cursor } from './cursor';
-import { longBracketLevel, readLongBracket } from './long-bracket';
 
 export interface Comment {
     text: string;
@@ -22,27 +21,34 @@ function scanLineComment(cursor: Cursor): Comment {
 }
 
 export function isCommentStart(cursor: Cursor): boolean {
-    return cursor.matches('--');
+    const next = cursor.peek(1);
+
+    return cursor.peek() === '#' && (next === '*' || next === '!' || next === '' || isWhitespace(next));
 }
 
 export function scanComment(cursor: Cursor, diagnostics: Diagnostic[]): Comment {
     const position = cursor.position();
 
-    cursor.advance(2);
+    if (!cursor.matches('#*')) {
+        cursor.advance();
 
-    const level = longBracketLevel(cursor);
-
-    if (level === null) {
         return scanLineComment(cursor);
     }
 
-    const result = readLongBracket(cursor, level);
+    cursor.advance(2);
+    const start = cursor.offset();
 
-    if (!result.terminated) {
-        diagnostics.push(
-            createDiagnostic('lexer', 'lex-unterminated-comment', 'Unterminated block comment. Close it with "]]".', position),
-        );
+    while (!cursor.isEof() && !cursor.matches('*#')) {
+        cursor.advance();
     }
 
-    return { text: result.text.trim(), isDirective: false };
+    const text = cursor.slice(start, cursor.offset()).trim();
+
+    if (cursor.isEof()) {
+        diagnostics.push(createDiagnostic('lexer', 'lex-unterminated-comment', 'Unterminated block comment. Close it with "*#".', position));
+    } else {
+        cursor.advance(2);
+    }
+
+    return { text, isDirective: false };
 }

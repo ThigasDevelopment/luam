@@ -68,12 +68,12 @@ describe('checker', () => {
         const message = messages('local name: string = nil')[0];
 
         expect(message).toContain('Variable "name" expects "string" but received "nil".');
-        expect(message).toContain('Annotate it "string?" to allow "nil", or put "--!nonstrict" at the top of the file.');
+        expect(message).toContain('Annotate it "string?" to allow "nil", or put "#!nonstrict" at the top of the file.');
     });
 
     it('keeps the nil hint out of an unrelated mismatch', () => {
         expect(messages("local total: number = 'text'")[0]).toBe('Variable "total" expects "number" but received "string".');
-        expect(messages('--!nonstrict\nlocal total: number = false\n')[0]).toBe('Variable "total" expects "number" but received "boolean".');
+        expect(messages('#!nonstrict\nlocal total: number = false\n')[0]).toBe('Variable "total" expects "number" but received "boolean".');
     });
 
     it('accepts any member of a union annotation', () => {
@@ -179,7 +179,7 @@ describe('checker', () => {
     });
 
     it('reports nothing in nocheck mode', () => {
-        const result = compile("--!nocheck\nlocal total: number = 'text'\n");
+        const result = compile("#!nocheck\nlocal total: number = 'text'\n");
 
         expect(result.mode).toBe('nocheck');
         expect(result.diagnostics).toEqual([]);
@@ -187,35 +187,35 @@ describe('checker', () => {
     });
 
     it('allows nil in nonstrict mode where strict rejects it', () => {
-        expect(compile('--!nonstrict\nlocal name: string = nil\n').diagnostics).toEqual([]);
-        expect(codes('--!strict\nlocal name: string = nil\n')).toEqual(['check-type-mismatch']);
+        expect(compile('#!nonstrict\nlocal name: string = nil\n').diagnostics).toEqual([]);
+        expect(codes('#!strict\nlocal name: string = nil\n')).toEqual(['check-type-mismatch']);
     });
 
     it('widens unannotated locals to any in nonstrict mode', () => {
-        expect(codes('--!nonstrict\nlocal total = 1\nlocal name: string = total\n')).toEqual([]);
-        expect(codes('--!strict\nlocal total = 1\nlocal name: string = total\n')).toEqual(['check-type-mismatch']);
+        expect(codes('#!nonstrict\nlocal total = 1\nlocal name: string = total\n')).toEqual([]);
+        expect(codes('#!strict\nlocal total = 1\nlocal name: string = total\n')).toEqual(['check-type-mismatch']);
     });
 
     it('still reports a definite mismatch in nonstrict mode', () => {
-        expect(codes("--!nonstrict\nlocal total: number = 'text'\n")).toEqual(['check-type-mismatch']);
+        expect(codes("#!nonstrict\nlocal total: number = 'text'\n")).toEqual(['check-type-mismatch']);
     });
 
     it('still reports a call and a template error in nonstrict mode', () => {
-        expect(codes('--!nonstrict\nlocal function take(value: number): void\nend\ntake()\n')).toEqual(['check-argument-count']);
-        expect(codes('--!nonstrict\nlocal greeting = `Ola ${missing}`\n')).toEqual(['check-unknown-template-root']);
+        expect(codes('#!nonstrict\nlocal function take(value: number): void\nend\ntake()\n')).toEqual(['check-argument-count']);
+        expect(codes('#!nonstrict\nlocal greeting = `Ola ${missing}`\n')).toEqual(['check-unknown-template-root']);
     });
 
     it('loses an extension rewrite when nonstrict widens the receiver', () => {
         const source = 'local items = {}\nprint(items.count)\n';
 
-        expect(compile(`--!strict\n${source}`).code).toBe('local items = {}\nprint(table.size(items))\n');
-        expect(compile(`--!nocheck\n${source}`).code).toBe('local items = {}\nprint(table.size(items))\n');
-        expect(compile(`--!nonstrict\n${source}`).code).toBe('local items = {}\nprint(items.count)\n');
-        expect(compile('--!nonstrict\nlocal items: any[] = {}\nprint(items.count)\n').code).toBe('local items = {}\nprint(table.size(items))\n');
+        expect(compile(`#!strict\n${source}`).code).toBe('local items = {}\nprint(table.size(items))\n');
+        expect(compile(`#!nocheck\n${source}`).code).toBe('local items = {}\nprint(table.size(items))\n');
+        expect(compile(`#!nonstrict\n${source}`).code).toBe('local items = {}\nprint(items.count)\n');
+        expect(compile('#!nonstrict\nlocal items: any[] = {}\nprint(items.count)\n').code).toBe('local items = {}\nprint(table.size(items))\n');
     });
 
     it('never lets nocheck silence a syntax error', () => {
-        const result = compile('--!nocheck\nlocal a = \n');
+        const result = compile('#!nocheck\nlocal a = \n');
 
         expect(result.diagnostics.map((diagnostic) => diagnostic.stage)).toEqual(['parser']);
         expect(result.code).toBeNull();

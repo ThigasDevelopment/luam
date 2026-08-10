@@ -243,6 +243,6 @@ describe('parser', () => {
     });
 
     it('matches the program snapshot for a typed program', () => {
-        expect(parse('--!strict\nlocal total: number = 0\nfor index = 1, 10 do\n    total += index\nend\n').program).toMatchSnapshot();
+        expect(parse('#!strict\nlocal total: number = 0\nfor index = 1, 10 do\n    total += index\nend\n').program).toMatchSnapshot();
     });
 });

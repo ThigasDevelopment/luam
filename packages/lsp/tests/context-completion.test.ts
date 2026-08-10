@@ -51,7 +51,8 @@ describe('event completion', () => {
     });
 
     it('offers nothing inside a comment', () => {
-        expect(labels('-- out\n', '-- out')).toEqual([]);
+        expect(labels('# out\n', '# out')).toEqual([]);
+        expect(labels('#* outputChatBox(\n*#', 'outputChatBox(')).toEqual([]);
     });
 });
 

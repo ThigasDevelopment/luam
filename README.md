@@ -17,8 +17,8 @@ You write `.luam` files with type annotations, classes, enums and template
 strings. The compiler checks them and emits readable **Lua 5.1** plus a generated
 `meta.xml` — a resource your server can start as-is.
 
-It is *typed Lua*, not TypeScript. Blocks still end with `end`, inequality is
-still `~=`, comments are still `--`. Types are an addition, not a new syntax.
+It is *typed Lua*, not TypeScript. Blocks still end with `end` and inequality is
+still `~=`, while comments use `#` and `#* ... *#` to avoid colliding with `--` decrement.
 
 ```lua
 local health: number = 100
@@ -358,15 +358,15 @@ Every field, the transport in detail, `.env` handling and declaration files:
 
 ```lua
 local name: string = 'Thigas'
-local player: Player? = nil          -- optional
-local id: string | number = 1        -- union
-local names: string[] = {}           -- array
+local player: Player? = nil          # optional
+local id: string | number = 1        # union
+local names: string[] = {}           # array
 
-type PlayerId = number               -- alias
+type PlayerId = number               # alias
 
-enum GameState { LOBBY, PLAYING }    -- GameState.LOBBY is 0
+enum GameState { LOBBY, PLAYING }    # GameState.LOBBY is 0
 
-interface Command {                  -- compile-only, never emitted
+interface Command {                  # compile-only, never emitted
     name: string
     execute(player: Player): void
 }
@@ -393,29 +393,30 @@ local vip = new VIPPlayer('Thigas', 2)
 | Template strings | `` `Hi ${name:Guest}` `` — scope-checked, with defaults |
 | Compound assignment | `+=`, `-=`, `*=`, `/=`, `..=` |
 | Increment | `score++` and `score--` as statements, compiled to `score = score + 1` |
+| Comments | `# line` and `#* block *#`; write length without a space as `#items` |
 | Object extensions | `items.count` → `table.size(items)`, `name.trim`, `ratio.clamp(a, b)` |
 | Multi-return | `local x, y, z = getElementPosition(el)` — typed from the MTA catalog |
 | `export` | Erased from the Lua, written into `meta.xml` as `<export function="f" />` |
 | Native libraries | `sleep` plus the `Threads`, `Async` and `Dotenv` classes, injected only when named |
 | Native classes | `local tasks = new Async(100)` — same `new` as a project class |
 | Deployment values | `.env` keys typed and reachable as `env.SERVER_NAME`, server-only |
-| Strictness | `--!strict` (default), `--!nonstrict`, `--!nocheck` per file |
+| Strictness | `#!strict` (default), `#!nonstrict`, `#!nocheck` per file |
 
 `class`, `interface`, `enum`, `new`, `fun` and `export` are contextual keywords —
 existing Lua that uses them as identifiers keeps compiling. Reach for
-`--!nocheck` when porting existing Lua: rename to `.luam` and the build passes
+`#!nocheck` when porting existing Lua: rename to `.luam` and the build passes
 while you annotate module by module.
 
 ### Environments
 
-Every file is `server`, `client` or `shared` — from its folder, or from a `--!`
+Every file is `server`, `client` or `shared` — from its folder, or from a `#!`
 directive. That decides which MTA APIs resolve.
 
 ```lua
---!client
+#!client
 
-dxDrawText('hud', 10, 10)   -- ok
-outputChatBox('hi', player) -- error: server API in a client file
+dxDrawText('hud', 10, 10)   # ok
+outputChatBox('hi', player) # error: server API in a client file
 ```
 
 `server` and `client` files may use `shared` declarations; `shared` may use only

@@ -71,7 +71,7 @@ function reportConflictingDirectives(found: readonly Environment[], diagnostics:
         return;
     }
 
-    const message = `A file declares a single environment but found "${found.join('", "')}". Keep only one "--!" environment directive.`;
+    const message = `A file declares a single environment but found "${found.join('", "')}". Keep only one "#!" environment directive.`;
 
     diagnostics.push(createDiagnostic('checker', 'env-conflicting-directive', message, FILE_START));
 }

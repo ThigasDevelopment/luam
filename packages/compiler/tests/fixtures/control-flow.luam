@@ -1,4 +1,4 @@
---!strict
+#!strict
 local total: number = 0
 
 for index = 1, 10 do

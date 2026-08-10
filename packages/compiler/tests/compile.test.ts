@@ -50,8 +50,8 @@ describe('compile', () => {
 
     it('resolves the strictness mode from a directive', () => {
         expect(compile('local a = 1').mode).toBe('strict');
-        expect(compile('--!nonstrict\nlocal a = 1\n').mode).toBe('nonstrict');
-        expect(compile('--!nocheck\nlocal a = 1\n').mode).toBe('nocheck');
+        expect(compile('#!nonstrict\nlocal a = 1\n').mode).toBe('nonstrict');
+        expect(compile('#!nocheck\nlocal a = 1\n').mode).toBe('nocheck');
     });
 
     it('reports the runtime helpers the generated resource requires', () => {

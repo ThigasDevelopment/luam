@@ -31,7 +31,7 @@ end
 }
 
 function serverModule(index: number): string {
-    return `--!server
+    return `#!server
 
 local entity = new Entity${index}('server-${index}')
 
@@ -48,7 +48,7 @@ end)
 }
 
 function clientModule(index: number): string {
-    return `--!client
+    return `#!client
 
 local entity = new Entity${index}('client-${index}')
 local caption: string = \`HUD \${entity.name}\`

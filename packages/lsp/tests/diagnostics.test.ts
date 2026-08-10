@@ -95,7 +95,7 @@ describe('diagnostics', () => {
     it('lets a directive override the path environment with a warning', () => {
         const service = new LanguageService();
 
-        service.update(SERVER_FILE, 1, '--!client\nlocal value = 1\n');
+        service.update(SERVER_FILE, 1, '#!client\nlocal value = 1\n');
 
         const diagnostics = service.diagnostics(SERVER_FILE);
 

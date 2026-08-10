@@ -41,18 +41,43 @@ function skipBlock(cursor: Cursor): void {
     cursor.advance(2);
 }
 
-function scanForeignSyntax(cursor: Cursor, diagnostics: Diagnostic[]): boolean {
+function skipLongBlock(cursor: Cursor): void {
+    cursor.advance(4);
+
+    while (!cursor.isEof() && !cursor.matches(']]')) {
+        cursor.advance();
+    }
+
+    cursor.advance(2);
+}
+
+function scanForeignSyntax(cursor: Cursor, diagnostics: Diagnostic[], tokens: readonly Token[]): boolean {
     const position = cursor.position();
 
+    if (cursor.matches('--') && !isDecrementOperator(cursor, tokens)) {
+        const isBlock = cursor.matches('--[[');
+        const message = isBlock ? 'Use "#* *#" for block comments. "--[[ ]]" is not valid syntax.' : 'Use "#" for line comments. "--" is not valid comment syntax.';
+
+        diagnostics.push(createDiagnostic('lexer', 'lex-foreign-comment', message, position));
+
+        if (isBlock) {
+            skipLongBlock(cursor);
+        } else {
+            skipLine(cursor);
+        }
+
+        return true;
+    }
+
     if (cursor.matches('//')) {
-        diagnostics.push(createDiagnostic('lexer', 'lex-foreign-comment', 'Use "--" for line comments. "//" is not valid syntax.', position));
+        diagnostics.push(createDiagnostic('lexer', 'lex-foreign-comment', 'Use "#" for line comments. "//" is not valid syntax.', position));
         skipLine(cursor);
 
         return true;
     }
 
     if (cursor.matches('/*')) {
-        const message = 'Use "--[[ ]]" for block comments. "/* */" is not valid syntax.';
+        const message = 'Use "#* *#" for block comments. "/* */" is not valid syntax.';
 
         diagnostics.push(createDiagnostic('lexer', 'lex-foreign-comment', message, position));
         skipBlock(cursor);
@@ -145,7 +170,7 @@ export function scan(source: string): LexResult {
             continue;
         }
 
-        if (scanForeignSyntax(cursor, diagnostics)) {
+        if (scanForeignSyntax(cursor, diagnostics, tokens)) {
             continue;
         }
 

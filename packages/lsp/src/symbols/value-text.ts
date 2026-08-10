@@ -39,7 +39,7 @@ function lineSlice(text: string, start: number): string | null {
 
     const lineEnd = text.indexOf('\n', start);
     const raw = text.slice(start, lineEnd === -1 ? text.length : lineEnd);
-    const comment = raw.indexOf('--');
+    const comment = raw.search(/#(?=\s|!|\*|$)/);
     const slice = (comment === -1 ? raw : raw.slice(0, comment)).trim();
 
     return slice.length === 0 || slice.length > INLINE_LIMIT ? null : slice;

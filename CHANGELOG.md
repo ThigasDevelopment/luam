@@ -73,11 +73,10 @@ Lua never had, the other stops a type from borrowing a keyword.
   `parse-invalid-type` with the replacement in the message. Diagnostics, hovers
   and signature help render the new form. **Breaking**: every existing function
   type annotation needs the keyword swapped.
-- `--` is read as a decrement operator only when the two dashes touch their
-  target and close the statement — `count--`, `count--;`, `count-- -- note`.
-  Everything else stays a comment, including `count -- note` and `count--note`.
-  **Breaking** in exactly one form: `count--` glued to a target with nothing
-  after it used to be an empty comment and is now a decrement.
+- Comments now use `#` for a line and `#* ... *#` for a block. `#items` remains
+  the length operator; a line comment starts with `# `, `#!`, or a bare `#`.
+  **Breaking**: Lua's `--` and `--[[ ... ]]` comment forms now report a lexical
+  diagnostic, while `--` remains the decrement statement operator.
 
 ### Editor Experience — Documentation, Signatures and Context
 
@@ -533,7 +532,7 @@ resource layout.
   and `pnpm audit`) and a release workflow that packages the CLI tarball and
   the VSIX on a `v*` tag. Dependabot watches npm and Actions weekly.
 - Strictness modes are documented with worked examples, including the one case
-  where `--!nonstrict` changes the emitted Lua.
+  where `#!nonstrict` changes the emitted Lua.
 
 #### Changed
 
@@ -550,7 +549,7 @@ resource layout.
 - Diagnostics read better. Argument-count errors say "expects at least 2
   arguments" instead of "2 argument(s)", an empty template interpolation lists
   the accepted forms, and a strict-mode `nil` mismatch names both ways out —
-  the `?` annotation and `--!nonstrict`.
+  the `?` annotation and `#!nonstrict`.
 - `pnpm` is pinned through the root `packageManager` field.
 
 #### Fixed
@@ -600,7 +599,7 @@ resource layout.
 ## Milestone 3 — Environments and Resource Assembly
 
 - Every file resolves to `server`, `client`, or `shared` from its path or a
-  `--!` directive, and MTA API availability is scoped to it.
+  `#!` directive, and MTA API availability is scoped to it.
 - `@luam/mta-types` describes the Lua standard library and the MTA APIs with
   neutral type descriptors.
 - Resource assembly maps sources to Lua outputs, orders runtime helpers first,

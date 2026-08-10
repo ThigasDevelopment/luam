@@ -1,4 +1,4 @@
---!strict
+#!strict
 type PlayerId = number
 type Nullable<T> = T | nil
 

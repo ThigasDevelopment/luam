@@ -18,7 +18,7 @@ const EXPORTED_SERVER = [
     '',
 ].join('\n');
 
-const EXPORTED_SHARED = ['--!shared', '', 'export function formatScore(score: number): string', "    return 'Score: ' .. score", 'end', ''].join('\n');
+const EXPORTED_SHARED = ['#!shared', '', 'export function formatScore(score: number): string', "    return 'Score: ' .. score", 'end', ''].join('\n');
 
 const REMOVED_DIRECTIVES = ['local setting = 32', 'local depends = 1', '', 'print(setting + depends)', ''].join('\n');
 

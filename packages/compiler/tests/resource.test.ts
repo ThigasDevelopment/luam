@@ -208,7 +208,7 @@ describe('manifest attribute policy', () => {
     it('enumerates a directory whose files do not all match the environment their path implies', () => {
         const mixed = compileProject([
             { path: 'src/shared/util.luam', source: 'function shared1(): void\nend\n' },
-            { path: 'src/shared/admin.luam', source: '--!server\n\nfunction adminOnly(): void\nend\n' },
+            { path: 'src/shared/admin.luam', source: '#!server\n\nfunction adminOnly(): void\nend\n' },
         ]);
         const built = assembleResource(mixed, {}).build?.manifest ?? '';
 
