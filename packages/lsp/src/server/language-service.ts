@@ -26,6 +26,10 @@ export class LanguageService {
         this.workspace.remove(uri);
     }
 
+    refresh(): DocumentAnalysis[] {
+        return this.workspace.refresh();
+    }
+
     analysis(uri: string): DocumentAnalysis | null {
         return this.workspace.get(uri);
     }

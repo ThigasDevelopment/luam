@@ -43,6 +43,14 @@ export class WorkspaceIndex {
         this.analyses.delete(pathKey(uriToPath(uri)));
     }
 
+    refresh(): DocumentAnalysis[] {
+        for (const analysis of this.all()) {
+            this.analyze(analysis.uri, analysis.version, analysis.text);
+        }
+
+        return this.all();
+    }
+
     get(uri: string): DocumentAnalysis | null {
         return this.analyses.get(pathKey(uriToPath(uri))) ?? null;
     }

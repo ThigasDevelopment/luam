@@ -116,4 +116,21 @@ describe('workspace loading', () => {
         service.update(uri, 2, 'local value: number = "text"\n');
         expect(service.diagnostics(uri)).toHaveLength(1);
     });
+
+    it('drops declarations from a deleted file before refreshing diagnostics', () => {
+        const root = workspace({ 'src/shared/old.luam': 'class Config {\n}\n' });
+        const service = new LanguageService();
+        const oldUri = uriFor(root, 'src/shared/old.luam');
+        const newUri = uriFor(root, 'src/shared/new.luam');
+
+        service.loadWorkspace([root]);
+        service.update(newUri, 1, 'class Config {\n}\n');
+        expect(service.diagnostics(newUri).map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
+
+        service.close(oldUri);
+        service.refresh();
+
+        expect(service.diagnostics(newUri)).toHaveLength(0);
+        expect(service.analysis(oldUri)).toBeNull();
+    });
 });
