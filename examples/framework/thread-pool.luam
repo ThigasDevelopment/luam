@@ -1,0 +1,27 @@
+class ThreadPool {
+    pool: any = nil
+
+    constructor(style: string, priority: string) {
+        self.pool = Threads.new(style, priority)
+    }
+
+    add(task: any): number {
+        return self.pool:add(task, {})
+    }
+
+    remove(id: number): boolean {
+        return self.pool:remove(id)
+    }
+
+    clear(): boolean {
+        return self.pool:clear()
+    }
+
+    priority(): string {
+        return self.pool:getPriority()
+    }
+
+    setPriority(priority: string): boolean {
+        return self.pool:setPriority(priority)
+    }
+}

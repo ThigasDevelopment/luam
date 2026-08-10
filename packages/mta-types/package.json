@@ -1,0 +1,26 @@
+{
+    "name": "@luam/mta-types",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "./src/catalog.ts",
+    "types": "./src/catalog.ts",
+    "files": [
+        "src"
+    ],
+    "imports": {
+        "#mta-types/*": "./src/*.ts"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "generate": "node --import ./scripts/source-resolver.ts scripts/generate-catalog.ts",
+        "test": "vitest run",
+        "typecheck": "tsc -p tsconfig.json"
+    },
+    "devDependencies": {
+        "@types/node": "^22.9.0",
+        "mtasa-lua-types": "1.1.1",
+        "typescript": "^5.6.3",
+        "vitest": "^2.1.4"
+    }
+}

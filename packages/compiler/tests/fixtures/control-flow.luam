@@ -1,0 +1,42 @@
+--!strict
+local total: number = 0
+
+for index = 1, 10 do
+    total += index
+end
+
+for step = 10, 1, -1 do
+    total -= step
+end
+
+for key, value in pairs({ a = 1 }) do
+    print(key, value)
+end
+
+while total > 0 do
+    total -= 1
+end
+
+repeat
+    total += 1
+until total >= 10
+
+do
+    local scoped: string = 'inner'
+
+    print(scoped)
+end
+
+if total > 5 then
+    print('high')
+elseif total > 2 then
+    print('medium')
+else
+    print('low')
+end
+
+for index = 1, 3 do
+    if index == 2 then
+        break
+    end
+end

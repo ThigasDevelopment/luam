@@ -1,0 +1,4 @@
+function kickIdle(player: Player): void
+    openMenu()
+    kickPlayer(player, 'idle')
+end

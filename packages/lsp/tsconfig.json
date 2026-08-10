@@ -1,0 +1,14 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "@lsp/*": ["src/*"],
+            "@compiler/*": ["../compiler/src/*"],
+            "@mta-types/*": ["../mta-types/src/*"],
+            "@runtime/*": ["../runtime/src/*"]
+        }
+    },
+    "include": ["src", "tests", "scripts", "vitest.config.ts"]
+}

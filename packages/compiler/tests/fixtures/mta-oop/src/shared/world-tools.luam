@@ -1,0 +1,9 @@
+function describeElement(element: Element): string
+    return element:getType() .. ' ' .. tostring(element:getID())
+end
+
+function reset(element: Element): boolean
+    element:setDimension(0)
+
+    return element:setInterior(0)
+end

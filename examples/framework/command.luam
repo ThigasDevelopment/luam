@@ -1,0 +1,54 @@
+class Command {
+    core: any = nil
+    name: string = ''
+    aliases: string[] = {}
+    description: string = ''
+
+    constructor(core: any) {
+        self.core = core
+    }
+
+    execute(player: any, ...): void {
+    }
+
+    names(): string[] {
+        local found: string[] = {}
+
+        if self.name ~= '' then
+            table.insert(found, self.name)
+        end
+
+        for index = 1, #self.aliases do
+            table.insert(found, self.aliases[index])
+        end
+
+        return found
+    }
+
+    handler(): any {
+        local command: Command = self
+
+        if self.core:isServer() then
+            return function(player: any, invoked: string, ...)
+                command:execute(player, ...)
+            end
+        end
+
+        return function(invoked: string, ...)
+            command:execute(nil, ...)
+        end
+    }
+
+    register(): number {
+        local registered: number = 0
+        local found: string[] = self:names()
+
+        for index = 1, #found do
+            addCommandHandler(found[index], self:handler())
+
+            registered += 1
+        end
+
+        return registered
+    }
+}

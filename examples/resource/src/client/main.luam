@@ -1,0 +1,5 @@
+local core: Core = new Core('client')
+
+addEventHandler('onClientResourceStart', resourceRoot, function()
+    core:start()
+end)

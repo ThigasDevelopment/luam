@@ -1,0 +1,65 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`mta oop fixture resource > locks the generated Lua and the manifest 1`] = `
+[
+  "src/client/hud.luam
+function drawVehicleName(vehicle)
+    local name = vehicle:getName()
+    local health = vehicle:getHealth()
+    dxDrawText(name .. ' ' .. tostring(health), 10, 10)
+    return true
+end
+function highlight(element)
+    element:setAlpha(180)
+    return element:setDimension(0)
+end
+",
+  "src/server/admin.luam
+function describePlayer(player)
+    local name = player:getName()
+    local serial = player:getSerial()
+    local money = player:getMoney()
+    return name .. ' ' .. serial .. ' ' .. tostring(money)
+end
+function punish(player, reason)
+    player:setMuted(true)
+    player:takeMoney(100)
+    if player:isMuted() then
+        return player:kick(nil, reason)
+    end
+    return player:setNametagText(reason)
+end
+function relocate(player, model)
+    player:setModel(model)
+    player:setHealth(100)
+    player:setFrozen(false)
+    return player:setInterior(0)
+end
+addEventHandler('onPlayerJoin', root, function()
+    outputChatBox(describePlayer(source), root)
+end)
+",
+  "src/shared/world-tools.luam
+function describeElement(element)
+    return element:getType() .. ' ' .. tostring(element:getID())
+end
+function reset(element)
+    element:setDimension(0)
+    return element:setInterior(0)
+end
+",
+]
+`;
+
+exports[`mta oop fixture resource > locks the generated Lua and the manifest 2`] = `
+"<meta>
+    <oop>true</oop>
+    <!-- Resource information -->
+    <info type="script" />
+    <!-- Source scripts -->
+    <script src="src/shared/**/*.lua" type="shared" cache="false" />
+    <script src="src/server/**/*.lua" />
+    <script src="src/client/**/*.lua" type="client" cache="false" />
+</meta>
+"
+`;

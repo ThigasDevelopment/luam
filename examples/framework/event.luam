@@ -1,0 +1,39 @@
+class Event {
+    name: string = ''
+    element: any = nil
+    handler: any = nil
+    attached: boolean = false
+
+    constructor(name: string, element: any, handler: any) {
+        self.name = name
+        self.element = element
+        self.handler = handler
+        self.attached = false
+    }
+
+    attach(): boolean {
+        if self.attached then
+            return false
+        end
+
+        self.attached = addEventHandler(self.name, self.element, self.handler)
+
+        return self.attached
+    }
+
+    detach(): boolean {
+        if not self.attached then
+            return false
+        end
+
+        removeEventHandler(self.name, self.element, self.handler)
+
+        self.attached = false
+
+        return true
+    }
+
+    describe(): string {
+        return self.name
+    }
+}

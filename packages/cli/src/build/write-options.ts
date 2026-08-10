@@ -1,0 +1,19 @@
+import type { PhaseTracker } from '@cli/build/phase-tracker';
+import type { WriteOptions } from '@cli/build/resource-writer';
+import type { LuamConfig } from '@cli/config/config-schema';
+import { LIBRARY_DIRECTORY } from '@compiler/project/resource';
+
+export function generatedRoots(config: LuamConfig): string[] {
+    return [...config.sourceDirs, ...config.assetDirs, LIBRARY_DIRECTORY];
+}
+
+export function trackedWriteOptions(root: string, config: LuamConfig, environmentTemplate: string | null, tracker: PhaseTracker): WriteOptions {
+    return {
+        root,
+        generatedRoots: generatedRoots(config),
+        environmentTemplate,
+        onProgress: (event): void => {
+            tracker.advance(event.item, event.index, event.total);
+        },
+    };
+}

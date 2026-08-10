@@ -1,0 +1,23 @@
+--!strict
+type PlayerId = number
+type Nullable<T> = T | nil
+
+local id: PlayerId = 7
+local maybe: Nullable<string> = nil
+local label: string | number = 'label'
+local optional: string? = nil
+local names: string[] = { 'a', 'b' }
+local matrix: number[][] = {}
+local callback: function(string): void = print
+local reducer: function(total: number, value: number): number = function(total: number, value: number): number
+    return total + value
+end
+local logger: function(...): void = print
+local wrapped: (function(string): void)? = nil
+local loose: function = print
+
+local function identity(value: number): number
+    return value
+end
+
+print(id, maybe, label, optional, names, matrix, callback, reducer, logger, wrapped, loose, identity(1))

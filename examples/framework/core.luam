@@ -1,0 +1,58 @@
+class Core {
+    side: string = 'shared'
+    listeners: any = nil
+    commands: any = nil
+    started: boolean = false
+
+    constructor(side: string) {
+        self.side = side
+        self.listeners = {}
+        self.commands = {}
+        self.started = false
+    }
+
+    isServer(): boolean {
+        return self.side == 'server'
+    }
+
+    isClient(): boolean {
+        return self.side == 'client'
+    }
+
+    log(message: string): void {
+        outputDebugString('[' .. self.side .. '] ' .. message)
+    }
+
+    start(): boolean {
+        if self.started then
+            return false
+        end
+
+        self.started = true
+
+        local loader: Loader = new Loader(self)
+
+        self.listeners = loader:loadListeners()
+        self.commands = loader:loadCommands()
+
+        self:log('loaded ' .. #self.listeners .. ' listener(s) and ' .. #self.commands .. ' command(s)')
+
+        return true
+    }
+
+    stop(): boolean {
+        if not self.started then
+            return false
+        end
+
+        for index = 1, #self.listeners do
+            self.listeners[index]:unregister()
+        end
+
+        self.listeners = {}
+        self.commands = {}
+        self.started = false
+
+        return true
+    }
+}

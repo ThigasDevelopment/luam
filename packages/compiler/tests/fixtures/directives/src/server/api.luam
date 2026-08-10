@@ -1,0 +1,7 @@
+export function getScore(player: Player): number
+    return 0
+end
+
+function helper(): void
+    print('internal')
+end

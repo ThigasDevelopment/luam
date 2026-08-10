@@ -1,0 +1,48 @@
+interface Command {
+    name: string
+    execute(player: Player): void
+}
+
+class Player {
+    name: string
+    health: number = 100
+
+    constructor(name: string) {
+        self.name = name
+    }
+
+    takeDamage(amount: number): void {
+        self.health -= amount
+    }
+
+    describe(): string {
+        return self.name
+    }
+}
+
+class VIPPlayer extends Player {
+    level: number = 1
+
+    constructor(name: string, level: number) {
+        self:super(name)
+        self.level = level
+    }
+
+    takeDamage(amount: number): void {
+        self:super(amount / 2)
+    }
+}
+
+class KickCommand implements Command {
+    name: string = 'kick'
+
+    execute(player: Player): void {
+        print(player.name)
+    }
+}
+
+local vip = new VIPPlayer('Thigas', 2)
+
+vip:takeDamage(20)
+
+print(vip.name, vip.health)

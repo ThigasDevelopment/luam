@@ -1,0 +1,5 @@
+RESOURCE_LABEL = getResourceName(getThisResource())
+
+function formatPlayerLabel(name: string): string
+    return `[${RESOURCE_LABEL}] ${name}`
+end

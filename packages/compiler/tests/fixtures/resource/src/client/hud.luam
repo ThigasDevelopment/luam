@@ -1,0 +1,6 @@
+local title: string = 'Luam'
+local caption: string = `HUD ${title}`
+
+addEventHandler('onClientRender', root, function()
+    dxDrawText(caption, 10, 10)
+end)

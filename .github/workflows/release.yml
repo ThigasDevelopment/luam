@@ -1,0 +1,135 @@
+name: Release
+
+on:
+    push:
+        tags: ['v*']
+    workflow_dispatch:
+        inputs:
+            version:
+                description: Version to package, without the leading v.
+                required: true
+                type: string
+
+permissions:
+    contents: read
+
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: false
+
+jobs:
+    verify:
+        name: Verify
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
+            - run: pnpm -r typecheck
+            - run: pnpm -r test
+
+    package:
+        name: Package
+        needs: verify
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.version.outputs.value }}
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
+
+            - name: Resolve the version
+              id: version
+              run: echo "value=${{ inputs.version || github.ref_name }}" | sed 's/=v/=/' >> "$GITHUB_OUTPUT"
+
+            - name: Stamp the CLI version
+              run: |
+                  cd packages/cli
+                  npm version "${{ steps.version.outputs.value }}" --no-git-tag-version --allow-same-version
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Bundle the extension
+              run: pnpm --filter @luam/vscode bundle
+
+            - name: Package the CLI
+              run: npm pack --pack-destination "$GITHUB_WORKSPACE/artifacts" ./packages/cli/dist
+
+            - name: Package the extension
+              run: |
+                  cd packages/vscode
+                  npm version "${{ steps.version.outputs.value }}" --no-git-tag-version --allow-same-version
+                  npx --yes @vscode/vsce package --no-dependencies --skip-license --out "$GITHUB_WORKSPACE/artifacts/luam-${{ steps.version.outputs.value }}.vsix"
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: luam-${{ steps.version.outputs.value }}
+                  path: artifacts/
+                  if-no-files-found: error
+
+    npm:
+        name: Publish to npm
+        needs: package
+        if: startsWith(github.ref, 'refs/tags/v')
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
+              with:
+                  registry-url: https://registry.npmjs.org
+
+            - name: Stamp the CLI version
+              run: |
+                  cd packages/cli
+                  npm version "${{ needs.package.outputs.version }}" --no-git-tag-version --allow-same-version
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: npm publish ./packages/cli/dist --access public --provenance
+
+    marketplace:
+        name: Publish to the VS Code Marketplace
+        needs: package
+        if: startsWith(github.ref, 'refs/tags/v')
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  name: luam-${{ needs.package.outputs.version }}
+                  path: artifacts
+
+            - name: Publish the extension
+              env:
+                  VSCE_PAT: ${{ secrets.VSCE_PAT }}
+              run: |
+                  if [ -z "$VSCE_PAT" ]; then
+                      echo "VSCE_PAT is not configured. Skipping the Marketplace publish."
+                      exit 0
+                  fi
+
+                  npx --yes @vscode/vsce publish --packagePath "artifacts/luam-${{ needs.package.outputs.version }}.vsix"
+
+    publish:
+        name: Publish
+        needs: package
+        if: startsWith(github.ref, 'refs/tags/v')
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  name: luam-${{ needs.package.outputs.version }}
+                  path: artifacts
+
+            - name: Create the release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: gh release create "${{ github.ref_name }}" artifacts/* --repo "${{ github.repository }}" --generate-notes --verify-tag

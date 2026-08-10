@@ -1,0 +1,24 @@
+--!strict
+local items: any[] = { 'a', 'b' }
+local label: string = '  spaced  '
+local lookup: table = {}
+local ratio: number = -1.75
+
+print(items.count)
+print(items.isEmpty)
+print(lookup.keys)
+print(lookup.values)
+print(items.includes('a'))
+print(label.trim)
+print(label.startsWith('  '))
+print(label.endsWith('  '))
+print(label.length)
+print(label.upper)
+print(label.lower)
+print(ratio.abs)
+print(ratio.floor)
+print(ratio.ceil)
+print(ratio.max(2))
+print(ratio.min(2))
+print(ratio.clamp(0, 1))
+print(lookup['count'])

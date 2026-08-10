@@ -1,0 +1,120 @@
+{
+    "name": "@luam/vscode",
+    "displayName": "Luam",
+    "description": "Language support for Luam, a typed Lua that compiles to Multi Theft Auto resources.",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/extension.cjs",
+    "publisher": "luam",
+    "license": "MIT",
+    "homepage": "https://github.com/ThigasDevelopment/luam#readme",
+    "bugs": {
+        "url": "https://github.com/ThigasDevelopment/luam/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ThigasDevelopment/luam.git"
+    },
+    "engines": {
+        "vscode": "^1.82.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "keywords": [
+        "mta",
+        "multi theft auto",
+        "lua",
+        "luam",
+        "typed lua"
+    ],
+    "activationEvents": [
+        "workspaceContains:**/*.luam",
+        "workspaceContains:luam.json"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "luam",
+                "aliases": [
+                    "Luam",
+                    "luam"
+                ],
+                "extensions": [
+                    ".luam"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "luam",
+                "scopeName": "source.luam",
+                "path": "./syntaxes/luam.tmLanguage.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "luam.ensure",
+                "title": "Luam: Ensure Resource",
+                "category": "Luam"
+            },
+            {
+                "command": "luam.restartServer",
+                "title": "Luam: Restart Language Server",
+                "category": "Luam"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "luam.ensure",
+                "key": "ctrl+alt+e",
+                "mac": "cmd+alt+e",
+                "when": "editorLangId == luam"
+            }
+        ],
+        "configuration": {
+            "title": "Luam",
+            "properties": {
+                "luam.cliPath": {
+                    "type": "string",
+                    "default": "luam",
+                    "description": "Command used to run the Luam CLI."
+                },
+                "luam.ensureWatch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Pass --watch when the ensure command runs."
+                },
+                "luam.trace.server": {
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Trace the communication with the Luam language server."
+                }
+            }
+        }
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "bundle": "node scripts/bundle.ts",
+        "test": "vitest run",
+        "typecheck": "tsc -p tsconfig.json"
+    },
+    "dependencies": {
+        "@luam/lsp": "workspace:*",
+        "vscode-languageclient": "^9.0.1"
+    },
+    "devDependencies": {
+        "@types/node": "^22.9.0",
+        "@types/vscode": "^1.82.0",
+        "esbuild": "^0.21.5",
+        "typescript": "^5.6.3",
+        "vitest": "^2.1.4"
+    }
+}

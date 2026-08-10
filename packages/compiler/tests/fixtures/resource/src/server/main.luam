@@ -1,0 +1,22 @@
+local joined: number = 0
+
+class Session {
+    name: string = ''
+
+    constructor(name: string) {
+        self.name = name
+    }
+}
+
+function announceJoin(player: Player): void
+    joined += 1
+
+    local session = new Session(getPlayerName(player))
+
+    outputChatBox(formatPlayerName(session.name), root)
+    outputChatBox(RESOURCE_NAME, root)
+end
+
+addEventHandler('onPlayerJoin', root, function()
+    announceJoin(source)
+end)

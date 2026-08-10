@@ -1,0 +1,10 @@
+--!strict
+local name: string = 'Thigas'
+local user: table = { name = 'Thigas' }
+
+local plain = `no interpolation here`
+local greeting = `Ola ${name}, bem-vindo(a) novamente!`
+local fallback = `Ola ${name:Guest}!`
+local nested = `Bem-vindo ${user.name}`
+
+print(plain, greeting, fallback, nested)

@@ -1,0 +1,29 @@
+import type { ApiCatalog } from '@mta-types/api-declaration';
+import { ANY, BOOLEAN, fn, named, STRING, TABLE } from '@mta-types/type-descriptor';
+
+export const MTA_ACL_SERVER: ApiCatalog = {
+    aclCreate: fn([STRING], named('ACL'), 1),
+    aclCreateGroup: fn([STRING], named('ACLGroup'), 1),
+    aclDestroy: fn([named('ACL')], BOOLEAN, 1),
+    aclDestroyGroup: fn([named('ACLGroup')], BOOLEAN, 1),
+    aclGet: fn([STRING], named('ACL'), 1),
+    aclGetGroup: fn([STRING], named('ACLGroup'), 1),
+    aclGetName: fn([named('ACL')], STRING, 1),
+    aclGetRight: fn([named('ACL'), STRING], BOOLEAN, 2),
+    aclGroupAddACL: fn([named('ACLGroup'), named('ACL')], BOOLEAN, 2),
+    aclGroupAddObject: fn([named('ACLGroup'), STRING], BOOLEAN, 2),
+    aclGroupGetName: fn([named('ACLGroup')], STRING, 1),
+    aclGroupList: fn([], TABLE, 0),
+    aclGroupListACL: fn([named('ACLGroup')], TABLE, 1),
+    aclGroupListObjects: fn([named('ACLGroup')], TABLE, 1),
+    aclGroupRemoveACL: fn([named('ACLGroup'), named('ACL')], BOOLEAN, 2),
+    aclGroupRemoveObject: fn([named('ACLGroup'), STRING], BOOLEAN, 2),
+    aclList: fn([], TABLE, 0),
+    aclListRights: fn([named('ACL'), STRING], TABLE, 2),
+    aclReload: fn([], BOOLEAN, 0),
+    aclRemoveRight: fn([named('ACL'), STRING], BOOLEAN, 2),
+    aclSave: fn([], BOOLEAN, 0),
+    aclSetRight: fn([named('ACL'), STRING, BOOLEAN], BOOLEAN, 3),
+    hasObjectPermissionTo: fn([ANY, STRING, BOOLEAN], BOOLEAN, 2),
+    isObjectInACLGroup: fn([STRING, named('ACLGroup')], BOOLEAN, 2),
+};

@@ -1,0 +1,18 @@
+--!shared
+
+RESOURCE_NAME = 'luam-demo'
+
+enum GameState {
+    LOBBY,
+    PLAYING,
+}
+
+local state = GameState.LOBBY
+
+function formatPlayerName(name: string): string
+    return 'Player: ' .. name
+end
+
+function countEntries(entries: any[]): number
+    return entries.count
+end

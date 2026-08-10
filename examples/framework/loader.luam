@@ -1,0 +1,73 @@
+class Loader {
+    core: any = nil
+
+    constructor(core: any) {
+        self.core = core
+    }
+
+    inherits(definition: any, baseName: string): boolean {
+        local current: any = definition
+
+        while current ~= nil do
+            local parent: any = rawget(current, '__super')
+
+            if parent == nil then
+                return false
+            end
+
+            if rawget(parent, '__name') == baseName then
+                return true
+            end
+
+            current = parent
+        end
+
+        return false
+    }
+
+    subclasses(baseName: string): string[] {
+        local found: string[] = {}
+        local definitions: table = getClasses()
+
+        for name, definition in pairs(definitions) do
+            if self:inherits(definition, baseName) then
+                table.insert(found, name)
+            end
+        end
+
+        table.sort(found)
+
+        return found
+    }
+
+    instantiate(baseName: string): any {
+        local created: any = {}
+        local names: string[] = self:subclasses(baseName)
+
+        for index = 1, #names do
+            table.insert(created, new(names[index])(self.core))
+        end
+
+        return created
+    }
+
+    loadListeners(): any {
+        local listeners: any = self:instantiate('Listener')
+
+        for index = 1, #listeners do
+            listeners[index]:register()
+        end
+
+        return listeners
+    }
+
+    loadCommands(): any {
+        local commands: any = self:instantiate('Command')
+
+        for index = 1, #commands do
+            commands[index]:register()
+        end
+
+        return commands
+    }
+}

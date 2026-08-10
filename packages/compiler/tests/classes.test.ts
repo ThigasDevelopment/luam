@@ -1,0 +1,138 @@
+import { describe, expect, it } from 'vitest';
+
+import { compile } from '@compiler/index';
+
+const PLAYER = 'class Player {\n    health: number = 100\n\n    constructor(name: string) {\n        self.name = name\n    }\n}\n';
+
+const COMMAND = 'interface Command {\n    name: string\n    execute(): void\n}\n';
+
+function emit(source: string): string {
+    const result = compile(source);
+
+    expect(result.diagnostics).toEqual([]);
+
+    return result.code ?? '';
+}
+
+function codes(source: string): string[] {
+    return compile(source).diagnostics.map((diagnostic) => diagnostic.code);
+}
+
+function helpers(source: string): string[] {
+    return compile(source).requiredHelpers;
+}
+
+describe('classes', () => {
+    it('emits fields with defaults and methods as a class runtime call', () => {
+        expect(emit(PLAYER)).toBe(
+            "class 'Player' {\n    health = 100,\n    constructor = function(self, name)\n        self.name = name\n    end\n}\n",
+        );
+    });
+
+    it('emits a field without a default as nothing', () => {
+        expect(emit('class Player {\n    name: string\n}\n')).toBe("class 'Player' {}\n");
+    });
+
+    it('emits inheritance as an extends modifier and keeps super calls', () => {
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor(name: string) {\n        self:super(name)\n    }\n}\n`;
+
+        expect(emit(source)).toContain("class 'VIPPlayer' :extends 'Player' {");
+        expect(emit(source)).toContain('self:super(name)');
+    });
+
+    it('emits instantiation as a new runtime call', () => {
+        expect(emit(`${PLAYER}local player = new Player('Thigas')\n`)).toContain("local player = new 'Player' ('Thigas')");
+    });
+
+    it('erases interfaces from the generated Lua', () => {
+        expect(emit(COMMAND)).toBe('');
+        expect(helpers(COMMAND)).toEqual([]);
+    });
+
+    it('emits an enum that is used and erases one that is not', () => {
+        expect(emit('enum State {\n    LOBBY,\n    PLAYING,\n}\nprint(State.LOBBY)\n')).toBe(
+            "State = enum { 'LOBBY', 'PLAYING' }\nprint(State.LOBBY)\n",
+        );
+        expect(emit('enum State {\n    LOBBY,\n}\nprint(1)\n')).toBe('print(1)\n');
+    });
+
+    it('requires the class helper only for emitted OOP and enum features', () => {
+        expect(helpers(PLAYER)).toEqual(['class']);
+        expect(helpers(`${PLAYER}local player = new Player('Thigas')\n`)).toEqual(['class']);
+        expect(helpers('enum State {\n    LOBBY,\n}\nprint(State.LOBBY)\n')).toEqual(['class']);
+        expect(helpers('enum State {\n    LOBBY,\n}\nprint(1)\n')).toEqual([]);
+        expect(helpers("local name: string = 'Thigas'\nprint(name)\n")).toEqual([]);
+    });
+
+    it('resolves inherited members through the parent chain', () => {
+        const source = `${PLAYER}class VIPPlayer extends Player {\n}\nlocal vip = new VIPPlayer('Thigas')\nlocal total: number = vip.health\n`;
+
+        expect(codes(source)).toEqual([]);
+    });
+
+    it('checks constructor arguments at the instantiation site', () => {
+        expect(codes(`${PLAYER}local player = new Player()\n`)).toEqual(['check-argument-count']);
+        expect(codes(`${PLAYER}local player = new Player(1)\n`)).toEqual(['check-type-mismatch']);
+        expect(codes(`${PLAYER}local player = new Player('Thigas')\n`)).toEqual([]);
+    });
+
+    it('reports an instantiation of a class that is not defined', () => {
+        expect(codes("local player = new Player('Thigas')")).toEqual(['check-unknown-class']);
+    });
+
+    it('reports a parent class that is not defined', () => {
+        expect(codes('class VIPPlayer extends Player {\n}\n')).toEqual(['check-unknown-class']);
+    });
+
+    it('reports a duplicate class definition', () => {
+        expect(codes(`${PLAYER}${PLAYER}`)).toEqual(['check-duplicate-class']);
+    });
+
+    it('reports a field default that does not match its annotation', () => {
+        expect(codes('class Player {\n    health: number = true\n}\n')).toEqual(['check-type-mismatch']);
+    });
+
+    it('reports an interface that is not defined', () => {
+        expect(codes('class KickCommand implements Command {\n}\n')).toEqual(['check-unknown-interface']);
+    });
+
+    it('reports a class that does not satisfy its interface', () => {
+        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: string = 'kick'\n}\n`)).toEqual([
+            'check-unimplemented-interface',
+        ]);
+        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: number = 1\n\n    execute(): void {\n    }\n}\n`)).toEqual([
+            'check-unimplemented-interface',
+        ]);
+    });
+
+    it('accepts a class that satisfies its interface', () => {
+        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: string = 'kick'\n\n    execute(): void {\n    }\n}\n`)).toEqual(
+            [],
+        );
+    });
+
+    it('reports a super call that cannot resolve a parent method', () => {
+        expect(codes('local function helper(): void\n    self:super()\nend\n')).toEqual(['check-invalid-super']);
+        expect(codes('class Player {\n    greet(): void {\n        self:super()\n    }\n}\n')).toEqual(['check-invalid-super']);
+        expect(codes(`${PLAYER}class VIPPlayer extends Player {\n    greet(): void {\n        self:super()\n    }\n}\n`)).toEqual([
+            'check-unknown-super-method',
+        ]);
+    });
+
+    it('checks super call arguments against the parent method', () => {
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor(name: string) {\n        self:super(1)\n    }\n}\n`;
+
+        expect(codes(source)).toEqual(['check-type-mismatch']);
+    });
+
+    it('reports an enum member that is not declared', () => {
+        expect(codes('enum State {\n    LOBBY,\n}\nprint(State.PLAYING)\n')).toEqual(['check-unknown-enum-member']);
+    });
+
+    it('keeps class, interface, enum, and new usable as plain Lua identifiers', () => {
+        expect(emit('local class = 1\nlocal new = 2\nlocal enum = 3\nprint(class, new, enum)\n')).toBe(
+            'local class = 1\nlocal new = 2\nlocal enum = 3\nprint(class, new, enum)\n',
+        );
+        expect(emit("class 'Player' { }\n")).toBe("class('Player')({})\n");
+    });
+});

@@ -1,0 +1,50 @@
+function describeElement(element: Element): string
+    local kind = getElementType(element)
+    local id = getElementID(element)
+    local dimension = getElementDimension(element)
+    local interior = getElementInterior(element)
+
+    return kind .. ':' .. id .. ':' .. tostring(dimension) .. ':' .. tostring(interior)
+end
+
+function spawnProps(x: number, y: number, z: number): number
+    local marker = createMarker(x, y, z, 'cylinder', 2)
+    local blip = createBlip(x, y, z, 0)
+    local shape = createColSphere(x, y, z, 5)
+    local created = 0
+
+    if isElement(marker) then
+        created += 1
+        setElementInterior(marker, 0)
+    end
+
+    if isElement(blip) then
+        created += 1
+        setBlipColor(blip, 255, 0, 0, 255)
+    end
+
+    if isElement(shape) then
+        created += 1
+        setElementDimension(shape, 0)
+    end
+
+    return created
+end
+
+function configureVehicle(vehicle: Vehicle): boolean
+    setVehicleDamageProof(vehicle, true)
+    setVehicleLocked(vehicle, false)
+    setVehicleSirensOn(vehicle, true)
+    setElementFrozen(vehicle, false)
+    setElementAlpha(vehicle, 255)
+
+    return getVehicleName(vehicle) ~= ''
+end
+
+function moveElement(element: Element, x: number, y: number, z: number): boolean
+    setElementPosition(element, x, y, z)
+    setElementRotation(element, 0, 0, 0)
+    setElementCollisionsEnabled(element, true)
+
+    return isElementWithinColShape(element, element)
+end

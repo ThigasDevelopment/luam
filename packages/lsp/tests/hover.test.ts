@@ -1,0 +1,90 @@
+import { describe, expect, it } from 'vitest';
+
+import { LanguageService } from '@lsp/server/language-service';
+import { pathToUri } from '@lsp/workspace/document-uri';
+
+import { positionOf } from './support/service-fixture';
+
+const SERVER_FILE = pathToUri('/project/src/server/main.luam');
+
+function hoverText(text: string, anchor: string, word: string): string {
+    const service = new LanguageService();
+
+    service.update(SERVER_FILE, 1, text);
+
+    const hover = service.hover(SERVER_FILE, positionOf(text, anchor, word));
+    const contents = hover?.contents;
+
+    if (contents === undefined || typeof contents === 'string' || Array.isArray(contents)) {
+        return '';
+    }
+
+    return contents.value;
+}
+
+describe('hover', () => {
+    it('shows the annotated type of a local', () => {
+        const text = 'local health: number = 100\nlocal copy = health\n';
+
+        expect(hoverText(text, 'copy', 'health')).toContain('local health: number');
+    });
+
+    it('shows the inferred type of an unannotated local', () => {
+        const text = 'local name = "thigas"\nlocal copy = name\n';
+
+        expect(hoverText(text, 'copy', 'name')).toContain('local name: string');
+    });
+
+    it('shows the signature of a function', () => {
+        const text = 'function greet(name: string, tag: string?): string\n    return name\nend\n\ngreet("a")\n';
+
+        expect(hoverText(text, '\ngreet(', 'greet')).toContain('greet(name: string, tag: string?): string');
+    });
+
+    it('shows the signature of a parameter', () => {
+        const text = 'function greet(name: string): string\n    return name\nend\n';
+
+        expect(hoverText(text, 'return', 'name')).toContain('parameter name: string');
+    });
+
+    it('shows the declaration of a class', () => {
+        const text = 'class Player {\n    name: string\n}\n\nlocal one = new Player()\n';
+
+        expect(hoverText(text, 'new ', 'Player')).toContain('class Player');
+    });
+
+    it('shows the parent of a class that extends another', () => {
+        const text = 'class Base {\n    health: number = 1\n}\n\nclass Vip extends Base {\n}\n';
+
+        expect(hoverText(text, 'class Vip', 'Vip')).toContain('class Vip extends Base');
+    });
+
+    it('shows a class member with its owner', () => {
+        const text = 'class Player {\n    name: string\n}\n\nlocal one = new Player()\nlocal value = one.name\n';
+
+        expect(hoverText(text, 'one.', 'name')).toContain('field name: string');
+    });
+
+    it('shows an mta api signature with its environment', () => {
+        const text = 'kickPlayer(source)\n';
+        const hover = hoverText(text, '', 'kickPlayer');
+
+        expect(hover).toContain('function kickPlayer');
+        expect(hover).toContain('mta api (server)');
+    });
+
+    it('shows a shared mta api with its environment', () => {
+        const hover = hoverText('outputChatBox("hello")\n', '', 'outputChatBox');
+
+        expect(hover).toContain('function outputChatBox');
+        expect(hover).toContain('mta api (shared)');
+    });
+
+    it('returns nothing for a position without a symbol', () => {
+        const service = new LanguageService();
+
+        service.update(SERVER_FILE, 1, 'local value = 1\n');
+
+        expect(service.hover(SERVER_FILE, { line: 5, character: 0 })).toBeNull();
+    });
+});

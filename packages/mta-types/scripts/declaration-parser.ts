@@ -1,0 +1,128 @@
+import ts from 'typescript';
+
+import { fn, type TypeDescriptor } from '#mta-types/type-descriptor';
+
+import { GeneratorError, type ParsedDeclaration } from './generator-model.ts';
+import { type MapContext, mapTypeNode } from './type-mapper.ts';
+import type { UpstreamFile } from './upstream-source.ts';
+
+export interface ParsedClass {
+    name: string;
+    parent: string | null;
+}
+
+function sourceFileOf(file: UpstreamFile): ts.SourceFile {
+    return ts.createSourceFile(file.path, file.contents, ts.ScriptTarget.ES2022, false, ts.ScriptKind.TS);
+}
+
+function contextFor(context: MapContext, node: ts.FunctionDeclaration): MapContext {
+    const names = (node.typeParameters ?? []).map((parameter) => parameter.name.text);
+
+    if (names.length === 0) {
+        return context;
+    }
+
+    return { ...context, typeParameters: new Set([...context.typeParameters, ...names]) };
+}
+
+function signatureOf(node: ts.FunctionDeclaration, context: MapContext): TypeDescriptor {
+    const local = contextFor(context, node);
+    const positional = node.parameters.filter((parameter) => parameter.dotDotDotToken === undefined);
+    const isVariadic = node.parameters.length !== positional.length;
+    const parameters = positional.map((parameter) => mapTypeNode(parameter.type, local));
+    const minimumArguments = positional.filter((parameter) => parameter.questionToken === undefined).length;
+
+    return fn(parameters, mapTypeNode(node.type, local), minimumArguments, isVariadic);
+}
+
+function isMultiReturn(node: ts.FunctionDeclaration): boolean {
+    if (node.type === undefined || !ts.isTypeReferenceNode(node.type) || !ts.isIdentifier(node.type.typeName)) {
+        return false;
+    }
+
+    return node.type.typeName.text === 'LuaMultiReturn';
+}
+
+export function parseFunctions(file: UpstreamFile, context: MapContext, multiReturns: Set<string>): ParsedDeclaration[] {
+    const declarations: ParsedDeclaration[] = [];
+
+    for (const statement of sourceFileOf(file).statements) {
+        if (!ts.isFunctionDeclaration(statement)) {
+            continue;
+        }
+
+        if (statement.name === undefined) {
+            throw new GeneratorError(file.path, 'an exported function declaration carries no name');
+        }
+
+        if (isMultiReturn(statement)) {
+            multiReturns.add(statement.name.text);
+        }
+
+        declarations.push({ name: statement.name.text, category: file.category, type: signatureOf(statement, context) });
+    }
+
+    return declarations;
+}
+
+export function parseVariables(file: UpstreamFile, context: MapContext): ParsedDeclaration[] {
+    const declarations: ParsedDeclaration[] = [];
+
+    for (const statement of sourceFileOf(file).statements) {
+        if (!ts.isVariableStatement(statement)) {
+            continue;
+        }
+
+        for (const declaration of statement.declarationList.declarations) {
+            if (!ts.isIdentifier(declaration.name)) {
+                throw new GeneratorError(file.path, 'a variable declaration uses a binding pattern instead of a name');
+            }
+
+            declarations.push({ name: declaration.name.text, category: file.category, type: mapTypeNode(declaration.type, context) });
+        }
+    }
+
+    return declarations;
+}
+
+export function parseEvents(file: UpstreamFile): string[] {
+    const events: string[] = [];
+
+    for (const statement of sourceFileOf(file).statements) {
+        if (!ts.isEnumDeclaration(statement)) {
+            continue;
+        }
+
+        for (const member of statement.members) {
+            if (member.initializer === undefined || !ts.isStringLiteral(member.initializer)) {
+                throw new GeneratorError(file.path, 'an event member carries no string value');
+            }
+
+            events.push(member.initializer.text);
+        }
+    }
+
+    if (events.length === 0) {
+        throw new GeneratorError(file.path, 'the event catalog declares no events');
+    }
+
+    return events;
+}
+
+export function parseClasses(file: UpstreamFile): ParsedClass[] {
+    const classes: ParsedClass[] = [];
+
+    for (const statement of sourceFileOf(file).statements) {
+        if (!ts.isClassDeclaration(statement) || statement.name === undefined) {
+            continue;
+        }
+
+        const heritage = statement.heritageClauses?.find((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword);
+        const expression = heritage?.types[0]?.expression;
+        const parent = expression !== undefined && ts.isIdentifier(expression) ? expression.text : null;
+
+        classes.push({ name: statement.name.text, parent });
+    }
+
+    return classes;
+}

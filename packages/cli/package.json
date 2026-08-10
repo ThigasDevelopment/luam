@@ -1,0 +1,33 @@
+{
+    "name": "@luam/cli",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "bin": {
+        "luam": "./dist/luam.mjs"
+    },
+    "files": [
+        "dist",
+        "src"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "bundle": "node scripts/bundle.ts",
+        "install-cli": "node scripts/install.ts",
+        "test": "vitest run",
+        "typecheck": "tsc -p tsconfig.json"
+    },
+    "dependencies": {
+        "@luam/compiler": "workspace:*",
+        "@luam/runtime": "workspace:*",
+        "@luam/template": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.9.0",
+        "esbuild": "^0.21.5",
+        "typescript": "^5.6.3",
+        "vitest": "^2.1.4"
+    }
+}

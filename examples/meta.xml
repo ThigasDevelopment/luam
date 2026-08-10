@@ -1,0 +1,38 @@
+<meta>
+	<!-- SCRIPT's INFO's -->
+	<info author = 'author-from-luam.json' type = 'script' version = 'version-from-luam.json' description = 'description-from-luam.json'/>
+	<!-- SCRIPT's CONFIG's -->
+	<script src = 'config.lua' type = 'shared' cache = 'false'/>
+	<!-- SCRIPT's SRC's -->
+	<script src = 'src/utils.lua' type = 'shared' cache = 'false'/>
+
+	<!-- CASO HOUVER UM ARQUIVO INDEX/MAIN CARREGAR ANTES -->
+
+	<script src = 'src/shared/**/*.lua' type = 'shared' cache = 'false'/>
+	<script src = 'src/server/**/*.lua'/>
+	<script src = 'src/client/**/*.lua' type = 'client' cache = 'false'/>
+	<!-- ASSET's -->
+	<file src = 'assets/fonts/**/*.ttf'/>
+
+	<file src = 'assets/models/**/*.dff'/>
+	<file src = 'assets/models/**/*.txd'/>
+
+	<file src = 'assets/images/**/*.png'/>
+	<file src = 'assets/images/**/*.dds'/>
+	<!-- SHADER's -->
+	<file src = 'assets/shaders/<name>.fx'/>
+	<!-- VERSION's RESOURCE's -->
+	<min_mta_version server = 'last-version-from-mta-server' client = 'last-version-from-mta-client'/>
+	<!-- EXPORT's FUNCTION's -->
+	<export function = 'example_shared' type = 'shared'/>
+	<export function = 'example_shared_1' type = 'shared'/>
+	<export function = 'example_shared_2' type = 'shared'/>
+	<export function = 'example_shared_3' type = 'shared'/>
+
+	<export function = 'example_server'/>
+	<export function = 'example_server_1'/>
+	<export function = 'example_server_2'/>
+
+	<export function = 'example_client' type = 'client'/>
+	<export function = 'example_client_2' type = 'client'/>
+</meta>

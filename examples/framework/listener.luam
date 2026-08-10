@@ -1,0 +1,40 @@
+class Listener {
+    core: any = nil
+    event: string = ''
+    element: any = nil
+    binding: any = nil
+
+    constructor(core: any) {
+        self.core = core
+        self.binding = nil
+    }
+
+    target(): any {
+        if self.element == nil then
+            return root
+        end
+
+        return self.element
+    }
+
+    handle(...): void {
+    }
+
+    register(): boolean {
+        if self.event == '' then
+            return false
+        end
+
+        self.binding = new Event(self.event, self:target(), bind(self.handle, self))
+
+        return self.binding:attach()
+    }
+
+    unregister(): boolean {
+        if self.binding == nil then
+            return false
+        end
+
+        return self.binding:detach()
+    }
+}

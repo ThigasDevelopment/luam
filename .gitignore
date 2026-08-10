@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.luam/
+*.log
+*.tgz
+*.vsix
+.DS_Store
+.env.local
+.claude/

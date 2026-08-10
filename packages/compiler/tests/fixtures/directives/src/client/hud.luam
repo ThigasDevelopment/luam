@@ -1,0 +1,3 @@
+export function refreshHud(): void
+    dxDrawText('hud', 10, 10)
+end

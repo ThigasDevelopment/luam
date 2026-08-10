@@ -1,0 +1,9 @@
+class PlayerJoinListener extends Listener {
+    event: string = 'onPlayerJoin'
+
+    handle(...): void {
+        local player: any = source
+
+        outputChatBox(formatPlayerLabel(getPlayerName(player)) .. ' joined the server.', root)
+    }
+}

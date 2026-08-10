@@ -1,0 +1,41 @@
+function punish(player: Player, reason: string): boolean
+    local account = getPlayerAccount(player)
+    local serial = getPlayerSerial(player)
+    local ip = getPlayerIP(player)
+
+    outputServerLog(serial .. ' ' .. ip)
+    setPlayerMuted(player, true)
+    takePlayerMoney(player, 100)
+
+    if isGuestAccount(account) then
+        return kickPlayer(player, reason)
+    end
+
+    return banPlayer(player)
+end
+
+function preparePlayer(player: Player, model: number): boolean
+    spawnPlayer(player, 0, 0, 5, 0, model)
+    setPlayerTeam(player, createTeam('Blue', 0, 0, 255))
+    givePlayerMoney(player, 500)
+    setElementHealth(player, 100)
+    fadeCamera(player, true, 2)
+
+    return setPlayerNametagShowing(player, true)
+end
+
+function announce(message: string): boolean
+    outputChatBox(message, root)
+    outputConsole(message)
+
+    return true
+end
+
+addEventHandler('onPlayerJoin', root, function()
+    announce(describeElement(source))
+    preparePlayer(source, 0)
+end)
+
+addEventHandler('onVehicleExplode', root, function()
+    configureVehicle(source)
+end)

@@ -1,0 +1,16 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": false,
+        "allowImportingTsExtensions": false,
+        "rootDir": "src",
+        "outDir": "dist",
+        "tsBuildInfoFile": "dist/tsconfig.build.tsbuildinfo"
+    },
+    "references": [
+        { "path": "../compiler/tsconfig.build.json" },
+        { "path": "../runtime/tsconfig.build.json" },
+        { "path": "../template/tsconfig.build.json" }
+    ],
+    "include": ["src"]
+}

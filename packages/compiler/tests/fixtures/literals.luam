@@ -1,0 +1,17 @@
+--!strict
+local name: string = 'Thigas'
+local escaped: string = 'line\nbreak'
+local quoted: string = "double"
+local raw: string = [[long bracket]]
+local count: number = 42
+local ratio: number = 1.5
+local scientific: number = 2e3
+local hex: number = 0xFF
+local enabled: boolean = true
+local disabled: boolean = false
+local missing: nil = nil
+local list: number[] = { 1, 2, 3 }
+local record: table = { name = 'a', [1] = 'b' }
+
+print(name, escaped, quoted, raw, count, ratio, scientific, hex)
+print(enabled, disabled, missing, list, record)

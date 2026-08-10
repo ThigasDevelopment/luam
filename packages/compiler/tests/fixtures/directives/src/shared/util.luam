@@ -1,0 +1,5 @@
+--!shared
+
+export function formatScore(score: number): string
+    return 'Score: ' .. score
+end

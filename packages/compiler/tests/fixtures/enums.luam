@@ -1,0 +1,15 @@
+enum GameState {
+    LOBBY,
+    PLAYING,
+    PAUSED,
+}
+
+enum UnusedState {
+    NONE,
+}
+
+local state: number = GameState.PLAYING
+
+if state == GameState.LOBBY then
+    print('waiting for players')
+end

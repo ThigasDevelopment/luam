@@ -1,0 +1,27 @@
+name: Setup
+description: Install pnpm and Node, restore the store cache, and install workspace dependencies.
+
+inputs:
+    node-version:
+        description: Node version to install.
+        required: false
+        default: '22'
+    registry-url:
+        description: npm registry to authenticate against. Set it only when the job publishes.
+        required: false
+        default: ''
+
+runs:
+    using: composite
+    steps:
+        - uses: pnpm/action-setup@v4
+
+        - uses: actions/setup-node@v4
+          with:
+              node-version: ${{ inputs.node-version }}
+              registry-url: ${{ inputs.registry-url }}
+              cache: pnpm
+
+        - name: Install dependencies
+          run: pnpm install --frozen-lockfile
+          shell: bash

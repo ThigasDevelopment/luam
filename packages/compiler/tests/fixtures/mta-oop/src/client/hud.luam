@@ -1,0 +1,14 @@
+function drawVehicleName(vehicle: Vehicle): boolean
+    local name = vehicle:getName()
+    local health = vehicle:getHealth()
+
+    dxDrawText(name .. ' ' .. tostring(health), 10, 10)
+
+    return true
+end
+
+function highlight(element: Element): boolean
+    element:setAlpha(180)
+
+    return element:setDimension(0)
+end

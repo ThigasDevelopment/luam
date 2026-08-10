@@ -1,0 +1,11 @@
+# Deployment values. This file is versioned and declares the keys and safe
+# defaults. Types come from this file: an unquoted number is a number, "true"
+# and "false" are booleans, and quoting forces a string.
+#
+# Override values on your machine in ".env.local", which is never committed.
+# The server administrator edits the generated "build/.env" instead.
+
+# Server
+SERVER_NAME="Luam Server"
+MAX_PLAYERS=32
+DEBUG=false

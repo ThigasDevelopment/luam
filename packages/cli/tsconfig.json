@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "baseUrl": ".",
+        "paths": {
+            "@cli/*": ["src/*"],
+            "@scripts/*": ["scripts/*"],
+            "@compiler/*": ["../compiler/src/*"],
+            "@mta-types/*": ["../mta-types/src/*"],
+            "@runtime/*": ["../runtime/src/*"],
+            "@template/*": ["../template/src/*"]
+        }
+    },
+    "include": ["src", "tests", "scripts", "vitest.config.ts"]
+}

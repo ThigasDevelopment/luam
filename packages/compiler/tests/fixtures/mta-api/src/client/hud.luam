@@ -1,0 +1,38 @@
+local width = 400
+local height = 60
+
+function drawPanel(caption: string): boolean
+    dxDrawRectangle(10, 10, width, height, tocolor(0, 0, 0, 180))
+    dxDrawText(caption, 20, 20)
+    dxDrawLine(10, 80, width, 80, tocolor(255, 255, 255, 255))
+
+    return true
+end
+
+function readLocalState(): string
+    local vehicle = getPedOccupiedVehicle(localPlayer)
+    local money = getPlayerMoney()
+    local zone = getZoneName(0, 0, 5)
+
+    if isElement(vehicle) then
+        return zone .. ' ' .. tostring(money) .. ' ' .. getVehicleName(vehicle)
+    end
+
+    return zone .. ' ' .. tostring(money)
+end
+
+function toggleCursor(visible: boolean): boolean
+    showCursor(visible)
+    setPlayerHudComponentVisible('radar', visible)
+
+    return isCursorShowing()
+end
+
+addEventHandler('onClientRender', root, function()
+    drawPanel(readLocalState())
+end)
+
+addEventHandler('onClientPlayerWasted', localPlayer, function()
+    outputChatBox('You died.')
+    setCameraTarget(localPlayer)
+end)

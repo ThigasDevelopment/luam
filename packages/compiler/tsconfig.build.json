@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "composite": true,
+        "noEmit": false,
+        "rootDir": "src",
+        "outDir": "dist",
+        "tsBuildInfoFile": "dist/tsconfig.build.tsbuildinfo"
+    },
+    "references": [{ "path": "../mta-types/tsconfig.build.json" }, { "path": "../runtime/tsconfig.build.json" }],
+    "include": ["src"]
+}

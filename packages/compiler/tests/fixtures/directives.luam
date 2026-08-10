@@ -1,0 +1,7 @@
+export function getScore(name: string): number
+    return name.length
+end
+
+local export = 1
+
+print(export)

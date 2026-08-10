@@ -1,0 +1,119 @@
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { LanguageService } from '@lsp/server/language-service';
+import { normalizeFsPath, pathToUri, uriToPath } from '@lsp/workspace/document-uri';
+import { scanSources } from '@lsp/workspace/source-scanner';
+
+import { createWorkspace, positionOf, removeWorkspace, uriFor } from './support/service-fixture';
+
+const roots: string[] = [];
+
+function workspace(files: Readonly<Record<string, string>>): string {
+    const root = createWorkspace(files);
+
+    roots.push(root);
+
+    return root;
+}
+
+afterEach(() => {
+    for (const root of roots.splice(0)) {
+        removeWorkspace(root);
+    }
+});
+
+describe('document uri', () => {
+    it('round trips a posix path', () => {
+        expect(uriToPath(pathToUri('/project/src/server/main.luam'))).toBe('/project/src/server/main.luam');
+    });
+
+    it('round trips a windows path', () => {
+        expect(uriToPath(pathToUri('C:\\project\\src\\server\\main.luam'))).toBe('C:/project/src/server/main.luam');
+    });
+
+    it('normalizes a lowercase drive letter', () => {
+        expect(normalizeFsPath('c:/project/main.luam')).toBe('C:/project/main.luam');
+    });
+});
+
+describe('source scanner', () => {
+    it('finds every source file and skips ignored directories', () => {
+        const root = workspace({
+            'src/server/main.luam': 'local value = 1\n',
+            'src/client/hud.luam': 'local value = 1\n',
+            'node_modules/other/skip.luam': 'local value = 1\n',
+            'src/server/main.lua': 'local value = 1\n',
+        });
+
+        const found = scanSources([root]).map((file) => file.path.slice(normalizeFsPath(root).length));
+
+        expect(found).toEqual(['/src/client/hud.luam', '/src/server/main.luam']);
+    });
+});
+
+describe('workspace loading', () => {
+    it('resolves a definition into a file that was never opened', () => {
+        const root = workspace({
+            'src/shared/util.luam': 'function sharedHelper(): void\nend\n',
+            'src/server/main.luam': 'sharedHelper()\n',
+        });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        const uri = uriFor(root, 'src/server/main.luam');
+        const text = 'sharedHelper()\n';
+        const locations = service.definition(uri, positionOf(text, '', 'sharedHelper'));
+
+        expect(locations.map((location) => location.uri)).toContain(uriFor(root, 'src/shared/util.luam'));
+    });
+
+    it('resolves a parent class declared by another file', () => {
+        const root = workspace({
+            'src/shared/base.luam': 'class Base {\n    id: number = 0\n}\n',
+            'src/server/derived.luam': 'class Derived extends Base {\n}\n',
+        });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        expect(service.diagnostics(uriFor(root, 'src/server/derived.luam'))).toHaveLength(0);
+    });
+
+    it('reports a parent class no file declares', () => {
+        const root = workspace({ 'src/server/derived.luam': 'class Derived extends Missing {\n}\n' });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        const codes = service.diagnostics(uriFor(root, 'src/server/derived.luam')).map((diagnostic) => diagnostic.code);
+
+        expect(codes).toEqual(['check-unknown-class']);
+    });
+
+    it('hides a client declaration from a server file', () => {
+        const root = workspace({
+            'src/client/base.luam': 'class ClientBase {\n}\n',
+            'src/server/derived.luam': 'class Derived extends ClientBase {\n}\n',
+        });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        const codes = service.diagnostics(uriFor(root, 'src/server/derived.luam')).map((diagnostic) => diagnostic.code);
+
+        expect(codes).toEqual(['check-unknown-class']);
+    });
+
+    it('keeps the open version of a file that was already scanned', () => {
+        const root = workspace({ 'src/server/main.luam': 'local value: number = 1\n' });
+        const service = new LanguageService();
+        const uri = uriFor(root, 'src/server/main.luam');
+
+        service.loadWorkspace([root]);
+        expect(service.diagnostics(uri)).toHaveLength(0);
+
+        service.update(uri, 2, 'local value: number = "text"\n');
+        expect(service.diagnostics(uri)).toHaveLength(1);
+    });
+});

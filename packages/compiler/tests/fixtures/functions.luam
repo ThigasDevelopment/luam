@@ -1,0 +1,29 @@
+--!strict
+function greet(name: string, tag: string?): string
+    if tag ~= nil then
+        return name .. ' (' .. tostring(tag) .. ')'
+    end
+
+    return name
+end
+
+local function double(value: number): number
+    return value * 2
+end
+
+local anonymous = function(...)
+    print(...)
+end
+
+local player: table = {}
+
+function player.describe(): void
+    print('player')
+end
+
+function player:rename(name: string): void
+    print(name)
+end
+
+anonymous(greet('Thigas'), double(2))
+player:rename('Thigas')

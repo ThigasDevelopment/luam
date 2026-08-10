@@ -1,0 +1,3 @@
+function restart(): void
+    restartResource(resource)
+end
