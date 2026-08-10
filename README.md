@@ -114,7 +114,20 @@ bin directory is not on your `PATH`.
 
 The VS Code extension gives you types, completion and errors while you type —
 from the same checker the CLI runs, so the editor and the build never disagree.
-See [Editor support](#editor-support) below for how to install it.
+Let the CLI detect supported editors and ask before changing each one:
+
+```bash
+luam setup
+```
+
+For an unattended development-machine setup, approve every detected editor:
+
+```bash
+luam setup --yes
+```
+
+Run `luam doctor` afterward to check the CLI, detected editors, and extension.
+See [Editor support](#editor-support) for the compatibility matrix and manual installation.
 
 ---
 
@@ -203,8 +216,8 @@ luam dev
 
 ## The CLI
 
-Five commands. Every one of them reads `luam.json` from the current directory,
-or from `--cwd`.
+Project commands read `luam.json` from the current directory or from `--cwd`.
+`setup`, `doctor`, and `init` do not require an existing project.
 
 ### `luam init`
 
@@ -216,6 +229,29 @@ luam init --name gamemode-race
 ```
 
 An existing `luam.json` is kept and reported — pass `--force` to overwrite it.
+
+### `luam setup`
+
+Detects supported editor commands on `PATH`, asks for consent, and installs the
+Luam extension. It tries the editor's marketplace first and falls back to the
+official `.vsix` from the GitHub release that matches the CLI version.
+
+```bash
+luam setup
+luam setup --yes
+```
+
+The command never installs into an editor silently. In CI or another
+non-interactive terminal, pass `--yes` explicitly.
+
+### `luam doctor`
+
+Reports the running CLI and Node.js versions, every supported editor detected
+on `PATH`, and whether that editor has the Luam extension.
+
+```bash
+luam doctor
+```
 
 ### `luam check`
 
@@ -506,17 +542,40 @@ server file, `kickPlayer` never appears in a client file.
 
 ### Installing it
 
-The extension is not on the Marketplace yet, so install the `.vsix` by hand.
+**Through the CLI (recommended).** The command detects all supported editors
+whose launchers are on `PATH` and asks before installing:
 
-**From a release (easiest).** Download `luam-<version>.vsix` from the
-[Releases page](https://github.com/ThigasDevelopment/luam/releases), then:
+```bash
+luam setup
+```
+
+| Editor | Launcher detected | Automatic installation | Distribution path |
+| --- | --- | --- | --- |
+| Visual Studio Code | `code` | Yes | Marketplace, then release `.vsix` fallback |
+| Visual Studio Code Insiders | `code-insiders` | Yes | Marketplace, then release `.vsix` fallback |
+| Cursor | `cursor` | Yes | Editor marketplace, then release `.vsix` fallback |
+| VSCodium | `codium` | Yes | Open VSX when available, then release `.vsix` fallback |
+| Windsurf | `windsurf` | Yes | Editor marketplace, then release `.vsix` fallback |
+
+Other VS Code-compatible forks can usually install the release `.vsix`
+manually, but `luam setup` does not claim support until their launcher and
+extension APIs are stable. JetBrains IDEs need a separate plugin and are not
+supported by this VS Code extension. Neovim, Zed, and Sublime Text need their
+own LSP adapter or extension and are not currently supported.
+
+**From a release.** Download `luam-<version>.vsix` from the
+[Releases page](https://github.com/ThigasDevelopment/luam/releases), then use
+the launcher for your editor:
 
 ```bash
 code --install-extension luam-0.1.1.vsix
+cursor --install-extension luam-0.1.1.vsix
+codium --install-extension luam-0.1.1.vsix
+windsurf --install-extension luam-0.1.1.vsix
 ```
 
-Or in VS Code: **Extensions** → **⋯** menu → **Install from VSIX…** → pick the
-file. Reload the window when it asks.
+In a compatible editor, you can also open **Extensions**, choose **Install from
+VSIX**, and select the downloaded file. Reload the window when prompted.
 
 **From source.** Build the VSIX yourself:
 

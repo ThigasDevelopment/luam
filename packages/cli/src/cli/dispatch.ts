@@ -7,11 +7,15 @@ import { USAGE, VERSION } from '@cli/cli/usage';
 import { runBuildCommand } from '@cli/commands/build-command';
 import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
+import { runDoctorCommand } from '@cli/commands/doctor-command';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import { runDevCommand } from '@cli/commands/dev-command';
 import { runInitCommand } from '@cli/commands/init-command';
+import { runSetupCommand } from '@cli/commands/setup-command';
 import { loadConfig } from '@cli/config/config-loader';
 import type { Environment } from '@cli/config/transport-validation';
+import { createEditorService } from '@cli/editor/editor-service';
+import { promptForInstallation } from '@cli/editor/installation-prompt';
 import { hasCliErrors } from '@cli/reporting/cli-diagnostic';
 import { reportCliDiagnostics } from '@cli/reporting/diagnostic-reporter';
 import { createConsoleLogger, type Logger } from '@cli/reporting/logger';
@@ -19,6 +23,8 @@ import { detectCapability, PLAIN_CAPABILITY, type OutputCapability } from '@cli/
 import { createReporter, type Reporter } from '@cli/reporting/reporter';
 import { createTransport } from '@cli/transport/transport-factory';
 import type { MtaTransport } from '@cli/transport/transport';
+import type { EditorService } from '@cli/editor/editor-service';
+import type { InstallationPrompt } from '@cli/editor/installation-prompt';
 
 export interface CliOverrides {
     logger: Logger;
@@ -27,6 +33,8 @@ export interface CliOverrides {
     env: Environment;
     transport: MtaTransport | null;
     signal: AbortSignal | null;
+    editorService: EditorService;
+    prompt: InstallationPrompt;
 }
 
 function resolveCapability(overrides: Partial<CliOverrides>, env: Environment, noColor: boolean): OutputCapability {
@@ -77,6 +85,16 @@ export async function runCli(argv: readonly string[], overrides: Partial<CliOver
 
     if (parsed.command === 'init') {
         return runInitCommand(root, logger, { name: parsed.name, force: parsed.force });
+    }
+
+    const editorService = overrides.editorService ?? createEditorService();
+
+    if (parsed.command === 'doctor') {
+        return runDoctorCommand(reporter, editorService);
+    }
+
+    if (parsed.command === 'setup') {
+        return runSetupCommand(reporter, { yes: parsed.yes, editorService, prompt: overrides.prompt ?? promptForInstallation });
     }
 
     const loaded = loadConfig(root, parsed.config, env);

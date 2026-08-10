@@ -1,4 +1,4 @@
-export type CommandName = 'build' | 'check' | 'dev' | 'ensure' | 'init';
+export type CommandName = 'build' | 'check' | 'dev' | 'doctor' | 'ensure' | 'init' | 'setup';
 
 export interface ParsedArguments {
     command: CommandName | null;
@@ -7,6 +7,7 @@ export interface ParsedArguments {
     name: string | null;
     watch: boolean | null;
     force: boolean;
+    yes: boolean;
     offline: boolean;
     noColor: boolean;
     help: boolean;
@@ -14,7 +15,7 @@ export interface ParsedArguments {
     errors: string[];
 }
 
-const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'ensure', 'init'];
+const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'doctor', 'ensure', 'init', 'setup'];
 
 const VALUE_FLAGS: readonly string[] = ['--cwd', '--config', '--name'];
 
@@ -30,6 +31,7 @@ function emptyArguments(): ParsedArguments {
         name: null,
         watch: null,
         force: false,
+        yes: false,
         offline: false,
         noColor: false,
         help: false,
@@ -88,6 +90,12 @@ export function parseArguments(argv: readonly string[]): ParsedArguments {
 
         if (token === '--force') {
             parsed.force = true;
+
+            continue;
+        }
+
+        if (token === '--yes' || token === '-y') {
+            parsed.yes = true;
 
             continue;
         }
