@@ -30,6 +30,10 @@ export class LanguageService {
         return this.workspace.refresh();
     }
 
+    reloadSettings(): DocumentAnalysis[] {
+        return this.workspace.reloadSettings();
+    }
+
     analysis(uri: string): DocumentAnalysis | null {
         return this.workspace.get(uri);
     }

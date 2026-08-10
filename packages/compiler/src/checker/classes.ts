@@ -116,6 +116,14 @@ function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): 
         return statement.superClass;
     }
 
+    if (context.mtaClasses !== null && context.mtaClasses.lookupClass(statement.superClass) !== null) {
+        const message = `Class "${statement.name}" cannot extend native MTA class "${statement.superClass}".`;
+
+        context.report('check-native-class-inheritance', message, statement.position);
+
+        return null;
+    }
+
     const message = `Class "${statement.name}" extends "${statement.superClass}", which is not defined.`;
 
     context.noteExternalReference(statement.superClass, statement.position);
@@ -127,6 +135,12 @@ function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): 
 export function checkClassDeclaration(context: CheckContext, statement: ClassDeclaration): void {
     if (context.declarations.lookupClass(statement.name) !== null) {
         context.report('check-duplicate-class', `Class "${statement.name}" is already defined.`, statement.position);
+
+        return;
+    }
+
+    if (context.mtaClasses !== null && context.mtaClasses.lookupClass(statement.name) !== null) {
+        context.report('check-duplicate-class', `Class "${statement.name}" is reserved by MTA when OOP is enabled.`, statement.position);
 
         return;
     }

@@ -92,10 +92,22 @@ describe('mta oop member resolution', () => {
         }
     });
 
-    it('lets a project class shadow an element class', () => {
-        const source = 'class Player {\n    greet(): string {\n        return "hi"\n    }\n}\n\nlocal p = new Player()\np:greet()\np:getName()\n';
+    it('reserves native MTA class names while OOP is enabled', () => {
+        const source = 'class Player {\n}\n';
 
-        expect(codes(source)).toEqual([]);
+        expect(codes(source)).toEqual(['check-duplicate-class']);
+        expect(messages(source)).toContain('Class "Player" is reserved by MTA when OOP is enabled.');
+    });
+
+    it('allows an MTA class name while OOP is disabled', () => {
+        expect(codes('class Player {\n}\n', SERVER_FILE, false)).toEqual([]);
+    });
+
+    it('rejects extending a native MTA class', () => {
+        const source = 'class Example extends Player {\n}\n';
+
+        expect(codes(source)).toEqual(['check-native-class-inheritance']);
+        expect(messages(source)).toEqual(['Class "Example" cannot extend native MTA class "Player".']);
     });
 
     it('leaves a method call on a non element receiver unchecked', () => {

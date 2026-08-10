@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { FileChangeType, TextDocuments, type Connection, type FileEvent, type InitializeParams, type InitializeResult } from 'vscode-languageserver';
@@ -6,6 +7,8 @@ import { FileChangeType, TextDocuments, type Connection, type FileEvent, type In
 import { LanguageService } from '@lsp/server/language-service';
 import { SERVER_CAPABILITIES } from '@lsp/server/capabilities';
 import { uriToPath } from '@lsp/workspace/document-uri';
+
+const CONFIG_FILE = 'luam.json';
 
 function workspaceRoots(params: InitializeParams): string[] {
     const folders = params.workspaceFolders ?? [];
@@ -45,7 +48,15 @@ function updateWatchedDocument(documents: TextDocuments<TextDocument>, service: 
 
 function registerWorkspace(connection: Connection, documents: TextDocuments<TextDocument>, service: LanguageService): void {
     connection.onDidChangeWatchedFiles((params) => {
+        let settingsChanged = false;
+
         for (const change of params.changes) {
+            if (basename(uriToPath(change.uri)) === CONFIG_FILE) {
+                settingsChanged = true;
+
+                continue;
+            }
+
             if (change.type === FileChangeType.Deleted) {
                 service.close(change.uri);
                 void connection.sendDiagnostics({ uri: change.uri, diagnostics: [] });
@@ -53,12 +64,14 @@ function registerWorkspace(connection: Connection, documents: TextDocuments<Text
         }
 
         for (const change of params.changes) {
-            if (change.type !== FileChangeType.Deleted) {
+            if (basename(uriToPath(change.uri)) !== CONFIG_FILE && change.type !== FileChangeType.Deleted) {
                 updateWatchedDocument(documents, service, change);
             }
         }
 
-        for (const analysis of service.refresh()) {
+        const analyses = settingsChanged ? service.reloadSettings() : service.refresh();
+
+        for (const analysis of analyses) {
             void connection.sendDiagnostics({ uri: analysis.uri, diagnostics: service.diagnostics(analysis.uri) });
         }
     });

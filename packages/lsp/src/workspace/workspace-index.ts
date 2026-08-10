@@ -12,6 +12,8 @@ import { scanSources } from './source-scanner';
 export class WorkspaceIndex {
     private readonly analyses = new Map<string, DocumentAnalysis>();
 
+    private roots: readonly string[] = [];
+
     private project: ProjectDeclarations = EMPTY_PROJECT_DECLARATIONS;
 
     private settings: ProjectSettings = DEFAULT_PROJECT_SETTINGS;
@@ -51,6 +53,12 @@ export class WorkspaceIndex {
         return this.all();
     }
 
+    reloadSettings(): DocumentAnalysis[] {
+        this.settings = loadProjectSettings(this.roots);
+
+        return this.refresh();
+    }
+
     get(uri: string): DocumentAnalysis | null {
         return this.analyses.get(pathKey(uriToPath(uri))) ?? null;
     }
@@ -66,6 +74,7 @@ export class WorkspaceIndex {
     }
 
     load(roots: readonly string[]): void {
+        this.roots = roots;
         this.project = loadProjectDeclarations(roots);
         this.settings = loadProjectSettings(roots);
 

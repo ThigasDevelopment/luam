@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { CLIENT_ID, SERVER_MODULE, SOURCE_PATTERN } from '@vscode-extension/client/language-client';
+import { CLIENT_ID, CONFIG_PATTERN, SERVER_MODULE, SOURCE_PATTERN } from '@vscode-extension/client/language-client';
 import { ensureCommandLine, NO_FOLDER_MESSAGE, TERMINAL_NAME } from '@vscode-extension/commands/ensure-command';
 import { DEFAULT_SETTINGS, readSettings } from '@vscode-extension/config/settings';
 import { activate, deactivate, ENSURE_COMMAND, RESTART_COMMAND } from '@vscode-extension/extension';
@@ -55,12 +55,12 @@ describe('activation', () => {
         expect(options.run.transport).toBe(1);
     });
 
-    it('selects luam documents and watches source files', () => {
+    it('selects luam documents and watches source and configuration files', () => {
         const { client } = activateExtension();
         const options = client.record.clientOptions as { documentSelector: Array<{ language: string; scheme: string }> };
 
         expect(options.documentSelector).toEqual([{ scheme: 'file', language: 'luam' }]);
-        expect(state.watchers).toEqual([SOURCE_PATTERN]);
+        expect(state.watchers).toEqual([SOURCE_PATTERN, CONFIG_PATTERN]);
     });
 
     it('registers the ensure and restart commands', () => {

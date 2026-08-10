@@ -1,3 +1,6 @@
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { LanguageService } from '@lsp/server/language-service';
@@ -115,6 +118,20 @@ describe('workspace loading', () => {
 
         service.update(uri, 2, 'local value: number = "text"\n');
         expect(service.diagnostics(uri)).toHaveLength(1);
+    });
+
+    it('rechecks documents after the OOP setting changes', () => {
+        const root = workspace({ 'luam.json': '{"oop":true}', 'src/server/main.luam': 'class Player {\n}\n' });
+        const service = new LanguageService();
+        const uri = uriFor(root, 'src/server/main.luam');
+
+        service.loadWorkspace([root]);
+        expect(service.diagnostics(uri).map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
+
+        writeFileSync(join(root, 'luam.json'), '{"oop":false}', 'utf8');
+        service.reloadSettings();
+
+        expect(service.diagnostics(uri)).toEqual([]);
     });
 
     it('drops declarations from a deleted file before refreshing diagnostics', () => {
