@@ -278,8 +278,8 @@ same global, the declaration wins and the source is checked against it.
 ## The `ensure` Development Loop
 
 `ensure` is the loop you leave running while you work. One command builds the
-resource, mirrors it into the MTA server, restarts it, and then repeats that on
-every save.
+resource directly into the MTA server, restarts it, and then repeats that on
+every save. It never writes to `<outDir>/<name>`.
 
 ### Setting it up
 
@@ -301,14 +301,13 @@ set LUAM_MTA_PASSWORD=...
 luam ensure
 ```
 
-`serverPath` and `transport` are both optional, and each one you add turns on
-another step:
+`serverPath` is required by `ensure`. The transport remains optional:
 
 | Configured | What `ensure` does |
 | --- | --- |
-| Neither | Builds into `<outDir>/<name>` and watches. |
-| `serverPath` only | Also mirrors the resource into the server. Restart it yourself. |
-| Both | Also calls `refreshResources` and `restartResource` over the transport. |
+| No `serverPath` | Reports a diagnostic without building or watching. |
+| `serverPath` only | Writes the resource into the server. Restart it yourself. |
+| `serverPath` and transport | Also calls `refreshResources` and `restartResource` over the transport. |
 
 The MTA side needs a resource — `luam-sync` above — that exports the two
 functions and grants HTTP access to the configured user. Any resource works as
@@ -320,10 +319,12 @@ long as `resource`, `username`, and the password match the server's ACL.
    only files whose declarations changed invalidate the files that see them.
 2. If anything is an error, report it and stop. No sync, no restart, and the
    previous resource stays on the server.
-3. Write `<outDir>/<name>`, skipping files whose content is identical.
-4. Mirror the same files into `<serverPath>/<resourcesDir>/<name>` and delete
-   generated files the project no longer produces.
-5. Restart the resource, but only if the sync actually changed a file.
+3. Write `<serverPath>/<resourcesDir>/<name>`, skipping identical files and
+   deleting generated files the project no longer produces.
+4. Restart the resource, but only if the sync actually changed a file.
+
+`ensure` never creates, updates, prunes, or deletes `<outDir>/<name>`. Use
+`luam build` when you need a local generated resource.
 
 ### Reading the output
 
@@ -336,10 +337,8 @@ Discovery: done in 1 ms.
 Compile: 42 files in 2 ms.
 Assembly: done in 0 ms.
 Manifest: done in 0 ms.
-Write: 18 files in 1 ms.
 Build passed: 42 files, 41 reused, 0 errors, 0 warnings in 3 ms.
-Wrote 1 file to "build/gamemode-race" (17 unchanged).
-Sync: done in 1 ms.
+Sync: 18 files in 1 ms.
 Synced 1 file to "C:/MTA Server/mods/deathmatch/resources/gamemode-race" (0 removed).
 Restart: done in 24 ms.
 Restarted "gamemode-race" through the "http" transport.

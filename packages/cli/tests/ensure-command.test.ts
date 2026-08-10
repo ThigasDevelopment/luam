@@ -66,6 +66,7 @@ describe('ensure runner', () => {
         expect(result.ok).toBe(true);
         expect(fixture.exists(`${SERVER_RESOURCE}/meta.xml`)).toBe(true);
         expect(fixture.exists(`${SERVER_RESOURCE}/src/server/main.lua`)).toBe(true);
+        expect(fixture.exists('build')).toBe(false);
         expect(transport.calls).toEqual(['refresh', 'restart:luam-demo']);
         expect(result.restarted).toBe(true);
     });
@@ -137,16 +138,6 @@ describe('ensure runner', () => {
         expect(logger.errors).toContain('Refresh failed: refresh rejected');
     });
 
-    it('warns and skips the restart when no server path is configured', async () => {
-        const { context, transport, logger } = harness(defaultProjectFiles());
-        const result = await createEnsureRunner(context, transport).run();
-
-        expect(result.ok).toBe(true);
-        expect(result.sync).toBeNull();
-        expect(transport.calls).toEqual([]);
-        expect(logger.warnings).toContain('No "serverPath" is configured, so the resource was not synced to an MTA server.');
-    });
-
     it('never restarts through the none transport', async () => {
         const { context } = harness(syncedProject());
         const result = await createEnsureRunner(context, createNoneTransport()).run();
@@ -170,6 +161,15 @@ describe('ensure command', () => {
         expect(await runEnsureCommand(context, { transport, watch: false, signal: null })).toBe(EXIT_DIAGNOSTICS);
     });
 
+    it('requires serverPath before building or watching', async () => {
+        const { context, fixture, transport, logger } = harness(defaultProjectFiles());
+
+        expect(await runEnsureCommand(context, { transport, watch: true, signal: null })).toBe(EXIT_DIAGNOSTICS);
+        expect(fixture.exists('build')).toBe(false);
+        expect(transport.calls).toEqual([]);
+        expect(logger.errors).toContain('luam ensure requires "serverPath" in luam.json.');
+    });
+
     it('rebuilds and restarts when a watched source changes', async () => {
         const { context, fixture, transport } = harness(syncedProject());
         const controller = new AbortController();
@@ -181,9 +181,51 @@ describe('ensure command', () => {
         await waitFor(() => transport.calls.length === 4);
 
         expect(fixture.read(`${SERVER_RESOURCE}/src/client/hud.lua`)).toContain('Luam watched');
+        expect(fixture.exists('build')).toBe(false);
 
         controller.abort();
 
         expect(await command).toBe(EXIT_OK);
+    });
+
+    it('uses absolute serverPath and custom resourcesDir without writing custom outDir', async () => {
+        const server = createProjectFixture();
+        const { context, fixture, transport } = harness(syncedProject({ outDir: 'dist', resourcesDir: 'resources-custom', serverPath: server.root }));
+
+        fixtures.push(server);
+
+        expect(await runEnsureCommand(context, { transport, watch: false, signal: null })).toBe(EXIT_OK);
+        expect(server.exists('resources-custom/luam-demo/meta.xml')).toBe(true);
+        expect(fixture.exists('dist')).toBe(false);
+        expect(fixture.exists('build')).toBe(false);
+    });
+
+    it('preserves local output while syncing changes and pruning stale server files', async () => {
+        const files = { ...syncedProject({ outDir: 'dist' }), 'src/client/extra.luam': 'local extra: number = 1\n' };
+        const { context, fixture, transport } = harness(files);
+        const localFiles = {
+            'dist/luam-demo/meta.xml': '<meta sentinel="true" />\n',
+            'dist/luam-demo/src/client/extra.lua': 'local sentinel = "unchanged"\n',
+        };
+
+        for (const [path, contents] of Object.entries(localFiles)) {
+            fixture.write(path, contents);
+        }
+
+        const runner = createEnsureRunner(context, transport);
+
+        await runner.run();
+        fixture.remove('src/client/extra.luam');
+        fixture.write('src/client/hud.luam', clientSource('Luam pruned'));
+
+        const result = await runner.run();
+
+        expect(result.sync?.removed).toContain('src/client/extra.lua');
+        expect(fixture.exists(`${SERVER_RESOURCE}/src/client/extra.lua`)).toBe(false);
+        expect(fixture.read(`${SERVER_RESOURCE}/src/client/hud.lua`)).toContain('Luam pruned');
+
+        for (const [path, contents] of Object.entries(localFiles)) {
+            expect(fixture.read(path)).toBe(contents);
+        }
     });
 });

@@ -4,7 +4,7 @@ import { writeResource, type WriteResult } from '@cli/build/resource-writer';
 import { trackedWriteOptions } from '@cli/build/write-options';
 import { reportBuildOutcome, reportPhaseTimings, totalDuration } from '@cli/commands/build-report';
 import { commandReporter, commandVersion, type CommandContext } from '@cli/commands/command-context';
-import { resolveTargets, type ResourceTargets } from '@cli/commands/resource-targets';
+import { resolveServerTarget } from '@cli/commands/resource-targets';
 import { pluralize } from '@cli/reporting/plural';
 import { createProgressRenderer, type ProgressRenderer } from '@cli/reporting/progress-renderer';
 import type { Reporter } from '@cli/reporting/reporter';
@@ -14,13 +14,12 @@ import { createProjectCache, type ProjectCache } from '@compiler/project/project
 export interface EnsureResult {
     ok: boolean;
     outcome: BuildOutcome;
-    output: WriteResult | null;
     sync: WriteResult | null;
     restarted: boolean;
 }
 
 export interface EnsureRunner {
-    targets: ResourceTargets;
+    target: string;
     run(): Promise<EnsureResult>;
 }
 
@@ -67,10 +66,10 @@ async function restartResource(scope: RunScope, transport: MtaTransport): Promis
 }
 
 function failed(outcome: BuildOutcome): EnsureResult {
-    return { ok: false, outcome, output: null, sync: null, restarted: false };
+    return { ok: false, outcome, sync: null, restarted: false };
 }
 
-async function runOnce(scope: RunScope, transport: MtaTransport, targets: ResourceTargets, cache: ProjectCache): Promise<EnsureResult> {
+async function runOnce(scope: RunScope, transport: MtaTransport, target: string, cache: ProjectCache): Promise<EnsureResult> {
     const { context, reporter, renderer, tracker } = scope;
 
     tracker.begin('version');
@@ -93,48 +92,40 @@ async function runOnce(scope: RunScope, transport: MtaTransport, targets: Resour
 
     const options = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
 
-    tracker.begin('write');
-
-    const output = writeResource(targets.outDir, outcome.build, options);
-
-    tracker.end();
-    renderer.clear();
     reportBuildOutcome(context, outcome, 'Build');
-    reporter.info(`Wrote ${pluralize(output.written.length, 'file')} to "${targets.outDir}" (${output.unchanged} unchanged).`);
-
-    if (targets.serverDir === null) {
-        reporter.warn('No "serverPath" is configured, so the resource was not synced to an MTA server.');
-
-        return { ok: true, outcome, output, sync: null, restarted: false };
-    }
 
     tracker.begin('sync');
 
-    const sync = writeResource(targets.serverDir, outcome.build, options);
+    const sync = writeResource(target, outcome.build, options);
 
     tracker.end();
     renderer.clear();
-    reporter.info(`Synced ${pluralize(sync.written.length, 'file')} to "${targets.serverDir}" (${sync.removed.length} removed).`);
+    reporter.info(`Synced ${pluralize(sync.written.length, 'file')} to "${target}" (${sync.removed.length} removed).`);
 
     if (transport.kind === 'none' || !hasChanges(sync)) {
-        return { ok: true, outcome, output, sync, restarted: false };
+        return { ok: true, outcome, sync, restarted: false };
     }
 
-    return { ok: true, outcome, output, sync, restarted: await restartResource(scope, transport) };
+    return { ok: true, outcome, sync, restarted: await restartResource(scope, transport) };
 }
 
 export function createEnsureRunner(context: CommandContext, transport: MtaTransport): EnsureRunner {
-    const targets = resolveTargets(context.root, context.config);
+    const target = resolveServerTarget(context.root, context.config);
+
+    if (target === null) {
+        throw new Error('Cannot create an ensure runner without serverPath.');
+    }
+
     const cache = createProjectCache();
     const reporter = commandReporter(context);
 
     return {
-        targets,
+        target,
         run: async (): Promise<EnsureResult> => {
             const renderer = createProgressRenderer(reporter);
             const tracker = createPhaseTracker(renderer.listen);
             const scope: RunScope = { context, reporter, renderer, tracker };
-            const result = await runOnce(scope, transport, targets, cache);
+            const result = await runOnce(scope, transport, target, cache);
 
             renderer.clear();
             reportPhaseTimings(reporter, tracker.durations(), totalDuration(tracker.durations()));

@@ -238,5 +238,7 @@ describe('watch output', () => {
         expect(target.logger.lines.filter((line) => line.includes('rebuild at '))).toHaveLength(1);
         expect(target.logger.text()).toContain('Sync: ');
         expect(target.logger.text()).toContain('Restart: ');
+        expect(target.logger.text()).not.toContain('Write: ');
+        expect(target.logger.text()).not.toContain('Wrote ');
     });
 });

@@ -62,6 +62,12 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, signal: 
 }
 
 export async function runEnsureCommand(context: CommandContext, options: EnsureOptions): Promise<number> {
+    if (context.config.serverPath === null) {
+        commandReporter(context).error('luam ensure requires "serverPath" in luam.json.');
+
+        return EXIT_DIAGNOSTICS;
+    }
+
     const runner = createEnsureRunner(context, options.transport);
     const first = await runner.run();
 

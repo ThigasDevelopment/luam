@@ -2,19 +2,16 @@ import { isAbsolute, resolve } from 'node:path';
 
 import type { LuamConfig } from '@cli/config/config-schema';
 
-export interface ResourceTargets {
-    outDir: string;
-    serverDir: string | null;
+export function resolveBuildTarget(root: string, config: LuamConfig): string {
+    return resolve(root, config.outDir, config.name);
 }
 
-export function resolveTargets(root: string, config: LuamConfig): ResourceTargets {
-    const outDir = resolve(root, config.outDir, config.name);
-
+export function resolveServerTarget(root: string, config: LuamConfig): string | null {
     if (config.serverPath === null) {
-        return { outDir, serverDir: null };
+        return null;
     }
 
     const serverRoot = isAbsolute(config.serverPath) ? config.serverPath : resolve(root, config.serverPath);
 
-    return { outDir, serverDir: resolve(serverRoot, config.resourcesDir, config.name) };
+    return resolve(serverRoot, config.resourcesDir, config.name);
 }

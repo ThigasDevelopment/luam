@@ -71,6 +71,14 @@ describe('build command', () => {
         expect(fixture.read('dist/luam-demo/meta.xml')).toContain('<info author="Thigas" type="script" version="1.2.3" description="A demo resource" />');
     });
 
+    it('writes only to outDir when serverPath is configured', async () => {
+        const { context, fixture } = harness(defaultProjectFiles({ serverPath: 'mta-server' }));
+
+        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+        expect(fixture.exists('build/luam-demo/meta.xml')).toBe(true);
+        expect(fixture.exists('mta-server')).toBe(false);
+    });
+
     it('copies an opt-in runtime helper the sources never trigger', async () => {
         const { context, fixture } = harness(defaultProjectFiles({ helpers: ['threads'] }));
 
