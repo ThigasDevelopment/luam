@@ -6,6 +6,18 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### MTA Development Logs
+
+#### Added
+
+- `luam dev`, which reuses the build, server sync, restart, and watch workflow
+  while following appended records from the local MTA `server.log`.
+- A development-only client and server helper pair that preserves
+  `outputDebugString`, validates and rate-limits relayed client records, and
+  produces stable `[time][environment][level]` terminal lines.
+- `development.logs` configuration for message length, rate, and window limits.
+  Normal `luam build` and `luam ensure` resources do not include the helpers.
+
 ### Decorators and Generated Accessors
 
 #### Added

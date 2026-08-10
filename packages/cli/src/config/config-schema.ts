@@ -17,6 +17,17 @@ export interface NoneTransportConfig {
 
 export type TransportConfig = HttpTransportConfig | NoneTransportConfig;
 
+export interface DevelopmentLogsConfig {
+    enabled: boolean;
+    maxMessageLength: number;
+    rateLimit: number;
+    rateWindowMs: number;
+}
+
+export interface DevelopmentConfig {
+    logs: DevelopmentLogsConfig;
+}
+
 export interface LuamConfig {
     name: string;
     author: string | null;
@@ -31,6 +42,7 @@ export interface LuamConfig {
     serverPath: string | null;
     resourcesDir: string;
     transport: TransportConfig;
+    development: DevelopmentConfig;
 }
 
 export const CONFIG_FILE_NAME = 'luam.json';
@@ -54,6 +66,13 @@ export const DEFAULT_REFRESH_FUNCTION = 'refreshResources';
 export const DEFAULT_RESTART_FUNCTION = 'restartResource';
 
 export const NONE_TRANSPORT: NoneTransportConfig = { kind: 'none' };
+
+export const DEFAULT_DEVELOPMENT_LOGS: DevelopmentLogsConfig = {
+    enabled: false,
+    maxMessageLength: 4096,
+    rateLimit: 30,
+    rateWindowMs: 1000,
+};
 
 const RESOURCE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 

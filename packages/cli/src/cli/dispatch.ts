@@ -8,6 +8,7 @@ import { runBuildCommand } from '@cli/commands/build-command';
 import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
+import { runDevCommand } from '@cli/commands/dev-command';
 import { runInitCommand } from '@cli/commands/init-command';
 import { loadConfig } from '@cli/config/config-loader';
 import type { Environment } from '@cli/config/transport-validation';
@@ -106,11 +107,12 @@ export async function runCli(argv: readonly string[], overrides: Partial<CliOver
     }
 
     const transport = overrides.transport ?? createTransport(loaded.config.transport);
-    const exitCode = await runEnsureCommand(context, {
+    const options = {
         transport,
         watch: parsed.watch ?? true,
         signal: overrides.signal ?? null,
-    });
+    };
+    const exitCode = parsed.command === 'dev' ? await runDevCommand(context, options) : await runEnsureCommand(context, options);
 
     return exitCode === EXIT_OK ? EXIT_OK : EXIT_DIAGNOSTICS;
 }

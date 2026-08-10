@@ -11,6 +11,10 @@ describe('argument parsing', () => {
         expect(parsed.watch).toBeNull();
     });
 
+    it('reads the development command', () => {
+        expect(parseArguments(['dev', '--no-watch'])).toMatchObject({ command: 'dev', watch: false, errors: [] });
+    });
+
     it('reads value options', () => {
         const parsed = parseArguments(['check', '--cwd', 'projects/demo', '--config', 'luam.dev.json']);
 
@@ -41,7 +45,7 @@ describe('argument parsing', () => {
     });
 
     it('rejects an unknown command', () => {
-        expect(parseArguments(['deploy']).errors).toEqual(['"deploy" is not a known command. Use "build", "check", "ensure", "init".']);
+        expect(parseArguments(['deploy']).errors).toEqual(['"deploy" is not a known command. Use "build", "check", "dev", "ensure", "init".']);
     });
 
     it('rejects an unknown option', () => {

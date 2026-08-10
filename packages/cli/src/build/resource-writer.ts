@@ -21,11 +21,21 @@ export interface WriteOptions {
 
 export const MANIFEST_FILE = 'meta.xml';
 
+function helperSource(helper: ResourceBuild['helpers'][number]): string {
+    let source = readHelperSource(helper.helper, helper.file);
+
+    for (const [placeholder, value] of Object.entries(helper.replacements ?? {})) {
+        source = source.replaceAll(placeholder, value);
+    }
+
+    return source;
+}
+
 export function resourceFiles(build: ResourceBuild): Map<string, string> {
     const files = new Map<string, string>();
 
     for (const helper of build.helpers) {
-        files.set(helper.path, readHelperSource(helper.helper, helper.file));
+        files.set(helper.path, helperSource(helper));
     }
 
     if (build.configuration !== null) {

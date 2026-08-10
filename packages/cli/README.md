@@ -11,6 +11,7 @@ into an MTA server, and restarting it.
 | `luam init` | Scaffolds a new resource project. Needs no configuration. |
 | `luam check` | Compiles and reports diagnostics. Writes nothing. |
 | `luam build` | Compiles and writes the resource into `<outDir>/<name>`. |
+| `luam dev` | Runs the ensure loop and streams server and relayed client resource logs. |
 | `luam ensure` | Builds, syncs into the MTA server, restarts, and watches sources. |
 
 ## Options
@@ -21,7 +22,7 @@ into an MTA server, and restarting it.
 | `--config <path>` | Configuration file to load instead of `luam.json`. |
 | `--name <name>` | Resource name for `init`. Defaults to the project directory name. |
 | `--force` | Let `init` overwrite files that already exist. |
-| `--watch` / `--no-watch` | Keep `ensure` watching, or run it once. `ensure` watches by default. |
+| `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default. |
 | `--no-color` | Print plain output with no colour and no emoji. |
 | `-h`, `--help` | Print the usage text. |
 | `-v`, `--version` | Print the CLI version. |
@@ -69,6 +70,14 @@ overwrite it.
     "helpers": ["threads"],
     "serverPath": "C:/MTA Server",
     "resourcesDir": "mods/deathmatch/resources",
+    "development": {
+        "logs": {
+            "enabled": false,
+            "maxMessageLength": 4096,
+            "rateLimit": 30,
+            "rateWindowMs": 1000
+        }
+    },
     "transport": {
         "kind": "http",
         "host": "127.0.0.1",
@@ -93,6 +102,7 @@ overwrite it.
 | `serverPath` | unset | MTA server root. `ensure` syncs the resource there. |
 | `resourcesDir` | `"mods/deathmatch/resources"` | Resource directory relative to `serverPath`. |
 | `transport` | `{ "kind": "none" }` | How `ensure` restarts the resource. |
+| `development.logs` | disabled, safe limits | Development log capture and client relay limits. `dev` enables capture even when this section is omitted. |
 
 `outDir`, `resourcesDir`, and every `sourceDirs`, `assetDirs`, and `loadOrder`
 entry must stay inside their base directory. An absolute path or a `..` segment
@@ -379,3 +389,36 @@ colour and emoji off as well; on a terminal the run still advances, in ASCII.
 
 `Ctrl+C` ends the watch. Pass `--no-watch` to run the build, sync, and restart
 exactly once, which is what you want from a script or an editor task.
+
+## Development Logs
+
+`luam dev` requires `serverPath` and reuses the complete `ensure` workflow. It
+also follows `<serverPath>/mods/deathmatch/logs/server.log` from its current end,
+handles truncation and rotation, and stops following when the command ends.
+
+The synchronized resource receives two development-only helpers. The client
+helper preserves the original return value and console output from
+`outputDebugString`, then relays valid records through an MTA event. The server
+helper validates types and length, limits each client to `rateLimit` records per
+`rateWindowMs`, and writes a structured marker for the CLI. These helpers are
+never selectable through `helpers`, never written by `build` or `ensure`, and
+are removed by the next normal sync.
+
+```json
+{
+    "name": "gamemode-race",
+    "serverPath": "C:/MTA Server",
+    "development": {
+        "logs": {
+            "maxMessageLength": 2048,
+            "rateLimit": 20,
+            "rateWindowMs": 1000
+        }
+    }
+}
+```
+
+The first release reads only the local MTA server log. It does not collect
+remote logs, evaluate expressions, or observe runtime values. Native lines for
+other named resources are ignored. Unattributed engine lines can appear as
+plain server output because their origin cannot be classified reliably.

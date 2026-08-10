@@ -23,6 +23,10 @@ export interface EnsureRunner {
     run(): Promise<EnsureResult>;
 }
 
+export interface EnsureRunnerOptions {
+    developmentLogs?: CommandContext['config']['development']['logs'] | null;
+}
+
 interface RunScope {
     context: CommandContext;
     reporter: Reporter;
@@ -69,13 +73,18 @@ function failed(outcome: BuildOutcome): EnsureResult {
     return { ok: false, outcome, sync: null, restarted: false };
 }
 
-async function runOnce(scope: RunScope, transport: MtaTransport, target: string, cache: ProjectCache): Promise<EnsureResult> {
+async function runOnce(scope: RunScope, transport: MtaTransport, target: string, cache: ProjectCache, options: EnsureRunnerOptions): Promise<EnsureResult> {
     const { context, reporter, renderer, tracker } = scope;
 
     tracker.begin('version');
 
     const version = await commandVersion(context);
-    const outcome = runCompile(context.root, context.config, { cache, tracker, minMtaVersion: version.version });
+    const outcome = runCompile(context.root, context.config, {
+        cache,
+        tracker,
+        minMtaVersion: version.version,
+        developmentLogs: options.developmentLogs ?? null,
+    });
 
     renderer.clear();
 
@@ -90,13 +99,13 @@ async function runOnce(scope: RunScope, transport: MtaTransport, target: string,
         return failed(outcome);
     }
 
-    const options = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
+    const writeOptions = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
 
     reportBuildOutcome(context, outcome, 'Build');
 
     tracker.begin('sync');
 
-    const sync = writeResource(target, outcome.build, options);
+    const sync = writeResource(target, outcome.build, writeOptions);
 
     tracker.end();
     renderer.clear();
@@ -109,7 +118,7 @@ async function runOnce(scope: RunScope, transport: MtaTransport, target: string,
     return { ok: true, outcome, sync, restarted: await restartResource(scope, transport) };
 }
 
-export function createEnsureRunner(context: CommandContext, transport: MtaTransport): EnsureRunner {
+export function createEnsureRunner(context: CommandContext, transport: MtaTransport, options: EnsureRunnerOptions = {}): EnsureRunner {
     const target = resolveServerTarget(context.root, context.config);
 
     if (target === null) {
@@ -125,7 +134,7 @@ export function createEnsureRunner(context: CommandContext, transport: MtaTransp
             const renderer = createProgressRenderer(reporter);
             const tracker = createPhaseTracker(renderer.listen);
             const scope: RunScope = { context, reporter, renderer, tracker };
-            const result = await runOnce(scope, transport, target, cache);
+            const result = await runOnce(scope, transport, target, cache, options);
 
             renderer.clear();
             reportPhaseTimings(reporter, tracker.durations(), totalDuration(tracker.durations()));

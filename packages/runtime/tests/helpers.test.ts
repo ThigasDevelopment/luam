@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
     automaticHelpers,
+    DEVELOPMENT_RUNTIME_HELPERS,
     expandHelpers,
     FEATURE_HELPERS,
     helperDepth,
@@ -14,6 +15,7 @@ import {
     manualHelpers,
     referenceHelpers,
     resolveHelperUrl,
+    resolveDevelopmentHelperUrl,
     runtimeGlobals,
     RUNTIME_HELPERS,
     type RuntimeFeature,
@@ -34,6 +36,15 @@ describe('runtime helpers', () => {
     it.each(names)('ships %s as a standalone Lua file', (name) => {
         expect(existsSync(fileURLToPath(resolveHelperUrl(name)))).toBe(true);
         expect(read(name).length).toBeGreaterThan(0);
+    });
+
+    it('ships development helpers outside the configurable runtime catalog', () => {
+        const development = Object.values(DEVELOPMENT_RUNTIME_HELPERS);
+
+        expect(development.map((helper) => helper.environment).sort()).toEqual(['client', 'server']);
+        expect(development.every((helper) => existsSync(fileURLToPath(resolveDevelopmentHelperUrl(helper.name))))).toBe(true);
+        expect(isRuntimeHelperName('development-logs-client')).toBe(false);
+        expect(isRuntimeHelperName('development-logs-server')).toBe(false);
     });
 
     it.each(names)('keeps %s free of require calls', (name) => {

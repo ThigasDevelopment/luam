@@ -188,22 +188,22 @@ refresh
 start my-resource
 ```
 
-**5. Iterate.** Point `luam.json` at your server and let `ensure` build, sync and
-restart on every save:
+**5. Iterate.** Point `luam.json` at your server and let `dev` build, sync,
+restart, and stream resource logs on every save:
 
 ```json
 { "name": "my-resource", "serverPath": "C:/MTA Server" }
 ```
 
 ```bash
-luam ensure
+luam dev
 ```
 
 ---
 
 ## The CLI
 
-Four commands. Every one of them reads `luam.json` from the current directory,
+Five commands. Every one of them reads `luam.json` from the current directory,
 or from `--cwd`.
 
 ### `luam init`
@@ -251,6 +251,30 @@ Wrote 7 files to "build/my-resource".
 
 A build that reports any error writes nothing, so a resource that worked is
 never replaced with partial output.
+
+### `luam dev`
+
+Runs the `ensure` build, server sync, restart, and watch loop while following
+`<serverPath>/mods/deathmatch/logs/server.log`. It starts at the end of the file,
+so existing history is not printed.
+
+```bash
+luam dev
+```
+
+Server records attributed to the active resource and relayed client
+`outputDebugString` calls share one stable stream:
+
+```
+[14:22:07][server][info] Resource started
+[14:22:09][client][warn] Missing vehicle model
+```
+
+The client call still reaches the MTA debug console. `dev` adds a validated,
+rate-limited MTA event relay only to the synchronized server resource. `build`
+and `ensure` never include these development helpers. Engine output without a
+resource identity may appear as plain server output; records attributed to
+other resources are ignored.
 
 ### `luam ensure`
 
@@ -312,7 +336,7 @@ a deploy script wants.
 | `--config <path>` | Load this file instead of `luam.json` |
 | `--name <name>` | Resource name for `init` |
 | `--force` | Let `init` overwrite a file that exists |
-| `--watch` / `--no-watch` | Keep `ensure` watching, or run it once. It watches by default |
+| `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default |
 | `--offline` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same |
 | `--no-color` | Plain output, no colour or emoji. `NO_COLOR` does the same |
 | `-h`, `--help` | Print the usage text |
@@ -345,6 +369,7 @@ Only `name` is required.
 | `serverPath` | unset | MTA server root, for `ensure` |
 | `resourcesDir` | `"mods/deathmatch/resources"` | Resource directory relative to `serverPath` |
 | `transport` | `{ "kind": "none" }` | How `ensure` restarts the resource |
+| `development.logs` | disabled, safe limits | Client relay message length and rate limits used by `dev` |
 
 Paths must stay inside their base directory — an absolute path or a `..` segment
 is rejected.

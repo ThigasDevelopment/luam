@@ -7,6 +7,7 @@ import {
     isValidResourceName,
     type LuamConfig,
 } from '@cli/config/config-schema';
+import { validateDevelopment } from '@cli/config/development-validation';
 import { validateTransport, type Environment } from '@cli/config/transport-validation';
 import {
     isRawObject,
@@ -40,6 +41,7 @@ const KNOWN_FIELDS = [
     'serverPath',
     'resourcesDir',
     'transport',
+    'development',
 ];
 
 const INVALID_ROOT = 'config-invalid-root';
@@ -150,6 +152,7 @@ export function validateConfig(raw: unknown, env: Environment): ValidatedConfig 
         serverPath: readString(raw, 'serverPath', diagnostics),
         resourcesDir: readContainedPath(raw, 'resourcesDir', DEFAULT_RESOURCES_DIR, diagnostics),
         transport: validateTransport(readObject(raw, 'transport', diagnostics), diagnostics, env),
+        development: validateDevelopment(readObject(raw, 'development', diagnostics), diagnostics),
     };
 
     if (hasCliErrors(diagnostics)) {

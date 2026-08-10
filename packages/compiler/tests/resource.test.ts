@@ -78,6 +78,17 @@ describe('resource assembly', () => {
         expect(assembly.build?.manifest).not.toContain('src/shared/lib');
     });
 
+    it('selects development log helpers only through the explicit development path', () => {
+        const normal = assembleResource(project, {}).build;
+        const development = assembleResource(project, { developmentLogs: { maxMessageLength: 100, rateLimit: 5, rateWindowMs: 500 } }).build;
+
+        expect(normal?.helpers.some((helper) => helper.helper.startsWith('development-'))).toBe(false);
+        expect(development?.helpers.filter((helper) => helper.helper.startsWith('development-')).map((helper) => helper.path)).toEqual([
+            'lib/client/development-logs-client.lua',
+            'lib/server/development-logs-server.lua',
+        ]);
+    });
+
     it('pins a helper that declares an environment regardless of where it is used', () => {
         const build = assembleResource(project, { helpers: ['env'] }).build;
 

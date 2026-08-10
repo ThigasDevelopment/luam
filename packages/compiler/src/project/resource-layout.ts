@@ -1,6 +1,13 @@
 import { createDiagnostic } from '@compiler/diagnostics/diagnostic';
 import { environmentRoot, FILE_START, normalizePath, type Environment } from '@compiler/environment/environment';
-import { expandHelpers, helperDepth, RUNTIME_HELPERS, type RuntimeHelperName } from '@runtime/helpers';
+import {
+    DEVELOPMENT_RUNTIME_HELPERS,
+    expandHelpers,
+    helperDepth,
+    RUNTIME_HELPERS,
+    type DevelopmentRuntimeHelperName,
+    type RuntimeHelperName,
+} from '@runtime/helpers';
 
 import type { CompiledModule, FileDiagnostic } from './module';
 
@@ -12,10 +19,17 @@ export interface ResourceScript {
 }
 
 export interface ResourceHelper {
-    helper: RuntimeHelperName;
+    helper: RuntimeHelperName | DevelopmentRuntimeHelperName;
     path: string;
     file: string;
     environment: Environment;
+    replacements?: Readonly<Record<string, string>>;
+}
+
+export interface DevelopmentLogHelpers {
+    maxMessageLength: number;
+    rateLimit: number;
+    rateWindowMs: number;
 }
 
 export interface ResourceAsset {
@@ -72,6 +86,26 @@ export function collectHelpers(modules: readonly CompiledModule[], manual: reado
             return { helper, file, path: libraryPath(environment, file), environment };
         })
         .sort((left, right) => helperDepth(left.helper) - helperDepth(right.helper) || left.path.localeCompare(right.path));
+}
+
+export function collectDevelopmentLogHelpers(options: DevelopmentLogHelpers | null | undefined): ResourceHelper[] {
+    if (options === null || options === undefined) {
+        return [];
+    }
+
+    const replacements = {
+        __LUAM_MAX_MESSAGE_LENGTH__: String(options.maxMessageLength),
+        __LUAM_RATE_LIMIT__: String(options.rateLimit),
+        __LUAM_RATE_WINDOW_MS__: String(options.rateWindowMs),
+    };
+
+    return Object.values(DEVELOPMENT_RUNTIME_HELPERS).map((helper) => ({
+        helper: helper.name,
+        file: helper.file,
+        path: libraryPath(helper.environment, helper.file),
+        environment: helper.environment,
+        replacements,
+    }));
 }
 
 export function collectScripts(modules: readonly CompiledModule[]): ResourceScript[] {

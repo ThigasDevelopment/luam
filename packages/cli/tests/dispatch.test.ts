@@ -124,6 +124,17 @@ describe('command dispatch', () => {
         expect(fixture.exists('mta-server/mods/deathmatch/resources/luam-demo/meta.xml')).toBe(true);
     });
 
+    it('routes dev through server sync with development log helpers', async () => {
+        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const logger = createMemoryLogger();
+        const transport = createMockTransport();
+        const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
+
+        expect(await runCli(['dev', '--no-watch'], { logger, cwd: fixture.root, env: OFFLINE, transport })).toBe(EXIT_OK);
+        expect(fixture.exists(`${resource}/lib/client/development-logs-client.lua`)).toBe(true);
+        expect(fixture.exists(`${resource}/lib/server/development-logs-server.lua`)).toBe(true);
+    });
+
     it('reads the transport password from the environment', async () => {
         const transport = { kind: 'http', resource: 'luam-sync', username: 'admin', passwordEnv: 'LUAM_PASSWORD' };
         const fixture = project(defaultProjectFiles({ transport }));

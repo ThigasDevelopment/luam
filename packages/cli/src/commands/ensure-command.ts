@@ -1,5 +1,6 @@
 import { commandReporter, type CommandContext } from '@cli/commands/command-context';
 import { createEnsureRunner, type EnsureRunner } from '@cli/commands/ensure-runner';
+import type { DevelopmentLogsConfig } from '@cli/config/config-schema';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
 import type { MtaTransport } from '@cli/transport/transport';
@@ -9,12 +10,21 @@ export interface EnsureOptions {
     transport: MtaTransport;
     watch: boolean;
     signal: AbortSignal | null;
+    developmentLogs?: DevelopmentLogsConfig | null;
+    commandName?: 'ensure' | 'dev';
 }
 
 function untilAborted(signal: AbortSignal | null): Promise<void> {
     return new Promise<void>((resolveLoop) => {
+        if (signal?.aborted === true) {
+            resolveLoop();
+
+            return;
+        }
+
         const stop = (): void => {
             process.off('SIGINT', stop);
+            signal?.removeEventListener('abort', stop);
             resolveLoop();
         };
 
@@ -63,12 +73,12 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, signal: 
 
 export async function runEnsureCommand(context: CommandContext, options: EnsureOptions): Promise<number> {
     if (context.config.serverPath === null) {
-        commandReporter(context).error('luam ensure requires "serverPath" in luam.json.');
+        commandReporter(context).error(`luam ${options.commandName ?? 'ensure'} requires "serverPath" in luam.json.`);
 
         return EXIT_DIAGNOSTICS;
     }
 
-    const runner = createEnsureRunner(context, options.transport);
+    const runner = createEnsureRunner(context, options.transport, { developmentLogs: options.developmentLogs ?? null });
     const first = await runner.run();
 
     if (!options.watch) {

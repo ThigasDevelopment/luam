@@ -44,6 +44,9 @@ describe('configuration validation', () => {
             serverPath: null,
             resourcesDir: 'mods/deathmatch/resources',
             transport: { kind: 'none' },
+            development: {
+                logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 },
+            },
         });
     });
 
@@ -101,6 +104,20 @@ describe('configuration validation', () => {
         expect(config).toBeNull();
         expect(codes(diagnostics)).toEqual(['config-unknown-helper']);
         expect(diagnostics[0]?.message).toContain('Known helpers: "async", "class", "dotenv", "env", "math", "string", "table", "threads"');
+    });
+
+    it('reads development log capture limits', () => {
+        const development = { logs: { enabled: true, maxMessageLength: 512, rateLimit: 10, rateWindowMs: 2000 } };
+        const { config, diagnostics } = validateConfig({ name: 'demo', development }, {});
+
+        expect(diagnostics).toEqual([]);
+        expect(config?.development).toEqual(development);
+    });
+
+    it('rejects invalid and unknown development log fields', () => {
+        const development = { logs: { maxMessageLength: 0, extra: true } };
+
+        expect(codes(validateConfig({ name: 'demo', development }, {}).diagnostics).sort()).toEqual(['config-invalid-type', 'config-unknown-field']);
     });
 
     it('reports every problem in one pass', () => {

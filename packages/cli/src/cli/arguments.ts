@@ -1,4 +1,4 @@
-export type CommandName = 'build' | 'check' | 'ensure' | 'init';
+export type CommandName = 'build' | 'check' | 'dev' | 'ensure' | 'init';
 
 export interface ParsedArguments {
     command: CommandName | null;
@@ -14,7 +14,7 @@ export interface ParsedArguments {
     errors: string[];
 }
 
-const COMMANDS: readonly string[] = ['build', 'check', 'ensure', 'init'];
+const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'ensure', 'init'];
 
 const VALUE_FLAGS: readonly string[] = ['--cwd', '--config', '--name'];
 

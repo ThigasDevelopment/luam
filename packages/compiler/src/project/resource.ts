@@ -5,11 +5,13 @@ import { sortFileDiagnostics, type FileDiagnostic, type ProjectResult } from './
 import type { AssemblyReporter } from './progress';
 import {
     collectHelpers,
+    collectDevelopmentLogHelpers,
     collectScripts,
     findDuplicateOutputs,
     resolveLoadOrder,
     sourceEntries,
     type ResourceAsset,
+    type DevelopmentLogHelpers,
     type ResourceHelper,
     type ResourceScript,
 } from './resource-layout';
@@ -32,6 +34,7 @@ export interface ResourceOptions {
     configuration?: ResourceConfiguration | null;
     loadOrder?: readonly string[];
     minMtaVersion?: string | null;
+    developmentLogs?: DevelopmentLogHelpers | null;
 }
 
 export interface ResourceBuild {
@@ -108,7 +111,7 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
         return { build: null, diagnostics: project.diagnostics };
     }
 
-    const helpers = collectHelpers(project.modules, options.helpers ?? []);
+    const helpers = [...collectHelpers(project.modules, options.helpers ?? []), ...collectDevelopmentLogHelpers(options.developmentLogs)];
     const scripts = collectScripts(project.modules);
     const configuration = configurationScript(options.configuration);
     const sorted = [...(options.assets ?? [])].sort((left, right) => left.path.localeCompare(right.path));

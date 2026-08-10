@@ -28,6 +28,7 @@ export interface CompileOptions {
     cache?: ProjectCache;
     tracker?: PhaseTracker;
     minMtaVersion?: string | null;
+    developmentLogs?: LuamConfig['development']['logs'] | null;
 }
 
 function helperList(config: LuamConfig, inputs: ProjectInputs): RuntimeHelperName[] {
@@ -40,7 +41,12 @@ function helperList(config: LuamConfig, inputs: ProjectInputs): RuntimeHelperNam
     return helpers.sort();
 }
 
-function resourceOptions(config: LuamConfig, inputs: ProjectInputs, minMtaVersion: string | null): ResourceOptions {
+function resourceOptions(
+    config: LuamConfig,
+    inputs: ProjectInputs,
+    minMtaVersion: string | null,
+    developmentLogs: LuamConfig['development']['logs'] | null,
+): ResourceOptions {
     const options: ResourceOptions = {
         oop: config.oop,
         helpers: helperList(config, inputs),
@@ -48,6 +54,7 @@ function resourceOptions(config: LuamConfig, inputs: ProjectInputs, minMtaVersio
         configuration: inputs.configuration,
         loadOrder: config.loadOrder,
         minMtaVersion,
+        developmentLogs,
     };
 
     if (config.author !== null) {
@@ -109,7 +116,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('assembly');
 
-    const assembly = assembleResource(project, resourceOptions(config, inputs, options.minMtaVersion ?? null), (step: AssemblyStep) => {
+    const assembly = assembleResource(project, resourceOptions(config, inputs, options.minMtaVersion ?? null, options.developmentLogs ?? null), (step: AssemblyStep) => {
         if (step === 'assembly') {
             tracker.begin('manifest');
         }
