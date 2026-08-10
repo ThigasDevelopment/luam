@@ -3,7 +3,7 @@ local core: Core = new Core('server')
 addEventHandler('onResourceStart', resourceRoot, function()
     core:start()
 
-    outputServerLog(`[${process.env.SERVER_NAME}] started with room for ${process.env.MAX_PLAYERS} players.`)
+    outputServerLog(`[${env.SERVER_NAME}] started with room for ${env.MAX_PLAYERS} players.`)
 end)
 
 addEventHandler('onResourceStop', resourceRoot, function()

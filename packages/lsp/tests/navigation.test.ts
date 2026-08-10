@@ -54,6 +54,13 @@ describe('definition', () => {
         expect(locations[0]?.range.start.line).toBe(1);
     });
 
+    it('resolves a generated accessor to its field', () => {
+        const text = 'class Player {\n    @Getter\n    name: string\n}\nlocal player = new Player()\nlocal name = player:getName()\n';
+        const locations = serviceWith(text).definition(SERVER_FILE, positionOf(text, 'player:', 'getName'));
+
+        expect(locations[0]?.range.start).toEqual({ line: 2, character: 4 });
+    });
+
     it('resolves a global declared in another file', () => {
         const service = new LanguageService();
         const text = 'sharedHelper()\n';

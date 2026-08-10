@@ -33,6 +33,7 @@ function registerFeatures(connection: Connection, service: LanguageService): voi
     connection.onDefinition((params) => service.definition(params.textDocument.uri, params.position));
     connection.onReferences((params) => service.references(params.textDocument.uri, params.position));
     connection.onRenameRequest((params) => service.rename(params.textDocument.uri, params.position, params.newName));
+    connection.onDocumentSymbol((params) => service.documentSymbols(params.textDocument.uri));
 }
 
 export function startServer(connection: Connection): LanguageService {

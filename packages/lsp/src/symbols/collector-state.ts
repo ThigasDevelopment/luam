@@ -1,6 +1,7 @@
 import type { Type } from '@compiler/checker/types';
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { Expression, FunctionExpression } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 
 import { locateWord, positionAt } from '@lsp/support/source-text';
 
@@ -23,6 +24,7 @@ export interface CollectorState {
     references: SymbolReference[];
     types: ReadonlyMap<Expression, Type>;
     walkFunction: FunctionWalker;
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
 }
 
 export interface DeclarationInput {
@@ -33,6 +35,7 @@ export interface DeclarationInput {
     container?: string | null;
     type?: Type | null;
     parameters?: readonly string[];
+    isSynthetic?: boolean;
 }
 
 export function createState(
@@ -40,8 +43,9 @@ export function createState(
     starts: number[],
     types: ReadonlyMap<Expression, Type>,
     walkFunction: FunctionWalker,
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
 ): CollectorState {
-    return { text, starts, scopes: new ScopeTree(), declarations: [], references: [], types, walkFunction };
+    return { text, starts, scopes: new ScopeTree(), declarations: [], references: [], types, walkFunction, generatedMembers };
 }
 
 export function declareSymbol(state: CollectorState, scopeId: number, input: DeclarationInput): SymbolDeclaration {
@@ -54,6 +58,7 @@ export function declareSymbol(state: CollectorState, scopeId: number, input: Dec
         detail: input.detail,
         type: input.type ?? null,
         parameters: input.parameters ?? [],
+        isSynthetic: input.isSynthetic ?? false,
     };
 
     state.declarations.push(declaration);

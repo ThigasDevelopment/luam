@@ -90,39 +90,51 @@ describe('checker', () => {
     });
 
     it('accepts a function that matches a function type annotation', () => {
-        const source = 'local double: function(value: number): number = function(value: number): number\n    return value * 2\nend\n';
+        const source = 'local double: fun(value: number): number = function(value: number): number\n    return value * 2\nend\n';
 
         expect(codes(source)).toEqual([]);
-        expect(codes('local logger: function(...): void = print')).toEqual([]);
+        expect(codes('local logger: fun(...): void = print')).toEqual([]);
     });
 
     it('rejects a function whose parameter type does not match the annotation', () => {
-        const source = 'local double: function(value: string): number = function(value: number): number\n    return value\nend\n';
+        const source = 'local double: fun(value: string): number = function(value: number): number\n    return value\nend\n';
 
         expect(codes(source)).toEqual(['check-type-mismatch']);
     });
 
     it('rejects a function whose return type does not match the annotation', () => {
-        const source = 'local label: function(value: number): string = function(value: number): number\n    return value\nend\n';
+        const source = 'local label: fun(value: number): string = function(value: number): number\n    return value\nend\n';
 
         expect(codes(source)).toEqual(['check-type-mismatch']);
     });
 
     it('rejects a non-function assigned to a function type annotation', () => {
-        expect(codes('local double: function(value: number): number = 1')).toEqual(['check-type-mismatch']);
+        expect(codes('local double: fun(value: number): number = 1')).toEqual(['check-type-mismatch']);
     });
 
     it('treats the bare function type as the loose form of the same rule', () => {
-        expect(codes('local loose: function = print')).toEqual([]);
-        expect(codes('local loose: function = 1')).toEqual(['check-type-mismatch']);
-        expect(codes('local anyReturn: function(string) = print')).toEqual([]);
+        expect(codes('local loose: fun = print')).toEqual([]);
+        expect(codes('local loose: fun = 1')).toEqual(['check-type-mismatch']);
+        expect(codes('local anyReturn: fun(string) = print')).toEqual([]);
     });
 
     it('names function types in diagnostics using the source syntax', () => {
-        expect(messages('local double: function(value: number): number = 1')[0]).toBe(
-            'Variable "double" expects "function(number): number" but received "number".',
+        expect(messages('local double: fun(value: number): number = 1')[0]).toBe(
+            'Variable "double" expects "fun(number): number" but received "number".',
         );
-        expect(messages('local loose: function = 1')[0]).toBe('Variable "loose" expects "function(...): any" but received "number".');
+        expect(messages('local loose: fun = 1')[0]).toBe('Variable "loose" expects "fun(...): any" but received "number".');
+    });
+
+    it('points at "fun" when a function type is written with the keyword', () => {
+        expect(codes('local callback: function(string): void = print')).toEqual(['parse-invalid-type']);
+        expect(messages('local callback: function(string): void = print')[0]).toContain('Use "fun" for function types.');
+    });
+
+    it('requires a numeric target for increment and decrement', () => {
+        expect(codes('local total: number = 0\ntotal++\n')).toEqual([]);
+        expect(codes('local total: number = 0\ntotal--\n')).toEqual([]);
+        expect(codes("local label: string = 'x'\nlabel++\n")).toEqual(['check-invalid-operand']);
+        expect(messages("local label: string = 'x'\nlabel++\n")[0]).toBe('Operator "++" cannot be applied to "string".');
     });
 
     it('accepts arrays where a table is expected', () => {

@@ -131,9 +131,13 @@ export function emitExpression(state: EmitState, expression: Expression, limit =
         case 'call-expression':
             return emitCall(state, expression);
         case 'new-expression': {
-            requireHelper(state, 'class');
-
             const args = expression.args.map((argument) => emitExpression(state, argument));
+
+            if (typeOf(state, expression)?.kind === 'record') {
+                return `${expression.className}.new(${args.join(', ')})`;
+            }
+
+            requireHelper(state, 'class');
 
             return `new ${emitString(expression.className)} (${args.join(', ')})`;
         }

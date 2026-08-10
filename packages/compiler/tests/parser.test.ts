@@ -51,6 +51,53 @@ function firstValue(source: string): Expression {
 }
 
 describe('parser', () => {
+    it('attaches decorators to classes and members in source order', () => {
+        const [statement] = statements('@Getter\nclass Player {\n    @Getter\n    @Setter\n    name: string\n}\n');
+
+        expect(statement).toMatchObject({
+            kind: 'class-declaration',
+            decorators: [{ name: 'Getter' }],
+            members: [{ kind: 'class-field', decorators: [{ name: 'Getter' }, { name: 'Setter' }] }],
+        });
+    });
+
+    it('parses optional class and interface fields with the marker on the name', () => {
+        const classField = statements('class Player {\n    name?: string\n}\n')[0];
+        const interfaceField = statements('interface Named {\n    name?: string\n}\n')[0];
+        const classMember = classField?.kind === 'class-declaration' ? classField.members[0] : undefined;
+        const interfaceMember = interfaceField?.kind === 'interface-declaration' ? interfaceField.members[0] : undefined;
+
+        expect(classMember?.kind === 'class-field' && classMember.annotation?.kind).toBe('type-optional');
+        expect(interfaceMember?.kind === 'interface-field' && interfaceMember.annotation.kind).toBe('type-optional');
+    });
+
+    it('rejects a field optional marker placed on the type', () => {
+        expect(codes('class Player {\n    name: string?\n}\n')).toEqual(['parse-field-optional-position']);
+        expect(codes('interface Named {\n    name: string?\n}\n')).toEqual(['parse-field-optional-position']);
+    });
+
+    it('reports decorator arguments while retaining the class', () => {
+        const result = parse('@Getter(true)\nclass Player {\n}\n');
+
+        expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['parse-decorator-arguments']);
+        expect(result.program.body.map((statement) => statement.kind)).toEqual(['class-declaration']);
+    });
+
+    it('reports unsupported decorator targets and retains the declaration', () => {
+        const result = parse('@Getter\nlocal value = 1\n');
+
+        expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['parse-unexpected-decorator']);
+        expect(result.program.body.map((statement) => statement.kind)).toEqual(['local-statement']);
+    });
+
+    it('recovers after a broken decorator inside a class', () => {
+        const result = parse('class Player {\n    @\n    broken: string\n    health: number\n}\n');
+        const statement = result.program.body[0];
+
+        expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain('parse-unexpected-decorator');
+        expect(statement?.kind === 'class-declaration' && statement.members.map((member) => member.name)).toContain('health');
+    });
+
     it('parses a local declaration with a type annotation', () => {
         expect(statements("local name: string = 'Thigas'")).toMatchSnapshot();
     });
@@ -99,6 +146,20 @@ describe('parser', () => {
         expect(kinds('total ..= "x"')).toEqual(['assignment-statement']);
     });
 
+    it('parses increment and decrement statements', () => {
+        const [statement] = statements('total++');
+
+        expect(statement).toMatchObject({ kind: 'assignment-statement', operator: '++', values: [] });
+        expect(kinds('total--')).toEqual(['assignment-statement']);
+        expect(kinds('self.count++')).toEqual(['assignment-statement']);
+        expect(kinds('items[1]--')).toEqual(['assignment-statement']);
+    });
+
+    it('rejects increment on multiple targets and on calls', () => {
+        expect(codes('a, b++')).toEqual(['parse-invalid-increment']);
+        expect(codes('next()++')).toEqual(['parse-invalid-increment']);
+    });
+
     it('applies Lua operator precedence', () => {
         expect(shape(firstValue('local a = 1 + 2 * 3'))).toBe('(1 + (2 * 3))');
         expect(shape(firstValue('local a = 1 * 2 + 3'))).toBe('((1 * 2) + 3)');
@@ -131,18 +192,18 @@ describe('parser', () => {
     });
 
     it('parses function type annotations', () => {
-        expect(statements('local callback: function(string): void = print')).toMatchSnapshot();
-        expect(kinds('local reducer: function(total: number, value: number): number = nil')).toEqual(['local-statement']);
-        expect(kinds('local logger: function(...): void = print')).toEqual(['local-statement']);
-        expect(kinds('local untyped: function = print')).toEqual(['local-statement']);
-        expect(kinds('local unknownReturn: function(string) = print')).toEqual(['local-statement']);
-        expect(kinds('local maybe: (function(string): void)? = nil')).toEqual(['local-statement']);
-        expect(kinds('local handlers: (function(string): void)[] = {}')).toEqual(['local-statement']);
+        expect(statements('local callback: fun(string): void = print')).toMatchSnapshot();
+        expect(kinds('local reducer: fun(total: number, value: number): number = nil')).toEqual(['local-statement']);
+        expect(kinds('local logger: fun(...): void = print')).toEqual(['local-statement']);
+        expect(kinds('local untyped: fun = print')).toEqual(['local-statement']);
+        expect(kinds('local unknownReturn: fun(string) = print')).toEqual(['local-statement']);
+        expect(kinds('local maybe: (fun(string): void)? = nil')).toEqual(['local-statement']);
+        expect(kinds('local handlers: (fun(string): void)[] = {}')).toEqual(['local-statement']);
     });
 
     it('parses a function type as a parameter and as a return annotation', () => {
-        expect(kinds('function on(handler: function(string): void, times: number): void\nend')).toEqual(['function-declaration']);
-        expect(kinds('function make(): function(string): void\n    return print\nend')).toEqual(['function-declaration']);
+        expect(kinds('function on(handler: fun(string): void, times: number): void\nend')).toEqual(['function-declaration']);
+        expect(kinds('function make(): fun(string): void\n    return print\nend')).toEqual(['function-declaration']);
     });
 
     it('reports a parenthesized type that holds more than one type', () => {

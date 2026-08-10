@@ -130,6 +130,21 @@ describe('resource assembly', () => {
         expect(result.build).toBeNull();
         expect(result.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['project-duplicate-output']);
     });
+
+    it('builds a resource with generated accessors and the class helper', () => {
+        const decorated = compileProject([
+            {
+                path: 'src/shared/player.luam',
+                source: 'class Player {\n    @Getter\n    @Setter\n    name: string\n}\n',
+            },
+        ]);
+        const built = assembleResource(decorated, {}).build;
+
+        expect(decorated.diagnostics).toEqual([]);
+        expect(built?.scripts[0]?.content).toContain('getName = function(self)');
+        expect(built?.scripts[0]?.content).toContain('setName = function(self, value)');
+        expect(built?.helpers.map((helper) => helper.path)).toContain('lib/shared/class.lua');
+    });
 });
 
 describe('manifest attribute policy', () => {

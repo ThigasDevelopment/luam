@@ -73,6 +73,43 @@ describe('process.env typing', () => {
     });
 });
 
+describe('env typing', () => {
+    it('declares env with the same keys as the env file', () => {
+        const source = 'local name: string = env.SERVER_NAME\nlocal slots: number = env.MAX_PLAYERS\nlocal debug: boolean = env.DEBUG\n';
+
+        expect(compile('src/server/main.luam', source).diagnostics).toEqual([]);
+    });
+
+    it('rejects a value used as the wrong type', () => {
+        expect(codes(compile('src/server/main.luam', 'local slots: string = env.MAX_PLAYERS\n'))).toEqual(['check-type-mismatch']);
+    });
+
+    it('reports a key the env file does not declare', () => {
+        const result = compile('src/server/main.luam', 'print(env.MAX_PLAYER)\n');
+
+        expect(codes(result)).toEqual(['check-unknown-record-key']);
+        expect(result.diagnostics[0]?.diagnostic.message).toBe(
+            '"MAX_PLAYER" is not a key of "env", declared in ".env". Declared keys: "DEBUG", "MAX_PLAYERS", "SERVER_NAME".',
+        );
+    });
+
+    it('keeps env off the client', () => {
+        expect(codes(compile('src/client/hud.luam', 'print(env.SERVER_NAME)\n'))).toEqual(['check-environment-api']);
+    });
+
+    it('leaves env undeclared when the project has no env file', () => {
+        const result = compileProject([{ path: 'src/server/main.luam', source: 'print(env.ANYTHING)\n' }]);
+
+        expect(result.diagnostics).toEqual([]);
+    });
+
+    it('emits the member access unchanged', () => {
+        const result = compile('src/server/main.luam', 'print(env.SERVER_NAME)\n');
+
+        expect(result.modules[0]?.code).toBe('print(env.SERVER_NAME)\n');
+    });
+});
+
 describe('declaration files', () => {
     it('type checks and produces no output', () => {
         const result = compile('src/shared/vendor.d.luam', 'class Vendor {\n    id: number = 0\n}\n');

@@ -1,4 +1,5 @@
 import type { MemberInfo } from '@compiler/checker/registry';
+import { KNOWN_DECORATORS } from '@compiler/checker/decorators';
 import { typeToString, type Type } from '@compiler/checker/types';
 import { NATIVE_EXTENSIONS } from '@compiler/extensions/native-extensions';
 import type { ApiDeclaration } from '@mta-types/api-declaration';
@@ -57,6 +58,15 @@ export const KEYWORD_ITEMS: readonly CompletionItem[] = [
 export const DIRECTIVE_ITEMS: readonly CompletionItem[] = [
     { label: 'export', kind: CompletionItemKind.Keyword, detail: 'export function — expose a function to other resources' },
 ];
+
+export function decoratorItems(): CompletionItem[] {
+    return [...KNOWN_DECORATORS.values()].map((decorator) => ({
+        label: decorator.name,
+        kind: CompletionItemKind.Function,
+        detail: `@${decorator.name}`,
+        documentation: { kind: MarkupKind.Markdown, value: decorator.documentation },
+    }));
+}
 
 export function symbolItem(declaration: SymbolDeclaration): CompletionItem {
     return { label: declaration.name, kind: ITEM_KINDS[declaration.kind], detail: declaration.detail };

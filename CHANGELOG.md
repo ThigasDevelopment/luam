@@ -6,6 +6,79 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Decorators and Generated Accessors
+
+#### Added
+
+- `@Getter` and `@Setter` on class fields or classes. Resolved boolean fields
+  generate `isName`; other fields generate `getName`; setters use `setName`.
+- Generated accessors are typed, inherited, satisfy interfaces, emit as ordinary
+  Lua 5.1 methods, and appear in completion, hover, definition, and signature
+  help without duplicating entries in the document outline.
+- Decorator completion and hover, VS Code syntax highlighting, dedicated parser
+  and checker diagnostics, a compiler fixture, and end-to-end resource coverage.
+
+### Native Classes and the `env` Global
+
+`Threads` and `Async` were libraries with a static `new`, which meant the
+language had two ways to construct something. Now they are classes, built with
+the same `new` a project class uses, and `Dotenv` joins them.
+
+#### Added
+
+- `Dotenv`, a server-only native class over the `.env` reader that already
+  shipped: `new Dotenv('.env.production')` answers `get(key, fallback)`,
+  `has(key)`, `all()` and `apply()`. `apply()` republishes its keys as the
+  global environment. It rides on the new `dotenv` runtime helper, injected
+  only when a module names `Dotenv`.
+- `env`, a global the project already has whenever it has a `.env`. It carries
+  the same typed keys as `process.env`, which stays valid, and is declared
+  `server` for the same reason.
+- 15 tests covering construction, the constructor signature, `env` typing and
+  environment pinning, plus `env.` completion in the editor. The suite is
+  852 tests.
+
+#### Changed
+
+- `Threads`, `Async` and `Dotenv` are constructed with `new`:
+  `local tasks = new Async(100)`. The constructor signature is checked from the
+  catalog and the instance keeps its members. `new Async(100)` lowers to
+  `Async.new(100)`, so the runtime libraries are untouched — only a project
+  class goes through the `new` helper in `class.lua`.
+- **Breaking**: `Async.new(100)` is now `check-native-constructor`. There is one
+  construction syntax in the language, and the message names the form to write.
+- `env.lua` no longer parses `.env` itself. It loads `dotenv.lua` and applies
+  the root file, so one parser serves both the automatic global and an explicit
+  `new Dotenv(path)`.
+
+### Increment, Decrement and the `fun` Type Keyword
+
+Two small syntax changes that pull in opposite directions: one adds an operator
+Lua never had, the other stops a type from borrowing a keyword.
+
+#### Added
+
+- `++` and `--` as statements. `score++` compiles to `score = score + 1` and
+  `score--` to `score = score - 1`. They take a single variable, field or index,
+  the target must be numeric, and they are statements only — never expressions,
+  because Lua has no assignment expression to build on.
+- 11 tests covering the two operators across the lexer, parser, checker and
+  emitter, plus the `operators.luam` fixture. The suite is 836 tests.
+
+#### Changed
+
+- Function types are written `fun(string): void`, not `function(string): void`.
+  `function` stays a reserved keyword for declarations alone, so a type never
+  competes with a block header. Writing `function` in a type position reports
+  `parse-invalid-type` with the replacement in the message. Diagnostics, hovers
+  and signature help render the new form. **Breaking**: every existing function
+  type annotation needs the keyword swapped.
+- `--` is read as a decrement operator only when the two dashes touch their
+  target and close the statement — `count--`, `count--;`, `count-- -- note`.
+  Everything else stays a comment, including `count -- note` and `count--note`.
+  **Breaking** in exactly one form: `count--` glued to a target with nothing
+  after it used to be an empty comment and is now a decrement.
+
 ### Editor Experience — Documentation, Signatures and Context
 
 Writing Luam by hand exposed an editor that knew the types but never explained

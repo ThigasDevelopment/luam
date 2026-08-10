@@ -68,7 +68,7 @@ describe('oop completion', () => {
 
         const item = workspace.service.completion(uri, markerAt(source, 'player:get')).find((entry) => entry.label === 'getName');
 
-        expect(item?.detail).toBe('Player.getName: function(): string — wraps getPlayerName (shared)');
+        expect(item?.detail).toBe('Player.getName: fun(): string — wraps getPlayerName (shared)');
     });
 
     it('offers nothing from the OOP surface when the flag is off', () => {
@@ -97,7 +97,7 @@ describe('oop hover', () => {
         const hover = workspace.service.hover(uri, positionOf(source, 'player:', 'getName'));
         const value = typeof hover?.contents === 'object' && 'value' in hover.contents ? hover.contents.value : '';
 
-        expect(value).toContain('Player.getName: function(): string');
+        expect(value).toContain('Player.getName: fun(): string');
         expect(value).toContain('wraps `getPlayerName` (shared)');
     });
 

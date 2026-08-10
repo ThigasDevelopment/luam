@@ -409,9 +409,9 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                 "kind": "type-name",
                 "name": "string",
                 "position": {
-                  "column": 26,
+                  "column": 21,
                   "line": 11,
-                  "offset": 281,
+                  "offset": 276,
                 },
                 "typeArguments": [],
               },
@@ -425,9 +425,9 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               "kind": "type-name",
               "name": "void",
               "position": {
-                "column": 35,
+                "column": 30,
                 "line": 11,
-                "offset": 290,
+                "offset": 285,
               },
               "typeArguments": [],
             },
@@ -451,9 +451,9 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "kind": "identifier",
           "name": "print",
           "position": {
-            "column": 42,
+            "column": 37,
             "line": 11,
-            "offset": 297,
+            "offset": 292,
           },
         },
       ],
@@ -469,9 +469,9 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                 "kind": "type-name",
                 "name": "number",
                 "position": {
-                  "column": 32,
+                  "column": 27,
                   "line": 12,
-                  "offset": 334,
+                  "offset": 324,
                 },
                 "typeArguments": [],
               },
@@ -479,9 +479,9 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                 "kind": "type-name",
                 "name": "number",
                 "position": {
-                  "column": 47,
+                  "column": 42,
                   "line": 12,
-                  "offset": 349,
+                  "offset": 339,
                 },
                 "typeArguments": [],
               },
@@ -489,15 +489,15 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 16,
               "line": 12,
-              "offset": 318,
+              "offset": 313,
             },
             "returnType": {
               "kind": "type-name",
               "name": "number",
               "position": {
-                "column": 56,
+                "column": 51,
                 "line": 12,
-                "offset": 358,
+                "offset": 348,
               },
               "typeArguments": [],
             },
@@ -506,7 +506,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 7,
             "line": 12,
-            "offset": 309,
+            "offset": 304,
           },
         },
       ],
@@ -514,7 +514,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
       "position": {
         "column": 1,
         "line": 12,
-        "offset": 303,
+        "offset": 298,
       },
       "values": [
         {
@@ -524,7 +524,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 5,
                 "line": 13,
-                "offset": 418,
+                "offset": 408,
               },
               "values": [
                 {
@@ -535,14 +535,14 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                     "position": {
                       "column": 12,
                       "line": 13,
-                      "offset": 425,
+                      "offset": 415,
                     },
                   },
                   "operator": "+",
                   "position": {
                     "column": 18,
                     "line": 13,
-                    "offset": 431,
+                    "offset": 421,
                   },
                   "right": {
                     "kind": "identifier",
@@ -550,7 +550,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                     "position": {
                       "column": 20,
                       "line": 13,
-                      "offset": 433,
+                      "offset": 423,
                     },
                   },
                 },
@@ -564,18 +564,18 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                 "kind": "type-name",
                 "name": "number",
                 "position": {
-                  "column": 81,
+                  "column": 76,
                   "line": 12,
-                  "offset": 383,
+                  "offset": 373,
                 },
                 "typeArguments": [],
               },
               "isVararg": false,
               "name": "total",
               "position": {
-                "column": 74,
+                "column": 69,
                 "line": 12,
-                "offset": 376,
+                "offset": 366,
               },
             },
             {
@@ -583,33 +583,33 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                 "kind": "type-name",
                 "name": "number",
                 "position": {
-                  "column": 96,
+                  "column": 91,
                   "line": 12,
-                  "offset": 398,
+                  "offset": 388,
                 },
                 "typeArguments": [],
               },
               "isVararg": false,
               "name": "value",
               "position": {
-                "column": 89,
+                "column": 84,
                 "line": 12,
-                "offset": 391,
+                "offset": 381,
               },
             },
           ],
           "position": {
-            "column": 65,
+            "column": 60,
             "line": 12,
-            "offset": 367,
+            "offset": 357,
           },
           "returnAnnotation": {
             "kind": "type-name",
             "name": "number",
             "position": {
-              "column": 105,
+              "column": 100,
               "line": 12,
-              "offset": 407,
+              "offset": 397,
             },
             "typeArguments": [],
           },
@@ -626,15 +626,15 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 15,
               "line": 15,
-              "offset": 457,
+              "offset": 447,
             },
             "returnType": {
               "kind": "type-name",
               "name": "void",
               "position": {
-                "column": 30,
+                "column": 25,
                 "line": 15,
-                "offset": 472,
+                "offset": 457,
               },
               "typeArguments": [],
             },
@@ -643,7 +643,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 7,
             "line": 15,
-            "offset": 449,
+            "offset": 439,
           },
         },
       ],
@@ -651,16 +651,16 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
       "position": {
         "column": 1,
         "line": 15,
-        "offset": 443,
+        "offset": 433,
       },
       "values": [
         {
           "kind": "identifier",
           "name": "print",
           "position": {
-            "column": 37,
+            "column": 32,
             "line": 15,
-            "offset": 479,
+            "offset": 464,
           },
         },
       ],
@@ -677,9 +677,9 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                   "kind": "type-name",
                   "name": "string",
                   "position": {
-                    "column": 26,
+                    "column": 21,
                     "line": 16,
-                    "offset": 510,
+                    "offset": 490,
                   },
                   "typeArguments": [],
                 },
@@ -687,31 +687,31 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 17,
                 "line": 16,
-                "offset": 501,
+                "offset": 486,
               },
               "returnType": {
                 "kind": "type-name",
                 "name": "void",
                 "position": {
-                  "column": 35,
+                  "column": 30,
                   "line": 16,
-                  "offset": 519,
+                  "offset": 499,
                 },
                 "typeArguments": [],
               },
             },
             "kind": "type-optional",
             "position": {
-              "column": 40,
+              "column": 35,
               "line": 16,
-              "offset": 524,
+              "offset": 504,
             },
           },
           "name": "wrapped",
           "position": {
             "column": 7,
             "line": 16,
-            "offset": 491,
+            "offset": 476,
           },
         },
       ],
@@ -719,15 +719,15 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
       "position": {
         "column": 1,
         "line": 16,
-        "offset": 485,
+        "offset": 470,
       },
       "values": [
         {
           "kind": "nil-literal",
           "position": {
-            "column": 44,
+            "column": 39,
             "line": 16,
-            "offset": 528,
+            "offset": 508,
           },
         },
       ],
@@ -742,7 +742,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 14,
               "line": 17,
-              "offset": 545,
+              "offset": 525,
             },
             "returnType": null,
           },
@@ -750,7 +750,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 7,
             "line": 17,
-            "offset": 538,
+            "offset": 518,
           },
         },
       ],
@@ -758,16 +758,16 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
       "position": {
         "column": 1,
         "line": 17,
-        "offset": 532,
+        "offset": 512,
       },
       "values": [
         {
           "kind": "identifier",
           "name": "print",
           "position": {
-            "column": 25,
+            "column": 20,
             "line": 17,
-            "offset": 556,
+            "offset": 531,
           },
         },
       ],
@@ -779,7 +779,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 5,
             "line": 20,
-            "offset": 614,
+            "offset": 589,
           },
           "values": [
             {
@@ -788,7 +788,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 12,
                 "line": 20,
-                "offset": 621,
+                "offset": 596,
               },
             },
           ],
@@ -804,7 +804,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
         "position": {
           "column": 16,
           "line": 19,
-          "offset": 578,
+          "offset": 553,
         },
       },
       "parameters": [
@@ -815,7 +815,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 32,
               "line": 19,
-              "offset": 594,
+              "offset": 569,
             },
             "typeArguments": [],
           },
@@ -824,14 +824,14 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 25,
             "line": 19,
-            "offset": 587,
+            "offset": 562,
           },
         },
       ],
       "position": {
         "column": 7,
         "line": 19,
-        "offset": 569,
+        "offset": 544,
       },
       "returnAnnotation": {
         "kind": "type-name",
@@ -839,7 +839,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
         "position": {
           "column": 41,
           "line": 19,
-          "offset": 603,
+          "offset": 578,
         },
         "typeArguments": [],
       },
@@ -853,7 +853,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 7,
               "line": 23,
-              "offset": 638,
+              "offset": 613,
             },
           },
           {
@@ -862,7 +862,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 11,
               "line": 23,
-              "offset": 642,
+              "offset": 617,
             },
           },
           {
@@ -871,7 +871,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 18,
               "line": 23,
-              "offset": 649,
+              "offset": 624,
             },
           },
           {
@@ -880,7 +880,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 25,
               "line": 23,
-              "offset": 656,
+              "offset": 631,
             },
           },
           {
@@ -889,7 +889,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 35,
               "line": 23,
-              "offset": 666,
+              "offset": 641,
             },
           },
           {
@@ -898,7 +898,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 42,
               "line": 23,
-              "offset": 673,
+              "offset": 648,
             },
           },
           {
@@ -907,7 +907,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 50,
               "line": 23,
-              "offset": 681,
+              "offset": 656,
             },
           },
           {
@@ -916,7 +916,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 60,
               "line": 23,
-              "offset": 691,
+              "offset": 666,
             },
           },
           {
@@ -925,7 +925,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 69,
               "line": 23,
-              "offset": 700,
+              "offset": 675,
             },
           },
           {
@@ -934,7 +934,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 77,
               "line": 23,
-              "offset": 708,
+              "offset": 683,
             },
           },
           {
@@ -943,7 +943,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 86,
               "line": 23,
-              "offset": 717,
+              "offset": 692,
             },
           },
           {
@@ -953,7 +953,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
                 "position": {
                   "column": 102,
                   "line": 23,
-                  "offset": 733,
+                  "offset": 708,
                 },
                 "raw": "1",
                 "value": 1,
@@ -965,7 +965,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 93,
                 "line": 23,
-                "offset": 724,
+                "offset": 699,
               },
             },
             "kind": "call-expression",
@@ -973,7 +973,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 101,
               "line": 23,
-              "offset": 732,
+              "offset": 707,
             },
           },
         ],
@@ -983,7 +983,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 1,
             "line": 23,
-            "offset": 632,
+            "offset": 607,
           },
         },
         "kind": "call-expression",
@@ -991,14 +991,14 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
         "position": {
           "column": 6,
           "line": 23,
-          "offset": 637,
+          "offset": 612,
         },
       },
       "kind": "call-statement",
       "position": {
         "column": 1,
         "line": 23,
-        "offset": 632,
+        "offset": 607,
       },
     },
   ],
@@ -1105,42 +1105,42 @@ exports[`fixture annotations.luam > locks the token stream 1`] = `
   "keyword "local" 11:1",
   "identifier "callback" 11:7",
   "punctuation ":" 11:15",
-  "keyword "function" 11:17",
-  "punctuation "(" 11:25",
-  "identifier "string" 11:26",
-  "punctuation ")" 11:32",
-  "punctuation ":" 11:33",
-  "identifier "void" 11:35",
-  "operator "=" 11:40",
-  "identifier "print" 11:42",
+  "identifier "fun" 11:17",
+  "punctuation "(" 11:20",
+  "identifier "string" 11:21",
+  "punctuation ")" 11:27",
+  "punctuation ":" 11:28",
+  "identifier "void" 11:30",
+  "operator "=" 11:35",
+  "identifier "print" 11:37",
   "keyword "local" 12:1",
   "identifier "reducer" 12:7",
   "punctuation ":" 12:14",
-  "keyword "function" 12:16",
-  "punctuation "(" 12:24",
-  "identifier "total" 12:25",
-  "punctuation ":" 12:30",
-  "identifier "number" 12:32",
-  "punctuation "," 12:38",
-  "identifier "value" 12:40",
-  "punctuation ":" 12:45",
-  "identifier "number" 12:47",
-  "punctuation ")" 12:53",
-  "punctuation ":" 12:54",
-  "identifier "number" 12:56",
-  "operator "=" 12:63",
-  "keyword "function" 12:65",
-  "punctuation "(" 12:73",
-  "identifier "total" 12:74",
-  "punctuation ":" 12:79",
-  "identifier "number" 12:81",
-  "punctuation "," 12:87",
-  "identifier "value" 12:89",
-  "punctuation ":" 12:94",
-  "identifier "number" 12:96",
-  "punctuation ")" 12:102",
-  "punctuation ":" 12:103",
-  "identifier "number" 12:105",
+  "identifier "fun" 12:16",
+  "punctuation "(" 12:19",
+  "identifier "total" 12:20",
+  "punctuation ":" 12:25",
+  "identifier "number" 12:27",
+  "punctuation "," 12:33",
+  "identifier "value" 12:35",
+  "punctuation ":" 12:40",
+  "identifier "number" 12:42",
+  "punctuation ")" 12:48",
+  "punctuation ":" 12:49",
+  "identifier "number" 12:51",
+  "operator "=" 12:58",
+  "keyword "function" 12:60",
+  "punctuation "(" 12:68",
+  "identifier "total" 12:69",
+  "punctuation ":" 12:74",
+  "identifier "number" 12:76",
+  "punctuation "," 12:82",
+  "identifier "value" 12:84",
+  "punctuation ":" 12:89",
+  "identifier "number" 12:91",
+  "punctuation ")" 12:97",
+  "punctuation ":" 12:98",
+  "identifier "number" 12:100",
   "keyword "return" 13:5",
   "identifier "total" 13:12",
   "operator "+" 13:18",
@@ -1149,34 +1149,34 @@ exports[`fixture annotations.luam > locks the token stream 1`] = `
   "keyword "local" 15:1",
   "identifier "logger" 15:7",
   "punctuation ":" 15:13",
-  "keyword "function" 15:15",
-  "punctuation "(" 15:23",
-  "operator "..." 15:24",
-  "punctuation ")" 15:27",
-  "punctuation ":" 15:28",
-  "identifier "void" 15:30",
-  "operator "=" 15:35",
-  "identifier "print" 15:37",
+  "identifier "fun" 15:15",
+  "punctuation "(" 15:18",
+  "operator "..." 15:19",
+  "punctuation ")" 15:22",
+  "punctuation ":" 15:23",
+  "identifier "void" 15:25",
+  "operator "=" 15:30",
+  "identifier "print" 15:32",
   "keyword "local" 16:1",
   "identifier "wrapped" 16:7",
   "punctuation ":" 16:14",
   "punctuation "(" 16:16",
-  "keyword "function" 16:17",
-  "punctuation "(" 16:25",
-  "identifier "string" 16:26",
-  "punctuation ")" 16:32",
-  "punctuation ":" 16:33",
-  "identifier "void" 16:35",
-  "punctuation ")" 16:39",
-  "operator "?" 16:40",
-  "operator "=" 16:42",
-  "keyword "nil" 16:44",
+  "identifier "fun" 16:17",
+  "punctuation "(" 16:20",
+  "identifier "string" 16:21",
+  "punctuation ")" 16:27",
+  "punctuation ":" 16:28",
+  "identifier "void" 16:30",
+  "punctuation ")" 16:34",
+  "operator "?" 16:35",
+  "operator "=" 16:37",
+  "keyword "nil" 16:39",
   "keyword "local" 17:1",
   "identifier "loose" 17:7",
   "punctuation ":" 17:12",
-  "keyword "function" 17:14",
-  "operator "=" 17:23",
-  "identifier "print" 17:25",
+  "identifier "fun" 17:14",
+  "operator "=" 17:18",
+  "identifier "print" 17:20",
   "keyword "local" 19:1",
   "keyword "function" 19:7",
   "identifier "identity" 19:16",
@@ -1296,6 +1296,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
       },
     },
     {
+      "decorators": [],
       "interfaces": [],
       "kind": "class-declaration",
       "members": [
@@ -1310,6 +1311,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "decorators": [],
           "kind": "class-field",
           "name": "name",
           "position": {
@@ -1330,6 +1332,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "decorators": [],
           "kind": "class-field",
           "name": "health",
           "position": {
@@ -1391,7 +1394,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               ],
             },
           ],
+          "decorators": [],
           "isConstructor": true,
+          "isSynthetic": false,
           "kind": "class-method",
           "name": "constructor",
           "parameters": [
@@ -1465,7 +1470,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               ],
             },
           ],
+          "decorators": [],
           "isConstructor": false,
+          "isSynthetic": false,
           "kind": "class-method",
           "name": "takeDamage",
           "parameters": [
@@ -1536,7 +1543,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               ],
             },
           ],
+          "decorators": [],
           "isConstructor": false,
+          "isSynthetic": false,
           "kind": "class-method",
           "name": "describe",
           "parameters": [],
@@ -1566,6 +1575,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
       "superClass": null,
     },
     {
+      "decorators": [],
       "interfaces": [],
       "kind": "class-declaration",
       "members": [
@@ -1580,6 +1590,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "decorators": [],
           "kind": "class-field",
           "name": "level",
           "position": {
@@ -1678,7 +1689,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               ],
             },
           ],
+          "decorators": [],
           "isConstructor": true,
+          "isSynthetic": false,
           "kind": "class-method",
           "name": "constructor",
           "parameters": [
@@ -1787,7 +1800,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               },
             },
           ],
+          "decorators": [],
           "isConstructor": false,
+          "isSynthetic": false,
           "kind": "class-method",
           "name": "takeDamage",
           "parameters": [
@@ -1837,6 +1852,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
       "superClass": "Player",
     },
     {
+      "decorators": [],
       "interfaces": [
         "Command",
       ],
@@ -1853,6 +1869,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "decorators": [],
           "kind": "class-field",
           "name": "name",
           "position": {
@@ -1919,7 +1936,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               },
             },
           ],
+          "decorators": [],
           "isConstructor": false,
+          "isSynthetic": false,
           "kind": "class-method",
           "name": "execute",
           "parameters": [
@@ -3367,6 +3386,463 @@ exports[`fixture control-flow.luam > locks the token stream 1`] = `
   "keyword "break" 40:9",
   "keyword "end" 41:5",
   "keyword "end" 42:1",
+]
+`;
+
+exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
+{
+  "body": [
+    {
+      "annotation": {
+        "kind": "type-name",
+        "name": "boolean",
+        "position": {
+          "column": 13,
+          "line": 1,
+          "offset": 12,
+        },
+        "typeArguments": [],
+      },
+      "kind": "type-alias-statement",
+      "name": "Flag",
+      "position": {
+        "column": 1,
+        "line": 1,
+        "offset": 0,
+      },
+      "typeParameters": [],
+    },
+    {
+      "decorators": [
+        {
+          "kind": "decorator",
+          "name": "Getter",
+          "position": {
+            "column": 1,
+            "line": 3,
+            "offset": 21,
+          },
+        },
+      ],
+      "interfaces": [],
+      "kind": "class-declaration",
+      "members": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 11,
+              "line": 6,
+              "offset": 66,
+            },
+            "typeArguments": [],
+          },
+          "decorators": [
+            {
+              "kind": "decorator",
+              "name": "Setter",
+              "position": {
+                "column": 5,
+                "line": 5,
+                "offset": 48,
+              },
+            },
+          ],
+          "kind": "class-field",
+          "name": "name",
+          "position": {
+            "column": 5,
+            "line": 6,
+            "offset": 60,
+          },
+          "value": {
+            "kind": "string-literal",
+            "position": {
+              "column": 20,
+              "line": 6,
+              "offset": 75,
+            },
+            "value": "Luam",
+          },
+        },
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "Flag",
+            "position": {
+              "column": 12,
+              "line": 10,
+              "offset": 118,
+            },
+            "typeArguments": [],
+          },
+          "decorators": [
+            {
+              "kind": "decorator",
+              "name": "Getter",
+              "position": {
+                "column": 5,
+                "line": 8,
+                "offset": 87,
+              },
+            },
+            {
+              "kind": "decorator",
+              "name": "Setter",
+              "position": {
+                "column": 5,
+                "line": 9,
+                "offset": 99,
+              },
+            },
+          ],
+          "kind": "class-field",
+          "name": "admin",
+          "position": {
+            "column": 5,
+            "line": 10,
+            "offset": 111,
+          },
+          "value": {
+            "kind": "boolean-literal",
+            "position": {
+              "column": 19,
+              "line": 10,
+              "offset": 125,
+            },
+            "value": false,
+          },
+        },
+      ],
+      "name": "Player",
+      "position": {
+        "column": 1,
+        "line": 4,
+        "offset": 29,
+      },
+      "superClass": null,
+    },
+    {
+      "declarations": [
+        {
+          "annotation": null,
+          "name": "player",
+          "position": {
+            "column": 7,
+            "line": 13,
+            "offset": 140,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 13,
+        "offset": 134,
+      },
+      "values": [
+        {
+          "args": [],
+          "className": "Player",
+          "kind": "new-expression",
+          "position": {
+            "column": 16,
+            "line": 13,
+            "offset": 149,
+          },
+        },
+      ],
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "string-literal",
+            "position": {
+              "column": 16,
+              "line": 14,
+              "offset": 177,
+            },
+            "value": "Compiler",
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "player",
+          "position": {
+            "column": 1,
+            "line": 14,
+            "offset": 162,
+          },
+        },
+        "kind": "call-expression",
+        "method": "setName",
+        "position": {
+          "column": 7,
+          "line": 14,
+          "offset": 168,
+        },
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 14,
+        "offset": 162,
+      },
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 13,
+              "line": 15,
+              "offset": 201,
+            },
+            "typeArguments": [],
+          },
+          "name": "name",
+          "position": {
+            "column": 7,
+            "line": 15,
+            "offset": 195,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 15,
+        "offset": 189,
+      },
+      "values": [
+        {
+          "args": [],
+          "callee": {
+            "kind": "identifier",
+            "name": "player",
+            "position": {
+              "column": 22,
+              "line": 15,
+              "offset": 210,
+            },
+          },
+          "kind": "call-expression",
+          "method": "getName",
+          "position": {
+            "column": 28,
+            "line": 15,
+            "offset": 216,
+          },
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "Flag",
+            "position": {
+              "column": 14,
+              "line": 16,
+              "offset": 240,
+            },
+            "typeArguments": [],
+          },
+          "name": "admin",
+          "position": {
+            "column": 7,
+            "line": 16,
+            "offset": 233,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 16,
+        "offset": 227,
+      },
+      "values": [
+        {
+          "args": [],
+          "callee": {
+            "kind": "identifier",
+            "name": "player",
+            "position": {
+              "column": 21,
+              "line": 16,
+              "offset": 247,
+            },
+          },
+          "kind": "call-expression",
+          "method": "isAdmin",
+          "position": {
+            "column": 27,
+            "line": 16,
+            "offset": 253,
+          },
+        },
+      ],
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "identifier",
+            "name": "name",
+            "position": {
+              "column": 7,
+              "line": 17,
+              "offset": 270,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "admin",
+            "position": {
+              "column": 13,
+              "line": 17,
+              "offset": 276,
+            },
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "print",
+          "position": {
+            "column": 1,
+            "line": 17,
+            "offset": 264,
+          },
+        },
+        "kind": "call-expression",
+        "method": null,
+        "position": {
+          "column": 6,
+          "line": 17,
+          "offset": 269,
+        },
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 17,
+        "offset": 264,
+      },
+    },
+  ],
+  "kind": "program",
+  "position": {
+    "column": 1,
+    "line": 1,
+    "offset": 0,
+  },
+}
+`;
+
+exports[`fixture decorators.luam > locks the generated Lua 5.1 output 1`] = `
+"class 'Player' {
+    name = 'Luam',
+    admin = false,
+    getName = function(self)
+        return self.name
+    end,
+    setName = function(self, value)
+        self.name = value
+    end,
+    isAdmin = function(self)
+        return self.admin
+    end,
+    setAdmin = function(self, value)
+        self.admin = value
+    end
+}
+local player = new 'Player' ()
+player:setName('Compiler')
+local name = player:getName()
+local admin = player:isAdmin()
+print(name, admin)
+"
+`;
+
+exports[`fixture decorators.luam > locks the generated Lua 5.1 output 2`] = `
+[
+  "class",
+]
+`;
+
+exports[`fixture decorators.luam > locks the token stream 1`] = `
+[
+  "identifier "type" 1:1",
+  "identifier "Flag" 1:6",
+  "operator "=" 1:11",
+  "identifier "boolean" 1:13",
+  "punctuation "@" 3:1",
+  "identifier "Getter" 3:2",
+  "identifier "class" 4:1",
+  "identifier "Player" 4:7",
+  "punctuation "{" 4:14",
+  "punctuation "@" 5:5",
+  "identifier "Setter" 5:6",
+  "identifier "name" 6:5",
+  "punctuation ":" 6:9",
+  "identifier "string" 6:11",
+  "operator "=" 6:18",
+  "string "Luam" 6:20",
+  "punctuation "@" 8:5",
+  "identifier "Getter" 8:6",
+  "punctuation "@" 9:5",
+  "identifier "Setter" 9:6",
+  "identifier "admin" 10:5",
+  "punctuation ":" 10:10",
+  "identifier "Flag" 10:12",
+  "operator "=" 10:17",
+  "keyword "false" 10:19",
+  "punctuation "}" 11:1",
+  "keyword "local" 13:1",
+  "identifier "player" 13:7",
+  "operator "=" 13:14",
+  "identifier "new" 13:16",
+  "identifier "Player" 13:20",
+  "punctuation "(" 13:26",
+  "punctuation ")" 13:27",
+  "identifier "player" 14:1",
+  "punctuation ":" 14:7",
+  "identifier "setName" 14:8",
+  "punctuation "(" 14:15",
+  "string "Compiler" 14:16",
+  "punctuation ")" 14:26",
+  "keyword "local" 15:1",
+  "identifier "name" 15:7",
+  "punctuation ":" 15:11",
+  "identifier "string" 15:13",
+  "operator "=" 15:20",
+  "identifier "player" 15:22",
+  "punctuation ":" 15:28",
+  "identifier "getName" 15:29",
+  "punctuation "(" 15:36",
+  "punctuation ")" 15:37",
+  "keyword "local" 16:1",
+  "identifier "admin" 16:7",
+  "punctuation ":" 16:12",
+  "identifier "Flag" 16:14",
+  "operator "=" 16:19",
+  "identifier "player" 16:21",
+  "punctuation ":" 16:27",
+  "identifier "isAdmin" 16:28",
+  "punctuation "(" 16:35",
+  "punctuation ")" 16:36",
+  "identifier "print" 17:1",
+  "punctuation "(" 17:6",
+  "identifier "name" 17:7",
+  "punctuation "," 17:11",
+  "identifier "admin" 17:13",
+  "punctuation ")" 17:18",
 ]
 `;
 
@@ -7947,60 +8423,252 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
       ],
     },
     {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "number",
+            "position": {
+              "column": 16,
+              "line": 13,
+              "offset": 444,
+            },
+            "typeArguments": [],
+          },
+          "name": "counter",
+          "position": {
+            "column": 7,
+            "line": 13,
+            "offset": 435,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 13,
+        "offset": 429,
+      },
+      "values": [
+        {
+          "kind": "number-literal",
+          "position": {
+            "column": 25,
+            "line": 13,
+            "offset": 453,
+          },
+          "raw": "0",
+          "value": 0,
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "element": {
+              "kind": "type-name",
+              "name": "number",
+              "position": {
+                "column": 14,
+                "line": 14,
+                "offset": 468,
+              },
+              "typeArguments": [],
+            },
+            "kind": "type-array",
+            "position": {
+              "column": 20,
+              "line": 14,
+              "offset": 474,
+            },
+          },
+          "name": "slots",
+          "position": {
+            "column": 7,
+            "line": 14,
+            "offset": 461,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 14,
+        "offset": 455,
+      },
+      "values": [
+        {
+          "fields": [
+            {
+              "key": null,
+              "name": null,
+              "position": {
+                "column": 27,
+                "line": 14,
+                "offset": 481,
+              },
+              "value": {
+                "kind": "number-literal",
+                "position": {
+                  "column": 27,
+                  "line": 14,
+                  "offset": 481,
+                },
+                "raw": "1",
+                "value": 1,
+              },
+            },
+            {
+              "key": null,
+              "name": null,
+              "position": {
+                "column": 30,
+                "line": 14,
+                "offset": 484,
+              },
+              "value": {
+                "kind": "number-literal",
+                "position": {
+                  "column": 30,
+                  "line": 14,
+                  "offset": 484,
+                },
+                "raw": "2",
+                "value": 2,
+              },
+            },
+          ],
+          "kind": "table-expression",
+          "position": {
+            "column": 25,
+            "line": 14,
+            "offset": 479,
+          },
+        },
+      ],
+    },
+    {
+      "kind": "assignment-statement",
+      "operator": "++",
+      "position": {
+        "column": 1,
+        "line": 16,
+        "offset": 489,
+      },
+      "targets": [
+        {
+          "kind": "identifier",
+          "name": "counter",
+          "position": {
+            "column": 1,
+            "line": 16,
+            "offset": 489,
+          },
+        },
+      ],
+      "values": [],
+    },
+    {
+      "kind": "assignment-statement",
+      "operator": "--",
+      "position": {
+        "column": 1,
+        "line": 17,
+        "offset": 499,
+      },
+      "targets": [
+        {
+          "kind": "identifier",
+          "name": "counter",
+          "position": {
+            "column": 1,
+            "line": 17,
+            "offset": 499,
+          },
+        },
+      ],
+      "values": [],
+    },
+    {
+      "kind": "assignment-statement",
+      "operator": "--",
+      "position": {
+        "column": 1,
+        "line": 18,
+        "offset": 509,
+      },
+      "targets": [
+        {
+          "kind": "identifier",
+          "name": "counter",
+          "position": {
+            "column": 1,
+            "line": 18,
+            "offset": 509,
+          },
+        },
+      ],
+      "values": [],
+    },
+    {
+      "kind": "assignment-statement",
+      "operator": "++",
+      "position": {
+        "column": 1,
+        "line": 19,
+        "offset": 535,
+      },
+      "targets": [
+        {
+          "index": {
+            "kind": "number-literal",
+            "position": {
+              "column": 7,
+              "line": 19,
+              "offset": 541,
+            },
+            "raw": "1",
+            "value": 1,
+          },
+          "kind": "index-expression",
+          "object": {
+            "kind": "identifier",
+            "name": "slots",
+            "position": {
+              "column": 1,
+              "line": 19,
+              "offset": 535,
+            },
+          },
+          "position": {
+            "column": 6,
+            "line": 19,
+            "offset": 540,
+          },
+        },
+      ],
+      "values": [],
+    },
+    {
       "expression": {
         "args": [
           {
             "kind": "identifier",
-            "name": "base",
+            "name": "counter",
             "position": {
               "column": 7,
-              "line": 14,
-              "offset": 436,
+              "line": 21,
+              "offset": 553,
             },
           },
           {
             "kind": "identifier",
-            "name": "negated",
+            "name": "slots",
             "position": {
-              "column": 13,
-              "line": 14,
-              "offset": 442,
-            },
-          },
-          {
-            "kind": "identifier",
-            "name": "joined",
-            "position": {
-              "column": 22,
-              "line": 14,
-              "offset": 451,
-            },
-          },
-          {
-            "kind": "identifier",
-            "name": "length",
-            "position": {
-              "column": 30,
-              "line": 14,
-              "offset": 459,
-            },
-          },
-          {
-            "kind": "identifier",
-            "name": "equal",
-            "position": {
-              "column": 38,
-              "line": 14,
-              "offset": 467,
-            },
-          },
-          {
-            "kind": "identifier",
-            "name": "different",
-            "position": {
-              "column": 45,
-              "line": 14,
-              "offset": 474,
+              "column": 16,
+              "line": 21,
+              "offset": 562,
             },
           },
         ],
@@ -8009,23 +8677,105 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
           "name": "print",
           "position": {
             "column": 1,
-            "line": 14,
-            "offset": 430,
+            "line": 21,
+            "offset": 547,
           },
         },
         "kind": "call-expression",
         "method": null,
         "position": {
           "column": 6,
-          "line": 14,
-          "offset": 435,
+          "line": 21,
+          "offset": 552,
         },
       },
       "kind": "call-statement",
       "position": {
         "column": 1,
-        "line": 14,
-        "offset": 430,
+        "line": 21,
+        "offset": 547,
+      },
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "identifier",
+            "name": "base",
+            "position": {
+              "column": 7,
+              "line": 22,
+              "offset": 575,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "negated",
+            "position": {
+              "column": 13,
+              "line": 22,
+              "offset": 581,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "joined",
+            "position": {
+              "column": 22,
+              "line": 22,
+              "offset": 590,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "length",
+            "position": {
+              "column": 30,
+              "line": 22,
+              "offset": 598,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "equal",
+            "position": {
+              "column": 38,
+              "line": 22,
+              "offset": 606,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "different",
+            "position": {
+              "column": 45,
+              "line": 22,
+              "offset": 613,
+            },
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "print",
+          "position": {
+            "column": 1,
+            "line": 22,
+            "offset": 569,
+          },
+        },
+        "kind": "call-expression",
+        "method": null,
+        "position": {
+          "column": 6,
+          "line": 22,
+          "offset": 574,
+        },
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 22,
+        "offset": 569,
       },
     },
     {
@@ -8036,8 +8786,8 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
             "name": "ranged",
             "position": {
               "column": 7,
-              "line": 15,
-              "offset": 491,
+              "line": 23,
+              "offset": 630,
             },
           },
           {
@@ -8045,8 +8795,8 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
             "name": "inverted",
             "position": {
               "column": 15,
-              "line": 15,
-              "offset": 499,
+              "line": 23,
+              "offset": 638,
             },
           },
           {
@@ -8054,8 +8804,8 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
             "name": "bounded",
             "position": {
               "column": 25,
-              "line": 15,
-              "offset": 509,
+              "line": 23,
+              "offset": 648,
             },
           },
           {
@@ -8063,8 +8813,8 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
             "name": "grouped",
             "position": {
               "column": 34,
-              "line": 15,
-              "offset": 518,
+              "line": 23,
+              "offset": 657,
             },
           },
           {
@@ -8072,8 +8822,8 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
             "name": "powered",
             "position": {
               "column": 43,
-              "line": 15,
-              "offset": 527,
+              "line": 23,
+              "offset": 666,
             },
           },
         ],
@@ -8082,23 +8832,23 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
           "name": "print",
           "position": {
             "column": 1,
-            "line": 15,
-            "offset": 485,
+            "line": 23,
+            "offset": 624,
           },
         },
         "kind": "call-expression",
         "method": null,
         "position": {
           "column": 6,
-          "line": 15,
-          "offset": 490,
+          "line": 23,
+          "offset": 629,
         },
       },
       "kind": "call-statement",
       "position": {
         "column": 1,
-        "line": 15,
-        "offset": 485,
+        "line": 23,
+        "offset": 624,
       },
     },
   ],
@@ -8123,6 +8873,13 @@ local inverted = not equal
 local bounded = base <= 2 or base >= 0
 local grouped = (1 + 2) * 3
 local powered = 2 ^ 3 ^ 2
+local counter = 0
+local slots = { 1, 2 }
+counter = counter + 1
+counter = counter - 1
+counter = counter - 1
+slots[1] = slots[1] + 1
+print(counter, slots)
 print(base, negated, joined, length, equal, different)
 print(ranged, inverted, bounded, grouped, powered)
 "
@@ -8243,32 +9000,67 @@ exports[`fixture operators.luam > locks the token stream 1`] = `
   "number "3" 12:29",
   "operator "^" 12:31",
   "number "2" 12:33",
-  "identifier "print" 14:1",
-  "punctuation "(" 14:6",
-  "identifier "base" 14:7",
-  "punctuation "," 14:11",
-  "identifier "negated" 14:13",
-  "punctuation "," 14:20",
-  "identifier "joined" 14:22",
+  "keyword "local" 13:1",
+  "identifier "counter" 13:7",
+  "punctuation ":" 13:14",
+  "identifier "number" 13:16",
+  "operator "=" 13:23",
+  "number "0" 13:25",
+  "keyword "local" 14:1",
+  "identifier "slots" 14:7",
+  "punctuation ":" 14:12",
+  "identifier "number" 14:14",
+  "punctuation "[" 14:20",
+  "punctuation "]" 14:21",
+  "operator "=" 14:23",
+  "punctuation "{" 14:25",
+  "number "1" 14:27",
   "punctuation "," 14:28",
-  "identifier "length" 14:30",
-  "punctuation "," 14:36",
-  "identifier "equal" 14:38",
-  "punctuation "," 14:43",
-  "identifier "different" 14:45",
-  "punctuation ")" 14:54",
-  "identifier "print" 15:1",
-  "punctuation "(" 15:6",
-  "identifier "ranged" 15:7",
-  "punctuation "," 15:13",
-  "identifier "inverted" 15:15",
-  "punctuation "," 15:23",
-  "identifier "bounded" 15:25",
-  "punctuation "," 15:32",
-  "identifier "grouped" 15:34",
-  "punctuation "," 15:41",
-  "identifier "powered" 15:43",
-  "punctuation ")" 15:50",
+  "number "2" 14:30",
+  "punctuation "}" 14:32",
+  "identifier "counter" 16:1",
+  "operator "++" 16:8",
+  "identifier "counter" 17:1",
+  "operator "--" 17:8",
+  "identifier "counter" 18:1",
+  "operator "--" 18:8",
+  "identifier "slots" 19:1",
+  "punctuation "[" 19:6",
+  "number "1" 19:7",
+  "punctuation "]" 19:8",
+  "operator "++" 19:9",
+  "identifier "print" 21:1",
+  "punctuation "(" 21:6",
+  "identifier "counter" 21:7",
+  "punctuation "," 21:14",
+  "identifier "slots" 21:16",
+  "punctuation ")" 21:21",
+  "identifier "print" 22:1",
+  "punctuation "(" 22:6",
+  "identifier "base" 22:7",
+  "punctuation "," 22:11",
+  "identifier "negated" 22:13",
+  "punctuation "," 22:20",
+  "identifier "joined" 22:22",
+  "punctuation "," 22:28",
+  "identifier "length" 22:30",
+  "punctuation "," 22:36",
+  "identifier "equal" 22:38",
+  "punctuation "," 22:43",
+  "identifier "different" 22:45",
+  "punctuation ")" 22:54",
+  "identifier "print" 23:1",
+  "punctuation "(" 23:6",
+  "identifier "ranged" 23:7",
+  "punctuation "," 23:13",
+  "identifier "inverted" 23:15",
+  "punctuation "," 23:23",
+  "identifier "bounded" 23:25",
+  "punctuation "," 23:32",
+  "identifier "grouped" 23:34",
+  "punctuation "," 23:41",
+  "identifier "powered" 23:43",
+  "punctuation ")" 23:50",
 ]
 `;
 

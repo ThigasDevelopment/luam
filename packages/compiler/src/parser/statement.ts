@@ -2,11 +2,11 @@ import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 
 import type { DeclareStatement, Expression, Statement, TypeAliasStatement, VariableDeclarator } from './ast';
 import { parseDoStatement, parseForStatement, parseIfStatement, parseRepeatStatement, parseWhileStatement } from './control-flow';
-import { isDeclarationStart, parseDeclaration } from './declarations';
+import { isDeclarationStart, parseDeclaration, parseDecorators } from './declarations';
 import { isDirectiveStart, parseDirective } from './directives';
 import { parseExpression, parseSuffixed } from './expression';
 import { parseFunctionDeclaration } from './function-expression';
-import { ASSIGNMENT_OPERATORS } from './precedence';
+import { ASSIGNMENT_OPERATORS, INCREMENT_OPERATORS } from './precedence';
 import { recoverInBlock } from './recovery';
 import { ParserError, type TokenStream } from './token-stream';
 import { parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
@@ -91,6 +91,23 @@ function isDeclareStatement(stream: TokenStream): boolean {
     return stream.check('identifier', 'declare') && stream.checkAhead(1, 'identifier') && stream.checkAhead(2, 'punctuation', ':');
 }
 
+function isIncrementTarget(target: Expression | undefined): boolean {
+    return target?.kind === 'identifier' || target?.kind === 'member-expression' || target?.kind === 'index-expression';
+}
+
+function parseIncrement(stream: TokenStream, targets: readonly Expression[], position: SourcePosition): Statement {
+    const operator = stream.current().value;
+    const target = targets[0];
+
+    if (targets.length !== 1 || !isIncrementTarget(target) || target === undefined) {
+        throw stream.error(`Operator "${operator}" takes a single variable as its target.`, 'parse-invalid-increment');
+    }
+
+    stream.next();
+
+    return { kind: 'assignment-statement', operator, targets: [target], values: [], position };
+}
+
 function parseExpressionStatement(stream: TokenStream): Statement {
     const position = stream.current().position;
     const targets: Expression[] = [parseSuffixed(stream)];
@@ -100,6 +117,10 @@ function parseExpressionStatement(stream: TokenStream): Statement {
     }
 
     const token = stream.current();
+
+    if (token.kind === 'operator' && INCREMENT_OPERATORS.has(token.value)) {
+        return parseIncrement(stream, targets, position);
+    }
 
     if (token.kind === 'operator' && ASSIGNMENT_OPERATORS.has(token.value)) {
         stream.next();
@@ -187,6 +208,20 @@ export function parseStatement(stream: TokenStream): Statement {
 
     if (isDeclarationStart(stream)) {
         return parseDeclaration(stream);
+    }
+
+    if (stream.check('punctuation', '@')) {
+        const decorators = parseDecorators(stream);
+
+        for (const decorator of decorators) {
+            stream.report('parse-unexpected-decorator', `Decorator "@${decorator.name}" cannot be used here.`, decorator.position);
+        }
+
+        if (stream.isEof()) {
+            throw stream.error('Expected a declaration after the decorator.', 'parse-unexpected-decorator');
+        }
+
+        return parseStatement(stream);
     }
 
     return parseExpressionStatement(stream);

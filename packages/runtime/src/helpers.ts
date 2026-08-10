@@ -1,4 +1,4 @@
-export type RuntimeHelperName = 'async' | 'class' | 'env' | 'math' | 'string' | 'table' | 'threads';
+export type RuntimeHelperName = 'async' | 'class' | 'dotenv' | 'env' | 'math' | 'string' | 'table' | 'threads';
 
 export type RuntimeInjection = 'automatic' | 'manual' | 'reference';
 
@@ -41,7 +41,15 @@ export const RUNTIME_HELPERS: Readonly<Record<RuntimeHelperName, RuntimeHelperMo
         injection: 'automatic',
         features: ['class-declaration', 'class-inheritance', 'class-instantiation', 'super-call', 'enum-declaration'],
     },
-    env: { name: 'env', file: 'env.lua', injection: 'manual', features: [], environment: 'server' },
+    dotenv: {
+        name: 'dotenv',
+        file: 'dotenv.lua',
+        injection: 'reference',
+        features: [],
+        globals: ['Dotenv'],
+        environment: 'server',
+    },
+    env: { name: 'env', file: 'env.lua', injection: 'manual', features: [], requires: ['dotenv'], environment: 'server' },
     math: { name: 'math', file: 'math.lua', injection: 'automatic', features: ['number-extension'] },
     string: { name: 'string', file: 'string.lua', injection: 'automatic', features: ['string-extension', 'template-string'] },
     table: { name: 'table', file: 'table.lua', injection: 'automatic', features: ['table-extension'] },

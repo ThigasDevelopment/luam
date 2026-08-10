@@ -24,7 +24,7 @@ export function annotationText(annotation: TypeAnnotation | null): string {
             parameters.push('...');
         }
 
-        return `function(${parameters.join(', ')}): ${annotationText(annotation.returnType)}`;
+        return `fun(${parameters.join(', ')}): ${annotationText(annotation.returnType)}`;
     }
 
     if (annotation.typeArguments.length === 0) {
@@ -53,6 +53,12 @@ export function variableText(keyword: string, name: string, annotation: TypeAnno
     }
 
     return fallback === null ? `${keyword} ${name}` : `${keyword} ${name}: ${fallback}`;
+}
+
+export function fieldText(name: string, annotation: TypeAnnotation): string {
+    return annotation.kind === 'type-optional'
+        ? `field ${name}?: ${annotationText(annotation.element)}`
+        : `field ${name}: ${annotationText(annotation)}`;
 }
 
 export function assignedText(declaration: string, value: string | null): string {

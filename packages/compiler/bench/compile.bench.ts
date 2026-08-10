@@ -106,7 +106,7 @@ describe('pipeline phases', () => {
                 const parsed = parse(file.source);
                 const checked = check(parsed.program, 'strict', 'shared');
 
-                emit(parsed.program, checked.types, checked.references);
+                emit(parsed.program, checked.types, checked.references, checked.generatedMembers);
             }
         },
         OPTIONS,

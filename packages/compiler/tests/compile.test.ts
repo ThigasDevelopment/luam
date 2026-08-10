@@ -41,7 +41,7 @@ describe('compile', () => {
     });
 
     it('orders diagnostics from every stage by source position', () => {
-        const result = compile("local total: number = 'text'\nprint(@)\na + 1\n");
+        const result = compile("local total: number = 'text'\nprint(&)\na + 1\n");
         const offsets = result.diagnostics.map((diagnostic) => diagnostic.position.offset);
 
         expect(result.diagnostics.map((diagnostic) => diagnostic.stage).sort()).toEqual(['checker', 'lexer', 'parser']);

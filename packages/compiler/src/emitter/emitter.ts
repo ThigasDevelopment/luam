@@ -10,6 +10,7 @@ import type {
     Program,
     Statement,
 } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { binaryPrecedence, COMPOUND_OPERATORS, isRightAssociative } from '@compiler/parser/precedence';
 
 import { emitClassDeclaration, emitEnumDeclaration } from './classes';
@@ -41,8 +42,20 @@ function emitCompoundValues(state: EmitState, statement: AssignmentStatement, ta
     return statement.values.map((value, index) => `${targets[index] ?? ''} ${operator} ${emitExpression(state, value, limit)}`);
 }
 
+function emitIncrement(statement: AssignmentStatement, targets: readonly string[]): string {
+    const target = targets[0] ?? '';
+    const operator = COMPOUND_OPERATORS[statement.operator] ?? '+';
+
+    return `${target} = ${target} ${operator} 1`;
+}
+
 function emitAssignment(state: EmitState, statement: AssignmentStatement): string {
     const targets = statement.targets.map((target) => emitExpression(state, target));
+
+    if (statement.values.length === 0) {
+        return emitIncrement(statement, targets);
+    }
+
     const values =
         statement.operator === '='
             ? statement.values.map((value) => emitExpression(state, value))
@@ -177,8 +190,13 @@ export function emitBlock(state: EmitState, statements: readonly Statement[]): s
     return lines;
 }
 
-export function emit(program: Program, types: Map<Expression, Type>, references: ReadonlySet<string>): EmitResult {
-    const state = createEmitState(types, references);
+export function emit(
+    program: Program,
+    types: Map<Expression, Type>,
+    references: ReadonlySet<string>,
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
+): EmitResult {
+    const state = createEmitState(types, references, generatedMembers);
     const lines = emitBlock(state, program.body);
     const code = lines.length === 0 ? '' : `${lines.join('\n')}\n`;
 

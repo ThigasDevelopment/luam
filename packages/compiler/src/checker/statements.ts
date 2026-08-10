@@ -118,7 +118,10 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
 
         if (statement.operator !== '=') {
             checkCompoundOperand(context, statement.operator, targetType, target.position);
-            checkCompoundOperand(context, statement.operator, valueType, value?.position ?? target.position);
+
+            if (statement.values.length > 0) {
+                checkCompoundOperand(context, statement.operator, valueType, value?.position ?? target.position);
+            }
 
             return;
         }

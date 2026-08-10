@@ -10,6 +10,14 @@ local inverted: boolean = not equal
 local bounded: boolean = base <= 2 or base >= 0
 local grouped: number = (1 + 2) * 3
 local powered: number = 2 ^ 3 ^ 2
+local counter: number = 0
+local slots: number[] = { 1, 2 }
 
+counter++
+counter--
+counter-- -- back to zero
+slots[1]++
+
+print(counter, slots)
 print(base, negated, joined, length, equal, different)
 print(ranged, inverted, bounded, grouped, powered)

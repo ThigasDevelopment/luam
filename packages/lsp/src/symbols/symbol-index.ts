@@ -1,5 +1,6 @@
 import type { Type } from '@compiler/checker/types';
 import type { Expression, FunctionExpression, Program } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 
 import { createState, type BlockContext, type CollectorState } from './collector-state';
 import { ROOT_SCOPE, type ScopeTree } from './scope-tree';
@@ -94,8 +95,9 @@ export function buildSymbolIndex(
     starts: number[],
     program: Program,
     types: ReadonlyMap<Expression, Type>,
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
 ): SymbolIndex {
-    const state = createState(text, starts, types, walkFunction);
+    const state = createState(text, starts, types, walkFunction, generatedMembers);
     const block: BlockContext = { scopeId: ROOT_SCOPE, end: text.length, container: null };
 
     collectStatements(state, block, program.body);

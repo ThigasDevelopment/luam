@@ -17,7 +17,7 @@ import {
 } from './collector-state';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { parameterText, signatureText, variableText } from './signature-text';
+import { fieldText, parameterText, signatureText, variableText } from './signature-text';
 import { collectFunctionScope } from './statement-collector';
 
 const KEYWORD_LENGTHS: Readonly<Record<DeclarationStatement['kind'], number>> = {
@@ -57,7 +57,7 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
             collectExpression(state, block, member.value);
         }
 
-        const detail = variableText('field', member.name, member.annotation, null);
+        const detail = member.annotation === null ? `field ${member.name}` : fieldText(member.name, member.annotation);
 
         declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner });
 
@@ -68,7 +68,19 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
 
     const parameters = member.parameters.map(parameterText);
 
-    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner, parameters });
+    declareSymbol(state, ROOT_SCOPE, {
+        name: member.name,
+        kind: 'method',
+        position: member.position,
+        detail,
+        container: owner,
+        parameters,
+        isSynthetic: member.isSynthetic,
+    });
+
+    if (member.isSynthetic) {
+        return;
+    }
     collectAnnotation(state, block, member.returnAnnotation);
     collectFunctionScope(state, block, {
         start: member.position.offset,
@@ -84,7 +96,7 @@ function collectInterfaceMember(state: CollectorState, block: BlockContext, owne
     if (member.kind === 'interface-field') {
         collectAnnotation(state, block, member.annotation);
 
-        const detail = variableText('field', member.name, member.annotation, null);
+        const detail = fieldText(member.name, member.annotation);
 
         declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner });
 
@@ -116,6 +128,10 @@ function collectClass(state: CollectorState, block: BlockContext, statement: Cla
     collectSuperTypes(state, block, statement, position.offset + statement.name.length);
 
     for (const member of statement.members) {
+        collectClassMember(state, block, statement.name, member);
+    }
+
+    for (const member of state.generatedMembers.get(statement) ?? []) {
         collectClassMember(state, block, statement.name, member);
     }
 }

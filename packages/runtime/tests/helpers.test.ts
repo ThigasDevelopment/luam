@@ -65,11 +65,12 @@ describe('runtime helpers', () => {
     it('injects a helper from a language feature, a referenced global, or an opt-in', () => {
         expect(automaticHelpers()).toEqual(['class', 'math', 'string', 'table']);
         expect(manualHelpers()).toEqual(['env']);
-        expect(referenceHelpers()).toEqual(['async', 'threads']);
+        expect(referenceHelpers()).toEqual(['async', 'dotenv', 'threads']);
     });
 
     it('names the globals that pull a library in', () => {
-        expect(runtimeGlobals()).toEqual(['Async', 'Threads', 'sleep']);
+        expect(runtimeGlobals()).toEqual(['Async', 'Dotenv', 'Threads', 'sleep']);
+        expect(helperForGlobal('Dotenv')).toBe('dotenv');
         expect(helperForGlobal('sleep')).toBe('threads');
         expect(helperForGlobal('Threads')).toBe('threads');
         expect(helperForGlobal('Async')).toBe('async');
@@ -87,10 +88,15 @@ describe('runtime helpers', () => {
         expect(helperDepth('class')).toBe(0);
     });
 
-    it('pins the env helper to the server so deployment values never reach a client', () => {
+    it('pins the environment helpers to the server so deployment values never reach a client', () => {
         expect(RUNTIME_HELPERS.env.environment).toBe('server');
         expect(RUNTIME_HELPERS.env.features).toEqual([]);
-        expect(Object.values(RUNTIME_HELPERS).filter((helper) => helper.environment !== undefined)).toHaveLength(1);
+        expect(RUNTIME_HELPERS.dotenv.environment).toBe('server');
+        expect(expandHelpers(['env']).sort()).toEqual(['dotenv', 'env']);
+
+        const pinned = Object.values(RUNTIME_HELPERS).filter((helper) => helper.environment !== undefined);
+
+        expect(pinned.map((helper) => helper.name).sort()).toEqual(['dotenv', 'env']);
     });
 
     it('recognizes only the helpers it ships', () => {

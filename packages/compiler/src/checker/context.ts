@@ -1,6 +1,7 @@
 import { createDiagnostic, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { Environment } from '@compiler/environment/environment';
 import type { Expression, TypeAnnotation } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { isAvailableIn, type ApiEnvironment } from '@mta-types/api-declaration';
 
 import { EMPTY_AMBIENT, type AmbientDeclarations } from './ambient';
@@ -74,6 +75,8 @@ export class CheckContext {
     readonly declaredGlobals = new Map<string, SourcePosition>();
 
     readonly externalReferences = new Map<string, SourcePosition>();
+
+    readonly generatedMembers = new Map<ClassDeclaration, ClassMethodDeclaration[]>();
 
     readonly mode: StrictMode;
 

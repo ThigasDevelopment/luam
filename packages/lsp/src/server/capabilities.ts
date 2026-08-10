@@ -6,11 +6,12 @@ export const SERVER_NAME = 'luam-lsp';
 
 export const SERVER_CAPABILITIES: ServerCapabilities = {
     textDocumentSync: TextDocumentSyncKind.Incremental,
-    completionProvider: { triggerCharacters: ['.', ':', '"', "'"], resolveProvider: false },
+    completionProvider: { triggerCharacters: ['.', ':', '"', "'", '@'], resolveProvider: false },
     signatureHelpProvider: { triggerCharacters: ['(', ','], retriggerCharacters: [')'] },
     hoverProvider: true,
     definitionProvider: true,
     referencesProvider: true,
     renameProvider: true,
+    documentSymbolProvider: true,
     workspace: { workspaceFolders: { supported: true, changeNotifications: true } },
 };

@@ -93,6 +93,13 @@ describe('type completion', () => {
         expect(found).not.toContain('outputChatBox');
     });
 
+    it('offers only types in an optional class field annotation', () => {
+        const found = labels('class Account {\n    name?: \n}\n', '    name?: ');
+
+        expect(found).toContain('string');
+        expect(found).not.toContain('outputChatBox');
+    });
+
     it('offers only types after a union bar', () => {
         const found = labels('local value: string | \n', 'local value: string | ');
 
@@ -112,5 +119,22 @@ describe('type completion', () => {
 
         expect(found).toContain('name');
         expect(found).not.toContain('string');
+    });
+});
+
+describe('decorator completion', () => {
+    it('offers decorators above a class field', () => {
+        const found = labels('class Account {\n    @\n    name: string\n}\n', '    @');
+
+        expect(found).toEqual(['Getter', 'Setter']);
+    });
+
+    it('offers decorators above a class declaration', () => {
+        expect(labels('@\nclass Account {\n}\n', '@')).toEqual(['Getter', 'Setter']);
+    });
+
+    it('does not offer decorators outside a class', () => {
+        expect(labels('@\nlocal value = 1\n', '@')).toEqual([]);
+        expect(labels('local value = other @\n', 'other @')).toEqual([]);
     });
 });

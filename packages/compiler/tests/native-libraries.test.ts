@@ -18,11 +18,15 @@ describe('native libraries', () => {
     });
 
     it('injects threads when the module uses the Threads library', () => {
-        expect(helpers("local pool = Threads.new('concurrent', 'normal')\n")).toEqual(['threads']);
+        expect(helpers("local pool = new Threads('concurrent', 'normal')\n")).toEqual(['threads']);
     });
 
     it('injects async and the threads it depends on', () => {
-        expect(helpers('local task = Async.new(100)\n')).toEqual(['async', 'threads']);
+        expect(helpers('local task = new Async(100)\n')).toEqual(['async', 'threads']);
+    });
+
+    it('injects dotenv when the module constructs one', () => {
+        expect(helpers("local values = new Dotenv('.env.production')\n")).toEqual(['dotenv']);
     });
 
     it('keeps injecting the helpers a language feature requires', () => {
@@ -38,14 +42,43 @@ describe('native libraries', () => {
     });
 
     it('knows the members a library declares', () => {
-        expect(compile('local task = Async.new(100)\n', { filePath: SERVER_FILE }).diagnostics).toEqual([]);
-        expect(compile('local pool = Threads.new()\n', { filePath: SERVER_FILE }).diagnostics).toEqual([]);
+        expect(compile('local task = new Async(100)\ntask:setInterval(50)\n', { filePath: SERVER_FILE }).diagnostics).toEqual([]);
+        expect(compile('local pool = new Threads()\npool:start()\n', { filePath: SERVER_FILE }).diagnostics).toEqual([]);
+        expect(compile("local values = new Dotenv()\nvalues:get('PORT')\n", { filePath: SERVER_FILE }).diagnostics).toEqual([]);
     });
 
     it('reports a member no library declares', () => {
         const codes = compile('local task = Async.build(100)\n', { filePath: SERVER_FILE }).diagnostics.map((diagnostic) => diagnostic.code);
 
         expect(codes).toEqual(['check-unknown-record-key']);
+    });
+
+    it('constructs a native library with "new" and lowers it to the runtime call', () => {
+        expect(compile('local task = new Async(100)\n', { filePath: SERVER_FILE }).code).toBe('local task = Async.new(100)\n');
+        expect(compile("local pool = new Threads('concurrent', 'normal')\n", { filePath: SERVER_FILE }).code).toBe(
+            "local pool = Threads.new('concurrent', 'normal')\n",
+        );
+    });
+
+    it('rejects the static constructor form', () => {
+        const result = compile('local task = Async.new(100)\n', { filePath: SERVER_FILE });
+
+        expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['check-native-constructor']);
+        expect(result.diagnostics[0]?.message).toBe('Construct "Async" with "new Async(...)". The "Async.new(...)" form is not part of the language.');
+    });
+
+    it('checks the constructor signature of a native library', () => {
+        const codes = compile("local task = new Async('fast')\n", { filePath: SERVER_FILE }).diagnostics.map((diagnostic) => diagnostic.code);
+
+        expect(codes).toEqual(['check-type-mismatch']);
+    });
+
+    it('keeps Dotenv off the client', () => {
+        const codes = compile("local values = new Dotenv()\n", { filePath: 'src/client/main.luam' }).diagnostics.map(
+            (diagnostic) => diagnostic.code,
+        );
+
+        expect(codes).toEqual(['check-unknown-class']);
     });
 
     it('emits the library call untouched', () => {

@@ -4,7 +4,15 @@ import type { CallExpression, Expression, MemberExpression, TableExpression, Tem
 
 import type { CheckContext } from './context';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
-import { checkNewExpression, checkSuperCall, resolveLibraryMember, resolveNamedMember, resolveRecordMember } from './members';
+import {
+    checkNewExpression,
+    checkSuperCall,
+    NATIVE_CONSTRUCTOR,
+    nativeConstructor,
+    resolveLibraryMember,
+    resolveNamedMember,
+    resolveRecordMember,
+} from './members';
 import { isMtaElement, resolveMtaMember } from './oop-members';
 import { checkBinary, checkUnary } from './operators';
 import { buildFunctionType, checkFunctionBody } from './statements';
@@ -45,7 +53,24 @@ function extensionType(receiver: Type, property: string): Type | null {
     return extension === null ? null : EXTENSION_RESULTS[extension.result];
 }
 
+function isNativeConstruction(context: CheckContext, expression: MemberExpression): boolean {
+    const object = expression.object;
+
+    if (expression.property !== NATIVE_CONSTRUCTOR || object.kind !== 'identifier') {
+        return false;
+    }
+
+    return nativeConstructor(context, object.name) !== null;
+}
+
 function checkMember(context: CheckContext, expression: MemberExpression): Type {
+    if (isNativeConstruction(context, expression) && expression.object.kind === 'identifier') {
+        const name = expression.object.name;
+        const message = `Construct "${name}" with "new ${name}(...)". The "${name}.new(...)" form is not part of the language.`;
+
+        context.report('check-native-constructor', message, expression.position);
+    }
+
     const library = resolveLibraryMember(context, expression);
 
     if (library !== null) {
@@ -123,7 +148,17 @@ function isSuperCall(expression: CallExpression): boolean {
 function checkMethodCall(context: CheckContext, expression: CallExpression, method: string, receiver: Type): Type {
     const argumentTypes = checkValueList(context, expression.args);
 
-    if (receiver.kind !== 'named' || !isMtaElement(context, receiver.name)) {
+    if (receiver.kind !== 'named') {
+        return ANY_TYPE;
+    }
+
+    const declared = context.declarations.lookupMember(receiver.name, method);
+
+    if (declared?.type.kind === 'function') {
+        return checkSignature(context, expression.args, argumentTypes, declared.type, expression.position);
+    }
+
+    if (!isMtaElement(context, receiver.name)) {
         return ANY_TYPE;
     }
 

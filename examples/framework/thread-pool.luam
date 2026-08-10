@@ -2,7 +2,7 @@ class ThreadPool {
     pool: any = nil
 
     constructor(style: string, priority: string) {
-        self.pool = Threads.new(style, priority)
+        self.pool = new Threads(style, priority)
     }
 
     add(task: any): number {

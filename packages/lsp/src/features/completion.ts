@@ -6,10 +6,18 @@ import { globalsFor } from '@mta-types/catalog';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
-import { completionContext, isStatementStart, resolveReceiver, type ReceiverTarget } from '@lsp/features/completion-context';
+import {
+    completionContext,
+    hasDecoratorPrefix,
+    isDecoratorPosition,
+    isStatementStart,
+    resolveReceiver,
+    type ReceiverTarget,
+} from '@lsp/features/completion-context';
 import {
     apiItem,
     DIRECTIVE_ITEMS,
+    decoratorItems,
     enumMemberItems,
     extensionItems,
     KEYWORD_ITEMS,
@@ -113,6 +121,14 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
 
     if (lexical.inString) {
         return deduplicate(stringItems(analysis, offset, others, lexical.frame));
+    }
+
+    if (isDecoratorPosition(analysis.text, offset)) {
+        return decoratorItems();
+    }
+
+    if (hasDecoratorPrefix(analysis.text, offset) || analysis.text[offset - 1] === '@') {
+        return [];
     }
 
     if (isTypePosition(analysis.text, offset)) {

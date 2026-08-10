@@ -1,19 +1,27 @@
 import type { Expression, NodeBase, Parameter, Statement, TypeAnnotation } from './ast';
 
+export interface Decorator extends NodeBase {
+    kind: 'decorator';
+    name: string;
+}
+
 export interface ClassFieldDeclaration extends NodeBase {
     kind: 'class-field';
     name: string;
     annotation: TypeAnnotation | null;
     value: Expression | null;
+    decorators: Decorator[];
 }
 
 export interface ClassMethodDeclaration extends NodeBase {
     kind: 'class-method';
     name: string;
     isConstructor: boolean;
+    isSynthetic: boolean;
     parameters: Parameter[];
     returnAnnotation: TypeAnnotation | null;
     body: Statement[];
+    decorators: Decorator[];
 }
 
 export type ClassMember = ClassFieldDeclaration | ClassMethodDeclaration;
@@ -24,6 +32,7 @@ export interface ClassDeclaration extends NodeBase {
     superClass: string | null;
     interfaces: string[];
     members: ClassMember[];
+    decorators: Decorator[];
 }
 
 export interface InterfaceFieldSignature extends NodeBase {

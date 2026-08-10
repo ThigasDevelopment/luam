@@ -25,6 +25,11 @@ function emitMembers(state: EmitState, statement: ClassDeclaration): string[] {
         if (member.value !== null) {
             entries.push(indentLine(state, `${member.name} = ${emitExpression(state, member.value)}`));
         }
+
+    }
+
+    for (const generated of state.generatedMembers.get(statement) ?? []) {
+        entries.push(indentLine(state, emitMethod(state, generated)));
     }
 
     state.indent -= 1;

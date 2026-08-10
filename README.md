@@ -62,7 +62,7 @@ luam --version
 | --- | --- |
 | Install | `npm install --global luam` |
 | Update to the latest | `npm update --global luam` |
-| Install a specific version | `npm install --global luam@0.1.0` |
+| Install a specific version | `npm install --global luam@0.1.1` |
 | Uninstall | `npm uninstall --global luam` |
 | Run once, without installing | `npx luam <command>` |
 
@@ -385,19 +385,23 @@ local vip = new VIPPlayer('Thigas', 2)
 
 | Feature | Notes |
 | --- | --- |
-| Type annotations | Optionals, unions, arrays, aliases, generics, function types — all erased |
+| Type annotations | Optionals, unions, arrays, aliases, generics, `fun(string): void` — all erased |
 | Classes | `extends`, `implements`, `constructor`, `self:super(...)`, `new`, checked statically |
+| Decorators | `@Getter` and `@Setter` generate typed Java-style accessors on fields or whole classes |
 | Interfaces | Verified by the checker, never reach the generated Lua |
 | Enums | Zero-based, checked members, erased when unused |
 | Template strings | `` `Hi ${name:Guest}` `` — scope-checked, with defaults |
-| Compound assignment | `+=`, `-=`, `..=` |
+| Compound assignment | `+=`, `-=`, `*=`, `/=`, `..=` |
+| Increment | `score++` and `score--` as statements, compiled to `score = score + 1` |
 | Object extensions | `items.count` → `table.size(items)`, `name.trim`, `ratio.clamp(a, b)` |
 | Multi-return | `local x, y, z = getElementPosition(el)` — typed from the MTA catalog |
 | `export` | Erased from the Lua, written into `meta.xml` as `<export function="f" />` |
-| Native libraries | `sleep`, `Threads`, `Async` ship with the language, injected only when named |
+| Native libraries | `sleep` plus the `Threads`, `Async` and `Dotenv` classes, injected only when named |
+| Native classes | `local tasks = new Async(100)` — same `new` as a project class |
+| Deployment values | `.env` keys typed and reachable as `env.SERVER_NAME`, server-only |
 | Strictness | `--!strict` (default), `--!nonstrict`, `--!nocheck` per file |
 
-`class`, `interface`, `enum`, `new` and `export` are contextual keywords —
+`class`, `interface`, `enum`, `new`, `fun` and `export` are contextual keywords —
 existing Lua that uses them as identifiers keeps compiling. Reach for
 `--!nocheck` when porting existing Lua: rename to `.luam` and the build passes
 while you annotate module by module.
@@ -476,7 +480,7 @@ The extension is not on the Marketplace yet, so install the `.vsix` by hand.
 [Releases page](https://github.com/ThigasDevelopment/luam/releases), then:
 
 ```bash
-code --install-extension luam-0.1.0.vsix
+code --install-extension luam-0.1.1.vsix
 ```
 
 Or in VS Code: **Extensions** → **⋯** menu → **Install from VSIX…** → pick the

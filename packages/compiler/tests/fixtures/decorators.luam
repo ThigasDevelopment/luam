@@ -1,0 +1,17 @@
+type Flag = boolean
+
+@Getter
+class Player {
+    @Setter
+    name: string = 'Luam'
+
+    @Getter
+    @Setter
+    admin: Flag = false
+}
+
+local player = new Player()
+player:setName('Compiler')
+local name: string = player:getName()
+local admin: Flag = player:isAdmin()
+print(name, admin)

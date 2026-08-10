@@ -3,6 +3,7 @@ import { createDiagnostic, type Diagnostic } from '@compiler/diagnostics/diagnos
 import { isIdentifierPart, isIdentifierStart, isLineBreak, isWhitespace } from './char';
 import { isCommentStart, scanComment } from './comment-scanner';
 import { Cursor } from './cursor';
+import { isDecrementOperator } from './decrement';
 import { longBracketLevel } from './long-bracket';
 import { isNumberStart, scanNumber } from './number-scanner';
 import { scanLongString, scanQuotedString, scanTemplate } from './text-scanner';
@@ -134,7 +135,7 @@ export function scan(source: string): LexResult {
             continue;
         }
 
-        if (isCommentStart(cursor)) {
+        if (isCommentStart(cursor) && !isDecrementOperator(cursor, tokens)) {
             const comment = scanComment(cursor, diagnostics);
 
             if (comment.isDirective) {

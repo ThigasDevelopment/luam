@@ -96,6 +96,15 @@ describe('grammar', () => {
         expect(matchesAny('buildDirective', 'export function getScore(player: Player): number')).toBe(true);
     });
 
+    it('highlights decorators only at the start of a line', () => {
+        const rule = rulePatterns('decorator')[0];
+
+        expect(matchesAny('decorator', '    @Getter')).toBe(true);
+        expect(matchesAny('decorator', 'local a = b @ c')).toBe(false);
+        expect(rule?.captures?.['1']?.name).toBe('punctuation.definition.decorator.luam');
+        expect(rule?.captures?.['2']?.name).toBe('entity.name.function.decorator.luam');
+    });
+
     it('leaves the removed directive words unhighlighted', () => {
         expect(matchesAny('buildDirective', 'setting MAX_PLAYERS = 32')).toBe(false);
         expect(matchesAny('buildDirective', "depends 'scoreboard'")).toBe(false);
@@ -121,5 +130,6 @@ describe('grammar', () => {
         expect(matchesAny('number', '10.5')).toBe(true);
         expect(matchesAny('operator', 'a ..= b')).toBe(true);
         expect(matchesAny('operator', 'a ~= b')).toBe(true);
+        expect(matchesAny('operator', 'name?: string')).toBe(true);
     });
 });

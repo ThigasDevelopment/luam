@@ -1,5 +1,6 @@
 import type { Type } from '@compiler/checker/types';
 import type { Expression } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
 export type RuntimeHelper = RuntimeHelperName;
@@ -9,12 +10,17 @@ export interface EmitState {
     references: ReadonlySet<string>;
     helpers: Set<RuntimeHelper>;
     indent: number;
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
 }
 
 export const INDENT = '    ';
 
-export function createEmitState(types: Map<Expression, Type>, references: ReadonlySet<string>): EmitState {
-    return { types, references, helpers: new Set<RuntimeHelper>(), indent: 0 };
+export function createEmitState(
+    types: Map<Expression, Type>,
+    references: ReadonlySet<string>,
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>,
+): EmitState {
+    return { types, references, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0 };
 }
 
 export function requireHelper(state: EmitState, helper: RuntimeHelper | null): void {

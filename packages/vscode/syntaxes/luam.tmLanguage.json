@@ -4,6 +4,8 @@
     "scopeName": "source.luam",
     "patterns": [
         { "include": "#directive" },
+        { "include": "#decorator" },
+        { "include": "#decrement" },
         { "include": "#comment" },
         { "include": "#string" },
         { "include": "#number" },
@@ -24,6 +26,17 @@
                 "1": { "name": "punctuation.definition.comment.luam" },
                 "2": { "name": "keyword.control.directive.luam" }
             }
+        },
+        "decorator": {
+            "match": "^\\s*(@)([A-Za-z_][A-Za-z0-9_]*)\\b",
+            "captures": {
+                "1": { "name": "punctuation.definition.decorator.luam" },
+                "2": { "name": "entity.name.function.decorator.luam" }
+            }
+        },
+        "decrement": {
+            "name": "keyword.operator.increment.luam",
+            "match": "(?<=[A-Za-z0-9_)\\]])--(?=[ \\t]*(?:;|\\}|$))"
         },
         "comment": {
             "patterns": [
@@ -149,7 +162,7 @@
             }
         },
         "annotation": {
-            "match": "(:)\\s*((?:function\\s*\\([^)]*\\)\\s*:\\s*)?[A-Za-z_][A-Za-z0-9_.]*(?:<[^>]*>)?(?:\\[\\])*\\??(?:\\s*\\|\\s*[A-Za-z_][A-Za-z0-9_.]*(?:\\[\\])*\\??)*)",
+            "match": "(:)\\s*((?:fun\\s*\\([^)]*\\)\\s*:\\s*)?[A-Za-z_][A-Za-z0-9_.]*(?:<[^>]*>)?(?:\\[\\])*\\??(?:\\s*\\|\\s*[A-Za-z_][A-Za-z0-9_.]*(?:\\[\\])*\\??)*)",
             "captures": {
                 "1": { "name": "punctuation.separator.type.luam" },
                 "2": { "name": "entity.name.type.luam" }
@@ -183,6 +196,8 @@
         "operator": {
             "patterns": [
                 { "name": "keyword.operator.logical.luam", "match": "\\b(?:and|or|not)\\b" },
+                { "name": "keyword.operator.increment.luam", "match": "\\+\\+" },
+                { "name": "keyword.operator.optional.luam", "match": "\\?(?=\\s*:)" },
                 { "name": "keyword.operator.assignment.luam", "match": "\\.\\.=|\\+=|-=|\\*=|/=|=" },
                 { "name": "keyword.operator.comparison.luam", "match": "==|~=|<=|>=|<|>" },
                 { "name": "keyword.operator.arithmetic.luam", "match": "\\+|-|\\*|/|%|\\^|#|\\.\\." }

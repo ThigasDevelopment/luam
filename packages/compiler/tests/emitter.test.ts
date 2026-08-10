@@ -21,12 +21,16 @@ describe('emitter', () => {
     });
 
     it('erases function type annotations', () => {
-        expect(emit('local callback: function(string): void = print')).toBe('local callback = print\n');
-        expect(emit('function make(): function(string): void\n    return print\nend\n')).toBe('function make()\n    return print\nend\n');
+        expect(emit('local callback: fun(string): void = print')).toBe('local callback = print\n');
+        expect(emit('function make(): fun(string): void\n    return print\nend\n')).toBe('function make()\n    return print\nend\n');
     });
 
     it('erases type aliases', () => {
         expect(emit('type PlayerId = number\nlocal id: PlayerId = 7\n')).toBe('local id = 7\n');
+    });
+
+    it('lowers increment and decrement statements', () => {
+        expect(emit('local total: number = 0\ntotal++\ntotal--\n')).toBe('local total = 0\ntotal = total + 1\ntotal = total - 1\n');
     });
 
     it('lowers arithmetic compound assignment', () => {

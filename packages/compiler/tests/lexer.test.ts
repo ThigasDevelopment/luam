@@ -71,6 +71,21 @@ describe('lexer', () => {
         expect(scan('+= -= *= /=').tokens.map((token) => token.value)).toEqual(['+=', '-=', '*=', '/=', '']);
     });
 
+    it('scans increment and decrement operators', () => {
+        expect(scan('count++').tokens.map((token) => token.value)).toEqual(['count', '++', '']);
+        expect(scan('count--').tokens.map((token) => token.value)).toEqual(['count', '--', '']);
+        expect(scan('count--;').tokens.map((token) => token.value)).toEqual(['count', '--', ';', '']);
+        expect(scan('items[1]--\n').tokens.map((token) => token.value)).toEqual(['items', '[', '1', ']', '--', '']);
+        expect(scan('count-- -- note').tokens.map((token) => token.value)).toEqual(['count', '--', '']);
+    });
+
+    it('keeps reading -- as a comment when it does not close a statement', () => {
+        expect(scan('count -- note').tokens.map((token) => token.value)).toEqual(['count', '']);
+        expect(scan('count--note').tokens.map((token) => token.value)).toEqual(['count', '']);
+        expect(scan('count--[[ block ]]').tokens.map((token) => token.value)).toEqual(['count', '']);
+        expect(scan('--!strict\ncount').directives).toEqual(['strict']);
+    });
+
     it('reports != as a lexical error and recovers as ~=', () => {
         const result = scan('a != b');
 
@@ -98,8 +113,9 @@ describe('lexer', () => {
         expect(diagnostic?.position).toEqual({ line: 1, column: 1, offset: 0 });
     });
 
-    it('reports an unexpected character', () => {
-        expect(codes('local a = @')).toEqual(['lex-unexpected-character']);
+    it('scans a decorator sigil as punctuation', () => {
+        expect(describeTokens('@Getter')).toEqual(['punctuation "@" 1:1', 'identifier "Getter" 1:2']);
+        expect(codes('local a = @')).toEqual([]);
     });
 
     it('splits template strings into text and interpolation segments', () => {

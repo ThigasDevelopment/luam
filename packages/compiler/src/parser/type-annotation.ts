@@ -3,6 +3,8 @@ import type { TokenStream } from './token-stream';
 
 const TYPE_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
 
+const FUNCTION_TYPE = 'fun';
+
 function parseTypeName(stream: TokenStream): TypeAnnotation {
     const token = stream.current();
 
@@ -35,7 +37,7 @@ function parseParameterType(stream: TokenStream): TypeAnnotation {
 }
 
 function parseFunctionType(stream: TokenStream): TypeAnnotation {
-    const position = stream.expect('keyword', 'function').position;
+    const position = stream.expect('identifier', FUNCTION_TYPE).position;
 
     if (!stream.check('punctuation', '(')) {
         return { kind: 'type-function', parameters: [], isVariadic: true, returnType: null, position };
@@ -86,6 +88,10 @@ function parseGroupedType(stream: TokenStream): TypeAnnotation {
 
 function parsePrimaryType(stream: TokenStream): TypeAnnotation {
     if (stream.check('keyword', 'function')) {
+        throw stream.error(`Use "${FUNCTION_TYPE}" for function types. "function" is a keyword and cannot name a type.`, 'parse-invalid-type');
+    }
+
+    if (stream.check('identifier', FUNCTION_TYPE)) {
         return parseFunctionType(stream);
     }
 

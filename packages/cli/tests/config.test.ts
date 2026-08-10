@@ -100,7 +100,7 @@ describe('configuration validation', () => {
 
         expect(config).toBeNull();
         expect(codes(diagnostics)).toEqual(['config-unknown-helper']);
-        expect(diagnostics[0]?.message).toContain('Known helpers: "async", "class", "env", "math", "string", "table", "threads"');
+        expect(diagnostics[0]?.message).toContain('Known helpers: "async", "class", "dotenv", "env", "math", "string", "table", "threads"');
     });
 
     it('reports every problem in one pass', () => {

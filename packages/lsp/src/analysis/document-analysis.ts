@@ -8,6 +8,7 @@ import type { Type } from '@compiler/checker/types';
 import { sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import type { Expression, Program } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { parse } from '@compiler/parser/parser';
 import { isDeclarationPath } from '@compiler/project/source-kind';
 
@@ -31,6 +32,7 @@ export interface DocumentAnalysis {
     project: ProjectDeclarations;
     oop: boolean;
     index: SymbolIndex;
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
 }
 
 export interface AnalysisInput {
@@ -75,6 +77,7 @@ export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
         directives: checked.directives,
         project,
         oop,
-        index: buildSymbolIndex(input.text, starts, parsed.program, checked.types),
+        index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.generatedMembers),
+        generatedMembers: checked.generatedMembers,
     };
 }

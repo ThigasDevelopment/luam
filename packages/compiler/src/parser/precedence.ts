@@ -24,12 +24,16 @@ export const UNARY_OPERATORS: ReadonlySet<string> = new Set(['not', '-', '#']);
 
 export const ASSIGNMENT_OPERATORS: ReadonlySet<string> = new Set(['=', '+=', '-=', '*=', '/=', '..=']);
 
+export const INCREMENT_OPERATORS: ReadonlySet<string> = new Set(['++', '--']);
+
 export const COMPOUND_OPERATORS: Readonly<Record<string, string>> = {
     '+=': '+',
     '-=': '-',
     '*=': '*',
     '/=': '/',
     '..=': '..',
+    '++': '+',
+    '--': '-',
 };
 
 export function binaryPrecedence(operator: string): number {

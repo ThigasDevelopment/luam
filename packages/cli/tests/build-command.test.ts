@@ -217,8 +217,12 @@ describe('build command', () => {
 
         await runBuildCommand(context);
 
+        const manifest = fixture.read('build/luam-demo/meta.xml');
+
         expect(fixture.exists('build/luam-demo/lib/server/env.lua')).toBe(true);
-        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="lib/server/env.lua" />');
+        expect(fixture.exists('build/luam-demo/lib/server/dotenv.lua')).toBe(true);
+        expect(manifest).toContain('<script src="lib/server/env.lua" />');
+        expect(manifest.indexOf('lib/server/dotenv.lua')).toBeLessThan(manifest.indexOf('lib/server/env.lua'));
     });
 
     it('ships no env library when the project declares no keys', async () => {
@@ -227,6 +231,7 @@ describe('build command', () => {
         await runBuildCommand(context);
 
         expect(fixture.exists('build/luam-demo/lib/server/env.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/lib/server/dotenv.lua')).toBe(false);
         expect(fixture.exists('build/luam-demo/.env')).toBe(false);
     });
 

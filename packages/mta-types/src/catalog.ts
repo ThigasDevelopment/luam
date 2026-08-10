@@ -1,6 +1,6 @@
 import { declareAll, isAvailableIn, type ApiDeclaration, type ApiEnvironment } from './api-declaration';
 import { LUA_GLOBALS } from './lua-standard';
-import { LUAM_RUNTIME_GLOBALS } from './luam-runtime';
+import { LUAM_RUNTIME_GLOBALS, LUAM_RUNTIME_SERVER_GLOBALS } from './luam-runtime';
 import { MTA_CLIENT_GLOBALS } from '@mta-types/generated/api/mta-client';
 import { MTA_SERVER_GLOBALS } from '@mta-types/generated/api/mta-server';
 import { MTA_SHARED_GLOBALS } from '@mta-types/generated/api/mta-shared';
@@ -8,6 +8,7 @@ import { MTA_SHARED_GLOBALS } from '@mta-types/generated/api/mta-shared';
 const DECLARATIONS: readonly ApiDeclaration[] = [
     ...declareAll(LUA_GLOBALS, 'shared', 'lua'),
     ...declareAll(LUAM_RUNTIME_GLOBALS, 'shared', 'extension'),
+    ...declareAll(LUAM_RUNTIME_SERVER_GLOBALS, 'server', 'extension'),
     ...declareAll(MTA_SHARED_GLOBALS, 'shared', 'mta'),
     ...declareAll(MTA_SERVER_GLOBALS, 'server', 'mta'),
     ...declareAll(MTA_CLIENT_GLOBALS, 'client', 'mta'),

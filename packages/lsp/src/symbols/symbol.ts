@@ -25,6 +25,7 @@ export interface SymbolDeclaration {
     detail: string;
     type: Type | null;
     parameters: readonly string[];
+    isSynthetic: boolean;
 }
 
 export interface SymbolReference {

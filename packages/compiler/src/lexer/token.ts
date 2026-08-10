@@ -45,6 +45,8 @@ export const KEYWORDS: ReadonlySet<string> = new Set([
 export const SYMBOLS: readonly string[] = [
     '...',
     '..=',
+    '++',
+    '--',
     '==',
     '~=',
     '<=',
@@ -66,6 +68,7 @@ export const SYMBOLS: readonly string[] = [
     '=',
     '|',
     '?',
+    '@',
     '(',
     ')',
     '{',
@@ -78,7 +81,7 @@ export const SYMBOLS: readonly string[] = [
     '.',
 ];
 
-const PUNCTUATION: ReadonlySet<string> = new Set(['(', ')', '{', '}', '[', ']', ';', ':', ',', '.']);
+const PUNCTUATION: ReadonlySet<string> = new Set(['(', ')', '{', '}', '[', ']', ';', ':', ',', '.', '@']);
 
 export function isKeyword(value: string): boolean {
     return KEYWORDS.has(value);

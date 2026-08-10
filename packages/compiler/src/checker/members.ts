@@ -7,7 +7,7 @@ import type { CheckContext } from './context';
 import { isMtaElement, resolveMtaMember } from './oop-members';
 import type { MemberInfo } from './registry';
 import { checkExpression, checkSignature } from './expressions';
-import { ANY_TYPE, createNamed, NUMBER_TYPE, type RecordType, type Type } from './types';
+import { ANY_TYPE, createNamed, NUMBER_TYPE, type FunctionType, type RecordType, type Type } from './types';
 
 function checkEnumMember(context: CheckContext, name: string, members: readonly string[], expression: MemberExpression): Type {
     if (members.includes(expression.property)) {
@@ -87,10 +87,33 @@ export function resolveNamedMember(context: CheckContext, name: string, expressi
     return contract === null ? null : checkInterfaceMember(context, name, contract.members, expression);
 }
 
+export const NATIVE_CONSTRUCTOR = 'new';
+
+export function nativeConstructor(context: CheckContext, name: string): FunctionType | null {
+    const symbol = context.binder.lookup(name);
+
+    if (symbol === null || symbol.isLocal || symbol.type.kind !== 'record') {
+        return null;
+    }
+
+    const constructor = symbol.type.members.get(NATIVE_CONSTRUCTOR);
+
+    return constructor === undefined || constructor.kind !== 'function' ? null : constructor;
+}
+
 export function checkNewExpression(context: CheckContext, expression: NewExpression): Type {
     const argumentTypes = expression.args.map((argument) => checkExpression(context, argument));
 
     if (context.declarations.lookupClass(expression.className) === null) {
+        const constructor = nativeConstructor(context, expression.className);
+
+        if (constructor !== null) {
+            context.references.add(expression.className);
+            checkSignature(context, expression.args, argumentTypes, constructor, expression.position);
+
+            return constructor.returnType;
+        }
+
         context.noteExternalReference(expression.className, expression.position);
         context.report('check-unknown-class', `Class "${expression.className}" is not defined.`, expression.position);
 

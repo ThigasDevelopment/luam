@@ -88,10 +88,14 @@ function isParameterList(text: string, inner: CallFrame, outer: CallFrame | unde
 }
 
 function isAnnotationColon(text: string, colon: number): boolean {
-    const beforeColon = skipSpaces(text, colon);
+    let beforeColon = skipSpaces(text, colon);
 
     if (text[beforeColon - 1] === ')') {
         return true;
+    }
+
+    if (text[beforeColon - 1] === '?') {
+        beforeColon = skipSpaces(text, beforeColon - 1);
     }
 
     const nameStart = skipIdentifier(text, beforeColon);

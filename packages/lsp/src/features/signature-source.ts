@@ -189,8 +189,10 @@ function memberSignature(analysis: DocumentAnalysis, offset: number, segments: r
     }
 
     const shape = typeParameters(found.type);
+    const declaration = analysis.index.membersOf(target.name).find((candidate) => candidate.name === member);
+    const parameters = declaration?.parameters.length === shape.parameters.length ? declaration.parameters : shape.parameters;
 
-    return { name: `${target.name}.${member}`, parameters: shape.parameters, returnText: shape.returnText, documentation: [], parameterDocs: [] };
+    return { name: `${target.name}.${member}`, parameters, returnText: shape.returnText, documentation: [], parameterDocs: [] };
 }
 
 export function resolveSignature(

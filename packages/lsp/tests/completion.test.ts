@@ -161,6 +161,14 @@ describe('project environment completion', () => {
         expect(labels(environmentService(), CLIENT_FILE, 'local value = process.\n', 'process.')).toEqual([]);
     });
 
+    it('offers the declared keys after "env." in a server file', () => {
+        expect(labels(environmentService(), SERVER_FILE, 'local value = env.\n', 'env.')).toEqual(['MAX_PLAYERS', 'SERVER_NAME']);
+    });
+
+    it('offers nothing after "env." in a client file', () => {
+        expect(labels(environmentService(), CLIENT_FILE, 'local value = env.\n', 'env.')).toEqual([]);
+    });
+
     it('reports the declared type of a key in the completion detail', () => {
         const service = environmentService();
 

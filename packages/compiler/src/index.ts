@@ -59,7 +59,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         return { ...shared, code: null, requiredHelpers: [] };
     }
 
-    const emitted = emit(parsed.program, checked.types, checked.references);
+    const emitted = emit(parsed.program, checked.types, checked.references, checked.generatedMembers);
     const required = new Set<RuntimeHelper>(emitted.requiredHelpers);
 
     for (const name of checked.references) {

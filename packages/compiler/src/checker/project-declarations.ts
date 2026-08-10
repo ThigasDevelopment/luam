@@ -12,6 +12,8 @@ export const PROCESS_GLOBAL = 'process';
 
 export const PROCESS_ENV = 'process.env';
 
+export const ENV_GLOBAL = 'env';
+
 const VALUE_TYPES: Readonly<Record<EnvValueKind, TypeDescriptor>> = { boolean: BOOLEAN, number: NUMBER, string: STRING };
 
 function envMembers(entries: readonly EnvEntry[]): RecordMember[] {
@@ -26,9 +28,15 @@ function envMembers(entries: readonly EnvEntry[]): RecordMember[] {
 
 export function environmentDeclaration(entries: readonly EnvEntry[], origin: string): ApiDeclaration {
     const env = record(PROCESS_ENV, envMembers(entries), origin);
-    const process = record(PROCESS_GLOBAL, [{ name: 'env', type: env }], origin);
+    const process = record(PROCESS_GLOBAL, [{ name: ENV_GLOBAL, type: env }], origin);
 
     return { name: PROCESS_GLOBAL, environment: 'server', source: 'project', type: process };
+}
+
+export function envDeclaration(entries: readonly EnvEntry[], origin: string): ApiDeclaration {
+    const env = record(ENV_GLOBAL, envMembers(entries), origin);
+
+    return { name: ENV_GLOBAL, environment: 'server', source: 'project', type: env };
 }
 
 export function projectDeclarations(entries: readonly EnvEntry[] | null, origin: string): ProjectDeclarations {
@@ -36,7 +44,7 @@ export function projectDeclarations(entries: readonly EnvEntry[] | null, origin:
         return EMPTY_PROJECT_DECLARATIONS;
     }
 
-    return { globals: [environmentDeclaration(entries, origin)] };
+    return { globals: [environmentDeclaration(entries, origin), envDeclaration(entries, origin)] };
 }
 
 export function projectEnvironments(declarations: ProjectDeclarations): ReadonlyMap<string, ApiEnvironment> {

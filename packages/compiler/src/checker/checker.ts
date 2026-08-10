@@ -1,6 +1,7 @@
 import { sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { DEFAULT_ENVIRONMENT, type Environment } from '@compiler/environment/environment';
 import type { Expression, Program } from '@compiler/parser/ast';
+import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 
 import { EMPTY_AMBIENT, type AmbientDeclarations } from './ambient';
 import { collectDirectives, type SourceDirectives } from './build-directives';
@@ -22,6 +23,7 @@ export interface CheckResult {
     directives: SourceDirectives;
     mode: StrictMode;
     environment: Environment;
+    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
 }
 
 function externalReferences(context: CheckContext): Map<string, SourcePosition> {
@@ -65,5 +67,6 @@ export function check(program: Program, mode: StrictMode, environment: Environme
         directives: directives.directives,
         mode,
         environment,
+        generatedMembers: context.generatedMembers,
     };
 }

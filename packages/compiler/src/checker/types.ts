@@ -179,7 +179,7 @@ export function typeToString(type: Type): string {
             parameters.push('...');
         }
 
-        return `function(${parameters.join(', ')}): ${typeToString(type.returnType)}`;
+        return `fun(${parameters.join(', ')}): ${typeToString(type.returnType)}`;
     }
 
     return type.kind;
@@ -187,6 +187,12 @@ export function typeToString(type: Type): string {
 
 export function isTableLike(type: Type): boolean {
     return type.kind === 'table' || type.kind === 'array';
+}
+
+export function isBooleanType(type: Type | undefined): boolean {
+    const resolved = type?.kind === 'optional' ? type.element : type;
+
+    return resolved?.kind === 'boolean';
 }
 
 export function isNumeric(type: Type): boolean {

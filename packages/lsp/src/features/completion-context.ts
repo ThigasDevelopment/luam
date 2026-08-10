@@ -42,6 +42,41 @@ export function isStatementStart(text: string, offset: number): boolean {
     return cursor < 0 || text[cursor] === '\n' || text[cursor] === '\r' || text[cursor] === ';';
 }
 
+export function isDecoratorPosition(text: string, offset: number): boolean {
+    const lineStart = Math.max(text.lastIndexOf('\n', offset - 1) + 1, 0);
+    const before = text.slice(lineStart, offset);
+
+    if (!/^\s*@[A-Za-z_]*$/.test(before)) {
+        return false;
+    }
+
+    const after = text.slice(offset);
+
+    if (/^[A-Za-z0-9_]*\s*(?:\r?\n\s*)+class\s+[A-Za-z_]/.test(after)) {
+        return true;
+    }
+
+    const prefix = text.slice(0, lineStart);
+    const classes = [...prefix.matchAll(/\bclass\s+[A-Za-z_][A-Za-z0-9_]*(?:\s+extends\s+[A-Za-z_][A-Za-z0-9_]*)?(?:\s+implements\s+[^\{]+)?\s*\{/g)];
+    const latest = classes.at(-1);
+
+    if (latest?.index === undefined) {
+        return false;
+    }
+
+    const body = prefix.slice(latest.index);
+    const opens = [...body.matchAll(/\{/g)].length;
+    const closes = [...body.matchAll(/\}/g)].length;
+
+    return opens > closes;
+}
+
+export function hasDecoratorPrefix(text: string, offset: number): boolean {
+    const lineStart = Math.max(text.lastIndexOf('\n', offset - 1) + 1, 0);
+
+    return /^\s*@[A-Za-z_]*$/.test(text.slice(lineStart, offset));
+}
+
 export function completionContext(text: string, offset: number): CompletionContext {
     const wordStart = scanIdentifier(text, offset);
     const separator = text[wordStart - 1];

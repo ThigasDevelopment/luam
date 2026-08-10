@@ -7,10 +7,11 @@ import type {
 } from '@compiler/parser/declaration-nodes';
 
 import type { CheckContext } from './context';
+import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
 import { buildFunctionType, checkFunctionBody } from './statements';
-import { ANY_TYPE, createNamed, isAssignable, typeToString, type Type } from './types';
+import { ANY_TYPE, createFunction, createNamed, isAssignable, typeToString, VOID_TYPE, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     const valueType = member.value === null ? null : checkExpression(context, member.value);
@@ -28,13 +29,34 @@ function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     return declared;
 }
 
-function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
+function generatedMethodType(member: ClassMethodDeclaration, fieldTypes: ReadonlyMap<ClassFieldDeclaration, Type>): Type {
+    const fieldType = [...fieldTypes].find(([field]) => field.position.offset === member.position.offset)?.[1] ?? ANY_TYPE;
+
+    return member.parameters.length === 0 ? createFunction([], fieldType) : createFunction([fieldType], VOID_TYPE);
+}
+
+function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): ClassMethodDeclaration[] {
+    const fieldTypes = new Map<ClassFieldDeclaration, Type>();
+
     for (const member of statement.members) {
-        const type =
-            member.kind === 'class-field' ? fieldType(context, member) : buildFunctionType(context, member.parameters, member.returnAnnotation);
+        if (member.kind === 'class-field') {
+            fieldTypes.set(member, fieldType(context, member));
+        }
+    }
+
+    const generated = expandClassDecorators(context, statement, fieldTypes);
+
+    for (const member of [...statement.members, ...generated]) {
+        const type = member.kind === 'class-field'
+            ? fieldTypes.get(member) ?? ANY_TYPE
+            : member.isSynthetic
+              ? generatedMethodType(member, fieldTypes)
+              : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
         info.members.set(member.name, { name: member.name, type, isMethod: member.kind === 'class-method', position: member.position });
     }
+
+    return generated;
 }
 
 function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMethodDeclaration): void {
@@ -117,7 +139,9 @@ export function checkClassDeclaration(context: CheckContext, statement: ClassDec
         position: statement.position,
     };
 
-    registerMembers(context, info, statement);
+    const generated = registerMembers(context, info, statement);
+
+    context.generatedMembers.set(statement, generated);
     context.declarations.declareClass(info);
     context.declareModuleGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: statement.position });
     checkInterfaces(context, info);
@@ -127,6 +151,7 @@ export function checkClassDeclaration(context: CheckContext, statement: ClassDec
             checkMethodBody(context, info, member);
         }
     }
+
 }
 
 export function checkInterfaceDeclaration(context: CheckContext, statement: InterfaceDeclaration): void {

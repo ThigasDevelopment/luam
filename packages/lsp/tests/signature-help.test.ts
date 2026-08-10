@@ -49,6 +49,13 @@ describe('signature help', () => {
         expect(help?.activeParameter).toBe(1);
     });
 
+    it('describes a generated setter parameter', () => {
+        const text = 'class Player {\n    @Setter\n    name: string\n}\nlocal player = new Player()\nplayer:setName(\n';
+        const help = helpFor(text, 'player:setName(');
+
+        expect(help?.signatures[0]?.label).toBe('Player.setName(value: string): void');
+    });
+
     it('offers nothing outside a call and nothing inside a comment', () => {
         expect(helpFor('local value = 1\n', 'local value')).toBeNull();
         expect(helpFor('-- outputChatBox(\n', 'outputChatBox(')).toBeNull();
