@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+    <defs>
+        <linearGradient id="luamMoonLight" x1="3" y1="4" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#6B57E8" />
+            <stop offset="0.55" stop-color="#3E63CC" />
+            <stop offset="1" stop-color="#1478B4" />
+        </linearGradient>
+        <mask id="luamCrescentLight">
+            <circle cx="15" cy="16" r="12.8" fill="#ffffff" />
+            <circle cx="24" cy="9" r="12" fill="#000000" />
+        </mask>
+    </defs>
+    <rect width="32" height="32" fill="url(#luamMoonLight)" mask="url(#luamCrescentLight)" />
+    <circle cx="26.5" cy="6" r="2.8" fill="#6B57E8" />
+</svg>

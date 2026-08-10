@@ -25,8 +25,15 @@
         ["`", "`"]
     ],
     "indentationRules": {
-        "increaseIndentPattern": "^\\s*(if\\b.*\\bthen|else\\b|elseif\\b.*\\bthen|for\\b.*\\bdo|while\\b.*\\bdo|repeat\\b|do\\b|function\\b|(class|interface|enum)\\b.*\\{|.*\\{\\s*)$",
-        "decreaseIndentPattern": "^\\s*(end\\b|else\\b|elseif\\b|until\\b|\\}).*$"
+        "increaseIndentPattern": "^((?!--).)*((\\b(else|function|then|do|repeat)\\b((?!\\b(end|until)\\b).)*)|[{(]\\s*)$",
+        "decreaseIndentPattern": "^\\s*(\\b(elseif|else|end|until)\\b|[)}\\]])"
     },
+    "onEnterRules": [
+        {
+            "beforeText": "^\\s*--\\[\\[",
+            "afterText": "^\\s*\\]\\]",
+            "action": { "indent": "indentOutdent" }
+        }
+    ],
     "wordPattern": "[A-Za-z_][A-Za-z0-9_]*"
 }

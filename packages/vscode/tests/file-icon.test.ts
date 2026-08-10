@@ -1,0 +1,65 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+import { describe, expect, it } from 'vitest';
+
+interface LanguageContribution {
+    id: string;
+    extensions: string[];
+    icon?: { light: string; dark: string };
+}
+
+interface Manifest {
+    contributes: { languages: LanguageContribution[] };
+}
+
+const packageRoot = fileURLToPath(new URL('..', import.meta.url));
+
+const manifest: Manifest = JSON.parse(readFileSync(`${packageRoot}package.json`, 'utf8'));
+
+const language = manifest.contributes.languages.find((entry) => entry.id === 'luam');
+
+function iconSource(relative: string): string {
+    return readFileSync(`${packageRoot}${relative.replace('./', '')}`, 'utf8');
+}
+
+describe('file icon', () => {
+    it('contributes a light and a dark icon for the luam language', () => {
+        expect(language?.extensions).toEqual(['.luam']);
+        expect(language?.icon?.light).toBe('./icons/luam-file-light.svg');
+        expect(language?.icon?.dark).toBe('./icons/luam-file-dark.svg');
+    });
+
+    it('ships both icon files', () => {
+        for (const relative of [language?.icon?.light ?? '', language?.icon?.dark ?? '']) {
+            expect(existsSync(`${packageRoot}${relative.replace('./', '')}`), relative).toBe(true);
+        }
+    });
+
+    it('draws the crescent with a mask so the cut circle is subtracted', () => {
+        for (const relative of [language?.icon?.light ?? '', language?.icon?.dark ?? '']) {
+            const source = iconSource(relative);
+
+            expect(source, relative).toContain('viewBox="0 0 32 32"');
+            expect(source, relative).toContain('<mask');
+            expect(source, relative).toContain('mask="url(#luamCrescent');
+            expect(source, relative).not.toContain('fill-rule="evenodd"');
+        }
+    });
+
+    it('keeps every drawn shape inside the viewport', () => {
+        const source = iconSource(language?.icon?.dark ?? '');
+        const circles = [...source.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"[^>]*fill="#9B8CFF"/g)];
+
+        expect(circles.length).toBe(1);
+
+        for (const circle of circles) {
+            const [x, y, radius] = [Number(circle[1]), Number(circle[2]), Number(circle[3])];
+
+            expect(x - radius).toBeGreaterThanOrEqual(0);
+            expect(y - radius).toBeGreaterThanOrEqual(0);
+            expect(x + radius).toBeLessThanOrEqual(32);
+            expect(y + radius).toBeLessThanOrEqual(32);
+        }
+    });
+});
