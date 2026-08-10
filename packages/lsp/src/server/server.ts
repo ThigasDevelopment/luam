@@ -28,6 +28,7 @@ function registerDocuments(connection: Connection, documents: TextDocuments<Text
 
 function registerFeatures(connection: Connection, service: LanguageService): void {
     connection.onCompletion((params) => service.completion(params.textDocument.uri, params.position));
+    connection.onSignatureHelp((params) => service.signatureHelp(params.textDocument.uri, params.position));
     connection.onHover((params) => service.hover(params.textDocument.uri, params.position));
     connection.onDefinition((params) => service.definition(params.textDocument.uri, params.position));
     connection.onReferences((params) => service.references(params.textDocument.uri, params.position));

@@ -54,3 +54,7 @@ export function variableText(keyword: string, name: string, annotation: TypeAnno
 
     return fallback === null ? `${keyword} ${name}` : `${keyword} ${name}: ${fallback}`;
 }
+
+export function assignedText(declaration: string, value: string | null): string {
+    return value === null ? declaration : `${declaration} = ${value}`;
+}

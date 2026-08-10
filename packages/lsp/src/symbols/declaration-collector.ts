@@ -17,7 +17,7 @@ import {
 } from './collector-state';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { signatureText, variableText } from './signature-text';
+import { parameterText, signatureText, variableText } from './signature-text';
 import { collectFunctionScope } from './statement-collector';
 
 const KEYWORD_LENGTHS: Readonly<Record<DeclarationStatement['kind'], number>> = {
@@ -66,7 +66,9 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
 
     const detail = signatureText(member.name, member.parameters, member.returnAnnotation);
 
-    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner });
+    const parameters = member.parameters.map(parameterText);
+
+    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner, parameters });
     collectAnnotation(state, block, member.returnAnnotation);
     collectFunctionScope(state, block, {
         start: member.position.offset,
@@ -91,7 +93,9 @@ function collectInterfaceMember(state: CollectorState, block: BlockContext, owne
 
     const detail = signatureText(member.name, member.parameters, member.returnAnnotation);
 
-    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner });
+    const parameters = member.parameters.map(parameterText);
+
+    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner, parameters });
     collectAnnotation(state, block, member.returnAnnotation);
 
     for (const parameter of member.parameters) {

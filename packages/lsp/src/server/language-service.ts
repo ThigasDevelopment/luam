@@ -1,11 +1,12 @@
 import type { Environment } from '@compiler/environment/environment';
-import type { CompletionItem, Diagnostic, Hover, Location, Position, WorkspaceEdit } from 'vscode-languageserver';
+import type { CompletionItem, Diagnostic, Hover, Location, Position, SignatureHelp, WorkspaceEdit } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { completionAt } from '@lsp/features/completion';
 import { collectDiagnostics } from '@lsp/features/diagnostics';
 import { hoverAt } from '@lsp/features/hover';
 import { definitionAt, referencesAt, renameAt } from '@lsp/features/navigation';
+import { signatureHelpAt } from '@lsp/features/signature-help';
 import { offsetAt } from '@lsp/support/source-text';
 import { WorkspaceIndex } from '@lsp/workspace/workspace-index';
 
@@ -42,6 +43,12 @@ export class LanguageService {
         const analysis = this.workspace.get(uri);
 
         return analysis === null ? [] : completionAt(analysis, this.offset(analysis, position), this.workspace.others(uri));
+    }
+
+    signatureHelp(uri: string, position: Position): SignatureHelp | null {
+        const analysis = this.workspace.get(uri);
+
+        return analysis === null ? null : signatureHelpAt(analysis, this.offset(analysis, position));
     }
 
     hover(uri: string, position: Position): Hover | null {

@@ -32,6 +32,7 @@ export interface DeclarationInput {
     detail: string;
     container?: string | null;
     type?: Type | null;
+    parameters?: readonly string[];
 }
 
 export function createState(
@@ -52,6 +53,7 @@ export function declareSymbol(state: CollectorState, scopeId: number, input: Dec
         container: input.container ?? null,
         detail: input.detail,
         type: input.type ?? null,
+        parameters: input.parameters ?? [],
     };
 
     state.declarations.push(declaration);

@@ -18,6 +18,9 @@ import {
     mtaMemberItem,
     symbolItem,
 } from '@lsp/features/completion-items';
+import { eventItems, isEventArgument } from '@lsp/features/event-completion';
+import { scanContext, type CallFrame } from '@lsp/features/source-context';
+import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
 
 function classItems(analysis: DocumentAnalysis, name: string): CompletionItem[] {
@@ -93,7 +96,29 @@ function deduplicate(items: readonly CompletionItem[]): CompletionItem[] {
     return unique;
 }
 
+function stringItems(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[], frame: CallFrame | null): CompletionItem[] {
+    if (frame === null || !frame.isCall || !isEventArgument(analysis.text, frame)) {
+        return [];
+    }
+
+    return eventItems(analysis, others);
+}
+
 export function completionAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): CompletionItem[] {
+    const lexical = scanContext(analysis.text, offset);
+
+    if (lexical.inComment) {
+        return [];
+    }
+
+    if (lexical.inString) {
+        return deduplicate(stringItems(analysis, offset, others, lexical.frame));
+    }
+
+    if (isTypePosition(analysis.text, offset)) {
+        return deduplicate(typeItems(analysis, offset));
+    }
+
     const context = completionContext(analysis.text, offset);
 
     if (context.trigger !== null) {

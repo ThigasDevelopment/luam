@@ -28,7 +28,8 @@ import {
 import { collectDeclaration } from './declaration-collector';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { signatureText, variableText } from './signature-text';
+import { assignedText, parameterText, signatureText, variableText } from './signature-text';
+import { valueText } from './value-text';
 
 export interface FunctionScopeInput {
     start: number;
@@ -81,7 +82,8 @@ function collectLocal(state: CollectorState, block: BlockContext, statement: Loc
 
         const value = statement.values[index];
         const type = value === undefined ? null : typeOf(state, value);
-        const detail = variableText('local', declarator.name, declarator.annotation, type === null ? null : typeToString(type));
+        const declared = variableText('local', declarator.name, declarator.annotation, type === null ? null : typeToString(type));
+        const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1));
 
         declareSymbol(state, block.scopeId, { name: declarator.name, kind: 'local', position: declarator.position, detail, type });
     });
@@ -108,7 +110,9 @@ function collectFunctionName(state: CollectorState, block: BlockContext, stateme
         const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation);
         const scopeId = statement.isLocal ? block.scopeId : ROOT_SCOPE;
 
-        declareSymbol(state, scopeId, { name: name.name, kind: 'function', position: name.position, detail });
+        const parameters = statement.parameters.map(parameterText);
+
+        declareSymbol(state, scopeId, { name: name.name, kind: 'function', position: name.position, detail, parameters });
         addReference(state, name.name, 'value', name.position, block.scopeId);
 
         return null;

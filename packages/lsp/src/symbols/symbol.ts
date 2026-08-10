@@ -24,6 +24,7 @@ export interface SymbolDeclaration {
     container: string | null;
     detail: string;
     type: Type | null;
+    parameters: readonly string[];
 }
 
 export interface SymbolReference {

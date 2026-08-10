@@ -3,6 +3,7 @@ import { mtaMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import type { RecordType, Type } from '@compiler/checker/types';
 import { isAvailableIn } from '@mta-types/api-declaration';
+import { findDeclaration } from '@mta-types/catalog';
 import { isLibrary, type LibraryName } from '@mta-types/library-members';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
@@ -108,13 +109,27 @@ function projectTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget
     return fromType(analysis, descriptorToType(declaration.type));
 }
 
+function catalogTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget | null {
+    const declaration = findDeclaration(name);
+
+    if (declaration === null || !isAvailableIn(declaration.environment, analysis.environment)) {
+        return null;
+    }
+
+    return fromType(analysis, descriptorToType(declaration.type));
+}
+
 function rootTarget(analysis: DocumentAnalysis, offset: number, name: string): ReceiverTarget | null {
     const accept = (candidate: SymbolDeclaration): boolean => matchesReferenceKind(candidate, 'value');
     const scopeId = analysis.index.scopes.innermostAt(offset);
     const declaration = analysis.index.scopes.resolve(scopeId, name, offset, accept);
 
     if (declaration === null) {
-        return isLibrary(name) ? { kind: 'library', library: name } : projectTarget(analysis, name);
+        if (isLibrary(name)) {
+            return { kind: 'library', library: name };
+        }
+
+        return projectTarget(analysis, name) ?? catalogTarget(analysis, name);
     }
 
     if (declaration.kind === 'enum') {
