@@ -1,4 +1,6 @@
-export const VERSION = '0.0.0';
+declare const LUAM_VERSION: string | undefined;
+
+export const VERSION = typeof LUAM_VERSION === 'string' ? LUAM_VERSION : '0.0.0-dev';
 
 export const USAGE = [
     'luam — the Luam compiler for Multi Theft Auto resources.',

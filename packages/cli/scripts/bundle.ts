@@ -37,4 +37,5 @@ await build({
     format: 'esm',
     target: 'node20',
     tsconfig: 'tsconfig.json',
+    define: { LUAM_VERSION: JSON.stringify(packageVersion()) },
 });

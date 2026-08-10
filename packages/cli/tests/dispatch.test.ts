@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { runCli } from '@cli/cli/dispatch';
 import { EXIT_DIAGNOSTICS, EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
+import { VERSION } from '@cli/cli/usage';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
@@ -44,7 +45,7 @@ describe('command dispatch', () => {
         const logger = createMemoryLogger();
 
         expect(await runCli(['--version'], { logger })).toBe(EXIT_OK);
-        expect(logger.lines).toEqual(['0.0.0']);
+        expect(logger.lines).toEqual([VERSION]);
     });
 
     it('rejects an unknown command', async () => {
