@@ -6,7 +6,7 @@ import { generate } from './catalog-generator.ts';
 import { upstreamVersion, UPSTREAM_PACKAGE } from './upstream-source.ts';
 
 const packageRoot = fileURLToPath(new URL('..', import.meta.url));
-const generatedDirs = ['src/generated', 'src/generated/api', 'src/generated/oop'];
+const generatedDirs = ['src/generated', 'src/generated/api', 'src/generated/docs', 'src/generated/oop'];
 
 const result = generate();
 const written = new Set(result.files.map((file) => file.path));
@@ -27,6 +27,7 @@ const lines = [
     `source: ${UPSTREAM_PACKAGE}@${upstreamVersion()}`,
     `files: ${result.files.length}`,
     `shared: ${result.catalog.shared.length}, server: ${result.catalog.server.length}, client: ${result.catalog.client.length}`,
+    `documented: ${result.documented}`,
     `events: ${result.events.server} server, ${result.events.client} client`,
     `element types: ${result.elementTypes}`,
     `oop: ${result.oop.classes.length} classes, ${result.oop.methods} methods, ${result.oop.properties} properties`,

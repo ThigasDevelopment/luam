@@ -1,4 +1,5 @@
 import type { ApiEnvironment } from '#mta-types/api-declaration';
+import { hasDocumentation, type ApiDocumentation } from '#mta-types/api-documentation';
 import { CATALOG_OVERRIDES, EXCLUDED_APIS } from '#mta-types/catalog-overrides';
 import { LUA_GLOBALS } from '#mta-types/lua-standard';
 import { LUAM_RUNTIME_GLOBALS } from '#mta-types/luam-runtime';
@@ -47,6 +48,18 @@ export function mergeDescriptor(left: TypeDescriptor, right: TypeDescriptor): Ty
     };
 }
 
+function richer(left: ApiDocumentation, right: ApiDocumentation): ApiDocumentation {
+    if (!hasDocumentation(left)) {
+        return right;
+    }
+
+    if (!hasDocumentation(right)) {
+        return left;
+    }
+
+    return left.summary.length >= right.summary.length ? left : right;
+}
+
 function collapse(declarations: readonly ParsedDeclaration[]): Map<string, ParsedDeclaration> {
     const byName = new Map<string, ParsedDeclaration>();
 
@@ -59,7 +72,11 @@ function collapse(declarations: readonly ParsedDeclaration[]): Map<string, Parse
             continue;
         }
 
-        byName.set(declaration.name, { ...existing, type: mergeDescriptor(existing.type, declaration.type) });
+        byName.set(declaration.name, {
+            ...existing,
+            type: mergeDescriptor(existing.type, declaration.type),
+            documentation: richer(existing.documentation, declaration.documentation),
+        });
     }
 
     return byName;
@@ -114,7 +131,8 @@ export function normalize(server: readonly ParsedDeclaration[], client: readonly
         const isShared = fromServer !== undefined && fromClient !== undefined;
         const environment: ApiEnvironment = isShared ? 'shared' : fromServer !== undefined ? 'server' : 'client';
         const type = isShared && fromClient !== undefined ? mergeDescriptor(source.type, fromClient.type) : source.type;
-        const entry = applyOverride({ name, category: source.category, environment, type });
+        const documentation = fromClient === undefined ? source.documentation : richer(source.documentation, fromClient.documentation);
+        const entry = applyOverride({ name, category: source.category, environment, type, documentation });
 
         buckets[entry.environment].push(entry);
     }

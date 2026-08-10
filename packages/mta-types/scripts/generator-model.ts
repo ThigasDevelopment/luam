@@ -1,10 +1,12 @@
 import type { ApiEnvironment } from '#mta-types/api-declaration';
+import type { ApiDocumentation } from '#mta-types/api-documentation';
 import type { TypeDescriptor } from '#mta-types/type-descriptor';
 
 export interface ParsedDeclaration {
     name: string;
     category: string;
     type: TypeDescriptor;
+    documentation: ApiDocumentation;
 }
 
 export interface CatalogEntry {
@@ -12,6 +14,7 @@ export interface CatalogEntry {
     category: string;
     environment: ApiEnvironment;
     type: TypeDescriptor;
+    documentation: ApiDocumentation;
 }
 
 export interface ElementTypeEntry {

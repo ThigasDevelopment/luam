@@ -2,6 +2,7 @@ import ts from 'typescript';
 
 import { fn, type TypeDescriptor } from '#mta-types/type-descriptor';
 
+import { functionDocumentation, variableDocumentation } from './documentation-parser.ts';
 import { GeneratorError, type ParsedDeclaration } from './generator-model.ts';
 import { type MapContext, mapTypeNode } from './type-mapper.ts';
 import type { UpstreamFile } from './upstream-source.ts';
@@ -45,8 +46,9 @@ function isMultiReturn(node: ts.FunctionDeclaration): boolean {
 
 export function parseFunctions(file: UpstreamFile, context: MapContext, multiReturns: Set<string>): ParsedDeclaration[] {
     const declarations: ParsedDeclaration[] = [];
+    const source = sourceFileOf(file);
 
-    for (const statement of sourceFileOf(file).statements) {
+    for (const statement of source.statements) {
         if (!ts.isFunctionDeclaration(statement)) {
             continue;
         }
@@ -59,7 +61,12 @@ export function parseFunctions(file: UpstreamFile, context: MapContext, multiRet
             multiReturns.add(statement.name.text);
         }
 
-        declarations.push({ name: statement.name.text, category: file.category, type: signatureOf(statement, context) });
+        declarations.push({
+            name: statement.name.text,
+            category: file.category,
+            type: signatureOf(statement, context),
+            documentation: functionDocumentation(source, statement),
+        });
     }
 
     return declarations;
@@ -67,8 +74,9 @@ export function parseFunctions(file: UpstreamFile, context: MapContext, multiRet
 
 export function parseVariables(file: UpstreamFile, context: MapContext): ParsedDeclaration[] {
     const declarations: ParsedDeclaration[] = [];
+    const source = sourceFileOf(file);
 
-    for (const statement of sourceFileOf(file).statements) {
+    for (const statement of source.statements) {
         if (!ts.isVariableStatement(statement)) {
             continue;
         }
@@ -78,7 +86,12 @@ export function parseVariables(file: UpstreamFile, context: MapContext): ParsedD
                 throw new GeneratorError(file.path, 'a variable declaration uses a binding pattern instead of a name');
             }
 
-            declarations.push({ name: declaration.name.text, category: file.category, type: mapTypeNode(declaration.type, context) });
+            declarations.push({
+                name: declaration.name.text,
+                category: file.category,
+                type: mapTypeNode(declaration.type, context),
+                documentation: variableDocumentation(source, statement),
+            });
         }
     }
 

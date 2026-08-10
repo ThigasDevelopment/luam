@@ -9,6 +9,7 @@ import { parseClasses, parseEvents, parseFunctions, parseVariables } from '@gene
 import { GeneratorError } from '@generator/generator-model';
 import { normalize } from '@generator/catalog-normalizer';
 import type { MapContext } from '@generator/type-mapper';
+import { EMPTY_DOCUMENTATION } from '@mta-types/api-documentation';
 import { CATALOG_OVERRIDES } from '@mta-types/catalog-overrides';
 import { BOOLEAN, fn, NUMBER, STRING } from '@mta-types/type-descriptor';
 
@@ -54,8 +55,24 @@ describe('catalog generator', () => {
             const lines = file.contents.split('\n');
 
             expect(lines.length, file.path).toBeLessThanOrEqual(275);
+
+            if (file.path.startsWith('src/generated/docs/')) {
+                continue;
+            }
+
             expect(Math.max(...lines.map((line) => line.length)), file.path).toBeLessThanOrEqual(150);
         }
+    });
+
+    it('emits documentation carrying parameter names, prose and a wiki link', () => {
+        const aggregate = result.files.find((file) => file.path === 'src/generated/docs/mta-docs.ts');
+        const modules = result.files.filter((file) => file.path.startsWith('src/generated/docs/mta-docs-'));
+        const combined = modules.map((file) => file.contents).join('\n');
+
+        expect(aggregate?.contents).toContain('MTA_API_DOCS');
+        expect(result.documented).toBeGreaterThan(900);
+        expect(combined).toContain("{ name: 'text', isOptional: false, isVariadic: false, summary: 'The text string");
+        expect(combined).toContain("wiki: 'https://wiki.multitheftauto.com/wiki/OutputChatBox'");
     });
 
     it('declares every name in exactly one environment', () => {
@@ -154,11 +171,11 @@ describe('generator input validation', () => {
 });
 
 describe('generator normalization', () => {
-    const serverOnly = { name: 'serverThing', category: 'fixture', type: { kind: 'string' } as const };
-    const clientOnly = { name: 'clientThing', category: 'fixture', type: { kind: 'number' } as const };
+    const serverOnly = { name: 'serverThing', category: 'fixture', type: { kind: 'string' } as const, documentation: EMPTY_DOCUMENTATION };
+    const clientOnly = { name: 'clientThing', category: 'fixture', type: { kind: 'number' } as const, documentation: EMPTY_DOCUMENTATION };
 
     it('declares a function present on both sides as shared', () => {
-        const both = { name: 'bothThing', category: 'fixture', type: { kind: 'string' } as const };
+        const both = { name: 'bothThing', category: 'fixture', type: { kind: 'string' } as const, documentation: EMPTY_DOCUMENTATION };
         const catalog = normalize([serverOnly, both], [clientOnly, both]);
 
         expect(catalog.shared.map((entry) => entry.name)).toEqual(['bothThing']);
@@ -167,8 +184,8 @@ describe('generator normalization', () => {
     });
 
     it('widens a signature the two sides disagree on', () => {
-        const server = { name: 'thing', category: 'fixture', type: fn([STRING], BOOLEAN, 1) };
-        const client = { name: 'thing', category: 'fixture', type: fn([NUMBER], BOOLEAN, 0, true) };
+        const server = { name: 'thing', category: 'fixture', type: fn([STRING], BOOLEAN, 1), documentation: EMPTY_DOCUMENTATION };
+        const client = { name: 'thing', category: 'fixture', type: fn([NUMBER], BOOLEAN, 0, true), documentation: EMPTY_DOCUMENTATION };
         const [entry] = normalize([server], [client]).shared;
 
         expect(entry?.type).toEqual({
@@ -181,7 +198,7 @@ describe('generator normalization', () => {
     });
 
     it('emits an aggregate that spreads every category module', () => {
-        const files = emitCatalog('server', [{ name: 'thing', category: 'fixture', environment: 'server', type: { kind: 'string' } }]);
+        const files = emitCatalog('server', [{ name: 'thing', category: 'fixture', environment: 'server', type: { kind: 'string' }, documentation: EMPTY_DOCUMENTATION }]);
         const aggregate = files.find((file) => file.path === 'src/generated/api/mta-server.ts');
 
         expect(files.map((file) => file.path)).toContain('src/generated/api/mta-fixture-server.ts');

@@ -5,6 +5,14 @@ const SERVER: ReadonlySet<string> = new Set(MTA_EVENTS.server);
 const CLIENT: ReadonlySet<string> = new Set(MTA_EVENTS.client);
 const SHARED: ReadonlySet<string> = new Set(MTA_EVENTS.shared);
 
+export function eventsFor(environment: ApiEnvironment): string[] {
+    if (environment === 'shared') {
+        return [...MTA_EVENTS.shared, ...MTA_EVENTS.server, ...MTA_EVENTS.client].sort();
+    }
+
+    return [...MTA_EVENTS.shared, ...MTA_EVENTS[environment]].sort();
+}
+
 export function eventEnvironment(name: string): ApiEnvironment | null {
     if (SHARED.has(name)) {
         return 'shared';

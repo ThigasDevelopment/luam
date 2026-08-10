@@ -7,6 +7,7 @@ import { parseOopClasses } from '@generator/oop-parser';
 import { buildOopSurface } from '@generator/oop-surface-builder';
 import type { MapContext } from '@generator/type-mapper';
 import { oopMethod } from '@mta-types/oop-declaration';
+import { EMPTY_DOCUMENTATION } from '@mta-types/api-documentation';
 import { BOOLEAN, fn, STRING } from '@mta-types/type-descriptor';
 
 const result = generate();
@@ -122,7 +123,7 @@ describe('oop surface builder', () => {
 
     it('types a property from the getter it resolves to', () => {
         const methods = [{ name: 'getName', procedural: 'getElementName', type: fn([], STRING, 0) }];
-        const catalog = normalize([{ name: 'getElementName', category: 'element', type: fn([], STRING, 0) }], []);
+        const catalog = normalize([{ name: 'getElementName', category: 'element', type: fn([], STRING, 0), documentation: EMPTY_DOCUMENTATION }], []);
         const surface = buildOopSurface([{ name: 'Element', methods, properties: ['name'] }], elementOnly, catalog);
 
         expect(surface.classes[0]?.members).toContainEqual(oopMethod('getName', 'server', 'getElementName', fn([], STRING, 0)));
@@ -136,7 +137,7 @@ describe('oop surface builder', () => {
     });
 
     it('drops a property with no resolvable getter', () => {
-        const catalog = normalize([{ name: 'getElementName', category: 'element', type: fn([], STRING, 0) }], []);
+        const catalog = normalize([{ name: 'getElementName', category: 'element', type: fn([], STRING, 0), documentation: EMPTY_DOCUMENTATION }], []);
         const surface = buildOopSurface([{ name: 'Element', methods: [], properties: ['vehicle'] }], elementOnly, catalog);
 
         expect(surface.skippedProperties).toEqual(['Element.vehicle']);

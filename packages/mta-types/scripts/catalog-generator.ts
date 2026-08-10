@@ -4,6 +4,7 @@ import { emitCatalog } from './catalog-emitter.ts';
 import { emitElementTypes, emitEvents, resolveElementTypes } from './catalog-data-emitter.ts';
 import { normalize, type NormalizedCatalog } from './catalog-normalizer.ts';
 import { parseClasses, parseEvents, parseFunctions, parseVariables } from './declaration-parser.ts';
+import { emitDocumentation } from './documentation-emitter.ts';
 import { GeneratorError, type GeneratedFile, type ParsedDeclaration } from './generator-model.ts';
 import { emitOopSurface } from './oop-emitter.ts';
 import { parseOopClasses } from './oop-parser.ts';
@@ -22,6 +23,7 @@ export interface GenerationResult {
     multiReturns: readonly string[];
     elementTypes: number;
     events: { server: number; client: number };
+    documented: number;
 }
 
 function declarationsFor(side: 'server' | 'client', context: MapContext, multiReturns: Set<string>): ParsedDeclaration[] {
@@ -61,10 +63,12 @@ export function generate(): GenerationResult {
         throw new GeneratorError('upstream', `resolved only ${oop.methods + oop.properties} OOP members, the source looks incomplete`);
     }
 
+    const documented = [...catalog.shared, ...catalog.server, ...catalog.client];
     const files = [
         ...emitCatalog('shared', catalog.shared),
         ...emitCatalog('server', catalog.server),
         ...emitCatalog('client', catalog.client),
+        ...emitDocumentation(documented),
         ...emitOopSurface(oop.classes),
         emitEvents(serverEvents, clientEvents),
         emitElementTypes(elementTypes),
@@ -77,5 +81,6 @@ export function generate(): GenerationResult {
         multiReturns: [...multiReturns].sort(),
         elementTypes: elementTypes.length,
         events: { server: serverEvents.length, client: clientEvents.length },
+        documented: documented.filter((entry) => entry.documentation.summary.length > 0).length,
     };
 }
