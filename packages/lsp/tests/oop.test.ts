@@ -83,6 +83,52 @@ describe('oop completion', () => {
 
         expect(labels(workspace, SERVER_PATH, chained, 'player.account:get')).toContain('getSerial');
     });
+
+    it('separates properties and methods for an explicitly typed element', () => {
+        const explicit = 'local player: Player = getRandomPlayer()\nplayer.\nplayer:\n';
+        const workspace = openProject(true, { [SERVER_PATH]: explicit });
+        const properties = labels(workspace, SERVER_PATH, explicit, 'player.');
+        const methods = labels(workspace, SERVER_PATH, explicit, '\nplayer:');
+
+        expect(properties).toContain('name');
+        expect(properties).toContain('health');
+        expect(properties).not.toContain('getName');
+        expect(properties).not.toContain('getHealth');
+        expect(methods).toContain('getName');
+        expect(methods).toContain('getHealth');
+        expect(methods).not.toContain('name');
+        expect(methods).not.toContain('health');
+    });
+
+    it('offers static methods on an MTA class value', () => {
+        const staticCall = 'local player = Player.getRandom()\nPlayer.\n';
+        const workspace = openProject(true, { [SERVER_PATH]: staticCall });
+        const found = labels(workspace, SERVER_PATH, staticCall, 'Player.');
+
+        expect(found).toContain('getRandom');
+        expect(found).not.toContain('getName');
+        expect(found).not.toContain('name');
+    });
+
+    it('scopes static methods and class values by environment', () => {
+        const source = 'Player.\n';
+        const server = openProject(true, { [SERVER_PATH]: source });
+        const client = openProject(true, { [CLIENT_PATH]: source });
+
+        expect(labels(server, SERVER_PATH, source, 'Player.')).toContain('getRandom');
+        expect(labels(client, CLIENT_PATH, source, 'Player.')).not.toContain('getRandom');
+        expect(labels(server, SERVER_PATH, 'Fil\n', 'Fil')).toContain('File');
+    });
+
+    it('offers File static methods separately from instance members', () => {
+        const source = 'File.\n';
+        const workspace = openProject(true, { [SERVER_PATH]: source });
+        const found = labels(workspace, SERVER_PATH, source, 'File.');
+
+        expect(found).toContain('new');
+        expect(found).toContain('exists');
+        expect(found).not.toContain('close');
+    });
 });
 
 describe('oop hover', () => {
@@ -108,6 +154,34 @@ describe('oop hover', () => {
         workspace.service.update(uri, 2, source);
 
         expect(workspace.service.hover(uri, positionOf(source, 'player:', 'getName'))).toBeNull();
+    });
+
+    it('describes a static method and its procedural function', () => {
+        const source = 'local player = Player.getRandom()\n';
+        const workspace = openProject(true, { [SERVER_PATH]: source });
+        const hover = workspace.service.hover(workspace.uri(SERVER_PATH), positionOf(source, 'Player.', 'getRandom'));
+        const value = typeof hover?.contents === 'object' && 'value' in hover.contents ? hover.contents.value : '';
+
+        expect(value).toContain('Player.getRandom: fun(): Player');
+        expect(value).toContain('wraps `getRandomPlayer` (server)');
+    });
+});
+
+describe('oop signature help', () => {
+    it('describes callable MTA classes', () => {
+        const source = 'local file = File(\n';
+        const workspace = openProject(true, { [SERVER_PATH]: source });
+        const help = workspace.service.signatureHelp(workspace.uri(SERVER_PATH), markerAt(source, 'File('));
+
+        expect(help?.signatures[0]?.label).toBe('File(argument1: string): File');
+    });
+
+    it('describes static MTA methods', () => {
+        const source = 'local player = Player.getRandom(\n';
+        const workspace = openProject(true, { [SERVER_PATH]: source });
+        const help = workspace.service.signatureHelp(workspace.uri(SERVER_PATH), markerAt(source, 'Player.getRandom('));
+
+        expect(help?.signatures[0]?.label).toBe('Player.getRandom(): Player');
     });
 });
 

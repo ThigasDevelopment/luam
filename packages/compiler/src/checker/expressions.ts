@@ -13,7 +13,13 @@ import {
     resolveNamedMember,
     resolveRecordMember,
 } from './members';
-import { isMtaElement, resolveMtaMember } from './oop-members';
+import {
+    isMtaClassReference,
+    isMtaElement,
+    resolveMtaConstructor,
+    resolveMtaMember,
+    resolveMtaStaticMember,
+} from './oop-members';
 import { checkBinary, checkUnary } from './operators';
 import { buildFunctionType, checkFunctionBody } from './statements';
 import { collectInterpolations } from './template';
@@ -64,6 +70,12 @@ function isNativeConstruction(context: CheckContext, expression: MemberExpressio
 }
 
 function checkMember(context: CheckContext, expression: MemberExpression): Type {
+    if (expression.object.kind === 'identifier' && isMtaClassReference(context, expression.object.name)) {
+        context.references.add(expression.object.name);
+
+        return context.record(expression, resolveMtaStaticMember(context, expression.object.name, expression.property, expression.position)?.type ?? ANY_TYPE);
+    }
+
     if (isNativeConstruction(context, expression) && expression.object.kind === 'identifier') {
         const name = expression.object.name;
         const message = `Construct "${name}" with "new ${name}(...)". The "${name}.new(...)" form is not part of the language.`;
@@ -177,6 +189,15 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
     }
 
     checkEventUsage(context, expression);
+
+    if (expression.method === null && expression.callee.kind === 'identifier' && isMtaClassReference(context, expression.callee.name)) {
+        context.references.add(expression.callee.name);
+
+        const constructor = resolveMtaConstructor(context, expression.callee.name, expression.position);
+        const argumentTypes = checkValueList(context, expression.args);
+
+        return context.record(expression, constructor === null ? ANY_TYPE : checkSignature(context, expression.args, argumentTypes, constructor, expression.position));
+    }
 
     const calleeType = checkExpression(context, expression.callee);
 

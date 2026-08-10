@@ -140,6 +140,42 @@ describe('mta oop emitter', () => {
     });
 });
 
+describe('mta oop class values', () => {
+    it('types static method calls and their return values', () => {
+        expect(codes('local player = Player.getRandom()\nplayer:getName()\n')).toEqual([]);
+    });
+
+    it('checks static method arguments and environments', () => {
+        expect(codes('local player = Player.getRandom(1)\n')).toEqual(['check-argument-count']);
+        expect(codes('local player = Player.getRandom()\n', CLIENT_FILE)).toEqual(['check-environment-api']);
+    });
+
+    it('requires the OOP flag for static methods', () => {
+        expect(codes('local player = Player.getRandom()\n', SERVER_FILE, false)).toEqual(['check-oop-disabled']);
+    });
+
+    it('lets a local value shadow an MTA class value', () => {
+        expect(codes('local Player = customFactory()\nPlayer.getRandom()\n')).toEqual([]);
+    });
+
+    it('types callable MTA constructors and preserves their Lua syntax', () => {
+        const source = 'local file: File = File("data.txt")\nfile:close()\n';
+        const result = compile(source, { filePath: SERVER_FILE, oop: true });
+
+        expect(result.diagnostics).toEqual([]);
+        expect(result.code).toBe("local file = File('data.txt')\nfile:close()\n");
+    });
+
+    it('checks callable constructor arguments and environments', () => {
+        expect(codes('local file = File()\n')).toEqual(['check-argument-count']);
+        expect(codes('local font = DxFont("font.ttf")\n', SERVER_FILE)).toEqual(['check-environment-api']);
+    });
+
+    it('keeps destructive creation as an explicit static method', () => {
+        expect(codes('local file: File = File.new("data.txt")\n')).toEqual([]);
+    });
+});
+
 describe('mta oop manifest', () => {
     const files: ProjectFile[] = [{ path: SERVER_FILE, source: 'local value = 1\n' }];
 

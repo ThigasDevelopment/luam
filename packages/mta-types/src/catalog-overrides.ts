@@ -28,3 +28,7 @@ export const CATALOG_OVERRIDES: Readonly<Record<string, CatalogOverride>> = {
     triggerServerEvent: { type: fn([STRING, named('Element')], BOOLEAN, 2, true) },
     unbindKey: { type: fn([ANY, STRING, STRING, ANY], BOOLEAN, 1) },
 };
+
+export const OOP_CONSTRUCTOR_OVERRIDES: Readonly<Record<string, TypeDescriptor>> = {
+    File: fn([STRING], named('File'), 1),
+};

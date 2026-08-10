@@ -7,7 +7,6 @@ import { ELEMENT_TYPES } from '@mta-types/generated/element-types';
 import { eventEnvironment } from '@mta-types/event-lookup';
 import { findLibraryMember, isLibrary } from '@mta-types/library-members';
 import { MTA_EVENTS } from '@mta-types/generated/mta-events';
-import { allOopClasses, findOopClass, findOopMember, oopClassesFor } from '@mta-types/oop-surface';
 import type { TypeDescriptor } from '@mta-types/type-descriptor';
 
 const ENVIRONMENTS = ['server', 'client', 'shared'] as const;
@@ -229,41 +228,5 @@ describe('catalog events and elements', () => {
         const orphans = ELEMENT_TYPES.filter((element) => element.parent !== null && !isElementType(element.parent));
 
         expect(orphans).toEqual([]);
-    });
-});
-
-describe('oop surface', () => {
-    it('declares a class for every element type', () => {
-        expect(allOopClasses().map((declaration) => declaration.name).sort()).toEqual(ELEMENT_TYPES.map((element) => element.name).sort());
-    });
-
-    it('finds a class and reports an unknown one', () => {
-        expect(findOopClass('Player')?.parent).toBe('Ped');
-        expect(findOopClass('Table')).toBeNull();
-    });
-
-    it('resolves a member through the element hierarchy', () => {
-        expect(findOopMember('Player', 'getName')?.procedural).toBe('getPlayerName');
-        expect(findOopMember('Player', 'setDimension')?.procedural).toBe('setElementDimension');
-        expect(findOopMember('Player', 'getNam')).toBeNull();
-    });
-
-    it('scopes the members of a class by environment', () => {
-        const names = (environment: 'server' | 'client'): string[] =>
-            oopClassesFor(environment)
-                .find((declaration) => declaration.name === 'Element')
-                ?.members.map((member) => member.name) ?? [];
-
-        expect(names('client')).toContain('getLighting');
-        expect(names('server')).not.toContain('getLighting');
-        expect(names('server')).toContain('setDimension');
-    });
-
-    it('declares every member with an environment the catalog agrees with', () => {
-        for (const declaration of allOopClasses()) {
-            for (const member of declaration.members) {
-                expect(member.environment, `${declaration.name}.${member.name}`).toBe(declarationEnvironment(member.procedural));
-            }
-        }
     });
 });

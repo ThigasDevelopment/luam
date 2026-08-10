@@ -92,6 +92,8 @@ project globals never produce a false diagnostic.
 | Element types | 57 |
 | OOP classes | 57 |
 | OOP methods | 652 |
+| OOP static methods | 118 |
+| OOP constructors | 46 |
 | OOP properties | 218 |
 
 Milestone 8 replaced 246 handwritten declarations with the full catalog. 97
@@ -101,9 +103,10 @@ checker models tuples.
 Milestone 11 added the OOP surface: the same upstream snapshot read a second
 way, as classes rather than free functions. It carries no declaration of its
 own — every member records the procedural function it wraps, and takes its
-environment from that function's entry in the catalog. 28 properties whose
-getter the upstream does not name are dropped rather than guessed, and static
-members and constructors are not modelled.
+environment from that function's entry in the catalog. Instance members,
+static methods, and callable constructors remain separate so their server and
+client shapes do not overwrite each other. 28 properties whose getter the
+upstream does not name are dropped rather than guessed.
 
 ## Refreshing
 

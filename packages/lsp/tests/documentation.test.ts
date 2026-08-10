@@ -110,13 +110,14 @@ describe('self inside a class', () => {
         expect(hoverText(text, 'return self', 'self')).toContain('self: Account');
     });
 
-    it('offers the class members after self', () => {
+    it('separates class fields and methods after self', () => {
         const service = new LanguageService();
-        const text = [...account.slice(0, 4), '        self.', ...account.slice(5)].join('\n');
+        const text = [...account.slice(0, 4), '        self.\n        self:', ...account.slice(5)].join('\n');
 
         service.update(SERVER_FILE, 1, text);
 
-        expect(service.completion(SERVER_FILE, markerAt(text, 'self.')).map((item) => item.label)).toEqual(['name', 'bump']);
+        expect(service.completion(SERVER_FILE, markerAt(text, 'self.')).map((item) => item.label)).toEqual(['name']);
+        expect(service.completion(SERVER_FILE, markerAt(text, 'self:')).map((item) => item.label)).toEqual(['bump']);
     });
 
     it('keeps self typed inside a callback declared in a method', () => {

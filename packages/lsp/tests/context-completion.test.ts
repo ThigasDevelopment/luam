@@ -109,7 +109,7 @@ describe('type completion', () => {
     });
 
     it('keeps a statement level method call out of type position', () => {
-        const found = labels(`${ACCOUNT}local account = new Account()\naccount.\n`, 'account.');
+        const found = labels(`${ACCOUNT}local account = new Account()\naccount:\n`, 'account:');
 
         expect(found).toContain('bump');
         expect(found).not.toContain('number');

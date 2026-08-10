@@ -9,6 +9,7 @@ const packageRoot = fileURLToPath(new URL('..', import.meta.url));
 const generatedDirs = ['src/generated', 'src/generated/api', 'src/generated/docs', 'src/generated/oop'];
 
 const result = generate();
+const oop = result.oop;
 const written = new Set(result.files.map((file) => file.path));
 
 for (const directory of generatedDirs) {
@@ -30,7 +31,7 @@ const lines = [
     `documented: ${result.documented}`,
     `events: ${result.events.server} server, ${result.events.client} client`,
     `element types: ${result.elementTypes}`,
-    `oop: ${result.oop.classes.length} classes, ${result.oop.methods} methods, ${result.oop.properties} properties`,
+    `oop: ${oop.classes.length} classes, ${oop.methods} methods, ${oop.staticMethods} static methods, ${oop.constructors} constructors, ${oop.properties} properties`,
     `oop members without a procedural function: ${result.oop.skippedMethods.length} methods, ${result.oop.skippedProperties.length} properties`,
     `multi-return functions: ${result.multiReturns.length}`,
     `reserved names skipped: ${result.catalog.reserved.join(', ')}`,

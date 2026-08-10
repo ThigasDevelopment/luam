@@ -1,4 +1,4 @@
-import { oopClass, oopMethod, oopProperty, type OopClass } from '@mta-types/oop-declaration';
+import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from '@mta-types/oop-declaration';
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_1: readonly OopClass[] = [
@@ -23,7 +23,15 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('setData', 'server', 'setAccountData', fn([STRING, ANY], BOOLEAN, 2)),
         oopMethod('setName', 'server', 'setAccountName', fn([STRING, BOOLEAN], BOOLEAN, 1)),
         oopMethod('setPassword', 'server', 'setAccountPassword', fn([STRING], BOOLEAN, 1)),
-    ]),
+    ], [
+        oopMethod('add', 'server', 'addAccount', fn([STRING, STRING, BOOLEAN], named('Account'), 2)),
+        oopMethod('getAll', 'server', 'getAccounts', fn([], TABLE, 0)),
+        oopMethod('getAllByData', 'server', 'getAccountsByData', fn([STRING, STRING], TABLE, 2)),
+        oopMethod('getAllByIP', 'server', 'getAccountsByIP', fn([STRING], TABLE, 1)),
+        oopMethod('getAllBySerial', 'server', 'getAccountsBySerial', fn([STRING], TABLE, 1)),
+    ],
+    oopConstructor('server', fn([STRING, STRING, BOOLEAN], named('Account'), 1)),
+    ),
     oopClass('ACL', null, [
         oopMethod('destroy', 'server', 'aclDestroy', fn([], BOOLEAN, 0)),
         oopMethod('getName', 'server', 'aclGetName', fn([], STRING, 0)),
@@ -32,7 +40,15 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopProperty('name', 'server', 'aclGetName', STRING),
         oopMethod('removeRight', 'server', 'aclRemoveRight', fn([STRING], BOOLEAN, 1)),
         oopMethod('setRight', 'server', 'aclSetRight', fn([STRING, BOOLEAN], BOOLEAN, 2)),
-    ]),
+    ], [
+        oopMethod('get', 'server', 'aclGet', fn([STRING], named('ACL'), 1)),
+        oopMethod('hasObjectPermissionTo', 'server', 'hasObjectPermissionTo', fn([ANY, STRING, BOOLEAN], BOOLEAN, 2)),
+        oopMethod('list', 'server', 'aclList', fn([], TABLE, 0)),
+        oopMethod('reload', 'server', 'aclReload', fn([], BOOLEAN, 0)),
+        oopMethod('save', 'server', 'aclSave', fn([], BOOLEAN, 0)),
+    ],
+    oopConstructor('server', fn([STRING], named('ACL'), 1)),
+    ),
     oopClass('ACLGroup', null, [
         oopMethod('addACL', 'server', 'aclGroupAddACL', fn([named('ACL')], BOOLEAN, 1)),
         oopMethod('addObject', 'server', 'aclGroupAddObject', fn([STRING], BOOLEAN, 1)),
@@ -44,7 +60,12 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopProperty('name', 'server', 'aclGroupGetName', STRING),
         oopMethod('removeACL', 'server', 'aclGroupRemoveACL', fn([named('ACL')], BOOLEAN, 1)),
         oopMethod('removeObject', 'server', 'aclGroupRemoveObject', fn([STRING], BOOLEAN, 1)),
-    ]),
+    ], [
+        oopMethod('get', 'server', 'aclGetGroup', fn([STRING], named('ACLGroup'), 1)),
+        oopMethod('list', 'server', 'aclGroupList', fn([], TABLE, 0)),
+    ],
+    oopConstructor('server', fn([STRING], named('ACLGroup'), 1)),
+    ),
     oopClass('Ban', null, [
         oopProperty('admin', 'server', 'getBanAdmin', STRING),
         oopMethod('getAdmin', 'server', 'getBanAdmin', fn([], STRING, 0)),
@@ -65,7 +86,12 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('setUnbanTime', 'server', 'setUnbanTime', fn([NUMBER], BOOLEAN, 1)),
         oopProperty('time', 'server', 'getBanTime', NUMBER),
         oopProperty('unbanTime', 'server', 'getUnbanTime', NUMBER),
-    ]),
+    ], [
+        oopMethod('getList', 'server', 'getBans', fn([], TABLE, 0)),
+        oopMethod('reload', 'server', 'reloadBans', fn([], BOOLEAN, 0)),
+    ],
+    oopConstructor('server', fn([STRING, STRING, STRING, named('Player'), STRING, NUMBER], named('Ban'), 0)),
+    ),
     oopClass('Blip', 'Element', [
         oopMethod('getColor', 'shared', 'getBlipColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER]), 0)),
         oopMethod('getIcon', 'shared', 'getBlipIcon', fn([], NUMBER, 0)),
@@ -106,8 +132,31 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopProperty('title', 'client', 'getBrowserTitle', STRING),
         oopMethod('toggleDevTools', 'client', 'toggleBrowserDevTools', fn([BOOLEAN], BOOLEAN, 1)),
         oopProperty('url', 'client', 'getBrowserURL', STRING),
-    ]),
-    oopClass('Camera', 'Element', []),
+    ], [
+        oopMethod('getSettings', 'client', 'getBrowserSettings', fn([], TABLE, 0)),
+        oopMethod('isDomainBlocked', 'client', 'isBrowserDomainBlocked', fn([STRING, BOOLEAN], BOOLEAN, 1)),
+        oopMethod('requestDomains', 'client', 'requestBrowserDomains', fn([TABLE, BOOLEAN, ANY], BOOLEAN, 1)),
+    ],
+    oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Browser'), 3)),
+    ),
+    oopClass('Camera', 'Element', [
+    ], [
+        oopMethod('fade', 'client', 'fadeCamera', fn([BOOLEAN, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 1)),
+        oopMethod('getCameraViewMode', 'client', 'getCameraViewMode', fn([], tupleOf([NUMBER, NUMBER]), 0)),
+        oopMethod('getClip', 'client', 'getCameraClip', fn([], tupleOf([BOOLEAN, BOOLEAN]), 0)),
+        oopMethod('getFieldOfView', 'client', 'getCameraFieldOfView', fn([STRING], NUMBER, 1)),
+        oopMethod('getGoggleEffect', 'client', 'getCameraGoggleEffect', fn([], STRING, 0)),
+        oopMethod('getInterior', 'client', 'getCameraInterior', fn([], NUMBER, 0)),
+        oopMethod('getMatrix', 'client', 'getCameraMatrix', fn([], TABLE, 0)),
+        oopMethod('setCameraViewMode', 'client', 'setCameraViewMode', fn([NUMBER, NUMBER], BOOLEAN, 1)),
+        oopMethod('setClip', 'client', 'setCameraClip', fn([BOOLEAN, BOOLEAN], BOOLEAN, 0)),
+        oopMethod('setFieldOfView', 'client', 'setCameraFieldOfView', fn([STRING, NUMBER], BOOLEAN, 2)),
+        oopMethod('setGoggleEffect', 'client', 'setCameraGoggleEffect', fn([STRING, BOOLEAN], BOOLEAN, 1)),
+        oopMethod('setInterior', 'client', 'setCameraInterior', fn([NUMBER], BOOLEAN, 1)),
+        oopMethod('setMatrix', 'client', 'setCameraMatrix', fn([TABLE, NUMBER, NUMBER], BOOLEAN, 1)),
+    ],
+    null,
+    ),
     oopClass('ColShape', 'Element', [
         oopMethod('addPoint', 'shared', 'addColPolygonPoint', fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 2)),
         oopProperty('elementsWithin', 'shared', 'getElementsWithinColShape', TABLE),
@@ -125,28 +174,62 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('setRadius', 'shared', 'setColShapeRadius', fn([NUMBER], BOOLEAN, 1)),
         oopMethod('setSize', 'shared', 'setColShapeSize', fn([ANY], BOOLEAN, 1)),
         oopProperty('shapeType', 'shared', 'getColShapeType', NUMBER),
-    ]),
+    ], [
+        oopMethod('Circle', 'shared', 'createColCircle', fn([NUMBER, NUMBER, NUMBER], named('ColShape'), 3)),
+        oopMethod('Cuboid', 'shared', 'createColCuboid', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 6)),
+        oopMethod('Polygon', 'shared', 'createColPolygon',
+            fn(
+                [
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                ],
+                named('ColShape'),
+                8,
+                true,
+            ),
+        ),
+        oopMethod('Rectangle', 'shared', 'createColRectangle', fn([NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 4)),
+        oopMethod('Sphere', 'shared', 'createColSphere', fn([NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 4)),
+        oopMethod('Tube', 'shared', 'createColTube', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 5)),
+    ],
+    null,
+    ),
     oopClass('DxFont', null, [
         oopMethod('getHeight', 'client', 'dxGetFontHeight', fn([NUMBER, ANY], NUMBER, 0)),
         oopMethod('getSize', 'client', 'dxGetTextSize', fn([STRING, NUMBER, NUMBER, NUMBER, ANY, BOOLEAN, BOOLEAN], tupleOf([NUMBER, NUMBER]), 1)),
         oopMethod('getTextWidth', 'client', 'dxGetTextWidth', fn([STRING, NUMBER, ANY, BOOLEAN], NUMBER, 1)),
-    ]),
-    oopClass('DxRenderTarget', null, []),
+    ], [
+    ],
+    oopConstructor('client', fn([STRING, NUMBER, BOOLEAN, STRING], named('DxFont'), 1)),
+    ),
+    oopClass('DxRenderTarget', null, [
+    ], [
+    ],
+    oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN], named('DxRenderTarget'), 2)),
+    ),
     oopClass('DxScreenSource', null, [
         oopMethod('update', 'client', 'dxUpdateScreenSource', fn([BOOLEAN], BOOLEAN, 0)),
-    ]),
-    oopClass('DxShader', null, []),
+    ], [
+    ],
+    oopConstructor('client', fn([NUMBER, NUMBER], named('DxScreenSource'), 2)),
+    ),
+    oopClass('DxShader', null, [
+    ], [
+    ],
+    oopConstructor('client', fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], named('DxShader'), 1)),
+    ),
     oopClass('DxTexture', null, [
         oopMethod('getPixels', 'client', 'dxGetTexturePixels', fn([ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], STRING, 1)),
         oopMethod('setEdge', 'client', 'dxSetTextureEdge', fn([STRING, NUMBER], BOOLEAN, 1)),
         oopMethod('setPixels', 'client', 'dxSetTexturePixels', fn([ANY, ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], BOOLEAN, 2)),
-    ]),
-    oopClass('Effect', 'Element', [
-        oopProperty('density', 'client', 'getEffectDensity', NUMBER),
-        oopMethod('getDensity', 'client', 'getEffectDensity', fn([], NUMBER, 0)),
-        oopMethod('getSpeed', 'client', 'getEffectSpeed', fn([], NUMBER, 0)),
-        oopMethod('setDensity', 'client', 'setEffectDensity', fn([NUMBER], BOOLEAN, 1)),
-        oopMethod('setSpeed', 'client', 'setEffectSpeed', fn([NUMBER], BOOLEAN, 1)),
-        oopProperty('speed', 'client', 'getEffectSpeed', NUMBER),
-    ]),
+    ], [
+    ],
+    oopConstructor('client', fn([STRING, STRING, BOOLEAN, STRING], named('DxTexture'), 1)),
+    ),
 ];

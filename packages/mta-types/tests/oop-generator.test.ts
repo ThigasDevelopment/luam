@@ -47,15 +47,21 @@ describe('oop surface generator', () => {
         expect(result.oop.classes).toHaveLength(result.elementTypes);
         expect(classNamed('Player')?.parent).toBe('Ped');
         expect(classNamed('Player')?.members.find((member) => member.name === 'getName')?.procedural).toBe('getPlayerName');
+        expect(classNamed('Player')?.staticMethods.find((member) => member.name === 'getRandom')?.environment).toBe('server');
     });
 
-    it('takes the environment of every member from its procedural function', () => {
+    it('never exposes a member where its procedural function is unavailable', () => {
         const entries = [...result.catalog.shared, ...result.catalog.server, ...result.catalog.client];
         const environments = new Map(entries.map((entry) => [entry.name, entry.environment]));
 
         for (const declaration of result.oop.classes) {
             for (const member of declaration.members) {
-                expect(member.environment, `${declaration.name}.${member.name}`).toBe(environments.get(member.procedural));
+                const proceduralEnvironment = environments.get(member.procedural);
+
+                expect(
+                    proceduralEnvironment === 'shared' || proceduralEnvironment === member.environment,
+                    `${declaration.name}.${member.name}`,
+                ).toBe(true);
             }
         }
     });
@@ -78,7 +84,7 @@ describe('oop surface generator', () => {
 });
 
 describe('oop parser', () => {
-    it('reads the procedural function from the upstream wiki link and skips a static member', () => {
+    it('keeps instance, static, and constructor methods on separate surfaces', () => {
         const source = [
             'export class Player extends Ped {',
             '    name: string;',
@@ -86,14 +92,22 @@ describe('oop parser', () => {
             '    getName(): string;',
             '    /** @see https://wiki.multitheftauto.com/wiki/GetRandomPlayer */',
             '    static getRandom(): Player;',
+            '    /** @see https://wiki.multitheftauto.com/wiki/CreatePlayer */',
+            '    static new(name: string): Player;',
+            '    constructor(name: string);',
             '    undocumented(): boolean;',
             '}',
             '',
         ].join('\n');
-        const [parsed] = parseOopClasses(upstreamFile(source), context);
+        const [parsed] = parseOopClasses(upstreamFile(source), context, 'server');
 
-        expect(parsed?.methods).toEqual([{ name: 'getName', procedural: 'getPlayerName', type: fn([], STRING, 0) }]);
-        expect(parsed?.properties).toEqual(['name']);
+        expect(parsed?.methods).toEqual([{ name: 'getName', procedural: 'getPlayerName', type: fn([], STRING, 0), environment: 'server' }]);
+        expect(parsed?.staticMethods).toEqual([
+            { name: 'getRandom', procedural: 'getRandomPlayer', type: fn([], { kind: 'named', name: 'Player' }, 0), environment: 'server' },
+            { name: 'new', procedural: 'createPlayer', type: fn([STRING], { kind: 'named', name: 'Player' }, 1), environment: 'server' },
+        ]);
+        expect(parsed?.constructors).toEqual([{ type: fn([STRING], { kind: 'named', name: 'Player' }, 1), environment: 'server' }]);
+        expect(parsed?.properties).toEqual([{ name: 'name', environment: 'server' }]);
     });
 
     it('reads optional and variadic parameters the way the procedural parser does', () => {
@@ -104,9 +118,10 @@ describe('oop parser', () => {
             '}',
             '',
         ].join('\n');
-        const [parsed] = parseOopClasses(upstreamFile(source), context);
+        const [parsed] = parseOopClasses(upstreamFile(source), context, 'client');
 
         expect(parsed?.methods[0]?.type).toEqual(fn([STRING], BOOLEAN, 0, true));
+        expect(parsed?.methods[0]?.environment).toBe('client');
     });
 });
 
@@ -114,7 +129,15 @@ describe('oop surface builder', () => {
     const elementOnly = [{ name: 'Element', parent: null }];
 
     it('drops a member whose procedural function is not declared', () => {
-        const parsed = [{ name: 'Element', methods: [{ name: 'vanish', procedural: 'vanishElement', type: fn([], BOOLEAN, 0) }], properties: [] }];
+        const parsed = [
+            {
+                name: 'Element',
+                methods: [{ name: 'vanish', procedural: 'vanishElement', type: fn([], BOOLEAN, 0), environment: 'server' as const }],
+                staticMethods: [],
+                constructors: [],
+                properties: [],
+            },
+        ];
         const surface = buildOopSurface(parsed, elementOnly, normalize([], []));
 
         expect(surface.skippedMethods).toEqual(['Element.vanish']);
@@ -122,9 +145,13 @@ describe('oop surface builder', () => {
     });
 
     it('types a property from the getter it resolves to', () => {
-        const methods = [{ name: 'getName', procedural: 'getElementName', type: fn([], STRING, 0) }];
+        const methods = [{ name: 'getName', procedural: 'getElementName', type: fn([], STRING, 0), environment: 'server' as const }];
         const catalog = normalize([{ name: 'getElementName', category: 'element', type: fn([], STRING, 0), documentation: EMPTY_DOCUMENTATION }], []);
-        const surface = buildOopSurface([{ name: 'Element', methods, properties: ['name'] }], elementOnly, catalog);
+        const surface = buildOopSurface(
+            [{ name: 'Element', methods, staticMethods: [], constructors: [], properties: [{ name: 'name', environment: 'server' }] }],
+            elementOnly,
+            catalog,
+        );
 
         expect(surface.classes[0]?.members).toContainEqual(oopMethod('getName', 'server', 'getElementName', fn([], STRING, 0)));
         expect(surface.classes[0]?.members).toContainEqual({
@@ -138,7 +165,11 @@ describe('oop surface builder', () => {
 
     it('drops a property with no resolvable getter', () => {
         const catalog = normalize([{ name: 'getElementName', category: 'element', type: fn([], STRING, 0), documentation: EMPTY_DOCUMENTATION }], []);
-        const surface = buildOopSurface([{ name: 'Element', methods: [], properties: ['vehicle'] }], elementOnly, catalog);
+        const surface = buildOopSurface(
+            [{ name: 'Element', methods: [], staticMethods: [], constructors: [], properties: [{ name: 'vehicle', environment: 'server' }] }],
+            elementOnly,
+            catalog,
+        );
 
         expect(surface.skippedProperties).toEqual(['Element.vehicle']);
     });
@@ -148,13 +179,13 @@ describe('oop emitter', () => {
     it('wraps a member that does not fit on one line', () => {
         const wide = fn([STRING, STRING, STRING, STRING, STRING, STRING, STRING, STRING, STRING, STRING, STRING, STRING], BOOLEAN, 12);
         const member = oopMethod('aVeryLongMethodNameIndeedThatKeepsGoing', 'server', 'setSomethingExceedinglyWide', wide);
-        const [file] = emitOopSurface([{ name: 'Element', parent: null, members: [member] }]);
+        const [file] = emitOopSurface([{ name: 'Element', parent: null, members: [member], staticMethods: [], constructor: null }]);
 
         expect(Math.max(...(file?.contents.split('\n').map((line) => line.length) ?? [0]))).toBeLessThanOrEqual(150);
     });
 
     it('emits a class with no members as an empty list', () => {
-        const [file] = emitOopSurface([{ name: 'Element', parent: null, members: [] }]);
+        const [file] = emitOopSurface([{ name: 'Element', parent: null, members: [], staticMethods: [], constructor: null }]);
 
         expect(file?.contents).toContain("oopClass('Element', null, []),");
     });

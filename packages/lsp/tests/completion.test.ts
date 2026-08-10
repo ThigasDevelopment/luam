@@ -54,14 +54,24 @@ describe('completion', () => {
         expect(found).toContain('local');
     });
 
-    it('offers class members after a dot on an instance', () => {
+    it('offers class fields after a dot on an instance', () => {
         const text = ['class Player {', '    name: string', '    greet(): void {', '    }', '}', '', 'local one = new Player()', 'one.'].join(
             '\n',
         );
         const found = labels(new LanguageService(), SERVER_FILE, text, 'one.');
 
         expect(found).toContain('name');
+        expect(found).not.toContain('greet');
+    });
+
+    it('offers class methods after a colon on an instance', () => {
+        const text = ['class Player {', '    name: string', '    greet(): void {', '    }', '}', '', 'local one = new Player()', 'one:'].join(
+            '\n',
+        );
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'one:');
+
         expect(found).toContain('greet');
+        expect(found).not.toContain('name');
     });
 
     it('offers inherited class members', () => {

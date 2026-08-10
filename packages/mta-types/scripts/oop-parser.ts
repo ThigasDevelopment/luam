@@ -1,6 +1,7 @@
 import ts from 'typescript';
 
-import { fn, type TypeDescriptor } from '#mta-types/type-descriptor';
+import type { ApiEnvironment } from '#mta-types/api-declaration';
+import { fn, named, type TypeDescriptor } from '#mta-types/type-descriptor';
 
 import { type MapContext, mapTypeNode } from './type-mapper.ts';
 import type { UpstreamFile } from './upstream-source.ts';
@@ -9,12 +10,25 @@ export interface ParsedOopMethod {
     name: string;
     procedural: string;
     type: TypeDescriptor;
+    environment: ApiEnvironment;
+}
+
+export interface ParsedOopProperty {
+    name: string;
+    environment: ApiEnvironment;
+}
+
+export interface ParsedOopConstructor {
+    type: TypeDescriptor;
+    environment: ApiEnvironment;
 }
 
 export interface ParsedOopClass {
     name: string;
     methods: ParsedOopMethod[];
-    properties: string[];
+    staticMethods: ParsedOopMethod[];
+    constructors: ParsedOopConstructor[];
+    properties: ParsedOopProperty[];
 }
 
 const WIKI_LINK = /@see\s+https?:\/\/\S*\/wiki\/([A-Za-z0-9_]+)/;
@@ -45,27 +59,37 @@ function contextFor(context: MapContext, node: ts.MethodDeclaration): MapContext
     return { ...context, typeParameters: new Set([...context.typeParameters, ...names]) };
 }
 
-function signatureOf(node: ts.MethodDeclaration, context: MapContext): TypeDescriptor {
-    const local = contextFor(context, node);
+function signatureOf(node: ts.MethodDeclaration | ts.ConstructorDeclaration, context: MapContext, returnType?: TypeDescriptor): TypeDescriptor {
+    const local = ts.isMethodDeclaration(node) ? contextFor(context, node) : context;
     const positional = node.parameters.filter((parameter) => parameter.dotDotDotToken === undefined);
     const isVariadic = node.parameters.length !== positional.length;
     const parameters = positional.map((parameter) => mapTypeNode(parameter.type, local));
     const minimumArguments = positional.filter((parameter) => parameter.questionToken === undefined).length;
 
-    return fn(parameters, mapTypeNode(node.type, local), minimumArguments, isVariadic);
+    return fn(parameters, returnType ?? mapTypeNode(node.type, local), minimumArguments, isVariadic);
 }
 
-function readMembers(declaration: ts.ClassDeclaration, contents: string, context: MapContext): ParsedOopClass {
+function readMembers(declaration: ts.ClassDeclaration, contents: string, context: MapContext, environment: ApiEnvironment): ParsedOopClass {
     const methods: ParsedOopMethod[] = [];
-    const properties: string[] = [];
+    const staticMethods: ParsedOopMethod[] = [];
+    const constructors: ParsedOopConstructor[] = [];
+    const properties: ParsedOopProperty[] = [];
 
     for (const member of declaration.members) {
-        if (isStatic(member) || member.name === undefined || !ts.isIdentifier(member.name)) {
+        if (ts.isConstructorDeclaration(member)) {
+            constructors.push({ type: signatureOf(member, context, named(declaration.name?.text ?? '')), environment });
+
+            continue;
+        }
+
+        if (member.name === undefined || !ts.isIdentifier(member.name)) {
             continue;
         }
 
         if (ts.isPropertyDeclaration(member)) {
-            properties.push(member.name.text);
+            if (!isStatic(member)) {
+                properties.push({ name: member.name.text, environment });
+            }
 
             continue;
         }
@@ -77,20 +101,26 @@ function readMembers(declaration: ts.ClassDeclaration, contents: string, context
         const procedural = proceduralOf(contents, member);
 
         if (procedural !== null) {
-            methods.push({ name: member.name.text, procedural, type: signatureOf(member, context) });
+            const parsed = { name: member.name.text, procedural, type: signatureOf(member, context), environment };
+
+            if (!isStatic(member)) {
+                methods.push(parsed);
+            } else {
+                staticMethods.push(parsed);
+            }
         }
     }
 
-    return { name: declaration.name?.text ?? '', methods, properties };
+    return { name: declaration.name?.text ?? '', methods, staticMethods, constructors, properties };
 }
 
-export function parseOopClasses(file: UpstreamFile, context: MapContext): ParsedOopClass[] {
+export function parseOopClasses(file: UpstreamFile, context: MapContext, environment: ApiEnvironment): ParsedOopClass[] {
     const source = ts.createSourceFile(file.path, file.contents, ts.ScriptTarget.ES2022, false, ts.ScriptKind.TS);
     const classes: ParsedOopClass[] = [];
 
     for (const statement of source.statements) {
         if (ts.isClassDeclaration(statement) && statement.name !== undefined) {
-            classes.push(readMembers(statement, file.contents, context));
+            classes.push(readMembers(statement, file.contents, context, environment));
         }
     }
 

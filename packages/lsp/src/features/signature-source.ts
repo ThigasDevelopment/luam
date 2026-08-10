@@ -1,6 +1,7 @@
-import { mtaMember } from '@compiler/checker/oop-classes';
+import { mtaConstructor, mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import { typeToString, type RecordType, type Type } from '@compiler/checker/types';
+import { isAvailableIn } from '@mta-types/api-declaration';
 import { findDeclaration } from '@mta-types/catalog';
 import { apiDocumentation, memberDocumentation } from '@mta-types/documentation-lookup';
 import { isLibrary, LIBRARY_MEMBERS } from '@mta-types/library-members';
@@ -147,6 +148,44 @@ function fromMtaMember(owner: string, member: string, isMethodCall: boolean): Si
     };
 }
 
+function fromMtaStaticMember(analysis: DocumentAnalysis, owner: string, member: string): SignatureSource | null {
+    const found = mtaStaticMember(owner, member);
+
+    if (found === null || found.type.kind !== 'function' || found.environment === undefined || !isAvailableIn(found.environment, analysis.environment)) {
+        return null;
+    }
+
+    const documentation = found.procedural === undefined ? null : apiDocumentation(found.procedural);
+    const named = documentation?.parameters.filter((parameter) => !parameter.isVariadic) ?? [];
+    const shape = typeParameters(found.type);
+    const parameters = shape.parameters.map((label, index) => {
+        const name = named[index]?.name;
+
+        return name === undefined ? label : label.replace(/^argument\d+/, name);
+    });
+
+    return {
+        name: `${owner}.${member}`,
+        parameters,
+        returnText: shape.returnText,
+        documentation: documentation === null ? [] : documentationBody({ ...documentation, parameters: [] }),
+        parameterDocs: named.map((parameter) => parameter.summary),
+    };
+}
+
+function fromMtaConstructor(analysis: DocumentAnalysis, name: string): SignatureSource | null {
+    const found = mtaConstructor(name);
+    const constructor = found === null || !isAvailableIn(found.environment, analysis.environment) ? undefined : found.type;
+
+    if (constructor === undefined) {
+        return null;
+    }
+
+    const shape = typeParameters(constructor);
+
+    return { name, parameters: shape.parameters, returnText: shape.returnText, documentation: [], parameterDocs: [] };
+}
+
 function localSignature(analysis: DocumentAnalysis, offset: number, name: string): SignatureSource | null {
     const scopeId = analysis.index.scopes.innermostAt(offset);
     const accept = (candidate: SymbolDeclaration): boolean => matchesReferenceKind(candidate, 'value');
@@ -172,6 +211,10 @@ function memberSignature(analysis: DocumentAnalysis, offset: number, segments: r
 
     if (target.kind === 'record') {
         return fromRecord(target.record, member);
+    }
+
+    if (target.kind === 'static-class') {
+        return fromMtaStaticMember(analysis, target.name, member);
     }
 
     if (target.kind !== 'class') {
@@ -208,7 +251,7 @@ export function resolveSignature(
     }
 
     if (segments.length === 1) {
-        return localSignature(analysis, offset, first) ?? fromApi(first);
+        return localSignature(analysis, offset, first) ?? (analysis.oop ? fromMtaConstructor(analysis, first) : null) ?? fromApi(first);
     }
 
     return memberSignature(analysis, offset, segments, trigger === ':');

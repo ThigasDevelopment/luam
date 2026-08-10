@@ -6,6 +6,15 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Native MTA Class Values
+
+#### Added
+
+- Typed MTA static methods such as `Player.getRandom()` with server/client
+  scoping, argument checks, completion, hover, and signature help.
+- Typed callable MTA constructors such as `File(path)`, preserving native Lua
+  emission and keeping `File.new(path)` as the destructive creation operation.
+
 ### MTA Development Logs
 
 #### Added

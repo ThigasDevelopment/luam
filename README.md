@@ -424,6 +424,7 @@ local vip = new VIPPlayer('Thigas', 2)
 | `export` | Erased from the Lua, written into `meta.xml` as `<export function="f" />` |
 | Native libraries | `sleep` plus the `Threads`, `Async` and `Dotenv` classes, injected only when named |
 | Native classes | `local tasks = new Async(100)` — same `new` as a project class |
+| MTA OOP classes | `Player.getRandom()`, `File.exists(path)`, and callable constructors such as `File(path)` |
 | Deployment values | `.env` keys typed and reachable as `env.SERVER_NAME`, server-only |
 | Strictness | `#!strict` (default), `#!nonstrict`, `#!nocheck` per file |
 
@@ -451,7 +452,12 @@ a build.
 
 The catalog ships **1294 MTA declarations**, **203 events**, **57 element types**
 and the Lua standard library, generated from the MTA wiki — plus the OOP surface
-(**57 classes, 652 methods**) behind `"oop": true`.
+(**57 classes, 652 methods, 118 static methods, 46 constructors**) behind
+`"oop": true`.
+
+`File(path)` opens an existing file read/write and creates it when missing.
+Use `File.new(path)` only for destructive creation because it truncates an
+existing file. Use `fileOpen(path, true)` when read-only access is required.
 
 ---
 

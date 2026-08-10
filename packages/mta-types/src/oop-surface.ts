@@ -17,6 +17,9 @@ export function oopClassesFor(environment: ApiEnvironment): OopClass[] {
         name: declaration.name,
         parent: declaration.parent,
         members: declaration.members.filter((member) => isAvailableIn(member.environment, environment)),
+        staticMethods: declaration.staticMethods.filter((member) => isAvailableIn(member.environment, environment)),
+        constructor:
+            declaration.constructor !== null && isAvailableIn(declaration.constructor.environment, environment) ? declaration.constructor : null,
     }));
 }
 
@@ -38,4 +41,8 @@ export function findOopMember(className: string, member: string): OopMember | nu
     }
 
     return null;
+}
+
+export function findOopStaticMethod(className: string, method: string): OopMember | null {
+    return BY_NAME.get(className)?.staticMethods.find((entry) => entry.name === method) ?? null;
 }

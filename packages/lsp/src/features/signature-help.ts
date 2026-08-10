@@ -50,11 +50,11 @@ export function signatureHelpAt(analysis: DocumentAnalysis, offset: number): Sig
     const { segments, trigger } = calleeSegments(analysis.text, context.frame.open);
     const source = resolveSignature(analysis, offset, segments, trigger);
 
-    if (source === null || source.parameters.length === 0) {
+    if (source === null) {
         return null;
     }
 
-    const active = Math.min(context.frame.argument, source.parameters.length - 1);
+    const active = source.parameters.length === 0 ? 0 : Math.min(context.frame.argument, source.parameters.length - 1);
 
     return { signatures: [signatureInformation(source)], activeSignature: 0, activeParameter: active };
 }

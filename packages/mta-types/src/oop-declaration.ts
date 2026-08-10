@@ -11,10 +11,17 @@ export interface OopMember {
     type: TypeDescriptor;
 }
 
+export interface OopConstructor {
+    environment: ApiEnvironment;
+    type: TypeDescriptor;
+}
+
 export interface OopClass {
     name: string;
     parent: string | null;
     members: readonly OopMember[];
+    staticMethods: readonly OopMember[];
+    constructor: OopConstructor | null;
 }
 
 export function oopMethod(name: string, environment: ApiEnvironment, procedural: string, type: TypeDescriptor): OopMember {
@@ -25,6 +32,16 @@ export function oopProperty(name: string, environment: ApiEnvironment, procedura
     return { name, kind: 'property', environment, procedural, type };
 }
 
-export function oopClass(name: string, parent: string | null, members: readonly OopMember[]): OopClass {
-    return { name, parent, members };
+export function oopConstructor(environment: ApiEnvironment, type: TypeDescriptor): OopConstructor {
+    return { environment, type };
+}
+
+export function oopClass(
+    name: string,
+    parent: string | null,
+    members: readonly OopMember[],
+    staticMethods: readonly OopMember[] = [],
+    constructor: OopConstructor | null = null,
+): OopClass {
+    return { name, parent, members, staticMethods, constructor };
 }

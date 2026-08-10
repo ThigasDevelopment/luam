@@ -1,6 +1,4 @@
-import { mtaMember } from '@compiler/checker/oop-classes';
 import { KNOWN_DECORATORS } from '@compiler/checker/decorators';
-import { isMtaElementName } from '@compiler/checker/oop-members';
 import { typeToString } from '@compiler/checker/types';
 import type { ClassDeclaration, ClassFieldDeclaration, Decorator } from '@compiler/parser/declaration-nodes';
 import { findDeclaration } from '@mta-types/catalog';
@@ -11,6 +9,7 @@ import type { Hover } from 'vscode-languageserver';
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { descriptorText, namedDescriptorText } from '@lsp/features/api-text';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
+import { mtaMemberHover } from '@lsp/features/mta-hover';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { isIdentifierChar, wordAt } from '@lsp/support/source-text';
 import type { SymbolDeclaration } from '@lsp/symbols/symbol';
@@ -101,37 +100,6 @@ function libraryMemberHover(analysis: DocumentAnalysis, name: string, offset: nu
     return { contents: { kind: 'markdown', value } };
 }
 
-function mtaReceiver(analysis: DocumentAnalysis, name: string): string | null {
-    for (const [expression] of analysis.types) {
-        const owner =
-            expression.kind === 'member-expression' && expression.property === name
-                ? analysis.types.get(expression.object)
-                : expression.kind === 'call-expression' && expression.method === name
-                  ? analysis.types.get(expression.callee)
-                  : undefined;
-
-        if (owner?.kind === 'named' && isMtaElementName(analysis.declarations, owner.name)) {
-            return owner.name;
-        }
-    }
-
-    return null;
-}
-
-function mtaMemberHover(analysis: DocumentAnalysis, name: string): Hover | null {
-    const receiver = analysis.oop ? mtaReceiver(analysis, name) : null;
-    const member = receiver === null ? null : mtaMember(receiver, name);
-
-    if (receiver === null || member === null) {
-        return null;
-    }
-
-    const signature = `${receiver}.${name}: ${typeToString(member.type)}`;
-    const note = `wraps \`${member.procedural ?? ''}\` (${member.environment ?? ''})`;
-
-    return { contents: { kind: 'markdown', value: `${markdown(signature)}\n\n${note}` } };
-}
-
 function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
     const name = wordAt(analysis.text, offset);
 
@@ -148,7 +116,7 @@ function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
     const declaration = findDeclaration(name);
 
     if (declaration === null) {
-        return mtaMemberHover(analysis, name) ?? projectHover(analysis, name) ?? recordMemberHover(analysis, name);
+        return mtaMemberHover(analysis, name, offset) ?? projectHover(analysis, name) ?? recordMemberHover(analysis, name);
     }
 
     return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };

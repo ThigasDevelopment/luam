@@ -1,8 +1,9 @@
-import { mtaMembersFor } from '@compiler/checker/oop-classes';
+import { mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import type { RecordType } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
 import { globalsFor } from '@mta-types/catalog';
+import { oopClassesFor } from '@mta-types/oop-surface';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
@@ -31,12 +32,17 @@ import { scanContext, type CallFrame } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
 
-function classItems(analysis: DocumentAnalysis, name: string): CompletionItem[] {
+function classItems(analysis: DocumentAnalysis, name: string, isMethod: boolean): CompletionItem[] {
     if (analysis.oop && isMtaElementName(analysis.declarations, name)) {
-        return mtaMembersFor(name, analysis.environment).map((member) => mtaMemberItem(member, name));
+        return mtaMembersFor(name, analysis.environment)
+            .filter((member) => member.isMethod === isMethod)
+            .map((member) => mtaMemberItem(member, name));
     }
 
-    return analysis.declarations.collectMembers(name).map((member) => memberItem(member.name, member.type, member.isMethod, name));
+    return analysis.declarations
+        .collectMembers(name)
+        .filter((member) => member.isMethod === isMethod)
+        .map((member) => memberItem(member.name, member.type, member.isMethod, name));
 }
 
 function enumItems(analysis: DocumentAnalysis, name: string): CompletionItem[] {
@@ -47,7 +53,11 @@ function recordItems(record: RecordType): CompletionItem[] {
     return [...record.members].map(([name, type]) => memberItem(name, type, false, record.name));
 }
 
-function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget): CompletionItem[] {
+function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger: '.' | ':'): CompletionItem[] {
+    if (target.kind === 'static-class') {
+        return trigger === ':' ? [] : mtaStaticMembersFor(target.name, analysis.environment).map((member) => mtaMemberItem(member, target.name));
+    }
+
     if (target.kind === 'library') {
         return libraryItems(target.library);
     }
@@ -60,7 +70,7 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget): Comple
         return recordItems(target.record);
     }
 
-    return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name);
+    return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
 }
 
 function scopeItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
@@ -72,6 +82,16 @@ function scopeItems(analysis: DocumentAnalysis, offset: number): CompletionItem[
 
 function apiItems(analysis: DocumentAnalysis): CompletionItem[] {
     return globalsFor(analysis.environment).map(apiItem);
+}
+
+function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
+    if (!analysis.oop) {
+        return [];
+    }
+
+    return oopClassesFor(analysis.environment)
+        .filter((declaration) => declaration.constructor !== null || declaration.staticMethods.length > 0)
+        .map((declaration) => ({ label: declaration.name, kind: CompletionItemKind.Class, detail: `MTA OOP class ${declaration.name}` }));
 }
 
 function workspaceItems(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[]): CompletionItem[] {
@@ -140,7 +160,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     if (context.trigger !== null) {
         const target = resolveReceiver(analysis, offset, context.segments);
 
-        return target === null ? [] : deduplicate(memberItems(analysis, target));
+        return target === null ? [] : deduplicate(memberItems(analysis, target, context.trigger));
     }
 
     const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
@@ -148,6 +168,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     return deduplicate([
         ...scopeItems(analysis, offset),
         ...workspaceItems(analysis, others),
+        ...mtaClassItems(analysis),
         ...apiItems(analysis),
         ...directives,
         ...KEYWORD_ITEMS,

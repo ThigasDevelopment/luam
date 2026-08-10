@@ -1,5 +1,5 @@
 import { descriptorToType } from '@compiler/checker/api-types';
-import { mtaMember } from '@compiler/checker/oop-classes';
+import { isMtaClass, mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import type { RecordType, Type } from '@compiler/checker/types';
 import { isAvailableIn } from '@mta-types/api-declaration';
@@ -13,6 +13,7 @@ import { matchesReferenceKind, type SymbolDeclaration } from '@lsp/symbols/symbo
 export type ReceiverTarget =
     | { kind: 'library'; library: LibraryName }
     | { kind: 'class'; name: string }
+    | { kind: 'static-class'; name: string }
     | { kind: 'enum'; name: string }
     | { kind: 'record'; record: RecordType }
     | { kind: 'native'; receiver: 'table' | 'string' | 'number' };
@@ -160,11 +161,21 @@ function rootTarget(analysis: DocumentAnalysis, offset: number, name: string): R
     const declaration = analysis.index.scopes.resolve(scopeId, name, offset, accept);
 
     if (declaration === null) {
+        const project = projectTarget(analysis, name);
+
+        if (project !== null) {
+            return project;
+        }
+
         if (isLibrary(name)) {
             return { kind: 'library', library: name };
         }
 
-        return projectTarget(analysis, name) ?? catalogTarget(analysis, name);
+        if (analysis.oop && isMtaClass(name)) {
+            return { kind: 'static-class', name };
+        }
+
+        return catalogTarget(analysis, name);
     }
 
     if (declaration.kind === 'enum') {
@@ -184,7 +195,7 @@ function memberTarget(analysis: DocumentAnalysis, target: ReceiverTarget, name: 
     }
 
     if (target.kind !== 'class') {
-        return null;
+        return target.kind === 'static-class' ? fromType(analysis, mtaStaticMember(target.name, name)?.type ?? null) : null;
     }
 
     if (analysis.oop && isMtaElementName(analysis.declarations, target.name)) {

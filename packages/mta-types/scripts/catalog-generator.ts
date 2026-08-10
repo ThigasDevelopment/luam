@@ -33,7 +33,9 @@ function declarationsFor(side: 'server' | 'client', context: MapContext, multiRe
 }
 
 export function generate(): GenerationResult {
-    const sources = [...classFiles('server'), ...classFiles('client')];
+    const serverClasses = classFiles('server');
+    const clientClasses = classFiles('client');
+    const sources = [...serverClasses, ...clientClasses];
     const classes = sources.flatMap(parseClasses);
     const elementTypes = resolveElementTypes(classes);
     const context: MapContext = {
@@ -54,7 +56,10 @@ export function generate(): GenerationResult {
     const serverEvents = parseEvents(eventFile('server'));
     const clientEvents = parseEvents(eventFile('client'));
     const oop = buildOopSurface(
-        sources.flatMap((file) => parseOopClasses(file, context)),
+        [
+            ...serverClasses.flatMap((file) => parseOopClasses(file, context, 'server')),
+            ...clientClasses.flatMap((file) => parseOopClasses(file, context, 'client')),
+        ],
         elementTypes,
         catalog,
     );

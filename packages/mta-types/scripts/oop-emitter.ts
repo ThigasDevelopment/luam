@@ -1,4 +1,4 @@
-import type { OopClass, OopMember } from '#mta-types/oop-declaration';
+import type { OopClass, OopConstructor, OopMember } from '#mta-types/oop-declaration';
 
 import { collectHelpers, printDescriptor } from './descriptor-printer.ts';
 import type { GeneratedFile } from './generator-model.ts';
@@ -45,14 +45,46 @@ function memberLines(member: OopMember): string[] {
     ];
 }
 
+function constructorLines(constructor: OopConstructor | null): string[] {
+    if (constructor === null) {
+        return ['    null,'];
+    }
+
+    const single = `    oopConstructor('${constructor.environment}', ${printDescriptor(constructor.type)}),`;
+
+    if (single.length <= MAX_LINE_LENGTH) {
+        return [single];
+    }
+
+    return [
+        `    oopConstructor('${constructor.environment}',`,
+        ...memberLines({ name: '', kind: 'method', environment: constructor.environment, procedural: '', type: constructor.type })
+            .slice(1, -1)
+            .map((line) => line.slice(4)),
+        '    ),',
+    ];
+}
+
 function classLines(declaration: OopClass): string[] {
     const parent = declaration.parent === null ? 'null' : `'${declaration.parent}'`;
 
-    if (declaration.members.length === 0) {
-        return [`    oopClass('${declaration.name}', ${parent}, []),`];
+    if (declaration.staticMethods.length === 0 && declaration.constructor === null) {
+        if (declaration.members.length === 0) {
+            return [`    oopClass('${declaration.name}', ${parent}, []),`];
+        }
+
+        return [`    oopClass('${declaration.name}', ${parent}, [`, ...declaration.members.flatMap(memberLines), '    ]),'];
     }
 
-    return [`    oopClass('${declaration.name}', ${parent}, [`, ...declaration.members.flatMap(memberLines), '    ]),'];
+    return [
+        `    oopClass('${declaration.name}', ${parent}, [`,
+        ...declaration.members.flatMap(memberLines),
+        '    ], [',
+        ...declaration.staticMethods.flatMap(memberLines),
+        '    ],',
+        ...constructorLines(declaration.constructor),
+        '    ),',
+    ];
 }
 
 function chunkClasses(classes: readonly OopClass[]): OopClass[][] {
@@ -88,6 +120,16 @@ function renderModule(symbol: string, classes: readonly OopClass[]): string {
         for (const member of declaration.members) {
             collectHelpers(member.type, helpers);
             builders.add(CONSTRUCTORS[member.kind]);
+        }
+
+        for (const member of declaration.staticMethods) {
+            collectHelpers(member.type, helpers);
+            builders.add(CONSTRUCTORS[member.kind]);
+        }
+
+        if (declaration.constructor !== null) {
+            collectHelpers(declaration.constructor.type, helpers);
+            builders.add('oopConstructor');
         }
     }
 
