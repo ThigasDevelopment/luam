@@ -35,7 +35,7 @@ watches `**/*.luam` so the server sees files that change outside the editor.
 
 ## Building
 
-`pnpm --filter @luam/vscode bundle` produces both halves of the extension:
+`pnpm --filter luam bundle` produces both halves of the extension:
 
 - `dist/extension.cjs` — the extension itself, with `vscode` left external.
 - `dist/server/luam-lsp.cjs` — the language server the extension forks over IPC.
@@ -44,7 +44,7 @@ Both must exist before the extension is packaged or run from source.
 
 ## Testing
 
-`pnpm --filter @luam/vscode test` runs headlessly. The tests stub the `vscode`
+`pnpm --filter luam test` runs headlessly. The tests stub the `vscode`
 and `vscode-languageclient/node` modules, so activation, command registration,
 the ensure command line, the manifest contract, and every grammar pattern are
 verified without downloading VS Code.

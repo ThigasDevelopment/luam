@@ -43,7 +43,7 @@ jobs:
               run: pnpm --filter @luam/cli test
 
             - name: LSP and VS Code extension
-              run: pnpm --filter @luam/lsp --filter @luam/vscode test
+              run: pnpm --filter @luam/lsp --filter luam test
 
     build:
         name: Build

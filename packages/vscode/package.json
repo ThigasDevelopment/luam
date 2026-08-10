@@ -1,6 +1,7 @@
 {
-    "name": "@luam/vscode",
+    "name": "luam",
     "displayName": "Luam",
+    "icon": "icon.png",
     "description": "Language support for Luam, a typed Lua that compiles to Multi Theft Auto resources.",
     "version": "0.1.0",
     "private": true,

@@ -50,7 +50,7 @@ jobs:
               run: pnpm --filter @luam/cli bundle
 
             - name: Bundle the extension
-              run: pnpm --filter @luam/vscode bundle
+              run: pnpm --filter luam bundle
 
             - name: Package the CLI
               run: npm pack --pack-destination "$GITHUB_WORKSPACE/artifacts" ./packages/cli/dist

@@ -4,7 +4,7 @@
 parser, binder, type checker, and diagnostics, so the editor and the build never
 disagree about a file.
 
-The server is editor-agnostic. `@luam/vscode` bundles it, and any editor that
+The server is editor-agnostic. `luam` bundles it, and any editor that
 speaks LSP can launch it the same way.
 
 ## Capabilities

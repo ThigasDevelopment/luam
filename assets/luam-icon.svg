@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 28 200 200" width="200" height="200" role="img" aria-label="Luam">
+    <title>Luam</title>
+
+    <defs>
+        <linearGradient id="luam-moon" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#7c5cff" />
+            <stop offset="100%" stop-color="#0891b2" />
+        </linearGradient>
+
+        <mask id="luam-crescent">
+            <rect x="0" y="0" width="256" height="256" fill="#000000" />
+            <circle cx="128" cy="128" r="58" fill="#ffffff" />
+            <circle cx="158" cy="106" r="51" fill="#000000" />
+        </mask>
+    </defs>
+
+    <g transform="translate(128 128) rotate(-25)">
+        <ellipse cx="0" cy="0" rx="91" ry="33" fill="none" stroke="#0891b2" stroke-width="4" opacity="0.55" />
+    </g>
+
+    <circle cx="128" cy="128" r="58" fill="url(#luam-moon)" mask="url(#luam-crescent)" />
+
+    <g transform="translate(128 128) rotate(-25)">
+        <path d="M -91 0 A 91 33 0 0 0 91 0" fill="none" stroke="#0891b2" stroke-width="4" />
+        <circle cx="91" cy="0" r="8" fill="#7c5cff" />
+    </g>
+</svg>

@@ -488,7 +488,7 @@ file. Reload the window when it asks.
 git clone https://github.com/ThigasDevelopment/luam.git
 cd luam
 pnpm install
-pnpm --filter @luam/vscode bundle
+pnpm --filter luam bundle
 npx --yes @vscode/vsce package --no-dependencies --skip-license --out luam.vsix
 code --install-extension luam.vsix
 ```
@@ -497,7 +497,7 @@ code --install-extension luam.vsix
 instead — it reloads on rebuild:
 
 ```bash
-pnpm --filter @luam/vscode bundle
+pnpm --filter luam bundle
 code --extensionDevelopmentPath=packages/vscode
 ```
 
