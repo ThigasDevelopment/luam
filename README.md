@@ -552,7 +552,7 @@ The repo is a pnpm workspace: `compiler`, `cli`, `lsp`, `vscode`, `runtime`,
 ```bash
 pnpm install
 pnpm typecheck    # strict TypeScript across every package
-pnpm test         # 768 tests
+pnpm test         # 769 tests
 pnpm build
 ```
 
