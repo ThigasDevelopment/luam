@@ -6,6 +6,81 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Editor Experience — Documentation, Signatures and Context
+
+Writing Luam by hand exposed an editor that knew the types but never explained
+them. The catalog carried signatures with no parameter names and no prose, so a
+hover read `mta api (shared)` and nothing else. Completion answered every
+position with the same list of globals, and a half-typed line inside a class
+discarded the class.
+
+#### Added
+
+- API documentation generated from the upstream `mtasa-lua-types` JSDoc:
+  description, parameter names, per-parameter text, return text and the wiki
+  link, for 1161 of the 1294 catalogued globals. It lands in
+  `src/generated/docs/`, imported only by the LSP, so the CLI bundle is
+  unchanged at 400 KB while the language server carries the prose.
+- Signature help. Typing `outputChatBox(` now shows
+  `outputChatBox(text: string, visibleTo?: …)` with the active parameter
+  highlighted and its documentation beneath. It resolves MTA globals, Lua
+  library members, MTA OOP methods, and functions declared in the file.
+- Event-name completion. Inside the name argument of `addEventHandler`,
+  `addEvent`, `triggerEvent`, `triggerServerEvent`, `triggerClientEvent` and
+  their latent forms, the editor offers the events for the file's environment
+  plus every custom event the workspace declares with `addEvent`.
+- Type-position completion. After an annotation colon — a local, a parameter, a
+  return type, a class field, or the next option after a union bar — the list
+  holds only primitives, project classes, interfaces, enums and MTA element
+  types.
+- Parser recovery inside class bodies, interface bodies and brace blocks. A
+  broken member or statement is reported and skipped, and the surrounding
+  declaration survives.
+- 42 tests covering documentation, signature help, the two new completion
+  contexts, variable values and `self`. The suite is 805 tests.
+
+#### Changed
+
+- Hover on an MTA function renders the description, a named signature, the
+  documented parameters, the return text and a wiki link, instead of the bare
+  scope line.
+- Completion items for MTA functions carry the same documentation and a detail
+  line with parameter names rather than bare positional types.
+- Hover on a local shows its value — `local maxPlayers: number = 32` — for a
+  literal, or the call that produced it.
+- Completion returns nothing inside a comment, and nothing inside a string that
+  is not an event name, rather than the full list of globals.
+
+- Hand-written documentation for the Lua standard library, the three Luam
+  library tables and the native runtime — every Lua global, all 39 `math`,
+  `string` and `table` members, and the `Thread`, `Threads` and `Async`
+  surfaces. Lua entries link the 5.1 manual, and a Luam addition says so.
+- A file icon for `.luam`, contributed per language so it slots into whatever
+  file icon theme is active rather than replacing it. The mark is the crescent
+  from the extension logo with its orbiting body, redrawn to stay legible at
+  16 pixels, in a light and a dark variant.
+- 24 tests covering the Lua and runtime documentation, the native library
+  completion, the indentation rules and the icon contribution. The suite is
+  829 tests.
+
+#### Fixed
+
+- `self` lost its type while a class method was mid-edit. A parse error inside
+  a class body used to discard the whole class declaration, so typing `self.`
+  removed the very information the completion needed.
+- A diagnostic was listed in Problems but drawn nowhere in the editor. Ranges
+  were one character wide, and a parse error at end of file landed on an empty
+  line with nothing to underline. Parser diagnostics now carry the offending
+  token's end, the checker's are widened to the whole token, and a range that
+  would still be empty snaps back to the last visible character.
+- `Async`, `Thread` and `Threads` offered no members. Member resolution
+  consulted the project globals but never the API catalog, so the natively
+  injected records resolved to nothing.
+- Enter after a Lua block header reset the indentation. The increase pattern
+  required a line to be exactly `function`, so `function greet()` and
+  `local function greet()` never nested. Both patterns now follow the
+  well-tested Lua rules, extended for braces and hanging parens.
+
 ### Milestone 13 — The Generated Manifest Standard
 
 The generated `meta.xml` now reads like the file a resource author would write
