@@ -10,12 +10,12 @@ describe('the installable package', () => {
     }
 
     it('publishes under the command name', () => {
-        expect(field('name')).toBe('luam');
+        expect(field('name')).toBe('@thigasdevelopment/luam');
         expect(field('version')).toBe('1.2.3');
     });
 
     it('points the luam binary at the bundle', () => {
-        expect(field('bin')).toEqual({ luam: './luam.mjs' });
+        expect(field('bin')).toEqual({ luam: 'luam.mjs' });
     });
 
     it('declares no dependencies, because the bundle carries everything', () => {

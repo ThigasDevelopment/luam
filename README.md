@@ -5,7 +5,7 @@
 <p align="center">Typed Lua for Multi Theft Auto. Compiles to plain Lua 5.1.</p>
 
 <p align="center">
-    <a href="https://www.npmjs.com/package/luam"><img alt="npm" src="https://img.shields.io/npm/v/luam?color=cb3837&label=npm"></a>
+    <a href="https://www.npmjs.com/package/@thigasdevelopment/luam"><img alt="npm" src="https://img.shields.io/npm/v/@thigasdevelopment/luam?color=cb3837&label=npm"></a>
     <img alt="Target" src="https://img.shields.io/badge/target-Lua%205.1-000080">
     <img alt="Platform" src="https://img.shields.io/badge/platform-Multi%20Theft%20Auto-3ddc97">
     <img alt="Node" src="https://img.shields.io/badge/node-%3E%3D20-5fa04e">
@@ -49,7 +49,7 @@ node --version   # must print v20.x or newer
 ### 1. Install the CLI
 
 ```bash
-npm install --global luam
+npm install --global @thigasdevelopment/luam
 ```
 
 That gives you one command, `luam`. Check it:
@@ -60,13 +60,13 @@ luam --version
 
 | Task | Command |
 | --- | --- |
-| Install | `npm install --global luam` |
-| Update to the latest | `npm update --global luam` |
-| Install a specific version | `npm install --global luam@0.1.1` |
-| Uninstall | `npm uninstall --global luam` |
-| Run once, without installing | `npx luam <command>` |
+| Install | `npm install --global @thigasdevelopment/luam` |
+| Update to the latest | `npm update --global @thigasdevelopment/luam` |
+| Install a specific version | `npm install --global @thigasdevelopment/luam@0.1.1` |
+| Uninstall | `npm uninstall --global @thigasdevelopment/luam` |
+| Run once, without installing | `npx @thigasdevelopment/luam <command>` |
 
-`npx luam build` works anywhere and caches the download, which is handy in CI or
+`npx @thigasdevelopment/luam build` works anywhere and caches the download, which is handy in CI or
 on a machine you would rather not install into.
 
 <details>
@@ -85,7 +85,7 @@ npm config get prefix
 - **macOS / Linux** — add `<prefix>/bin` to your `PATH` in `~/.zshrc` or
   `~/.bashrc`, then run `source ~/.zshrc`.
 
-Nothing to configure if you would rather not: `npx luam <command>` needs no
+Nothing to configure if you would rather not: `npx @thigasdevelopment/luam <command>` needs no
 `PATH` entry at all.
 
 </details>
@@ -533,7 +533,7 @@ frontend the CLI uses, so the editor and the build never disagree about a file.
 | Syntax highlighting | `.luam` files, including type annotations and template strings |
 | Diagnostics | On open and on every keystroke, cleared when you fix the file |
 | Completion | Scope symbols, workspace globals, MTA APIs scoped to the file's environment, keywords |
-| Member completion | `.` and `:` complete class fields and methods (inherited too), enum members, and native extensions |
+| Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members |
 | Hover | Declared or inferred type, function signature, and the environment of an MTA API |
 | Navigation | Go to definition, find references, rename — across files for globals |
 
