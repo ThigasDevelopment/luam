@@ -7,7 +7,7 @@ import { isDirectiveStart, parseDirective } from './directives';
 import { parseExpression, parseSuffixed } from './expression';
 import { parseFunctionDeclaration } from './function-expression';
 import { ASSIGNMENT_OPERATORS, INCREMENT_OPERATORS } from './precedence';
-import { recoverInBlock } from './recovery';
+import { BRACE_TERMINATORS, recoverInBlock } from './recovery';
 import { ParserError, type TokenStream } from './token-stream';
 import { parseNamedAnnotation, parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
 
@@ -233,7 +233,7 @@ export function parseStatement(stream: TokenStream): Statement {
     return parseExpressionStatement(stream);
 }
 
-function parseBlockStatement(stream: TokenStream): Statement | null {
+function parseBlockStatement(stream: TokenStream, terminators: ReadonlySet<string> = BRACE_TERMINATORS): Statement | null {
     try {
         return parseStatement(stream);
     } catch (error) {
@@ -241,7 +241,7 @@ function parseBlockStatement(stream: TokenStream): Statement | null {
             throw error;
         }
 
-        recoverInBlock(stream, error);
+        recoverInBlock(stream, error, terminators);
 
         return null;
     }
@@ -288,7 +288,16 @@ export function parseBlock(stream: TokenStream, terminators: readonly string[]):
             return body;
         }
 
-        const statement = parseStatement(stream);
+        const offset = stream.current().position.offset;
+        const statement = parseBlockStatement(stream, stop);
+
+        if (statement === null) {
+            if (stream.current().position.offset === offset) {
+                return body;
+            }
+
+            continue;
+        }
 
         body.push(statement);
 

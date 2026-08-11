@@ -1,4 +1,4 @@
-import { createNamed, typeToString } from '@compiler/checker/types';
+import { createNamed, renameRecord, typeToString } from '@compiler/checker/types';
 import type {
     AssignmentStatement,
     DeclareStatement,
@@ -83,8 +83,9 @@ function collectLocal(state: CollectorState, block: BlockContext, statement: Loc
         collectAnnotation(state, block, declarator.annotation);
 
         const value = statement.values[index];
-        const type = value === undefined ? null : typeOf(state, value);
-        const declared = variableText('local', declarator.name, declarator.annotation, type === null ? null : typeToString(type));
+        const inferred = value === undefined ? null : typeOf(state, value);
+        const type = declarator.annotation === null ? inferred : annotationType(declarator.annotation);
+        const declared = variableText('local', declarator.name, declarator.annotation, inferred === null ? null : typeToString(inferred));
         const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1));
 
         declareSymbol(state, block.scopeId, { name: declarator.name, kind: 'local', position: declarator.position, detail, type });
@@ -210,7 +211,10 @@ function collectTypeAlias(state: CollectorState, block: BlockContext, statement:
     collectAnnotation(state, block, statement.annotation);
 
     if (position !== null) {
-        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'type-alias', position, detail: `type ${statement.name}` });
+        const resolved = annotationType(statement.annotation);
+        const type = statement.annotation.kind === 'type-object' ? renameRecord(resolved, statement.name) : resolved;
+
+        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'type-alias', position, detail: `type ${statement.name}`, type });
     }
 }
 

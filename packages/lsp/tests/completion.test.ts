@@ -64,6 +64,43 @@ describe('completion', () => {
         expect(found).not.toContain('greet');
     });
 
+    it('offers the keys of an object type after a dot', () => {
+        const text = ['local args: { name: string, tag?: string } = {}', 'args.'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'args.');
+
+        expect(found).toContain('name');
+        expect(found).toContain('tag');
+    });
+
+    it('offers the keys of an object type parameter inside the function body', () => {
+        const text = ['function take(args: { name: string, tag?: string }): void', '    args.', 'end'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'args.');
+
+        expect(found).toContain('name');
+        expect(found).toContain('tag');
+    });
+
+    it('offers the keys of an aliased object type inside a constructor body', () => {
+        const text = ['type Args = { name: string }', 'class Teste {', '    constructor(args: Args) {', '        args.', '    }', '}'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'args.');
+
+        expect(found).toContain('name');
+    });
+
+    it('offers class members of a parameter inside the function body', () => {
+        const text = ['class Player {', '    name: string', '}', 'function take(one: Player): void', '    one.', 'end'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, '    one.');
+
+        expect(found).toContain('name');
+    });
+
+    it('offers the keys of an object type nested in another object type', () => {
+        const text = ['function make(): { owner: { id: number } }', '    return {}', 'end', '', 'local args = make()', 'args.owner.'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'args.owner.');
+
+        expect(found).toContain('id');
+    });
+
     it('offers class methods after a colon on an instance', () => {
         const text = ['class Player {', '    name: string', '    greet(): void {', '    }', '}', '', 'local one = new Player()', 'one:'].join(
             '\n',

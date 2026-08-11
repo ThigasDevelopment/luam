@@ -111,13 +111,33 @@ export function completionContext(text: string, offset: number): CompletionConte
     return { trigger: separator, segments };
 }
 
-function fromType(analysis: DocumentAnalysis, type: Type | null): ReceiverTarget | null {
+function aliasType(analysis: DocumentAnalysis, name: string): Type | null {
+    if (analysis.declarations.lookupClass(name) !== null || analysis.declarations.lookupInterface(name) !== null) {
+        return null;
+    }
+
+    return analysis.index.declarations.find((declaration) => declaration.kind === 'type-alias' && declaration.name === name)?.type ?? null;
+}
+
+function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<string> = new Set()): ReceiverTarget | null {
     if (type === null) {
         return null;
     }
 
     if (type.kind === 'named') {
-        return analysis.declarations.lookupEnum(type.name) === null ? { kind: 'class', name: type.name } : { kind: 'enum', name: type.name };
+        if (analysis.declarations.lookupEnum(type.name) !== null) {
+            return { kind: 'enum', name: type.name };
+        }
+
+        const alias = seen.has(type.name) ? null : aliasType(analysis, type.name);
+
+        if (alias !== null) {
+            seen.add(type.name);
+
+            return fromType(analysis, alias, seen);
+        }
+
+        return { kind: 'class', name: type.name };
     }
 
     if (type.kind === 'table' || type.kind === 'array') {
