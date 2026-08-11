@@ -101,7 +101,7 @@ jobs:
     marketplace:
         name: Publish to the VS Code Marketplace
         needs: package
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && vars.PUBLISH_MARKETPLACE == 'true'
         runs-on: ubuntu-latest
         environment: pipeline
         steps:
