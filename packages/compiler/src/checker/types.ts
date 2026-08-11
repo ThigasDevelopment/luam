@@ -77,6 +77,18 @@ export function createRecord(name: string, members: ReadonlyMap<string, Type>, o
     return { kind: 'record', name, origin, members };
 }
 
+export function renameRecord(type: Type, name: string): Type {
+    return type.kind === 'record' ? createRecord(name, type.members, type.origin) : type;
+}
+
+export function createObjectType(members: ReadonlyMap<string, Type>): Type {
+    const keys = [...members].map(([name, member]) =>
+        member.kind === 'optional' ? `${name}?: ${typeToString(member.element)}` : `${name}: ${typeToString(member)}`,
+    );
+
+    return createRecord(keys.length === 0 ? '{}' : `{ ${keys.join(', ')} }`, members);
+}
+
 export function createFunction(parameters: Type[], returnType: Type, minimumArguments?: number, isVariadic = false): Type {
     return { kind: 'function', parameters, returnType, minimumArguments: minimumArguments ?? parameters.length, isVariadic };
 }
@@ -222,6 +234,26 @@ function isFunctionAssignable(source: FunctionType, target: FunctionType, option
     return target.returnType.kind === 'void' || isAssignable(source.returnType, target.returnType, options);
 }
 
+function isRecordAssignable(source: RecordType, target: RecordType, options: AssignabilityOptions): boolean {
+    for (const [name, member] of target.members) {
+        const value = source.members.get(name);
+
+        if (value === undefined) {
+            if (member.kind !== 'optional') {
+                return false;
+            }
+
+            continue;
+        }
+
+        if (!isAssignable(value, member, options)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function isAssignable(source: Type, target: Type, options: AssignabilityOptions = { allowNil: false }): boolean {
     if (source.kind === 'any' || target.kind === 'any' || target.kind === 'unknown') {
         return true;
@@ -261,6 +293,10 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
 
     if (target.kind === 'table') {
         return isTableLike(source) || source.kind === 'record';
+    }
+
+    if (target.kind === 'record') {
+        return source.kind === 'record' ? isRecordAssignable(source, target, options) : source.kind === 'table';
     }
 
     if (target.kind === 'array') {

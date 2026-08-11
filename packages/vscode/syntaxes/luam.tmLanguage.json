@@ -162,11 +162,21 @@
             }
         },
         "annotation": {
-            "match": "(:)\\s*((?:fun\\s*\\([^)]*\\)\\s*:\\s*)?[A-Za-z_][A-Za-z0-9_.]*(?:<[^>]*>)?(?:\\[\\])*\\??(?:\\s*\\|\\s*[A-Za-z_][A-Za-z0-9_.]*(?:\\[\\])*\\??)*)",
-            "captures": {
-                "1": { "name": "punctuation.separator.type.luam" },
-                "2": { "name": "entity.name.type.luam" }
-            }
+            "patterns": [
+                {
+                    "match": "(:)\\s*(?=\\{)",
+                    "captures": {
+                        "1": { "name": "punctuation.separator.type.luam" }
+                    }
+                },
+                {
+                    "match": "(:)\\s*((?:fun\\s*\\([^)]*\\)\\s*:\\s*)?[A-Za-z_][A-Za-z0-9_.]*(?:<[^>]*>)?(?:\\[\\])*\\??(?:\\s*\\|\\s*[A-Za-z_][A-Za-z0-9_.]*(?:\\[\\])*\\??)*)",
+                    "captures": {
+                        "1": { "name": "punctuation.separator.type.luam" },
+                        "2": { "name": "entity.name.type.luam" }
+                    }
+                }
+            ]
         },
         "keyword": {
             "patterns": [

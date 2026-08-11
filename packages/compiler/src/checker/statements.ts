@@ -15,7 +15,7 @@ import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration 
 import type { CheckContext } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor } from './control-flow';
 import { checkExpression, checkValueList } from './expressions';
-import { ANY_TYPE, createFunction, isConcatenable, isNumeric, NIL_TYPE, typeToString, type Type } from './types';
+import { ANY_TYPE, createFunction, isConcatenable, isNumeric, NIL_TYPE, renameRecord, typeToString, type Type } from './types';
 
 const ORIGIN: SourcePosition = { line: 0, column: 0, offset: 0 };
 
@@ -229,10 +229,14 @@ function checkStatement(context: CheckContext, statement: Statement): void {
             return checkNumericFor(context, statement);
         case 'generic-for-statement':
             return checkGenericFor(context, statement);
-        case 'type-alias-statement':
-            context.binder.declareAlias(statement.name, context.resolveAnnotation(statement.annotation));
+        case 'type-alias-statement': {
+            const resolved = context.resolveAnnotation(statement.annotation);
+            const named = statement.annotation.kind === 'type-object' ? renameRecord(resolved, statement.name) : resolved;
+
+            context.binder.declareAlias(statement.name, named);
 
             return;
+        }
         case 'declare-statement':
             return checkDeclareStatement(context, statement);
         case 'class-declaration':

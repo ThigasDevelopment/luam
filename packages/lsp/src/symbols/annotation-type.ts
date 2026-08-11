@@ -4,6 +4,7 @@ import {
     createArray,
     createFunction,
     createNamed,
+    createObjectType,
     createOptional,
     createUnion,
     NIL_TYPE,
@@ -58,6 +59,10 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
         const parameters = annotation.parameters.map((parameter) => annotationType(parameter));
 
         return createFunction(parameters, annotationType(annotation.returnType), minimumOf(parameters), annotation.isVariadic);
+    }
+
+    if (annotation.kind === 'type-object') {
+        return createObjectType(new Map(annotation.members.map((member) => [member.name, annotationType(member.annotation)])));
     }
 
     return PRIMITIVE_TYPES[annotation.name] ?? createNamed(annotation.name);

@@ -94,6 +94,8 @@ describe('grammar', () => {
         expect(matchesAny('keyword', 'local kind = type(1)')).toBe(true);
         expect(matchesAny('annotation', 'local player: Player? = nil')).toBe(true);
         expect(matchesAny('annotation', 'local names: string[] = {}')).toBe(true);
+        expect(matchesAny('annotation', 'local args: { name: string } = {}')).toBe(true);
+        expect(matchesAny('annotation', 'type Args = { name: string }')).toBe(true);
     });
 
     it('highlights build directives', () => {

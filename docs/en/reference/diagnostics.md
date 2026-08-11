@@ -45,6 +45,7 @@ writes nothing.
 | `parse-export-local` | `export` applied to a `local function`. |
 | `parse-invalid-optional` | A `?` on a name with no type annotation after it. |
 | `parse-optional-position` | The `?` was written on the type. It attaches to the name. |
+| `parse-duplicate-key` | An object type declares the same key more than once. |
 | `parse-unexpected-decorator` | A decorator where none may appear. |
 | `parse-decorator-arguments` | A decorator was given arguments. It takes none. |
 
@@ -64,7 +65,7 @@ writes nothing.
 | `check-argument-count` | Too few or too many arguments. |
 | `check-invalid-operand` | An operator cannot be applied to that type. |
 | `check-unknown-member` | The member does not exist on the receiver. |
-| `check-unknown-record-key` | The key is not declared. Used by `process.env`. |
+| `check-unknown-record-key` | The key is not declared by the object type. Also used by `process.env`. |
 
 ## Checker — control flow
 

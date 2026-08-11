@@ -35,6 +35,14 @@ export function collectAnnotation(state: CollectorState, block: BlockContext, an
         return;
     }
 
+    if (annotation.kind === 'type-object') {
+        for (const member of annotation.members) {
+            collectAnnotation(state, block, member.annotation);
+        }
+
+        return;
+    }
+
     for (const parameter of annotation.parameters) {
         collectAnnotation(state, block, parameter);
     }

@@ -1,7 +1,10 @@
 type PlayerId = number
 type Nullable<T> = T | nil
+type SpawnArgs = { name: string, team?: string }
 
 local id: PlayerId = 7
+local spawn: SpawnArgs = { name = 'Thigas' }
+local point: { x: number, y: number } = { x = 0, y = 0 }
 local nickname: string = 'Thigas'
 local target?: Player = nil
 local key: string | number = 1
@@ -11,5 +14,5 @@ local pending: Nullable<string> = nil
 local anything: any = nickname
 
 function summarize(): string
-    return tostring(id) .. tostring(nickname) .. tostring(target) .. tostring(key) .. tostring(scores.count) .. tostring(grid.count) .. tostring(pending) .. tostring(anything)
+    return tostring(id) .. tostring(nickname) .. tostring(target) .. tostring(key) .. tostring(scores.count) .. tostring(grid.count) .. tostring(pending) .. tostring(anything) .. spawn.name .. tostring(point.x)
 end

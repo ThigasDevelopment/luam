@@ -18,6 +18,7 @@ import {
     createArray,
     createFunction,
     createNamed,
+    createObjectType,
     createOptional,
     createUnion,
     isAssignable,
@@ -190,6 +191,16 @@ export class CheckContext {
 
         if (annotation.kind === 'type-union') {
             return createUnion(annotation.options.map((option) => this.resolveAnnotation(option)));
+        }
+
+        if (annotation.kind === 'type-object') {
+            const members = new Map<string, Type>();
+
+            for (const member of annotation.members) {
+                members.set(member.name, this.resolveAnnotation(member.annotation));
+            }
+
+            return createObjectType(members);
         }
 
         if (annotation.kind === 'type-function') {

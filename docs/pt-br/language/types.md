@@ -105,6 +105,44 @@ local players: Player[] = {}
 [extensões de objeto](/pt-br/language/extensions) de tabela, então `scores.count`
 e `scores.isEmpty` funcionam.
 
+## Tipos de objeto
+
+`{ chave: Tipo }` descreve uma tabela pelas chaves que ela declara. Ele é escrito
+no lugar, onde qualquer tipo é aceito:
+
+```luam
+local point: { x: number, y: number } = { x = 0, y = 0 }
+
+function spawn(args: { name: string, team?: string }): void
+    outputChatBox(args.name)
+end
+```
+
+As chaves são separadas por vírgula, ponto e vírgula ou quebra de linha, e o
+marcador de opcional fica na chave — `team?: string`, nunca `team: string?`. Ler
+uma chave que o tipo não declara é `check-unknown-record-key`:
+
+| Você escreveu | Diagnóstico |
+| --- | --- |
+| `args.nmae` em `{ name: string }` | `check-unknown-record-key: "nmae" is not a key of "{ name: string }". Declared keys: "name".` |
+| `{ name: string, name: number }` | `parse-duplicate-key` |
+| `{ name }` | `parse-invalid-type` |
+
+Um tipo de objeto é aceito onde outro é esperado quando declara todas as chaves
+que o alvo exige, com um tipo compatível. Uma chave que o alvo marca como
+opcional pode faltar.
+
+::: warning Sem inferência a partir de uma tabela literal
+Uma tabela literal tem o tipo `table`, não o das suas chaves, então
+`spawn({ nmae = 'a' })` é aceito — o argumento não carrega forma nenhuma para
+comparar. A forma é conhecida em dois lugares, e são esses os dois lugares em que
+ela é verificada: ao ler uma chave de um valor anotado e ao passar um valor
+anotado para outra posição anotada.
+:::
+
+Um tipo de objeto é uma forma, não um contrato que uma classe possa implementar.
+Para isso, use uma [interface](/pt-br/language/enums-and-interfaces).
+
 ## Aliases
 
 `type` dá nome a um tipo. Ele é apagado por completo.
@@ -112,14 +150,20 @@ e `scores.isEmpty` funcionam.
 ```luam
 type PlayerId = number
 type Nullable<T> = T | nil
+type SpawnArgs = { name: string, team?: string }
 
 local id: PlayerId = 7
 local pending: Nullable<string> = nil
+local args: SpawnArgs = { name = 'Thigas' }
 ```
 
 Aliases podem receber parâmetros de tipo, como `Nullable<T>` mostra. **Classes**
 genéricas não são suportadas — veja
 [Limitações](/pt-br/reference/limitations).
+
+Um alias de um tipo de objeto leva o nome dele para os diagnósticos: ler
+`args.nmae` acima reporta `"nmae" is not a key of "SpawnArgs"`. Um alias precisa
+ser declarado antes do código que o usa.
 
 ## Tipos de função
 

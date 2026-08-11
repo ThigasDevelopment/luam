@@ -35,12 +35,23 @@ export interface TypeFunctionAnnotation extends NodeBase {
     returnType: TypeAnnotation | null;
 }
 
+export interface TypeObjectMember extends NodeBase {
+    name: string;
+    annotation: TypeAnnotation;
+}
+
+export interface TypeObjectAnnotation extends NodeBase {
+    kind: 'type-object';
+    members: TypeObjectMember[];
+}
+
 export type TypeAnnotation =
     | TypeNameAnnotation
     | TypeArrayAnnotation
     | TypeOptionalAnnotation
     | TypeUnionAnnotation
-    | TypeFunctionAnnotation;
+    | TypeFunctionAnnotation
+    | TypeObjectAnnotation;
 
 export interface Parameter extends NodeBase {
     name: string;

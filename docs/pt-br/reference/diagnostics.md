@@ -45,6 +45,7 @@ erro não escreve nada.
 | `parse-export-local` | `export` aplicado a uma `local function`. |
 | `parse-invalid-optional` | Um `?` em um nome sem anotação de tipo depois. |
 | `parse-optional-position` | O `?` foi escrito no tipo. Ele gruda no nome. |
+| `parse-duplicate-key` | Um tipo de objeto declara a mesma chave mais de uma vez. |
 | `parse-unexpected-decorator` | Um decorador onde nenhum pode aparecer. |
 | `parse-decorator-arguments` | Um decorador recebeu argumentos. Ele não aceita nenhum. |
 
@@ -64,7 +65,7 @@ erro não escreve nada.
 | `check-argument-count` | Argumentos de menos ou de mais. |
 | `check-invalid-operand` | Um operador não pode ser aplicado a esse tipo. |
 | `check-unknown-member` | O membro não existe no receptor. |
-| `check-unknown-record-key` | A chave não é declarada. Usado por `process.env`. |
+| `check-unknown-record-key` | A chave não é declarada pelo tipo de objeto. Também usado por `process.env`. |
 
 ## Checker — fluxo de controle
 

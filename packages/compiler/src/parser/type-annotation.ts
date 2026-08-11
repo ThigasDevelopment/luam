@@ -1,4 +1,4 @@
-import type { TypeAnnotation } from './ast';
+import type { TypeAnnotation, TypeObjectMember } from './ast';
 import type { TokenStream } from './token-stream';
 
 const TYPE_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
@@ -86,6 +86,44 @@ function parseGroupedType(stream: TokenStream): TypeAnnotation {
     return inner;
 }
 
+function parseObjectMember(stream: TokenStream): TypeObjectMember {
+    const token = stream.expectName();
+    const annotation = parseNamedAnnotation(stream, 'field');
+
+    if (annotation === null) {
+        throw stream.error(`Key "${token.value}" of an object type requires a type annotation.`, 'parse-invalid-type');
+    }
+
+    return { name: token.value, annotation, position: token.position };
+}
+
+function parseObjectType(stream: TokenStream): TypeAnnotation {
+    const position = stream.expect('punctuation', '{').position;
+    const members: TypeObjectMember[] = [];
+    const declared = new Set<string>();
+
+    while (!stream.check('punctuation', '}') && !stream.isEof()) {
+        if (stream.match('punctuation', ';') || stream.match('punctuation', ',')) {
+            continue;
+        }
+
+        const member = parseObjectMember(stream);
+
+        if (declared.has(member.name)) {
+            stream.report('parse-duplicate-key', `Object type key "${member.name}" is declared more than once.`, member.position);
+
+            continue;
+        }
+
+        declared.add(member.name);
+        members.push(member);
+    }
+
+    stream.expect('punctuation', '}');
+
+    return { kind: 'type-object', members, position };
+}
+
 function parsePrimaryType(stream: TokenStream): TypeAnnotation {
     if (stream.check('keyword', 'function')) {
         throw stream.error(`Use "${FUNCTION_TYPE}" for function types. "function" is a keyword and cannot name a type.`, 'parse-invalid-type');
@@ -93,6 +131,10 @@ function parsePrimaryType(stream: TokenStream): TypeAnnotation {
 
     if (stream.check('identifier', FUNCTION_TYPE)) {
         return parseFunctionType(stream);
+    }
+
+    if (stream.check('punctuation', '{')) {
+        return parseObjectType(stream);
     }
 
     return stream.check('punctuation', '(') ? parseGroupedType(stream) : parseTypeName(stream);

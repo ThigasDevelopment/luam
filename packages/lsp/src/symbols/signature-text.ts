@@ -27,6 +27,12 @@ export function annotationText(annotation: TypeAnnotation | null): string {
         return `fun(${parameters.join(', ')}): ${annotationText(annotation.returnType)}`;
     }
 
+    if (annotation.kind === 'type-object') {
+        const members = annotation.members.map((member) => namedAnnotationText(member.name, member.annotation));
+
+        return members.length === 0 ? '{}' : `{ ${members.join(', ')} }`;
+    }
+
     if (annotation.typeArguments.length === 0) {
         return annotation.name;
     }

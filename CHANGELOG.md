@@ -6,6 +6,57 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Object Types
+
+An argument bag is the most common shape in an MTA resource, and the only way to
+type one was to declare an `interface` for it. Luam now accepts an object type
+inline, wherever a type is accepted.
+
+#### Added
+
+- `{ key: Type }` as a type annotation, on locals, parameters, fields, return
+  types, type aliases, and nested inside another type. Keys are separated by a
+  comma, a semicolon, or a line break, and the optional marker attaches to the
+  key — `team?: string`. The annotation is erased like every other one.
+- Key checking on a value with an object type. Reading a key the type does not
+  declare is `check-unknown-record-key`, and an alias lends its name to the
+  message, so a misspelled key on a `SpawnArgs` names `SpawnArgs`.
+- Structural assignability between object types: a source is accepted when it
+  declares every key the target requires with a compatible type, and a key the
+  target marks optional may be missing. A table literal carries no shape, so it
+  stays assignable to any object type.
+- `parse-duplicate-key`, reported when an object type declares the same key more
+  than once.
+- Editor support: hover and signature help render an object type by its keys,
+  completion after a dot offers the keys, including keys of a nested object type,
+  and the grammar keeps highlighting the types inside the braces.
+
+#### Changed
+
+- A local declared with an annotation now takes its type from that annotation in
+  the language server instead of from its initializer, so completion after a dot
+  follows the declared type.
+
+### Completion Inside a Block
+
+Typing `args.` to see what is on a value is the moment completion matters most,
+and it is exactly the moment the file does not parse. A statement that failed
+inside a `do`, `if`, loop, or function body took the whole enclosing declaration
+down with it, so the editor lost the parameters and locals it needed to answer.
+
+#### Fixed
+
+- The parser now recovers from a failed statement inside a block terminated by
+  `end`, the way it already did inside a `{ }` body: the diagnostic is reported,
+  the rest of the line is skipped, and the surrounding declaration survives. A
+  parameter is offered after a dot in its own function body again, whatever its
+  type — class, MTA element, or object type.
+- A stray `}` inside an `end` block is reported once instead of twice.
+- The language server resolves a type alias when it looks for the members of a
+  value, so a parameter annotated with an alias of an object type offers its
+  keys. A class or interface of the same name still wins, and a self-referencing
+  alias stops instead of recursing.
+
 ### Editor Detection on Windows
 
 Editor launchers ship as `.cmd` scripts on Windows, and a direct process spawn
