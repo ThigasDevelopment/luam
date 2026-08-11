@@ -148,3 +148,25 @@ export function parseOptionalAnnotation(stream: TokenStream): TypeAnnotation | n
 
     return parseTypeAnnotation(stream);
 }
+
+export type NamedDeclaration = 'field' | 'local' | 'parameter';
+
+export const OPTIONAL_MARKER = '?';
+
+const DECLARATION_LABEL: Readonly<Record<NamedDeclaration, string>> = { field: 'fields', local: 'locals', parameter: 'parameters' };
+
+export function parseNamedAnnotation(stream: TokenStream, declaration: NamedDeclaration): TypeAnnotation | null {
+    const optional = stream.check('operator', '?') ? stream.next() : null;
+    const annotation = parseOptionalAnnotation(stream);
+    const label = DECLARATION_LABEL[declaration];
+
+    if (optional !== null && annotation === null) {
+        throw stream.error(`An optional marker on a ${declaration} must be followed by a type annotation.`, 'parse-invalid-optional');
+    }
+
+    if (optional === null && annotation?.kind === 'type-optional') {
+        stream.report('parse-optional-position', `Write optional ${label} as "name?: Type", not "name: Type?".`, annotation.position);
+    }
+
+    return optional === null || annotation === null ? annotation : { kind: 'type-optional', element: annotation, position: optional.position };
+}

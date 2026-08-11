@@ -72,8 +72,8 @@ describe('parser', () => {
     });
 
     it('rejects a field optional marker placed on the type', () => {
-        expect(codes('class Player {\n    name: string?\n}\n')).toEqual(['parse-field-optional-position']);
-        expect(codes('interface Named {\n    name: string?\n}\n')).toEqual(['parse-field-optional-position']);
+        expect(codes('class Player {\n    name: string?\n}\n')).toEqual(['parse-optional-position']);
+        expect(codes('interface Named {\n    name: string?\n}\n')).toEqual(['parse-optional-position']);
     });
 
     it('reports decorator arguments while retaining the class', () => {
@@ -103,7 +103,7 @@ describe('parser', () => {
     });
 
     it('parses a function declaration with parameter and return annotations', () => {
-        const [statement] = statements('function greet(name: string, tag: string?): string\n    return name\nend');
+        const [statement] = statements('function greet(name: string, tag?: string): string\n    return name\nend');
 
         expect(statement?.kind).toBe('function-declaration');
         expect(statement).toMatchSnapshot();
@@ -197,7 +197,7 @@ describe('parser', () => {
         expect(kinds('local logger: fun(...): void = print')).toEqual(['local-statement']);
         expect(kinds('local untyped: fun = print')).toEqual(['local-statement']);
         expect(kinds('local unknownReturn: fun(string) = print')).toEqual(['local-statement']);
-        expect(kinds('local maybe: (fun(string): void)? = nil')).toEqual(['local-statement']);
+        expect(kinds('local maybe?: fun(string): void = nil')).toEqual(['local-statement']);
         expect(kinds('local handlers: (fun(string): void)[] = {}')).toEqual(['local-statement']);
     });
 

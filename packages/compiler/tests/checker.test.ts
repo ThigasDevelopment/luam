@@ -45,7 +45,7 @@ describe('checker', () => {
     });
 
     it('accepts a call that omits an optional parameter', () => {
-        expect(codes("local function take(value: string?): void\nend\ntake()\n")).toEqual([]);
+        expect(codes("local function take(value?: string): void\nend\ntake()\n")).toEqual([]);
     });
 
     it('reports a return type mismatch', () => {
@@ -57,7 +57,7 @@ describe('checker', () => {
     });
 
     it('accepts nil for an optional annotation', () => {
-        expect(codes('local name: string? = nil')).toEqual([]);
+        expect(codes('local name?: string = nil')).toEqual([]);
     });
 
     it('rejects nil for a required annotation in strict mode', () => {

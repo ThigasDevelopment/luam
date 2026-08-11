@@ -16,7 +16,7 @@ import { parseParameters } from './function-expression';
 import { recoverInBlock } from './recovery';
 import { parseBraceBlock } from './statement';
 import { ParserError, type TokenStream } from './token-stream';
-import { parseOptionalAnnotation } from './type-annotation';
+import { parseNamedAnnotation, parseOptionalAnnotation } from './type-annotation';
 
 const DECLARATION_NAMES: ReadonlySet<string> = new Set(['class', 'interface', 'enum']);
 
@@ -115,20 +115,7 @@ function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorat
 }
 
 function parseFieldAnnotation(stream: TokenStream): ReturnType<typeof parseOptionalAnnotation> {
-    const optional = stream.check('operator', '?') ? stream.next() : null;
-    const annotation = parseOptionalAnnotation(stream);
-
-    if (optional !== null && annotation === null) {
-        throw stream.error('An optional field marker must be followed by a type annotation.', 'parse-invalid-field-optional');
-    }
-
-    if (optional === null && annotation?.kind === 'type-optional') {
-        stream.report('parse-field-optional-position', 'Write optional fields as "name?: Type", not "name: Type?".', annotation.position);
-    }
-
-    return optional === null || annotation === null
-        ? annotation
-        : { kind: 'type-optional', element: annotation, position: optional.position };
+    return parseNamedAnnotation(stream, 'field');
 }
 
 function parseClassMember(stream: TokenStream): ClassMember {

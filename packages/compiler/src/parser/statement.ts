@@ -9,7 +9,7 @@ import { parseFunctionDeclaration } from './function-expression';
 import { ASSIGNMENT_OPERATORS, INCREMENT_OPERATORS } from './precedence';
 import { recoverInBlock } from './recovery';
 import { ParserError, type TokenStream } from './token-stream';
-import { parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
+import { parseNamedAnnotation, parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
 
 const BLOCK_END: ReadonlySet<string> = new Set(['end', 'else', 'elseif', 'until']);
 
@@ -26,7 +26,7 @@ export function parseExpressionList(stream: TokenStream): Expression[] {
 export function parseDeclarator(stream: TokenStream): VariableDeclarator {
     const token = stream.expect('identifier');
 
-    return { name: token.value, annotation: parseOptionalAnnotation(stream), position: token.position };
+    return { name: token.value, annotation: parseNamedAnnotation(stream, 'local'), position: token.position };
 }
 
 function parseLocalStatement(stream: TokenStream, position: SourcePosition): Statement {

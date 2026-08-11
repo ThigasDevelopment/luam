@@ -34,11 +34,18 @@ export function annotationText(annotation: TypeAnnotation | null): string {
     return `${annotation.name}<${annotation.typeArguments.map(annotationText).join(', ')}>`;
 }
 
+export function namedAnnotationText(name: string, annotation: TypeAnnotation | null): string {
+    if (annotation === null) {
+        return name;
+    }
+
+    return annotation.kind === 'type-optional' ? `${name}?: ${annotationText(annotation.element)}` : `${name}: ${annotationText(annotation)}`;
+}
+
 export function parameterText(parameter: Parameter): string {
     const prefix = parameter.isVararg ? '...' : '';
-    const annotation = parameter.annotation === null ? '' : `: ${annotationText(parameter.annotation)}`;
 
-    return `${prefix}${parameter.name}${annotation}`;
+    return `${prefix}${namedAnnotationText(parameter.name, parameter.annotation)}`;
 }
 
 export function signatureText(name: string, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): string {
@@ -49,16 +56,14 @@ export function signatureText(name: string, parameters: readonly Parameter[], re
 
 export function variableText(keyword: string, name: string, annotation: TypeAnnotation | null, fallback: string | null): string {
     if (annotation !== null) {
-        return `${keyword} ${name}: ${annotationText(annotation)}`;
+        return `${keyword} ${namedAnnotationText(name, annotation)}`;
     }
 
     return fallback === null ? `${keyword} ${name}` : `${keyword} ${name}: ${fallback}`;
 }
 
 export function fieldText(name: string, annotation: TypeAnnotation): string {
-    return annotation.kind === 'type-optional'
-        ? `field ${name}?: ${annotationText(annotation.element)}`
-        : `field ${name}: ${annotationText(annotation)}`;
+    return `field ${namedAnnotationText(name, annotation)}`;
 }
 
 export function assignedText(declaration: string, value: string | null): string {

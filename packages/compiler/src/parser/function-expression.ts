@@ -1,7 +1,7 @@
 import type { Expression, FunctionDeclaration, FunctionExpression, Identifier, MemberExpression, Parameter } from './ast';
 import { parseBlock } from './statement';
 import type { TokenStream } from './token-stream';
-import { parseOptionalAnnotation } from './type-annotation';
+import { parseNamedAnnotation, parseOptionalAnnotation } from './type-annotation';
 
 function parseParameter(stream: TokenStream): Parameter {
     const token = stream.current();
@@ -16,7 +16,7 @@ function parseParameter(stream: TokenStream): Parameter {
 
     const name = stream.expect('identifier').value;
 
-    return { name, annotation: parseOptionalAnnotation(stream), isVararg: false, position: token.position };
+    return { name, annotation: parseNamedAnnotation(stream, 'parameter'), isVararg: false, position: token.position };
 }
 
 export function parseParameters(stream: TokenStream): Parameter[] {

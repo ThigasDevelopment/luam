@@ -36,9 +36,9 @@ describe('hover', () => {
     });
 
     it('shows the signature of a function', () => {
-        const text = 'function greet(name: string, tag: string?): string\n    return name\nend\n\ngreet("a")\n';
+        const text = 'function greet(name: string, tag?: string): string\n    return name\nend\n\ngreet("a")\n';
 
-        expect(hoverText(text, '\ngreet(', 'greet')).toContain('greet(name: string, tag: string?): string');
+        expect(hoverText(text, '\ngreet(', 'greet')).toContain('greet(name: string, tag?: string): string');
     });
 
     it('shows the signature of a parameter', () => {
