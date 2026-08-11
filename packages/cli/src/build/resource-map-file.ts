@@ -112,6 +112,7 @@ function isResourceMap(value: unknown): value is ResourceMap {
         value.version === RESOURCE_MAP_VERSION &&
         typeof value.resource === 'string' &&
         (value.layout === 'tree' || value.layout === 'bundle') &&
+        (value.minified === undefined || typeof value.minified === 'boolean') &&
         hasValidFiles(value.files)
     );
 }

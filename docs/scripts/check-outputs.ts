@@ -36,7 +36,8 @@ function projects(root: string): string[] {
 }
 
 function run(cli: string, command: string, cwd: string): { output: string; status: number } {
-    const result = spawnSync(process.execPath, [cli, command, '--cwd', cwd, '--no-color', '--offline'], { encoding: 'utf8' });
+    const offline = command === 'build' ? ['--offline'] : [];
+    const result = spawnSync(process.execPath, [cli, command, '--cwd', cwd, '--no-color', ...offline], { encoding: 'utf8' });
 
     return { output: `${result.stdout ?? ''}${result.stderr ?? ''}`.trim(), status: result.status ?? 1 };
 }

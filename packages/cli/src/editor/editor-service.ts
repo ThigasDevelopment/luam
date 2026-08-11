@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { VERSION } from '@cli/cli/usage';
+import { VERSION } from '@cli/cli/version';
 import { runEditorCommand } from '@cli/editor/editor-command';
 
 import type { SpawnSyncReturns } from 'node:child_process';

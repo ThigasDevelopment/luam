@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { runCli } from '@cli/cli/dispatch';
+import { runCli } from '@cli/cli/run';
 import { EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 import { FALLBACK_RESOURCE_NAME, resolveResourceName } from '@cli/commands/init-command';
 import { buildScaffoldPlan } from '@cli/scaffold/scaffold-plan';

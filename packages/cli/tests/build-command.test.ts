@@ -168,12 +168,12 @@ describe('build command', () => {
         expect(fixture.exists('build/luam-demo/assets/images/logo.png')).toBe(false);
     });
 
-    it('copies config.lua verbatim and lists it before the developer scripts', async () => {
-        const files = { ...defaultProjectFiles(), 'config.lua': 'Config = { greeting = "hi" }\n' };
+    it('minifies config.lua and lists it before the developer scripts', async () => {
+        const files = { ...defaultProjectFiles(), 'config.lua': 'Config = { greeting = "hi" } -- keep\n' };
         const { context, fixture } = harness(files);
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.read('build/luam-demo/config.lua')).toBe('Config = { greeting = "hi" }\n');
+        expect(fixture.read('build/luam-demo/config.lua')).toBe('Config={greeting="hi"}');
 
         const entries: string[] = fixture.read('build/luam-demo/meta.xml').match(/src="[^"]+"/g) ?? [];
 

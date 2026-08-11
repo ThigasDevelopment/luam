@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { runCli } from '@cli/cli/dispatch';
+import { runCli } from '@cli/cli/run';
 import { EXIT_DIAGNOSTICS, EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
-import { VERSION } from '@cli/cli/usage';
+import { VERSION } from '@cli/cli/version';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
@@ -52,7 +52,7 @@ describe('command dispatch', () => {
         const logger = createMemoryLogger();
 
         expect(await runCli(['deploy'], { logger })).toBe(EXIT_USAGE);
-        expect(logger.errors[0]).toContain('"deploy" is not a known command.');
+        expect(logger.errors.join('\n')).toContain("unknown command 'deploy'");
     });
 
     it('reports a missing configuration file', async () => {
@@ -135,16 +135,16 @@ describe('command dispatch', () => {
         expect(fixture.exists(`${resource}/lib/server/development-logs-server.lua`)).toBe(true);
     });
 
-    it('warns that dev ignores a layout flag and still writes the tree layout', async () => {
+    it('rejects an option that the command does not own', async () => {
         const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
         const logger = createMemoryLogger();
         const transport = createMockTransport();
-        const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
-        expect(await runCli(['dev', '--no-watch', '--bundle'], { logger, cwd: fixture.root, env: OFFLINE, transport })).toBe(EXIT_OK);
-        expect(logger.text()).toContain('"luam dev" always writes the tree layout');
-        expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
-        expect(fixture.exists(`${resource}/src/server.lua`)).toBe(false);
+        expect(await runCli(['dev', '--no-watch', '--bundle'], { logger, cwd: fixture.root, env: OFFLINE, transport })).toBe(EXIT_USAGE);
+        expect(await runCli(['doctor', '--config', 'luam.json'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);
+        expect(await runCli(['check', '--offline'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);
+        expect(transport.calls).toEqual([]);
+        expect(fixture.exists('mta-server/mods/deathmatch/resources/luam-demo')).toBe(false);
     });
 
     it('reads the transport password from the environment', async () => {

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 
 import { readHelperSource } from '@cli/build/helper-files';
+import { minifyLuaFiles } from '@cli/build/lua-minifier';
 import { pruneResource } from '@cli/build/resource-prune';
 import type { ProgressReporter } from '@compiler/project/progress';
 import { ENVIRONMENT_FILE, type ResourceBuild } from '@compiler/project/resource';
@@ -17,6 +18,7 @@ export interface WriteOptions {
     generatedFiles: readonly string[];
     generatedRoots: readonly string[];
     environmentTemplate: string | null;
+    minify?: boolean;
     onProgress?: ProgressReporter;
 }
 
@@ -94,7 +96,8 @@ function writeEnvironmentFile(targetDir: string, template: string | null): boole
 }
 
 export function writeResource(targetDir: string, build: ResourceBuild, options: WriteOptions): WriteResult {
-    const files = resourceFiles(build);
+    const assembled = resourceFiles(build);
+    const files = options.minify === true ? minifyLuaFiles(assembled) : assembled;
     const written: string[] = [];
     const total = files.size + build.assets.length + (options.environmentTemplate === null ? 0 : 1);
     let index = 0;

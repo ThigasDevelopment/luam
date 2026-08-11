@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
-import { runCli } from '@cli/cli/dispatch';
+import { runCli } from '@cli/cli/run';
 
 import type { Editor, EditorService, ExtensionInstallResult } from '@cli/editor/editor-service';
 

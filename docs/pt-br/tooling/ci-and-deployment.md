@@ -23,13 +23,13 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '20'
-            - run: npx --yes @thigasdevelopment/luam check --offline
+            - run: npx --yes @thigasdevelopment/luam check
 ```
 
-`npx` não precisa de instalação global e guarda o download em cache. `--offline`
-pula a consulta de `min_mta_version`, o que mantém o job independente da rede — um
-build sem rede continua funcionando, mas pular a consulta de propósito deixa o log
-limpo.
+`npx` não precisa de instalação global e guarda o download em cache. O `check` não
+faz consulta de release alguma, então nunca alcança a rede e não possui a flag
+`--offline`. O `build` faz, e o `--offline` dele pula a consulta — um build sem
+rede continua funcionando, mas pular a consulta de propósito deixa o log limpo.
 
 A saída descarta todas as sequências de escape quando o fluxo não é um terminal,
 então a transcrição de CI não carrega caracteres de controle. `--no-color` força
@@ -98,7 +98,7 @@ regras de transporte — veja
 
 ```bash
 #!/bin/sh
-npx --yes @thigasdevelopment/luam check --offline --no-color || exit 1
+npx --yes @thigasdevelopment/luam check --no-color || exit 1
 ```
 
 ## Cache

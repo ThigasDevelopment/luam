@@ -1,15 +1,15 @@
 # Output layouts and source maps
 
 Luam uses a compact bundle layout for a resource you ship and a tree layout for
-development. Bundling is the production shape, not a minification setting: it
-preserves names and readable Lua while reducing the resource to at most one
-script per environment.
+development. Bundling reduces the resource to at most one script per
+environment; minification then removes the formatting from what `luam build`
+writes. Both are production-only, and neither renames an identifier.
 
 ## Command defaults and overrides
 
 | Command | Default layout | Layout override | Source map |
 | --- | --- | --- | --- |
-| `luam build` | Bundle when `output.bundle` is `true` (the default); tree when it is `false`. | `--bundle` or `--no-bundle` overrides the configuration. | Writes `<outDir>/<name>.luam-map.json` when `output.map` is `true` (the default). `--no-map` disables and removes that map. |
+| `luam build` | Bundle when `output.bundle` is `true` (the default); tree when it is `false`. Minified in both. | `--bundle` or `--no-bundle` overrides the configuration. | Writes `<outDir>/<name>.luam-map.json` when `output.map` is `true` (the default), marked `minified`. `--no-map` disables and removes that map. |
 | `luam ensure` | Tree, regardless of `output.bundle`. | `--bundle` selects bundle; `--no-bundle` selects tree. | Keeps a map in memory only. It never writes a map file. `--no-map` disables it. |
 | `luam dev` | Tree, regardless of configuration or bundle flags. | None. `dev` always keeps generated files individually addressable. | Keeps a map in memory to resolve streamed logs. It never writes a map file. `output.map: false` or `--no-map` disables resolution. |
 
@@ -83,12 +83,53 @@ local build also needs this shape.
 Switching layouts removes generated files from the previous layout. Files whose
 bytes did not change are not rewritten, and `.env` is never overwritten.
 
+## Production minification
+
+`luam build` writes every generated `.lua` file as a single line. It applies to
+bundles, to the mirrored tree under `--no-bundle`, to runtime helpers under
+`lib/`, and to `config.lua`. `meta.xml`, `.env`, and copied assets are written
+byte for byte as they were.
+
+The transformation lexes Lua 5.1 rather than matching text, so it is safe for
+every construct the emitter can produce:
+
+- comments, line and long bracket alike, are removed;
+- short strings, long bracket strings, and numeric literals keep their bytes
+  exactly, including a `--` or `]]` that appears inside one;
+- a single space is inserted only where two tokens would otherwise merge, so
+  `a - -b` never becomes a comment and `1 .. 2` never becomes a malformed
+  number;
+- **no identifier is renamed.** A production runtime error still names the
+  function, method, or class you wrote.
+
+```lua
+-- authored
+local total = 0
+
+for index = 1, 3 do -- accumulate
+    total = total + index
+end
+```
+
+```lua
+local total=0 for index=1,3 do total=total+index end
+```
+
+Minification runs on the whole file set in memory before the first write. A file
+that does not scan as Lua 5.1 aborts the command with the file and line, and the
+previous production resource is left intact — nothing is written and nothing is
+pruned.
+
+`luam ensure` and `luam dev` never minify. Use them whenever you need to read
+the generated Lua.
+
 ## Resource map file
 
 `luam build` writes `<outDir>/<name>.luam-map.json` beside the resource directory,
 never inside it. The current format version is `1`. It records:
 
-- `version`, `resource`, and `layout` for the build;
+- `version`, `resource`, and `layout` for the build, plus `minified: true` on a
+  map written by `luam build`;
 - each generated Lua `path`;
 - each module or helper segment and its generated line range;
 - sparse, 1-based generated-to-source line mappings and an optional enclosing
@@ -108,7 +149,19 @@ the project default.
 
 ## Resolving production traces
 
-Pass either a bare generated position or a quoted MTA log line:
+::: warning A minified build has no line to resolve
+Every script `luam build` writes is one line, so MTA reports `line 1` for every
+error in it. That number identifies nothing, and no map can recover the authored
+line from it without a generated column, which this release does not record.
+
+`luam trace` reads the `minified` flag and refuses such a map with an actionable
+message instead of returning a confident wrong line. Reproduce the error under
+`luam dev` or `luam ensure`: both keep the readable tree and resolve to the exact
+source line and enclosing symbol.
+:::
+
+Against a readable build, pass either a bare generated position or a quoted MTA
+log line:
 
 ```bash
 luam trace src/server.lua:42

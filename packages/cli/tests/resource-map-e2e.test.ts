@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { runCli } from '@cli/cli/dispatch';
+import { runCli } from '@cli/cli/run';
 import { EXIT_OK } from '@cli/cli/exit-codes';
 import { resolveResourcePosition, type OutputLayout, type ResourceMap } from '@compiler/project/resource';
 

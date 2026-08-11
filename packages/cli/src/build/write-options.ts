@@ -22,3 +22,7 @@ export function trackedWriteOptions(root: string, config: LuamConfig, environmen
         },
     };
 }
+
+export function productionWriteOptions(root: string, config: LuamConfig, environmentTemplate: string | null, tracker: PhaseTracker): WriteOptions {
+    return { ...trackedWriteOptions(root, config, environmentTemplate, tracker), minify: true };
+}

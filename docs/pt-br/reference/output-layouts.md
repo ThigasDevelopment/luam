@@ -1,15 +1,16 @@
 # Estruturas de saída e mapas de código
 
 O Luam usa uma estrutura compacta de bundles para um resource publicado e uma
-estrutura em árvore para desenvolvimento. O bundle é o formato de produção, não
-uma opção de minificação: ele preserva nomes e Lua legível enquanto reduz o
-resource a no máximo um script por ambiente.
+estrutura em árvore para desenvolvimento. O bundle reduz o resource a no máximo
+um script por ambiente; a minificação então remove a formatação do que o
+`luam build` escreve. Ambos são exclusivos de produção, e nenhum dos dois
+renomeia um identificador.
 
 ## Padrões dos comandos e sobrescritas
 
 | Comando | Estrutura padrão | Sobrescrita da estrutura | Mapa de código |
 | --- | --- | --- | --- |
-| `luam build` | Bundle quando `output.bundle` é `true` (o padrão); árvore quando é `false`. | `--bundle` ou `--no-bundle` sobrescreve a configuração. | Escreve `<outDir>/<name>.luam-map.json` quando `output.map` é `true` (o padrão). `--no-map` desliga e remove esse mapa. |
+| `luam build` | Bundle quando `output.bundle` é `true` (o padrão); árvore quando é `false`. Minificado nos dois casos. | `--bundle` ou `--no-bundle` sobrescreve a configuração. | Escreve `<outDir>/<name>.luam-map.json` quando `output.map` é `true` (o padrão), marcado como `minified`. `--no-map` desliga e remove esse mapa. |
 | `luam ensure` | Árvore, independentemente de `output.bundle`. | `--bundle` seleciona bundle; `--no-bundle` seleciona árvore. | Mantém um mapa apenas em memória. Nunca escreve o arquivo de mapa. `--no-map` o desliga. |
 | `luam dev` | Árvore, independentemente da configuração ou das flags de bundle. | Nenhuma. O `dev` sempre mantém os arquivos gerados individualmente acessíveis. | Mantém um mapa em memória para resolver os logs acompanhados. Nunca escreve o arquivo. `output.map: false` ou `--no-map` desliga a resolução. |
 
@@ -84,12 +85,52 @@ resource em execução permanece fácil de inspecionar. Use
 Trocar de estrutura remove arquivos gerados pela estrutura anterior. Arquivos
 cujos bytes não mudaram não são reescritos, e `.env` nunca é sobrescrito.
 
+## Minificação de produção
+
+O `luam build` escreve cada arquivo `.lua` gerado em uma única linha. Isso vale
+para os bundles, para a árvore espelhada com `--no-bundle`, para os helpers de
+runtime em `lib/` e para o `config.lua`. `meta.xml`, `.env` e os assets copiados
+são escritos byte a byte como estavam.
+
+A transformação analisa tokens de Lua 5.1 em vez de casar texto, então é segura
+para todas as construções que o emissor produz:
+
+- comentários, de linha e de colchete longo, são removidos;
+- strings curtas, strings de colchete longo e literais numéricos mantêm os bytes
+  exatos, inclusive um `--` ou `]]` que apareça dentro de um deles;
+- um único espaço é inserido apenas onde dois tokens se fundiriam, então
+  `a - -b` nunca vira um comentário e `1 .. 2` nunca vira um número inválido;
+- **nenhum identificador é renomeado.** Um erro em produção continua nomeando a
+  função, o método ou a classe que você escreveu.
+
+```lua
+-- código escrito
+local total = 0
+
+for index = 1, 3 do -- acumula
+    total = total + index
+end
+```
+
+```lua
+local total=0 for index=1,3 do total=total+index end
+```
+
+A minificação roda sobre todo o conjunto de arquivos em memória antes da primeira
+escrita. Um arquivo que não é Lua 5.1 válido aborta o comando informando o arquivo
+e a linha, e o resource de produção anterior fica intacto — nada é escrito e nada
+é removido.
+
+`luam ensure` e `luam dev` nunca minificam. Use-os sempre que precisar ler o Lua
+gerado.
+
 ## Arquivo de mapa do resource
 
 `luam build` escreve `<outDir>/<name>.luam-map.json` ao lado do diretório do
 resource, nunca dentro dele. A versão atual do formato é `1`. Ele registra:
 
-- `version`, `resource` e `layout` do build;
+- `version`, `resource` e `layout` do build, mais `minified: true` em um mapa
+  escrito pelo `luam build`;
 - cada `path` Lua gerado;
 - cada segmento de módulo ou helper e seu intervalo de linhas geradas;
 - mapeamentos esparsos e baseados em 1 entre linhas geradas e de código, além do
@@ -109,7 +150,20 @@ o padrão do projeto.
 
 ## Resolvendo traces de produção
 
-Passe uma posição gerada simples ou uma linha de log do MTA entre aspas:
+::: warning Um build minificado não tem linha para resolver
+Todo script que o `luam build` escreve tem uma única linha, então o MTA informa
+`line 1` para qualquer erro nele. Esse número não identifica nada, e nenhum mapa
+recupera a linha autoral a partir dele sem uma coluna gerada, que esta versão não
+registra.
+
+O `luam trace` lê a marca `minified` e recusa esse mapa com uma mensagem
+acionável em vez de devolver com confiança uma linha errada. Reproduza o erro sob
+`luam dev` ou `luam ensure`: ambos mantêm a árvore legível e resolvem a linha e o
+símbolo exatos do código-fonte.
+:::
+
+Contra um build legível, passe uma posição gerada simples ou uma linha de log do
+MTA entre aspas:
 
 ```bash
 luam trace src/server.lua:42

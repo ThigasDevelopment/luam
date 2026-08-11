@@ -90,6 +90,13 @@ export function runTraceCommand(root: string, reporter: Reporter, options: Trace
         return EXIT_DIAGNOSTICS;
     }
 
+    if (loaded.map.minified === true) {
+        reporter.error(`Resource map "${path}" describes minified production output, where every script is one line.`);
+        reporter.detail('A generated line cannot be resolved there. Reproduce the error under "luam dev" or "luam ensure" for a source position.');
+
+        return EXIT_DIAGNOSTICS;
+    }
+
     let failed = false;
 
     for (const line of lines) {

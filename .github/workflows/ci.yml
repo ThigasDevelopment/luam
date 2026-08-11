@@ -39,6 +39,9 @@ jobs:
             - name: Compiler, runtime, and mta-types
               run: pnpm --filter @luam/compiler --filter @luam/runtime --filter @luam/mta-types --filter @luam/template test
 
+            - name: Install Lua 5.1 for minifier validation
+              run: sudo apt-get update && sudo apt-get install -y lua5.1
+
             - name: CLI
               run: pnpm --filter @luam/cli test
 
@@ -57,6 +60,23 @@ jobs:
             - name: Bundle the CLI
               run: pnpm --filter @luam/cli bundle
 
+            - name: Install Lua 5.1 for the production smoke test
+              run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+            - name: Check the command contract of the bundled CLI
+              run: |
+                  LUAM="node $GITHUB_WORKSPACE/packages/cli/dist/luam.mjs"
+                  $LUAM --help | grep -q 'Exit codes:'
+                  $LUAM --help | grep -q 'trace'
+                  $LUAM build --help | grep -q -- '--bundle'
+                  $LUAM dev --help | grep -q -- '--watch'
+                  $LUAM --version
+                  set +e
+                  $LUAM dev --bundle > /dev/null 2>&1
+                  test $? -eq 2
+                  $LUAM deploy > /dev/null 2>&1
+                  test $? -eq 2
+
             - name: Build a resource with the bundled CLI
               run: |
                   mkdir -p "$RUNNER_TEMP/smoke/src/server"
@@ -70,6 +90,9 @@ jobs:
                   test -f build/luam-smoke/src/server.lua
                   test -f build/luam-smoke/.env
                   ! grep -q '<file src=".env"' build/luam-smoke/meta.xml
+                  test "$(wc -l < build/luam-smoke/src/server.lua)" -eq 0
+                  lua5.1 -e 'assert(loadfile("build/luam-smoke/src/server.lua"))'
+                  grep -q '"minified": true' build/luam-smoke.luam-map.json
 
             - name: Switch to the minimum supported Node
               uses: actions/setup-node@v4

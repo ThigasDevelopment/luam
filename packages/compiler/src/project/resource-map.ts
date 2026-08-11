@@ -23,6 +23,7 @@ export interface ResourceMap {
     version: number;
     resource: string;
     layout: OutputLayout;
+    minified?: boolean;
     files: ResourceMapFile[];
 }
 

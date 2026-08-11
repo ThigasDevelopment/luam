@@ -2,8 +2,8 @@ import { statSync, utimesSync } from 'node:fs';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { runCli } from '@cli/cli/dispatch';
-import { EXIT_OK } from '@cli/cli/exit-codes';
+import { runCli } from '@cli/cli/run';
+import { EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
@@ -191,9 +191,19 @@ describe('bundle and map output', () => {
         const transport = createMockTransport();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
-        await runCli(['dev', '--no-watch', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger, transport });
+        await runCli(['dev', '--no-watch'], { cwd: fixture.root, env: OFFLINE, logger, transport });
 
         expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
         expect(fixture.exists(`${resource}/src/server.lua`)).toBe(false);
+    });
+
+    it('rejects a layout flag on dev instead of ignoring it', async () => {
+        const fixture = project({ bundle: true, map: true }, 'mta-server');
+        const logger = createMemoryLogger();
+        const transport = createMockTransport();
+
+        expect(await runCli(['dev', '--no-watch', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger, transport })).toBe(EXIT_USAGE);
+        expect(logger.errors.join('\n')).toContain("unknown option '--bundle'");
+        expect(transport.calls).toEqual([]);
     });
 });

@@ -86,7 +86,7 @@ describe('build directives through the cli', () => {
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
 
-        expect(fixture.read('build/luam-demo/src/server/rules.lua')).toContain('local setting = 32');
+        expect(fixture.read('build/luam-demo/src/server/rules.lua')).toContain('local setting=32');
         expect(manifest).not.toContain('<setting');
         expect(manifest).not.toContain('<include');
     });

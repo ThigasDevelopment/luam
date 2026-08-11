@@ -1,0 +1,24 @@
+import { registerBuildCommand } from '@cli/cli/registry/build-registration';
+import { registerCheckCommand } from '@cli/cli/registry/check-registration';
+import { registerDevCommand } from '@cli/cli/registry/dev-registration';
+import { registerDoctorCommand } from '@cli/cli/registry/doctor-registration';
+import { registerEnsureCommand } from '@cli/cli/registry/ensure-registration';
+import { registerInitCommand } from '@cli/cli/registry/init-registration';
+import { registerSetupCommand } from '@cli/cli/registry/setup-registration';
+import { registerTraceCommand } from '@cli/cli/registry/trace-registration';
+
+import type { CliRuntime } from '@cli/cli/cli-runtime';
+import type { Command } from 'commander';
+
+export type CommandRegistrar = (program: Command, runtime: CliRuntime) => void;
+
+export const COMMAND_REGISTRARS: readonly CommandRegistrar[] = [
+    registerBuildCommand,
+    registerCheckCommand,
+    registerDevCommand,
+    registerDoctorCommand,
+    registerEnsureCommand,
+    registerInitCommand,
+    registerSetupCommand,
+    registerTraceCommand,
+];

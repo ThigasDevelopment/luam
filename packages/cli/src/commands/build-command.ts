@@ -1,19 +1,23 @@
 import { runCompile } from '@cli/build/build-runner';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
 import { writeResourceMap } from '@cli/build/resource-map-file';
-import { writeResource } from '@cli/build/resource-writer';
-import { trackedWriteOptions } from '@cli/build/write-options';
+import { writeResource, type WriteResult } from '@cli/build/resource-writer';
+import { productionWriteOptions } from '@cli/build/write-options';
 import { reportBuildOutcome, reportPhaseTimings, totalDuration } from '@cli/commands/build-report';
 import { commandReporter, commandVersion, type CommandContext } from '@cli/commands/command-context';
 import { resolveBuildTarget } from '@cli/commands/resource-targets';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { pluralize } from '@cli/reporting/plural';
 import { createProgressRenderer } from '@cli/reporting/progress-renderer';
-import type { OutputLayout } from '@compiler/project/resource';
+import type { OutputLayout, ResourceMap } from '@compiler/project/resource';
 
 export interface BuildCommandOptions {
     layout?: OutputLayout;
     map?: boolean;
+}
+
+function minifiedMap(map: ResourceMap | null): ResourceMap | null {
+    return map === null ? null : { ...map, minified: true };
 }
 
 export async function runBuildCommand(context: CommandContext, options: BuildCommandOptions = {}): Promise<number> {
@@ -49,9 +53,20 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
 
     tracker.begin('write');
 
-    const writeOptions = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
-    const result = writeResource(target, outcome.build, writeOptions);
-    writeResourceMap(context.root, context.config, outcome.map);
+    const writeOptions = productionWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
+    let result: WriteResult;
+
+    try {
+        result = writeResource(target, outcome.build, writeOptions);
+    } catch (error: unknown) {
+        tracker.end('failed');
+        renderer.clear();
+        reporter.error(`Build wrote nothing to "${target}". ${error instanceof Error ? error.message : String(error)}`);
+
+        return EXIT_DIAGNOSTICS;
+    }
+
+    writeResourceMap(context.root, context.config, minifiedMap(outcome.map));
 
     tracker.end();
     renderer.clear();

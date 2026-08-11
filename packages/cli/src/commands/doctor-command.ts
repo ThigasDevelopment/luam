@@ -1,5 +1,5 @@
 import { EXIT_OK } from '@cli/cli/exit-codes';
-import { VERSION } from '@cli/cli/usage';
+import { VERSION } from '@cli/cli/version';
 import type { EditorService } from '@cli/editor/editor-service';
 import type { Reporter } from '@cli/reporting/reporter';
 

@@ -6,6 +6,52 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### One-Line Production Lua
+
+MTA downloads every client script to every joining player, and until now those
+scripts shipped with the comments and indentation the emitter wrote for a reader
+who never sees them.
+
+#### Added
+
+- A Lua 5.1 token scanner and a minifier. `luam build` writes every generated
+  `.lua` file — bundles, the mirrored tree under `--no-bundle`, runtime helpers,
+  and `config.lua` — as one line with comments and formatting removed. A single
+  space is inserted only where two tokens would otherwise merge, so `a - -b`
+  never becomes a comment and `1 .. 2` never becomes a malformed number.
+- `minified: true` on the resource map `luam build` writes, and a `luam trace`
+  that refuses such a map with an actionable message rather than resolving a
+  generated line that a one-line artifact does not have.
+
+#### Changed
+
+- `meta.xml`, `.env`, and copied assets are still written untouched, and no
+  identifier is renamed, so a production error names the symbol the developer
+  wrote. `luam ensure` and `luam dev` output is unchanged.
+- Minification runs over the whole file set in memory before the first write, so
+  a file that does not scan as Lua 5.1 aborts the command with its file and line
+  and leaves the previous production resource intact.
+
+### CLI Command Registry
+
+The hand-written parser wrote every flag into one flat record, so it accepted
+every option on every command and silently ignored the ones that did not apply.
+
+#### Added
+
+- `luam <command> --help` and `luam help <command>`, generated from each
+  command's own declaration instead of a maintained string constant.
+- Declarative command modules over `commander`, a shared project-context factory,
+  and an `index.ts` that does nothing but assign `process.exitCode`.
+
+#### Changed
+
+- Every option now belongs to the commands that read it, and an option outside
+  that set exits `2` without running the command. `luam dev --bundle` fails
+  instead of warning, `luam check --offline` and `luam doctor --config` fail
+  instead of succeeding, and `--version` is a root option. Exit codes `0`, `1`,
+  and `2` keep their meanings. See the migration table in the CLI reference.
+
 ### Object Types
 
 An argument bag is the most common shape in an MTA resource, and the only way to

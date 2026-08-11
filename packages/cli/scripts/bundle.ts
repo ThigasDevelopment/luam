@@ -38,4 +38,5 @@ await build({
     target: 'node20',
     tsconfig: 'tsconfig.json',
     define: { LUAM_VERSION: JSON.stringify(packageVersion()) },
+    banner: { js: ["import { createRequire } from 'node:module';", 'const require = createRequire(import.meta.url);'].join('\n') },
 });

@@ -28,7 +28,7 @@ function snippetProjects(): string[] {
 
 function checkProject(cli: string, project: string): boolean {
     const cwd = join(snippetsRoot, project);
-    const result = spawnSync(process.execPath, [cli, 'check', '--cwd', cwd, '--no-color', '--offline'], { encoding: 'utf8' });
+    const result = spawnSync(process.execPath, [cli, 'check', '--cwd', cwd, '--no-color'], { encoding: 'utf8' });
 
     if (result.status === 0) {
         process.stdout.write(`ok    docs/snippets/${project}\n`);

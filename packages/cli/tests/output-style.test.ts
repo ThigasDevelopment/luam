@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseArguments } from '@cli/cli/arguments';
 import { detectCapability, PLAIN_CAPABILITY, RICH_CAPABILITY } from '@cli/reporting/output-capability';
 import { createOutputStyle, ERASE_LINE } from '@cli/reporting/output-style';
 import { pluralize } from '@cli/reporting/plural';
@@ -41,12 +40,6 @@ describe('output capability', () => {
 
         expect(capability.color).toBe(false);
         expect(capability.unicode).toBe(false);
-    });
-
-    it('parses the --no-color flag', () => {
-        expect(parseArguments(['build', '--no-color']).noColor).toBe(true);
-        expect(parseArguments(['build', '--no-color']).errors).toEqual([]);
-        expect(parseArguments(['build']).noColor).toBe(false);
     });
 });
 

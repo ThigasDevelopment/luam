@@ -22,7 +22,8 @@
     "dependencies": {
         "@luam/compiler": "workspace:*",
         "@luam/runtime": "workspace:*",
-        "@luam/template": "workspace:*"
+        "@luam/template": "workspace:*",
+        "commander": "^12.1.0"
     },
     "devDependencies": {
         "@types/node": "^22.9.0",

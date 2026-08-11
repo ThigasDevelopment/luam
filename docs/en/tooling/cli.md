@@ -7,6 +7,16 @@ luam <command> [options]
 Project commands read `luam.json` from the current directory, or from `--cwd`.
 `setup`, `doctor` and `init` do not require an existing project.
 
+Every option belongs to the commands that read it. An option a command does not
+own is a usage error, not a warning, so a flag never looks like it took effect
+when it did not. Ask any command what it accepts:
+
+```bash
+luam --help
+luam build --help
+luam help trace
+```
+
 | Command | What it does |
 | --- | --- |
 | [`init`](#luam-init) | Scaffolds `luam.json`. |
@@ -57,6 +67,13 @@ also writes `<outDir>/<name>.luam-map.json`; see
 [Output layouts and source maps](/en/reference/output-layouts) for the exact
 resource shape and overrides.
 
+**`build` is the only command that minifies.** Every `.lua` file it writes —
+bundles, the mirrored tree under `--no-bundle`, runtime helpers, and `config.lua`
+— is written as one line with its comments and formatting removed. Identifiers
+are never renamed, so a runtime error still names the function you wrote.
+`meta.xml`, `.env`, and assets are written untouched. `ensure` and `dev` keep the
+readable output they always had.
+
 ```
 Discovery: done in 1 ms.
 Compile: 3 files in 12 ms.
@@ -101,7 +118,8 @@ truncation and rotation.
 
 The development-only log helpers it adds are never written by `build` or
 `ensure`, and are removed by the next normal sync. `dev` always uses the tree
-layout and resolves covered generated positions through its in-memory map.
+layout and resolves covered generated positions through its in-memory map, so it
+owns no layout flag: `luam dev --bundle` is a usage error.
 
 ## `luam trace`
 
@@ -117,6 +135,12 @@ configured map and then one discoverable map below the project. It prints
 `source-file:line (symbol)` when a symbol is available. Exit code `1` means at
 least one input did not resolve or the map could not be used; `0` means every
 input resolved. See the [worked production trace](/en/reference/output-layouts#resolving-production-traces).
+
+A minified `build` script is one line, so MTA reports `line 1` for every error in
+it and a generated line carries no information. `trace` recognises the
+`minified` flag on a map written by `build` and refuses it rather than returning
+a confident wrong line. Reproduce the error under `luam dev` or `luam ensure`,
+where the readable tree resolves to the exact source line and symbol.
 
 ## `luam setup`
 
@@ -144,21 +168,40 @@ reporting a problem.
 
 ## Options
 
-| Option | Meaning |
+Each option lists the commands that own it. Passing it to any other command
+returns `2` and runs nothing.
+
+| Option | Owned by | Meaning |
+| --- | --- | --- |
+| `--cwd <path>` | every command | Project directory holding `luam.json`. Defaults to the current directory. |
+| `--no-color` | every command | Plain output, no colour or emoji. `NO_COLOR` does the same. |
+| `-h`, `--help` | every command | Print the help text for that command. |
+| `-v`, `--version` | root only | Print the CLI version, as `luam --version`. |
+| `--config <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Load this file instead of `luam.json`. |
+| `--bundle` / `--no-bundle` | `build`, `ensure` | Select bundle or tree output. `dev` owns neither. |
+| `--watch` / `--no-watch` | `dev`, `ensure` | Keep watching, or run once. Both watch by default. |
+| `--no-map` | `build`, `dev`, `ensure` | Disable map generation. For `build`, also remove the existing default map after success. |
+| `--offline` | `build`, `dev`, `ensure` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same. |
+| `--map <path>` | `trace` | Resource map to read. Relative paths resolve from the project directory. |
+| `--name <name>` | `init` | Resource name. |
+| `--force` | `init` | Overwrite a file that exists. |
+| `-y`, `--yes` | `init`, `setup` | Accept the defaults, or install into every detected editor, without prompting. |
+
+## Migrating from an earlier CLI
+
+Before this release the parser accepted every option on every command and
+ignored the ones that did not apply. Those invocations now fail with `2`:
+
+| Invocation | What changed |
 | --- | --- |
-| `--cwd <path>` | Project directory holding `luam.json`. Defaults to the current directory. |
-| `--config <path>` | Load this file instead of `luam.json`. |
-| `--name <name>` | Resource name for `init`. |
-| `--force` | Let `init` overwrite a file that exists. |
-| `-y`, `--yes` | Install the extension in every detected editor without prompting. |
-| `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run once. Both watch by default. |
-| `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`. `dev` always uses tree and warns that it ignored the flag. |
-| `--no-map` | Disable map generation. For `build`, also remove the existing default map after success. |
-| `--map <path>` | Resource map used by `trace`. Relative paths resolve from the project directory. |
-| `--offline` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same. |
-| `--no-color` | Plain output, no colour or emoji. `NO_COLOR` does the same. |
-| `-h`, `--help` | Print the usage text. |
-| `-v`, `--version` | Print the CLI version. |
+| `luam dev --bundle` | `dev` never bundled. It warned; it now fails. Use `luam build --bundle` or `luam ensure --bundle`. |
+| `luam check --offline` | `check` performs no release lookup. Drop the flag, or set `LUAM_OFFLINE` if a script needs one setting for both commands. |
+| `luam doctor --config x.json` | `doctor` and `setup` load no project. Drop the flag. |
+| `luam build --version` | `--version` is a root option. Use `luam --version`. |
+| `luam trace --name x` | `--name` belongs to `init`. Drop the flag. |
+
+Scripts that pass only options the command owns are unaffected, and every exit
+code keeps its meaning.
 
 ## Exit codes
 

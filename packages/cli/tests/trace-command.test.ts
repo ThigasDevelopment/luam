@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { runCli } from '@cli/cli/dispatch';
+import { runCli } from '@cli/cli/run';
 import { readResourceMap } from '@cli/build/resource-map-file';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { runTraceCommand } from '@cli/commands/trace-command';
@@ -30,14 +30,21 @@ function generatedPosition(map: ResourceMap): { generated: string; source: strin
     throw new Error('The test map has no mapped module position.');
 }
 
-async function builtProject(): Promise<{ fixture: ProjectFixture; map: ResourceMap; position: { generated: string; source: string } }> {
+const MAP_FILE = 'build/luam-demo.luam-map.json';
+
+async function builtProject(minified = false): Promise<{ fixture: ProjectFixture; map: ResourceMap; position: { generated: string; source: string } }> {
     const fixture = createProjectFixture(defaultProjectFiles({ output: { bundle: true, map: true } }));
 
     fixtures.push(fixture);
 
     expect(await runCli(['build'], { cwd: fixture.root, env: OFFLINE, logger: createMemoryLogger() })).toBe(EXIT_OK);
 
-    const map = JSON.parse(fixture.read('build/luam-demo.luam-map.json')) as ResourceMap;
+    const written = JSON.parse(fixture.read(MAP_FILE)) as ResourceMap;
+    const { minified: production, ...development } = written;
+    const map = minified ? written : (development as ResourceMap);
+
+    expect(production).toBe(true);
+    fixture.write(MAP_FILE, `${JSON.stringify(map)}\n`);
 
     return { fixture, map, position: generatedPosition(map) };
 }
@@ -116,8 +123,17 @@ describe('trace command', () => {
 
         logger.errors.length = 0;
 
-        expect(await runCli(['trace', 'missing.lua:1', '--map', 'build/luam-demo.luam-map.json'], { cwd: fixture.root, logger })).toBe(EXIT_DIAGNOSTICS);
+        expect(await runCli(['trace', 'missing.lua:1', '--map', MAP_FILE], { cwd: fixture.root, logger })).toBe(EXIT_DIAGNOSTICS);
         expect(logger.errors.at(-1)).toContain('does not cover');
+    });
+
+    it('refuses a production map instead of resolving a line the artifact does not have', async () => {
+        const { fixture, position } = await builtProject(true);
+        const logger = createMemoryLogger();
+
+        expect(await runCli(['trace', position.generated, '--map', MAP_FILE], { cwd: fixture.root, logger })).toBe(EXIT_DIAGNOSTICS);
+        expect(logger.errors.join('\n')).toContain('describes minified production output');
+        expect(logger.lines.join('\n')).toContain('luam dev');
     });
 
     it('reports an unknown integer version before validating its structure', () => {
