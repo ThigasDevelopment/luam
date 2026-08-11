@@ -2,6 +2,7 @@ import type { MemberInfo } from '@compiler/checker/registry';
 import { KNOWN_DECORATORS } from '@compiler/checker/decorators';
 import { typeToString, type Type } from '@compiler/checker/types';
 import { NATIVE_EXTENSIONS } from '@compiler/extensions/native-extensions';
+import { KEYWORDS } from '@compiler/lexer/token';
 import type { ApiDeclaration } from '@mta-types/api-declaration';
 import type { ApiDocumentation } from '@mta-types/api-documentation';
 import { memberDocumentation } from '@mta-types/documentation-lookup';
@@ -26,34 +27,12 @@ const ITEM_KINDS: Readonly<Record<SymbolKind, CompletionItemKind>> = {
     'enum-member': CompletionItemKind.EnumMember,
 };
 
-export const KEYWORD_ITEMS: readonly CompletionItem[] = [
-    'and',
-    'break',
-    'class',
-    'do',
-    'else',
-    'elseif',
-    'end',
-    'enum',
-    'false',
-    'for',
-    'function',
-    'if',
-    'in',
-    'interface',
-    'local',
-    'new',
-    'nil',
-    'not',
-    'or',
-    'repeat',
-    'return',
-    'then',
-    'true',
-    'type',
-    'until',
-    'while',
-].map((label) => ({ label, kind: CompletionItemKind.Keyword }));
+const CONTEXTUAL_KEYWORDS: ReadonlySet<string> = new Set(['constructor', 'export', 'extends', 'implements']);
+
+export const KEYWORD_ITEMS: readonly CompletionItem[] = [...KEYWORDS]
+    .filter((label) => !CONTEXTUAL_KEYWORDS.has(label))
+    .sort()
+    .map((label) => ({ label, kind: CompletionItemKind.Keyword }));
 
 export const DIRECTIVE_ITEMS: readonly CompletionItem[] = [
     { label: 'export', kind: CompletionItemKind.Keyword, detail: 'export function — expose a function to other resources' },

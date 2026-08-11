@@ -2,6 +2,6 @@ export function getScore(name: string): number
     return name.length
 end
 
-local export = 1
+local settings: table = { export = true }
 
-print(export)
+print(settings.export)

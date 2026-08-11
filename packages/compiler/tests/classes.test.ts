@@ -129,10 +129,22 @@ describe('classes', () => {
         expect(codes('enum State {\n    LOBBY,\n}\nprint(State.PLAYING)\n')).toEqual(['check-unknown-enum-member']);
     });
 
-    it('keeps class, interface, enum, and new usable as plain Lua identifiers', () => {
-        expect(emit('local class = 1\nlocal new = 2\nlocal enum = 3\nprint(class, new, enum)\n')).toBe(
-            'local class = 1\nlocal new = 2\nlocal enum = 3\nprint(class, new, enum)\n',
-        );
-        expect(emit("class 'Player' { }\n")).toBe("class('Player')({})\n");
+    it('reserves class, interface, enum, and new so they cannot name a variable', () => {
+        expect(codes('local class = 1\n')).toEqual(['parse-unexpected-token']);
+        expect(codes('local new = 2\n')).toEqual(['parse-unexpected-token']);
+        expect(codes('local enum = 3\n')).toEqual(['parse-unexpected-token']);
+        expect(codes('local interface = 4\n')).toEqual(['parse-unexpected-token']);
+    });
+
+    it('keeps the reserved words usable as table fields and members', () => {
+        const source = 'local pool: table = { new = 1, type = 2, class = 3 }\nprint(pool.new, pool.type, pool.class)\n';
+
+        expect(codes(source)).toEqual([]);
+        expect(emit(source)).toBe('local pool = { new = 1, type = 2, class = 3 }\nprint(pool.new, pool.type, pool.class)\n');
+    });
+
+    it('keeps the Lua "type" function callable', () => {
+        expect(codes('local kind: string = type(1)\n')).toEqual([]);
+        expect(emit('local kind: string = type(1)\n')).toBe('local kind = type(1)\n');
     });
 });

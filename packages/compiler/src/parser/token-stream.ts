@@ -1,5 +1,5 @@
 import { createDiagnostic, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
-import type { Token, TokenKind } from '@compiler/lexer/token';
+import { isLuamKeyword, type Token, type TokenKind } from '@compiler/lexer/token';
 
 export class ParserError extends Error {
     readonly diagnostic: Diagnostic;
@@ -77,6 +77,20 @@ export class TokenStream {
         const expected = value === undefined ? kind : `"${value}"`;
 
         throw this.error(`Expected ${expected} but found "${this.describeCurrent()}".`, 'parse-unexpected-token');
+    }
+
+    checkName(offset = 0): boolean {
+        const token = this.peek(offset);
+
+        return token.kind === 'identifier' || (token.kind === 'keyword' && isLuamKeyword(token.value));
+    }
+
+    expectName(): Token {
+        if (this.checkName()) {
+            return this.next();
+        }
+
+        throw this.error(`Expected a name but found "${this.describeCurrent()}".`, 'parse-unexpected-token');
     }
 
     describeCurrent(): string {

@@ -8,7 +8,7 @@ const EXPORT_LOCAL_MESSAGE =
     'An exported function must be a global because MTA resolves "call" against the resource globals. Remove "local" or remove "export".';
 
 export function isDirectiveStart(stream: TokenStream): boolean {
-    if (!stream.check('identifier', EXPORT_DIRECTIVE)) {
+    if (!stream.check('keyword', EXPORT_DIRECTIVE)) {
         return false;
     }
 

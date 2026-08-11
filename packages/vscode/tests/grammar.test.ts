@@ -88,6 +88,10 @@ describe('grammar', () => {
         expect(matchesAny('function', 'function formatName(name: string): string')).toBe(true);
         expect(matchesAny('keyword', 'if value ~= nil then')).toBe(true);
         expect(matchesAny('keyword', 'local health = 100')).toBe(true);
+        expect(matchesAny('keyword', 'class Vip extends')).toBe(true);
+        expect(matchesAny('keyword', 'class Vip implements')).toBe(true);
+        expect(matchesAny('keyword', 'declare score: number')).toBe(true);
+        expect(matchesAny('keyword', 'local kind = type(1)')).toBe(true);
         expect(matchesAny('annotation', 'local player: Player? = nil')).toBe(true);
         expect(matchesAny('annotation', 'local names: string[] = {}')).toBe(true);
     });

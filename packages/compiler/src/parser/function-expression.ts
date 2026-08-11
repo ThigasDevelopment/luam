@@ -54,7 +54,7 @@ function parseFunctionName(stream: TokenStream): { name: Identifier | MemberExpr
     let name: Identifier | MemberExpression = { kind: 'identifier', name: token.value, position: token.position };
 
     while (stream.match('punctuation', '.')) {
-        const property = stream.expect('identifier').value;
+        const property = stream.expectName().value;
 
         name = { kind: 'member-expression', object: name as Expression, property, position: token.position };
     }

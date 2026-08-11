@@ -176,7 +176,15 @@
                 },
                 {
                     "name": "storage.modifier.luam",
-                    "match": "\\b(?:local|constructor)\\b"
+                    "match": "\\b(?:local|constructor|declare|export|extends|implements)\\b"
+                },
+                {
+                    "name": "storage.type.luam",
+                    "match": "\\b(?:class|interface|enum|type)\\b"
+                },
+                {
+                    "name": "keyword.operator.new.luam",
+                    "match": "\\bnew\\b"
                 },
                 {
                     "name": "variable.language.self.luam",

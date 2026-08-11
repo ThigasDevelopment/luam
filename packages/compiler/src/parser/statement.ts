@@ -71,7 +71,7 @@ function parseTypeAlias(stream: TokenStream): TypeAliasStatement {
 }
 
 function isTypeAlias(stream: TokenStream): boolean {
-    if (!stream.check('identifier', 'type') || !stream.checkAhead(1, 'identifier')) {
+    if (!stream.check('keyword', 'type') || !stream.checkAhead(1, 'identifier')) {
         return false;
     }
 
@@ -88,7 +88,7 @@ function parseDeclareStatement(stream: TokenStream): DeclareStatement {
 }
 
 function isDeclareStatement(stream: TokenStream): boolean {
-    return stream.check('identifier', 'declare') && stream.checkAhead(1, 'identifier') && stream.checkAhead(2, 'punctuation', ':');
+    return stream.check('keyword', 'declare') && stream.checkAhead(1, 'identifier') && stream.checkAhead(2, 'punctuation', ':');
 }
 
 function isIncrementTarget(target: Expression | undefined): boolean {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { scan } from '@compiler/lexer/lexer';
-import type { Token } from '@compiler/lexer/token';
+import { KEYWORDS, LUAM_KEYWORDS, type Token } from '@compiler/lexer/token';
 
 function describeTokens(source: string): string[] {
     return scan(source)
@@ -21,6 +21,13 @@ describe('lexer', () => {
             'operator "=" 1:13',
             'keyword "nil" 1:15',
         ]);
+    });
+
+    it('reserves the words Luam adds on top of Lua 5.1', () => {
+        const source = 'class constructor declare enum export extends implements interface new type';
+
+        expect(scan(source).tokens.filter((token) => token.kind === 'identifier')).toEqual([]);
+        expect([...LUAM_KEYWORDS].every((word) => KEYWORDS.has(word))).toBe(true);
     });
 
     it('scans integer, float, exponent, and hexadecimal numbers', () => {

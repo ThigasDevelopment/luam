@@ -25,8 +25,8 @@ const CLASS_MODIFIERS: ReadonlySet<string> = new Set(['extends', 'implements']);
 function isClassHeader(stream: TokenStream, offset = 0): boolean {
     return (
         stream.checkAhead(offset + 2, 'punctuation', '{') ||
-        stream.checkAhead(offset + 2, 'identifier', 'extends') ||
-        stream.checkAhead(offset + 2, 'identifier', 'implements')
+        stream.checkAhead(offset + 2, 'keyword', 'extends') ||
+        stream.checkAhead(offset + 2, 'keyword', 'implements')
     );
 }
 
@@ -51,7 +51,7 @@ export function isDeclarationStart(stream: TokenStream): boolean {
 
     const token = stream.peek(offset);
 
-    if (token.kind !== 'identifier' || !DECLARATION_NAMES.has(token.value) || !stream.checkAhead(offset + 1, 'identifier')) {
+    if (token.kind !== 'keyword' || !DECLARATION_NAMES.has(token.value) || !stream.checkAhead(offset + 1, 'identifier')) {
         return false;
     }
 
@@ -133,7 +133,7 @@ function parseFieldAnnotation(stream: TokenStream): ReturnType<typeof parseOptio
 
 function parseClassMember(stream: TokenStream): ClassMember {
     const decorators = parseDecorators(stream);
-    const token = stream.expect('identifier');
+    const token = stream.expectName();
 
     if (stream.check('punctuation', '(')) {
         return parseClassMethod(stream, token, decorators);
@@ -146,7 +146,7 @@ function parseClassMember(stream: TokenStream): ClassMember {
 }
 
 function parseClassModifiers(stream: TokenStream, declaration: ClassDeclaration): void {
-    while (stream.check('identifier') && CLASS_MODIFIERS.has(stream.current().value)) {
+    while (stream.check('keyword') && CLASS_MODIFIERS.has(stream.current().value)) {
         if (stream.next().value === 'extends') {
             declaration.superClass = stream.expect('identifier').value;
 
@@ -189,7 +189,7 @@ function parseClassDeclaration(stream: TokenStream, decorators: Decorator[]): Cl
 }
 
 function parseInterfaceMember(stream: TokenStream): InterfaceMember {
-    const token = stream.expect('identifier');
+    const token = stream.expectName();
 
     if (stream.check('punctuation', '(')) {
         const parameters = parseParameters(stream);
@@ -243,7 +243,7 @@ function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {
     stream.expect('punctuation', '{');
 
     while (!stream.check('punctuation', '}') && !stream.isEof()) {
-        const token = stream.expect('identifier');
+        const token = stream.expectName();
 
         members.push({ name: token.value, position: token.position });
 

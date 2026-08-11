@@ -35,7 +35,7 @@ function emitLocal(state: EmitState, statement: LocalStatement): string {
 }
 
 function emitCompoundValues(state: EmitState, statement: AssignmentStatement, targets: readonly string[]): string[] {
-    const operator = COMPOUND_OPERATORS[statement.operator] ?? statement.operator;
+    const operator = COMPOUND_OPERATORS.get(statement.operator) ?? statement.operator;
     const precedence = binaryPrecedence(operator);
     const limit = isRightAssociative(operator) ? precedence : precedence + 1;
 
@@ -44,7 +44,7 @@ function emitCompoundValues(state: EmitState, statement: AssignmentStatement, ta
 
 function emitIncrement(statement: AssignmentStatement, targets: readonly string[]): string {
     const target = targets[0] ?? '';
-    const operator = COMPOUND_OPERATORS[statement.operator] ?? '+';
+    const operator = COMPOUND_OPERATORS.get(statement.operator) ?? '+';
 
     return `${target} = ${target} ${operator} 1`;
 }

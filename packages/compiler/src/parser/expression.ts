@@ -1,4 +1,4 @@
-import type { Token } from '@compiler/lexer/token';
+import { CALLABLE_KEYWORDS, type Token } from '@compiler/lexer/token';
 
 import type { Expression, TableField } from './ast';
 import { parseFunctionExpression } from './function-expression';
@@ -46,7 +46,7 @@ function parseTableField(stream: TokenStream): TableField {
         return { key, name: null, value: parseExpression(stream), position };
     }
 
-    if (stream.check('identifier') && stream.checkAhead(1, 'operator', '=')) {
+    if (stream.checkName() && stream.checkAhead(1, 'operator', '=')) {
         const name = stream.next().value;
 
         stream.next();
@@ -78,12 +78,18 @@ function parsePrimary(stream: TokenStream): Expression {
         return { kind: 'template-literal', segments: token.segments ?? [], position: token.position };
     }
 
-    if (token.kind === 'identifier' && token.value === 'new' && stream.checkAhead(1, 'identifier')) {
+    if (token.kind === 'keyword' && token.value === 'new' && stream.checkAhead(1, 'identifier')) {
         stream.next();
 
         const className = stream.next().value;
 
         return { kind: 'new-expression', className, args: parseArguments(stream), position: token.position };
+    }
+
+    if (token.kind === 'keyword' && CALLABLE_KEYWORDS.has(token.value) && stream.checkAhead(1, 'punctuation', '(')) {
+        stream.next();
+
+        return { kind: 'identifier', name: token.value, position: token.position };
     }
 
     if (token.kind === 'identifier') {
@@ -160,7 +166,7 @@ export function parseSuffixed(stream: TokenStream): Expression {
         if (token.kind === 'punctuation' && token.value === '.') {
             stream.next();
 
-            const property = stream.expect('identifier').value;
+            const property = stream.expectName().value;
 
             expression = { kind: 'member-expression', object: expression, property, position: token.position };
 
@@ -179,7 +185,7 @@ export function parseSuffixed(stream: TokenStream): Expression {
             continue;
         }
 
-        if (token.kind === 'punctuation' && token.value === ':' && stream.checkAhead(1, 'identifier')) {
+        if (token.kind === 'punctuation' && token.value === ':' && stream.checkName(1)) {
             stream.next();
 
             const method = stream.next().value;

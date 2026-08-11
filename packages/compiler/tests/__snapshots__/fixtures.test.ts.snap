@@ -1036,11 +1036,11 @@ exports[`fixture annotations.luam > locks the generated Lua 5.1 output 2`] = `[]
 
 exports[`fixture annotations.luam > locks the token stream 1`] = `
 [
-  "identifier "type" 2:1",
+  "keyword "type" 2:1",
   "identifier "PlayerId" 2:6",
   "operator "=" 2:15",
   "identifier "number" 2:17",
-  "identifier "type" 3:1",
+  "keyword "type" 3:1",
   "identifier "Nullable" 3:6",
   "operator "<" 3:14",
   "identifier "T" 3:15",
@@ -2193,7 +2193,7 @@ exports[`fixture classes.luam > locks the generated Lua 5.1 output 2`] = `
 
 exports[`fixture classes.luam > locks the token stream 1`] = `
 [
-  "identifier "interface" 1:1",
+  "keyword "interface" 1:1",
   "identifier "Command" 1:11",
   "punctuation "{" 1:19",
   "identifier "name" 2:5",
@@ -2208,7 +2208,7 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "punctuation ":" 3:28",
   "identifier "void" 3:30",
   "punctuation "}" 4:1",
-  "identifier "class" 6:1",
+  "keyword "class" 6:1",
   "identifier "Player" 6:7",
   "punctuation "{" 6:14",
   "identifier "name" 7:5",
@@ -2219,7 +2219,7 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "identifier "number" 8:13",
   "operator "=" 8:20",
   "number "100" 8:22",
-  "identifier "constructor" 10:5",
+  "keyword "constructor" 10:5",
   "punctuation "(" 10:16",
   "identifier "name" 10:17",
   "punctuation ":" 10:21",
@@ -2259,9 +2259,9 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "identifier "name" 19:21",
   "punctuation "}" 20:5",
   "punctuation "}" 21:1",
-  "identifier "class" 23:1",
+  "keyword "class" 23:1",
   "identifier "VIPPlayer" 23:7",
-  "identifier "extends" 23:17",
+  "keyword "extends" 23:17",
   "identifier "Player" 23:25",
   "punctuation "{" 23:32",
   "identifier "level" 24:5",
@@ -2269,7 +2269,7 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "identifier "number" 24:12",
   "operator "=" 24:19",
   "number "1" 24:21",
-  "identifier "constructor" 26:5",
+  "keyword "constructor" 26:5",
   "punctuation "(" 26:16",
   "identifier "name" 26:17",
   "punctuation ":" 26:21",
@@ -2311,9 +2311,9 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "punctuation ")" 32:30",
   "punctuation "}" 33:5",
   "punctuation "}" 34:1",
-  "identifier "class" 36:1",
+  "keyword "class" 36:1",
   "identifier "KickCommand" 36:7",
-  "identifier "implements" 36:19",
+  "keyword "implements" 36:19",
   "identifier "Command" 36:30",
   "punctuation "{" 36:38",
   "identifier "name" 37:5",
@@ -2341,7 +2341,7 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "keyword "local" 44:1",
   "identifier "vip" 44:7",
   "operator "=" 44:11",
-  "identifier "new" 44:13",
+  "keyword "new" 44:13",
   "identifier "VIPPlayer" 44:17",
   "punctuation "(" 44:26",
   "string "Thigas" 44:27",
@@ -3778,13 +3778,13 @@ exports[`fixture decorators.luam > locks the generated Lua 5.1 output 2`] = `
 
 exports[`fixture decorators.luam > locks the token stream 1`] = `
 [
-  "identifier "type" 1:1",
+  "keyword "type" 1:1",
   "identifier "Flag" 1:6",
   "operator "=" 1:11",
   "identifier "boolean" 1:13",
   "punctuation "@" 3:1",
   "identifier "Getter" 3:2",
-  "identifier "class" 4:1",
+  "keyword "class" 4:1",
   "identifier "Player" 4:7",
   "punctuation "{" 4:14",
   "punctuation "@" 5:5",
@@ -3807,7 +3807,7 @@ exports[`fixture decorators.luam > locks the token stream 1`] = `
   "keyword "local" 13:1",
   "identifier "player" 13:7",
   "operator "=" 13:14",
-  "identifier "new" 13:16",
+  "keyword "new" 13:16",
   "identifier "Player" 13:20",
   "punctuation "(" 13:26",
   "punctuation ")" 13:27",
@@ -3933,8 +3933,17 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
     {
       "declarations": [
         {
-          "annotation": null,
-          "name": "export",
+          "annotation": {
+            "kind": "type-name",
+            "name": "table",
+            "position": {
+              "column": 17,
+              "line": 5,
+              "offset": 91,
+            },
+            "typeArguments": [],
+          },
+          "name": "settings",
           "position": {
             "column": 7,
             "line": 5,
@@ -3950,14 +3959,32 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
       },
       "values": [
         {
-          "kind": "number-literal",
+          "fields": [
+            {
+              "key": null,
+              "name": "export",
+              "position": {
+                "column": 27,
+                "line": 5,
+                "offset": 101,
+              },
+              "value": {
+                "kind": "boolean-literal",
+                "position": {
+                  "column": 36,
+                  "line": 5,
+                  "offset": 110,
+                },
+                "value": true,
+              },
+            },
+          ],
+          "kind": "table-expression",
           "position": {
-            "column": 16,
+            "column": 25,
             "line": 5,
-            "offset": 90,
+            "offset": 99,
           },
-          "raw": "1",
-          "value": 1,
         },
       ],
     },
@@ -3965,13 +3992,22 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
       "expression": {
         "args": [
           {
-            "kind": "identifier",
-            "name": "export",
-            "position": {
-              "column": 7,
-              "line": 7,
-              "offset": 99,
+            "kind": "member-expression",
+            "object": {
+              "kind": "identifier",
+              "name": "settings",
+              "position": {
+                "column": 7,
+                "line": 7,
+                "offset": 124,
+              },
             },
+            "position": {
+              "column": 15,
+              "line": 7,
+              "offset": 132,
+            },
+            "property": "export",
           },
         ],
         "callee": {
@@ -3980,7 +4016,7 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 1,
             "line": 7,
-            "offset": 93,
+            "offset": 118,
           },
         },
         "kind": "call-expression",
@@ -3988,14 +4024,14 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
         "position": {
           "column": 6,
           "line": 7,
-          "offset": 98,
+          "offset": 123,
         },
       },
       "kind": "call-statement",
       "position": {
         "column": 1,
         "line": 7,
-        "offset": 93,
+        "offset": 118,
       },
     },
   ],
@@ -4012,8 +4048,8 @@ exports[`fixture directives.luam > locks the generated Lua 5.1 output 1`] = `
 "function getScore(name)
     return string.len(name)
 end
-local export = 1
-print(export)
+local settings = { export = true }
+print(settings.export)
 "
 `;
 
@@ -4021,7 +4057,7 @@ exports[`fixture directives.luam > locks the generated Lua 5.1 output 2`] = `[]`
 
 exports[`fixture directives.luam > locks the token stream 1`] = `
 [
-  "identifier "export" 1:1",
+  "keyword "export" 1:1",
   "keyword "function" 1:8",
   "identifier "getScore" 1:17",
   "punctuation "(" 1:25",
@@ -4037,13 +4073,21 @@ exports[`fixture directives.luam > locks the token stream 1`] = `
   "identifier "length" 2:17",
   "keyword "end" 3:1",
   "keyword "local" 5:1",
-  "identifier "export" 5:7",
-  "operator "=" 5:14",
-  "number "1" 5:16",
+  "identifier "settings" 5:7",
+  "punctuation ":" 5:15",
+  "identifier "table" 5:17",
+  "operator "=" 5:23",
+  "punctuation "{" 5:25",
+  "keyword "export" 5:27",
+  "operator "=" 5:34",
+  "keyword "true" 5:36",
+  "punctuation "}" 5:41",
   "identifier "print" 7:1",
   "punctuation "(" 7:6",
-  "identifier "export" 7:7",
-  "punctuation ")" 7:13",
+  "identifier "settings" 7:7",
+  "punctuation "." 7:15",
+  "keyword "export" 7:16",
+  "punctuation ")" 7:22",
 ]
 `;
 
@@ -4272,7 +4316,7 @@ exports[`fixture enums.luam > locks the generated Lua 5.1 output 2`] = `
 
 exports[`fixture enums.luam > locks the token stream 1`] = `
 [
-  "identifier "enum" 1:1",
+  "keyword "enum" 1:1",
   "identifier "GameState" 1:6",
   "punctuation "{" 1:16",
   "identifier "LOBBY" 2:5",
@@ -4282,7 +4326,7 @@ exports[`fixture enums.luam > locks the token stream 1`] = `
   "identifier "PAUSED" 4:5",
   "punctuation "," 4:11",
   "punctuation "}" 5:1",
-  "identifier "enum" 7:1",
+  "keyword "enum" 7:1",
   "identifier "UnusedState" 7:6",
   "punctuation "{" 7:18",
   "identifier "NONE" 8:5",

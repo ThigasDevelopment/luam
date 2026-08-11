@@ -18,7 +18,7 @@ export interface Token {
     segments: TemplateSegment[] | null;
 }
 
-export const KEYWORDS: ReadonlySet<string> = new Set([
+export const LUA_KEYWORDS: ReadonlySet<string> = new Set([
     'and',
     'break',
     'do',
@@ -41,6 +41,23 @@ export const KEYWORDS: ReadonlySet<string> = new Set([
     'until',
     'while',
 ]);
+
+export const LUAM_KEYWORDS: ReadonlySet<string> = new Set([
+    'class',
+    'constructor',
+    'declare',
+    'enum',
+    'export',
+    'extends',
+    'implements',
+    'interface',
+    'new',
+    'type',
+]);
+
+export const CALLABLE_KEYWORDS: ReadonlySet<string> = new Set(['type']);
+
+export const KEYWORDS: ReadonlySet<string> = new Set([...LUA_KEYWORDS, ...LUAM_KEYWORDS]);
 
 export const SYMBOLS: readonly string[] = [
     '...',
@@ -85,6 +102,10 @@ const PUNCTUATION: ReadonlySet<string> = new Set(['(', ')', '{', '}', '[', ']', 
 
 export function isKeyword(value: string): boolean {
     return KEYWORDS.has(value);
+}
+
+export function isLuamKeyword(value: string): boolean {
+    return LUAM_KEYWORDS.has(value);
 }
 
 export function symbolKind(symbol: string): TokenKind {

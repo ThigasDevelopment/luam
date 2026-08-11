@@ -38,9 +38,9 @@ describe('export directive parsing', () => {
         expect(statement.isExported).toBe(false);
     });
 
-    it('keeps "export" usable as an identifier', () => {
-        expect(codes('local export = 1\nprint(export)\n')).toEqual([]);
-        expect(codes('export = getPlayers()\nprint(export)\n')).toEqual([]);
+    it('reserves "export" so it cannot name a variable', () => {
+        expect(codes('local export = 1\n')).toEqual(['parse-unexpected-token']);
+        expect(codes('export = getPlayers()\n')).toEqual(['parse-unexpected-token']);
     });
 
     it('keeps "export" usable as a table field and a call target', () => {
