@@ -43,7 +43,7 @@ describe('editor command', () => {
     it('resolves a launcher that only exists under a PATHEXT extension', () => {
         const directory = workspace(['code.cmd']);
 
-        const resolved = withEnvironment({ PATH: directory, PATHEXT: '.COM;.EXE;.BAT;.CMD' }, () => resolveWindowsCommand('code'));
+        const resolved = withEnvironment({ PATH: directory, PATHEXT: '.com;.exe;.bat;.cmd' }, () => resolveWindowsCommand('code'));
 
         expect(resolved?.toLowerCase()).toBe(join(directory, 'code.cmd').toLowerCase());
     });
@@ -51,7 +51,7 @@ describe('editor command', () => {
     it('follows the PATHEXT order inside a directory', () => {
         const directory = workspace(['code.cmd', 'code.exe']);
 
-        const resolved = withEnvironment({ PATH: directory, PATHEXT: '.EXE;.CMD' }, () => resolveWindowsCommand('code'));
+        const resolved = withEnvironment({ PATH: directory, PATHEXT: '.exe;.cmd' }, () => resolveWindowsCommand('code'));
 
         expect(resolved?.toLowerCase()).toBe(join(directory, 'code.exe').toLowerCase());
     });
@@ -59,7 +59,7 @@ describe('editor command', () => {
     it('returns null when no directory on PATH holds the command', () => {
         const directory = workspace([]);
 
-        const resolved = withEnvironment({ PATH: directory, PATHEXT: '.EXE;.CMD' }, () => resolveWindowsCommand('windsurf'));
+        const resolved = withEnvironment({ PATH: directory, PATHEXT: '.exe;.cmd' }, () => resolveWindowsCommand('windsurf'));
 
         expect(resolved).toBeNull();
     });

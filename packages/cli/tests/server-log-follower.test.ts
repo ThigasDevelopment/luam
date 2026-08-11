@@ -9,6 +9,10 @@ import { createProjectFixture, type ProjectFixture } from './support/project-fix
 
 const fixtures: ProjectFixture[] = [];
 
+function posix(path: string): string {
+    return path.replace(/\\/g, '/');
+}
+
 async function waitFor(condition: () => boolean): Promise<void> {
     const deadline = Date.now() + 3000;
 
@@ -29,7 +33,15 @@ afterEach(() => {
 
 describe('server log follower', () => {
     it('resolves the standard MTA server log path', () => {
-        expect(resolveServerLogPath('C:/project', 'mta-server').replace(/\\/g, '/')).toBe('C:/project/mta-server/mods/deathmatch/logs/server.log');
+        const root = posix(resolve('project'));
+
+        expect(posix(resolveServerLogPath(resolve('project'), 'mta-server'))).toBe(`${root}/mta-server/mods/deathmatch/logs/server.log`);
+    });
+
+    it('keeps an absolute server path instead of resolving it against the project root', () => {
+        const server = posix(resolve('/mta-server'));
+
+        expect(posix(resolveServerLogPath(resolve('project'), resolve('/mta-server')))).toBe(`${server}/mods/deathmatch/logs/server.log`);
     });
 
     it('skips history and reads appended complete lines once', async () => {

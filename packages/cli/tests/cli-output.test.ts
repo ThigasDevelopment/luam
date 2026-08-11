@@ -3,6 +3,8 @@ import { join, relative, resolve } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { runCompile } from '@cli/build/build-runner';
+import { createPhaseTracker } from '@cli/build/phase-tracker';
 import { runBuildCommand } from '@cli/commands/build-command';
 import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
@@ -11,6 +13,7 @@ import { validateConfig } from '@cli/config/config-validation';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { RICH_CAPABILITY } from '@cli/reporting/output-capability';
 import { createOutputStyle } from '@cli/reporting/output-style';
+import { createProgressRenderer } from '@cli/reporting/progress-renderer';
 
 import { createMemoryReporter, createTtyReporter, type MemoryReporter } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
@@ -173,18 +176,22 @@ describe('terminal build output', () => {
         expect(block).toContain('^');
     });
 
-    it('keeps painting under five milliseconds on a three hundred file build', async () => {
+    it('keeps painting under five milliseconds on a three hundred file build', () => {
         const { context, target } = harness(largeProject(300), createTtyReporter());
+        const renderer = createProgressRenderer(target.reporter, { animateAfterMs: 0 });
         let paintedMs = 0;
 
-        context.reporter = { ...target.reporter, paint: (text: string): void => {
+        const tracker = createPhaseTracker((event) => {
             const started = performance.now();
 
-            target.paint(text);
+            renderer.listen(event);
             paintedMs += performance.now() - started;
-        } };
+        });
 
-        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+        expect(runCompile(context.root, context.config, { tracker }).build).not.toBeNull();
+
+        renderer.clear();
+
         expect(target.painted.length).toBeGreaterThan(0);
         expect(paintedMs).toBeLessThan(5);
     });
