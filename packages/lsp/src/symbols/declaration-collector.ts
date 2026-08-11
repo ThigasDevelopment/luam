@@ -8,6 +8,8 @@ import type {
     InterfaceMember,
 } from '@compiler/parser/declaration-nodes';
 
+import { annotationType, signatureType } from '@lsp/symbols/annotation-type';
+
 import {
     addReference,
     declareSymbol,
@@ -58,8 +60,9 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
         }
 
         const detail = member.annotation === null ? `field ${member.name}` : fieldText(member.name, member.annotation);
+        const type = member.annotation === null ? null : annotationType(member.annotation);
 
-        declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner });
+        declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner, type });
 
         return;
     }
@@ -75,6 +78,7 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
         detail,
         container: owner,
         parameters,
+        type: signatureType(member.parameters, member.returnAnnotation),
         isSynthetic: member.isSynthetic,
     });
 
@@ -98,7 +102,14 @@ function collectInterfaceMember(state: CollectorState, block: BlockContext, owne
 
         const detail = fieldText(member.name, member.annotation);
 
-        declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner });
+        declareSymbol(state, ROOT_SCOPE, {
+            name: member.name,
+            kind: 'field',
+            position: member.position,
+            detail,
+            container: owner,
+            type: annotationType(member.annotation),
+        });
 
         return;
     }
@@ -106,8 +117,9 @@ function collectInterfaceMember(state: CollectorState, block: BlockContext, owne
     const detail = signatureText(member.name, member.parameters, member.returnAnnotation);
 
     const parameters = member.parameters.map(parameterText);
+    const type = signatureType(member.parameters, member.returnAnnotation);
 
-    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner, parameters });
+    declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'method', position: member.position, detail, container: owner, parameters, type });
     collectAnnotation(state, block, member.returnAnnotation);
 
     for (const parameter of member.parameters) {

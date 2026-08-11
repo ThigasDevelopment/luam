@@ -138,6 +138,98 @@ describe('completion', () => {
     });
 });
 
+describe('class header completion', () => {
+    it('offers extends and implements after a class name', () => {
+        expect(labels(new LanguageService(), SERVER_FILE, 'class Vip \n', 'class Vip ')).toEqual(['extends', 'implements']);
+    });
+
+    it('offers only implements once the class already extends a base', () => {
+        const text = 'class Base {\n}\n\nclass Vip extends Base \n';
+
+        expect(labels(new LanguageService(), SERVER_FILE, text, 'class Vip extends Base ')).toEqual(['implements']);
+    });
+
+    it('offers declared classes after extends', () => {
+        const text = 'class Base {\n}\n\ninterface Shape {\n}\n\nclass Vip extends \n';
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'class Vip extends ');
+
+        expect(found).toContain('Base');
+        expect(found).not.toContain('Shape');
+        expect(found).not.toContain('Vip');
+    });
+
+    it('offers declared interfaces after implements', () => {
+        const text = 'class Base {\n}\n\ninterface Shape {\n}\n\nclass Vip implements \n';
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'class Vip implements ');
+
+        expect(found).toContain('Shape');
+        expect(found).not.toContain('Base');
+    });
+
+    it('offers declared interfaces after a comma in an implements list', () => {
+        const text = 'interface Shape {\n}\n\ninterface Named {\n}\n\nclass Vip implements Shape, \n';
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'implements Shape, ');
+
+        expect(found).toContain('Named');
+    });
+});
+
+describe('argument aware completion', () => {
+    function rankOf(text: string, marker: string, label: string): string {
+        const service = new LanguageService();
+
+        service.update(SERVER_FILE, 1, text);
+
+        const item = service.completion(SERVER_FILE, markerAt(text, marker)).find((candidate) => candidate.label === label);
+
+        return item?.sortText?.slice(0, 1) ?? '';
+    }
+
+    const HANDLER = 'local root = getRootElement()\nlocal count = 1\naddEventHandler("onPlayerWasted", ';
+
+    it('ranks element values first on the element argument of addEventHandler', () => {
+        expect(rankOf(`${HANDLER})\n`, HANDLER, 'root')).toBe('0');
+    });
+
+    it('ranks functions that return an element after element values', () => {
+        expect(rankOf(`${HANDLER})\n`, HANDLER, 'getRootElement')).toBe('1');
+    });
+
+    it('ranks unrelated values and keywords last', () => {
+        expect(rankOf(`${HANDLER})\n`, HANDLER, 'count')).toBe('2');
+        expect(rankOf(`${HANDLER})\n`, HANDLER, 'local')).toBe('2');
+    });
+
+    it('ranks values that match the declared parameter of a project function first', () => {
+        const text = [
+            'class Weapon {',
+            '    name: string = "gun"',
+            '}',
+            '',
+            'function equip(weapon: Weapon): void',
+            'end',
+            '',
+            'local gun = new Weapon()',
+            'local count = 2',
+            'equip()',
+        ].join('\n');
+
+        expect(rankOf(text, 'equip(', 'gun')).toBe('0');
+        expect(rankOf(text, 'equip(', 'count')).toBe('2');
+    });
+
+    it('leaves items unranked outside of a typed argument', () => {
+        const text = 'local count = 1\nco\n';
+        const service = new LanguageService();
+
+        service.update(SERVER_FILE, 1, text);
+
+        const item = service.completion(SERVER_FILE, markerAt(text, '\nco')).find((candidate) => candidate.label === 'count');
+
+        expect(item?.sortText).toBeUndefined();
+    });
+});
+
 describe('project environment completion', () => {
     const roots: string[] = [];
 

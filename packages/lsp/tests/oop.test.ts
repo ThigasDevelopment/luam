@@ -71,6 +71,19 @@ describe('oop completion', () => {
         expect(item?.detail).toBe('Player.getName: fun(): string — wraps getPlayerName (shared)');
     });
 
+    it('ranks values that match the parameter type of a native method first', () => {
+        const text = 'local player = getPlayerFromName("bob")\nlocal amount = 50\nplayer:setHealth()\n';
+        const workspace = openProject(true, { [SERVER_PATH]: text });
+        const uri = workspace.uri(SERVER_PATH);
+
+        workspace.service.update(uri, 2, text);
+
+        const found = workspace.service.completion(uri, markerAt(text, 'player:setHealth('));
+
+        expect(found.find((item) => item.label === 'amount')?.sortText).toBe('0amount');
+        expect(found.find((item) => item.label === 'player')?.sortText).toBe('2player');
+    });
+
     it('offers nothing from the OOP surface when the flag is off', () => {
         const workspace = openProject(false, { [SERVER_PATH]: source });
 

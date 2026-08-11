@@ -1,3 +1,4 @@
+import { descriptorToType } from '@compiler/checker/api-types';
 import { mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import type { RecordType } from '@compiler/checker/types';
@@ -7,6 +8,8 @@ import { oopClassesFor } from '@mta-types/oop-surface';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
 import {
     completionContext,
     hasDecoratorPrefix,
@@ -73,15 +76,19 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
     return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
 }
 
-function scopeItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
+function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: ArgumentExpectation | null): CompletionItem[] {
     return analysis.index
         .visibleAt(offset)
         .filter((declaration) => !MEMBER_KINDS.has(declaration.kind))
-        .map(symbolItem);
+        .map((declaration) => withArgumentRank(symbolItem(declaration), declaration.type, expectation));
 }
 
-function apiItems(analysis: DocumentAnalysis): CompletionItem[] {
-    return globalsFor(analysis.environment).map(apiItem);
+function apiItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
+    return globalsFor(analysis.environment).map((declaration) => withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation));
+}
+
+function plainItems(items: readonly CompletionItem[], expectation: ArgumentExpectation | null): CompletionItem[] {
+    return items.map((item) => withArgumentRank(item, null, expectation));
 }
 
 function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
@@ -151,6 +158,12 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         return [];
     }
 
+    const header = classHeaderPosition(analysis.text, offset);
+
+    if (header !== null) {
+        return deduplicate(classHeaderItems(analysis, offset, header));
+    }
+
     if (isTypePosition(analysis.text, offset)) {
         return deduplicate(typeItems(analysis, offset));
     }
@@ -164,13 +177,14 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     }
 
     const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
+    const expectation = expectedArgument(analysis, offset, lexical.frame);
 
     return deduplicate([
-        ...scopeItems(analysis, offset),
-        ...workspaceItems(analysis, others),
-        ...mtaClassItems(analysis),
-        ...apiItems(analysis),
-        ...directives,
-        ...KEYWORD_ITEMS,
+        ...scopeItems(analysis, offset, expectation),
+        ...plainItems(workspaceItems(analysis, others), expectation),
+        ...plainItems(mtaClassItems(analysis), expectation),
+        ...apiItems(analysis, expectation),
+        ...plainItems(directives, expectation),
+        ...plainItems(KEYWORD_ITEMS, expectation),
     ]);
 }

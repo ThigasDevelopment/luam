@@ -14,6 +14,7 @@ import type {
 } from '@compiler/parser/ast';
 
 import { positionAt } from '@lsp/support/source-text';
+import { annotationType, signatureType } from '@lsp/symbols/annotation-type';
 
 import {
     addReference,
@@ -63,8 +64,9 @@ export function collectFunctionScope(state: CollectorState, block: BlockContext,
 
         if (parameter.name.length > 0) {
             const detail = variableText('parameter', parameter.name, parameter.annotation, null);
+            const type = annotationType(parameter.annotation);
 
-            declareSymbol(state, scopeId, { name: parameter.name, kind: 'parameter', position: parameter.position, detail });
+            declareSymbol(state, scopeId, { name: parameter.name, kind: 'parameter', position: parameter.position, detail, type });
         }
     }
 
@@ -111,8 +113,9 @@ function collectFunctionName(state: CollectorState, block: BlockContext, stateme
         const scopeId = statement.isLocal ? block.scopeId : ROOT_SCOPE;
 
         const parameters = statement.parameters.map(parameterText);
+        const type = signatureType(statement.parameters, statement.returnAnnotation);
 
-        declareSymbol(state, scopeId, { name: name.name, kind: 'function', position: name.position, detail, parameters });
+        declareSymbol(state, scopeId, { name: name.name, kind: 'function', position: name.position, detail, parameters, type });
         addReference(state, name.name, 'value', name.position, block.scopeId);
 
         return null;
