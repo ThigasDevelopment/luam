@@ -14,10 +14,10 @@ const luamGrammar = require('../../packages/vscode/syntaxes/luam.tmLanguage.json
 
 const luamLanguage = { ...luamGrammar, name: 'luam', displayName: 'Luam' };
 
-const SITE = 'https://thigasdevelopment.github.io/luam/';
+const SITE = 'https://luam.dracon.dev/';
 
 export default defineConfig({
-    base: '/luam/',
+    base: '/',
     title: 'Luam',
     description: en.description,
     lang: 'en-US',
@@ -27,8 +27,8 @@ export default defineConfig({
     srcExclude: ['adr/**', 'snippets/**'],
     sitemap: { hostname: SITE },
     head: [
-        ['link', { rel: 'icon', type: 'image/svg+xml', href: '/luam/luam-mark.svg' }],
-        ['link', { rel: 'alternate icon', type: 'image/png', href: '/luam/luam-icon.png' }],
+        ['link', { rel: 'icon', type: 'image/svg+xml', href: '/luam-mark.svg' }],
+        ['link', { rel: 'alternate icon', type: 'image/png', href: '/luam-icon.png' }],
         ['meta', { name: 'theme-color', content: '#0891b2' }],
         ['meta', { property: 'og:type', content: 'website' }],
         ['meta', { property: 'og:site_name', content: 'Luam' }],

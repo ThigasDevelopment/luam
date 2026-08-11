@@ -66,6 +66,6 @@ onMounted(() => {
         </li>
     </ul>
     <p class="luam-picker-footer">
-        Your choice is remembered in this browser. Open <code>/luam/?picker</code> to see this page again.
+        Your choice is remembered in this browser. Open <code>/?picker</code> to see this page again.
     </p>
 </div>
