@@ -34,9 +34,7 @@ function namePosition(state: CollectorState, statement: DeclarationStatement): S
     return locatePosition(state, offset, statement.name) ?? statement.position;
 }
 
-function collectSuperTypes(state: CollectorState, block: BlockContext, statement: ClassDeclaration, from: number): void {
-    const names = statement.superClass === null ? statement.interfaces : [statement.superClass, ...statement.interfaces];
-
+function collectSuperTypes(state: CollectorState, block: BlockContext, names: readonly string[], from: number): void {
     let cursor = from;
 
     for (const name of names) {
@@ -137,7 +135,9 @@ function collectClass(state: CollectorState, block: BlockContext, statement: Cla
         position,
         detail: `class ${statement.name}${extendsText}`,
     });
-    collectSuperTypes(state, block, statement, position.offset + statement.name.length);
+    const names = statement.superClass === null ? statement.interfaces : [statement.superClass, ...statement.interfaces];
+
+    collectSuperTypes(state, block, names, position.offset + statement.name.length);
 
     for (const member of statement.members) {
         collectClassMember(state, block, statement.name, member);
@@ -150,8 +150,10 @@ function collectClass(state: CollectorState, block: BlockContext, statement: Cla
 
 function collectInterface(state: CollectorState, block: BlockContext, statement: InterfaceDeclaration): void {
     const position = namePosition(state, statement);
+    const extendsText = statement.superInterfaces.length === 0 ? '' : ` extends ${statement.superInterfaces.join(', ')}`;
 
-    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'interface', position, detail: `interface ${statement.name}` });
+    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'interface', position, detail: `interface ${statement.name}${extendsText}` });
+    collectSuperTypes(state, block, statement.superInterfaces, position.offset + statement.name.length);
 
     for (const member of statement.members) {
         collectInterfaceMember(state, block, statement.name, member);

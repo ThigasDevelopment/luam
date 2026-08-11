@@ -90,6 +90,7 @@ describe('grammar', () => {
         expect(matchesAny('keyword', 'local health = 100')).toBe(true);
         expect(matchesAny('keyword', 'class Vip extends')).toBe(true);
         expect(matchesAny('keyword', 'class Vip implements')).toBe(true);
+        expect(matchesAny('declaration', 'interface Entity extends Named, Identified')).toBe(true);
         expect(matchesAny('keyword', 'declare score: number')).toBe(true);
         expect(matchesAny('keyword', 'local kind = type(1)')).toBe(true);
         expect(matchesAny('annotation', 'local player: Player? = nil')).toBe(true);

@@ -20,6 +20,7 @@ import {
     createNamed,
     createObjectType,
     createOptional,
+    createTuple,
     createUnion,
     isAssignable,
     NIL_TYPE,
@@ -95,6 +96,8 @@ export class CheckContext {
 
     private readonly ambientClasses = new Set<string>();
 
+    private readonly ambientInterfaces = new Set<string>();
+
     constructor(
         mode: StrictMode,
         environment: Environment,
@@ -126,6 +129,10 @@ export class CheckContext {
 
     isAmbientClass(name: string): boolean {
         return this.ambientClasses.has(name);
+    }
+
+    isAmbientInterface(name: string): boolean {
+        return this.ambientInterfaces.has(name);
     }
 
     noteExternalReference(name: string, position: SourcePosition): void {
@@ -203,6 +210,10 @@ export class CheckContext {
             return createObjectType(members);
         }
 
+        if (annotation.kind === 'type-tuple') {
+            return createTuple(annotation.elements.map((element) => this.resolveAnnotation(element)));
+        }
+
         if (annotation.kind === 'type-function') {
             const parameters = annotation.parameters.map((parameter) => this.resolveAnnotation(parameter));
             const optional = parameters.findIndex((parameter) => parameter.kind === 'optional');
@@ -244,6 +255,7 @@ export class CheckContext {
         }
 
         for (const info of ambient.interfaces) {
+            this.ambientInterfaces.add(info.name);
             this.declarations.declareInterface(info);
         }
 

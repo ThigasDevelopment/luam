@@ -60,6 +60,12 @@ function registerMembers(context: CheckContext, info: ClassInfo, statement: Clas
 }
 
 function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMethodDeclaration): void {
+    const explicitSelf = member.parameters.find((parameter) => parameter.name === 'self');
+
+    if (explicitSelf !== undefined) {
+        context.report('check-explicit-self-parameter', 'Class methods receive "self" automatically; remove it from the parameter list.', explicitSelf.position);
+    }
+
     context.pushClassMethod({ className: info.name, methodName: member.name });
     checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, createNamed(info.name));
     context.popClassMethod();
@@ -97,7 +103,7 @@ function checkInterfaces(context: CheckContext, info: ClassInfo): void {
             continue;
         }
 
-        for (const member of contract.members.values()) {
+        for (const member of context.declarations.collectMembers(contract.name)) {
             checkContract(context, info, name, member);
         }
     }
@@ -177,16 +183,58 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
 
     const members = new Map<string, MemberInfo>();
 
+    for (const name of new Set(statement.superInterfaces)) {
+        const parent = context.declarations.lookupInterface(name);
+
+        if (name === statement.name || context.declarations.interfaceExtends(name, statement.name)) {
+            context.report('check-interface-cycle', `Interface "${statement.name}" creates an inheritance cycle through "${name}".`, statement.position);
+        } else if (parent === null) {
+            context.noteExternalReference(name, statement.position);
+            context.report('check-unknown-interface', `Interface "${statement.name}" extends "${name}", which is not defined.`, statement.position);
+        } else if (context.isAmbientInterface(name)) {
+            context.noteExternalReference(name, statement.position);
+        }
+    }
+
+    if (new Set(statement.superInterfaces).size !== statement.superInterfaces.length) {
+        context.report('check-duplicate-interface-parent', `Interface "${statement.name}" extends the same interface more than once.`, statement.position);
+    }
+
     for (const member of statement.members) {
         const type =
             member.kind === 'interface-field'
                 ? context.resolveAnnotation(member.annotation)
                 : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
-        members.set(member.name, { name: member.name, type, isMethod: member.kind === 'interface-method', position: member.position });
+        const info = { name: member.name, type, isMethod: member.kind === 'interface-method', position: member.position };
+
+        if (members.has(member.name)) {
+            context.report('check-duplicate-interface-member', `Interface "${statement.name}" declares member "${member.name}" more than once.`, member.position);
+        } else {
+            members.set(member.name, info);
+        }
     }
 
-    context.declarations.declareInterface({ name: statement.name, members, position: statement.position });
+    const inherited = new Map<string, MemberInfo>();
+
+    for (const parent of statement.superInterfaces) {
+        for (const member of context.declarations.collectMembers(parent)) {
+            const existing = members.get(member.name) ?? inherited.get(member.name);
+
+            if (existing !== undefined && (existing.isMethod !== member.isMethod || typeToString(existing.type) !== typeToString(member.type))) {
+                context.report('check-conflicting-interface-member', `Interface "${statement.name}" inherits conflicting declarations of "${member.name}".`, statement.position);
+            } else if (existing === undefined) {
+                inherited.set(member.name, member);
+            }
+        }
+    }
+
+    context.declarations.declareInterface({
+        name: statement.name,
+        superInterfaces: statement.superInterfaces,
+        members,
+        position: statement.position,
+    });
 }
 
 export function checkEnumDeclaration(context: CheckContext, statement: EnumDeclaration): void {

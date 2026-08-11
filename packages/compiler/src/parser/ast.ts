@@ -45,13 +45,19 @@ export interface TypeObjectAnnotation extends NodeBase {
     members: TypeObjectMember[];
 }
 
+export interface TypeTupleAnnotation extends NodeBase {
+    kind: 'type-tuple';
+    elements: TypeAnnotation[];
+}
+
 export type TypeAnnotation =
     | TypeNameAnnotation
     | TypeArrayAnnotation
     | TypeOptionalAnnotation
     | TypeUnionAnnotation
     | TypeFunctionAnnotation
-    | TypeObjectAnnotation;
+    | TypeObjectAnnotation
+    | TypeTupleAnnotation;
 
 export interface Parameter extends NodeBase {
     name: string;

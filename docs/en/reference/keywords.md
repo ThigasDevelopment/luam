@@ -6,7 +6,7 @@ adds 11 of its own.
 
 The one place a reserved word is still allowed is a **property name** — after a
 `.` or a `:`, as a table field key, and as a class, interface or enum member.
-That keeps `Threads.new(...)`, `element.type` and `constructor(...)` valid.
+That keeps `Threads.new(...)`, `element.type` and `constructor = function (...)` valid.
 
 ## Lua 5.1 keywords
 

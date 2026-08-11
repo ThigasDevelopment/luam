@@ -1,3 +1,4 @@
+import { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver';
 import { describe, expect, it } from 'vitest';
 
 import { LanguageService } from '@lsp/server/language-service';
@@ -17,6 +18,14 @@ function labels(text: string, marker: string, uri: string = SERVER_FILE): string
     service.update(uri, 1, text);
 
     return service.completion(uri, markerAt(text, marker)).map((item) => item.label);
+}
+
+function items(text: string, marker: string) {
+    const service = new LanguageService();
+
+    service.update(SERVER_FILE, 1, text);
+
+    return service.completion(SERVER_FILE, markerAt(text, marker));
 }
 
 describe('event completion', () => {
@@ -137,5 +146,29 @@ describe('decorator completion', () => {
     it('does not offer decorators outside a class', () => {
         expect(labels('@\nlocal value = 1\n', '@')).toEqual([]);
         expect(labels('local value = other @\n', 'other @')).toEqual([]);
+    });
+});
+
+describe('class body completion', () => {
+    it('suggests an assignment-style constructor when the class has none', () => {
+        const constructor = items('class Account {\n    \n}\n', '    ').find((item) => item.label === 'constructor');
+
+        expect(constructor).toMatchObject({
+            kind: CompletionItemKind.Constructor,
+            insertText: 'constructor = function (${1})\n        ${0}\n    end',
+            insertTextFormat: InsertTextFormat.Snippet,
+        });
+    });
+
+    it('does not suggest a constructor when the class already has one', () => {
+        const text = 'class Account {\n    constructor = function ()\n    end\n    \n}\n';
+
+        expect(labels(text, '    \n}')).not.toContain('constructor');
+    });
+
+    it('does not suggest a constructor from inside a class method', () => {
+        const text = 'class Account {\n    describe = function ()\n        \n    end\n}\n';
+
+        expect(labels(text, '        ')).not.toContain('constructor');
     });
 });

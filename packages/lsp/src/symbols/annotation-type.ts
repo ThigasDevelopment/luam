@@ -6,6 +6,7 @@ import {
     createNamed,
     createObjectType,
     createOptional,
+    createTuple,
     createUnion,
     NIL_TYPE,
     NUMBER_TYPE,
@@ -63,6 +64,10 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
 
     if (annotation.kind === 'type-object') {
         return createObjectType(new Map(annotation.members.map((member) => [member.name, annotationType(member.annotation)])));
+    }
+
+    if (annotation.kind === 'type-tuple') {
+        return createTuple(annotation.elements.map((element) => annotationType(element)));
     }
 
     return PRIMITIVE_TYPES[annotation.name] ?? createNamed(annotation.name);

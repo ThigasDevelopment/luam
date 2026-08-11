@@ -102,12 +102,44 @@ describe('variable hover', () => {
 });
 
 describe('self inside a class', () => {
-    const account = ['class Account {', '    name: string', '', '    bump(amount: number): number {', '        return amount', '    }', '}', ''];
+    const account = ['class Account {', '    name: string', '', '    bump = function (amount: number): number', '        return amount', '    end', '}', ''];
 
     it('types self as the enclosing class in a method', () => {
         const text = `${[...account.slice(0, 4), '        return self.name and amount', ...account.slice(5)].join('\n')}`;
 
         expect(hoverText(text, 'return self', 'self')).toContain('self: Account');
+    });
+
+    it('suggests self inside an assignment-style class method', () => {
+        const service = new LanguageService();
+        const text = [...account.slice(0, 4), '        self', ...account.slice(5)].join('\n');
+
+        service.update(SERVER_FILE, 1, text);
+
+        expect(service.completion(SERVER_FILE, markerAt(text, '        self')).map((item) => item.label)).toContain('self');
+    });
+
+    it('suggests implicit self without an explicit method parameter', () => {
+        const service = new LanguageService();
+        const text = [
+            'type TesteOptions = { name: string }',
+            'class Teste {',
+            '\tname: string',
+            '',
+            '\tconstructor = function (options: TesteOptions)',
+            '\t\tself.name = options.name',
+            '\tend',
+            '',
+            '\tdescribe = function (): string',
+            '\t\tself.',
+            '\tend',
+            '}',
+            "local teste = new Teste ({ name = 'Ola Mundo!' });",
+        ].join('\n');
+
+        service.update(SERVER_FILE, 1, text);
+
+        expect(service.completion(SERVER_FILE, markerAt(text, '\t\tself.')).map((item) => item.label)).toContain('name');
     });
 
     it('separates class fields and methods after self', () => {

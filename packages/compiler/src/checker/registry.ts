@@ -22,6 +22,7 @@ export interface ClassInfo {
 
 export interface InterfaceInfo {
     name: string;
+    superInterfaces: string[];
     members: Map<string, MemberInfo>;
     position: SourcePosition;
 }
@@ -71,6 +72,18 @@ export class DeclarationRegistry {
         return this.interfaces.get(name) ?? null;
     }
 
+    interfaceExtends(name: string, target: string, visited: Set<string> = new Set()): boolean {
+        const current = this.lookupInterface(name);
+
+        if (current === null || visited.has(name)) {
+            return false;
+        }
+
+        visited.add(name);
+
+        return current.superInterfaces.some((parent) => parent === target || this.interfaceExtends(parent, target, visited));
+    }
+
     declareEnum(info: EnumInfo): void {
         this.enums.set(info.name, info);
     }
@@ -91,11 +104,31 @@ export class DeclarationRegistry {
         return [...this.enums.values()];
     }
 
-    collectMembers(className: string): MemberInfo[] {
+    private collectInterfaceMembers(name: string, collected: Map<string, MemberInfo>, visited: Set<string>): void {
+        const current = this.lookupInterface(name);
+
+        if (current === null || visited.has(current.name)) {
+            return;
+        }
+
+        visited.add(current.name);
+
+        for (const [memberName, member] of current.members) {
+            if (!collected.has(memberName)) {
+                collected.set(memberName, member);
+            }
+        }
+
+        for (const parent of current.superInterfaces) {
+            this.collectInterfaceMembers(parent, collected, visited);
+        }
+    }
+
+    collectMembers(name: string): MemberInfo[] {
         const collected = new Map<string, MemberInfo>();
         const visited = new Set<string>();
 
-        let current = this.lookupClass(className);
+        let current = this.lookupClass(name);
 
         while (current !== null && !visited.has(current.name)) {
             for (const [name, member] of current.members) {
@@ -109,13 +142,17 @@ export class DeclarationRegistry {
             current = current.superClass === null ? null : this.lookupClass(current.superClass);
         }
 
+        if (current === null && this.lookupClass(name) === null) {
+            this.collectInterfaceMembers(name, collected, visited);
+        }
+
         return [...collected.values()];
     }
 
-    lookupMember(className: string, member: string): MemberInfo | null {
+    lookupMember(name: string, member: string): MemberInfo | null {
         const visited = new Set<string>();
 
-        let current = this.lookupClass(className);
+        let current = this.lookupClass(name);
 
         while (current !== null && !visited.has(current.name)) {
             const found = current.members.get(member);
@@ -129,6 +166,10 @@ export class DeclarationRegistry {
             current = current.superClass === null ? null : this.lookupClass(current.superClass);
         }
 
-        return null;
+        const collected = new Map<string, MemberInfo>();
+
+        this.collectInterfaceMembers(name, collected, visited);
+
+        return collected.get(member) ?? null;
     }
 }

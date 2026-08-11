@@ -7,7 +7,7 @@ import type { ApiDeclaration } from '@mta-types/api-declaration';
 import type { ApiDocumentation } from '@mta-types/api-documentation';
 import { memberDocumentation } from '@mta-types/documentation-lookup';
 import { LIBRARY_MEMBERS, type LibraryName } from '@mta-types/library-members';
-import { CompletionItemKind, MarkupKind, type CompletionItem } from 'vscode-languageserver';
+import { CompletionItemKind, InsertTextFormat, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
 import { descriptorText, namedDescriptorText } from '@lsp/features/api-text';
 import { documentationBody, documentationFor } from '@lsp/features/documentation-text';
@@ -37,6 +37,19 @@ export const KEYWORD_ITEMS: readonly CompletionItem[] = [...KEYWORDS]
 export const DIRECTIVE_ITEMS: readonly CompletionItem[] = [
     { label: 'export', kind: CompletionItemKind.Keyword, detail: 'export function — expose a function to other resources' },
 ];
+
+export function constructorItem(text: string, offset: number): CompletionItem {
+    const lineStart = text.lastIndexOf('\n', offset - 1) + 1;
+    const indentation = text.slice(lineStart, offset).match(/^\s*/)?.[0] ?? '';
+
+    return {
+        label: 'constructor',
+        kind: CompletionItemKind.Constructor,
+        detail: 'Declare the class constructor',
+        insertText: `constructor = function (\${1})\n${indentation}    \${0}\n${indentation}end`,
+        insertTextFormat: InsertTextFormat.Snippet,
+    };
+}
 
 export function decoratorItems(): CompletionItem[] {
     return [...KNOWN_DECORATORS.values()].map((decorator) => ({

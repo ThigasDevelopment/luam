@@ -171,6 +171,32 @@ function checkReturn(context: CheckContext, statement: ReturnStatement): void {
         return;
     }
 
+    if (expected.kind === 'tuple') {
+        if (valueTypes.length !== expected.elements.length) {
+            const message = `This function declares ${expected.elements.length} return values but returns ${valueTypes.length}.`;
+
+            context.report('check-return-mismatch', message, statement.position);
+
+            return;
+        }
+
+        valueTypes.forEach((type, index) => {
+            const value = statement.values[Math.min(index, statement.values.length - 1)];
+
+            context.expectAssignable(type, expected.elements[index] ?? ANY_TYPE, value?.position ?? statement.position, `Return value ${index + 1}`);
+        });
+
+        return;
+    }
+
+    if (valueTypes.length > 1) {
+        const message = `This function declares one return value of type "${typeToString(expected)}" but returns ${valueTypes.length} values.`;
+
+        context.report('check-return-mismatch', message, statement.position);
+
+        return;
+    }
+
     const first = valueTypes[0];
     const value = statement.values[0];
 

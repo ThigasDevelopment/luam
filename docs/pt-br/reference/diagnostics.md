@@ -80,9 +80,14 @@ erro não escreve nada.
 | --- | --- |
 | `check-unknown-class` | `new` ou `extends` nomeia uma classe não declarada. |
 | `check-duplicate-class` | Duas classes com o mesmo nome em um arquivo. |
-| `check-unknown-interface` | `implements` nomeia uma interface não declarada. |
+| `check-unknown-interface` | `implements` ou `extends` de interface nomeia uma interface não declarada. |
 | `check-duplicate-interface` | Duas interfaces com o mesmo nome em um arquivo. |
+| `check-duplicate-interface-parent` | Uma interface estende a mesma interface pai mais de uma vez. |
+| `check-duplicate-interface-member` | Uma interface declara o mesmo membro mais de uma vez. |
+| `check-conflicting-interface-member` | Interfaces pai declaram um membro de formas incompatíveis. |
+| `check-interface-cycle` | Um ciclo de herança entre interfaces foi declarado. |
 | `check-unimplemented-interface` | Um membro exigido pela interface está faltando. |
+| `check-explicit-self-parameter` | Um método declara explicitamente o `self` que já é injetado automaticamente. |
 | `check-duplicate-enum` | Dois enums com o mesmo nome em um arquivo. |
 | `check-unknown-enum-member` | O enum não tem esse membro. |
 | `check-invalid-super` | `self:super(...)` fora de uma classe. |

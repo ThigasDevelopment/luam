@@ -9,6 +9,7 @@ import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { classBodyNeedsConstructor } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
 import {
     completionContext,
@@ -20,6 +21,7 @@ import {
 } from '@lsp/features/completion-context';
 import {
     apiItem,
+    constructorItem,
     DIRECTIVE_ITEMS,
     decoratorItems,
     enumMemberItems,
@@ -164,19 +166,26 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         return deduplicate(classHeaderItems(analysis, offset, header));
     }
 
-    if (isTypePosition(analysis.text, offset)) {
-        return deduplicate(typeItems(analysis, offset));
-    }
-
     const context = completionContext(analysis.text, offset);
 
     if (context.trigger !== null) {
         const target = resolveReceiver(analysis, offset, context.segments);
 
-        return target === null ? [] : deduplicate(memberItems(analysis, target, context.trigger));
+        if (target !== null) {
+            return deduplicate(memberItems(analysis, target, context.trigger));
+        }
+    }
+
+    if (isTypePosition(analysis.text, offset)) {
+        return deduplicate(typeItems(analysis, offset));
+    }
+
+    if (context.trigger !== null) {
+        return [];
     }
 
     const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
+    const constructor = classBodyNeedsConstructor(analysis, lexical.frame, offset) ? [constructorItem(analysis.text, offset)] : [];
     const expectation = expectedArgument(analysis, offset, lexical.frame);
 
     return deduplicate([
@@ -185,6 +194,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...plainItems(mtaClassItems(analysis), expectation),
         ...apiItems(analysis, expectation),
         ...plainItems(directives, expectation),
+        ...plainItems(constructor, expectation),
         ...plainItems(KEYWORD_ITEMS, expectation),
     ]);
 }

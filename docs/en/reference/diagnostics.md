@@ -80,9 +80,14 @@ writes nothing.
 | --- | --- |
 | `check-unknown-class` | `new` or `extends` names a class that is not declared. |
 | `check-duplicate-class` | Two classes with the same name in one file. |
-| `check-unknown-interface` | `implements` names an interface that is not declared. |
+| `check-unknown-interface` | `implements` or interface `extends` names an interface that is not declared. |
 | `check-duplicate-interface` | Two interfaces with the same name in one file. |
+| `check-duplicate-interface-parent` | An interface extends the same parent more than once. |
+| `check-duplicate-interface-member` | An interface declares the same member more than once. |
+| `check-conflicting-interface-member` | Parent interfaces declare one member incompatibly. |
+| `check-interface-cycle` | An interface inheritance cycle is declared. |
 | `check-unimplemented-interface` | A member the interface requires is missing. |
+| `check-explicit-self-parameter` | A class method explicitly declares the automatically injected `self`. |
 | `check-duplicate-enum` | Two enums with the same name in one file. |
 | `check-unknown-enum-member` | The enum has no such member. |
 | `check-invalid-super` | `self:super(...)` outside a class. |

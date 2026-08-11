@@ -13,6 +13,54 @@ function messages(source: string, filePath = SERVER_FILE, oop = false): string[]
 }
 
 describe('multi-return functions', () => {
+    it('accepts typed tuple returns and distributes their values', () => {
+        const source = [
+            'function describe(): (string, boolean)',
+            '    return "name", true',
+            'end',
+            'local name: string, enabled: boolean = describe()',
+        ].join('\n');
+
+        expect(codes(source)).toEqual([]);
+    });
+
+    it('supports typed tuple returns from class methods', () => {
+        const source = [
+            'class Teste {',
+            '    name: string',
+            '    enabled: boolean',
+            '    describe = function (): (string, boolean)',
+            '        return self.name, self.enabled',
+            '    end',
+            '}',
+            'local teste = new Teste()',
+            'local name: string, enabled: boolean = teste:describe()',
+        ].join('\n');
+
+        expect(codes(source)).toEqual([]);
+    });
+
+    it('checks every typed tuple return value', () => {
+        const wrongType = 'function describe(): (string, boolean)\n    return "name", 1\nend\n';
+        const wrongArity = 'function describe(): (string, boolean)\n    return "name"\nend\n';
+
+        expect(codes(wrongType)).toEqual(['check-type-mismatch']);
+        expect(codes(wrongArity)).toEqual(['check-return-mismatch']);
+    });
+
+    it('rejects multiple values from a function with one declared return type', () => {
+        const source = 'function describe(): string\n    return "name", true\nend\n';
+
+        expect(codes(source)).toEqual(['check-return-mismatch']);
+        expect(messages(source)[0]).toContain('returns 2 values');
+    });
+
+    it('rejects an expanded tuple from a function with one declared return type', () => {
+        const source = 'function position(): number\n    local element = createObject(1337, 0, 0, 0)\n    return getElementPosition(element)\nend\n';
+
+        expect(codes(source)).toEqual(['check-return-mismatch']);
+    });
+
     it('distributes the returned values across a multiple local declaration', () => {
         const source = 'local element = createObject(1337, 0, 0, 0)\nlocal x: number, y: number, z: number = getElementPosition(element)\n';
 

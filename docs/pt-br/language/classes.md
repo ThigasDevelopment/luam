@@ -1,25 +1,25 @@
 # Classes
 
-Uma classe declara campos, um construtor e métodos. O corpo usa chaves, enquanto
-as funções em Lua dentro de `function ... end` continuam terminando com `end` — a
-forma com chaves pertence à declaração, não aos comandos.
+Uma classe declara campos, um construtor e métodos. O corpo da classe usa chaves.
+Construtores e métodos usam `nome = function (...) ... end`; o Luam injeta o
+parâmetro tipado `self` automaticamente.
 
 ```luam
 class Account {
     name: string
     balance: number = 0
 
-    constructor(name: string) {
+    constructor = function (name: string)
         self.name = name
-    }
+    end
 
-    deposit(amount: number): void {
+    deposit = function (amount: number): void
         self.balance += amount
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         return self.name .. ': ' .. tostring(self.balance)
-    }
+    end
 }
 ```
 
@@ -57,14 +57,14 @@ que não é classe é `check-unknown-class`.
 class PremiumAccount extends Account {
     tier: number = 1
 
-    constructor(name: string, tier: number) {
+    constructor = function (name: string, tier: number)
         self:super(name)
         self.tier = tier
-    }
+    end
 
-    deposit(amount: number): void {
+    deposit = function (amount: number): void
         self:super(amount * 2)
-    }
+    end
 }
 ```
 
@@ -86,9 +86,9 @@ Declare a classe pai antes das filhas.
 class Round implements Describable {
     label: string = 'round'
 
-    describe(): string {
+    describe = function (): string
         return self.label
-    }
+    end
 }
 ```
 

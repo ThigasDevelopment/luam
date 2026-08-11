@@ -2,30 +2,30 @@ class Account {
     name: string
     balance: number = 0
 
-    constructor(name: string) {
+    constructor = function (name: string)
         self.name = name
-    }
+    end
 
-    deposit(amount: number): void {
+    deposit = function (amount: number): void
         self.balance += amount
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         return self.name .. ': ' .. tostring(self.balance)
-    }
+    end
 }
 
 class PremiumAccount extends Account {
     tier: number = 1
 
-    constructor(name: string, tier: number) {
+    constructor = function (name: string, tier: number)
         self:super(name)
         self.tier = tier
-    }
+    end
 
-    deposit(amount: number): void {
+    deposit = function (amount: number): void
         self:super(amount * 2)
-    }
+    end
 }
 
 function openAccount(): string

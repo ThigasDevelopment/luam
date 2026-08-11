@@ -55,6 +55,14 @@ describe('decorators', () => {
         expect(emitted.match(/getHealth =/g)).toHaveLength(1);
     });
 
+    it('ignores constructors when applying class accessors', () => {
+        const emitted = code('@Getter\n@Setter\nclass Example {\n    constructor = function ()\n    end\n}\n');
+
+        expect(emitted).toContain('constructor = function(self)');
+        expect(emitted).not.toContain('getConstructor');
+        expect(emitted).not.toContain('setConstructor');
+    });
+
     it('types generated accessors and method calls', () => {
         const valid = 'class Player {\n    @Getter\n    @Setter\n    name: string\n}\nlocal player = new Player()\nplayer:setName("Luam")\nlocal name: string = player:getName()\n';
         const invalid = valid.replace('player:setName("Luam")', 'player:setName(1)');

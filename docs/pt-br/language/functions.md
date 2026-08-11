@@ -84,8 +84,20 @@ Nomes de parâmetro dentro de `fun(...)` são documentais — `fun(string): void
 
 ## Múltiplos retornos
 
-Funções do MTA que retornam vários valores são tipadas pelo catálogo, então cada
-destino recebe o seu próprio tipo:
+Declare vários tipos de retorno como uma tupla. O Lua continua retornando valores
+separados; a tupla existe apenas para verificação estática:
+
+```luam
+function describe(): (string, boolean)
+    return 'pronto', true
+end
+
+local label, enabled = describe()
+```
+
+O checker valida a quantidade e o tipo de cada valor retornado. Funções do MTA
+que retornam vários valores também são tipadas pelo catálogo, então cada destino
+recebe o seu próprio tipo:
 
 ```luam
 local x, y, z = getElementPosition(element)

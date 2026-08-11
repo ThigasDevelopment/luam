@@ -12,7 +12,7 @@ import type {
     InterfaceMember,
 } from './declaration-nodes';
 import { parseExpression } from './expression';
-import { parseParameters } from './function-expression';
+import { parseFunctionExpression, parseParameters } from './function-expression';
 import { recoverInBlock } from './recovery';
 import { parseBraceBlock } from './statement';
 import { ParserError, type TokenStream } from './token-stream';
@@ -59,7 +59,13 @@ export function isDeclarationStart(stream: TokenStream): boolean {
         return false;
     }
 
-    return token.value === 'class' ? isClassHeader(stream, offset) : stream.checkAhead(offset + 2, 'punctuation', '{');
+    if (token.value === 'class') {
+        return isClassHeader(stream, offset);
+    }
+
+    return token.value === 'interface'
+        ? stream.checkAhead(offset + 2, 'punctuation', '{') || stream.checkAhead(offset + 2, 'keyword', 'extends')
+        : stream.checkAhead(offset + 2, 'punctuation', '{');
 }
 
 function skipDecoratorArguments(stream: TokenStream): void {
@@ -97,6 +103,24 @@ export function parseDecorators(stream: TokenStream): Decorator[] {
 }
 
 function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorator[]): ClassMethodDeclaration {
+    stream.expect('operator', '=');
+
+    const expression = parseFunctionExpression(stream);
+
+    return {
+        kind: 'class-method',
+        name: token.value,
+        isConstructor: token.value === 'constructor',
+        isSynthetic: false,
+        parameters: expression.parameters,
+        returnAnnotation: expression.returnAnnotation,
+        body: expression.body,
+        decorators,
+        position: token.position,
+    };
+}
+
+function parseLegacyClassMethod(stream: TokenStream, token: Token, decorators: Decorator[]): ClassMethodDeclaration {
     const parameters = parseParameters(stream);
     const returnAnnotation = parseOptionalAnnotation(stream);
     const body = parseBraceBlock(stream);
@@ -123,6 +147,10 @@ function parseClassMember(stream: TokenStream): ClassMember {
     const token = stream.expectName();
 
     if (stream.check('punctuation', '(')) {
+        return parseLegacyClassMethod(stream, token, decorators);
+    }
+
+    if (stream.check('operator', '=') && stream.checkAhead(1, 'keyword', 'function')) {
         return parseClassMethod(stream, token, decorators);
     }
 
@@ -197,7 +225,14 @@ function parseInterfaceMember(stream: TokenStream): InterfaceMember {
 function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
+    const superInterfaces: string[] = [];
     const members: InterfaceMember[] = [];
+
+    if (stream.match('keyword', 'extends')) {
+        do {
+            superInterfaces.push(stream.expect('identifier').value);
+        } while (stream.match('punctuation', ','));
+    }
 
     stream.expect('punctuation', '{');
 
@@ -219,7 +254,7 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
 
     stream.expect('punctuation', '}');
 
-    return { kind: 'interface-declaration', name, members, position };
+    return { kind: 'interface-declaration', name, superInterfaces, members, position };
 }
 
 function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {

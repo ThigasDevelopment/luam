@@ -1,25 +1,25 @@
 # Classes
 
-A class declares fields, a constructor and methods. The body uses braces, while
-the functions inside a Lua `function ... end` still end with `end` — the brace
-form belongs to the declaration, not to the statements.
+A class declares fields, a constructor and methods. The class body uses braces.
+Constructors and methods use `name = function (...) ... end`; Luam injects the
+typed `self` parameter automatically.
 
 ```luam
 class Account {
     name: string
     balance: number = 0
 
-    constructor(name: string) {
+    constructor = function (name: string)
         self.name = name
-    }
+    end
 
-    deposit(amount: number): void {
+    deposit = function (amount: number): void
         self.balance += amount
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         return self.name .. ': ' .. tostring(self.balance)
-    }
+    end
 }
 ```
 
@@ -57,14 +57,14 @@ is `check-unknown-class`.
 class PremiumAccount extends Account {
     tier: number = 1
 
-    constructor(name: string, tier: number) {
+    constructor = function (name: string, tier: number)
         self:super(name)
         self.tier = tier
-    }
+    end
 
-    deposit(amount: number): void {
+    deposit = function (amount: number): void
         self:super(amount * 2)
-    }
+    end
 }
 ```
 
@@ -86,9 +86,9 @@ file**. Declare a parent before its children.
 class Round implements Describable {
     label: string = 'round'
 
-    describe(): string {
+    describe = function (): string
         return self.label
-    }
+    end
 }
 ```
 

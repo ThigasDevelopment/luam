@@ -84,7 +84,13 @@ export function resolveNamedMember(context: CheckContext, name: string, expressi
 
     const contract = context.declarations.lookupClass(name) === null ? context.declarations.lookupInterface(name) : null;
 
-    return contract === null ? null : checkInterfaceMember(context, name, contract.members, expression);
+    if (contract === null) {
+        return null;
+    }
+
+    const members = new Map(context.declarations.collectMembers(name).map((member) => [member.name, member]));
+
+    return checkInterfaceMember(context, name, members, expression);
 }
 
 export const NATIVE_CONSTRUCTOR = 'new';

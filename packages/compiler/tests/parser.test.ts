@@ -71,6 +71,17 @@ describe('parser', () => {
         expect(interfaceMember?.kind === 'interface-field' && interfaceMember.annotation.kind).toBe('type-optional');
     });
 
+    it('parses multiple parent interfaces', () => {
+        const [statement] = statements('interface Child extends Parent, Named {\n    value: string\n}\n');
+
+        expect(statement).toMatchObject({
+            kind: 'interface-declaration',
+            name: 'Child',
+            superInterfaces: ['Parent', 'Named'],
+            members: [{ name: 'value' }],
+        });
+    });
+
     it('rejects a field optional marker placed on the type', () => {
         expect(codes('class Player {\n    name: string?\n}\n')).toEqual(['parse-optional-position']);
         expect(codes('interface Named {\n    name: string?\n}\n')).toEqual(['parse-optional-position']);
@@ -206,8 +217,19 @@ describe('parser', () => {
         expect(kinds('function make(): fun(string): void\n    return print\nend')).toEqual(['function-declaration']);
     });
 
-    it('reports a parenthesized type that holds more than one type', () => {
-        expect(codes('local broken: (string, number) = nil')).toEqual(['parse-invalid-type']);
+    it('parses a tuple return annotation', () => {
+        const [statement] = statements('function describe(): (string, boolean)\n    return "name", true\nend\n');
+
+        expect(statement).toMatchObject({
+            kind: 'function-declaration',
+            returnAnnotation: { kind: 'type-tuple', elements: [{ name: 'string' }, { name: 'boolean' }] },
+        });
+    });
+
+    it('parses tuple annotations outside return positions', () => {
+        const [statement] = statements('local result: (string, number) = nil');
+
+        expect(statement).toMatchObject({ declarations: [{ annotation: { kind: 'type-tuple' } }] });
     });
 
     it('parses type aliases with generic parameters', () => {

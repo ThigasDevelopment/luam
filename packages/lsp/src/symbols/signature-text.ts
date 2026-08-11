@@ -33,6 +33,10 @@ export function annotationText(annotation: TypeAnnotation | null): string {
         return members.length === 0 ? '{}' : `{ ${members.join(', ')} }`;
     }
 
+    if (annotation.kind === 'type-tuple') {
+        return `(${annotation.elements.map(annotationText).join(', ')})`;
+    }
+
     if (annotation.typeArguments.length === 0) {
         return annotation.name;
     }

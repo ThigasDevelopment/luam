@@ -83,8 +83,20 @@ Parameter names inside `fun(...)` are documentary — `fun(string): void` and
 
 ## Multi-return
 
-MTA functions that return several values are typed from the catalog, so each
-target gets its own type:
+Declare multiple return types as a tuple. Lua still returns separate values; the
+tuple exists only for static checking:
+
+```luam
+function describe(): (string, boolean)
+    return 'ready', true
+end
+
+local label, enabled = describe()
+```
+
+The checker validates the number and type of each returned value. MTA functions
+that return several values are also typed from the catalog, so each target gets
+its own type:
 
 ```luam
 local x, y, z = getElementPosition(element)

@@ -7,6 +7,7 @@ import type { DeclarationRegistry } from '@compiler/checker/registry';
 import type { Type } from '@compiler/checker/types';
 import { sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
+import type { Token } from '@compiler/lexer/token';
 import type { Expression, Program } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { parse } from '@compiler/parser/parser';
@@ -20,6 +21,7 @@ export interface DocumentAnalysis {
     path: string;
     version: number;
     text: string;
+    tokens: Token[];
     starts: number[];
     program: Program;
     environment: Environment;
@@ -66,6 +68,7 @@ export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
         path: input.path,
         version: input.version,
         text: input.text,
+        tokens: parsed.tokens,
         starts,
         program: parsed.program,
         environment: resolved.environment,

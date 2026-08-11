@@ -103,7 +103,7 @@ export function expandClassDecorators(
     const classDecorators = validateDecorators(context, statement.decorators, 'class');
 
     for (const member of statement.members) {
-        if (member.kind === 'class-method') {
+        if (member.kind === 'class-method' || member.name === 'constructor') {
             validateDecorators(context, member.decorators, 'method');
 
             continue;

@@ -125,7 +125,16 @@
                     }
                 },
                 {
-                    "match": "\\b(interface|enum)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+                    "match": "\\b(interface)\\s+([A-Za-z_][A-Za-z0-9_]*)(?:\\s+(extends)\\s+([A-Za-z_][A-Za-z0-9_,\\s]*))?",
+                    "captures": {
+                        "1": { "name": "storage.type.luam" },
+                        "2": { "name": "entity.name.type.luam" },
+                        "3": { "name": "storage.modifier.luam" },
+                        "4": { "name": "entity.other.inherited-class.luam" }
+                    }
+                },
+                {
+                    "match": "\\b(enum)\\s+([A-Za-z_][A-Za-z0-9_]*)",
                     "captures": {
                         "1": { "name": "storage.type.luam" },
                         "2": { "name": "entity.name.type.luam" }

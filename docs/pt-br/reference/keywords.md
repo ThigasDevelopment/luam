@@ -7,7 +7,7 @@ Lua 5.1 e adiciona 11 próprias.
 O único lugar onde uma palavra reservada continua permitida é como **nome de
 propriedade** — depois de um `.` ou de um `:`, como chave de campo de tabela e
 como membro de classe, interface ou enum. É isso que mantém `Threads.new(...)`,
-`element.type` e `constructor(...)` válidos.
+`element.type` e `constructor = function (...)` válidos.
 
 ## Palavras-chave do Lua 5.1
 

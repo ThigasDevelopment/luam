@@ -49,7 +49,7 @@ function classText(info: ClassInfo): string {
 }
 
 function interfaceText(info: InterfaceInfo): string {
-    return `interface ${info.name}{${membersText(info.members)}}`;
+    return `interface ${info.name}:${[...info.superInterfaces].sort(compareText).join(',')}{${membersText(info.members)}}`;
 }
 
 function enumText(info: EnumInfo): string {

@@ -51,14 +51,35 @@ with `implements`:
 class Round implements Describable {
     label: string = 'round'
 
-    describe(): string {
+    describe = function (): string
         return self.label
-    }
+    end
 }
 ```
 
+An interface can extend one or more interfaces. The child inherits every field
+and method, and classes implementing it must satisfy the complete contract:
+
+```luam
+interface Named {
+    name: string
+}
+
+interface Identified {
+    id: number
+}
+
+interface Entity extends Named, Identified {
+    describe(): string
+}
+```
+
+Compatible inherited declarations are merged. Incompatible declarations report
+`check-conflicting-interface-member`; repeated parents and inheritance cycles are
+also rejected.
+
 A missing member is `check-unimplemented-interface`, and the message names it.
-Referring to an interface that does not exist is `check-unknown-interface`;
+Referring to an interface that does not exist in `implements` or `extends` is `check-unknown-interface`;
 declaring the same one twice is `check-duplicate-interface`.
 
 An interface is also usable as a type:

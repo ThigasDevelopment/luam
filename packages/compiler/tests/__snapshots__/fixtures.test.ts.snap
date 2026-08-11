@@ -1292,6 +1292,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "line": 1,
         "offset": 0,
       },
+      "superInterfaces": [],
     },
     {
       "decorators": [],

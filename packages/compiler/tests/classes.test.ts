@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { compile } from '@compiler/index';
 
-const PLAYER = 'class Player {\n    health: number = 100\n\n    constructor(name: string) {\n        self.name = name\n    }\n}\n';
+const PLAYER = 'class Player {\n    health: number = 100\n\n    constructor = function (name: string)\n        self.name = name\n    end\n}\n';
 
 const COMMAND = 'interface Command {\n    name: string\n    execute(): void\n}\n';
 
@@ -29,12 +29,24 @@ describe('classes', () => {
         );
     });
 
+    it('injects self into assignment-style class methods', () => {
+        const source = 'class Player {\n    describe = function (): string\n        return self.name\n    end\n}\n';
+
+        expect(emit(source)).toContain('describe = function(self)');
+    });
+
+    it('rejects an explicit self parameter in class methods', () => {
+        const source = 'class Player {\n    describe = function (self: Player): string\n        return self.name\n    end\n}\n';
+
+        expect(codes(source)).toEqual(['check-explicit-self-parameter']);
+    });
+
     it('emits a field without a default as nothing', () => {
         expect(emit('class Player {\n    name: string\n}\n')).toBe("class 'Player' {}\n");
     });
 
     it('emits inheritance as an extends modifier and keeps super calls', () => {
-        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor(name: string) {\n        self:super(name)\n    }\n}\n`;
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        self:super(name)\n    end\n}\n`;
 
         expect(emit(source)).toContain("class 'VIPPlayer' :extends 'Player' {");
         expect(emit(source)).toContain('self:super(name)');
@@ -111,6 +123,57 @@ describe('classes', () => {
         );
     });
 
+    it('checks classes against inherited interface members', () => {
+        const source = [
+            'interface Named { name: string }',
+            'interface Described { describe(): string }',
+            'interface Entity extends Named, Described { id: number }',
+            'class Player implements Entity {',
+            '    name: string',
+            '    id: number',
+            '    describe = function (): string return self.name end',
+            '}',
+        ].join('\n');
+
+        expect(codes(source)).toEqual([]);
+        expect(codes(source.replace('    id: number\n', ''))).toEqual(['check-unimplemented-interface']);
+    });
+
+    it('resolves inherited members on interface-typed values', () => {
+        const source = [
+            'interface Named { name: string }',
+            'interface Entity extends Named { describe(value: number): string }',
+            'local entity: Entity',
+            'local name: string = entity.name',
+            'local description: string = entity:describe(1)',
+        ].join('\n');
+
+        expect(codes(source)).toEqual([]);
+        expect(codes(source.replace('describe(1)', "describe('wrong')"))).toEqual(['check-type-mismatch']);
+    });
+
+    it('accepts compatible members inherited from multiple interfaces', () => {
+        const source = 'interface Left { id: number }\ninterface Right { id: number }\ninterface Child extends Left, Right {}\n';
+
+        expect(codes(source)).toEqual([]);
+    });
+
+    it('reports invalid interface inheritance', () => {
+        expect(codes('interface Child extends Missing {}\n')).toEqual(['check-unknown-interface']);
+        expect(codes('interface Child extends Child {}\n')).toEqual(['check-interface-cycle']);
+        expect(codes('interface Parent {}\ninterface Child extends Parent, Parent {}\n')).toEqual(['check-duplicate-interface-parent']);
+    });
+
+    it('reports conflicting inherited interface members', () => {
+        const source = 'interface Left { id: number }\ninterface Right { id: string }\ninterface Child extends Left, Right {}\n';
+
+        expect(codes(source)).toEqual(['check-conflicting-interface-member']);
+    });
+
+    it('reports duplicate members declared by an interface', () => {
+        expect(codes('interface Named { name: string name: number }\n')).toEqual(['check-duplicate-interface-member']);
+    });
+
     it('reports a super call that cannot resolve a parent method', () => {
         expect(codes('local function helper(): void\n    self:super()\nend\n')).toEqual(['check-invalid-super']);
         expect(codes('class Player {\n    greet(): void {\n        self:super()\n    }\n}\n')).toEqual(['check-invalid-super']);
@@ -120,7 +183,7 @@ describe('classes', () => {
     });
 
     it('checks super call arguments against the parent method', () => {
-        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor(name: string) {\n        self:super(1)\n    }\n}\n`;
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        self:super(1)\n    end\n}\n`;
 
         expect(codes(source)).toEqual(['check-type-mismatch']);
     });

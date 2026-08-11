@@ -53,6 +53,7 @@ export type InterfaceMember = InterfaceFieldSignature | InterfaceMethodSignature
 export interface InterfaceDeclaration extends NodeBase {
     kind: 'interface-declaration';
     name: string;
+    superInterfaces: string[];
     members: InterfaceMember[];
 }
 

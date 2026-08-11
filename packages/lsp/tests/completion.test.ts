@@ -209,6 +209,32 @@ describe('class header completion', () => {
 
         expect(found).toContain('Named');
     });
+
+    it('offers extends after an interface name', () => {
+        expect(labels(new LanguageService(), SERVER_FILE, 'interface Child \n', 'interface Child ')).toEqual(['extends']);
+    });
+
+    it('offers interfaces after extends and commas in interface headers', () => {
+        const text = 'interface Parent {}\ninterface Named {}\ninterface Child extends Parent, \n';
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'extends Parent, ');
+
+        expect(found).toContain('Named');
+        expect(found).not.toContain('Child');
+    });
+
+    it('offers inherited interface members', () => {
+        const text = [
+            'interface Named { name: string }',
+            'interface Entity extends Named { describe(): string }',
+            'local entity: Entity',
+            'entity.',
+            'entity:',
+        ].join('\n');
+        const service = new LanguageService();
+
+        expect(labels(service, SERVER_FILE, text, 'entity.')).toContain('name');
+        expect(labels(service, SERVER_FILE, text, 'entity:')).toContain('describe');
+    });
 });
 
 describe('argument aware completion', () => {

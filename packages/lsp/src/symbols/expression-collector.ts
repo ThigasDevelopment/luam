@@ -43,6 +43,14 @@ export function collectAnnotation(state: CollectorState, block: BlockContext, an
         return;
     }
 
+    if (annotation.kind === 'type-tuple') {
+        for (const element of annotation.elements) {
+            collectAnnotation(state, block, element);
+        }
+
+        return;
+    }
+
     for (const parameter of annotation.parameters) {
         collectAnnotation(state, block, parameter);
     }

@@ -51,14 +51,36 @@ com `implements`:
 class Round implements Describable {
     label: string = 'round'
 
-    describe(): string {
+    describe = function (): string
         return self.label
-    }
+    end
 }
 ```
 
+Uma interface pode estender uma ou mais interfaces. A interface filha herda todos
+os campos e métodos, e as classes que a implementam devem satisfazer o contrato
+completo:
+
+```luam
+interface Named {
+    name: string
+}
+
+interface Identified {
+    id: number
+}
+
+interface Entity extends Named, Identified {
+    describe(): string
+}
+```
+
+Declarações herdadas compatíveis são combinadas. Declarações incompatíveis geram
+`check-conflicting-interface-member`; pais repetidos e ciclos de herança também
+são rejeitados.
+
 Um membro faltando é `check-unimplemented-interface`, e a mensagem o nomeia.
-Referir-se a uma interface inexistente é `check-unknown-interface`; declarar a
+Referir-se a uma interface inexistente em `implements` ou `extends` é `check-unknown-interface`; declarar a
 mesma duas vezes é `check-duplicate-interface`.
 
 Uma interface também é utilizável como tipo:

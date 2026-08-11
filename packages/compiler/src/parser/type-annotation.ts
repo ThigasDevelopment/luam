@@ -73,17 +73,25 @@ function parseFunctionType(stream: TokenStream): TypeAnnotation {
 }
 
 function parseGroupedType(stream: TokenStream): TypeAnnotation {
-    stream.expect('punctuation', '(');
+    const position = stream.expect('punctuation', '(').position;
 
     const inner = parseTypeAnnotation(stream);
 
-    if (stream.check('punctuation', ',')) {
-        throw stream.error('A parenthesized type must contain a single type.', 'parse-invalid-type');
+    if (!stream.match('punctuation', ',')) {
+        stream.expect('punctuation', ')');
+
+        return inner;
     }
+
+    const elements = [inner];
+
+    do {
+        elements.push(parseTypeAnnotation(stream));
+    } while (stream.match('punctuation', ','));
 
     stream.expect('punctuation', ')');
 
-    return inner;
+    return { kind: 'type-tuple', elements, position };
 }
 
 function parseObjectMember(stream: TokenStream): TypeObjectMember {
