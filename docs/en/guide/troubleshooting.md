@@ -28,7 +28,7 @@ one-line form above, so a CI transcript carries no escape sequence.
 
 The npm global bin directory is not on your `PATH`. See
 [Installation](/en/guide/installation#luam-command-not-found), or use
-`npx luam <command>`, which needs no `PATH` entry.
+`npx @thigasdevelopment/luam <command>`, which needs no `PATH` entry.
 
 ## The build reports no sources
 

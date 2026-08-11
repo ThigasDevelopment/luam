@@ -2,7 +2,7 @@ const REPOSITORY_URL = 'https://github.com/ThigasDevelopment/luam';
 
 export function distManifest(version: string): string {
     const manifest = {
-        name: 'luam',
+        name: '@thigasdevelopment/luam',
         version,
         description: 'The Luam compiler for Multi Theft Auto resources.',
         keywords: ['mta', 'mtasa', 'multi-theft-auto', 'lua', 'lua5.1', 'luau', 'compiler', 'transpiler', 'typed-lua'],

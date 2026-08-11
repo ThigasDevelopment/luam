@@ -15,7 +15,7 @@ that configures a project, and the editor support that runs the same checker.
 
 | Package | What it is |
 | --- | --- |
-| `luam` | The published CLI. One command, `luam`. |
+| `@thigasdevelopment/luam` | The published CLI. One command, `luam`. |
 | `@luam/compiler` | Lexer, parser, binder, checker, emitter, project assembly. |
 | `@luam/lsp` | The language server, built on the same frontend. |
 | `luam` (VS Code) | The extension: grammar, client, commands. |

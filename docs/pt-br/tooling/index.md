@@ -15,7 +15,7 @@ configura um projeto e o suporte de editor que roda o mesmo verificador.
 
 | Pacote | O que é |
 | --- | --- |
-| `luam` | A CLI publicada. Um comando, `luam`. |
+| `@thigasdevelopment/luam` | A CLI publicada. Um comando, `luam`. |
 | `@luam/compiler` | Lexer, parser, binder, checker, emitter e montagem do projeto. |
 | `@luam/lsp` | O servidor de linguagem, feito sobre o mesmo frontend. |
 | `luam` (VS Code) | A extensão: gramática, cliente, comandos. |

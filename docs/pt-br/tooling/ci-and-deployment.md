@@ -23,7 +23,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '20'
-            - run: npx --yes luam check
+            - run: npx --yes @thigasdevelopment/luam check
 ```
 
 `npx` não precisa de instalação global e guarda o download em cache. O `check` não
@@ -46,7 +46,7 @@ isso em qualquer lugar.
 ## Produzindo um artefato do resource
 
 ```bash
-npx --yes luam build --offline
+npx --yes @thigasdevelopment/luam build --offline
 ```
 
 O resource aparece em `<outDir>/<name>` — envie esse diretório como artefato do
@@ -54,7 +54,7 @@ build. Um build que reporta qualquer erro não escreve nada, então um artefato 
 está completo ou não existe.
 
 ```yaml
-            - run: npx --yes luam build --offline
+            - run: npx --yes @thigasdevelopment/luam build --offline
             - uses: actions/upload-artifact@v4
               with:
                   name: resource
@@ -77,7 +77,7 @@ sincronizar, reiniciar.
 
 ```bash
 export LUAM_MTA_PASSWORD=...
-npx --yes luam ensure --no-watch
+npx --yes @thigasdevelopment/luam ensure --no-watch
 ```
 
 Essa é a forma "script de deploy" do laço de desenvolvimento, e usa as mesmas
@@ -98,7 +98,7 @@ regras de transporte — veja
 
 ```bash
 #!/bin/sh
-npx --yes luam check --no-color || exit 1
+npx --yes @thigasdevelopment/luam check --no-color || exit 1
 ```
 
 ## Cache
