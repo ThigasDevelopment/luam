@@ -9,9 +9,9 @@ exports[`directive manifest > locks the manifest for a project using every direc
     <script src="src/server/**/*.lua" />
     <script src="src/client/**/*.lua" type="client" cache="false" />
     <!-- Exported functions -->
-    <export function="formatScore" type="shared" />
-    <export function="getScore" />
-    <export function="refreshHud" type="client" />
+    <export function="formatScore" type="shared" http="false" />
+    <export function="getScore" http="false" />
+    <export function="refreshHud" type="client" http="false" />
     <!-- Assets -->
     <file src="assets/logo.png" />
 </meta>

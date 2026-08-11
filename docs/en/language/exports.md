@@ -11,7 +11,7 @@ end
 ```
 
 ```xml
-<export function="getScore" type="server" />
+<export function="getScore" type="server" http="false" />
 ```
 
 ## Calling an export
@@ -25,6 +25,25 @@ local score = exports['luam-docs-exported-function']:getScore(player)
 The export's `type` follows the file's environment, so a function in
 `src/server` is exported to the server side and a function in `src/client` to the
 client side.
+
+## HTTP access
+
+Add the contextual `http` modifier to let MTA's HTTP server call the function:
+
+```luam
+export http function getPlayerCount(): number
+    return getPlayerCount()
+end
+```
+
+```xml
+<export function="getPlayerCount" type="server" http="true" />
+```
+
+Without the modifier, the compiler always emits `http="false"`. Outside an
+`export` directive, `http` remains an ordinary identifier. Remote access also
+depends on the `resource.<name>.http` ACL right and the server's authentication
+configuration.
 
 ## Rules
 
@@ -55,10 +74,7 @@ See [Keywords](/en/reference/keywords).
 
 ## What is not verified
 
-An export is **named, never verified** against the calling side, and it cannot
-carry an extra attribute such as `http="true"`. If you need one, add the entry by
-hand in a resource that owns its own `meta.xml` — the generated manifest does not
-accept extra export attributes. See
+An export is **named, never verified** against the calling side. See
 [Limitations](/en/reference/limitations).
 
 ## A complete example

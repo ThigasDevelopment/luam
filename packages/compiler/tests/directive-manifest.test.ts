@@ -72,9 +72,15 @@ describe('directive manifest', () => {
     it('types an export by the environment of its file', () => {
         const manifest = manifestOf(files);
 
-        expect(manifest).toContain('<export function="getScore" />');
-        expect(manifest).toContain('<export function="refreshHud" type="client" />');
-        expect(manifest).toContain('<export function="formatScore" type="shared" />');
+        expect(manifest).toContain('<export function="getScore" http="false" />');
+        expect(manifest).toContain('<export function="refreshHud" type="client" http="false" />');
+        expect(manifest).toContain('<export function="formatScore" type="shared" http="false" />');
+    });
+
+    it('enables http access only for an http export', () => {
+        const source = 'export http function score(): number\n    return 1\nend\n';
+
+        expect(manifestOf([serverFile(source)])).toContain('<export function="score" http="true" />');
     });
 
     it('emits one element for a shared export rather than a server and client pair', () => {
@@ -128,8 +134,8 @@ describe('directive caching', () => {
         const after = [serverFile('export function points(): number\n    return 1\nend\n')];
         const manifest = (files: readonly ProjectFile[]): string => assembleResource(cache.compile(files), {}).build?.manifest ?? '';
 
-        expect(manifest(before)).toContain('<export function="score" />');
-        expect(manifest(after)).toContain('<export function="points" />');
+        expect(manifest(before)).toContain('<export function="score" http="false" />');
+        expect(manifest(after)).toContain('<export function="points" http="false" />');
         expect(manifest(after)).not.toContain('score');
     });
 });

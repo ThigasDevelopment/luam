@@ -12,17 +12,23 @@ export function isDirectiveStart(stream: TokenStream): boolean {
         return false;
     }
 
-    return stream.checkAhead(1, 'keyword', 'function') || (stream.checkAhead(1, 'keyword', 'local') && stream.checkAhead(2, 'keyword', 'function'));
+    const modifierOffset = stream.checkAhead(1, 'identifier', 'http') ? 1 : 0;
+
+    return (
+        stream.checkAhead(modifierOffset + 1, 'keyword', 'function') ||
+        (stream.checkAhead(modifierOffset + 1, 'keyword', 'local') && stream.checkAhead(modifierOffset + 2, 'keyword', 'function'))
+    );
 }
 
 export function parseDirective(stream: TokenStream): Statement {
     const token = stream.next();
+    const isHttpExport = stream.match('identifier', 'http');
 
     if (!stream.match('keyword', 'local')) {
-        return parseFunctionDeclaration(stream, false, true);
+        return parseFunctionDeclaration(stream, false, true, isHttpExport);
     }
 
     stream.report('parse-export-local', EXPORT_LOCAL_MESSAGE, token.position);
 
-    return parseFunctionDeclaration(stream, true, false);
+    return parseFunctionDeclaration(stream, true);
 }

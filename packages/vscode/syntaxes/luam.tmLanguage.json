@@ -106,9 +106,10 @@
         "buildDirective": {
             "patterns": [
                 {
-                    "match": "\\b(export)\\s+(?=(?:local\\s+)?function\\b)",
+                    "match": "\\b(export)\\s+(?:(http)\\s+)?(?=(?:local\\s+)?function\\b)",
                     "captures": {
-                        "1": { "name": "storage.modifier.export.luam" }
+                        "1": { "name": "storage.modifier.export.luam" },
+                        "2": { "name": "storage.modifier.http.luam" }
                     }
                 }
             ]

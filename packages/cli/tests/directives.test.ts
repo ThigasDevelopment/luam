@@ -53,7 +53,7 @@ describe('build directives through the cli', () => {
         const { context, fixture } = harness({ ...defaultProjectFiles(), 'src/server/main.luam': EXPORTED_SERVER });
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<export function="announceJoin" />');
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<export function="announceJoin" http="false" />');
     });
 
     it('writes a shared export as one entry rather than a server and client pair', async () => {
@@ -63,7 +63,7 @@ describe('build directives through the cli', () => {
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
 
-        expect(manifest).toContain('<export function="formatScore" type="shared" />');
+        expect(manifest).toContain('<export function="formatScore" type="shared" http="false" />');
         expect(manifest.match(/formatScore/g)).toHaveLength(1);
     });
 

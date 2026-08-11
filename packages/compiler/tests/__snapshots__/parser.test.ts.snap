@@ -148,6 +148,7 @@ exports[`parser > parses a function declaration with parameter and return annota
     },
   ],
   "isExported": false,
+  "isHttpExport": false,
   "isLocal": false,
   "isMethod": false,
   "kind": "function-declaration",

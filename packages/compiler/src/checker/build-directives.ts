@@ -5,6 +5,7 @@ import { DECLARATION_EXTENSION } from '@compiler/project/source-kind';
 
 export interface ExportedFunction {
     name: string;
+    http: boolean;
     position: SourcePosition;
 }
 
@@ -84,7 +85,7 @@ function collectExport(statement: FunctionDeclaration, result: DirectiveResult, 
         return;
     }
 
-    result.directives.exports.push({ name: statement.name.name, position: statement.position });
+    result.directives.exports.push({ name: statement.name.name, http: statement.isHttpExport, position: statement.position });
 }
 
 export function collectDirectives(body: readonly Statement[], options: DirectiveOptions): DirectiveResult {

@@ -490,7 +490,7 @@ local vip = new VIPPlayer('Thigas', 2)
 | Comments | `# line` and `#* block *#`; write length without a space as `#items` |
 | Object extensions | `items.count` → `table.size(items)`, `name.trim`, `ratio.clamp(a, b)` |
 | Multi-return | `local x, y, z = getElementPosition(el)` — typed from the MTA catalog |
-| `export` | Erased from the Lua, written into `meta.xml` as `<export function="f" />` |
+| `export` | Erased from the Lua, written into `meta.xml` as `<export function="f" http="false" />` |
 | Native libraries | `sleep` plus the `Threads`, `Async` and `Dotenv` classes, injected only when named |
 | Native classes | `local tasks = new Async(100)` — same `new` as a project class |
 | MTA OOP classes | `Player.getRandom()`, `File.exists(path)`, and callable constructors such as `File(path)` |
@@ -681,8 +681,7 @@ node packages/lsp/dist/luam-lsp.mjs --stdio
 - **No static members, declared metamethods, or generic classes.**
 - **The editor does not re-check an open file when another one changes.**
   Cross-module violations surface in `luam check`.
-- **An export is named, never verified**, and cannot carry an attribute such as
-  `http="true"`.
+- **An export is named, never verified** against the side that calls it.
 
 ---
 

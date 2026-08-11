@@ -6,6 +6,16 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### HTTP Exports
+
+#### Added
+
+- `export http function name()` emits an MTA export with `http="true"`.
+
+#### Changed
+
+- A regular `export function name()` now emits an explicit `http="false"`.
+
 ### One-Line Production Lua
 
 MTA downloads every client script to every joining player, and until now those

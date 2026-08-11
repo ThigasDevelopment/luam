@@ -49,8 +49,8 @@ luam build
 `meta.xml` gains one entry per exported function:
 
 ```xml
-<export function="getScore" type="server" />
-<export function="addScore" type="server" />
+<export function="getScore" type="server" http="false" />
+<export function="addScore" type="server" http="false" />
 ```
 
 ## Calling it

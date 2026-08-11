@@ -68,7 +68,7 @@ function parseFunctionName(stream: TokenStream): { name: Identifier | MemberExpr
     return { name: { kind: 'member-expression', object: name as Expression, property, position: token.position }, isMethod: true };
 }
 
-export function parseFunctionDeclaration(stream: TokenStream, isLocal: boolean, isExported = false): FunctionDeclaration {
+export function parseFunctionDeclaration(stream: TokenStream, isLocal: boolean, isExported = false, isHttpExport = false): FunctionDeclaration {
     const position = stream.expect('keyword', 'function').position;
     const { name, isMethod } = parseFunctionName(stream);
     const parameters = parseParameters(stream);
@@ -77,5 +77,5 @@ export function parseFunctionDeclaration(stream: TokenStream, isLocal: boolean, 
 
     stream.expect('keyword', 'end');
 
-    return { kind: 'function-declaration', name, isLocal, isExported, isMethod, parameters, returnAnnotation, body, position };
+    return { kind: 'function-declaration', name, isLocal, isExported, isHttpExport, isMethod, parameters, returnAnnotation, body, position };
 }

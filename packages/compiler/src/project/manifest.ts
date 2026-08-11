@@ -5,6 +5,7 @@ import type { Environment } from '@compiler/environment/environment';
 export interface ExportContribution {
     kind: 'export';
     name: string;
+    http: boolean;
     side: Environment;
     position: SourcePosition;
 }
@@ -22,7 +23,9 @@ export function occupiedSides(contribution: ExportContribution): readonly Enviro
 }
 
 export function toContributions(directives: SourceDirectives, environment: Environment): ManifestContribution[] {
-    return directives.exports.map((entry): ManifestContribution => ({ kind: 'export', name: entry.name, side: environment, position: entry.position }));
+    return directives.exports.map(
+        (entry): ManifestContribution => ({ kind: 'export', name: entry.name, http: entry.http, side: environment, position: entry.position }),
+    );
 }
 
 export interface ManifestInfo {
@@ -125,11 +128,15 @@ function fileElement(file: ManifestFile): string {
 }
 
 function exportElement(contribution: ExportContribution): string {
+    const attributes = [attribute('function', contribution.name), attribute('http', String(contribution.http))];
+
     if (contribution.side === DEFAULT_SIDE) {
-        return `${INDENT}<export ${attribute('function', contribution.name)} />`;
+        return `${INDENT}<export ${attributes.join(' ')} />`;
     }
 
-    return `${INDENT}<export ${attribute('function', contribution.name)} ${attribute('type', contribution.side)} />`;
+    attributes.splice(1, 0, attribute('type', contribution.side));
+
+    return `${INDENT}<export ${attributes.join(' ')} />`;
 }
 
 function versionElement(version: string): string {

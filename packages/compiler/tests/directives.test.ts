@@ -29,13 +29,22 @@ describe('export directive parsing', () => {
 
         expect(statement.kind).toBe('function-declaration');
         expect(statement.isExported).toBe(true);
+        expect(statement.isHttpExport).toBe(false);
         expect(statement.isLocal).toBe(false);
+    });
+
+    it('marks an http export', () => {
+        const statement = firstStatement('export http function score(): number\n    return 1\nend\n') as FunctionDeclaration;
+
+        expect(statement.isExported).toBe(true);
+        expect(statement.isHttpExport).toBe(true);
     });
 
     it('leaves an ordinary function unexported', () => {
         const statement = firstStatement('function score(): number\n    return 1\nend\n') as FunctionDeclaration;
 
         expect(statement.isExported).toBe(false);
+        expect(statement.isHttpExport).toBe(false);
     });
 
     it('reserves "export" so it cannot name a variable', () => {
@@ -45,6 +54,10 @@ describe('export directive parsing', () => {
 
     it('keeps "export" usable as a table field and a call target', () => {
         expect(codes("local settings: table = { export = true }\nprint(settings.export)\n")).toEqual([]);
+    });
+
+    it('keeps "http" usable as an ordinary identifier', () => {
+        expect(codes('local http = true\nprint(http)\n')).toEqual([]);
     });
 
     it('reports parse-export-local for an exported local function', () => {
@@ -58,6 +71,14 @@ describe('export directive checking', () => {
 
         expect(codes(source)).toEqual([]);
         expect(exportedNames(source)).toEqual(['score']);
+    });
+
+    it('collects whether an export allows http access', () => {
+        const regular = compile('export function score()\nend\n', { filePath: SERVER_FILE }).directives.exports;
+        const http = compile('export http function score()\nend\n', { filePath: SERVER_FILE }).directives.exports;
+
+        expect(regular[0]?.http).toBe(false);
+        expect(http[0]?.http).toBe(true);
     });
 
     it('lists nothing for a file with no directive', () => {

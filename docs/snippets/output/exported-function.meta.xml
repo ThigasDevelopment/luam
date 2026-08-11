@@ -4,6 +4,6 @@
     <!-- Source scripts -->
     <script src="src/server.lua" />
     <!-- Exported functions -->
-    <export function="addScore" />
-    <export function="getScore" />
+    <export function="addScore" http="false" />
+    <export function="getScore" http="false" />
 </meta>

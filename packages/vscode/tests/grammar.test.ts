@@ -101,6 +101,7 @@ describe('grammar', () => {
 
     it('highlights build directives', () => {
         expect(matchesAny('buildDirective', 'export function getScore(player: Player): number')).toBe(true);
+        expect(matchesAny('buildDirective', 'export http function getScore(player: Player): number')).toBe(true);
     });
 
     it('highlights decorators only at the start of a line', () => {
@@ -121,7 +122,9 @@ describe('grammar', () => {
         const rule = rulePatterns('buildDirective')[0];
 
         expect(rule?.captures?.['1']?.name).toBe('storage.modifier.export.luam');
+        expect(rule?.captures?.['2']?.name).toBe('storage.modifier.http.luam');
         expect(matchesAny('function', 'export function getScore(')).toBe(true);
+        expect(matchesAny('function', 'export http function getScore(')).toBe(true);
     });
 
     it('leaves an ordinary identifier named after a directive alone', () => {

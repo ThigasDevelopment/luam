@@ -200,6 +200,7 @@ export interface FunctionDeclaration extends NodeBase {
     name: Identifier | MemberExpression;
     isLocal: boolean;
     isExported: boolean;
+    isHttpExport: boolean;
     isMethod: boolean;
     parameters: Parameter[];
     returnAnnotation: TypeAnnotation | null;
