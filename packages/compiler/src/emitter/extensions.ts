@@ -6,8 +6,8 @@ function receiverKind(type: Type | null): ExtensionReceiver | null {
         return null;
     }
 
-    if (type.kind === 'string' || type.kind === 'number') {
-        return type.kind;
+    if (type.kind === 'string' || type.kind === 'string-literal' || type.kind === 'number') {
+        return type.kind === 'string-literal' ? 'string' : type.kind;
     }
 
     return isTableLike(type) ? 'table' : null;

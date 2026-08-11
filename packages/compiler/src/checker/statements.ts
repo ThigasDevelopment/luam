@@ -24,6 +24,7 @@ import {
     NIL_TYPE,
     renameRecord,
     typeToString,
+    widenLiteral,
     type FunctionType,
     type Type,
 } from './types';
@@ -94,7 +95,7 @@ function checkLocal(context: CheckContext, statement: LocalStatement): void {
         const valueType = valueTypes[index] ?? NIL_TYPE;
 
         if (declaration.annotation === null) {
-            const inferred = context.allowNil || value === undefined ? ANY_TYPE : valueType;
+            const inferred = context.allowNil || value === undefined ? ANY_TYPE : widenLiteral(valueType);
 
             context.binder.declare({ name: declaration.name, type: inferred, isLocal: true, position: declaration.position });
 

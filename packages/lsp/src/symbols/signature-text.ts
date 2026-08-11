@@ -18,6 +18,10 @@ export function annotationText(annotation: TypeAnnotation | null): string {
         return annotation.options.map(annotationText).join(' | ');
     }
 
+    if (annotation.kind === 'type-string-literal') {
+        return `'${annotation.value.replace(/(['\\])/g, '\\$1')}'`;
+    }
+
     if (annotation.kind === 'type-function') {
         const parameters = annotation.parameters.map(annotationText);
 

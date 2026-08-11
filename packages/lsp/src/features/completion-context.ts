@@ -144,8 +144,8 @@ function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<strin
         return { kind: 'native', receiver: 'table' };
     }
 
-    if (type.kind === 'string' || type.kind === 'number') {
-        return { kind: 'native', receiver: type.kind };
+    if (type.kind === 'string' || type.kind === 'string-literal' || type.kind === 'number') {
+        return { kind: 'native', receiver: type.kind === 'string-literal' ? 'string' : type.kind };
     }
 
     if (type.kind === 'record') {

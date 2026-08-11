@@ -21,6 +21,7 @@ import {
     createNamed,
     createObjectType,
     createOptional,
+    createStringLiteral,
     createTuple,
     createUnion,
     isAssignable,
@@ -33,6 +34,7 @@ import {
     UNKNOWN_TYPE,
     USERDATA_TYPE,
     VOID_TYPE,
+    widenLiteral,
     type Type,
 } from './types';
 
@@ -201,7 +203,7 @@ export class CheckContext {
     }
 
     inferReturnType(type: Type): void {
-        this.returnStack[this.returnStack.length - 1]?.inferred.push(type);
+        this.returnStack[this.returnStack.length - 1]?.inferred.push(widenLiteral(type));
     }
 
     pushClassMethod(frame: ClassMethodFrame): void {
@@ -231,6 +233,10 @@ export class CheckContext {
 
         if (annotation.kind === 'type-union') {
             return createUnion(annotation.options.map((option) => this.resolveAnnotation(option)));
+        }
+
+        if (annotation.kind === 'type-string-literal') {
+            return createStringLiteral(annotation.value);
         }
 
         if (annotation.kind === 'type-object') {
@@ -263,7 +269,8 @@ export class CheckContext {
             return;
         }
 
-        const message = `${subject} expects "${typeToString(target)}" but received "${typeToString(source)}".`;
+        const received = target.kind === 'string-literal' || target.kind === 'union' ? source : widenLiteral(source);
+        const message = `${subject} expects "${typeToString(target)}" but received "${typeToString(received)}".`;
 
         this.report('check-type-mismatch', `${message}${nilHint(source, target, this.mode)}`, position);
     }

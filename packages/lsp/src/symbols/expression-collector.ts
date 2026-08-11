@@ -21,6 +21,10 @@ export function collectAnnotation(state: CollectorState, block: BlockContext, an
         return;
     }
 
+    if (annotation.kind === 'type-string-literal') {
+        return;
+    }
+
     if (annotation.kind === 'type-array' || annotation.kind === 'type-optional') {
         collectAnnotation(state, block, annotation.element);
 

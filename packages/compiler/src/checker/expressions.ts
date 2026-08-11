@@ -27,6 +27,7 @@ import {
     ANY_TYPE,
     BOOLEAN_TYPE,
     createArray,
+    createStringLiteral,
     createUnion,
     firstValueOf,
     isTableLike,
@@ -47,7 +48,7 @@ const EXTENSION_RESULTS: Readonly<Record<ExtensionResult, Type>> = {
 };
 
 function extensionType(receiver: Type, property: string): Type | null {
-    const kind = receiver.kind === 'string' || receiver.kind === 'number' ? receiver.kind : null;
+    const kind = receiver.kind === 'string-literal' ? 'string' : receiver.kind === 'string' || receiver.kind === 'number' ? receiver.kind : null;
     const target = kind ?? (isTableLike(receiver) ? 'table' : null);
 
     if (target === null) {
@@ -255,7 +256,7 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'number-literal':
             return context.record(expression, NUMBER_TYPE);
         case 'string-literal':
-            return context.record(expression, STRING_TYPE);
+            return context.record(expression, createStringLiteral(expression.value));
         case 'template-literal':
             return checkTemplate(context, expression);
         case 'vararg-expression':

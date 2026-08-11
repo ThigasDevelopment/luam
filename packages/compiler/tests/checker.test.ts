@@ -110,6 +110,14 @@ describe('checker', () => {
         expect(codes("type PlayerId = number\nlocal id: PlayerId = 'seven'\n")).toEqual(['check-type-mismatch']);
     });
 
+    it('restricts string literal unions to their declared values', () => {
+        const alias = "type PenisString = 'Marcio' | 'Penis Largo'\n";
+
+        expect(codes(`${alias}local value: PenisString = 'Marcio'\n`)).toEqual([]);
+        expect(codes(`${alias}local value: PenisString = 'Penis Largo'\n`)).toEqual([]);
+        expect(codes(`${alias}local value: PenisString = 'Outro'\n`)).toEqual(['check-type-mismatch']);
+    });
+
     it('accepts a function that matches a function type annotation', () => {
         const source = 'local double: fun(value: number): number = function(value: number): number\n    return value * 2\nend\n';
 

@@ -51,6 +51,21 @@ function firstValue(source: string): Expression {
 }
 
 describe('parser', () => {
+    it('parses unions of string literal types', () => {
+        const [statement] = statements("type PenisString = 'Marcio' | 'Penis Largo'\n");
+
+        expect(statement).toMatchObject({
+            kind: 'type-alias-statement',
+            annotation: {
+                kind: 'type-union',
+                options: [
+                    { kind: 'type-string-literal', value: 'Marcio' },
+                    { kind: 'type-string-literal', value: 'Penis Largo' },
+                ],
+            },
+        });
+    });
+
     it('attaches decorators to classes and members in source order', () => {
         const [statement] = statements('@Getter\nclass Player {\n    @Getter\n    @Setter\n    name: string\n}\n');
 

@@ -6,6 +6,7 @@ import {
     createNamed,
     createObjectType,
     createOptional,
+    createStringLiteral,
     createTuple,
     createUnion,
     NIL_TYPE,
@@ -54,6 +55,10 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
 
     if (annotation.kind === 'type-union') {
         return createUnion(annotation.options.map((option) => annotationType(option)));
+    }
+
+    if (annotation.kind === 'type-string-literal') {
+        return createStringLiteral(annotation.value);
     }
 
     if (annotation.kind === 'type-function') {

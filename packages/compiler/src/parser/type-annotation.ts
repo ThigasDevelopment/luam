@@ -133,6 +133,12 @@ function parseObjectType(stream: TokenStream): TypeAnnotation {
 }
 
 function parsePrimaryType(stream: TokenStream): TypeAnnotation {
+    if (stream.check('string')) {
+        const token = stream.next();
+
+        return { kind: 'type-string-literal', value: token.value, position: token.position };
+    }
+
     if (stream.check('keyword', 'function')) {
         throw stream.error(`Use "${FUNCTION_TYPE}" for function types. "function" is a keyword and cannot name a type.`, 'parse-invalid-type');
     }

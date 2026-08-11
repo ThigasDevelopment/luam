@@ -23,6 +23,11 @@ export interface UnionType {
     options: Type[];
 }
 
+export interface StringLiteralType {
+    kind: 'string-literal';
+    value: string;
+}
+
 export interface NamedType {
     kind: 'named';
     name: string;
@@ -48,7 +53,7 @@ export interface RecordType {
     members: ReadonlyMap<string, Type>;
 }
 
-export type Type = PrimitiveType | TableType | ArrayType | OptionalType | UnionType | NamedType | FunctionType | TupleType | RecordType;
+export type Type = PrimitiveType | TableType | ArrayType | OptionalType | UnionType | StringLiteralType | NamedType | FunctionType | TupleType | RecordType;
 
 export interface AssignabilityOptions {
     allowNil: boolean;
@@ -71,6 +76,14 @@ export function createArray(element: Type): Type {
 
 export function createNamed(name: string): Type {
     return { kind: 'named', name };
+}
+
+export function createStringLiteral(value: string): Type {
+    return { kind: 'string-literal', value };
+}
+
+export function widenLiteral(type: Type): Type {
+    return type.kind === 'string-literal' ? STRING_TYPE : type;
 }
 
 export function createRecord(name: string, members: ReadonlyMap<string, Type>, origin: string | null = null): Type {
@@ -176,6 +189,10 @@ export function typeToString(type: Type): string {
         return type.options.map(typeToString).join(' | ');
     }
 
+    if (type.kind === 'string-literal') {
+        return `'${type.value.replace(/(['\\])/g, '\\$1')}'`;
+    }
+
     if (type.kind === 'named' || type.kind === 'record') {
         return type.name;
     }
@@ -212,7 +229,7 @@ export function isNumeric(type: Type): boolean {
 }
 
 export function isConcatenable(type: Type): boolean {
-    return type.kind === 'string' || isNumeric(type);
+    return type.kind === 'string' || type.kind === 'string-literal' || isNumeric(type);
 }
 
 function isFunctionAssignable(source: FunctionType, target: FunctionType, options: AssignabilityOptions): boolean {
@@ -305,6 +322,14 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
 
     if (source.kind === 'function' && target.kind === 'function') {
         return isFunctionAssignable(source, target, options);
+    }
+
+    if (source.kind === 'string-literal') {
+        return target.kind === 'string' || (target.kind === 'string-literal' && source.value === target.value);
+    }
+
+    if (target.kind === 'string-literal') {
+        return false;
     }
 
     return source.kind === target.kind;
