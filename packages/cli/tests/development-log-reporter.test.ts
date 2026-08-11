@@ -31,4 +31,12 @@ describe('development log reporting', () => {
 
         expect(painted).toEqual([reporter.style.eraseLine()]);
     });
+
+    it('prints an enclosing symbol with a resolved source position', () => {
+        const { reporter } = createMemoryReporter();
+
+        expect(formatDevelopmentLog(reporter, { ...RECORD, source: { path: 'src/client/hud.luam', line: 4, symbol: 'renderHud' } })).toContain(
+            '(src/client/hud.luam:4 (renderHud))',
+        );
+    });
 });

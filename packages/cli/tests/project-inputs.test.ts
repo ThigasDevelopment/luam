@@ -84,9 +84,9 @@ describe('deployment env template', () => {
 });
 
 describe('generated roots', () => {
-    it('covers the source directories, the asset directories, and the runtime library', () => {
+    it('covers asset directories and the runtime library without owning source directories', () => {
         const config = { ...defaultConfig(), sourceDirs: ['src'], assetDirs: ['assets', 'media'] };
 
-        expect(generatedRoots(config)).toEqual(['src', 'assets', 'media', 'lib']);
+        expect(generatedRoots(config)).toEqual(['assets', 'media', 'lib']);
     });
 });

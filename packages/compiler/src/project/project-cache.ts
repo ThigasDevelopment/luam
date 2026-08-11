@@ -114,6 +114,8 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
         externalReferences: result.externalReferences,
         contributions: toContributions(result.directives, result.environment),
         diagnostics: result.diagnostics,
+        lines: result.lines,
+        topLevelReturn: result.topLevelReturn,
     };
 }
 

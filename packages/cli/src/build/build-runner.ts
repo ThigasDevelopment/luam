@@ -1,5 +1,6 @@
 import type { PhaseDuration } from '@cli/build/build-phase';
 import { renderEnvironmentTemplate } from '@cli/build/env-template';
+import { readHelperSource } from '@cli/build/helper-files';
 import { createPhaseTracker, type PhaseTracker } from '@cli/build/phase-tracker';
 import { readProjectInputs, ENVIRONMENT_FILE, type ProjectInputs } from '@cli/build/project-inputs';
 import { discoverSources } from '@cli/build/source-discovery';
@@ -9,7 +10,7 @@ import { projectDeclarations } from '@compiler/checker/project-declarations';
 import type { FileDiagnostic, ProjectFile, ProjectStats } from '@compiler/project/module';
 import { createProjectCache, type ProjectCache } from '@compiler/project/project-cache';
 import type { AssemblyStep } from '@compiler/project/progress';
-import { assembleResource, type ResourceBuild, type ResourceOptions } from '@compiler/project/resource';
+import { assembleResource, materializeBundles, type OutputLayout, type ResourceBuild, type ResourceMap, type ResourceOptions } from '@compiler/project/resource';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
 export interface BuildOutcome {
@@ -22,6 +23,7 @@ export interface BuildOutcome {
     environmentTemplate: string | null;
     phases: PhaseDuration[];
     sources: ReadonlyMap<string, string>;
+    map: ResourceMap | null;
 }
 
 export interface CompileOptions {
@@ -29,6 +31,8 @@ export interface CompileOptions {
     tracker?: PhaseTracker;
     minMtaVersion?: string | null;
     developmentLogs?: LuamConfig['development']['logs'] | null;
+    layout?: OutputLayout;
+    map?: boolean;
 }
 
 function helperList(config: LuamConfig, inputs: ProjectInputs): RuntimeHelperName[] {
@@ -46,6 +50,7 @@ function resourceOptions(
     inputs: ProjectInputs,
     minMtaVersion: string | null,
     developmentLogs: LuamConfig['development']['logs'] | null,
+    layout: OutputLayout,
 ): ResourceOptions {
     const options: ResourceOptions = {
         oop: config.oop,
@@ -55,6 +60,8 @@ function resourceOptions(
         loadOrder: config.loadOrder,
         minMtaVersion,
         developmentLogs,
+        layout,
+        resourceName: config.name,
     };
 
     if (config.author !== null) {
@@ -70,6 +77,26 @@ function resourceOptions(
     }
 
     return options;
+}
+
+function helperContent(helper: ResourceBuild['helpers'][number]): string {
+    let content = readHelperSource(helper.helper, helper.file);
+
+    for (const [placeholder, value] of Object.entries(helper.replacements ?? {})) {
+        content = content.replaceAll(placeholder, value);
+    }
+
+    return content;
+}
+
+function materialize(build: ResourceBuild, resource: string, includeMap: boolean): ResourceBuild {
+    if (build.layout === 'tree') {
+        return includeMap ? build : { ...build, map: null };
+    }
+
+    const bundled = materializeBundles(resource, build.bundles, helperContent);
+
+    return { ...build, scripts: bundled.scripts, map: includeMap ? bundled.map : null };
 }
 
 function diagnosticSources(files: readonly ProjectFile[], entries: readonly FileDiagnostic[]): ReadonlyMap<string, string> {
@@ -102,6 +129,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
             environmentTemplate: null,
             phases: tracker.durations(),
             sources: new Map(),
+            map: null,
         };
     }
 
@@ -116,16 +144,22 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('assembly');
 
-    const assembly = assembleResource(project, resourceOptions(config, inputs, options.minMtaVersion ?? null, options.developmentLogs ?? null), (step: AssemblyStep) => {
-        if (step === 'assembly') {
-            tracker.begin('manifest');
-        }
-    });
+    const assembly = assembleResource(
+        project,
+        resourceOptions(config, inputs, options.minMtaVersion ?? null, options.developmentLogs ?? null, options.layout ?? 'tree'),
+        (step: AssemblyStep) => {
+            if (step === 'assembly') {
+                tracker.begin('manifest');
+            }
+        },
+    );
 
-    tracker.end(assembly.build === null ? 'failed' : 'done');
+    const build = assembly.build === null ? null : materialize(assembly.build, config.name, options.map ?? true);
+
+    tracker.end(build === null ? 'failed' : 'done');
 
     return {
-        build: assembly.build,
+        build,
         diagnostics,
         fileDiagnostics: assembly.diagnostics,
         fileCount: sources.files.length,
@@ -134,5 +168,6 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
         environmentTemplate: inputs.deployed === null ? null : renderEnvironmentTemplate(inputs.deployed),
         phases: tracker.durations(),
         sources: diagnosticSources(sources.files, assembly.diagnostics),
+        map: build?.map ?? null,
     };
 }

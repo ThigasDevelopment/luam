@@ -28,6 +28,11 @@ export interface DevelopmentConfig {
     logs: DevelopmentLogsConfig;
 }
 
+export interface OutputConfig {
+    bundle: boolean;
+    map: boolean;
+}
+
 export interface LuamConfig {
     name: string;
     author: string | null;
@@ -41,6 +46,7 @@ export interface LuamConfig {
     helpers: RuntimeHelperName[];
     serverPath: string | null;
     resourcesDir: string;
+    output: OutputConfig;
     transport: TransportConfig;
     development: DevelopmentConfig;
 }
@@ -54,6 +60,8 @@ export const DEFAULT_ASSET_DIRS: readonly string[] = ['assets'];
 export const DEFAULT_OUT_DIR = 'build';
 
 export const DEFAULT_OOP = false;
+
+export const DEFAULT_OUTPUT: OutputConfig = { bundle: true, map: true };
 
 export const DEFAULT_RESOURCES_DIR = 'mods/deathmatch/resources';
 

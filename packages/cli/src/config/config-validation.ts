@@ -2,10 +2,12 @@ import {
     DEFAULT_ASSET_DIRS,
     DEFAULT_OOP,
     DEFAULT_OUT_DIR,
+    DEFAULT_OUTPUT,
     DEFAULT_RESOURCES_DIR,
     DEFAULT_SOURCE_DIRS,
     isValidResourceName,
     type LuamConfig,
+    type OutputConfig,
 } from '@cli/config/config-schema';
 import { validateDevelopment } from '@cli/config/development-validation';
 import { validateTransport, type Environment } from '@cli/config/transport-validation';
@@ -40,6 +42,7 @@ const KNOWN_FIELDS = [
     'helpers',
     'serverPath',
     'resourcesDir',
+    'output',
     'transport',
     'development',
 ];
@@ -53,6 +56,21 @@ const INVALID_NAME = 'config-invalid-name';
 const ESCAPING_PATH = 'config-escaping-path';
 
 const UNKNOWN_HELPER = 'config-unknown-helper';
+
+const OUTPUT_FIELDS = ['bundle', 'map'];
+
+function readOutput(source: RawObject | null, diagnostics: CliDiagnostic[]): OutputConfig {
+    if (source === null) {
+        return { ...DEFAULT_OUTPUT };
+    }
+
+    rejectUnknownFields(source, OUTPUT_FIELDS, 'output.', diagnostics);
+
+    return {
+        bundle: readBoolean(source, 'bundle', diagnostics, 'output.') ?? DEFAULT_OUTPUT.bundle,
+        map: readBoolean(source, 'map', diagnostics, 'output.') ?? DEFAULT_OUTPUT.map,
+    };
+}
 
 function isContainedPath(value: string): boolean {
     const normalized = value.replace(/\\/g, '/');
@@ -151,6 +169,7 @@ export function validateConfig(raw: unknown, env: Environment): ValidatedConfig 
         helpers: readHelpers(raw, diagnostics),
         serverPath: readString(raw, 'serverPath', diagnostics),
         resourcesDir: readContainedPath(raw, 'resourcesDir', DEFAULT_RESOURCES_DIR, diagnostics),
+        output: readOutput(readObject(raw, 'output', diagnostics), diagnostics),
         transport: validateTransport(readObject(raw, 'transport', diagnostics), diagnostics, env),
         development: validateDevelopment(readObject(raw, 'development', diagnostics), diagnostics),
     };

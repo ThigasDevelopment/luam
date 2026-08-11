@@ -14,6 +14,7 @@ export interface WriteResult {
 
 export interface WriteOptions {
     root: string;
+    generatedFiles: readonly string[];
     generatedRoots: readonly string[];
     environmentTemplate: string | null;
     onProgress?: ProgressReporter;
@@ -34,8 +35,10 @@ function helperSource(helper: ResourceBuild['helpers'][number]): string {
 export function resourceFiles(build: ResourceBuild): Map<string, string> {
     const files = new Map<string, string>();
 
-    for (const helper of build.helpers) {
-        files.set(helper.path, helperSource(helper));
+    if (build.layout === 'tree') {
+        for (const helper of build.helpers) {
+            files.set(helper.path, helperSource(helper));
+        }
     }
 
     if (build.configuration !== null) {
@@ -135,7 +138,7 @@ export function writeResource(targetDir: string, build: ResourceBuild, options: 
     }
 
     const keep = new Set([...files.keys(), ...build.assets.map((asset) => asset.path), ENVIRONMENT_FILE]);
-    const removed = pruneResource(targetDir, keep, { generatedRoots: options.generatedRoots });
+    const removed = pruneResource(targetDir, keep, { generatedFiles: options.generatedFiles, generatedRoots: options.generatedRoots });
 
     return { written: written.sort((left, right) => left.localeCompare(right)), removed, unchanged };
 }

@@ -6,10 +6,12 @@ import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/
 import { hasErrors, sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import { emit } from '@compiler/emitter/emitter';
-import type { RuntimeHelper } from '@compiler/emitter/state';
+import type { RuntimeHelper, SourceLineMapping } from '@compiler/emitter/state';
 import { parse } from '@compiler/parser/parser';
 import { isDeclarationPath } from '@compiler/project/source-kind';
 import { expandHelpers, helperForGlobal } from '@runtime/helpers';
+
+import type { Statement } from '@compiler/parser/ast';
 
 export interface CompileOptions {
     filePath?: string;
@@ -30,6 +32,41 @@ export interface CompileResult {
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
     externalReferences: ReadonlyMap<string, SourcePosition>;
     directives: SourceDirectives;
+    lines: SourceLineMapping[];
+    topLevelReturn: SourcePosition | null;
+}
+
+function findTopLevelReturn(statements: readonly Statement[]): SourcePosition | null {
+    for (const statement of statements) {
+        if (statement.kind === 'return-statement') {
+            return statement.position;
+        }
+
+        let bodies: readonly (readonly Statement[])[] = [];
+
+        switch (statement.kind) {
+            case 'do-statement':
+            case 'while-statement':
+            case 'repeat-statement':
+            case 'numeric-for-statement':
+            case 'generic-for-statement':
+                bodies = [statement.body];
+                break;
+            case 'if-statement':
+                bodies = [...statement.clauses.map((clause) => clause.body), ...(statement.alternate === null ? [] : [statement.alternate])];
+                break;
+        }
+
+        for (const body of bodies) {
+            const position = findTopLevelReturn(body);
+
+            if (position !== null) {
+                return position;
+            }
+        }
+    }
+
+    return null;
 }
 
 export function compile(source: string, options: CompileOptions = {}): CompileResult {
@@ -53,10 +90,11 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         declaredGlobals: checked.declaredGlobals,
         externalReferences: checked.externalReferences,
         directives: checked.directives,
+        topLevelReturn: findTopLevelReturn(parsed.program.body),
     };
 
     if (hasErrors(diagnostics) || options.emitCode === false || isDeclarationFile) {
-        return { ...shared, code: null, requiredHelpers: [] };
+        return { ...shared, code: null, requiredHelpers: [], lines: [] };
     }
 
     const emitted = emit(parsed.program, checked.types, checked.references, checked.generatedMembers);
@@ -70,5 +108,5 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         }
     }
 
-    return { ...shared, code: emitted.code, requiredHelpers: expandHelpers(required).sort() };
+    return { ...shared, code: emitted.code, requiredHelpers: expandHelpers(required).sort(), lines: emitted.lines };
 }

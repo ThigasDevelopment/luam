@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { runDevCommand } from '@cli/commands/dev-command';
+import { deployedMapAfterBuild, runDevCommand } from '@cli/commands/dev-command';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import type { CommandContext } from '@cli/commands/command-context';
 import { validateConfig } from '@cli/config/config-validation';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
+import type { ResourceMap } from '@compiler/project/resource';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
@@ -67,5 +68,11 @@ describe('development command', () => {
         expect(harness.fixture.exists(`${resource}/lib/client/development-logs-client.lua`)).toBe(false);
         expect(harness.fixture.exists(`${resource}/lib/server/development-logs-server.lua`)).toBe(false);
         expect(harness.fixture.read(`${resource}/meta.xml`)).not.toContain('development-logs');
+    });
+
+    it('retains the deployed map when a rebuild fails', () => {
+        const map: ResourceMap = { version: 1, resource: 'demo', layout: 'tree', files: [] };
+
+        expect(deployedMapAfterBuild(map, { build: null, map: null })).toBe(map);
     });
 });

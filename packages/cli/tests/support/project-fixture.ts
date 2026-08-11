@@ -67,7 +67,7 @@ export function createProjectFixture(files: Readonly<Record<string, string>> = {
 
 export function defaultProjectFiles(config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     return {
-        'luam.json': `${JSON.stringify({ name: 'luam-demo', ...config }, null, 4)}\n`,
+        'luam.json': `${JSON.stringify({ name: 'luam-demo', output: { bundle: false, map: true }, ...config }, null, 4)}\n`,
         'src/shared/config.luam': VALID_SHARED,
         'src/server/main.luam': VALID_SERVER,
         'src/client/hud.luam': VALID_CLIENT,

@@ -5,6 +5,7 @@ export type DevelopmentLogLevel = 'debug' | 'info' | 'warn' | 'error';
 export interface DevelopmentLogSource {
     path: string;
     line: number;
+    symbol?: string;
 }
 
 export interface DevelopmentLogRecord {

@@ -5,6 +5,8 @@ import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
 import type { MtaTransport } from '@cli/transport/transport';
 import { watchSources } from '@cli/watch/source-watcher';
+import type { BuildOutcome } from '@cli/build/build-runner';
+import type { OutputLayout } from '@compiler/project/resource';
 
 export interface EnsureOptions {
     transport: MtaTransport;
@@ -12,6 +14,9 @@ export interface EnsureOptions {
     signal: AbortSignal | null;
     developmentLogs?: DevelopmentLogsConfig | null;
     commandName?: 'ensure' | 'dev';
+    layout?: OutputLayout;
+    map?: boolean;
+    onBuild?: (outcome: BuildOutcome) => void;
 }
 
 function untilAborted(signal: AbortSignal | null): Promise<void> {
@@ -36,7 +41,7 @@ function untilAborted(signal: AbortSignal | null): Promise<void> {
     });
 }
 
-async function watchLoop(context: CommandContext, runner: EnsureRunner, signal: AbortSignal | null): Promise<void> {
+async function watchLoop(context: CommandContext, runner: EnsureRunner, options: EnsureOptions): Promise<void> {
     const reporter = commandReporter(context);
     let running = false;
     let queued = false;
@@ -55,7 +60,9 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, signal: 
 
             reportRebuildSeparator(reporter);
 
-            await runner.run();
+            const result = await runner.run();
+
+            options.onBuild?.(result.outcome);
         } while (queued);
 
         running = false;
@@ -67,7 +74,7 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, signal: 
 
     reporter.info(`Watching ${context.config.sourceDirs.map((entry) => `"${entry}"`).join(', ')} for changes. Press Ctrl+C to stop.`);
 
-    await untilAborted(signal);
+    await untilAborted(options.signal);
     watcher.close();
 }
 
@@ -78,14 +85,20 @@ export async function runEnsureCommand(context: CommandContext, options: EnsureO
         return EXIT_DIAGNOSTICS;
     }
 
-    const runner = createEnsureRunner(context, options.transport, { developmentLogs: options.developmentLogs ?? null });
+    const runner = createEnsureRunner(context, options.transport, {
+        developmentLogs: options.developmentLogs ?? null,
+        layout: options.layout ?? 'tree',
+        map: options.map ?? context.config.output.map,
+    });
     const first = await runner.run();
+
+    options.onBuild?.(first.outcome);
 
     if (!options.watch) {
         return first.ok ? EXIT_OK : EXIT_DIAGNOSTICS;
     }
 
-    await watchLoop(context, runner, options.signal);
+    await watchLoop(context, runner, options);
 
     return EXIT_OK;
 }

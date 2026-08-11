@@ -1,5 +1,6 @@
 import { runCompile } from '@cli/build/build-runner';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
+import { writeResourceMap } from '@cli/build/resource-map-file';
 import { writeResource } from '@cli/build/resource-writer';
 import { trackedWriteOptions } from '@cli/build/write-options';
 import { reportBuildOutcome, reportPhaseTimings, totalDuration } from '@cli/commands/build-report';
@@ -8,8 +9,14 @@ import { resolveBuildTarget } from '@cli/commands/resource-targets';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { pluralize } from '@cli/reporting/plural';
 import { createProgressRenderer } from '@cli/reporting/progress-renderer';
+import type { OutputLayout } from '@compiler/project/resource';
 
-export async function runBuildCommand(context: CommandContext): Promise<number> {
+export interface BuildCommandOptions {
+    layout?: OutputLayout;
+    map?: boolean;
+}
+
+export async function runBuildCommand(context: CommandContext, options: BuildCommandOptions = {}): Promise<number> {
     const reporter = commandReporter(context);
     const renderer = createProgressRenderer(reporter);
     const tracker = createPhaseTracker(renderer.listen);
@@ -17,7 +24,13 @@ export async function runBuildCommand(context: CommandContext): Promise<number> 
     tracker.begin('version');
 
     const version = await commandVersion(context);
-    const outcome = runCompile(context.root, context.config, { tracker, minMtaVersion: version.version });
+    const layout = options.layout ?? (context.config.output.bundle ? 'bundle' : 'tree');
+    const outcome = runCompile(context.root, context.config, {
+        tracker,
+        minMtaVersion: version.version,
+        layout,
+        map: options.map ?? context.config.output.map,
+    });
 
     renderer.clear();
 
@@ -36,8 +49,9 @@ export async function runBuildCommand(context: CommandContext): Promise<number> 
 
     tracker.begin('write');
 
-    const options = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
-    const result = writeResource(target, outcome.build, options);
+    const writeOptions = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
+    const result = writeResource(target, outcome.build, writeOptions);
+    writeResourceMap(context.root, context.config, outcome.map);
 
     tracker.end();
     renderer.clear();

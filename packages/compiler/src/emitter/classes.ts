@@ -1,13 +1,13 @@
+import { emitExpression, emitFunctionBody, emitString } from './expressions';
+import { indentLine, markSource, requireHelper, withSymbol, type EmitState } from './state';
+
 import type { Parameter } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration, EnumDeclaration } from '@compiler/parser/declaration-nodes';
 
-import { emitExpression, emitFunctionBody, emitString } from './expressions';
-import { indentLine, requireHelper, type EmitState } from './state';
-
-function emitMethod(state: EmitState, member: ClassMethodDeclaration): string {
+function emitMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {
     const self: Parameter = { name: 'self', annotation: null, isVararg: false, position: member.position };
 
-    return emitFunctionBody(state, [self, ...member.parameters], member.body, `${member.name} = function`);
+    return withSymbol(state, `${className}:${member.name}`, () => emitFunctionBody(state, [self, ...member.parameters], member.body, `${member.name} = function`));
 }
 
 function emitMembers(state: EmitState, statement: ClassDeclaration): string[] {
@@ -17,19 +17,19 @@ function emitMembers(state: EmitState, statement: ClassDeclaration): string[] {
 
     for (const member of statement.members) {
         if (member.kind === 'class-method') {
-            entries.push(indentLine(state, emitMethod(state, member)));
+            entries.push(indentLine(state, `${markSource(state, member.position.line, `${statement.name}:${member.name}`)}${emitMethod(state, statement.name, member)}`));
 
             continue;
         }
 
         if (member.value !== null) {
-            entries.push(indentLine(state, `${member.name} = ${emitExpression(state, member.value)}`));
+            entries.push(indentLine(state, `${markSource(state, member.position.line, statement.name)}${member.name} = ${emitExpression(state, member.value)}`));
         }
 
     }
 
     for (const generated of state.generatedMembers.get(statement) ?? []) {
-        entries.push(indentLine(state, emitMethod(state, generated)));
+        entries.push(indentLine(state, `${markSource(state, generated.position.line, `${statement.name}:${generated.name}`)}${emitMethod(state, statement.name, generated)}`));
     }
 
     state.indent -= 1;

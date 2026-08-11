@@ -10,6 +10,7 @@ import { createProgressRenderer, type ProgressRenderer } from '@cli/reporting/pr
 import type { Reporter } from '@cli/reporting/reporter';
 import type { MtaTransport } from '@cli/transport/transport';
 import { createProjectCache, type ProjectCache } from '@compiler/project/project-cache';
+import type { OutputLayout } from '@compiler/project/resource';
 
 export interface EnsureResult {
     ok: boolean;
@@ -25,6 +26,8 @@ export interface EnsureRunner {
 
 export interface EnsureRunnerOptions {
     developmentLogs?: CommandContext['config']['development']['logs'] | null;
+    layout?: OutputLayout;
+    map?: boolean;
 }
 
 interface RunScope {
@@ -84,6 +87,8 @@ async function runOnce(scope: RunScope, transport: MtaTransport, target: string,
         tracker,
         minMtaVersion: version.version,
         developmentLogs: options.developmentLogs ?? null,
+        layout: options.layout ?? 'tree',
+        map: options.map ?? context.config.output.map,
     });
 
     renderer.clear();

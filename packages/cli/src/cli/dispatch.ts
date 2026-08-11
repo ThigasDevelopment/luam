@@ -12,6 +12,7 @@ import { runEnsureCommand } from '@cli/commands/ensure-command';
 import { runDevCommand } from '@cli/commands/dev-command';
 import { runInitCommand } from '@cli/commands/init-command';
 import { runSetupCommand } from '@cli/commands/setup-command';
+import { runTraceCommand } from '@cli/commands/trace-command';
 import { loadConfig } from '@cli/config/config-loader';
 import type { Environment } from '@cli/config/transport-validation';
 import { createEditorService } from '@cli/editor/editor-service';
@@ -97,6 +98,15 @@ export async function runCli(argv: readonly string[], overrides: Partial<CliOver
         return runSetupCommand(reporter, { yes: parsed.yes, editorService, prompt: overrides.prompt ?? promptForInstallation });
     }
 
+    if (parsed.command === 'trace') {
+        return runTraceCommand(root, reporter, {
+            configPath: parsed.config,
+            env,
+            mapPath: parsed.map,
+            operand: parsed.operand,
+        });
+    }
+
     const loaded = loadConfig(root, parsed.config, env);
 
     reportCliDiagnostics(reporter, loaded.diagnostics);
@@ -121,7 +131,13 @@ export async function runCli(argv: readonly string[], overrides: Partial<CliOver
     }
 
     if (parsed.command === 'build') {
-        return runBuildCommand(context);
+        const layout = parsed.bundle ?? loaded.config.output.bundle ? 'bundle' : 'tree';
+
+        return runBuildCommand(context, { layout, map: parsed.noMap ? false : loaded.config.output.map });
+    }
+
+    if (parsed.command === 'dev' && parsed.bundle !== null) {
+        reporter.warn('"luam dev" always writes the tree layout, so "--bundle" and "--no-bundle" are ignored.');
     }
 
     const transport = overrides.transport ?? createTransport(loaded.config.transport);
@@ -129,6 +145,8 @@ export async function runCli(argv: readonly string[], overrides: Partial<CliOver
         transport,
         watch: parsed.watch ?? true,
         signal: overrides.signal ?? null,
+        layout: parsed.command === 'dev' ? ('tree' as const) : parsed.bundle === true ? ('bundle' as const) : ('tree' as const),
+        map: parsed.noMap ? false : loaded.config.output.map,
     };
     const exitCode = parsed.command === 'dev' ? await runDevCommand(context, options) : await runEnsureCommand(context, options);
 

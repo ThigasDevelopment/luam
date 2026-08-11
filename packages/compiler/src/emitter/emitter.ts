@@ -1,3 +1,10 @@
+import { emitClassDeclaration, emitEnumDeclaration } from './classes';
+import { emitExpression, emitFunctionBody } from './expressions';
+import { finalizeEmission, type SourceLineMapping } from './source-map';
+import { createEmitState, indentLine, markSource, withSymbol, type EmitState, type RuntimeHelper } from './state';
+
+import { binaryPrecedence, COMPOUND_OPERATORS, isRightAssociative } from '@compiler/parser/precedence';
+
 import type { Type } from '@compiler/checker/types';
 import type {
     AssignmentStatement,
@@ -11,15 +18,11 @@ import type {
     Statement,
 } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
-import { binaryPrecedence, COMPOUND_OPERATORS, isRightAssociative } from '@compiler/parser/precedence';
-
-import { emitClassDeclaration, emitEnumDeclaration } from './classes';
-import { emitExpression, emitFunctionBody } from './expressions';
-import { createEmitState, indentLine, type EmitState, type RuntimeHelper } from './state';
 
 export interface EmitResult {
     code: string;
     requiredHelpers: RuntimeHelper[];
+    lines: SourceLineMapping[];
 }
 
 function emitLocal(state: EmitState, statement: LocalStatement): string {
@@ -77,9 +80,10 @@ function emitFunctionName(state: EmitState, statement: FunctionDeclaration): str
 
 function emitFunctionDeclaration(state: EmitState, statement: FunctionDeclaration): string {
     const prefix = statement.isLocal ? 'local function ' : 'function ';
-    const header = `${prefix}${emitFunctionName(state, statement)}`;
+    const name = emitFunctionName(state, statement);
+    const header = `${prefix}${name}`;
 
-    return emitFunctionBody(state, statement.parameters, statement.body, header);
+    return withSymbol(state, name, () => emitFunctionBody(state, statement.parameters, statement.body, header));
 }
 
 function emitNested(state: EmitState, body: readonly Statement[]): string[] {
@@ -183,7 +187,7 @@ export function emitBlock(state: EmitState, statements: readonly Statement[]): s
         const text = emitStatement(state, statement);
 
         if (text !== null) {
-            lines.push(indentLine(state, text));
+            lines.push(indentLine(state, `${markSource(state, statement.position.line)}${text}`));
         }
     }
 
@@ -198,7 +202,8 @@ export function emit(
 ): EmitResult {
     const state = createEmitState(types, references, generatedMembers);
     const lines = emitBlock(state, program.body);
-    const code = lines.length === 0 ? '' : `${lines.join('\n')}\n`;
+    const markedCode = lines.length === 0 ? '' : `${lines.join('\n')}\n`;
+    const finalized = finalizeEmission(markedCode, state.markers);
 
-    return { code, requiredHelpers: [...state.helpers].sort() };
+    return { code: finalized.code, requiredHelpers: [...state.helpers].sort(), lines: finalized.lines };
 }

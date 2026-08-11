@@ -13,7 +13,8 @@ export function formatDevelopmentLog(reporter: Reporter, record: DevelopmentLogR
     const prefix = `[${formatTimestamp(record.timestamp)}][${record.environment}][${record.level}]`;
     const tone = LEVEL_TONES[record.level];
     const styled = tone === undefined ? prefix : reporter.style.paint(tone, prefix);
-    const location = record.source === undefined ? '' : ` (${record.source.path}:${record.source.line})`;
+    const symbol = record.source?.symbol === undefined ? '' : ` (${record.source.symbol})`;
+    const location = record.source === undefined ? '' : ` (${record.source.path}:${record.source.line}${symbol})`;
 
     return `${styled} ${record.message}${location}`;
 }

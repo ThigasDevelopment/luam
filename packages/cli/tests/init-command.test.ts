@@ -133,7 +133,7 @@ describe('an initialized project', () => {
         expect(logger.errors).toEqual([]);
         expect(code).toBe(EXIT_OK);
         expect(project.exists('build/demo/meta.xml')).toBe(true);
-        expect(project.exists('build/demo/src/server/main.lua')).toBe(true);
+        expect(project.exists('build/demo/src/server.lua')).toBe(true);
     });
 
     it('ships nothing the project did not author', async () => {

@@ -4,7 +4,7 @@ import { BUILD_PHASES, isCountedPhase, type BuildPhaseEvent } from '@cli/build/b
 import { runCompile } from '@cli/build/build-runner';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
 import { writeResource } from '@cli/build/resource-writer';
-import { generatedRoots } from '@cli/build/write-options';
+import { generatedFiles, generatedRoots } from '@cli/build/write-options';
 import { validateConfig } from '@cli/config/config-validation';
 import type { LuamConfig } from '@cli/config/config-schema';
 import { createProjectCache } from '@compiler/project/project-cache';
@@ -80,6 +80,7 @@ describe('write progress', () => {
 
         const result = writeResource(`${fixture.root}/build/luam-demo`, outcome.build!, {
             root: fixture.root,
+            generatedFiles: generatedFiles(),
             generatedRoots: generatedRoots(config),
             environmentTemplate: null,
             onProgress: (event) => events.push(event),
@@ -99,6 +100,7 @@ describe('write progress', () => {
 
         writeResource(`${fixture.root}/build/luam-demo`, outcome.build!, {
             root: fixture.root,
+            generatedFiles: generatedFiles(),
             generatedRoots: generatedRoots(config),
             environmentTemplate: outcome.environmentTemplate,
             onProgress: (event) => events.push(event),

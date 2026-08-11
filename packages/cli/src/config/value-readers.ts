@@ -28,7 +28,7 @@ export function describe(value: unknown): string {
     return `a ${typeof value}`;
 }
 
-export function readString(source: RawObject, field: string, diagnostics: CliDiagnostic[]): string | null {
+export function readString(source: RawObject, field: string, diagnostics: CliDiagnostic[], scope = ''): string | null {
     const value = source[field];
 
     if (value === undefined) {
@@ -36,13 +36,13 @@ export function readString(source: RawObject, field: string, diagnostics: CliDia
     }
 
     if (typeof value !== 'string' || value.trim().length === 0) {
-        return report(diagnostics, field, 'a non-empty string', value);
+        return report(diagnostics, `${scope}${field}`, 'a non-empty string', value);
     }
 
     return value.trim();
 }
 
-export function readNumber(source: RawObject, field: string, diagnostics: CliDiagnostic[]): number | null {
+export function readNumber(source: RawObject, field: string, diagnostics: CliDiagnostic[], scope = ''): number | null {
     const value = source[field];
 
     if (value === undefined) {
@@ -50,13 +50,13 @@ export function readNumber(source: RawObject, field: string, diagnostics: CliDia
     }
 
     if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
-        return report(diagnostics, field, 'a positive integer', value);
+        return report(diagnostics, `${scope}${field}`, 'a positive integer', value);
     }
 
     return value;
 }
 
-export function readBoolean(source: RawObject, field: string, diagnostics: CliDiagnostic[]): boolean | null {
+export function readBoolean(source: RawObject, field: string, diagnostics: CliDiagnostic[], scope = ''): boolean | null {
     const value = source[field];
 
     if (value === undefined) {
@@ -64,13 +64,13 @@ export function readBoolean(source: RawObject, field: string, diagnostics: CliDi
     }
 
     if (typeof value !== 'boolean') {
-        return report(diagnostics, field, 'a boolean', value);
+        return report(diagnostics, `${scope}${field}`, 'a boolean', value);
     }
 
     return value;
 }
 
-export function readStringArray(source: RawObject, field: string, diagnostics: CliDiagnostic[]): string[] | null {
+export function readStringArray(source: RawObject, field: string, diagnostics: CliDiagnostic[], scope = ''): string[] | null {
     const value = source[field];
 
     if (value === undefined) {
@@ -78,19 +78,19 @@ export function readStringArray(source: RawObject, field: string, diagnostics: C
     }
 
     if (!Array.isArray(value) || value.length === 0) {
-        return report(diagnostics, field, 'a non-empty array of strings', value);
+        return report(diagnostics, `${scope}${field}`, 'a non-empty array of strings', value);
     }
 
     const entries = value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0);
 
     if (entries.length !== value.length) {
-        return report(diagnostics, field, 'a non-empty array of strings', value);
+        return report(diagnostics, `${scope}${field}`, 'a non-empty array of strings', value);
     }
 
     return entries.map((entry) => entry.trim());
 }
 
-export function readObject(source: RawObject, field: string, diagnostics: CliDiagnostic[]): RawObject | null {
+export function readObject(source: RawObject, field: string, diagnostics: CliDiagnostic[], scope = ''): RawObject | null {
     const value = source[field];
 
     if (value === undefined) {
@@ -98,7 +98,7 @@ export function readObject(source: RawObject, field: string, diagnostics: CliDia
     }
 
     if (!isRawObject(value)) {
-        return report(diagnostics, field, 'an object', value);
+        return report(diagnostics, `${scope}${field}`, 'an object', value);
     }
 
     return value;

@@ -74,7 +74,10 @@ export function reportBuildOutcome(context: CommandContext, outcome: BuildOutcom
         return false;
     }
 
-    reporter.success(`${action} passed: ${pluralize(outcome.fileCount, 'file')}${formatReuse(outcome)}, ${formatCounts(counts)} in ${duration}.`);
+    const filesSummary = `${pluralize(outcome.fileCount, 'file')}${formatReuse(outcome)}`;
+    const summary = `${action} passed: ${filesSummary}, ${formatCounts(counts)} in ${duration} (${outcome.build.layout} layout).`;
+
+    reporter.success(summary);
 
     return true;
 }

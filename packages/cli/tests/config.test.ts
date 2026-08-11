@@ -43,6 +43,7 @@ describe('configuration validation', () => {
             helpers: [],
             serverPath: null,
             resourcesDir: 'mods/deathmatch/resources',
+            output: { bundle: true, map: true },
             transport: { kind: 'none' },
             development: {
                 logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 },
@@ -90,12 +91,30 @@ describe('configuration validation', () => {
         expect(validateConfig({ name: 'demo', oop: false }, {}).config?.oop).toBe(false);
     });
 
+    it('reads output switches and rejects invalid output fields', () => {
+        expect(validateConfig({ name: 'demo', output: { bundle: false, map: false } }, {}).config?.output).toEqual({ bundle: false, map: false });
+        expect(codes(validateConfig({ name: 'demo', output: { bundle: 'yes', extra: true } }, {}).diagnostics).sort()).toEqual([
+            'config-invalid-type',
+            'config-unknown-field',
+        ]);
+    });
+
     it('rejects an oop flag that is not a boolean', () => {
         const { config, diagnostics } = validateConfig({ name: 'demo', oop: 'true' }, {});
 
         expect(config).toBeNull();
         expect(codes(diagnostics)).toEqual(['config-invalid-type']);
         expect(diagnostics[0]?.message).toBe('"oop" must be a boolean but received a string.');
+    });
+
+    it('qualifies a nested field with its scope when the type is wrong', () => {
+        const output = validateConfig({ name: 'demo', output: { bundle: 'yes' } }, {}).diagnostics;
+        const logs = validateConfig({ name: 'demo', development: { logs: { enabled: 'yes' } } }, {}).diagnostics;
+        const transport = validateConfig({ name: 'demo', transport: { kind: 5 } }, {}).diagnostics;
+
+        expect(output[0]?.message).toBe('"output.bundle" must be a boolean but received a string.');
+        expect(logs[0]?.message).toBe('"development.logs.enabled" must be a boolean but received a string.');
+        expect(transport[0]?.message).toBe('"transport.kind" must be a non-empty string but received a number.');
     });
 
     it('rejects a helper the runtime does not ship', () => {

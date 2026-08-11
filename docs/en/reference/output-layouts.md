@@ -117,7 +117,9 @@ luam trace "ERROR: [my-resource/src/server.lua:42] attempt to index a nil value"
 
 The command first tries the configured `<outDir>/<name>.luam-map.json`. If that
 does not exist, it searches below the project directory and uses the map only
-when exactly one exists. Select another relative or absolute path explicitly:
+when exactly one exists. The search skips `node_modules` and directories whose
+name starts with a dot, so a map kept in one of those is only reachable through
+`--map`. Select another relative or absolute path explicitly:
 
 ```bash
 luam trace src/server.lua:42 --map releases/1.4.0/my-resource.luam-map.json

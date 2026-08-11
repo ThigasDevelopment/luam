@@ -25,6 +25,8 @@ const INVALID_SEGMENT = 'config-invalid-url-segment';
 
 const REMOTE_PLAINTEXT = 'config-remote-plaintext-transport';
 
+const SCOPE = 'transport.';
+
 const URL_SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 const URL_HOST = /^[A-Za-z0-9._[\]:-]+$/;
@@ -54,8 +56,8 @@ function warnRemotePlaintext(host: string, diagnostics: CliDiagnostic[]): void {
 }
 
 function resolvePassword(source: RawObject, diagnostics: CliDiagnostic[], env: Environment): string | null {
-    const passwordEnv = readString(source, 'passwordEnv', diagnostics);
-    const password = readString(source, 'password', diagnostics);
+    const passwordEnv = readString(source, 'passwordEnv', diagnostics, SCOPE);
+    const password = readString(source, 'password', diagnostics, SCOPE);
 
     if (passwordEnv !== null) {
         const resolved = env[passwordEnv];
@@ -91,15 +93,15 @@ function requireField(value: string | null, field: string, diagnostics: CliDiagn
 }
 
 function validateHttpTransport(source: RawObject, diagnostics: CliDiagnostic[], env: Environment): TransportConfig {
-    const declared = requireField(readString(source, 'resource', diagnostics), 'resource', diagnostics);
+    const declared = requireField(readString(source, 'resource', diagnostics, SCOPE), 'resource', diagnostics);
     const resource = validateSegment(declared, 'resource', URL_SEGMENT, diagnostics);
-    const username = requireField(readString(source, 'username', diagnostics), 'username', diagnostics);
+    const username = requireField(readString(source, 'username', diagnostics, SCOPE), 'username', diagnostics);
     const password = resolvePassword(source, diagnostics, env);
-    const refresh = readString(source, 'refreshFunction', diagnostics) ?? DEFAULT_REFRESH_FUNCTION;
-    const restart = readString(source, 'restartFunction', diagnostics) ?? DEFAULT_RESTART_FUNCTION;
+    const refresh = readString(source, 'refreshFunction', diagnostics, SCOPE) ?? DEFAULT_REFRESH_FUNCTION;
+    const restart = readString(source, 'restartFunction', diagnostics, SCOPE) ?? DEFAULT_RESTART_FUNCTION;
     const refreshFunction = validateSegment(refresh, 'refreshFunction', URL_SEGMENT, diagnostics);
     const restartFunction = validateSegment(restart, 'restartFunction', URL_SEGMENT, diagnostics);
-    const host = validateSegment(readString(source, 'host', diagnostics) ?? DEFAULT_HTTP_HOST, 'host', URL_HOST, diagnostics);
+    const host = validateSegment(readString(source, 'host', diagnostics, SCOPE) ?? DEFAULT_HTTP_HOST, 'host', URL_HOST, diagnostics);
 
     if (host !== null) {
         warnRemotePlaintext(host, diagnostics);
@@ -112,7 +114,7 @@ function validateHttpTransport(source: RawObject, diagnostics: CliDiagnostic[], 
     return {
         kind: 'http',
         host,
-        port: readNumber(source, 'port', diagnostics) ?? DEFAULT_HTTP_PORT,
+        port: readNumber(source, 'port', diagnostics, SCOPE) ?? DEFAULT_HTTP_PORT,
         resource,
         username,
         password,
@@ -128,7 +130,7 @@ export function validateTransport(source: RawObject | null, diagnostics: CliDiag
 
     rejectUnknownFields(source, KNOWN_FIELDS, 'transport.', diagnostics);
 
-    const kind = readString(source, 'kind', diagnostics) ?? 'none';
+    const kind = readString(source, 'kind', diagnostics, SCOPE) ?? 'none';
 
     if (kind === 'none') {
         return NONE_TRANSPORT;

@@ -69,6 +69,7 @@ describe('ensure runner', () => {
         expect(fixture.exists('build')).toBe(false);
         expect(transport.calls).toEqual(['refresh', 'restart:luam-demo']);
         expect(result.restarted).toBe(true);
+        expect(result.outcome.map?.layout).toBe('tree');
     });
 
     it('skips the sync and the restart when the build fails', async () => {

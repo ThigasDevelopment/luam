@@ -152,7 +152,7 @@ reporting a problem.
 | `--force` | Let `init` overwrite a file that exists. |
 | `-y`, `--yes` | Install the extension in every detected editor without prompting. |
 | `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run once. Both watch by default. |
-| `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`. `dev` always uses tree. |
+| `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`. `dev` always uses tree and warns that it ignored the flag. |
 | `--no-map` | Disable map generation. For `build`, also remove the existing default map after success. |
 | `--map <path>` | Resource map used by `trace`. Relative paths resolve from the project directory. |
 | `--offline` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same. |

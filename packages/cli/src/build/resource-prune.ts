@@ -4,6 +4,7 @@ import { join, relative, resolve } from 'node:path';
 import { ENVIRONMENT_FILE } from '@compiler/project/resource';
 
 export interface PruneOptions {
+    generatedFiles: readonly string[];
     generatedRoots: readonly string[];
 }
 
@@ -22,7 +23,7 @@ function isUnderRoot(relativePath: string, root: string): boolean {
 }
 
 function isGenerated(relativePath: string, options: PruneOptions): boolean {
-    if (relativePath.endsWith(GENERATED_EXTENSION) || relativePath === GENERATED_MANIFEST) {
+    if (relativePath.endsWith(GENERATED_EXTENSION) || relativePath === GENERATED_MANIFEST || options.generatedFiles.includes(relativePath)) {
         return true;
     }
 

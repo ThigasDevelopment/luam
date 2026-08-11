@@ -135,6 +135,18 @@ describe('command dispatch', () => {
         expect(fixture.exists(`${resource}/lib/server/development-logs-server.lua`)).toBe(true);
     });
 
+    it('warns that dev ignores a layout flag and still writes the tree layout', async () => {
+        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const logger = createMemoryLogger();
+        const transport = createMockTransport();
+        const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
+
+        expect(await runCli(['dev', '--no-watch', '--bundle'], { logger, cwd: fixture.root, env: OFFLINE, transport })).toBe(EXIT_OK);
+        expect(logger.text()).toContain('"luam dev" always writes the tree layout');
+        expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
+        expect(fixture.exists(`${resource}/src/server.lua`)).toBe(false);
+    });
+
     it('reads the transport password from the environment', async () => {
         const transport = { kind: 'http', resource: 'luam-sync', username: 'admin', passwordEnv: 'LUAM_PASSWORD' };
         const fixture = project(defaultProjectFiles({ transport }));

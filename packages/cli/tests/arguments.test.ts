@@ -42,6 +42,17 @@ describe('argument parsing', () => {
         expect(parseArguments(['ensure', '--no-watch']).watch).toBe(false);
     });
 
+    it('reads layout, map, and trace arguments', () => {
+        expect(parseArguments(['build', '--bundle', '--no-map'])).toMatchObject({ bundle: true, noMap: true, errors: [] });
+        expect(parseArguments(['build', '--no-bundle'])).toMatchObject({ bundle: false, errors: [] });
+        expect(parseArguments(['trace', 'src/server.lua:12', '--map', 'build/demo.luam-map.json'])).toMatchObject({
+            command: 'trace',
+            operand: 'src/server.lua:12',
+            map: 'build/demo.luam-map.json',
+            errors: [],
+        });
+    });
+
     it('reads help and version flags', () => {
         expect(parseArguments(['--help']).help).toBe(true);
         expect(parseArguments(['-h']).help).toBe(true);
@@ -51,7 +62,7 @@ describe('argument parsing', () => {
 
     it('rejects an unknown command', () => {
         expect(parseArguments(['deploy']).errors).toEqual([
-            '"deploy" is not a known command. Use "build", "check", "dev", "doctor", "ensure", "init", "setup".',
+            '"deploy" is not a known command. Use "build", "check", "dev", "doctor", "ensure", "init", "setup", "trace".',
         ]);
     });
 

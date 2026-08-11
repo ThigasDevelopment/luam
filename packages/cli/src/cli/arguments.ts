@@ -1,4 +1,4 @@
-export type CommandName = 'build' | 'check' | 'dev' | 'doctor' | 'ensure' | 'init' | 'setup';
+export type CommandName = 'build' | 'check' | 'dev' | 'doctor' | 'ensure' | 'init' | 'setup' | 'trace';
 
 export interface ParsedArguments {
     command: CommandName | null;
@@ -6,6 +6,10 @@ export interface ParsedArguments {
     config: string | null;
     name: string | null;
     watch: boolean | null;
+    bundle: boolean | null;
+    map: string | null;
+    noMap: boolean;
+    operand: string | null;
     force: boolean;
     yes: boolean;
     offline: boolean;
@@ -15,9 +19,9 @@ export interface ParsedArguments {
     errors: string[];
 }
 
-const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'doctor', 'ensure', 'init', 'setup'];
+const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'doctor', 'ensure', 'init', 'setup', 'trace'];
 
-const VALUE_FLAGS: readonly string[] = ['--cwd', '--config', '--name'];
+const VALUE_FLAGS: readonly string[] = ['--cwd', '--config', '--map', '--name'];
 
 function isCommand(value: string): value is CommandName {
     return COMMANDS.includes(value);
@@ -30,6 +34,10 @@ function emptyArguments(): ParsedArguments {
         config: null,
         name: null,
         watch: null,
+        bundle: null,
+        map: null,
+        noMap: false,
+        operand: null,
         force: false,
         yes: false,
         offline: false,
@@ -83,6 +91,12 @@ export function parseArguments(argv: readonly string[]): ParsedArguments {
                 continue;
             }
 
+            if (token === '--map') {
+                parsed.map = value;
+
+                continue;
+            }
+
             parsed.config = value;
 
             continue;
@@ -124,6 +138,24 @@ export function parseArguments(argv: readonly string[]): ParsedArguments {
             continue;
         }
 
+        if (token === '--bundle') {
+            parsed.bundle = true;
+
+            continue;
+        }
+
+        if (token === '--no-bundle') {
+            parsed.bundle = false;
+
+            continue;
+        }
+
+        if (token === '--no-map') {
+            parsed.noMap = true;
+
+            continue;
+        }
+
         if (token === '--help' || token === '-h') {
             parsed.help = true;
 
@@ -143,6 +175,12 @@ export function parseArguments(argv: readonly string[]): ParsedArguments {
         }
 
         if (parsed.command !== null) {
+            if (parsed.command === 'trace' && parsed.operand === null) {
+                parsed.operand = token;
+
+                continue;
+            }
+
             parsed.errors.push(`"${token}" is unexpected because the command is already "${parsed.command}".`);
 
             continue;

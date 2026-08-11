@@ -6,6 +6,52 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Output Layouts and Source Maps
+
+A shipped resource and a resource under development want opposite shapes. The
+bundle layout collapses each environment into one script for release; the tree
+layout keeps every module addressable while you work. A resource map connects
+the two, so a line in a generated bundle names the line you wrote.
+
+#### Added
+
+- The bundle layout, which emits at most `src/shared.lua`, `src/server.lua` and
+  `src/client.lua`. Helpers and modules stay isolated in `do ... end` blocks,
+  helpers precede modules, and `loadOrder` still orders modules. `config.lua`,
+  `.env` and assets are never bundled. An empty environment produces no bundle
+  and no `<script>` entry.
+- Deterministic resource maps at `<outDir>/<name>.luam-map.json`, recording each
+  generated file, its module and helper segments, and sparse generated-to-source
+  line mappings with the enclosing function, method or class symbol.
+- `luam trace`, which resolves a generated position back to its authored line.
+  It accepts a bare `file:line`, a full MTA log line, or one position per stdin
+  line, and `--map` selects a map from another build.
+- `output.bundle` and `output.map` configuration, plus the `--bundle`,
+  `--no-bundle` and `--no-map` flags.
+- `luam dev` resolves streamed `server.log` positions through its in-memory map,
+  so a development record names the authored file, line and symbol.
+- `project-bundle-toplevel-return` and `project-bundle-output-collision`, which
+  fail a bundle build before anything is written.
+
+#### Changed
+
+- **Breaking**: `luam build` produces the bundle layout by default, because
+  `output.bundle` defaults to `true`. A project whose module ends in a top-level
+  return no longer builds without a change: keep the previous output with
+  `--no-bundle` or `"output": { "bundle": false }`, or remove the return. Both
+  bundle diagnostics name these switches. `ensure` and `dev` still write the
+  tree layout by default, so no deployment shape changes on its own.
+- `luam dev` warns that it ignored `--bundle` or `--no-bundle` instead of
+  dropping the flag silently.
+- `luam trace` rejects empty input before it looks for a map, and reports it
+  instead of blocking on an interactive terminal that never reaches end of file.
+- Default map discovery skips `node_modules` and dot directories. On a project
+  with installed dependencies this replaced a multi-second full-tree scan and
+  can no longer match a map shipped by a dependency.
+- A configuration type error names the full path of a nested field, so a wrong
+  `output.bundle`, `development.logs.enabled` or `transport.port` is no longer
+  reported under its bare name. Unknown-field errors already did this.
+
 ### Native MTA Class Values
 
 #### Added

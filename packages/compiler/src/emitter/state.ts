@@ -1,3 +1,5 @@
+import { emissionMarker, type EmissionMarker, type SourceLineMapping } from './source-map';
+
 import type { Type } from '@compiler/checker/types';
 import type { Expression } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
@@ -11,6 +13,8 @@ export interface EmitState {
     helpers: Set<RuntimeHelper>;
     indent: number;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
+    markers: EmissionMarker[];
+    symbol: string | undefined;
 }
 
 export const INDENT = '    ';
@@ -20,7 +24,7 @@ export function createEmitState(
     references: ReadonlySet<string>,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>,
 ): EmitState {
-    return { types, references, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0 };
+    return { types, references, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0, markers: [], symbol: undefined };
 }
 
 export function requireHelper(state: EmitState, helper: RuntimeHelper | null): void {
@@ -36,3 +40,29 @@ export function typeOf(state: EmitState, expression: Expression): Type | null {
 export function indentLine(state: EmitState, text: string): string {
     return `${INDENT.repeat(state.indent)}${text}`;
 }
+
+export function markSource(state: EmitState, sourceLine: number, symbol = state.symbol): string {
+    const marker: EmissionMarker = { sourceLine };
+
+    if (symbol !== undefined) {
+        marker.symbol = symbol;
+    }
+
+    state.markers.push(marker);
+
+    return emissionMarker(state.markers.length - 1);
+}
+
+export function withSymbol<T>(state: EmitState, symbol: string | undefined, action: () => T): T {
+    const previous = state.symbol;
+
+    state.symbol = symbol;
+
+    try {
+        return action();
+    } finally {
+        state.symbol = previous;
+    }
+}
+
+export type { SourceLineMapping };

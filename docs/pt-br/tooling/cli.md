@@ -156,7 +156,7 @@ problema.
 | `--force` | Deixa o `init` sobrescrever um arquivo existente. |
 | `-y`, `--yes` | Instala a extensão em todos os editores detectados sem perguntar. |
 | `--watch` / `--no-watch` | Mantém `ensure` ou `dev` observando, ou roda uma vez. Ambos observam por padrão. |
-| `--bundle` / `--no-bundle` | Seleciona bundle ou árvore para `build` e `ensure`. `dev` sempre usa árvore. |
+| `--bundle` / `--no-bundle` | Seleciona bundle ou árvore para `build` e `ensure`. `dev` sempre usa árvore e avisa que ignorou a flag. |
 | `--no-map` | Desliga a geração do mapa. Para `build`, também remove o mapa padrão existente depois do sucesso. |
 | `--map <path>` | Mapa usado por `trace`. Caminhos relativos partem do diretório do projeto. |
 | `--offline` | Pula a consulta de `min_mta_version`. `LUAM_OFFLINE` faz o mesmo. |

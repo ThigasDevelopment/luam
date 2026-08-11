@@ -1,3 +1,5 @@
+import type { CompiledModule, FileDiagnostic } from './module';
+
 import { createDiagnostic } from '@compiler/diagnostics/diagnostic';
 import { environmentRoot, FILE_START, normalizePath, type Environment } from '@compiler/environment/environment';
 import {
@@ -9,13 +11,14 @@ import {
     type RuntimeHelperName,
 } from '@runtime/helpers';
 
-import type { CompiledModule, FileDiagnostic } from './module';
+import type { SourceLineMapping } from '@compiler/emitter/source-map';
 
 export interface ResourceScript {
     path: string;
     source: string;
     environment: Environment;
     content: string;
+    lines?: SourceLineMapping[];
 }
 
 export interface ResourceHelper {
@@ -111,7 +114,7 @@ export function collectDevelopmentLogHelpers(options: DevelopmentLogHelpers | nu
 export function collectScripts(modules: readonly CompiledModule[]): ResourceScript[] {
     return modules
         .filter((module): module is CompiledModule & { code: string } => module.code !== null)
-        .map((module) => ({ path: outputPath(module.path), source: module.path, environment: module.environment, content: module.code }))
+        .map((module) => ({ path: outputPath(module.path), source: module.path, environment: module.environment, content: module.code, lines: module.lines }))
         .sort((left, right) => ENVIRONMENT_ORDER[left.environment] - ENVIRONMENT_ORDER[right.environment] || left.path.localeCompare(right.path));
 }
 
