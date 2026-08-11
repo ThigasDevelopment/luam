@@ -15,7 +15,18 @@ import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration 
 import type { CheckContext } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor } from './control-flow';
 import { checkExpression, checkValueList } from './expressions';
-import { ANY_TYPE, createFunction, isConcatenable, isNumeric, NIL_TYPE, renameRecord, typeToString, type Type } from './types';
+import {
+    ANY_TYPE,
+    createFunction,
+    createTuple,
+    isConcatenable,
+    isNumeric,
+    NIL_TYPE,
+    renameRecord,
+    typeToString,
+    type FunctionType,
+    type Type,
+} from './types';
 
 const ORIGIN: SourcePosition = { line: 0, column: 0, offset: 0 };
 
@@ -29,7 +40,7 @@ function minimumArguments(context: CheckContext, parameters: readonly Parameter[
     return index === -1 ? parameters.length : index;
 }
 
-export function buildFunctionType(context: CheckContext, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): Type {
+export function buildFunctionType(context: CheckContext, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): FunctionType {
     const isVariadic = parameters.some((parameter) => parameter.isVararg);
     const types = parameters.filter((parameter) => !parameter.isVararg).map((parameter) => context.resolveAnnotation(parameter.annotation));
 
@@ -41,10 +52,11 @@ export function checkFunctionBody(
     parameters: readonly Parameter[],
     returnAnnotation: TypeAnnotation | null,
     body: readonly Statement[],
+    signature: FunctionType,
     selfType: Type | null,
 ): void {
     context.binder.pushScope();
-    context.pushReturnType(context.resolveAnnotation(returnAnnotation));
+    context.pushReturnType(returnAnnotation === null ? null : context.resolveAnnotation(returnAnnotation));
 
     if (selfType !== null) {
         context.binder.declare({ name: 'self', type: selfType, isLocal: true, position: ORIGIN });
@@ -57,7 +69,12 @@ export function checkFunctionBody(
     }
 
     checkStatements(context, body);
-    context.popReturnType();
+    const inferred = context.popReturnType();
+
+    if (returnAnnotation === null) {
+        signature.returnType = inferred;
+    }
+
     context.binder.popScope();
 }
 
@@ -152,14 +169,20 @@ function checkFunctionDeclaration(context: CheckContext, statement: FunctionDecl
     }
 
     context.record(statement.name, type);
-    checkFunctionBody(context, statement.parameters, statement.returnAnnotation, statement.body, statement.isMethod ? ANY_TYPE : null);
+    checkFunctionBody(context, statement.parameters, statement.returnAnnotation, statement.body, type, statement.isMethod ? ANY_TYPE : null);
 }
 
 function checkReturn(context: CheckContext, statement: ReturnStatement): void {
     const valueTypes = checkValueList(context, statement.values);
     const expected = context.currentReturnType();
 
-    if (expected === null || expected.kind === 'any') {
+    if (expected === null) {
+        context.inferReturnType(createTuple(valueTypes));
+
+        return;
+    }
+
+    if (expected.kind === 'any') {
         return;
     }
 
@@ -259,7 +282,7 @@ function checkStatement(context: CheckContext, statement: Statement): void {
             const resolved = context.resolveAnnotation(statement.annotation);
             const named = statement.annotation.kind === 'type-object' ? renameRecord(resolved, statement.name) : resolved;
 
-            context.binder.declareAlias(statement.name, named);
+            context.binder.declareAlias(statement.name, named, statement.typeParameters);
 
             return;
         }

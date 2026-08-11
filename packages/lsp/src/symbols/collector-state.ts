@@ -1,3 +1,4 @@
+import type { DeclarationRegistry } from '@compiler/checker/registry';
 import type { Type } from '@compiler/checker/types';
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { Expression, FunctionExpression } from '@compiler/parser/ast';
@@ -25,6 +26,7 @@ export interface CollectorState {
     types: ReadonlyMap<Expression, Type>;
     walkFunction: FunctionWalker;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
+    checkerDeclarations: DeclarationRegistry;
 }
 
 export interface DeclarationInput {
@@ -43,9 +45,10 @@ export function createState(
     starts: number[],
     types: ReadonlyMap<Expression, Type>,
     walkFunction: FunctionWalker,
+    checkerDeclarations: DeclarationRegistry,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
 ): CollectorState {
-    return { text, starts, scopes: new ScopeTree(), declarations: [], references: [], types, walkFunction, generatedMembers };
+    return { text, starts, scopes: new ScopeTree(), declarations: [], references: [], types, walkFunction, generatedMembers, checkerDeclarations };
 }
 
 export function declareSymbol(state: CollectorState, scopeId: number, input: DeclarationInput): SymbolDeclaration {

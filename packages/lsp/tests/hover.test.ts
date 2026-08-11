@@ -41,6 +41,12 @@ describe('hover', () => {
         expect(hoverText(text, '\ngreet(', 'greet')).toContain('greet(name: string, tag?: string): string');
     });
 
+    it('shows the inferred return type of an unannotated function', () => {
+        const text = 'function greet()\n    return "hello"\nend\n\ngreet()\n';
+
+        expect(hoverText(text, '\ngreet(', 'greet')).toContain('greet(): string');
+    });
+
     it('shows the signature of a parameter', () => {
         const text = 'function greet(name: string): string\n    return name\nend\n';
 
@@ -63,6 +69,12 @@ describe('hover', () => {
         const text = 'class Player {\n    name: string\n}\n\nlocal one = new Player()\nlocal value = one.name\n';
 
         expect(hoverText(text, 'one.', 'name')).toContain('field name: string');
+    });
+
+    it('shows the inferred return type of an unannotated class method', () => {
+        const text = 'class Text {\n    name: string\n    describe = function ()\n        return self.name\n    end\n}\nlocal text = new Text()\ntext:describe()\n';
+
+        expect(hoverText(text, 'text:', 'describe')).toContain('describe(): string');
     });
 
     it('renders an optional field marker on the field name', () => {

@@ -142,6 +142,17 @@ function parseFieldAnnotation(stream: TokenStream): ReturnType<typeof parseOptio
     return parseNamedAnnotation(stream, 'field');
 }
 
+function expectClassFieldBoundary(stream: TokenStream, token: Token): void {
+    const current = stream.current();
+    const delimiter = current.kind === 'punctuation' && (current.value === '}' || current.value === ';' || current.value === ',');
+
+    if (current.kind === 'eof' || delimiter || current.position.line > token.position.line) {
+        return;
+    }
+
+    throw stream.error(`Expected a line break or separator after class member "${token.value}".`, 'parse-unexpected-token');
+}
+
 function parseClassMember(stream: TokenStream): ClassMember {
     const decorators = parseDecorators(stream);
     const token = stream.expectName();
@@ -156,6 +167,8 @@ function parseClassMember(stream: TokenStream): ClassMember {
 
     const annotation = parseFieldAnnotation(stream);
     const value = stream.match('operator', '=') ? parseExpression(stream) : null;
+
+    expectClassFieldBoundary(stream, token);
 
     return { kind: 'class-field', name: token.value, annotation, value, decorators, position: token.position };
 }

@@ -40,6 +40,21 @@ describe('multi-return functions', () => {
         expect(codes(source)).toEqual([]);
     });
 
+    it('infers tuple returns from unannotated class methods', () => {
+        const source = [
+            'class Teste {',
+            '    describe = function ()',
+            '        return "name", true',
+            '    end',
+            '}',
+            'local teste = new Teste()',
+            'local name: number, enabled: boolean = teste:describe()',
+        ].join('\n');
+
+        expect(codes(source)).toEqual(['check-type-mismatch']);
+        expect(messages(source)[0]).toContain('received "string"');
+    });
+
     it('checks every typed tuple return value', () => {
         const wrongType = 'function describe(): (string, boolean)\n    return "name", 1\nend\n';
         const wrongArity = 'function describe(): (string, boolean)\n    return "name"\nend\n';

@@ -110,11 +110,16 @@ function collectFunctionName(state: CollectorState, block: BlockContext, stateme
     const name = statement.name;
 
     if (name.kind === 'identifier') {
-        const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation);
+        const checked = typeOf(state, name);
+        const inferredReturn = checked?.kind === 'function' ? checked.returnType : null;
+        const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation, inferredReturn);
         const scopeId = statement.isLocal ? block.scopeId : ROOT_SCOPE;
 
         const parameters = statement.parameters.map(parameterText);
-        const type = signatureType(statement.parameters, statement.returnAnnotation);
+        const type =
+            statement.returnAnnotation === null && checked?.kind === 'function'
+                ? checked
+                : signatureType(statement.parameters, statement.returnAnnotation);
 
         declareSymbol(state, scopeId, { name: name.name, kind: 'function', position: name.position, detail, parameters, type });
         addReference(state, name.name, 'value', name.position, block.scopeId);

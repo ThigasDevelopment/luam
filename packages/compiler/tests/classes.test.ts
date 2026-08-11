@@ -29,6 +29,12 @@ describe('classes', () => {
         );
     });
 
+    it('rejects consecutive class member names without a separator', () => {
+        const source = 'class Name { constructor = function () end random name = function () end }';
+
+        expect(codes(source)).toContain('parse-unexpected-token');
+    });
+
     it('injects self into assignment-style class methods', () => {
         const source = 'class Player {\n    describe = function (): string\n        return self.name\n    end\n}\n';
 

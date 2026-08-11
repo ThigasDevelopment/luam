@@ -89,7 +89,7 @@ export function createObjectType(members: ReadonlyMap<string, Type>): Type {
     return createRecord(keys.length === 0 ? '{}' : `{ ${keys.join(', ')} }`, members);
 }
 
-export function createFunction(parameters: Type[], returnType: Type, minimumArguments?: number, isVariadic = false): Type {
+export function createFunction(parameters: Type[], returnType: Type, minimumArguments?: number, isVariadic = false): FunctionType {
     return { kind: 'function', parameters, returnType, minimumArguments: minimumArguments ?? parameters.length, isVariadic };
 }
 

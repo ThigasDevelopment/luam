@@ -52,6 +52,27 @@ describe('checker', () => {
         expect(codes("local function value(): number\n    return 'text'\nend\n")).toEqual(['check-type-mismatch']);
     });
 
+    it('infers the return type of an unannotated function declaration', () => {
+        const source = 'local function value()\n    return 42\nend\nlocal label: string = value()\n';
+
+        expect(codes(source)).toEqual(['check-type-mismatch']);
+        expect(messages(source)[0]).toContain('received "number"');
+    });
+
+    it('infers the return type of an unannotated function expression', () => {
+        const source = 'local value = function()\n    return true\nend\nlocal total: number = value()\n';
+
+        expect(codes(source)).toEqual(['check-type-mismatch']);
+        expect(messages(source)[0]).toContain('received "boolean"');
+    });
+
+    it('unifies alternative inferred return types', () => {
+        const source = 'local function value(flag: boolean)\n    if flag then\n        return 1\n    end\n    return "one"\nend\nlocal enabled: boolean = value(true)\n';
+
+        expect(codes(source)).toEqual(['check-type-mismatch']);
+        expect(messages(source)[0]).toContain('received "number | string"');
+    });
+
     it('reports a value returned from a void function', () => {
         expect(codes('local function value(): void\n    return 1\nend\n')).toEqual(['check-return-mismatch']);
     });

@@ -1,3 +1,4 @@
+import type { DeclarationRegistry } from '@compiler/checker/registry';
 import type { Type } from '@compiler/checker/types';
 import type { Expression, FunctionExpression, Program } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
@@ -95,9 +96,10 @@ export function buildSymbolIndex(
     starts: number[],
     program: Program,
     types: ReadonlyMap<Expression, Type>,
+    checkerDeclarations: DeclarationRegistry,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
 ): SymbolIndex {
-    const state = createState(text, starts, types, walkFunction, generatedMembers);
+    const state = createState(text, starts, types, walkFunction, checkerDeclarations, generatedMembers);
     const block: BlockContext = { scopeId: ROOT_SCOPE, end: text.length, container: null };
 
     collectStatements(state, block, program.body);

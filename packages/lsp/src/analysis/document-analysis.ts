@@ -80,7 +80,7 @@ export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
         directives: checked.directives,
         project,
         oop,
-        index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.generatedMembers),
+        index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.declarations, checked.generatedMembers),
         generatedMembers: checked.generatedMembers,
     };
 }

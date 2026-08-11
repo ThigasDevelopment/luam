@@ -1,3 +1,4 @@
+import { typeToString, type Type } from '@compiler/checker/types';
 import type { Parameter, TypeAnnotation } from '@compiler/parser/ast';
 
 export function annotationText(annotation: TypeAnnotation | null): string {
@@ -58,10 +59,11 @@ export function parameterText(parameter: Parameter): string {
     return `${prefix}${namedAnnotationText(parameter.name, parameter.annotation)}`;
 }
 
-export function signatureText(name: string, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): string {
+export function signatureText(name: string, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null, inferredReturn: Type | null = null): string {
     const rendered = parameters.map(parameterText).join(', ');
+    const returnType = returnAnnotation === null && inferredReturn !== null ? typeToString(inferredReturn) : annotationText(returnAnnotation);
 
-    return `${name}(${rendered}): ${annotationText(returnAnnotation)}`;
+    return `${name}(${rendered}): ${returnType}`;
 }
 
 export function variableText(keyword: string, name: string, annotation: TypeAnnotation | null, fallback: string | null): string {

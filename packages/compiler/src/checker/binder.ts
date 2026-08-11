@@ -9,10 +9,15 @@ export interface SymbolInfo {
     position: SourcePosition;
 }
 
+export interface TypeAliasInfo {
+    type: Type;
+    parameters: readonly string[];
+}
+
 export class Binder {
     private readonly scopes: Array<Map<string, SymbolInfo>> = [new Map()];
 
-    private readonly aliases = new Map<string, Type>();
+    private readonly aliases = new Map<string, TypeAliasInfo>();
 
     private builtins: ReadonlyMap<string, SymbolInfo> = new Map();
 
@@ -58,11 +63,11 @@ export class Binder {
         return this.scopes[this.scopes.length - 1]?.has(name) ?? false;
     }
 
-    declareAlias(name: string, type: Type): void {
-        this.aliases.set(name, type);
+    declareAlias(name: string, type: Type, parameters: readonly string[] = []): void {
+        this.aliases.set(name, { type, parameters });
     }
 
-    lookupAlias(name: string): Type | null {
+    lookupAlias(name: string): TypeAliasInfo | null {
         return this.aliases.get(name) ?? null;
     }
 }

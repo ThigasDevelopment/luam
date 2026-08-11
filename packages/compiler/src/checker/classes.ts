@@ -66,8 +66,14 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
         context.report('check-explicit-self-parameter', 'Class methods receive "self" automatically; remove it from the parameter list.', explicitSelf.position);
     }
 
+    const signature = info.members.get(member.name)?.type;
+
+    if (signature?.kind !== 'function') {
+        return;
+    }
+
     context.pushClassMethod({ className: info.name, methodName: member.name });
-    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, createNamed(info.name));
+    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, createNamed(info.name));
     context.popClassMethod();
 }
 

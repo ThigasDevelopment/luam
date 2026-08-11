@@ -289,7 +289,7 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'function-expression': {
             const type = buildFunctionType(context, expression.parameters, expression.returnAnnotation);
 
-            checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, null);
+            checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, type, null);
 
             return context.record(expression, type);
         }

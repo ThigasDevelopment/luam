@@ -12,6 +12,7 @@ import { builtinSymbols } from './globals';
 import { mtaClassRegistry } from './oop-classes';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import { DeclarationRegistry } from './registry';
+import { substituteType } from './type-substitution';
 import {
     ANY_TYPE,
     BOOLEAN_TYPE,
@@ -55,6 +56,11 @@ export interface ClassMethodFrame {
     methodName: string;
 }
 
+interface ReturnFrame {
+    expected: Type | null;
+    inferred: Type[];
+}
+
 function nilHint(source: Type, target: Type, mode: StrictMode): string {
     if (mode !== 'strict' || source.kind !== 'nil' || target.kind === 'nil' || target.kind === 'optional') {
         return '';
@@ -88,7 +94,7 @@ export class CheckContext {
 
     isDeclarationFile = false;
 
-    private readonly returnStack: Type[] = [];
+    private readonly returnStack: ReturnFrame[] = [];
 
     private readonly methodStack: ClassMethodFrame[] = [];
 
@@ -159,16 +165,43 @@ export class CheckContext {
         return this.types.get(expression) ?? UNKNOWN_TYPE;
     }
 
-    pushReturnType(type: Type): void {
-        this.returnStack.push(type);
+    pushReturnType(type: Type | null): void {
+        this.returnStack.push({ expected: type, inferred: [] });
     }
 
-    popReturnType(): void {
-        this.returnStack.pop();
+    popReturnType(): Type {
+        const frame = this.returnStack.pop();
+
+        if (frame === undefined || frame.inferred.length === 0) {
+            return VOID_TYPE;
+        }
+
+        const tuples = frame.inferred.filter((type) => type.kind === 'tuple');
+
+        const tupleSize = tuples[0]?.kind === 'tuple' ? tuples[0].elements.length : null;
+        const sameTupleSize = tuples.length === frame.inferred.length && tuples.every((type) => type.kind === 'tuple' && type.elements.length === tupleSize);
+
+        if (sameTupleSize) {
+            const first = tuples[0];
+
+            if (first?.kind === 'tuple') {
+                const elements = first.elements.map((_, index) =>
+                    createUnion(tuples.map((type) => type.kind === 'tuple' ? type.elements[index] ?? ANY_TYPE : ANY_TYPE)),
+                );
+
+                return createTuple(elements);
+            }
+        }
+
+        return createUnion(frame.inferred);
     }
 
     currentReturnType(): Type | null {
-        return this.returnStack[this.returnStack.length - 1] ?? null;
+        return this.returnStack[this.returnStack.length - 1]?.expected ?? null;
+    }
+
+    inferReturnType(type: Type): void {
+        this.returnStack[this.returnStack.length - 1]?.inferred.push(type);
     }
 
     pushClassMethod(frame: ClassMethodFrame): void {
@@ -222,7 +255,7 @@ export class CheckContext {
             return createFunction(parameters, this.resolveAnnotation(annotation.returnType), minimum, annotation.isVariadic);
         }
 
-        return this.resolveNamedAnnotation(annotation.name);
+        return this.resolveNamedAnnotation(annotation.name, annotation.typeArguments, annotation.position);
     }
 
     expectAssignable(source: Type, target: Type, position: SourcePosition, subject: string): void {
@@ -269,13 +302,32 @@ export class CheckContext {
         }
     }
 
-    private resolveNamedAnnotation(name: string): Type {
+    private resolveNamedAnnotation(name: string, typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {
         const builtin = BUILTIN_TYPES[name];
 
         if (builtin !== undefined) {
+            if (typeArguments.length > 0) {
+                this.report('check-generic-arity', `Type "${name}" does not accept type arguments.`, position);
+            }
+
             return builtin;
         }
 
-        return this.binder.lookupAlias(name) ?? createNamed(name);
+        const alias = this.binder.lookupAlias(name);
+
+        if (alias === null) {
+            return createNamed(name);
+        }
+
+        if (typeArguments.length !== alias.parameters.length) {
+            const expected = alias.parameters.length === 1 ? '1 type argument' : `${alias.parameters.length} type arguments`;
+
+            this.report('check-generic-arity', `Type "${name}" expects ${expected} but received ${typeArguments.length}.`, position);
+        }
+
+        const resolved = typeArguments.map((argument) => this.resolveAnnotation(argument));
+        const substitutions = new Map(alias.parameters.map((parameter, index) => [parameter, resolved[index] ?? ANY_TYPE]));
+
+        return substituteType(alias.type, substitutions);
     }
 }

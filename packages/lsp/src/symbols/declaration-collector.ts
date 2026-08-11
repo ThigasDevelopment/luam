@@ -65,7 +65,9 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
         return;
     }
 
-    const detail = signatureText(member.name, member.parameters, member.returnAnnotation);
+    const checked = state.checkerDeclarations.lookupMember(owner, member.name)?.type;
+    const inferredReturn = checked?.kind === 'function' ? checked.returnType : null;
+    const detail = signatureText(member.name, member.parameters, member.returnAnnotation, inferredReturn);
 
     const parameters = member.parameters.map(parameterText);
 
@@ -76,7 +78,10 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
         detail,
         container: owner,
         parameters,
-        type: signatureType(member.parameters, member.returnAnnotation),
+        type:
+            member.returnAnnotation === null && checked?.kind === 'function'
+                ? checked
+                : signatureType(member.parameters, member.returnAnnotation),
         isSynthetic: member.isSynthetic,
     });
 
