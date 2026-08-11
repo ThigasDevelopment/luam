@@ -10,7 +10,7 @@ describe('the installable package', () => {
     }
 
     it('publishes under the command name', () => {
-        expect(field('name')).toBe('@thigasdevelopment/luam');
+        expect(field('name')).toBe('luam');
         expect(field('version')).toBe('1.2.3');
     });
 

@@ -15,7 +15,7 @@ node --version
 ## Install the CLI
 
 ```bash
-npm install --global @thigasdevelopment/luam
+npm install --global luam
 ```
 
 That installs one command, `luam`:
@@ -26,13 +26,13 @@ luam --version
 
 | Task | Command |
 | --- | --- |
-| Install | `npm install --global @thigasdevelopment/luam` |
-| Update to the latest | `npm update --global @thigasdevelopment/luam` |
-| Install a specific version | `npm install --global @thigasdevelopment/luam@0.1.1` |
-| Uninstall | `npm uninstall --global @thigasdevelopment/luam` |
-| Run once, without installing | `npx @thigasdevelopment/luam <command>` |
+| Install | `npm install --global luam` |
+| Update to the latest | `npm update --global luam` |
+| Install a specific version | `npm install --global luam@0.1.1` |
+| Uninstall | `npm uninstall --global luam` |
+| Run once, without installing | `npx luam <command>` |
 
-`npx @thigasdevelopment/luam build` works anywhere and caches the download, which
+`npx luam build` works anywhere and caches the download, which
 suits CI and any machine you would rather not install into.
 
 ## `luam: command not found`
@@ -50,7 +50,7 @@ npm config get prefix
 - **macOS and Linux** — add `<prefix>/bin` to your `PATH` in `~/.zshrc` or
   `~/.bashrc`, then run `source ~/.zshrc`.
 
-`npx @thigasdevelopment/luam <command>` needs no `PATH` entry at all.
+`npx luam <command>` needs no `PATH` entry at all.
 
 ## Install the editor extension
 

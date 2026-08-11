@@ -23,7 +23,7 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: '20'
-            - run: npx --yes @thigasdevelopment/luam check
+            - run: npx --yes luam check
 ```
 
 `npx` needs no global install and caches the download. `check` performs no
@@ -45,7 +45,7 @@ transcript carries no control characters. `--no-color` forces that anywhere.
 ## Producing a resource artifact
 
 ```bash
-npx --yes @thigasdevelopment/luam build --offline
+npx --yes luam build --offline
 ```
 
 The resource lands in `<outDir>/<name>` — upload that directory as the build
@@ -53,7 +53,7 @@ artifact. A build that reports any error writes nothing, so an artifact is eithe
 complete or absent.
 
 ```yaml
-            - run: npx --yes @thigasdevelopment/luam build --offline
+            - run: npx --yes luam build --offline
             - uses: actions/upload-artifact@v4
               with:
                   name: resource
@@ -75,7 +75,7 @@ server console.
 
 ```bash
 export LUAM_MTA_PASSWORD=...
-npx --yes @thigasdevelopment/luam ensure --no-watch
+npx --yes luam ensure --no-watch
 ```
 
 That is the deploy-script form of the development loop, and it uses the same
@@ -95,7 +95,7 @@ transport rules — see [Security boundaries](/en/mta/security).
 
 ```bash
 #!/bin/sh
-npx --yes @thigasdevelopment/luam check --no-color || exit 1
+npx --yes luam check --no-color || exit 1
 ```
 
 ## Caching

@@ -28,7 +28,7 @@ escape.
 
 O diretório global de binários do npm não está no `PATH`. Veja
 [Instalação](/pt-br/guide/installation#luam-command-not-found), ou use
-`npx @thigasdevelopment/luam <command>`, que não precisa de entrada no `PATH`.
+`npx luam <command>`, que não precisa de entrada no `PATH`.
 
 ## O build informa que não há fontes
 
