@@ -6,6 +6,19 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Editor Detection on Windows
+
+Editor launchers ship as `.cmd` scripts on Windows, and a direct process spawn
+never applies `PATHEXT`, so `luam setup` and `luam doctor` reported no editor at
+all on a machine with Visual Studio Code installed.
+
+#### Fixed
+
+- `luam setup` and `luam doctor` now detect editors on Windows. The command is
+  resolved against `PATH` and `PATHEXT` before it runs, and a `.cmd` or `.bat`
+  launcher is executed through `COMSPEC` as a single quoted command line, so a
+  launcher installed under a path with spaces is invoked as one argument.
+
 ### The `continue` Statement
 
 Lua 5.1 has neither `continue` nor the `goto` that replaced the need for it in

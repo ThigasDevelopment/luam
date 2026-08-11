@@ -1,9 +1,9 @@
-import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { VERSION } from '@cli/cli/usage';
+import { runEditorCommand } from '@cli/editor/editor-command';
 
 import type { SpawnSyncReturns } from 'node:child_process';
 
@@ -37,12 +37,8 @@ export const SUPPORTED_EDITORS: readonly Editor[] = [
 const MAX_VSIX_BYTES = 50 * 1024 * 1024;
 const RELEASE_URL = `https://github.com/ThigasDevelopment/luam/releases/download/v${VERSION}/luam-${VERSION}.vsix`;
 
-function run(command: string, args: readonly string[]): SpawnSyncReturns<string> {
-    return spawnSync(command, [...args], { encoding: 'utf8', shell: false, windowsHide: true, maxBuffer: 1024 * 1024 });
-}
-
 function succeeded(result: SpawnSyncReturns<string>): boolean {
-    return result.error === undefined && result.status === 0;
+    return (result.error === undefined || result.error === null) && result.status === 0;
 }
 
 function trustedReleaseHost(url: string): boolean {
@@ -82,7 +78,7 @@ function installVsix(editor: Editor, bytes: Uint8Array): ExtensionInstallResult 
 
     try {
         writeFileSync(path, bytes, { flag: 'wx' });
-        const result = run(editor.command, ['--install-extension', path, '--force']);
+        const result = runEditorCommand(editor.command, ['--install-extension', path, '--force']);
 
         return succeeded(result) ? { source: 'release', error: null } : { source: null, error: 'The editor rejected the release VSIX.' };
     } finally {
@@ -94,14 +90,14 @@ export function createEditorService(): EditorService {
     let release: Promise<Uint8Array> | null = null;
 
     return {
-        detect: (): Editor[] => SUPPORTED_EDITORS.filter((editor) => succeeded(run(editor.command, ['--version']))),
+        detect: (): Editor[] => SUPPORTED_EDITORS.filter((editor) => succeeded(runEditorCommand(editor.command, ['--version']))),
         hasExtension: (editor: Editor): boolean => {
-            const result = run(editor.command, ['--list-extensions']);
+            const result = runEditorCommand(editor.command, ['--list-extensions']);
 
             return succeeded(result) && result.stdout.split(/\r?\n/u).some((entry) => entry.trim().toLowerCase() === EXTENSION_ID);
         },
         install: async (editor: Editor): Promise<ExtensionInstallResult> => {
-            const marketplace = run(editor.command, ['--install-extension', EXTENSION_ID, '--force']);
+            const marketplace = runEditorCommand(editor.command, ['--install-extension', EXTENSION_ID, '--force']);
 
             if (succeeded(marketplace)) {
                 return { source: 'marketplace', error: null };
