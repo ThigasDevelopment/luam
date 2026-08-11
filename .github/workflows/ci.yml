@@ -29,7 +29,7 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                node-version: ['20', '22', '24']
+                node-version: ['22', '24']
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/setup
@@ -59,18 +59,30 @@ jobs:
 
             - name: Build a resource with the bundled CLI
               run: |
-                  mkdir -p "$RUNNER_TEMP/smoke"
+                  mkdir -p "$RUNNER_TEMP/smoke/src/server"
                   cd "$RUNNER_TEMP/smoke"
                   node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" init --name luam-smoke
+                  printf 'local greeting: string = "luam"\nprint(greeting)\n' > src/server/main.luam
+                  printf 'TOKEN=secret\n' > .env
                   node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" check
                   node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" build
                   test -f build/luam-smoke/meta.xml
-                  test -f build/luam-smoke/src/server/main.lua
-                  test -f build/luam-smoke/src/shared/lib/class.lua
-                  test -f build/luam-smoke/src/server/lib/env.lua
-                  test -f build/luam-smoke/config.lua
+                  test -f build/luam-smoke/src/server.lua
                   test -f build/luam-smoke/.env
                   ! grep -q '<file src=".env"' build/luam-smoke/meta.xml
+
+            - name: Switch to the minimum supported Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - name: Rebuild the resource on the minimum supported Node
+              run: |
+                  cd "$RUNNER_TEMP/smoke"
+                  rm -rf build
+                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" build
+                  test -f build/luam-smoke/meta.xml
+                  test -f build/luam-smoke/src/server.lua
 
     benchmark:
         name: Benchmark
