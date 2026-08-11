@@ -66,6 +66,13 @@ erro não escreve nada.
 | `check-unknown-member` | O membro não existe no receptor. |
 | `check-unknown-record-key` | A chave não é declarada. Usado por `process.env`. |
 
+## Checker — fluxo de controle
+
+| Código | Significado |
+| --- | --- |
+| `check-invalid-break` | Um `break` fora de um laço, ou que não é o último do bloco. |
+| `check-invalid-continue` | Um `continue` fora de um laço, que não é o último do bloco, ou que pularia sobre um local lido pela condição do `until`. |
+
 ## Checker — declarações
 
 | Código | Significado |

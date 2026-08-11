@@ -17,6 +17,7 @@ const LABELS: Readonly<Record<string, string>> = {
     'call-statement': 'A call',
     'return-statement': 'A "return"',
     'break-statement': 'A "break"',
+    'continue-statement': 'A "continue"',
     'do-statement': 'A "do" block',
     'while-statement': 'A "while" loop',
     'repeat-statement': 'A "repeat" loop',

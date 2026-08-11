@@ -2,7 +2,8 @@
 
 Luam is Lua 5.1. Statements, blocks, tables, metatables, scoping and the standard
 library behave exactly as they do in MTA today. This page covers what stayed the
-same, and the three places where the syntax had to move.
+same, the three places where the syntax had to move, and the one statement Luam
+adds.
 
 ## What stayed the same
 
@@ -99,6 +100,89 @@ end
 
 See [Types](/en/language/types).
 
+## What Luam adds: `continue`
+
+`continue` skips to the next iteration of the innermost `for`, `while` or
+`repeat`:
+
+```luam
+for index = 1, 10 do
+    if skip(index) then continue end
+
+    print(index)
+end
+```
+
+Lua 5.1 has neither `continue` nor `goto`, so the compiler lowers it. The body
+becomes a `repeat ... until true` block, where `break` leaves only that block and
+therefore lands on the next iteration:
+
+```lua
+for index = 1, 10 do
+    repeat
+        if skip(index) then
+            break
+        end
+        print(index)
+    until true
+end
+```
+
+The wrapper costs nothing at runtime. A block emits no opcode in Lua 5.1, and a
+constant `until true` emits no test, so the loop runs the same instructions it
+would without the `repeat`. A loop that contains no `continue` is emitted exactly
+as before — you only ever see the `repeat` where you asked for a `continue`.
+
+When a real `break` shares the same loop level, the compiler keeps it apart with
+a flag, so `break` still leaves the loop and `continue` still skips one turn:
+
+```luam
+for index = 1, 10 do
+    if skip(index) then continue end
+    if done(index) then break end
+
+    print(index)
+end
+```
+
+```lua
+for index = 1, 10 do
+    local __luam_break = false
+    repeat
+        if skip(index) then
+            break
+        end
+        if done(index) then
+            __luam_break = true
+            break
+        end
+        print(index)
+    until true
+    if __luam_break then break end
+end
+```
+
+Three rules apply, and each has its own diagnostic:
+
+- `continue` only appears inside a loop, and a function body inside a loop is not
+  the same level. Otherwise `check-invalid-continue`.
+- `continue` is the last statement of its block, which is the Lua 5.1 rule for
+  `break` too. Otherwise `check-invalid-continue`, or `check-invalid-break`.
+- `continue` inside a `repeat` cannot jump over a local the `until` condition
+  reads, because the wrapper would put that local out of scope. Declare the local
+  above the loop, or use `while`.
+
+```luam
+repeat
+    local found: boolean = search()
+
+    if retry() then continue end
+until found
+```
+
+That last one is `check-invalid-continue`: the `until` reads `found`, which
+`continue` would skip.
+
 ## A complete example
 
 <<< @/snippets/language/src/shared/syntax.luam
@@ -111,3 +195,5 @@ See [Types](/en/language/types).
 | `a != b` | `lex-foreign-operator` | Use `a ~= b`. |
 | `local x = y++` | `parse-invalid-increment` | Make `y++` its own statement. |
 | `#count` meaning a comment | no error, wrong meaning | Add a space: `# count`. |
+| `continue` outside a loop | `check-invalid-continue` | Move it inside the loop body. |
+| `break print(x)` | `check-invalid-break` | Put `break` last in its block. |

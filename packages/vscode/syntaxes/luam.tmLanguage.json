@@ -172,7 +172,7 @@
             "patterns": [
                 {
                     "name": "keyword.control.luam",
-                    "match": "\\b(?:break|do|else|elseif|end|for|function|if|in|repeat|return|then|until|while)\\b"
+                    "match": "\\b(?:break|continue|do|else|elseif|end|for|function|if|in|repeat|return|then|until|while)\\b"
                 },
                 {
                     "name": "storage.modifier.luam",

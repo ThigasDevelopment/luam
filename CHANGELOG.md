@@ -6,6 +6,40 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### The `continue` Statement
+
+Lua 5.1 has neither `continue` nor the `goto` that replaced the need for it in
+5.2, so every MTA script inverts a condition or nests another `if` to skip one
+turn of a loop. Luam adds the statement and lowers it, at no runtime cost.
+
+#### Added
+
+- `continue`, which skips to the next iteration of the innermost `for`, `while`
+  or `repeat`. The loop body is emitted as a `repeat ... until true` block, where
+  `break` leaves only that block. A block emits no opcode in Lua 5.1 and a
+  constant `until true` emits no test, so the lowered loop runs the instructions
+  it would have run without the wrapper. A loop with no `continue` is emitted
+  exactly as before.
+- A `__luam_break` flag, emitted only when a real `break` shares the loop level
+  with a `continue`, so the two keep their own meanings. Nested loops each carry
+  their own flag, and a `break` belonging to an inner loop is left alone.
+- `check-invalid-continue` and `check-invalid-break`, reported by a jump pass
+  that runs before type checking. They cover a jump outside any loop, including
+  one inside a function body nested in a loop; a jump that is not the last
+  statement of its block, which Lua 5.1 requires; and a `continue` inside a
+  `repeat` that would jump over a local the `until` condition reads, which the
+  wrapper would put out of scope.
+- 15 tests covering the lowering across the four loop forms, the break flag, loop
+  nesting, and every diagnostic. The suite is 1021 tests.
+
+#### Changed
+
+- **Breaking**: `continue` is a reserved word. A variable, parameter or function
+  named `continue` needs a rename, as with the other 10 words Luam adds.
+- **Breaking**: a `break` followed by another statement in the same block now
+  reports `check-invalid-break`. It previously compiled and emitted Lua 5.1 that
+  the target refused, since `break` there must close its block.
+
 ### Output Layouts and Source Maps
 
 A shipped resource and a resource under development want opposite shapes. The
