@@ -17,10 +17,14 @@ function emitParameters(parameters: readonly Parameter[]): string {
 }
 
 export function emitFunctionBody(state: EmitState, parameters: readonly Parameter[], body: readonly Statement[], header: string): string {
+    const previous = state.loopWrap;
+
     state.indent += 1;
+    state.loopWrap = false;
 
     const lines = emitBlock(state, body);
 
+    state.loopWrap = previous;
     state.indent -= 1;
 
     const signature = `${header}(${emitParameters(parameters)})`;

@@ -15,6 +15,7 @@ export interface EmitState {
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
     markers: EmissionMarker[];
     symbol: string | undefined;
+    loopWrap: boolean;
 }
 
 export const INDENT = '    ';
@@ -24,7 +25,7 @@ export function createEmitState(
     references: ReadonlySet<string>,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>,
 ): EmitState {
-    return { types, references, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0, markers: [], symbol: undefined };
+    return { types, references, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0, markers: [], symbol: undefined, loopWrap: false };
 }
 
 export function requireHelper(state: EmitState, helper: RuntimeHelper | null): void {

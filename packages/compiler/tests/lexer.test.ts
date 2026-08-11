@@ -24,7 +24,7 @@ describe('lexer', () => {
     });
 
     it('reserves the words Luam adds on top of Lua 5.1', () => {
-        const source = 'class constructor declare enum export extends implements interface new type';
+        const source = 'class constructor continue declare enum export extends implements interface new type';
 
         expect(scan(source).tokens.filter((token) => token.kind === 'identifier')).toEqual([]);
         expect([...LUAM_KEYWORDS].every((word) => KEYWORDS.has(word))).toBe(true);

@@ -198,6 +198,10 @@ export interface BreakStatement extends NodeBase {
     kind: 'break-statement';
 }
 
+export interface ContinueStatement extends NodeBase {
+    kind: 'continue-statement';
+}
+
 export interface DoStatement extends NodeBase {
     kind: 'do-statement';
     body: Statement[];
@@ -262,6 +266,7 @@ export type Statement =
     | FunctionDeclaration
     | ReturnStatement
     | BreakStatement
+    | ContinueStatement
     | DoStatement
     | WhileStatement
     | RepeatStatement

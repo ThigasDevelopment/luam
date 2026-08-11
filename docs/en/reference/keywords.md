@@ -2,7 +2,7 @@
 
 Every word in this page is reserved by the lexer: none of them can name a
 variable, a parameter or a function. Luam reserves the 21 Lua 5.1 keywords and
-adds 10 of its own.
+adds 11 of its own.
 
 The one place a reserved word is still allowed is a **property name** — after a
 `.` or a `:`, as a table field key, and as a class, interface or enum member.
@@ -38,15 +38,17 @@ These 21 words are reserved exactly as in Lua 5.1.
 
 ::: tip Lua 5.1 has no `goto`
 `goto` became a keyword in Lua 5.2. Luam targets 5.1, so `goto` is an ordinary
-identifier here.
+identifier here. `continue` is the one jump Luam adds, and it is lowered rather
+than mapped onto `goto` — see [Lua foundations](/en/language/syntax).
 :::
 
 ## Keywords Luam adds
 
-These 10 words are reserved on top of Lua 5.1.
+These 11 words are reserved on top of Lua 5.1.
 
 | Keyword | Role | Page |
 | --- | --- | --- |
+| `continue` | Skips to the next iteration of the innermost loop | [Lua foundations](/en/language/syntax) |
 | `class` | Opens a class declaration | [Classes](/en/language/classes) |
 | `extends` | Names the parent of a class | [Classes](/en/language/classes) |
 | `implements` | Names the interfaces a class satisfies | [Classes](/en/language/classes) |

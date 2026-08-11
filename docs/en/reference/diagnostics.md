@@ -66,6 +66,13 @@ writes nothing.
 | `check-unknown-member` | The member does not exist on the receiver. |
 | `check-unknown-record-key` | The key is not declared. Used by `process.env`. |
 
+## Checker — control flow
+
+| Code | Meaning |
+| --- | --- |
+| `check-invalid-break` | A `break` outside a loop, or not last in its block. |
+| `check-invalid-continue` | A `continue` outside a loop, not last in its block, or one that would jump over a local the `until` condition reads. |
+
 ## Checker — declarations
 
 | Code | Meaning |

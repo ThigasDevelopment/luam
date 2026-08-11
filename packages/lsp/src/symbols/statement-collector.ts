@@ -256,7 +256,7 @@ function collectStatement(state: CollectorState, block: BlockContext, statement:
         collectTypeAlias(state, block, statement);
     } else if (statement.kind === 'declare-statement') {
         collectDeclare(state, block, statement);
-    } else if (statement.kind !== 'break-statement') {
+    } else if (statement.kind !== 'break-statement' && statement.kind !== 'continue-statement') {
         collectDeclaration(state, block, statement);
     }
 }

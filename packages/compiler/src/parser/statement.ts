@@ -180,6 +180,12 @@ function parseKeywordStatement(stream: TokenStream, value: string): Statement | 
         return { kind: 'break-statement', position: token.position };
     }
 
+    if (value === 'continue') {
+        stream.next();
+
+        return { kind: 'continue-statement', position: token.position };
+    }
+
     return null;
 }
 

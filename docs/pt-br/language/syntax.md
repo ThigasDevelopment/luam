@@ -2,7 +2,8 @@
 
 Luam é Lua 5.1. Comandos, blocos, tabelas, metatabelas, escopo e a biblioteca
 padrão se comportam exatamente como já se comportam no MTA hoje. Esta página cobre
-o que continuou igual e os três pontos em que a sintaxe precisou mudar.
+o que continuou igual, os três pontos em que a sintaxe precisou mudar e o único
+comando que o Luam adiciona.
 
 ## O que continuou igual
 
@@ -99,6 +100,91 @@ end
 
 Veja [Tipos](/pt-br/language/types).
 
+## O que o Luam adiciona: `continue`
+
+`continue` pula para a próxima iteração do `for`, `while` ou `repeat` mais
+interno:
+
+```luam
+for index = 1, 10 do
+    if skip(index) then continue end
+
+    print(index)
+end
+```
+
+Lua 5.1 não tem `continue` nem `goto`, então o compilador reescreve o comando. O
+corpo vira um bloco `repeat ... until true`, onde `break` sai apenas desse bloco
+e portanto cai na próxima iteração:
+
+```lua
+for index = 1, 10 do
+    repeat
+        if skip(index) then
+            break
+        end
+        print(index)
+    until true
+end
+```
+
+O envelope não custa nada em runtime. Um bloco não emite instrução em Lua 5.1, e
+um `until true` constante não emite teste, então o laço executa as mesmas
+instruções que executaria sem o `repeat`. Um laço sem `continue` é emitido
+exatamente como antes — o `repeat` só aparece onde você pediu um `continue`.
+
+Quando um `break` de verdade divide o mesmo nível do laço, o compilador os separa
+com uma flag, então `break` continua saindo do laço e `continue` continua pulando
+uma volta:
+
+```luam
+for index = 1, 10 do
+    if skip(index) then continue end
+    if done(index) then break end
+
+    print(index)
+end
+```
+
+```lua
+for index = 1, 10 do
+    local __luam_break = false
+    repeat
+        if skip(index) then
+            break
+        end
+        if done(index) then
+            __luam_break = true
+            break
+        end
+        print(index)
+    until true
+    if __luam_break then break end
+end
+```
+
+Valem três regras, cada uma com seu diagnóstico:
+
+- `continue` só aparece dentro de um laço, e um corpo de função dentro de um laço
+  não é o mesmo nível. Caso contrário, `check-invalid-continue`.
+- `continue` é o último comando do seu bloco, que é a regra do Lua 5.1 para o
+  `break` também. Caso contrário, `check-invalid-continue` ou
+  `check-invalid-break`.
+- `continue` dentro de um `repeat` não pode pular sobre um local que a condição
+  do `until` lê, porque o envelope deixaria esse local fora de escopo. Declare o
+  local acima do laço, ou use `while`.
+
+```luam
+repeat
+    local found: boolean = search()
+
+    if retry() then continue end
+until found
+```
+
+Esse último caso é `check-invalid-continue`: o `until` lê `found`, que o
+`continue` pularia.
+
 ## Um exemplo completo
 
 <<< @/snippets/language/src/shared/syntax.luam
@@ -111,3 +197,5 @@ Veja [Tipos](/pt-br/language/types).
 | `a != b` | `lex-foreign-operator` | Use `a ~= b`. |
 | `local x = y++` | `parse-invalid-increment` | Faça de `y++` um comando próprio. |
 | `#count` querendo um comentário | sem erro, sentido errado | Adicione um espaço: `# count`. |
+| `continue` fora de um laço | `check-invalid-continue` | Mova para dentro do corpo do laço. |
+| `break print(x)` | `check-invalid-break` | Deixe `break` por último no bloco. |

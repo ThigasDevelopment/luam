@@ -2,7 +2,7 @@
 
 Toda palavra desta página é reservada pelo lexer: nenhuma delas pode nomear uma
 variável, um parâmetro ou uma função. O Luam reserva as 21 palavras-chave do
-Lua 5.1 e adiciona 10 próprias.
+Lua 5.1 e adiciona 11 próprias.
 
 O único lugar onde uma palavra reservada continua permitida é como **nome de
 propriedade** — depois de um `.` ou de um `:`, como chave de campo de tabela e
@@ -39,15 +39,18 @@ Estas 21 palavras são reservadas exatamente como em Lua 5.1.
 
 ::: tip Lua 5.1 não tem `goto`
 `goto` virou palavra-chave em Lua 5.2. O Luam tem como alvo o 5.1, então aqui
-`goto` é um identificador comum.
+`goto` é um identificador comum. `continue` é o único salto que o Luam adiciona,
+e ele é reescrito em vez de mapeado para `goto` — veja
+[Fundamentos de Lua](/pt-br/language/syntax).
 :::
 
 ## Palavras-chave que o Luam adiciona
 
-Estas 10 palavras são reservadas além das do Lua 5.1.
+Estas 11 palavras são reservadas além das do Lua 5.1.
 
 | Palavra-chave | Papel | Página |
 | --- | --- | --- |
+| `continue` | Pula para a próxima iteração do laço mais interno | [Fundamentos de Lua](/pt-br/language/syntax) |
 | `class` | Abre uma declaração de classe | [Classes](/pt-br/language/classes) |
 | `extends` | Nomeia a classe pai | [Classes](/pt-br/language/classes) |
 | `implements` | Nomeia as interfaces que a classe satisfaz | [Classes](/pt-br/language/classes) |
