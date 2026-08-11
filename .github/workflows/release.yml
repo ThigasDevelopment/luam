@@ -52,6 +52,9 @@ jobs:
             - name: Bundle the extension
               run: pnpm --filter luam bundle
 
+            - name: Prepare the artifact directory
+              run: mkdir -p "$GITHUB_WORKSPACE/artifacts"
+
             - name: Package the CLI
               run: npm pack --pack-destination "$GITHUB_WORKSPACE/artifacts" ./packages/cli/dist
 
