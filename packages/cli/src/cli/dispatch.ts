@@ -11,6 +11,7 @@ import { runDoctorCommand } from '@cli/commands/doctor-command';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import { runDevCommand } from '@cli/commands/dev-command';
 import { runInitCommand } from '@cli/commands/init-command';
+import { promptForProject, type InitPrompt } from '@cli/commands/init-prompt';
 import { runSetupCommand } from '@cli/commands/setup-command';
 import { runTraceCommand } from '@cli/commands/trace-command';
 import { loadConfig } from '@cli/config/config-loader';
@@ -36,6 +37,7 @@ export interface CliOverrides {
     signal: AbortSignal | null;
     editorService: EditorService;
     prompt: InstallationPrompt;
+    initPrompt: InitPrompt;
 }
 
 function resolveCapability(overrides: Partial<CliOverrides>, env: Environment, noColor: boolean): OutputCapability {
@@ -85,7 +87,9 @@ export async function runCli(argv: readonly string[], overrides: Partial<CliOver
     const root = resolve(overrides.cwd ?? process.cwd(), parsed.cwd ?? '.');
 
     if (parsed.command === 'init') {
-        return runInitCommand(root, logger, { name: parsed.name, force: parsed.force });
+        const target = parsed.operand === null ? root : resolve(root, parsed.operand);
+
+        return runInitCommand(target, logger, { name: parsed.name, force: parsed.force, yes: parsed.yes, prompt: overrides.initPrompt ?? promptForProject });
     }
 
     const editorService = overrides.editorService ?? createEditorService();

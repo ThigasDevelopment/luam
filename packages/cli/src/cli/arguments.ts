@@ -175,7 +175,7 @@ export function parseArguments(argv: readonly string[]): ParsedArguments {
         }
 
         if (parsed.command !== null) {
-            if (parsed.command === 'trace' && parsed.operand === null) {
+            if ((parsed.command === 'init' || parsed.command === 'trace') && parsed.operand === null) {
                 parsed.operand = token;
 
                 continue;

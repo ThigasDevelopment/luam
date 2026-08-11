@@ -21,9 +21,15 @@ function fixture(files: Readonly<Record<string, string>> = {}): ProjectFixture {
     return created;
 }
 
+const answers = { version: '2.0.0', description: 'A prompt description', author: 'Luam Team' };
+
 async function init(root: string, ...args: readonly string[]): Promise<{ code: number; logger: ReturnType<typeof createMemoryLogger> }> {
     const logger = createMemoryLogger();
-    const code = await runCli(['init', '--cwd', root, ...args], { logger, env: OFFLINE });
+    const code = await runCli(['init', '--cwd', root, ...args], {
+        logger,
+        env: OFFLINE,
+        initPrompt: async (defaults) => ({ ...defaults, ...answers }),
+    });
 
     return { code, logger };
 }
@@ -36,18 +42,18 @@ afterEach(() => {
 
 describe('scaffold plan', () => {
     it('renders one file per template entry', async () => {
-        expect(buildScaffoldPlan('demo').files.map((file) => file.path)).toEqual(TEMPLATE_FILES.map((file) => file.path));
+        expect(buildScaffoldPlan({ ...answers, name: 'demo' }).files.map((file) => file.path)).toEqual(TEMPLATE_FILES.map((file) => file.path));
     });
 
     it('names the resource in the generated configuration', async () => {
-        const config = buildScaffoldPlan('demo').files.find((file) => file.path === 'luam.json');
+        const config = buildScaffoldPlan({ ...answers, name: 'demo' }).files.find((file) => file.path === 'luam.json');
         const parsed: unknown = JSON.parse(config?.content ?? '{}');
 
-        expect(parsed).toMatchObject({ name: 'demo', outDir: 'build', assetDirs: ['assets'], sourceDirs: ['src'] });
+        expect(parsed).toMatchObject({ name: 'demo', version: '2.0.0', description: 'A prompt description', author: 'Luam Team', outDir: 'build', assetDirs: ['assets'], sourceDirs: ['src'] });
     });
 
     it('scaffolds the project manifest and nothing else', async () => {
-        expect(buildScaffoldPlan('demo').files.map((file) => file.path)).toEqual(['luam.json']);
+        expect(buildScaffoldPlan({ ...answers, name: 'demo' }).files.map((file) => file.path)).toEqual(['luam.json']);
     });
 });
 
@@ -78,6 +84,15 @@ describe('luam init', () => {
 
         expect(project.exists('src')).toBe(false);
         expect(logger.text()).toContain(`Scaffolded "demo" into "${project.root}"`);
+    });
+
+    it('uses the destination path and prompted project details', async () => {
+        const project = fixture();
+        const { code } = await init(project.root, 'resources/race');
+
+        expect(code).toBe(EXIT_OK);
+        expect(project.exists('resources/race/luam.json')).toBe(true);
+        expect(JSON.parse(project.read('resources/race/luam.json'))).toMatchObject({ ...answers, name: 'race' });
     });
 
     it('keeps existing files unless force is passed', async () => {

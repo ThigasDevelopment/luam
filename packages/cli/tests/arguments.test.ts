@@ -29,10 +29,11 @@ describe('argument parsing', () => {
     });
 
     it('reads the init options', () => {
-        const parsed = parseArguments(['init', '--name', 'my-resource', '--force']);
+        const parsed = parseArguments(['init', 'projects/my-resource', '--name', 'my-resource', '--force']);
 
         expect(parsed.command).toBe('init');
         expect(parsed.name).toBe('my-resource');
+        expect(parsed.operand).toBe('projects/my-resource');
         expect(parsed.force).toBe(true);
         expect(parsed.errors).toEqual([]);
     });
