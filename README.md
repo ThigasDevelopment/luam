@@ -5,6 +5,12 @@
 <p align="center">Typed Lua for Multi Theft Auto. Compiles to plain Lua 5.1.</p>
 
 <p align="center">
+    <a href="https://thigasdevelopment.github.io/luam/"><b>Manual</b></a> ·
+    <a href="https://thigasdevelopment.github.io/luam/en/">English</a> ·
+    <a href="https://thigasdevelopment.github.io/luam/pt-br/">Português (Brasil)</a>
+</p>
+
+<p align="center">
     <a href="https://www.npmjs.com/package/@thigasdevelopment/luam"><img alt="npm" src="https://img.shields.io/npm/v/@thigasdevelopment/luam?color=cb3837&label=npm"></a>
     <img alt="Target" src="https://img.shields.io/badge/target-Lua%205.1-000080">
     <img alt="Platform" src="https://img.shields.io/badge/platform-Multi%20Theft%20Auto-3ddc97">
@@ -37,6 +43,10 @@ before the server ever starts. A build with any error writes nothing.
 ---
 
 ## Install
+
+> Full instructions, including `PATH` troubleshooting:
+> **[Installation](https://thigasdevelopment.github.io/luam/en/guide/installation)**
+> · [Instalação](https://thigasdevelopment.github.io/luam/pt-br/guide/installation)
 
 You need [Node.js](https://nodejs.org/) 20 or newer and an
 [MTA:SA](https://multitheftauto.com/) 1.5+ server. No Lua toolchain — the
@@ -133,6 +143,10 @@ See [Editor support](#editor-support) for the compatibility matrix and manual in
 
 ## Quick start
 
+> Step by step, with a checked example:
+> **[Quick start](https://thigasdevelopment.github.io/luam/en/guide/quick-start)**
+> · [Início rápido](https://thigasdevelopment.github.io/luam/pt-br/guide/quick-start)
+
 **1. Scaffold.** `init` writes exactly one file, `luam.json`. No framework, no
 example tree, nothing to delete.
 
@@ -216,6 +230,10 @@ luam dev
 
 ## The CLI
 
+> Every command, option and exit code:
+> **[CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli)**
+> · [Comandos da CLI](https://thigasdevelopment.github.io/luam/pt-br/tooling/cli)
+
 Project commands read `luam.json` from the current directory or from `--cwd`.
 `setup`, `doctor`, and `init` do not require an existing project.
 
@@ -269,7 +287,9 @@ Build failed: 1 error, 0 warnings in 4 ms.
 
 ### `luam build`
 
-Compiles and writes the resource into `<outDir>/<name>`.
+Compiles and writes the bundled production resource into `<outDir>/<name>`, plus
+`<outDir>/<name>.luam-map.json` for resolving production error positions. Pass
+`--no-bundle` for tree output or `--no-map` to suppress the map.
 
 ```bash
 luam build
@@ -373,6 +393,9 @@ a deploy script wants.
 | `--name <name>` | Resource name for `init` |
 | `--force` | Let `init` overwrite a file that exists |
 | `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default |
+| `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`; `dev` always uses tree |
+| `--no-map` | Disable source position maps |
+| `--map <path>` | Select the resource map for `luam trace` |
 | `--offline` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same |
 | `--no-color` | Plain output, no colour or emoji. `NO_COLOR` does the same |
 | `-h`, `--help` | Print the usage text |
@@ -400,6 +423,8 @@ Only `name` is required.
 | `assetDirs` | `["assets"]` | Copied verbatim and declared `<file>`, so clients download them |
 | `outDir` | `"build"` | Receives `<outDir>/<name>` |
 | `loadOrder` | `[]` | Source paths pinned ahead of their group in `meta.xml`. An entry matching no file fails the build |
+| `output.bundle` | `true` | Default `build` layout; command flags override it |
+| `output.map` | `true` | Generate source position maps; only `build` writes one to disk |
 | `oop` | `false` | Enables the MTA OOP API (`player:getName()`) and writes `<oop>true</oop>` |
 | `helpers` | `[]` | Runtime helpers to copy even when no feature requires them |
 | `serverPath` | unset | MTA server root, for `ensure` |
@@ -411,11 +436,19 @@ Paths must stay inside their base directory — an absolute path or a `..` segme
 is rejected.
 
 Every field, the transport in detail, `.env` handling and declaration files:
-**[`packages/cli/README.md`](packages/cli/README.md)**.
+**[luam.json](https://thigasdevelopment.github.io/luam/en/tooling/luam-json)**
+and
+[Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)
+· [luam.json](https://thigasdevelopment.github.io/luam/pt-br/tooling/luam-json)
+· also in [`packages/cli/README.md`](packages/cli/README.md).
 
 ---
 
 ## The language
+
+> Every feature, with emitted Lua and the errors it catches:
+> **[The language](https://thigasdevelopment.github.io/luam/en/language/)**
+> · [A linguagem](https://thigasdevelopment.github.io/luam/pt-br/language/)
 
 ```lua
 local name: string = 'Thigas'
@@ -464,10 +497,14 @@ local vip = new VIPPlayer('Thigas', 2)
 | Deployment values | `.env` keys typed and reachable as `env.SERVER_NAME`, server-only |
 | Strictness | `#!strict` (default), `#!nonstrict`, `#!nocheck` per file |
 
-`class`, `interface`, `enum`, `new`, `fun` and `export` are contextual keywords —
-existing Lua that uses them as identifiers keeps compiling. Reach for
-`#!nocheck` when porting existing Lua: rename to `.luam` and the build passes
-while you annotate module by module.
+`class`, `constructor`, `declare`, `enum`, `export`, `extends`, `implements`,
+`interface`, `new` and `type` are **reserved**, on top of the 21 Lua 5.1
+keywords. Existing Lua that uses one as an identifier needs a rename — but a
+property name still works (`config.type`), and `type(value)` keeps working
+because `type` stays callable. `fun` is the one term that stays contextual.
+
+Reach for `#!nocheck` when porting existing Lua: rename to `.luam` and the build
+passes while you annotate module by module.
 
 ### Environments
 
@@ -500,30 +537,36 @@ existing file. Use `fileOpen(path, true)` when read-only access is required.
 ## What you get out
 
 ```
-build/my-resource/
-├── meta.xml          generated: scripts typed by environment, helpers first
-├── config.lua        copied verbatim, yours to edit
-├── .env              written once, never overwritten
-├── lib/shared/class.lua
-└── src/
-    ├── shared/config.lua
-    ├── server/main.lua
-    └── client/hud.lua
+build/
+├── my-resource.luam-map.json
+└── my-resource/
+    ├── meta.xml
+    ├── config.lua
+    ├── .env
+    ├── assets/
+    └── src/
+        ├── shared.lua
+        ├── server.lua
+        └── client.lua
 ```
 
-The output mirrors the tree you authored, changing only the extension, so a path
-in an MTA error maps straight back to a source file. Runtime helpers land in
-`lib/<environment>` and are copied **only when the generated code uses the
-feature** — a resource with no classes never carries `class.lua`.
+`build` ships at most one bundle per non-empty environment. `config.lua`, `.env`,
+and assets remain unbundled at their stable paths, and the map remains outside
+the resource. `ensure` defaults to a mirrored tree and `dev` always uses one.
+Use `luam trace src/server.lua:42` with the matching map to recover the authored
+file, line, and symbol. See [output layouts and source maps](https://thigasdevelopment.github.io/luam/en/reference/output-layouts).
 
-`meta.xml` uses one wildcard per environment, so adding a module leaves it byte
-identical. `min_mta_version` is resolved from the latest MTA release and cached;
+`min_mta_version` is resolved from the latest MTA release and cached;
 with no network and no cache it is omitted with a warning, and the build still
 succeeds.
 
 ---
 
 ## Editor support
+
+> Compatibility matrix, manual `.vsix` install, settings:
+> **[Editors](https://thigasdevelopment.github.io/luam/en/tooling/editors)**
+> · [Editores](https://thigasdevelopment.github.io/luam/pt-br/tooling/editors)
 
 The **Luam** extension for VS Code starts a language server built on the same
 frontend the CLI uses, so the editor and the build never disagree about a file.
@@ -626,6 +669,10 @@ node packages/lsp/dist/luam-lsp.mjs --stdio
 
 ## Known limitations
 
+> With the workaround for each:
+> **[Limitations](https://thigasdevelopment.github.io/luam/en/reference/limitations)**
+> · [Limitações](https://thigasdevelopment.github.io/luam/pt-br/reference/limitations)
+
 - **No type narrowing.** `if value ~= nil then` does not refine `string?`.
 - **Declaration order matters for classes within a file.** `extends` and `new`
   resolve against classes declared earlier in the same file.
@@ -662,6 +709,23 @@ Each package documents itself: [`cli`](packages/cli/README.md),
 [`vscode`](packages/vscode/README.md) and
 [`template`](packages/template/README.md). Released milestones and their changes
 are in the [changelog](CHANGELOG.md).
+
+### The manual
+
+The user-facing manual lives in [`docs/`](docs/) and is published to
+[thigasdevelopment.github.io/luam](https://thigasdevelopment.github.io/luam/).
+
+```bash
+pnpm docs:dev       # local preview with hot reload
+pnpm docs:verify    # locale parity, snippet checks, and a full build
+```
+
+English is the source locale and pt-BR is translated from it; every page exists in
+both, and CI fails when one is missing. Code samples are real files under
+`docs/snippets/`, verified with `luam check` on every documentation build, and
+rendered into both locales from the same source — so a sample cannot drift. See
+the [documentation changelog](https://thigasdevelopment.github.io/luam/en/changelog)
+for the conventions.
 
 ---
 

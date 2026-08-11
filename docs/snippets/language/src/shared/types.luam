@@ -1,0 +1,15 @@
+type PlayerId = number
+type Nullable<T> = T | nil
+
+local id: PlayerId = 7
+local nickname: string = 'Thigas'
+local target?: Player = nil
+local key: string | number = 1
+local scores: number[] = { 10, 20 }
+local grid: number[][] = {}
+local pending: Nullable<string> = nil
+local anything: any = nickname
+
+function summarize(): string
+    return tostring(id) .. tostring(nickname) .. tostring(target) .. tostring(key) .. tostring(scores.count) .. tostring(grid.count) .. tostring(pending) .. tostring(anything)
+end

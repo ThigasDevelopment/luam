@@ -1,0 +1,20 @@
+function describePlayer(player: Player): string
+    local name: string = player:getName()
+    local serial: string = player:getSerial()
+    local money: number = player:getMoney()
+
+    return `${name} ${serial} ${money}`
+end
+
+function punish(player: Player, reason: string): boolean
+    player:setMuted(true)
+    player:takeMoney(100)
+
+    return player:kick(nil, reason)
+end
+
+addEventHandler('onPlayerJoin', root, function()
+    local player: Player = source
+
+    outputChatBox(describePlayer(player), root)
+end)

@@ -1,0 +1,24 @@
+@Getter
+class Profile {
+    @Setter
+    nickname: string = 'Luam'
+
+    @Getter
+    @Setter
+    banned: boolean = false
+
+    level: number = 1
+}
+
+function useProfile(): string
+    local profile = new Profile()
+
+    profile:setNickname('Thigas')
+    profile:setBanned(false)
+
+    local nickname: string = profile:getNickname()
+    local banned: boolean = profile:isBanned()
+    local level: number = profile:getLevel()
+
+    return nickname .. tostring(banned) .. tostring(level)
+end

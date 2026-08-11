@@ -1,0 +1,11 @@
+export function getServerScore(player: Player): number
+    return getElementHealth(player)
+end
+
+export function resetServerScore(player: Player): boolean
+    return setElementHealth(player, 100)
+end
+
+function internalHelper(): void
+    outputDebugString('not exported')
+end

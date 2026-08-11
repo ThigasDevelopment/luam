@@ -1,0 +1,6 @@
+<meta>
+    <!-- Resource information -->
+    <info type="script" description="Deployment values declared in .env and read through process.env." />
+    <!-- Source scripts -->
+    <script src="src/server.lua" />
+</meta>

@@ -1,0 +1,9 @@
+local frames: number = 0
+
+addEventHandler('onClientRender', root, function()
+    frames += 1
+end)
+
+addEventHandler('onClientResourceStop', resourceRoot, function()
+    outputDebugString(`drew ${frames} frames`)
+end)

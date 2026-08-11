@@ -1,0 +1,4 @@
+{
+    "name": "luam-docs-client-hud",
+    "description": "A client-side HUD drawn every frame."
+}

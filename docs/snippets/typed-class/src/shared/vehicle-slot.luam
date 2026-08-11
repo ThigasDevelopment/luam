@@ -1,0 +1,44 @@
+interface Describable {
+    describe(): string
+}
+
+@Getter
+class VehicleSlot implements Describable {
+    @Setter
+    model: number = 411
+
+    owner: string = 'nobody'
+
+    constructor(owner: string, model: number) {
+        self.owner = owner
+        self.model = model
+    }
+
+    describe(): string {
+        return `${self.owner} drives ${self.model}`
+    }
+}
+
+class ReservedSlot extends VehicleSlot {
+    reason: string = 'staff'
+
+    constructor(owner: string, model: number, reason: string) {
+        self:super(owner, model)
+        self.reason = reason
+    }
+
+    describe(): string {
+        local base: string = self:super()
+
+        return `${base} (${self.reason})`
+    }
+}
+
+function describeSlots(): string
+    local slot = new VehicleSlot('Thigas', 411)
+    local reserved = new ReservedSlot('Admin', 520, 'event')
+
+    slot:setModel(541)
+
+    return slot:describe() .. ' | ' .. reserved:describe() .. ' | ' .. tostring(reserved:getModel())
+end

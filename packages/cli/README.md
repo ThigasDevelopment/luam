@@ -4,6 +4,13 @@
 compiler leaves out: source discovery, writing the resource to disk, syncing it
 into an MTA server, and restarting it.
 
+> **User documentation:**
+> [CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli) ·
+> [luam.json](https://thigasdevelopment.github.io/luam/en/tooling/luam-json) ·
+> [Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)
+> · [em português](https://thigasdevelopment.github.io/luam/pt-br/tooling/cli).
+> This file is the package-level reference for contributors.
+
 ## Commands
 
 | Command | Behavior |
@@ -13,6 +20,7 @@ into an MTA server, and restarting it.
 | `luam build` | Compiles and writes the resource into `<outDir>/<name>`. |
 | `luam dev` | Runs the ensure loop and streams server and relayed client resource logs. |
 | `luam ensure` | Builds, syncs into the MTA server, restarts, and watches sources. |
+| `luam trace` | Resolves generated Lua positions through a resource map without compiling. |
 
 ## Options
 
@@ -23,6 +31,9 @@ into an MTA server, and restarting it.
 | `--name <name>` | Resource name for `init`. Defaults to the project directory name. |
 | `--force` | Let `init` overwrite files that already exist. |
 | `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default. |
+| `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`. `dev` always uses tree. |
+| `--no-map` | Disable source position map generation. |
+| `--map <path>` | Resource map used by `trace`. |
 | `--no-color` | Print plain output with no colour and no emoji. |
 | `-h`, `--help` | Print the usage text. |
 | `-v`, `--version` | Print the CLI version. |
@@ -66,6 +77,10 @@ overwrite it.
     "assetDirs": ["assets"],
     "outDir": "build",
     "loadOrder": ["src/server/index.luam", "assets/shaders/base.fx"],
+    "output": {
+        "bundle": true,
+        "map": true
+    },
     "oop": false,
     "helpers": ["threads"],
     "serverPath": "C:/MTA Server",
@@ -97,6 +112,8 @@ overwrite it.
 | `assetDirs` | `["assets"]` | Directories copied verbatim and declared as `<file>` entries, so clients download them. |
 | `outDir` | `"build"` | Directory that receives `<outDir>/<name>`. |
 | `loadOrder` | `[]` | Source paths pinned ahead of their group in `meta.xml`. Order is meaningful, and an entry matching no file fails the build. |
+| `output.bundle` | `true` | Default `build` layout. `ensure` still defaults to tree and `dev` always uses tree. |
+| `output.map` | `true` | Generates position maps. Only `build` writes a map file. |
 | `oop` | `false` | Enables the MTA OOP API. Writes `<oop>true</oop>` and lets the checker resolve `player:getName()`. |
 | `helpers` | `[]` | Runtime helpers to copy even when no language feature requires them. |
 | `serverPath` | unset | MTA server root. `ensure` syncs the resource there. |
@@ -127,9 +144,9 @@ is opt-in; `env` is injected automatically when the project has a `.env`, so
 listing it is only needed to ship the library without one. Listing an automatic
 helper is harmless and listing an unknown name is an error.
 
-`helperDir` was removed. Helpers are written to `lib/<environment>`, outside the
-source tree, so a server-only helper is never downloaded by a client and no file
-is declared twice. A `luam.json` that still names `helperDir` fails with
+`helperDir` was removed. Tree output writes helpers to `lib/<environment>` and
+bundle output includes them in environment bundles. A server-only helper is
+never downloaded by a client. A `luam.json` that still names `helperDir` fails with
 `config-unknown-field`; delete the line.
 
 ## Transport
@@ -162,39 +179,37 @@ point `host` at `127.0.0.1` instead of exposing the interface.
 
 ## Build Output
 
-The generated resource mirrors the tree you authored. `src/server/main.luam`
-becomes `src/server/main.lua`, so a path in an MTA error maps to a source file by
-changing one extension:
+`build` produces the bundle layout by default and writes its map beside, not
+inside, the resource:
 
 ```
-build/<name>/
-    meta.xml                       Generated manifest
-    .env                           Deployment values, generated once
-    config.lua                     Copied verbatim from the project root
-    lib/
-        shared/class.lua           Runtime helpers, outside the source tree
-        server/env.lua             Server-only helper, never downloaded by a client
-    assets/                        Copied verbatim, declared as <file>
-    src/
-        shared/config.lua
-        server/main.lua
-        client/hud.lua
+build/
+    <name>.luam-map.json           Build-specific source position map
+    <name>/
+        meta.xml                   Generated manifest
+        .env                       Deployment values, generated once
+        config.lua                 Copied verbatim from the project root
+        assets/                    Copied verbatim, declared as <file>
+        src/
+            shared.lua             Present only for a non-empty environment
+            server.lua
+            client.lua
 ```
 
-`meta.xml` lists helpers first, then `config.lua`, then your `loadOrder` entries,
-then one wildcard per environment in shared, server, client order:
+The bundle manifest lists `config.lua` and then each non-empty environment:
 
 ```xml
-<script src="lib/shared/class.lua" type="shared" cache="false" />
 <script src="config.lua" type="shared" cache="false" />
-<script src="src/shared/**/*.lua" type="shared" cache="false" />
-<script src="src/server/**/*.lua" />
-<script src="src/client/**/*.lua" type="client" cache="false" />
+<script src="src/shared.lua" type="shared" cache="false" />
+<script src="src/server.lua" />
+<script src="src/client.lua" type="client" cache="false" />
 ```
 
-Adding a module to an environment that already has one leaves `meta.xml`
-unchanged. A server entry carries neither `type` nor `cache`, because both equal
-the MTA default; every client and shared entry carries `cache="false"`.
+Runtime helpers precede modules inside each bundle. `config.lua`, `.env`, and
+assets remain unbundled. `build --no-bundle` writes the mirrored module tree and
+`lib/<environment>` helpers; this is also the default for `ensure` and the fixed
+layout for `dev`. See the
+[output layout reference](https://thigasdevelopment.github.io/luam/en/reference/output-layouts).
 
 `min_mta_version` is resolved from the latest published MTA release and cached in
 `.luam/mta-version.json`. When the network is unavailable the build uses the

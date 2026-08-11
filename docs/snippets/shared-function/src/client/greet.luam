@@ -1,0 +1,5 @@
+addEventHandler('onClientResourceStart', resourceRoot, function()
+    local label: string = formatPlayerLabel(getPlayerName(localPlayer))
+
+    outputDebugString(formatCount(label, 1))
+end)

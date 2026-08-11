@@ -1,0 +1,7 @@
+interface ConfigShape {
+    greeting: string
+    limit: number
+}
+
+declare Config: ConfigShape
+declare legacyVersion: string

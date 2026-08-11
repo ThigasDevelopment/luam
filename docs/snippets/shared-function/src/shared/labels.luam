@@ -1,0 +1,9 @@
+RESOURCE_LABEL = 'luam-docs'
+
+function formatPlayerLabel(name: string): string
+    return `[${RESOURCE_LABEL}] ${name}`
+end
+
+function formatCount(label: string, total: number): string
+    return `${label}: ${total}`
+end

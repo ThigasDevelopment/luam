@@ -1,0 +1,7 @@
+interface Describable {
+    describe(): string
+}
+
+class Round implements Describable {
+    label: string = 'round'
+}

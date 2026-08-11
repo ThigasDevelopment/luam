@@ -1,0 +1,20 @@
+function describeExtensions(): string
+    local items: any[] = { 'a', 'b', 'c' }
+    local label: string = '  Luam  '
+    local ratio: number = -1.75
+
+    local size: number = items.count
+    local empty: boolean = items.isEmpty
+    local found: boolean = items.includes('a')
+
+    local trimmed: string = label.trim
+    local upper: string = label.upper
+    local starts: boolean = label.startsWith('  ')
+    local length: number = label.length
+
+    local clamped: number = ratio.clamp(0, 1)
+    local floor: number = ratio.floor
+    local absolute: number = ratio.abs
+
+    return table.concat({ tostring(size), tostring(empty), tostring(found), trimmed, upper, tostring(starts), tostring(length), tostring(clamped), tostring(floor), tostring(absolute) }, ' ')
+end

@@ -1,0 +1,7 @@
+Discovery: done in 1 ms.
+Compile: 1 file in 6 ms.
+Assembly: failed in 0 ms.
+src/server/legacy.luam:1:7 error parse-unexpected-token: Expected identifier but found "export".
+src/server/legacy.luam:2:7 error parse-unexpected-token: Expected identifier but found "class".
+src/server/legacy.luam:4:7 error parse-unexpected-token: Unexpected "export" in expression.
+Check failed: 3 errors, 0 warnings in 8 ms.

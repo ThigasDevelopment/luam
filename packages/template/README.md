@@ -5,7 +5,14 @@ the entire package.
 
 `luam init` scaffolds a manifest and nothing else: no framework, no example
 sources, no tree to delete before writing your own first file. A build ships
-exactly what the project authored.
+the authored resource as one bundle per non-empty environment by default, while
+`config.lua`, `.env`, and assets keep their own paths. The generated source map
+stays beside the resource rather than inside it.
+
+> **User documentation:**
+> [Quick start](https://thigasdevelopment.github.io/luam/en/guide/quick-start) ·
+> [Project layout](https://thigasdevelopment.github.io/luam/en/guide/project-layout)
+> · [em português](https://thigasdevelopment.github.io/luam/pt-br/guide/quick-start).
 
 The package ships source, not compiler logic.
 

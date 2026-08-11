@@ -132,4 +132,9 @@ jobs:
             - name: Create the release
               env:
                   GH_TOKEN: ${{ github.token }}
-              run: gh release create "${{ github.ref_name }}" artifacts/* --repo "${{ github.repository }}" --generate-notes --verify-tag
+              run: |
+                  gh release create "${{ github.ref_name }}" artifacts/* \
+                      --repo "${{ github.repository }}" \
+                      --notes "Manual: [English](https://thigasdevelopment.github.io/luam/en/) · [Português (Brasil)](https://thigasdevelopment.github.io/luam/pt-br/) — see the [documentation changelog](https://thigasdevelopment.github.io/luam/en/changelog)." \
+                      --generate-notes \
+                      --verify-tag

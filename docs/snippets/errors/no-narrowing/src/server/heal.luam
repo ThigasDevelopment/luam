@@ -1,0 +1,7 @@
+local function heal(player: Player, command: string, amount: string?): void
+    local requested: number = tonumber(amount) or 100
+
+    setElementHealth(player, requested)
+end
+
+addCommandHandler('heal', heal)

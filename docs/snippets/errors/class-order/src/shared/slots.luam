@@ -1,0 +1,7 @@
+class ReservedSlot extends VehicleSlot {
+    reason: string = 'staff'
+}
+
+class VehicleSlot {
+    model: number = 411
+}

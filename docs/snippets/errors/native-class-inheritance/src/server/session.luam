@@ -1,0 +1,3 @@
+class Session extends Player {
+    joinedAt: number = 0
+}

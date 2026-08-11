@@ -8,6 +8,12 @@ The MTA catalogs are **generated**, not handwritten. See
 ADR-006 for the source
 decision.
 
+> **User documentation:**
+> [APIs and events](https://thigasdevelopment.github.io/luam/en/mta/apis-and-events) ·
+> [Environments](https://thigasdevelopment.github.io/luam/en/mta/environments) ·
+> [OOP API](https://thigasdevelopment.github.io/luam/en/mta/oop)
+> · [em português](https://thigasdevelopment.github.io/luam/pt-br/mta/apis-and-events).
+
 ## Layout
 
 ```

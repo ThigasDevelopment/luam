@@ -1,0 +1,11 @@
+local serverName: string = 'Luam'
+local session: table = { player = 'Thigas' }
+
+function buildMessages(): string[]
+    local plain: string = `no interpolation here`
+    local greeting: string = `Welcome to ${serverName}!`
+    local fallback: string = `Welcome, ${session.player:Guest}!`
+    local nested: string = `Player ${session.player}`
+
+    return { plain, greeting, fallback, nested }
+end

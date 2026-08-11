@@ -1,0 +1,24 @@
+local visible: boolean = true
+local margin: number = 16
+
+local function draw(): void
+    if not visible then
+        return
+    end
+
+    local health: number = getElementHealth(localPlayer)
+    local name: string = getPlayerName(localPlayer)
+    local caption: string = `${name} — ${health} HP`
+
+    dxDrawText(caption, margin, margin, 0, 0, tocolor(255, 255, 255, 220), 1.2)
+end
+
+addEventHandler('onClientRender', root, draw)
+
+addEventHandler('onClientResourceStop', resourceRoot, function()
+    removeEventHandler('onClientRender', root, draw)
+end)
+
+bindKey('F7', 'down', function()
+    visible = not visible
+end)

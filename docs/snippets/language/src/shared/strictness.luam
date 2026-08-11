@@ -1,0 +1,8 @@
+#!nonstrict
+
+function readLegacyGreeting(): string
+    local greeting = Config.greeting
+    local version = legacyVersion
+
+    return greeting .. ' ' .. version
+end

@@ -3,6 +3,10 @@
 The extension registers the `luam` language, starts `@luam/lsp`, and ships the
 TextMate grammar that highlights Luam source.
 
+> **User documentation:**
+> [Editors](https://thigasdevelopment.github.io/luam/en/tooling/editors)
+> · [Editores](https://thigasdevelopment.github.io/luam/pt-br/tooling/editors).
+
 ## Features
 
 - Diagnostics, completion, hover, go to definition, find references, and rename

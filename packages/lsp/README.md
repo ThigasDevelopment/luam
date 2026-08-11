@@ -7,6 +7,11 @@ disagree about a file.
 The server is editor-agnostic. `luam` bundles it, and any editor that
 speaks LSP can launch it the same way.
 
+> **User documentation:**
+> [Language server](https://thigasdevelopment.github.io/luam/en/tooling/language-server) ·
+> [Editors](https://thigasdevelopment.github.io/luam/en/tooling/editors)
+> · [em português](https://thigasdevelopment.github.io/luam/pt-br/tooling/language-server).
+
 ## Capabilities
 
 | Capability | Behavior |

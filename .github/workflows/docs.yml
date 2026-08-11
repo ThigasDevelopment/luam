@@ -1,0 +1,66 @@
+name: Docs
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - 'docs/**'
+            - 'packages/cli/package.json'
+            - '.github/workflows/docs.yml'
+    pull_request:
+        branches: [main, develop]
+        paths:
+            - 'docs/**'
+            - 'packages/cli/package.json'
+            - '.github/workflows/docs.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: docs-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    validate:
+        name: Validate
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
+
+            - name: Locale parity
+              run: pnpm docs:parity
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Check the documented snippets
+              run: pnpm docs:snippets
+
+            - name: Check the captured compiler output
+              run: pnpm docs:outputs
+
+            - name: Build the site
+              run: pnpm docs:build
+
+            - uses: actions/upload-pages-artifact@v3
+              if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+              with:
+                  path: docs/.vitepress/dist
+
+    deploy:
+        name: Deploy
+        needs: validate
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        permissions:
+            pages: write
+            id-token: write
+        steps:
+            - id: deployment
+              uses: actions/deploy-pages@v4

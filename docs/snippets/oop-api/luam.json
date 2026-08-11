@@ -1,0 +1,5 @@
+{
+    "name": "luam-docs-oop-api",
+    "description": "The MTA OOP API enabled through the oop flag.",
+    "oop": true
+}

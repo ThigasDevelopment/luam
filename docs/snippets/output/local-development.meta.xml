@@ -1,0 +1,6 @@
+<meta>
+    <!-- Resource information -->
+    <info type="script" description="The project the local development loop rebuilds on every save." />
+    <!-- Source scripts -->
+    <script src="src/server.lua" />
+</meta>

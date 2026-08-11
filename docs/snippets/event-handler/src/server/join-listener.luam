@@ -1,0 +1,19 @@
+local online: number = 0
+
+addEventHandler('onPlayerJoin', root, function()
+    local player: Player = source
+    local name: string = getPlayerName(player)
+
+    online += 1
+
+    outputChatBox(`${name} joined. ${online} online.`, root)
+end)
+
+addEventHandler('onPlayerQuit', root, function(reason: string)
+    local player: Player = source
+    local name: string = getPlayerName(player)
+
+    online -= 1
+
+    outputServerLog(`${name} left: ${reason}`)
+end)

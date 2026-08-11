@@ -5,12 +5,21 @@
     "packageManager": "pnpm@11.20.0",
     "scripts": {
         "build": "pnpm -r build",
+        "docs:build": "vitepress build docs",
+        "docs:dev": "vitepress dev docs",
+        "docs:preview": "vitepress preview docs",
+        "docs:snippets": "node docs/scripts/check-snippets.ts",
+        "docs:parity": "node docs/scripts/check-parity.ts",
+        "docs:outputs": "node docs/scripts/check-outputs.ts",
+        "docs:capture": "node docs/scripts/check-outputs.ts --write",
+        "docs:verify": "pnpm docs:parity && pnpm docs:snippets && pnpm docs:outputs && pnpm docs:build",
         "install:cli": "pnpm --filter @luam/cli install-cli",
         "test": "pnpm -r test",
         "typecheck": "pnpm -r typecheck"
     },
     "devDependencies": {
         "typescript": "^5.6.3",
+        "vitepress": "^1.6.4",
         "vitest": "^2.1.4"
     }
 }

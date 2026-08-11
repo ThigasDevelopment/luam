@@ -7,3 +7,4 @@ dist/
 .DS_Store
 .env.local
 .claude/
+docs/.vitepress/cache/

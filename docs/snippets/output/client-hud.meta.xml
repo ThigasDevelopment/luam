@@ -1,0 +1,6 @@
+<meta>
+    <!-- Resource information -->
+    <info type="script" description="A client-side HUD drawn every frame." />
+    <!-- Source scripts -->
+    <script src="src/client.lua" type="client" cache="false" />
+</meta>

@@ -1,0 +1,32 @@
+# A line comment starts with a hash followed by a space.
+
+#*
+    A block comment opens with hash-star and closes with star-hash.
+*#
+
+local rounds: number = 3
+local names: string[] = { 'ana', 'bruno', 'caio' }
+
+function describeRounds(): string
+    local total: number = 0
+
+    for index = 1, rounds do
+        total += index
+    end
+
+    if total ~= 0 then
+        return 'total: ' .. tostring(total)
+    end
+
+    return 'no rounds'
+end
+
+function listNames(): string
+    local label: string = ''
+
+    for index, name in ipairs(names) do
+        label = label .. tostring(index) .. '=' .. name .. ' '
+    end
+
+    return label
+end

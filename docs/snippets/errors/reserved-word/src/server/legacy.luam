@@ -1,0 +1,4 @@
+local export = 1
+local class = 'admin'
+
+print(export, class)

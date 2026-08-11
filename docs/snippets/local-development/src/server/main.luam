@@ -1,0 +1,13 @@
+local restarts: number = 0
+
+addEventHandler('onResourceStart', resourceRoot, function()
+    restarts += 1
+
+    outputServerLog(`resource started (${restarts})`)
+end)
+
+addCommandHandler('ping', function(player: Player)
+    outputChatBox('pong', player)
+
+    outputDebugString('ping answered')
+end)

@@ -1,0 +1,2 @@
+error config-invalid-json: The configuration file "C:\Users\THIGAS\Documents\Projects\luam\docs\snippets\errors\native-class-inheritance\luam.json" is not valid JSON: Expected double-quoted property name in JSON at position 57 (line 2 column 56)
+Configuration "C:\Users\THIGAS\Documents\Projects\luam\docs\snippets\errors\native-class-inheritance\luam.json" is invalid.

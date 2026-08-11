@@ -1,0 +1,3 @@
+addEventHandler('onClientRender', root, function()
+    outputDebugString('frame')
+end)

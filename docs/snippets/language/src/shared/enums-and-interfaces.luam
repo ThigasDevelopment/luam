@@ -1,0 +1,27 @@
+enum MatchState {
+    LOBBY,
+    PLAYING,
+    FINISHED,
+}
+
+interface Describable {
+    label: string
+    describe(): string
+}
+
+class Round implements Describable {
+    label: string = 'round'
+    state: number = MatchState.LOBBY
+
+    describe(): string {
+        return self.label .. ':' .. tostring(self.state)
+    }
+}
+
+function startRound(): string
+    local round = new Round()
+
+    round.state = MatchState.PLAYING
+
+    return round:describe()
+end

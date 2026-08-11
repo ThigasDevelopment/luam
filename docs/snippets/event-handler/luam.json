@@ -1,0 +1,4 @@
+{
+    "name": "luam-docs-event-handler",
+    "description": "Server and client handlers for built-in MTA events."
+}

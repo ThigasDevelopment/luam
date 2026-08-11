@@ -1,0 +1,5 @@
+local api: table = {}
+
+export function api.getScore(): number
+    return 1
+end

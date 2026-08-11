@@ -1,0 +1,3 @@
+function describe(player: Player): string
+    return player:getName()
+end

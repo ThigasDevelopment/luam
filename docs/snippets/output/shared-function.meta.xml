@@ -1,0 +1,8 @@
+<meta>
+    <!-- Resource information -->
+    <info type="script" description="One shared function called from the server and from the client." />
+    <!-- Source scripts -->
+    <script src="src/shared.lua" type="shared" cache="false" />
+    <script src="src/server.lua" />
+    <script src="src/client.lua" type="client" cache="false" />
+</meta>

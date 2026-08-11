@@ -1,0 +1,10 @@
+<meta>
+    <!-- Resource information -->
+    <info type="script" description="Snippets rendered by the language section of the manual." />
+    <!-- Source scripts -->
+    <script src="src/shared.lua" type="shared" cache="false" />
+    <script src="src/server.lua" />
+    <!-- Exported functions -->
+    <export function="getServerScore" />
+    <export function="resetServerScore" />
+</meta>

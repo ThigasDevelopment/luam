@@ -1,0 +1,9 @@
+interface Session {
+    tag: string?
+}
+
+function greet(name: string, tag: string?): string
+    return name
+end
+
+local title: string? = nil

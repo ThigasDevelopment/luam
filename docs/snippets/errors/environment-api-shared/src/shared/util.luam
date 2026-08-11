@@ -1,0 +1,3 @@
+function punish(player: Player): boolean
+    return kickPlayer(player, 'afk')
+end

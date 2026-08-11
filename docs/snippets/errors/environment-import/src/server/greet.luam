@@ -1,0 +1,3 @@
+function announceJoin(player: Player): void
+    outputChatBox(getPlayerName(player), root)
+end

@@ -1,0 +1,37 @@
+class Account {
+    name: string
+    balance: number = 0
+
+    constructor(name: string) {
+        self.name = name
+    }
+
+    deposit(amount: number): void {
+        self.balance += amount
+    }
+
+    describe(): string {
+        return self.name .. ': ' .. tostring(self.balance)
+    }
+}
+
+class PremiumAccount extends Account {
+    tier: number = 1
+
+    constructor(name: string, tier: number) {
+        self:super(name)
+        self.tier = tier
+    }
+
+    deposit(amount: number): void {
+        self:super(amount * 2)
+    }
+}
+
+function openAccount(): string
+    local account = new PremiumAccount('Thigas', 2)
+
+    account:deposit(50)
+
+    return account:describe()
+end

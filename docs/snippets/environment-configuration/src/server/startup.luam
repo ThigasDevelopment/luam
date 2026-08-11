@@ -1,0 +1,11 @@
+addEventHandler('onResourceStart', resourceRoot, function()
+    local name: string = process.env.SERVER_NAME
+    local maxPlayers: number = process.env.MAX_PLAYERS
+    local debug: boolean = process.env.DEBUG
+
+    outputServerLog(`${name} accepts ${maxPlayers} players`)
+
+    if debug then
+        outputServerLog('debug mode is on')
+    end
+end)

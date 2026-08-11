@@ -1,0 +1,5 @@
+Discovery: done in 18 ms.
+Compile: 3 files in 13 ms.
+Assembly: done in 1 ms.
+Manifest: done in 2 ms.
+Check passed: 3 files, 0 errors, 0 warnings in 35 ms (tree layout).
