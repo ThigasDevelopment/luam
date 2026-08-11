@@ -93,13 +93,16 @@ function captureProject(cli: string, project: string): Capture[] {
 }
 
 function captureError(cli: string, project: string): Capture {
-    const check = run(cli, 'check', join(errorsRoot, project));
+    const directory = join(errorsRoot, project);
+    const check = run(cli, 'check', directory);
 
     if (check.status === 0) {
         throw new Error(`docs/snippets/errors/${project} was expected to fail "luam check" but it passed.`);
     }
 
-    return { file: `errors/${project}.txt`, content: check.output };
+    const scrubbed = check.output.split(directory).join(`docs/snippets/errors/${project}`).split('\\').join('/');
+
+    return { file: `errors/${project}.txt`, content: scrubbed };
 }
 
 function normalize(content: string): string {
