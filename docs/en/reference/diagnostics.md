@@ -16,7 +16,7 @@ The prefix names the stage that produced it.
 | `check-` | Type checking. |
 | `project-` | Assembling the resource from several modules. |
 | `build-` | Discovering sources and reading files. |
-| `config-` | Loading `luam.json`. |
+| `config-` | Loading `.luam.manifest`. |
 
 A **warning** never fails a build. An **error** does, and a build with any error
 writes nothing.
@@ -48,6 +48,7 @@ writes nothing.
 | `parse-duplicate-key` | An object type declares the same key more than once. |
 | `parse-unexpected-decorator` | A decorator where none may appear. |
 | `parse-decorator-arguments` | A decorator was given arguments. It takes none. |
+| `parse-class-method-form` | A class member was written as `name(...) { ... }`. It is `name = function (...) ... end`. |
 
 ## Environment
 
@@ -152,14 +153,15 @@ writes nothing.
 
 | Code | Meaning |
 | --- | --- |
-| `config-not-found` | No `luam.json` in the directory. |
-| `config-unreadable` | The file exists but could not be read. |
-| `config-invalid-json` | The file is not valid JSON. |
-| `config-missing-field` | A required field — `name` — is absent. |
+| `config-not-found` | No `.luam.manifest` in the directory. |
+| `config-unsupported-manifest` | The selected file is not a `.luam.manifest` file. |
+| `config-unreadable-manifest` | The file could not be read. |
+| `config-invalid-statement` | A statement the manifest dialect does not allow. Only `local` declarations and assignments to configuration fields. |
+| `config-invalid-expression` | A value the manifest expression language does not allow — a call, a function, an index by anything but a name. |
+| `config-missing-field` | A required field — `name`, or `transport.kind` once `transport` is written — is absent. |
 | `config-invalid-name` | `name` is not a valid MTA resource name. |
 | `config-invalid-type` | A field has the wrong type. |
-| `config-unknown-field` | A field is not recognized. Includes the removed `helperDir`. |
-| `config-invalid-root` | The project root could not be resolved. |
+| `config-unknown-field` | A name is not a configuration field. Includes the removed `helperDir`. |
 | `config-escaping-path` | A path is absolute or contains a `..` segment. |
 | `config-unknown-helper` | `helpers` names a helper that does not exist. |
 | `config-invalid-transport` | The transport block has an invalid shape. |

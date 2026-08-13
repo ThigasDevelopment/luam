@@ -1,5 +1,5 @@
 Discovery: done in 2 ms.
-Compile: 1 file in 11 ms.
+Compile: 1 file in 10 ms.
 Assembly: failed in 0 ms.
 src/server/hud.luam:9:45 error check-environment-api: API "localPlayer" is client-only and is not available in a "server" file.
 src/server/hud.luam:10:40 error check-environment-api: API "localPlayer" is client-only and is not available in a "server" file.
@@ -7,4 +7,4 @@ src/server/hud.luam:13:5 error check-environment-api: API "dxDrawText" is client
 src/server/hud.luam:16:16 error check-environment-event: Event "onClientRender" is client-only and cannot be used in a "server" file.
 src/server/hud.luam:18:16 error check-environment-event: Event "onClientResourceStop" is client-only and cannot be used in a "server" file.
 src/server/hud.luam:19:23 error check-environment-event: Event "onClientRender" is client-only and cannot be used in a "server" file.
-Check failed: 6 errors, 0 warnings in 13 ms.
+Check failed: 6 errors, 0 warnings in 12 ms.

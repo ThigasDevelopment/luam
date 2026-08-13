@@ -1,6 +1,6 @@
 # Luam Template
 
-`@luam/template` holds the starter `luam.json` that `luam init` writes. That is
+`@luam/template` holds the starter `.luam.manifest` that `luam init` writes. That is
 the entire package.
 
 `luam init` scaffolds a manifest and nothing else: no framework, no example
@@ -20,11 +20,11 @@ The package ships source, not compiler logic.
 
 | Path | Contents |
 | ---- | -------- |
-| `files/luam.json` | The starter manifest, the only file `luam init` writes. |
+| `files/luam.manifest` | The starter manifest. `luam init` writes it as `.luam.manifest`, and it is the only file it writes. |
 | `src/template.ts` | The file catalog: target path, kind, and source location. |
 
 `packages/cli` reads the catalog and copies each entry into the new project,
-rendering `luam.json` with the resolved resource name.
+rendering `.luam.manifest` with the resolved resource name.
 
 ## Not here
 

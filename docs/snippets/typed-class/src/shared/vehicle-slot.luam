@@ -9,29 +9,29 @@ class VehicleSlot implements Describable {
 
     owner: string = 'nobody'
 
-    constructor(owner: string, model: number) {
+    constructor = function (owner: string, model: number)
         self.owner = owner
         self.model = model
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         return `${self.owner} drives ${self.model}`
-    }
+    end
 }
 
 class ReservedSlot extends VehicleSlot {
     reason: string = 'staff'
 
-    constructor(owner: string, model: number, reason: string) {
+    constructor = function (owner: string, model: number, reason: string)
         self:super(owner, model)
         self.reason = reason
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         local base: string = self:super()
 
         return `${base} (${self.reason})`
-    }
+    end
 }
 
 function describeSlots(): string

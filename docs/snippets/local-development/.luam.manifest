@@ -1,0 +1,2 @@
+name = 'luam-docs-local-development'
+description = 'The project the local development loop rebuilds on every save.'

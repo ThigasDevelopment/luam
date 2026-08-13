@@ -13,11 +13,11 @@ export function valueOption(flags: string, description: string): Option {
 }
 
 export function cwdOption(): Option {
-    return valueOption('--cwd <path>', 'Project directory that contains luam.json. Defaults to the current directory.');
+    return valueOption('--cwd <path>', 'Project directory that contains .luam.manifest. Defaults to the current directory.');
 }
 
-export function configOption(): Option {
-    return valueOption('--config <path>', 'Configuration file to load instead of luam.json.');
+export function manifestOption(): Option {
+    return valueOption('--manifest <path>', 'Manifest module to load instead of .luam.manifest.');
 }
 
 export function colorOption(): Option {
@@ -43,5 +43,5 @@ export function addWatchOptions(command: Command): Command {
 }
 
 export function addProjectOptions(command: Command): Command {
-    return command.addOption(cwdOption()).addOption(configOption()).addOption(colorOption());
+    return command.addOption(cwdOption()).addOption(manifestOption()).addOption(colorOption());
 }

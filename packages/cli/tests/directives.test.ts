@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { runBuildCommand } from '@cli/commands/build-command';
 import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
-import { validateConfig } from '@cli/config/config-validation';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
@@ -31,7 +31,7 @@ interface Harness {
 function harness(files: Readonly<Record<string, string>>): Harness {
     const fixture = createProjectFixture(files);
     const logger = createMemoryLogger();
-    const config = validateConfig(JSON.parse(fixture.read('luam.json')), {}).config;
+    const config = loadManifest(fixture.root).config;
 
     if (config === null) {
         throw new Error('The fixture configuration is invalid.');

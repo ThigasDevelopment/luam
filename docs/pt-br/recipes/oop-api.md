@@ -12,7 +12,7 @@ no `meta.xml`.
 
 ```
 luam-docs-oop-api/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── server/
         └── admin.luam
@@ -20,7 +20,7 @@ luam-docs-oop-api/
 
 ## Código
 
-<<< @/snippets/oop-api/luam.json
+<<< @/snippets/oop-api/.luam.manifest{js}
 
 <<< @/snippets/oop-api/src/server/admin.luam
 

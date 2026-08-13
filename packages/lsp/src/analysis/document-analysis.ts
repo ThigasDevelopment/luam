@@ -1,20 +1,29 @@
+import { dirname } from 'node:path';
+
 import { EMPTY_AMBIENT, type AmbientDeclarations } from '@compiler/checker/ambient';
-import type { SourceDirectives } from '@compiler/checker/build-directives';
+import { EMPTY_DIRECTIVES, type SourceDirectives } from '@compiler/checker/build-directives';
 import { check } from '@compiler/checker/checker';
 import { resolveStrictMode, type StrictMode } from '@compiler/checker/directives';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
-import type { DeclarationRegistry } from '@compiler/checker/registry';
+import { DeclarationRegistry } from '@compiler/checker/registry';
 import type { Type } from '@compiler/checker/types';
-import { sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
+import { createPosition, sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import type { Token } from '@compiler/lexer/token';
+import { analyzeManifest, type ManifestAnalysis } from '@compiler/manifest/manifest-analysis';
 import type { Expression, Program } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { parse } from '@compiler/parser/parser';
 import { isDeclarationPath } from '@compiler/project/source-kind';
 
+import { isManifestPath } from '@lsp/workspace/project-settings';
+
 import { lineStarts } from '@lsp/support/source-text';
 import { buildSymbolIndex, type SymbolIndex } from '@lsp/symbols/symbol-index';
+
+const DEFAULT_MANIFEST_MODE = 'check';
+
+const EMPTY_PROGRAM: Program = { kind: 'program', body: [], position: createPosition(1, 1, 0) };
 
 export interface DocumentAnalysis {
     uri: string;
@@ -35,6 +44,7 @@ export interface DocumentAnalysis {
     oop: boolean;
     index: SymbolIndex;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
+    manifest: ManifestAnalysis | null;
 }
 
 export interface AnalysisInput {
@@ -44,10 +54,19 @@ export interface AnalysisInput {
     text: string;
     project?: ProjectDeclarations;
     oop?: boolean;
+    env?: Readonly<Record<string, string>>;
     ambient?: (environment: Environment) => AmbientDeclarations;
 }
 
 export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
+    if (isManifestPath(input.path)) {
+        return analyzeManifestDocument(input);
+    }
+
+    return analyzeSourceDocument(input);
+}
+
+function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
     const parsed = parse(input.text);
     const mode = resolveStrictMode(parsed.directives);
     const resolved = resolveEnvironment(input.path, parsed.directives);
@@ -82,5 +101,35 @@ export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
         oop,
         index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.declarations, checked.generatedMembers),
         generatedMembers: checked.generatedMembers,
+        manifest: null,
+    };
+}
+
+function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
+    const root = dirname(input.path);
+    const manifest = analyzeManifest(input.text, { mode: DEFAULT_MANIFEST_MODE, root, env: input.env ?? {} });
+    const starts = lineStarts(input.text);
+    const declarations = new DeclarationRegistry();
+
+    return {
+        uri: input.uri,
+        path: input.path,
+        version: input.version,
+        text: input.text,
+        tokens: manifest.tokens,
+        starts,
+        program: manifest.program,
+        environment: 'shared',
+        mode: 'strict',
+        diagnostics: manifest.diagnostics,
+        types: new Map(),
+        declarations,
+        declaredGlobals: new Map(),
+        directives: EMPTY_DIRECTIVES,
+        project: input.project ?? EMPTY_PROJECT_DECLARATIONS,
+        oop: false,
+        index: buildSymbolIndex(input.text, starts, EMPTY_PROGRAM, new Map(), declarations),
+        generatedMembers: new Map(),
+        manifest,
     };
 }

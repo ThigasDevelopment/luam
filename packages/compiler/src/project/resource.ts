@@ -164,7 +164,7 @@ function bundleDiagnostics(
 
     for (const module of project.modules) {
         if (module.code !== null && module.topLevelReturn !== null) {
-            const message = `"${module.path}" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "output": { "bundle": false } in luam.json.`;
+            const message = `"${module.path}" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "output = { bundle = false }" in .luam.manifest.`;
 
             diagnostics.push({ path: module.path, diagnostic: createDiagnostic('project', 'project-bundle-toplevel-return', message, module.topLevelReturn) });
         }

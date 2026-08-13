@@ -12,7 +12,7 @@ that possible.
 
 ```
 luam-docs-exported-function/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── server/
         └── scores.luam
@@ -20,7 +20,7 @@ luam-docs-exported-function/
 
 ## Source
 
-<<< @/snippets/exported-function/luam.json
+<<< @/snippets/exported-function/.luam.manifest{js}
 
 <<< @/snippets/exported-function/src/server/scores.luam
 

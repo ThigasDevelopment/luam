@@ -35,5 +35,5 @@ Veja [Instalação](/pt-br/guide/installation) se algum dos comandos falhar.
 ## Nomes
 
 Os projetos das receitas se chamam `luam-docs-<receita>` para nunca colidirem com
-um resource que você já roda. Renomeie `name` no `luam.json`, e a pasta de saída
+um resource que você já roda. Renomeie `name` no `.luam.manifest`, e a pasta de saída
 acompanha.

@@ -35,7 +35,7 @@ export const SECTIONS: readonly Section[] = [
     },
     {
         id: 'tooling',
-        pages: ['index', 'cli', 'luam-json', 'editors', 'language-server', 'ci-and-deployment'],
+        pages: ['index', 'cli', 'luam-manifest', 'editors', 'language-server', 'ci-and-deployment'],
     },
     {
         id: 'recipes',

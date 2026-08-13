@@ -8,7 +8,7 @@ import { resolveDevelopmentLogPosition } from '@cli/commands/trace-position';
 import type { ResourceMap, ResourceMapSegment } from '@compiler/project/resource';
 
 import { createMemoryLogger, createMemoryReporter } from './support/memory-logger';
-import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, defaultProjectFiles, MANIFEST_FILE, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
@@ -59,7 +59,7 @@ describe('trace command', () => {
     it('uses an explicit map without project configuration for bare and full log positions', async () => {
         const { fixture, map, position } = await builtProject();
 
-        fixture.remove('luam.json');
+        fixture.remove(MANIFEST_FILE);
 
         const bare = createMemoryLogger();
         const full = createMemoryLogger();
@@ -74,12 +74,12 @@ describe('trace command', () => {
     it('discovers one default map and resolves multiple stdin lines', async () => {
         const { fixture, map, position } = await builtProject();
 
-        fixture.remove('luam.json');
+        fixture.remove(MANIFEST_FILE);
 
         const { logger, reporter } = createMemoryReporter();
         const second = generatedPosition({ ...map, files: map.files.slice().reverse() });
         const code = runTraceCommand(fixture.root, reporter, {
-            configPath: null,
+            manifestPath: null,
             env: {},
             mapPath: null,
             operand: null,
@@ -93,7 +93,7 @@ describe('trace command', () => {
     it('rejects empty input before it looks for a map', async () => {
         const { fixture } = await builtProject();
         const { logger, reporter } = createMemoryReporter();
-        const code = runTraceCommand(fixture.root, reporter, { configPath: null, env: {}, mapPath: null, operand: null, input: '\n  \n' });
+        const code = runTraceCommand(fixture.root, reporter, { manifestPath: null, env: {}, mapPath: null, operand: null, input: '\n  \n' });
 
         expect(code).toBe(EXIT_DIAGNOSTICS);
         expect(logger.errors).toEqual(['Trace received no positions. Provide a file and line or pipe positions through stdin.']);
@@ -102,7 +102,7 @@ describe('trace command', () => {
     it('ignores maps below node_modules and dot directories when discovering', async () => {
         const { fixture, position } = await builtProject();
 
-        fixture.remove('luam.json');
+        fixture.remove(MANIFEST_FILE);
         fixture.write('node_modules/other/decoy.luam-map.json', '{}');
         fixture.write('.cache/decoy.luam-map.json', '{}');
 

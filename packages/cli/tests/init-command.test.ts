@@ -1,13 +1,16 @@
+import { resolve } from 'node:path';
+
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { runCli } from '@cli/cli/run';
 import { EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 import { FALLBACK_RESOURCE_NAME, resolveResourceName } from '@cli/commands/init-command';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { buildScaffoldPlan } from '@cli/scaffold/scaffold-plan';
-import { TEMPLATE_FILES } from '@template/template';
+import { MANIFEST_FILE_NAME, TEMPLATE_FILES } from '@template/template';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createProjectFixture, VALID_SERVER, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, manifestSource, VALID_SERVER, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
@@ -45,15 +48,22 @@ describe('scaffold plan', () => {
         expect(buildScaffoldPlan({ ...answers, name: 'demo' }).files.map((file) => file.path)).toEqual(TEMPLATE_FILES.map((file) => file.path));
     });
 
-    it('names the resource in the generated configuration', async () => {
-        const config = buildScaffoldPlan({ ...answers, name: 'demo' }).files.find((file) => file.path === 'luam.json');
-        const parsed: unknown = JSON.parse(config?.content ?? '{}');
+    it('names the resource in the generated manifest', async () => {
+        const manifest = buildScaffoldPlan({ ...answers, name: 'demo' }).files.find((file) => file.path === MANIFEST_FILE_NAME);
+        const content = manifest?.content ?? '';
 
-        expect(parsed).toMatchObject({ name: 'demo', version: '2.0.0', description: 'A prompt description', author: 'Luam Team', outDir: 'build', assetDirs: ['assets'], sourceDirs: ['src'] });
+        expect(content).not.toContain('export default');
+        expect(content).toContain("name = 'demo'");
+        expect(content).toContain("version = '2.0.0'");
+        expect(content).toContain("description = 'A prompt description'");
+        expect(content).toContain("author = 'Luam Team'");
+        expect(content).toContain("outDir = 'build'");
+        expect(content).toContain("sourceDirs = { 'src' }");
+        expect(content).toContain("assetDirs = { 'assets' }");
     });
 
     it('scaffolds the project manifest and nothing else', async () => {
-        expect(buildScaffoldPlan({ ...answers, name: 'demo' }).files.map((file) => file.path)).toEqual(['luam.json']);
+        expect(buildScaffoldPlan({ ...answers, name: 'demo' }).files.map((file) => file.path)).toEqual([MANIFEST_FILE_NAME]);
     });
 });
 
@@ -91,22 +101,23 @@ describe('luam init', () => {
         const { code } = await init(project.root, 'resources/race');
 
         expect(code).toBe(EXIT_OK);
-        expect(project.exists('resources/race/luam.json')).toBe(true);
-        expect(JSON.parse(project.read('resources/race/luam.json'))).toMatchObject({ ...answers, name: 'race' });
+        expect(project.exists(`resources/race/${MANIFEST_FILE_NAME}`)).toBe(true);
+        expect(loadManifest(resolve(project.root, 'resources/race')).config).toMatchObject({ ...answers, name: 'race' });
     });
 
     it('keeps existing files unless force is passed', async () => {
-        const project = fixture({ 'luam.json': '{ "name": "kept" }\n' });
+        const kept = manifestSource({ name: 'kept' });
+        const project = fixture({ [MANIFEST_FILE_NAME]: kept });
         const first = await init(project.root);
 
         expect(first.code).toBe(EXIT_OK);
-        expect(project.read('luam.json')).toBe('{ "name": "kept" }\n');
-        expect(first.logger.warnings.join('\n')).toContain('Kept the existing "luam.json"');
+        expect(project.read(MANIFEST_FILE_NAME)).toBe(kept);
+        expect(first.logger.warnings.join('\n')).toContain(`Kept the existing "${MANIFEST_FILE_NAME}"`);
 
         const second = await init(project.root, '--name', 'demo', '--force');
 
         expect(second.code).toBe(EXIT_OK);
-        expect(project.read('luam.json')).toContain('"name": "demo"');
+        expect(project.read(MANIFEST_FILE_NAME)).toContain("name = 'demo'");
     });
 
     it('reports when nothing was written', async () => {
@@ -126,7 +137,7 @@ describe('luam init', () => {
 
         expect(code).toBe(EXIT_USAGE);
         expect(logger.errors.join('\n')).toContain('"--name" must be a valid MTA resource name');
-        expect(project.exists('luam.json')).toBe(false);
+        expect(project.exists(MANIFEST_FILE_NAME)).toBe(false);
     });
 
     it('needs no configuration to run', async () => {

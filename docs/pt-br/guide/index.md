@@ -27,12 +27,12 @@ Se isso imprimir algo abaixo de `v20`, atualize antes de continuar.
 
 ## O que você vai ter no final
 
-Um diretório de projeto com os seus fontes `.luam` e um `luam.json`, e um
+Um diretório de projeto com os seus fontes `.luam` e um `.luam.manifest`, e um
 diretório de build com um resource completo do MTA:
 
 ```
 my-resource/
-├── luam.json
+├── .luam.manifest
 ├── src/
 │   ├── shared/
 │   ├── server/
@@ -40,6 +40,6 @@ my-resource/
 └── build/my-resource/     ← copie isto para o seu servidor MTA
 ```
 
-Nada mais é criado. `luam init` escreve `luam.json` e para, então não existe
+Nada mais é criado. `luam init` escreve `.luam.manifest` e para, então não existe
 framework nem árvore de exemplo para apagar antes da sua primeira linha de
 código.

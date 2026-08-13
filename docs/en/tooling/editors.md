@@ -78,7 +78,7 @@ code --extensionDevelopmentPath=packages/vscode
 
 ## Activation
 
-The extension activates when the workspace holds a `luam.json` or any `.luam`
+The extension activates when the workspace holds a `.luam.manifest` or any `.luam`
 file, so **open your resource folder as the workspace root**. It watches
 `**/*.luam`, so files changed outside the editor still reach the server.
 

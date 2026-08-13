@@ -7,6 +7,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDir, '..', '..');
 const snippetsRoot = join(repositoryRoot, 'docs', 'snippets');
 const defaultCli = join(repositoryRoot, 'packages', 'cli', 'dist', 'luam.mjs');
+const MANIFEST_FILE = '.luam.manifest';
 
 function resolveCli(): string {
     const configured = process.env.LUAM_CLI;
@@ -22,7 +23,7 @@ function snippetProjects(): string[] {
     return readdirSync(snippetsRoot, { withFileTypes: true })
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name)
-        .filter((name) => existsSync(join(snippetsRoot, name, 'luam.json')))
+        .filter((name) => existsSync(join(snippetsRoot, name, MANIFEST_FILE)))
         .sort();
 }
 

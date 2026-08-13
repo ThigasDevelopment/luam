@@ -1,0 +1,2 @@
+name = 'luam-docs-typed-class'
+description = 'A typed class with inheritance, an interface, and accessors.'

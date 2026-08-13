@@ -1,8 +1,8 @@
-Version: done in 1 ms.
-Discovery: done in 19 ms.
-Compile: 11 files in 25 ms.
+Version: done in 0 ms.
+Discovery: done in 18 ms.
+Compile: 11 files in 27 ms.
 Assembly: done in 1 ms.
-Manifest: done in 4 ms.
-Write: 3 files in 4 ms.
-Build passed: 11 files, 0 errors, 0 warnings in 49 ms (bundle layout).
+Manifest: done in 3 ms.
+Write: 3 files in 9 ms.
+Build passed: 11 files, 0 errors, 0 warnings in 50 ms (bundle layout).
 Wrote 3 files to "build/luam-docs-language" (0 unchanged, 0 removed).

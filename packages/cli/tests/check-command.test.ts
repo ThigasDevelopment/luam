@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
-import { validateConfig } from '@cli/config/config-validation';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
-import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
 
@@ -19,7 +19,7 @@ interface Harness {
 function harness(files: Readonly<Record<string, string>>): Harness {
     const fixture = createProjectFixture(files);
     const logger = createMemoryLogger();
-    const config = validateConfig(JSON.parse(fixture.read('luam.json')), {}).config;
+    const config = loadManifest(fixture.root).config;
 
     if (config === null) {
         throw new Error('The fixture configuration is invalid.');
@@ -67,14 +67,14 @@ describe('check command', () => {
     });
 
     it('reports a missing source directory', () => {
-        const { context, logger } = harness({ 'luam.json': '{ "name": "luam-demo" }' });
+        const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }) });
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
         expect(logger.errors[0]).toContain('build-source-dir-missing');
     });
 
     it('reports a project without source files', () => {
-        const { context, logger } = harness({ 'luam.json': '{ "name": "luam-demo" }', 'src/shared/notes.md': 'ignored\n' });
+        const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'src/shared/notes.md': 'ignored\n' });
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
         expect(logger.errors[0]).toContain('build-no-sources');

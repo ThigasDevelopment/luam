@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { resolveTemplateUrl, TEMPLATE_FILES } from '@template/template';
+import { MANIFEST_FILE_NAME, resolveTemplateUrl, TEMPLATE_FILES } from '@template/template';
 
 function read(source: string): string {
     return readFileSync(fileURLToPath(resolveTemplateUrl(source)), 'utf8');
@@ -17,7 +17,8 @@ describe('template catalog', () => {
     });
 
     it('scaffolds the project manifest and nothing else', () => {
-        expect(TEMPLATE_FILES.map((file) => file.path)).toEqual(['luam.json']);
+        expect(TEMPLATE_FILES.map((file) => file.path)).toEqual([MANIFEST_FILE_NAME]);
+        expect(TEMPLATE_FILES.map((file) => file.kind)).toEqual(['manifest']);
     });
 
     it('lists every entry exactly once', () => {
@@ -26,9 +27,19 @@ describe('template catalog', () => {
         expect(paths.length).toBe(new Set(paths).size);
     });
 
-    it('declares the directories a new project builds from', () => {
-        const parsed: unknown = JSON.parse(read('luam.json'));
+    it('ships the starter manifest in the manifest dialect', () => {
+        const source = read('luam.manifest');
 
-        expect(parsed).toMatchObject({ outDir: 'build', sourceDirs: ['src'], assetDirs: ['assets'] });
+        expect(source).not.toContain('export default');
+        expect(source).toContain("name = 'luam-resource'");
+        expect(source).toContain("outDir = 'build'");
+    });
+
+    it('declares the directories a new project builds from', () => {
+        const source = read('luam.manifest');
+
+        expect(source).toContain("sourceDirs = { 'src' }");
+        expect(source).toContain("assetDirs = { 'assets' }");
+        expect(source).toContain("    kind = 'none',");
     });
 });

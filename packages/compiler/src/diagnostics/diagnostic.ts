@@ -1,4 +1,4 @@
-export type DiagnosticStage = 'lexer' | 'parser' | 'checker' | 'emitter' | 'project';
+export type DiagnosticStage = 'lexer' | 'parser' | 'checker' | 'emitter' | 'project' | 'manifest';
 
 export type DiagnosticSeverity = 'error' | 'warning';
 

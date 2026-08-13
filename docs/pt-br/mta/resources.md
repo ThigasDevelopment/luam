@@ -24,7 +24,7 @@ uma árvore espelhada por padrão e `dev` sempre usa uma. Veja
 [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts) para os
 dois formatos.
 
-O **nome** do resource vem do `luam.json` e nomeia a pasta. Ele nunca chega ao
+O **nome** do resource vem do `.luam.manifest` e nomeia a pasta. Ele nunca chega ao
 `meta.xml`, porque o MTA lê o nome de um resource a partir do diretório.
 
 ## O manifesto gerado
@@ -80,10 +80,8 @@ tenha sucesso.
 
 `loadOrder` fixa caminhos de código à frente do seu grupo:
 
-```json
-{
-    "loadOrder": ["src/server/index.luam", "assets/shaders/base.fx"]
-}
+```luam
+loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
 ```
 
 Um script é colocado antes dos outros módulos do seu ambiente, e um asset antes

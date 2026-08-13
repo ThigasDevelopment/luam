@@ -15,7 +15,7 @@ acompanhar o log, repetir a cada gravação.
 
 ```
 luam-docs-local-development/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── server/
         └── main.luam
@@ -23,7 +23,7 @@ luam-docs-local-development/
 
 ## Código
 
-<<< @/snippets/local-development/luam.json
+<<< @/snippets/local-development/.luam.manifest{js}
 
 <<< @/snippets/local-development/src/server/main.luam
 

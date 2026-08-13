@@ -27,12 +27,12 @@ If that prints anything below `v20`, upgrade before continuing.
 
 ## What you will end up with
 
-A project directory that holds your `.luam` sources and one `luam.json`, and a
+A project directory that holds your `.luam` sources and one `.luam.manifest`, and a
 build directory that holds a complete MTA resource:
 
 ```
 my-resource/
-├── luam.json
+├── .luam.manifest
 ├── src/
 │   ├── shared/
 │   ├── server/
@@ -40,5 +40,5 @@ my-resource/
 └── build/my-resource/     ← copy this into your MTA server
 ```
 
-Nothing else is scaffolded. `luam init` writes `luam.json` and stops, so there is
+Nothing else is scaffolded. `luam init` writes `.luam.manifest` and stops, so there is
 no framework and no example tree to delete before your first line of code.

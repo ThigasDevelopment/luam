@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest';
 
 interface LanguageContribution {
     id: string;
-    extensions: string[];
+    extensions?: string[];
+    filenames?: string[];
     icon?: { light: string; dark: string };
 }
 
@@ -18,6 +19,8 @@ const packageRoot = fileURLToPath(new URL('..', import.meta.url));
 const manifest: Manifest = JSON.parse(readFileSync(`${packageRoot}package.json`, 'utf8'));
 
 const language = manifest.contributes.languages.find((entry) => entry.id === 'luam');
+
+const manifestLanguage = manifest.contributes.languages.find((entry) => entry.id === 'luam-manifest');
 
 function iconSource(relative: string): string {
     return readFileSync(`${packageRoot}${relative.replace('./', '')}`, 'utf8');
@@ -44,6 +47,30 @@ describe('file icon', () => {
             expect(source, relative).toContain('<mask');
             expect(source, relative).toContain('mask="url(#luamCrescent');
             expect(source, relative).not.toContain('fill-rule="evenodd"');
+        }
+    });
+
+    it('contributes a dedicated light and dark icon for the manifest filename', () => {
+        expect(manifestLanguage?.filenames).toEqual(['.luam.manifest']);
+        expect(manifestLanguage?.icon?.light).toBe('./icons/luam-manifest-light.svg');
+        expect(manifestLanguage?.icon?.dark).toBe('./icons/luam-manifest-dark.svg');
+    });
+
+    it('ships both manifest icon files', () => {
+        for (const relative of [manifestLanguage?.icon?.light ?? '', manifestLanguage?.icon?.dark ?? '']) {
+            expect(existsSync(`${packageRoot}${relative.replace('./', '')}`), relative).toBe(true);
+        }
+    });
+
+    it('gives the manifest its own icon rather than reusing the source icon', () => {
+        expect(manifestLanguage?.icon?.light).not.toBe(language?.icon?.light);
+        expect(manifestLanguage?.icon?.dark).not.toBe(language?.icon?.dark);
+
+        for (const relative of [manifestLanguage?.icon?.light ?? '', manifestLanguage?.icon?.dark ?? '']) {
+            const source = iconSource(relative);
+
+            expect(source, relative).toContain('viewBox="0 0 32 32"');
+            expect(source, relative).toContain('mask="url(#luamCrescentManifest');
         }
     });
 

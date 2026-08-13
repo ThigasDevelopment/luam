@@ -40,7 +40,7 @@ export const en: LocaleStrings = {
         'mta/security': 'Security boundaries',
         'tooling/index': 'Overview',
         'tooling/cli': 'CLI commands',
-        'tooling/luam-json': 'luam.json',
+        'tooling/luam-manifest': '.luam.manifest',
         'tooling/editors': 'Editors',
         'tooling/language-server': 'Language server',
         'tooling/ci-and-deployment': 'CI and deployment',

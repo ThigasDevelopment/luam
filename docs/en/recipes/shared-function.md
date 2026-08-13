@@ -11,7 +11,7 @@ client.
 
 ```
 luam-docs-shared-function/
-├── luam.json
+├── .luam.manifest
 └── src/
     ├── shared/labels.luam
     ├── server/greet.luam
@@ -20,7 +20,7 @@ luam-docs-shared-function/
 
 ## Source
 
-<<< @/snippets/shared-function/luam.json
+<<< @/snippets/shared-function/.luam.manifest{js}
 
 <<< @/snippets/shared-function/src/shared/labels.luam
 

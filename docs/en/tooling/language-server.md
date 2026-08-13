@@ -68,6 +68,18 @@ On `initialize` the server scans the workspace folders for `.luam` files and
 analyzes them. Open documents always win over the scanned copy, so unsaved edits
 drive diagnostics and navigation immediately.
 
+## The manifest
+
+[`.luam.manifest`](/en/tooling/luam-manifest) is scanned and analyzed like any
+other document. Its diagnostics appear as you type, completion offers the fields
+valid at the cursor — with their type, whether they are required, and their
+default — and the closed sets complete inside the quotes. Hover names the field's
+full path and type.
+
+The dialect has no calls and no function values, so the server evaluates a
+manifest itself. Opening a folder never runs project code, and `oop` takes effect
+on save rather than after the next CLI run.
+
 ## Running it
 
 ```bash
@@ -87,7 +99,7 @@ Any LSP client needs three things:
 
 1. **Command** — `node /path/to/luam-lsp.mjs --stdio`.
 2. **Document selector** — files matching `**/*.luam`, language id `luam`.
-3. **Root** — the folder holding `luam.json`, so the workspace scan finds every
+3. **Root** — the folder holding `.luam.manifest`, so the workspace scan finds every
    module.
 
 There is no configuration section the server requires; the settings listed under

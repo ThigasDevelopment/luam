@@ -12,7 +12,7 @@ stops.
 
 ```
 luam-docs-client-hud/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── client/
         └── hud.luam
@@ -20,7 +20,7 @@ luam-docs-client-hud/
 
 ## Source
 
-<<< @/snippets/client-hud/luam.json
+<<< @/snippets/client-hud/.luam.manifest{js}
 
 <<< @/snippets/client-hud/src/client/hud.luam
 

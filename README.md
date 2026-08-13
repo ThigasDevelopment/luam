@@ -147,7 +147,7 @@ See [Editor support](#editor-support) for the compatibility matrix and manual in
 > **[Quick start](https://thigasdevelopment.github.io/luam/en/guide/quick-start)**
 > · [Início rápido](https://thigasdevelopment.github.io/luam/pt-br/guide/quick-start)
 
-**1. Scaffold.** `init` writes exactly one file, `luam.json`. No framework, no
+**1. Scaffold.** `init` writes exactly one file, `.luam.manifest`. No framework, no
 example tree, nothing to delete.
 
 ```bash
@@ -161,7 +161,7 @@ the environment**: `src/server` is server-side, `src/client` is client-side,
 
 ```
 my-resource/
-├── luam.json
+├── .luam.manifest
 └── src/
     ├── shared/config.luam
     ├── server/main.luam
@@ -215,11 +215,12 @@ refresh
 start my-resource
 ```
 
-**5. Iterate.** Point `luam.json` at your server and let `dev` build, sync,
+**5. Iterate.** Point `.luam.manifest` at your server and let `dev` build, sync,
 restart, and stream resource logs on every save:
 
-```json
-{ "name": "my-resource", "serverPath": "C:/MTA Server" }
+```luam
+name = 'my-resource'
+serverPath = 'C:/MTA Server'
 ```
 
 ```bash
@@ -234,19 +235,19 @@ luam dev
 > **[CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli)**
 > · [Comandos da CLI](https://thigasdevelopment.github.io/luam/pt-br/tooling/cli)
 
-Project commands read `luam.json` from the current directory or from `--cwd`.
+Project commands read `.luam.manifest` from the current directory or from `--cwd`.
 `setup`, `doctor`, and `init` do not require an existing project.
 
 ### `luam init`
 
-Scaffolds `luam.json` and stops. The resource name comes from `--name`, or from
+Scaffolds `.luam.manifest` and stops. The resource name comes from `--name`, or from
 the directory you are in.
 
 ```bash
 luam init --name gamemode-race
 ```
 
-An existing `luam.json` is kept and reported — pass `--force` to overwrite it.
+An existing `.luam.manifest` is kept and reported — pass `--force` to overwrite it.
 
 ### `luam setup`
 
@@ -341,7 +342,7 @@ your MTA server, restarts it, and repeats all of that on every save.
 luam ensure
 ```
 
-How much it does depends on what `luam.json` gives it:
+How much it does depends on what `.luam.manifest` gives it:
 
 | Configured | What `ensure` does |
 | --- | --- |
@@ -352,18 +353,17 @@ How much it does depends on what `luam.json` gives it:
 To get the restart, add an `http` transport pointing at a resource on your server
 that exports `refreshResources` and `restartResource`:
 
-```json
-{
-    "name": "my-resource",
-    "serverPath": "C:/MTA Server",
-    "transport": {
-        "kind": "http",
-        "host": "127.0.0.1",
-        "port": 22005,
-        "resource": "luam-sync",
-        "username": "luam",
-        "passwordEnv": "LUAM_MTA_PASSWORD"
-    }
+```luam
+name = 'my-resource'
+serverPath = 'C:/MTA Server'
+
+transport = {
+    kind = 'http',
+    host = '127.0.0.1',
+    port = 22005,
+    resource = 'luam-sync',
+    username = 'luam',
+    passwordEnv = 'LUAM_MTA_PASSWORD',
 }
 ```
 
@@ -388,8 +388,8 @@ a deploy script wants.
 
 | Option | Meaning |
 | --- | --- |
-| `--cwd <path>` | Project directory holding `luam.json`. Defaults to the current directory |
-| `--config <path>` | Load this file instead of `luam.json` |
+| `--cwd <path>` | Project directory holding `.luam.manifest`. Defaults to the current directory |
+| `--manifest <path>` | Load this file instead of `.luam.manifest` |
 | `--name <name>` | Resource name for `init` |
 | `--force` | Let `init` overwrite a file that exists |
 | `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default |
@@ -411,7 +411,7 @@ Progress is painted on stderr and the report goes to stdout, so redirecting
 stdout captures the report alone. Output drops all escape sequences when the
 stream is not a terminal — a CI log stays readable.
 
-### `luam.json`
+### `.luam.manifest`
 
 Only `name` is required.
 
@@ -436,10 +436,10 @@ Paths must stay inside their base directory — an absolute path or a `..` segme
 is rejected.
 
 Every field, the transport in detail, `.env` handling and declaration files:
-**[luam.json](https://thigasdevelopment.github.io/luam/en/tooling/luam-json)**
+**[.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)**
 and
 [Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)
-· [luam.json](https://thigasdevelopment.github.io/luam/pt-br/tooling/luam-json)
+· [.luam.manifest](https://thigasdevelopment.github.io/luam/pt-br/tooling/luam-manifest)
 · also in [`packages/cli/README.md`](packages/cli/README.md).
 
 ---
@@ -468,10 +468,10 @@ interface Command {                  # compile-only, never emitted
 class VIPPlayer extends Player implements Command {
     level: number = 1
 
-    constructor(name: string, level: number) {
+    constructor = function (name: string, level: number)
         self:super(name)
         self.level = level
-    }
+    end
 }
 
 local vip = new VIPPlayer('Thigas', 2)
@@ -639,7 +639,7 @@ pnpm --filter luam bundle
 code --extensionDevelopmentPath=packages/vscode
 ```
 
-The extension activates when the workspace holds a `luam.json` or any `.luam`
+The extension activates when the workspace holds a `.luam.manifest` or any `.luam`
 file, so open your resource folder as the workspace root.
 
 ### Commands and settings

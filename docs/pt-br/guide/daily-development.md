@@ -12,7 +12,7 @@ reinicia-o e repete tudo isso a cada gravação.
 luam ensure
 ```
 
-Quanto ele faz depende do que o `luam.json` fornece:
+Quanto ele faz depende do que o `.luam.manifest` fornece:
 
 | Configurado | O que o `ensure` faz |
 | --- | --- |
@@ -111,17 +111,15 @@ de desenvolvimento, e a próxima sincronização normal os remove.
 Saídas da engine sem identidade de resource podem aparecer como saída simples do
 servidor; registros atribuídos a outros resources são ignorados.
 
-Ajuste o relay no `luam.json`:
+Ajuste o relay no `.luam.manifest`:
 
-```json
-{
-    "development": {
-        "logs": {
-            "maxMessageLength": 2048,
-            "rateLimit": 20,
-            "rateWindowMs": 1000
-        }
-    }
+```luam
+development = {
+    logs = {
+        maxMessageLength = 2048,
+        rateLimit = 20,
+        rateWindowMs = 1000,
+    },
 }
 ```
 

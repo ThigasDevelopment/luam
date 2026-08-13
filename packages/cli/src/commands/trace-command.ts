@@ -2,14 +2,15 @@ import { existsSync, readFileSync } from 'node:fs';
 
 import { discoverResourceMap, explicitResourceMapPath, readResourceMap, resourceMapPath } from '@cli/build/resource-map-file';
 import { parseTracePosition } from '@cli/commands/trace-position';
-import { loadConfig } from '@cli/config/config-loader';
-import type { Environment } from '@cli/config/transport-validation';
+import { manifestMode } from '@cli/config/manifest-context';
+import { loadManifest } from '@cli/config/manifest-loader';
+import type { Environment } from '@cli/config/validation-context';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import type { Reporter } from '@cli/reporting/reporter';
 import { resolveResourcePosition } from '@compiler/project/resource';
 
 export interface TraceOptions {
-    configPath: string | null;
+    manifestPath: string | null;
     env: Environment;
     mapPath: string | null;
     operand: string | null;
@@ -17,7 +18,7 @@ export interface TraceOptions {
 }
 
 function defaultMapPath(root: string, options: TraceOptions, reporter: Reporter): string | null {
-    const loaded = loadConfig(root, options.configPath, options.env);
+    const loaded = loadManifest(root, { path: options.manifestPath, mode: manifestMode('trace'), env: options.env });
 
     if (loaded.config !== null) {
         const configured = resourceMapPath(root, loaded.config);

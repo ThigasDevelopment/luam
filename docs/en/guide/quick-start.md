@@ -12,16 +12,14 @@ cd my-resource
 luam init
 ```
 
-`init` writes exactly one file, `luam.json`. No framework, no example tree,
+`init` writes exactly one file, `.luam.manifest`. No framework, no example tree,
 nothing to delete.
 
-```json
-{
-    "name": "my-resource"
-}
+```luam
+name = 'my-resource'
 ```
 
-An existing `luam.json` is kept and reported; pass `--force` to overwrite it.
+An existing `.luam.manifest` is kept and reported; pass `--force` to overwrite it.
 
 ## 2. Write some Luam
 
@@ -30,7 +28,7 @@ Create the source tree yourself. **The folder decides the environment**:
 
 ```
 my-resource/
-├── luam.json
+├── .luam.manifest
 └── src/
     ├── shared/labels.luam
     ├── server/greet.luam
@@ -78,14 +76,12 @@ start my-resource
 
 ## 5. Iterate
 
-Point `luam.json` at your server and let `ensure` build, sync and restart on
+Point `.luam.manifest` at your server and let `ensure` build, sync and restart on
 every save:
 
-```json
-{
-    "name": "my-resource",
-    "serverPath": "C:/MTA Server"
-}
+```luam
+name = 'my-resource'
+serverPath = 'C:/MTA Server'
 ```
 
 ```bash

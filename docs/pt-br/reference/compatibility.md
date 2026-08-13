@@ -40,7 +40,7 @@ APIs de extensão de um fork estejam estáveis.
 ## Sistemas operacionais
 
 Windows, macOS e Linux são suportados para a CLI e para a extensão do editor. O
-tratamento de caminhos normaliza separadores, então um `luam.json` escrito em uma
+tratamento de caminhos normaliza separadores, então um `.luam.manifest` escrito em uma
 plataforma funciona em outra.
 
 `serverPath` aponta para a raiz do servidor MTA na máquina que roda a CLI, então o

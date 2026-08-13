@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { normalizeFsPath } from './document-uri';
+import { isManifestPath } from './project-settings';
 
 export const SOURCE_EXTENSION = '.luam';
 
@@ -24,6 +25,10 @@ function isIgnored(name: string): boolean {
     return IGNORED_DIRECTORIES.has(name) || name.startsWith('.');
 }
 
+function isSource(name: string): boolean {
+    return name.endsWith(SOURCE_EXTENSION) || isManifestPath(name);
+}
+
 function collect(directory: string, files: ScannedFile[]): void {
     let entries;
 
@@ -44,7 +49,7 @@ function collect(directory: string, files: ScannedFile[]): void {
             continue;
         }
 
-        if (!entry.isFile() || !entry.name.endsWith(SOURCE_EXTENSION)) {
+        if (!entry.isFile() || !isSource(entry.name)) {
             continue;
         }
 

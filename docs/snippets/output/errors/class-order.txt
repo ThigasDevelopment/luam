@@ -1,5 +1,5 @@
-Discovery: done in 1 ms.
-Compile: 1 file in 7 ms.
+Discovery: done in 2 ms.
+Compile: 1 file in 5 ms.
 Assembly: failed in 0 ms.
 src/shared/slots.luam:1:1 error check-unknown-class: Class "ReservedSlot" extends "VehicleSlot", which is not defined.
-Check failed: 1 error, 0 warnings in 9 ms.
+Check failed: 1 error, 0 warnings in 8 ms.

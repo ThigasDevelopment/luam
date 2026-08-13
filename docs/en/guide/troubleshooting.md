@@ -18,7 +18,7 @@ src/client/hud.luam:1:1 error check-environment-api: API "kickPlayer" is server-
 The rule prefix tells you which stage rejected the file: `lex-` while reading
 characters, `parse-` while reading structure, `check-` while type checking,
 `project-` while assembling the resource, `build-` while discovering sources, and
-`config-` while loading `luam.json`.
+`config-` while loading `.luam.manifest`.
 
 On a terminal the CLI groups diagnostics under their file and prints the offending
 source line with a caret. When the stream is not a terminal, it prints the plain
@@ -68,10 +68,10 @@ completion and argument checking for that call.
 ## `player:getName()` is rejected
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "oop": true in luam.json to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "oop = true" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Set `"oop": true` in `luam.json`. That also writes `<oop>true</oop>` into
+Set `oop = true` in `.luam.manifest`. That also writes `<oop>true</oop>` into
 `meta.xml`, which is what makes the object form exist at runtime. See
 [OOP API](/en/mta/oop).
 

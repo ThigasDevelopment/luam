@@ -11,7 +11,7 @@ informado de volta ao jogador.
 
 ```
 luam-docs-server-command/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── server/
         └── heal-command.luam
@@ -19,7 +19,7 @@ luam-docs-server-command/
 
 ## Código
 
-<<< @/snippets/server-command/luam.json
+<<< @/snippets/server-command/.luam.manifest{js}
 
 <<< @/snippets/server-command/src/server/heal-command.luam
 

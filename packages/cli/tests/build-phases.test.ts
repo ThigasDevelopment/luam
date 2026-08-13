@@ -5,12 +5,12 @@ import { runCompile } from '@cli/build/build-runner';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
 import { writeResource } from '@cli/build/resource-writer';
 import { generatedFiles, generatedRoots } from '@cli/build/write-options';
-import { validateConfig } from '@cli/config/config-validation';
+import { loadManifest } from '@cli/config/manifest-loader';
 import type { LuamConfig } from '@cli/config/config-schema';
 import { createProjectCache } from '@compiler/project/project-cache';
 import type { ProgressEvent } from '@compiler/project/progress';
 
-import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
 
@@ -21,7 +21,7 @@ interface Harness {
 
 function harness(files: Readonly<Record<string, string>>): Harness {
     const fixture = createProjectFixture(files);
-    const config = validateConfig(JSON.parse(fixture.read('luam.json')), {}).config;
+    const config = loadManifest(fixture.root).config;
 
     if (config === null) {
         throw new Error('The fixture configuration is invalid.');
@@ -145,7 +145,7 @@ describe('build phases', () => {
     });
 
     it('fails discovery when no source directory exists', () => {
-        const { fixture, config } = harness({ 'luam.json': '{ "name": "luam-demo" }' });
+        const { fixture, config } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }) });
         const outcome = runCompile(fixture.root, config);
 
         expect(outcome.phases).toHaveLength(1);

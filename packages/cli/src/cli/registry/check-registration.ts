@@ -11,7 +11,7 @@ export function registerCheckCommand(program: Command, runtime: CliRuntime): voi
     addProjectOptions(command);
 
     command.action((options: ProjectOptions): void => {
-        const project = createProjectContext(runtime, options);
+        const project = createProjectContext(runtime, 'check', options);
 
         runtime.exitCode = project.context === null ? project.error : runCheckCommand(project.context);
     });

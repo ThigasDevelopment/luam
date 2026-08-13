@@ -58,16 +58,14 @@ rebuild sobrescreve aquele arquivo.
 O `ensure` reinicia um resource pela interface HTTP do MTA, que **não tem TLS**. A
 autenticação básica, portanto, trafega em claro.
 
-```json
-{
-    "transport": {
-        "kind": "http",
-        "host": "127.0.0.1",
-        "port": 22005,
-        "resource": "luam-sync",
-        "username": "luam",
-        "passwordEnv": "LUAM_MTA_PASSWORD"
-    }
+```luam
+transport = {
+    kind = 'http',
+    host = '127.0.0.1',
+    port = 22005,
+    resource = 'luam-sync',
+    username = 'luam',
+    passwordEnv = 'LUAM_MTA_PASSWORD',
 }
 ```
 

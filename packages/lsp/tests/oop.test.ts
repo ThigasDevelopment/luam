@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { analyzeManifest } from '@compiler/manifest/manifest-analysis';
 import { LanguageService } from '@lsp/server/language-service';
-import { readProjectSettings } from '@lsp/workspace/project-settings';
+import { settingsFrom } from '@lsp/workspace/project-settings';
 
 import { createWorkspace, markerAt, positionOf, removeWorkspace, uriFor } from './support/service-fixture';
 
@@ -17,7 +18,7 @@ interface Workspace {
 }
 
 function openProject(oop: boolean, files: Readonly<Record<string, string>>): Workspace {
-    const root = createWorkspace({ 'luam.json': JSON.stringify({ name: 'luam-demo', oop }), ...files });
+    const root = createWorkspace({ '.luam.manifest': `name = 'demo'\noop = ${oop}\n`, ...files });
     const service = new LanguageService();
 
     roots.push(root);
@@ -210,10 +211,17 @@ describe('oop diagnostics in the editor', () => {
 });
 
 describe('project settings', () => {
-    it('reads the oop flag and defaults it to false', () => {
-        expect(readProjectSettings({ name: 'demo', oop: true })).toEqual({ oop: true });
-        expect(readProjectSettings({ name: 'demo' })).toEqual({ oop: false });
-        expect(readProjectSettings({ name: 'demo', oop: 'yes' })).toEqual({ oop: false });
-        expect(readProjectSettings(['demo'])).toBeNull();
+    function settingsOf(source: string): { oop: boolean } {
+        return settingsFrom(analyzeManifest(source, { mode: 'check', root: 'project', env: {} }));
+    }
+
+    it('reads the oop flag from the manifest', () => {
+        expect(settingsOf("name = 'demo'\noop = true\n")).toEqual({ oop: true });
+        expect(settingsOf("name = 'demo'\noop = false\n")).toEqual({ oop: false });
+    });
+
+    it('falls back to the default when the manifest says nothing', () => {
+        expect(settingsOf("name = 'demo'\n")).toEqual({ oop: false });
+        expect(settingsFrom(null)).toEqual({ oop: false });
     });
 });

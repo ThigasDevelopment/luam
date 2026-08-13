@@ -1,3 +1,4 @@
+import { isValidResourceName } from '@compiler/manifest/manifest-rules';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
 export interface HttpTransportConfig {
@@ -51,39 +52,8 @@ export interface LuamConfig {
     development: DevelopmentConfig;
 }
 
-export const CONFIG_FILE_NAME = 'luam.json';
-
-export const DEFAULT_SOURCE_DIRS: readonly string[] = ['src'];
-
-export const DEFAULT_ASSET_DIRS: readonly string[] = ['assets'];
-
-export const DEFAULT_OUT_DIR = 'build';
-
-export const DEFAULT_OOP = false;
-
-export const DEFAULT_OUTPUT: OutputConfig = { bundle: true, map: true };
-
-export const DEFAULT_RESOURCES_DIR = 'mods/deathmatch/resources';
-
-export const DEFAULT_HTTP_HOST = '127.0.0.1';
-
-export const DEFAULT_HTTP_PORT = 22005;
-
-export const DEFAULT_REFRESH_FUNCTION = 'refreshResources';
-
-export const DEFAULT_RESTART_FUNCTION = 'restartResource';
+export const MANIFEST_FILE_NAME = '.luam.manifest';
 
 export const NONE_TRANSPORT: NoneTransportConfig = { kind: 'none' };
 
-export const DEFAULT_DEVELOPMENT_LOGS: DevelopmentLogsConfig = {
-    enabled: false,
-    maxMessageLength: 4096,
-    rateLimit: 30,
-    rateWindowMs: 1000,
-};
-
-const RESOURCE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
-
-export function isValidResourceName(name: string): boolean {
-    return RESOURCE_NAME.test(name);
-}
+export { isValidResourceName };

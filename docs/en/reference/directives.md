@@ -69,7 +69,7 @@ drifted out of its folder is visible without failing the build.
 ## What a directive is not
 
 - Not a shebang. The compiler never executes a file.
-- Not a project setting. Use [`luam.json`](/en/tooling/luam-json) for anything
+- Not a project setting. Use [`.luam.manifest`](/en/tooling/luam-manifest) for anything
   that spans files.
 - Not a build instruction. Directives that configured `meta.xml` — `#!setting`
   and `#!depends` — were removed; the manifest is generated from the project

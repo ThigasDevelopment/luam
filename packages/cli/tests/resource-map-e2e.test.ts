@@ -5,7 +5,7 @@ import { EXIT_OK } from '@cli/cli/exit-codes';
 import { resolveResourcePosition, type OutputLayout, type ResourceMap } from '@compiler/project/resource';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createProjectFixture, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
@@ -20,7 +20,7 @@ afterEach(() => {
 describe('built resource maps', () => {
     it.each<OutputLayout>(['tree', 'bundle'])('resolves an authored line and enclosing symbol in the %s layout', async (layout) => {
         const fixture = createProjectFixture({
-            'luam.json': `${JSON.stringify({ name: 'demo', output: { bundle: layout === 'bundle', map: true } }, null, 4)}\n`,
+            [MANIFEST_FILE]: manifestSource({ name: 'demo', output: { bundle: layout === 'bundle', map: true } }),
             'src/server/main.luam': ['function announce(): void', "    print('ready')", 'end', ''].join('\n'),
         });
 

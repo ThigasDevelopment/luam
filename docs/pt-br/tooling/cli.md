@@ -4,7 +4,7 @@
 luam <command> [options]
 ```
 
-Comandos de projeto leem o `luam.json` do diretório atual, ou de `--cwd`. `setup`,
+Comandos de projeto leem o `.luam.manifest` do diretório atual, ou de `--cwd`. `setup`,
 `doctor` e `init` não exigem um projeto existente.
 
 Cada opção pertence aos comandos que a leem. Uma opção que o comando não possui é
@@ -19,7 +19,7 @@ luam help trace
 
 | Comando | O que faz |
 | --- | --- |
-| [`init`](#luam-init) | Cria o `luam.json`. |
+| [`init`](#luam-init) | Cria o `.luam.manifest`. |
 | [`check`](#luam-check) | Compila e reporta diagnósticos. Não escreve nada. |
 | [`build`](#luam-build) | Compila e escreve o resource em `<outDir>/<name>`. |
 | [`ensure`](#luam-ensure) | Constrói, sincroniza no servidor MTA, reinicia e observa. |
@@ -35,12 +35,12 @@ luam init
 luam init --name gamemode-race
 ```
 
-Escreve **um arquivo**, `luam.json`, e para. Não há framework, não há árvore de
+Escreve **um arquivo**, `.luam.manifest`, e para. Não há framework, não há árvore de
 exemplo e não há nada para apagar antes da sua primeira linha de código.
 
 O nome do resource vem de `--name`, ou do diretório do projeto quando ele é um
 nome válido de resource do MTA, ou de `luam-resource` como último recurso. Um
-`luam.json` existente é mantido e informado; `--force` o sobrescreve.
+`.luam.manifest` existente é mantido e informado; `--force` o sobrescreve.
 
 ## `luam check`
 
@@ -178,11 +178,11 @@ retorna `2` e não executa nada.
 
 | Opção | Pertence a | Significado |
 | --- | --- | --- |
-| `--cwd <path>` | todos os comandos | Diretório do projeto com o `luam.json`. Padrão: o diretório atual. |
+| `--cwd <path>` | todos os comandos | Diretório do projeto com o `.luam.manifest`. Padrão: o diretório atual. |
 | `--no-color` | todos os comandos | Saída simples, sem cor nem emoji. `NO_COLOR` faz o mesmo. |
 | `-h`, `--help` | todos os comandos | Imprime o texto de ajuda daquele comando. |
 | `-v`, `--version` | apenas a raiz | Imprime a versão da CLI, como `luam --version`. |
-| `--config <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Carrega este arquivo em vez do `luam.json`. |
+| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Carrega este arquivo em vez do `.luam.manifest`. |
 | `--bundle` / `--no-bundle` | `build`, `ensure` | Seleciona bundle ou árvore. `dev` não possui nenhuma das duas. |
 | `--watch` / `--no-watch` | `dev`, `ensure` | Mantém observando, ou roda uma vez. Ambos observam por padrão. |
 | `--no-map` | `build`, `dev`, `ensure` | Desliga a geração do mapa. Para `build`, também remove o mapa padrão existente depois do sucesso. |
@@ -201,7 +201,8 @@ ignorava as que não se aplicavam. Essas invocações agora falham com `2`:
 | --- | --- |
 | `luam dev --bundle` | `dev` nunca fez bundle. Antes avisava; agora falha. Use `luam build --bundle` ou `luam ensure --bundle`. |
 | `luam check --offline` | `check` não consulta release alguma. Remova a flag, ou defina `LUAM_OFFLINE` se um script precisa de um único ajuste para os dois comandos. |
-| `luam doctor --config x.json` | `doctor` e `setup` não carregam projeto. Remova a flag. |
+| `luam build --config luam.json` | `--config` virou `--manifest`, e o arquivo que ele aponta agora é um [`.luam.manifest`](/pt-br/tooling/luam-manifest) escrito no dialeto de manifesto do Luam. |
+| `luam doctor --manifest .luam.manifest` | `doctor` e `setup` não carregam projeto. Remova a flag. |
 | `luam build --version` | `--version` é uma opção da raiz. Use `luam --version`. |
 | `luam trace --name x` | `--name` pertence ao `init`. Remova a flag. |
 

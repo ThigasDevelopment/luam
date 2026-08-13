@@ -9,6 +9,7 @@ import type { Hover } from 'vscode-languageserver';
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { descriptorText, namedDescriptorText } from '@lsp/features/api-text';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
+import { manifestHover } from '@lsp/features/manifest-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { isIdentifierChar, wordAt } from '@lsp/support/source-text';
@@ -196,6 +197,10 @@ function decoratorHover(analysis: DocumentAnalysis, offset: number): Hover | nul
 }
 
 export function hoverAt(analysis: DocumentAnalysis, offset: number): Hover | null {
+    if (analysis.manifest !== null) {
+        return manifestHover(analysis, offset);
+    }
+
     const decorator = decoratorHover(analysis, offset);
 
     if (decorator !== null) {

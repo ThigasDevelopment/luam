@@ -33,6 +33,7 @@ import {
     symbolItem,
 } from '@lsp/features/completion-items';
 import { eventItems, isEventArgument } from '@lsp/features/event-completion';
+import { manifestCompletion } from '@lsp/features/manifest-completion';
 import { scanContext, type CallFrame } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
@@ -142,6 +143,10 @@ function stringItems(analysis: DocumentAnalysis, offset: number, others: readonl
 }
 
 export function completionAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): CompletionItem[] {
+    if (analysis.manifest !== null) {
+        return deduplicate(manifestCompletion(analysis, offset));
+    }
+
     const lexical = scanContext(analysis.text, offset);
 
     if (lexical.inComment) {

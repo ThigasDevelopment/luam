@@ -2,6 +2,7 @@ import { formatCliDiagnostic, type CliDiagnostic } from '@cli/reporting/cli-diag
 import { reportGroupedDiagnostics } from '@cli/reporting/diagnostic-layout';
 import { pluralize } from '@cli/reporting/plural';
 import type { Reporter } from '@cli/reporting/reporter';
+import type { Diagnostic } from '@compiler/diagnostics/diagnostic';
 import type { FileDiagnostic } from '@compiler/project/module';
 
 export interface DiagnosticCounts {
@@ -26,6 +27,16 @@ export function countCliDiagnostics(diagnostics: readonly CliDiagnostic[]): Diag
     const errors = diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length;
 
     return { errors, warnings: diagnostics.length - errors };
+}
+
+export function reportManifestDiagnostics(reporter: Reporter, path: string, source: string, diagnostics: readonly Diagnostic[]): void {
+    if (diagnostics.length === 0) {
+        return;
+    }
+
+    const entries = diagnostics.map((diagnostic) => ({ path, diagnostic }));
+
+    reportFileDiagnostics(reporter, entries, new Map([[path, source]]));
 }
 
 export function reportCliDiagnostics(reporter: Reporter, diagnostics: readonly CliDiagnostic[]): void {

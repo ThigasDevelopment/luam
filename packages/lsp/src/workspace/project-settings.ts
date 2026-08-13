@@ -1,7 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { basename } from 'node:path';
 
-const CONFIG_FILE = 'luam.json';
+import type { ManifestAnalysis } from '@compiler/manifest/manifest-analysis';
 
 export interface ProjectSettings {
     oop: boolean;
@@ -9,34 +8,16 @@ export interface ProjectSettings {
 
 export const DEFAULT_PROJECT_SETTINGS: ProjectSettings = { oop: false };
 
-function readConfig(root: string): unknown {
-    const path = resolve(root, CONFIG_FILE);
+export const MANIFEST_FILE_NAME = '.luam.manifest';
 
-    try {
-        return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : null;
-    } catch {
-        return null;
-    }
+export function isManifestPath(path: string): boolean {
+    return basename(path).endsWith(MANIFEST_FILE_NAME);
 }
 
-export function readProjectSettings(raw: unknown): ProjectSettings | null {
-    if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
-        return null;
+export function settingsFrom(manifest: ManifestAnalysis | null): ProjectSettings {
+    if (manifest === null) {
+        return DEFAULT_PROJECT_SETTINGS;
     }
 
-    const oop = (raw as Record<string, unknown>).oop;
-
-    return { oop: oop === true };
-}
-
-export function loadProjectSettings(roots: readonly string[]): ProjectSettings {
-    for (const root of roots) {
-        const settings = readProjectSettings(readConfig(root));
-
-        if (settings !== null) {
-            return settings;
-        }
-    }
-
-    return DEFAULT_PROJECT_SETTINGS;
+    return { oop: manifest.value.oop === true };
 }

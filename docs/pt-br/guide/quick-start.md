@@ -12,16 +12,14 @@ cd my-resource
 luam init
 ```
 
-`init` escreve exatamente um arquivo, `luam.json`. Sem framework, sem árvore de
+`init` escreve exatamente um arquivo, `.luam.manifest`. Sem framework, sem árvore de
 exemplo, nada para apagar.
 
-```json
-{
-    "name": "my-resource"
-}
+```luam
+name = 'my-resource'
 ```
 
-Um `luam.json` existente é mantido e informado; passe `--force` para
+Um `.luam.manifest` existente é mantido e informado; passe `--force` para
 sobrescrevê-lo.
 
 ## 2. Escrever um pouco de Luam
@@ -31,7 +29,7 @@ roda no servidor, `src/client` roda no cliente e `src/shared` roda nos dois.
 
 ```
 my-resource/
-├── luam.json
+├── .luam.manifest
 └── src/
     ├── shared/labels.luam
     ├── server/greet.luam
@@ -80,14 +78,12 @@ start my-resource
 
 ## 5. Iterar
 
-Aponte o `luam.json` para o seu servidor e deixe o `ensure` construir, sincronizar
+Aponte o `.luam.manifest` para o seu servidor e deixe o `ensure` construir, sincronizar
 e reiniciar a cada gravação:
 
-```json
-{
-    "name": "my-resource",
-    "serverPath": "C:/MTA Server"
-}
+```luam
+name = 'my-resource'
+serverPath = 'C:/MTA Server'
 ```
 
 ```bash

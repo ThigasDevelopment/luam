@@ -70,7 +70,7 @@ saiu da sua pasta fica visível sem falhar o build.
 
 - Não é um shebang. O compilador nunca executa um arquivo.
 - Não é uma configuração de projeto. Use o
-  [`luam.json`](/pt-br/tooling/luam-json) para qualquer coisa que atravesse
+  [`.luam.manifest`](/pt-br/tooling/luam-manifest) para qualquer coisa que atravesse
   arquivos.
 - Não é uma instrução de build. As diretivas que configuravam o `meta.xml` —
   `#!setting` e `#!depends` — foram removidas; o manifesto é gerado a partir do

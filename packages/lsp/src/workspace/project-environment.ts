@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 
 import { EMPTY_PROJECT_DECLARATIONS, projectDeclarations, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import { parseEnvFile } from '@compiler/project/env-file';
@@ -16,6 +16,10 @@ function readEnvironment(root: string): string | null {
     }
 }
 
+export function isEnvironmentPath(path: string): boolean {
+    return basename(path) === ENVIRONMENT_FILE;
+}
+
 export function loadProjectDeclarations(roots: readonly string[]): ProjectDeclarations {
     for (const root of roots) {
         const source = readEnvironment(root);
@@ -26,4 +30,16 @@ export function loadProjectDeclarations(roots: readonly string[]): ProjectDeclar
     }
 
     return EMPTY_PROJECT_DECLARATIONS;
+}
+
+export function loadProjectEnvironment(roots: readonly string[]): Record<string, string> {
+    for (const root of roots) {
+        const source = readEnvironment(root);
+
+        if (source !== null) {
+            return Object.fromEntries(parseEnvFile(source).entries.map((entry) => [entry.key, entry.value]));
+        }
+    }
+
+    return {};
 }

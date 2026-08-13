@@ -6,11 +6,9 @@ configuration flag.
 
 ## Turning it on
 
-```json
-{
-    "name": "my-resource",
-    "oop": true
-}
+```luam
+name = 'my-resource'
+oop = true
 ```
 
 `oop` is `false` by default. With it on the compiler:
@@ -78,7 +76,7 @@ a codebase harder to read.
 
 ## A complete example
 
-<<< @/snippets/oop-api/luam.json
+<<< @/snippets/oop-api/.luam.manifest{js}
 
 <<< @/snippets/oop-api/src/server/admin.luam
 

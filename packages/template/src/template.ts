@@ -1,4 +1,4 @@
-export type TemplateFileKind = 'config';
+export type TemplateFileKind = 'manifest';
 
 export interface TemplateFile {
     source: string;
@@ -6,7 +6,9 @@ export interface TemplateFile {
     kind: TemplateFileKind;
 }
 
-export const TEMPLATE_FILES: readonly TemplateFile[] = [{ source: 'luam.json', path: 'luam.json', kind: 'config' }];
+export const MANIFEST_FILE_NAME = '.luam.manifest';
+
+export const TEMPLATE_FILES: readonly TemplateFile[] = [{ source: 'luam.manifest', path: MANIFEST_FILE_NAME, kind: 'manifest' }];
 
 export function resolveTemplateUrl(source: string): URL {
     return new URL(`../files/${source}`, import.meta.url);

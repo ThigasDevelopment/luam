@@ -2,10 +2,10 @@ import { resolve } from 'node:path';
 
 import { resolveMtaVersion } from '@cli/build/mta-release';
 import { EXIT_USAGE } from '@cli/cli/exit-codes';
-import { loadConfig } from '@cli/config/config-loader';
+import { manifestMode } from '@cli/config/manifest-context';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { createEditorService } from '@cli/editor/editor-service';
-import { hasCliErrors } from '@cli/reporting/cli-diagnostic';
-import { reportCliDiagnostics } from '@cli/reporting/diagnostic-reporter';
+import { reportManifestDiagnostics } from '@cli/reporting/diagnostic-reporter';
 import { createConsoleLogger } from '@cli/reporting/logger';
 import { detectCapability, PLAIN_CAPABILITY } from '@cli/reporting/output-capability';
 import { createReporter } from '@cli/reporting/reporter';
@@ -14,7 +14,7 @@ import { createTransport } from '@cli/transport/transport-factory';
 import type { CommandContext } from '@cli/commands/command-context';
 import type { InitPrompt } from '@cli/commands/init-prompt';
 import type { LuamConfig } from '@cli/config/config-schema';
-import type { Environment } from '@cli/config/transport-validation';
+import type { Environment } from '@cli/config/validation-context';
 import type { EditorService } from '@cli/editor/editor-service';
 import type { InstallationPrompt } from '@cli/editor/installation-prompt';
 import type { Logger } from '@cli/reporting/logger';
@@ -48,7 +48,7 @@ export interface RootOptions {
 }
 
 export interface ProjectOptions extends RootOptions {
-    config?: string;
+    manifest?: string;
     offline?: boolean;
 }
 
@@ -85,14 +85,14 @@ export function commandRoot(runtime: CliRuntime, options: RootOptions): string {
     return resolve(runtime.cwd, options.cwd ?? '.');
 }
 
-export function createProjectContext(runtime: CliRuntime, options: ProjectOptions): ProjectContext {
+export function createProjectContext(runtime: CliRuntime, command: string, options: ProjectOptions): ProjectContext {
     const root = commandRoot(runtime, options);
-    const loaded = loadConfig(root, options.config ?? null, runtime.env);
+    const loaded = loadManifest(root, { path: options.manifest ?? null, mode: manifestMode(command), env: runtime.env });
 
-    reportCliDiagnostics(runtime.reporter, loaded.diagnostics);
+    reportManifestDiagnostics(runtime.reporter, loaded.path, loaded.source, loaded.diagnostics);
 
-    if (loaded.config === null || hasCliErrors(loaded.diagnostics)) {
-        runtime.reporter.error(`Configuration "${loaded.path}" is invalid.`);
+    if (loaded.config === null) {
+        runtime.reporter.error(`Manifest "${loaded.path}" is invalid.`);
 
         return { context: null, error: EXIT_USAGE };
     }

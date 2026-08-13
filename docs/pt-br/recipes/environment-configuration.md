@@ -11,7 +11,7 @@ lidos no servidor através de `process.env`.
 
 ```
 luam-docs-environment-configuration/
-├── luam.json
+├── .luam.manifest
 ├── .env
 └── src/
     └── server/
@@ -20,7 +20,7 @@ luam-docs-environment-configuration/
 
 ## Código
 
-<<< @/snippets/environment-configuration/luam.json
+<<< @/snippets/environment-configuration/.luam.manifest{js}
 
 <<< @/snippets/environment-configuration/.env{ini}
 

@@ -6,6 +6,61 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### The `.luam.manifest` Dialect
+
+`luam.json` was the same on every machine and for every command, so a project
+that wanted a development `outDir` or an `http` transport only when a password
+was present kept two files and remembered which one to pass to `--config`. A
+manifest now varies by mode and environment, and it is written in Luam — the
+compiler parses, checks, and evaluates it in process, so a configuration mistake
+reads like a compile error and the editor understands the file.
+
+#### Added
+
+- `.luam.manifest`, a restricted Luam dialect at the project root. It holds
+  `local` declarations and assignments to configuration fields. A value is a
+  literal, a table, or those combined with `and`, `or`, `not`, comparison,
+  arithmetic, and concatenation. There are no calls and no function values, so
+  evaluating a manifest is pure and total.
+- `mode` (`development` for `dev` and `ensure`, `production` for `build`,
+  otherwise the command name), `env` (a table of `string?`), and the absolute
+  `root`, in scope alongside the configuration fields and nothing else.
+- `--manifest <path>`, which loads an alternate `.luam.manifest` for a
+  deployment profile.
+- Positioned configuration diagnostics: every one carries a line and a column, so
+  `outDir = 5` points at the value rather than at the file.
+- Manifest support in the language server — diagnostics as you type, completion
+  for every field with its type, whether it is required, and its default, and
+  completion for the closed sets inside the quotes; hover names the field's full
+  path and type.
+- A `luam-manifest` file association in the VS Code extension, with its own
+  grammar, `#` comment configuration, and light and dark document icons,
+  separate from the `.luam` grammar.
+- `config-unsupported-manifest`, `config-unreadable-manifest`,
+  `config-invalid-statement`, and `config-invalid-expression`.
+
+#### Changed
+
+- **Breaking.** `luam.json` is no longer read, merged, or reported, even when it
+  sits beside a `.luam.manifest`. Rename the file, drop the outer braces and the
+  quotes around the field names, write `=` instead of `:`, and rename `--config`
+  to `--manifest`.
+- **Breaking.** `--config` was renamed to `--manifest` on `build`, `check`,
+  `dev`, `ensure`, and `trace`.
+- **Breaking.** `transport.kind` is required once a `transport` table is written.
+  `transport = { }` is `config-missing-field` instead of silently meaning `none`.
+  Omitting the table entirely still means `none`.
+- `luam init` writes `.luam.manifest` and nothing else.
+- The language server reads the manifest directly, so a change to `oop` takes
+  effect on save rather than after the next CLI run. No diagnostic carries the
+  manifest source or an environment value.
+
+#### Removed
+
+- `config-invalid-json` and `config-unreadable`, which described the JSON reader.
+- `.luam/settings.json`. There is no settings snapshot, and no child process
+  evaluates the manifest.
+
 ### HTTP Exports
 
 #### Added

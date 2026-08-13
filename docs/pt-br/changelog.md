@@ -7,6 +7,26 @@ repositório.
 O aviso no topo de cada página nomeia a versão do Luam que o manual documenta.
 Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
+## Não lançado
+
+### Alterado
+
+- O `luam.json` virou o [`.luam.manifest`](/pt-br/tooling/luam-manifest), um
+  dialeto restrito do Luam que o compilador analisa, verifica e avalia. A página
+  foi reescrita em torno das duas instruções permitidas, da linguagem de
+  expressões, dos valores injetados `mode`, `env` e `root`, e do porquê de o
+  dialeto não ter chamadas. Cada campo, padrão e regra de validação continua
+  igual; `--config` virou `--manifest`; e o `luam.json` não é mais lido. A página
+  termina com a migração em três passos.
+- Todo exemplo de configuração do manual é escrito no dialeto em vez de JSON, e a
+  referência de diagnósticos lista os códigos de manifesto que substituíram
+  `config-invalid-json` e `config-unreadable`.
+- [Campos de configuração](/pt-br/reference/configuration-fields) marca cada campo
+  como obrigatório ou opcional, igual ao que o autocompletar do editor mostra.
+- [Estrutura do projeto](/pt-br/guide/project-layout) não descreve mais um
+  snapshot de configuração. O editor lê o próprio manifesto, então `oop` passa a
+  valer ao salvar.
+
 ## Documenta o Luam 0.1.1
 
 O primeiro manual publicado.
@@ -39,7 +59,7 @@ antes vivia lá em detalhe agora tem um lugar canônico:
 | Instalação e problemas de PATH | [Instalação](/pt-br/guide/installation) |
 | O início rápido | [Início rápido](/pt-br/guide/quick-start) |
 | Cada comando e opção da CLI | [Comandos da CLI](/pt-br/tooling/cli) |
-| A tabela do `luam.json` | [luam.json](/pt-br/tooling/luam-json) e [Campos de configuração](/pt-br/reference/configuration-fields) |
+| A tabela do `luam.json` | [.luam.manifest](/pt-br/tooling/luam-manifest) e [Campos de configuração](/pt-br/reference/configuration-fields) |
 | A tabela de recursos | [A linguagem](/pt-br/language/) |
 | Suporte a editores | [Editores](/pt-br/tooling/editors) |
 | Limitações conhecidas | [Limitações](/pt-br/reference/limitations) |

@@ -16,7 +16,7 @@ export function registerBuildCommand(program: Command, runtime: CliRuntime): voi
     addLayoutOptions(addProjectOptions(command)).addOption(noMapOption()).addOption(offlineOption());
 
     command.action(async (options: BuildOptions): Promise<void> => {
-        const project = createProjectContext(runtime, options);
+        const project = createProjectContext(runtime, 'build', options);
 
         if (project.context === null) {
             runtime.exitCode = project.error;

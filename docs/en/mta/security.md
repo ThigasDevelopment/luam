@@ -56,16 +56,14 @@ overwrites that file.
 `ensure` restarts a resource over MTA's HTTP interface, which has **no TLS**.
 Basic authentication therefore travels in the clear.
 
-```json
-{
-    "transport": {
-        "kind": "http",
-        "host": "127.0.0.1",
-        "port": 22005,
-        "resource": "luam-sync",
-        "username": "luam",
-        "passwordEnv": "LUAM_MTA_PASSWORD"
-    }
+```luam
+transport = {
+    kind = 'http',
+    host = '127.0.0.1',
+    port = 22005,
+    resource = 'luam-sync',
+    username = 'luam',
+    passwordEnv = 'LUAM_MTA_PASSWORD',
 }
 ```
 

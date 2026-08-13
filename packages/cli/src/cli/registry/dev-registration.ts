@@ -16,7 +16,7 @@ export function registerDevCommand(program: Command, runtime: CliRuntime): void 
     addWatchOptions(addProjectOptions(command)).addOption(noMapOption()).addOption(offlineOption());
 
     command.action(async (options: DevOptions): Promise<void> => {
-        const project = createProjectContext(runtime, options);
+        const project = createProjectContext(runtime, 'dev', options);
 
         if (project.context === null) {
             runtime.exitCode = project.error;

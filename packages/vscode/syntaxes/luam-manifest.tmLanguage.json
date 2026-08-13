@@ -1,0 +1,101 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Luam Manifest",
+    "scopeName": "source.luam-manifest",
+    "patterns": [
+        { "include": "#comment" },
+        { "include": "#string" },
+        { "include": "#number" },
+        { "include": "#declaration" },
+        { "include": "#field" },
+        { "include": "#constant" },
+        { "include": "#injected" },
+        { "include": "#operator" },
+        { "include": "#identifier" }
+    ],
+    "repository": {
+        "comment": {
+            "patterns": [
+                {
+                    "name": "comment.block.luam-manifest",
+                    "begin": "#\\*",
+                    "end": "\\*#"
+                },
+                {
+                    "name": "comment.line.number-sign.luam-manifest",
+                    "begin": "#(?=\\s|$)",
+                    "end": "$"
+                }
+            ]
+        },
+        "string": {
+            "patterns": [
+                {
+                    "name": "string.quoted.single.luam-manifest",
+                    "begin": "'",
+                    "end": "'",
+                    "patterns": [{ "include": "#escape" }]
+                },
+                {
+                    "name": "string.quoted.double.luam-manifest",
+                    "begin": "\"",
+                    "end": "\"",
+                    "patterns": [{ "include": "#escape" }]
+                },
+                {
+                    "name": "string.template.luam-manifest",
+                    "begin": "`",
+                    "end": "`",
+                    "patterns": [{ "include": "#interpolation" }, { "include": "#escape" }]
+                }
+            ]
+        },
+        "interpolation": {
+            "name": "meta.embedded.expression.luam-manifest",
+            "begin": "\\$\\{",
+            "end": "\\}",
+            "beginCaptures": { "0": { "name": "punctuation.definition.template-expression.begin.luam-manifest" } },
+            "endCaptures": { "0": { "name": "punctuation.definition.template-expression.end.luam-manifest" } },
+            "patterns": [{ "include": "#injected" }, { "include": "#identifier" }]
+        },
+        "escape": {
+            "name": "constant.character.escape.luam-manifest",
+            "match": "\\\\(?:[abfnrtv\\\\\"'\\n]|x[0-9A-Fa-f]{2}|[0-9]{1,3})"
+        },
+        "number": {
+            "name": "constant.numeric.luam-manifest",
+            "match": "\\b(?:0[xX][0-9A-Fa-f]+|(?:[0-9]+\\.?[0-9]*|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?)\\b"
+        },
+        "declaration": {
+            "match": "\\b(local)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+            "captures": {
+                "1": { "name": "storage.modifier.local.luam-manifest" },
+                "2": { "name": "variable.other.readwrite.luam-manifest" }
+            }
+        },
+        "field": {
+            "match": "([A-Za-z_][A-Za-z0-9_]*)\\s*(?==[^=])",
+            "captures": { "1": { "name": "support.type.property-name.luam-manifest" } }
+        },
+        "constant": {
+            "name": "constant.language.luam-manifest",
+            "match": "\\b(?:true|false|nil)\\b"
+        },
+        "injected": {
+            "name": "variable.language.luam-manifest",
+            "match": "\\b(?:mode|env|root)\\b"
+        },
+        "operator": {
+            "patterns": [
+                { "name": "keyword.operator.logical.luam-manifest", "match": "\\b(?:and|or|not)\\b" },
+                { "name": "keyword.operator.assignment.luam-manifest", "match": "=(?!=)" },
+                { "name": "keyword.operator.comparison.luam-manifest", "match": "==|~=|<=|>=|<|>" },
+                { "name": "keyword.operator.arithmetic.luam-manifest", "match": "\\+|-|\\*|/|%|\\^|\\.\\." }
+            ]
+        },
+        "identifier": {
+            "name": "variable.other.luam-manifest",
+            "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+    }
+}

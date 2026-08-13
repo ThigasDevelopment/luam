@@ -4,21 +4,14 @@ import { renderEnvironmentTemplate } from '@cli/build/env-template';
 import { readProjectInputs } from '@cli/build/project-inputs';
 import { generatedRoots } from '@cli/build/write-options';
 import type { LuamConfig } from '@cli/config/config-schema';
-import { validateConfig } from '@cli/config/config-validation';
 import { parseEnvFile } from '@compiler/project/env-file';
 
-import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, defaultProjectFiles, manifestConfig, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
 
 function defaultConfig(): LuamConfig {
-    const config = validateConfig({ name: 'luam-demo' }, {}).config;
-
-    if (config === null) {
-        throw new Error('The default configuration is invalid.');
-    }
-
-    return config;
+    return manifestConfig({ name: 'luam-demo' });
 }
 
 function fixture(files: Readonly<Record<string, string>>): ProjectFixture {

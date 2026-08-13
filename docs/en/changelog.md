@@ -6,6 +6,25 @@ Changes to this manual. Compiler and CLI changes live in the repository's
 The banner at the top of every page names the Luam version the manual documents.
 When that version changes, the entry below says what moved.
 
+## Unreleased
+
+### Changed
+
+- `luam.json` became [`.luam.manifest`](/en/tooling/luam-manifest), a restricted
+  Luam dialect the compiler parses, checks, and evaluates. The page is rebuilt
+  around the two statements it allows, the expression language, the injected
+  `mode`, `env`, and `root`, and why the dialect has no calls. Every field,
+  default, and validation rule is unchanged; `--config` became `--manifest`; and
+  `luam.json` is no longer read at all. The page ends with the three-step
+  migration.
+- Every configuration sample in the manual is written in the dialect rather than
+  JSON, and the diagnostics reference lists the manifest codes that replaced
+  `config-invalid-json` and `config-unreadable`.
+- [Configuration fields](/en/reference/configuration-fields) marks every field
+  required or optional, matching what editor completion shows.
+- [Project layout](/en/guide/project-layout) no longer describes a settings
+  snapshot. The editor reads the manifest itself, so `oop` takes effect on save.
+
 ## Documents Luam 0.1.1
 
 The first published manual.
@@ -38,7 +57,7 @@ there in detail now has a canonical home:
 | Install and PATH troubleshooting | [Installation](/en/guide/installation) |
 | The quick start | [Quick start](/en/guide/quick-start) |
 | Every CLI command and option | [CLI commands](/en/tooling/cli) |
-| The `luam.json` table | [luam.json](/en/tooling/luam-json) and [Configuration fields](/en/reference/configuration-fields) |
+| The `luam.json` table | [.luam.manifest](/en/tooling/luam-manifest) and [Configuration fields](/en/reference/configuration-fields) |
 | The feature table | [The language](/en/language/) |
 | Editor support | [Editors](/en/tooling/editors) |
 | Known limitations | [Limitations](/en/reference/limitations) |

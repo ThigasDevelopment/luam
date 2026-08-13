@@ -11,7 +11,7 @@ gerados.
 
 ```
 luam-docs-typed-class/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── shared/
         └── vehicle-slot.luam
@@ -19,7 +19,7 @@ luam-docs-typed-class/
 
 ## Código
 
-<<< @/snippets/typed-class/luam.json
+<<< @/snippets/typed-class/.luam.manifest{js}
 
 <<< @/snippets/typed-class/src/shared/vehicle-slot.luam
 

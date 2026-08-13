@@ -68,6 +68,18 @@ No `initialize`, o servidor varre as pastas do workspace em busca de arquivos
 `.luam` e os analisa. Documentos abertos sempre vencem a cópia varrida, então
 edições não salvas guiam diagnósticos e navegação imediatamente.
 
+## O manifesto
+
+O [`.luam.manifest`](/pt-br/tooling/luam-manifest) é varrido e analisado como
+qualquer outro documento. Seus diagnósticos aparecem enquanto você digita, o
+autocompletar oferece os campos válidos no cursor — com tipo, se são obrigatórios
+e o padrão — e os conjuntos fechados completam dentro das aspas. O hover nomeia o
+caminho completo do campo e seu tipo.
+
+O dialeto não tem chamadas nem valores de função, então o próprio servidor avalia
+o manifesto. Abrir uma pasta nunca executa código do projeto, e `oop` passa a
+valer ao salvar em vez de depois da próxima execução da CLI.
+
 ## Executando
 
 ```bash
@@ -88,7 +100,7 @@ Qualquer cliente LSP precisa de três coisas:
 1. **Comando** — `node /caminho/para/luam-lsp.mjs --stdio`.
 2. **Seletor de documento** — arquivos que casam com `**/*.luam`, id de linguagem
    `luam`.
-3. **Raiz** — a pasta com o `luam.json`, para que a varredura do workspace encontre
+3. **Raiz** — a pasta com o `.luam.manifest`, para que a varredura do workspace encontre
    todos os módulos.
 
 Não há seção de configuração exigida pelo servidor; as configurações listadas em

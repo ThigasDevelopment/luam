@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { CommandContext } from '@cli/commands/command-context';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import { createEnsureRunner } from '@cli/commands/ensure-runner';
-import { validateConfig } from '@cli/config/config-validation';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { createNoneTransport } from '@cli/transport/none-transport';
 
@@ -25,7 +25,7 @@ interface Harness {
 function harness(files: Readonly<Record<string, string>>): Harness {
     const fixture = createProjectFixture(files);
     const logger = createMemoryLogger();
-    const config = validateConfig(JSON.parse(fixture.read('luam.json')), {}).config;
+    const config = loadManifest(fixture.root).config;
 
     if (config === null) {
         throw new Error('The fixture configuration is invalid.');
@@ -168,7 +168,7 @@ describe('ensure command', () => {
         expect(await runEnsureCommand(context, { transport, watch: true, signal: null })).toBe(EXIT_DIAGNOSTICS);
         expect(fixture.exists('build')).toBe(false);
         expect(transport.calls).toEqual([]);
-        expect(logger.errors).toContain('luam ensure requires "serverPath" in luam.json.');
+        expect(logger.errors).toContain('luam ensure requires "serverPath" in .luam.manifest.');
     });
 
     it('rebuilds and restarts when a watched source changes', async () => {

@@ -6,11 +6,9 @@ opção de configuração.
 
 ## Ligando
 
-```json
-{
-    "name": "my-resource",
-    "oop": true
-}
+```luam
+name = 'my-resource'
+oop = true
 ```
 
 `oop` é `false` por padrão. Com ele ligado, o compilador:
@@ -78,7 +76,7 @@ deixa a base de código mais difícil de ler.
 
 ## Um exemplo completo
 
-<<< @/snippets/oop-api/luam.json
+<<< @/snippets/oop-api/.luam.manifest{js}
 
 <<< @/snippets/oop-api/src/server/admin.luam
 

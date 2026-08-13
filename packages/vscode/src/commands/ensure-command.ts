@@ -4,7 +4,7 @@ import { readSettings, type LuamSettings } from '@vscode-extension/config/settin
 
 export const TERMINAL_NAME = 'Luam Ensure';
 
-export const NO_FOLDER_MESSAGE = 'Open a folder that contains a "luam.json" before running the ensure command.';
+export const NO_FOLDER_MESSAGE = 'Open a folder that contains a ".luam.manifest" before running the ensure command.';
 
 export function ensureCommandLine(settings: LuamSettings): string {
     return settings.ensureWatch ? `${settings.cliPath} ensure --watch` : `${settings.cliPath} ensure`;

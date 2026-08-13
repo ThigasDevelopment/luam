@@ -19,7 +19,7 @@ export function registerTraceCommand(program: Command, runtime: CliRuntime): voi
 
     command.action((position: string | undefined, options: TraceOptions): void => {
         runtime.exitCode = runTraceCommand(commandRoot(runtime, options), runtime.reporter, {
-            configPath: options.config ?? null,
+            manifestPath: options.manifest ?? null,
             env: runtime.env,
             mapPath: options.map ?? null,
             operand: position ?? null,

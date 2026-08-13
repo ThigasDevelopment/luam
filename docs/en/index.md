@@ -67,6 +67,6 @@ from the generated Lua.
 | Build your first resource | [Quick start](/en/guide/quick-start) |
 | Understand the type system | [Types](/en/language/types) |
 | Know which MTA API a file may call | [Environments](/en/mta/environments) |
-| Configure a project | [luam.json](/en/tooling/luam-json) |
+| Configure a project | [.luam.manifest](/en/tooling/luam-manifest) |
 | Copy a working example | [Recipes](/en/recipes/) |
 | Look up a keyword or a diagnostic | [Reference](/en/reference/) |

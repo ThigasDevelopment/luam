@@ -12,7 +12,7 @@ and repeats all of that on every save.
 luam ensure
 ```
 
-How much it does depends on what `luam.json` gives it:
+How much it does depends on what `.luam.manifest` gives it:
 
 | Configured | What `ensure` does |
 | --- | --- |
@@ -109,17 +109,15 @@ normal sync removes them.
 Engine output with no resource identity can appear as plain server output;
 records attributed to other resources are ignored.
 
-Tune the relay in `luam.json`:
+Tune the relay in `.luam.manifest`:
 
-```json
-{
-    "development": {
-        "logs": {
-            "maxMessageLength": 2048,
-            "rateLimit": 20,
-            "rateWindowMs": 1000
-        }
-    }
+```luam
+development = {
+    logs = {
+        maxMessageLength = 2048,
+        rateLimit = 20,
+        rateWindowMs = 1000,
+    },
 }
 ```
 

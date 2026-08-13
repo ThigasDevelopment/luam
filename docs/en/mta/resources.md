@@ -23,7 +23,7 @@ This is the default bundle layout. Empty environments are omitted. `ensure`
 defaults to a mirrored tree and `dev` always uses one. See
 [Output layouts and source maps](/en/reference/output-layouts) for both shapes.
 
-The resource **name** comes from `luam.json` and names the folder. It never
+The resource **name** comes from `.luam.manifest` and names the folder. It never
 reaches `meta.xml`, because MTA reads a resource's name from its directory.
 
 ## The generated manifest
@@ -78,10 +78,8 @@ succeed.
 
 `loadOrder` pins source paths ahead of their group:
 
-```json
-{
-    "loadOrder": ["src/server/index.luam", "assets/shaders/base.fx"]
-}
+```luam
+loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
 ```
 
 A script is placed before other modules in its environment, and an asset before

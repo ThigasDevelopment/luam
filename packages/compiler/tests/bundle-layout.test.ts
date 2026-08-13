@@ -130,7 +130,7 @@ describe('bundle resource layout', () => {
         expect(bundled.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['project-bundle-toplevel-return']);
         expect(bundled.diagnostics[0]?.diagnostic.position.line).toBe(2);
         expect(bundled.diagnostics[0]?.diagnostic.message).toBe(
-            '"src/server/main.luam" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "output": { "bundle": false } in luam.json.',
+            '"src/server/main.luam" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "output = { bundle = false }" in .luam.manifest.',
         );
     });
 

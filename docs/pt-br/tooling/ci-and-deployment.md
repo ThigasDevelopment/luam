@@ -41,7 +41,7 @@ isso em qualquer lugar.
 | --- | --- | --- |
 | `0` | Sucesso | O job passa. |
 | `1` | Diagnósticos reportados | O job falha. |
-| `2` | Linha de comando ou configuração inválida | Corrija o workflow ou o `luam.json`. |
+| `2` | Linha de comando ou configuração inválida | Corrija o workflow ou o `.luam.manifest`. |
 
 ## Produzindo um artefato do resource
 

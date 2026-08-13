@@ -9,7 +9,7 @@ import { runBuildCommand } from '@cli/commands/build-command';
 import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
-import { validateConfig } from '@cli/config/config-validation';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { RICH_CAPABILITY } from '@cli/reporting/output-capability';
 import { createOutputStyle } from '@cli/reporting/output-style';
@@ -33,7 +33,7 @@ interface Harness {
 
 function harness(files: Readonly<Record<string, string>>, target: MemoryReporter = createMemoryReporter()): Harness {
     const fixture = createProjectFixture(files);
-    const config = validateConfig(JSON.parse(fixture.read('luam.json')), {}).config;
+    const config = loadManifest(fixture.root).config;
 
     if (config === null) {
         throw new Error('The fixture configuration is invalid.');

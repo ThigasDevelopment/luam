@@ -19,7 +19,7 @@ export function registerEnsureCommand(program: Command, runtime: CliRuntime): vo
         .addOption(offlineOption());
 
     command.action(async (options: EnsureOptions): Promise<void> => {
-        const project = createProjectContext(runtime, options);
+        const project = createProjectContext(runtime, 'ensure', options);
 
         if (project.context === null) {
             runtime.exitCode = project.error;

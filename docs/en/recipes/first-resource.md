@@ -11,7 +11,7 @@ The smallest resource that starts, logs, and stops cleanly.
 
 ```
 luam-docs-first-resource/
-├── luam.json
+├── .luam.manifest
 └── src/
     └── server/
         └── main.luam
@@ -19,7 +19,7 @@ luam-docs-first-resource/
 
 ## Source
 
-<<< @/snippets/first-resource/luam.json
+<<< @/snippets/first-resource/.luam.manifest{js}
 
 <<< @/snippets/first-resource/src/server/main.luam
 
@@ -70,7 +70,7 @@ The generated manifest:
 <<< @/snippets/output/first-resource.meta.xml{xml}
 
 Note what the compiler did on its own: the `<info>` attributes come from
-`luam.json`, the helper is listed before your code, and the server entry carries
+`.luam.manifest`, the helper is listed before your code, and the server entry carries
 neither `type` nor `cache` because both equal the MTA default. `min_mta_version`
 is absent because this capture runs with `--offline`.
 

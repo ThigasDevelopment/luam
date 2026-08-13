@@ -1,0 +1,2 @@
+name = 'luam-docs-environment-configuration'
+description = 'Deployment values declared in .env and read through process.env.'

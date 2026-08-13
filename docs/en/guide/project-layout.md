@@ -4,7 +4,7 @@
 
 ```
 my-resource/
-├── luam.json          project manifest, the only file luam init writes
+├── .luam.manifest          project manifest, the only file luam init writes
 ├── .env               deployment keys and their defaults, committed
 ├── .env.local         local overrides, never committed
 ├── config.lua         plain Lua the resource author owns, copied verbatim
@@ -15,7 +15,7 @@ my-resource/
     └── client/        runs on every client only
 ```
 
-Only `luam.json` and at least one source file are required. Everything else is
+Only `.luam.manifest` and at least one source file are required. Everything else is
 optional and appears in the output only when it exists.
 
 ### The folder decides the environment
@@ -65,20 +65,27 @@ trees, manifests, and overrides.
   segment is rejected with `config-escaping-path`.
 - Two sources that would produce the same output path fail the build with
   `project-duplicate-output`. Rename one of them.
-- `name` in `luam.json` names the output folder and the resource `ensure`
+- `name` in `.luam.manifest` names the output folder and the resource `ensure`
   restarts. It never reaches `meta.xml` — MTA reads a resource's name from its
   folder.
+
+## What the CLI writes beside the project
+
+`build` caches the latest MTA release it looked up in `.luam/mta-version.json`, so
+a later build with no network still succeeds. That is the only thing the CLI
+writes outside `outDir`, and it is generated — ignore `.luam/` in version control.
+
+There is no settings snapshot. The language server reads `.luam.manifest`
+directly, so a change to `oop` takes effect as soon as the file is saved.
 
 ## Configuring the layout
 
 Every directory above is a default you can change in
-[`luam.json`](/en/tooling/luam-json):
+[`.luam.manifest`](/en/tooling/luam-manifest):
 
-```json
-{
-    "name": "my-resource",
-    "sourceDirs": ["src"],
-    "assetDirs": ["assets"],
-    "outDir": "build"
-}
+```luam
+name = 'my-resource'
+sourceDirs = { 'src' }
+assetDirs = { 'assets' }
+outDir = 'build'
 ```

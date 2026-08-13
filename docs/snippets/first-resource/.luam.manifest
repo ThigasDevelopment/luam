@@ -1,0 +1,4 @@
+name = 'luam-docs-first-resource'
+author = 'Thigas'
+version = '1.0.0'
+description = 'The smallest resource the manual builds.'

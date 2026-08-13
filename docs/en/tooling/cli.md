@@ -4,7 +4,7 @@
 luam <command> [options]
 ```
 
-Project commands read `luam.json` from the current directory, or from `--cwd`.
+Project commands read `.luam.manifest` from the current directory, or from `--cwd`.
 `setup`, `doctor` and `init` do not require an existing project.
 
 Every option belongs to the commands that read it. An option a command does not
@@ -19,7 +19,7 @@ luam help trace
 
 | Command | What it does |
 | --- | --- |
-| [`init`](#luam-init) | Scaffolds `luam.json`. |
+| [`init`](#luam-init) | Scaffolds `.luam.manifest`. |
 | [`check`](#luam-check) | Compiles and reports diagnostics. Writes nothing. |
 | [`build`](#luam-build) | Compiles and writes the resource into `<outDir>/<name>`. |
 | [`ensure`](#luam-ensure) | Builds, syncs into the MTA server, restarts, and watches. |
@@ -35,12 +35,12 @@ luam init
 luam init --name gamemode-race
 ```
 
-Writes **one file**, `luam.json`, and stops. There is no framework, no example
+Writes **one file**, `.luam.manifest`, and stops. There is no framework, no example
 tree, and nothing to delete before your first line of code.
 
 The resource name comes from `--name`, or from the project directory when that is
 a valid MTA resource name, or from `luam-resource` as a last resort. An existing
-`luam.json` is kept and reported; `--force` overwrites it.
+`.luam.manifest` is kept and reported; `--force` overwrites it.
 
 ## `luam check`
 
@@ -173,11 +173,11 @@ returns `2` and runs nothing.
 
 | Option | Owned by | Meaning |
 | --- | --- | --- |
-| `--cwd <path>` | every command | Project directory holding `luam.json`. Defaults to the current directory. |
+| `--cwd <path>` | every command | Project directory holding `.luam.manifest`. Defaults to the current directory. |
 | `--no-color` | every command | Plain output, no colour or emoji. `NO_COLOR` does the same. |
 | `-h`, `--help` | every command | Print the help text for that command. |
 | `-v`, `--version` | root only | Print the CLI version, as `luam --version`. |
-| `--config <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Load this file instead of `luam.json`. |
+| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Load this file instead of `.luam.manifest`. |
 | `--bundle` / `--no-bundle` | `build`, `ensure` | Select bundle or tree output. `dev` owns neither. |
 | `--watch` / `--no-watch` | `dev`, `ensure` | Keep watching, or run once. Both watch by default. |
 | `--no-map` | `build`, `dev`, `ensure` | Disable map generation. For `build`, also remove the existing default map after success. |
@@ -196,7 +196,8 @@ ignored the ones that did not apply. Those invocations now fail with `2`:
 | --- | --- |
 | `luam dev --bundle` | `dev` never bundled. It warned; it now fails. Use `luam build --bundle` or `luam ensure --bundle`. |
 | `luam check --offline` | `check` performs no release lookup. Drop the flag, or set `LUAM_OFFLINE` if a script needs one setting for both commands. |
-| `luam doctor --config x.json` | `doctor` and `setup` load no project. Drop the flag. |
+| `luam build --config luam.json` | `--config` became `--manifest`, and the file it points at is now a [`.luam.manifest`](/en/tooling/luam-manifest) written in the Luam manifest dialect. |
+| `luam doctor --manifest .luam.manifest` | `doctor` and `setup` load no project. Drop the flag. |
 | `luam build --version` | `--version` is a root option. Use `luam --version`. |
 | `luam trace --name x` | `--name` belongs to `init`. Drop the flag. |
 

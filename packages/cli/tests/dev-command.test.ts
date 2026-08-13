@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { deployedMapAfterBuild, runDevCommand } from '@cli/commands/dev-command';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import type { CommandContext } from '@cli/commands/command-context';
-import { validateConfig } from '@cli/config/config-validation';
+import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import type { ResourceMap } from '@compiler/project/resource';
 
@@ -15,7 +15,7 @@ const fixtures: ProjectFixture[] = [];
 
 function context(overrides: Readonly<Record<string, unknown>> = {}): { context: CommandContext; fixture: ProjectFixture } {
     const fixture = createProjectFixture(defaultProjectFiles(overrides));
-    const config = validateConfig(JSON.parse(fixture.read('luam.json')), {}).config;
+    const config = loadManifest(fixture.root).config;
 
     if (config === null) {
         throw new Error('The fixture configuration is invalid.');

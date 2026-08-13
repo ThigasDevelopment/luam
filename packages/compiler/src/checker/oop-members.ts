@@ -7,7 +7,7 @@ import { isMtaClass, mtaConstructor, mtaMember, mtaStaticMember } from './oop-cl
 import type { DeclarationRegistry, MemberInfo } from './registry';
 import type { FunctionType } from './types';
 
-const OOP_HINT = 'Set "oop": true in luam.json to enable the MTA OOP API.';
+const OOP_HINT = 'Set "oop = true" in .luam.manifest to enable the MTA OOP API.';
 
 function scopeLabel(environment: string): string {
     return environment === 'shared' ? 'shared' : `${environment}-only`;

@@ -5,8 +5,8 @@ import { canReference, type Environment } from '@compiler/environment/environmen
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
 import { pathKey, pathToUri, uriToPath } from './document-uri';
-import { loadProjectDeclarations } from './project-environment';
-import { DEFAULT_PROJECT_SETTINGS, loadProjectSettings, type ProjectSettings } from './project-settings';
+import { loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
+import { DEFAULT_PROJECT_SETTINGS, settingsFrom, type ProjectSettings } from './project-settings';
 import { scanSources } from './source-scanner';
 
 export class WorkspaceIndex {
@@ -16,6 +16,8 @@ export class WorkspaceIndex {
 
     private project: ProjectDeclarations = EMPTY_PROJECT_DECLARATIONS;
 
+    private env: Readonly<Record<string, string>> = {};
+
     private settings: ProjectSettings = DEFAULT_PROJECT_SETTINGS;
 
     private ambientFor(uri: string, environment: Environment): AmbientDeclarations {
@@ -24,7 +26,7 @@ export class WorkspaceIndex {
         return mergeAmbient(visible.map((analysis) => ambientFromRegistry(analysis.declarations)));
     }
 
-    analyze(uri: string, version: number, text: string): DocumentAnalysis {
+    private run(uri: string, version: number, text: string): DocumentAnalysis {
         const path = uriToPath(uri);
         const analysis = analyzeDocument({
             uri,
@@ -32,6 +34,7 @@ export class WorkspaceIndex {
             version,
             text,
             project: this.project,
+            env: this.env,
             oop: this.settings.oop,
             ambient: (environment) => this.ambientFor(uri, environment),
         });
@@ -41,20 +44,53 @@ export class WorkspaceIndex {
         return analysis;
     }
 
+    private manifest(): DocumentAnalysis | null {
+        return this.all().find((analysis) => analysis.manifest !== null) ?? null;
+    }
+
+    private applySettings(): boolean {
+        const settings = settingsFrom(this.manifest()?.manifest ?? null);
+
+        if (settings.oop === this.settings.oop) {
+            return false;
+        }
+
+        this.settings = settings;
+
+        return true;
+    }
+
+    analyze(uri: string, version: number, text: string): DocumentAnalysis {
+        const analysis = this.run(uri, version, text);
+
+        if (analysis.manifest === null || !this.applySettings()) {
+            return analysis;
+        }
+
+        for (const other of this.all().filter((entry) => entry.manifest === null)) {
+            this.run(other.uri, other.version, other.text);
+        }
+
+        return analysis;
+    }
+
     remove(uri: string): void {
         this.analyses.delete(pathKey(uriToPath(uri)));
     }
 
     refresh(): DocumentAnalysis[] {
+        this.applySettings();
+
         for (const analysis of this.all()) {
-            this.analyze(analysis.uri, analysis.version, analysis.text);
+            this.run(analysis.uri, analysis.version, analysis.text);
         }
 
         return this.all();
     }
 
     reloadSettings(): DocumentAnalysis[] {
-        this.settings = loadProjectSettings(this.roots);
+        this.project = loadProjectDeclarations(this.roots);
+        this.env = loadProjectEnvironment(this.roots);
 
         return this.refresh();
     }
@@ -70,13 +106,13 @@ export class WorkspaceIndex {
     others(uri: string): DocumentAnalysis[] {
         const key = pathKey(uriToPath(uri));
 
-        return this.all().filter((analysis) => pathKey(analysis.path) !== key);
+        return this.all().filter((analysis) => pathKey(analysis.path) !== key && analysis.manifest === null);
     }
 
     load(roots: readonly string[]): void {
         this.roots = roots;
         this.project = loadProjectDeclarations(roots);
-        this.settings = loadProjectSettings(roots);
+        this.env = loadProjectEnvironment(roots);
 
         const loaded: DocumentAnalysis[] = [];
 
@@ -85,11 +121,13 @@ export class WorkspaceIndex {
                 continue;
             }
 
-            loaded.push(this.analyze(pathToUri(file.path), 0, file.text));
+            loaded.push(this.run(pathToUri(file.path), 0, file.text));
         }
 
+        this.applySettings();
+
         for (const analysis of loaded) {
-            this.analyze(analysis.uri, analysis.version, analysis.text);
+            this.run(analysis.uri, analysis.version, analysis.text);
         }
     }
 }

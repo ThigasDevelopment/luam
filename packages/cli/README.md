@@ -6,7 +6,7 @@ into an MTA server, and restarting it.
 
 > **User documentation:**
 > [CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli) ·
-> [luam.json](https://thigasdevelopment.github.io/luam/en/tooling/luam-json) ·
+> [.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest) ·
 > [Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)
 > · [em português](https://thigasdevelopment.github.io/luam/pt-br/tooling/cli).
 > This file is the package-level reference for contributors.
@@ -26,8 +26,8 @@ into an MTA server, and restarting it.
 
 | Option | Meaning |
 | ------ | ------- |
-| `--cwd <path>` | Project directory that holds `luam.json`. Defaults to the current directory. |
-| `--config <path>` | Configuration file to load instead of `luam.json`. |
+| `--cwd <path>` | Project directory that holds `.luam.manifest`. Defaults to the current directory. |
+| `--manifest <path>` | Configuration file to load instead of `.luam.manifest`. |
 | `--name <name>` | Resource name for `init`. Defaults to the project directory name. |
 | `--force` | Let `init` overwrite files that already exist. |
 | `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default. |
@@ -47,12 +47,12 @@ luam init
 luam build
 ```
 
-`init` writes one file, `luam.json`. There is no framework, no example tree, and
+`init` writes one file, `.luam.manifest`. There is no framework, no example tree, and
 nothing to delete before writing your own code. The resource name comes from
 `--name`, or from the project directory when that is a valid MTA resource name,
 or from `luam-resource` as a last resort.
 
-A `luam.json` that already exists is kept and reported; pass `--force` to
+A `.luam.manifest` that already exists is kept and reported; pass `--force` to
 overwrite it.
 
 ## Exit Codes
@@ -65,42 +65,59 @@ overwrite it.
 
 ## Configuration
 
-`luam.json` sits at the project root. Only `name` is required.
+`.luam.manifest` sits at the project root. Only `name` is required.
 
-```json
-{
-    "name": "luam-demo",
-    "author": "Thigas",
-    "version": "1.0.0",
-    "description": "A demo resource",
-    "sourceDirs": ["src"],
-    "assetDirs": ["assets"],
-    "outDir": "build",
-    "loadOrder": ["src/server/index.luam", "assets/shaders/base.fx"],
-    "output": {
-        "bundle": true,
-        "map": true
+It is written in Luam, restricted to `local` declarations and assignments to
+configuration fields. A value is a literal, a table, or those combined with
+`and`, `or`, `not`, comparison, arithmetic, and concatenation — there are no
+calls and no function values, so the compiler evaluates a manifest in process and
+so does the language server. `mode` (`development` for `dev` and `ensure`,
+`production` for `build`, otherwise the command name), `env` (a table of
+`string?`), and the absolute `root` are in scope alongside the fields, which is
+how one file covers every machine:
+
+```luam
+name = 'luam-demo'
+outDir = mode == 'production' and 'build' or 'build-dev'
+```
+
+```luam
+name = 'luam-demo'
+author = 'Thigas'
+version = '1.0.0'
+description = 'A demo resource'
+
+sourceDirs = { 'src' }
+assetDirs = { 'assets' }
+outDir = 'build'
+loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
+
+output = {
+    bundle = true,
+    map = true,
+}
+
+oop = false
+helpers = { 'threads' }
+serverPath = 'C:/MTA Server'
+resourcesDir = 'mods/deathmatch/resources'
+
+development = {
+    logs = {
+        enabled = false,
+        maxMessageLength = 4096,
+        rateLimit = 30,
+        rateWindowMs = 1000,
     },
-    "oop": false,
-    "helpers": ["threads"],
-    "serverPath": "C:/MTA Server",
-    "resourcesDir": "mods/deathmatch/resources",
-    "development": {
-        "logs": {
-            "enabled": false,
-            "maxMessageLength": 4096,
-            "rateLimit": 30,
-            "rateWindowMs": 1000
-        }
-    },
-    "transport": {
-        "kind": "http",
-        "host": "127.0.0.1",
-        "port": 22005,
-        "resource": "luam-sync",
-        "username": "luam",
-        "passwordEnv": "LUAM_MTA_PASSWORD"
-    }
+}
+
+transport = {
+    kind = 'http',
+    host = '127.0.0.1',
+    port = 22005,
+    resource = 'luam-sync',
+    username = 'luam',
+    passwordEnv = 'LUAM_MTA_PASSWORD',
 }
 ```
 
@@ -108,17 +125,17 @@ overwrite it.
 | ----- | ------- | ------- |
 | `name` | required | Resource name. Names the output folder and the resource `ensure` restarts. It never reaches `meta.xml` — MTA reads the name from the folder. |
 | `author`, `version`, `description` | unset | Optional `meta.xml` info attributes. |
-| `sourceDirs` | `["src"]` | Directories scanned for `.luam` and `.d.luam` files. Non-source files here are copied but not declared. |
-| `assetDirs` | `["assets"]` | Directories copied verbatim and declared as `<file>` entries, so clients download them. |
-| `outDir` | `"build"` | Directory that receives `<outDir>/<name>`. |
-| `loadOrder` | `[]` | Source paths pinned ahead of their group in `meta.xml`. Order is meaningful, and an entry matching no file fails the build. |
+| `sourceDirs` | `{ 'src' }` | Directories scanned for `.luam` and `.d.luam` files. Non-source files here are copied but not declared. |
+| `assetDirs` | `{ 'assets' }` | Directories copied verbatim and declared as `<file>` entries, so clients download them. |
+| `outDir` | `'build'` | Directory that receives `<outDir>/<name>`. |
+| `loadOrder` | `{ }` | Source paths pinned ahead of their group in `meta.xml`. Order is meaningful, and an entry matching no file fails the build. |
 | `output.bundle` | `true` | Default `build` layout. `ensure` still defaults to tree and `dev` always uses tree. |
 | `output.map` | `true` | Generates position maps. Only `build` writes a map file. |
 | `oop` | `false` | Enables the MTA OOP API. Writes `<oop>true</oop>` and lets the checker resolve `player:getName()`. |
-| `helpers` | `[]` | Runtime helpers to copy even when no language feature requires them. |
+| `helpers` | `{ }` | Runtime helpers to copy even when no language feature requires them. |
 | `serverPath` | unset | MTA server root. `ensure` syncs the resource there. |
-| `resourcesDir` | `"mods/deathmatch/resources"` | Resource directory relative to `serverPath`. |
-| `transport` | `{ "kind": "none" }` | How `ensure` restarts the resource. |
+| `resourcesDir` | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
+| `transport` | absent | How `ensure` restarts the resource. Omitting the table means `kind = 'none'`; writing it without `kind` is `config-missing-field`. |
 | `development.logs` | disabled, safe limits | Development log capture and client relay limits. `dev` enables capture even when this section is omitted. |
 
 `outDir`, `resourcesDir`, and every `sourceDirs`, `assetDirs`, and `loadOrder`
@@ -146,7 +163,7 @@ helper is harmless and listing an unknown name is an error.
 
 `helperDir` was removed. Tree output writes helpers to `lib/<environment>` and
 bundle output includes them in environment bundles. A server-only helper is
-never downloaded by a client. A `luam.json` that still names `helperDir` fails with
+never downloaded by a client. A `.luam.manifest` that still names `helperDir` fails with
 `config-unknown-field`; delete the line.
 
 ## Transport
@@ -308,16 +325,15 @@ every save. It never writes to `<outDir>/<name>`.
 
 ### Setting it up
 
-```json
-{
-    "name": "gamemode-race",
-    "serverPath": "C:/MTA Server",
-    "transport": {
-        "kind": "http",
-        "resource": "luam-sync",
-        "username": "luam",
-        "passwordEnv": "LUAM_MTA_PASSWORD"
-    }
+```luam
+name = 'gamemode-race'
+serverPath = 'C:/MTA Server'
+
+transport = {
+    kind = 'http',
+    resource = 'luam-sync',
+    username = 'luam',
+    passwordEnv = 'LUAM_MTA_PASSWORD',
 }
 ```
 
@@ -419,17 +435,16 @@ helper validates types and length, limits each client to `rateLimit` records per
 never selectable through `helpers`, never written by `build` or `ensure`, and
 are removed by the next normal sync.
 
-```json
-{
-    "name": "gamemode-race",
-    "serverPath": "C:/MTA Server",
-    "development": {
-        "logs": {
-            "maxMessageLength": 2048,
-            "rateLimit": 20,
-            "rateWindowMs": 1000
-        }
-    }
+```luam
+name = 'gamemode-race'
+serverPath = 'C:/MTA Server'
+
+development = {
+    logs = {
+        maxMessageLength = 2048,
+        rateLimit = 20,
+        rateWindowMs = 1000,
+    },
 }
 ```
 

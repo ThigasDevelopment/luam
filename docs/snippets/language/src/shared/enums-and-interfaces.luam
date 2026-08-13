@@ -13,9 +13,9 @@ class Round implements Describable {
     label: string = 'round'
     state: number = MatchState.LOBBY
 
-    describe(): string {
+    describe = function (): string
         return self.label .. ':' .. tostring(self.state)
-    }
+    end
 }
 
 function startRound(): string

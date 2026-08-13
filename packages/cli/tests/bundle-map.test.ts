@@ -7,7 +7,7 @@ import { EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
-import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
@@ -68,7 +68,7 @@ describe('bundle and map output', () => {
 
     it('uses fixed bundle paths for custom source directories and omits an empty client bundle', async () => {
         const fixture = createProjectFixture({
-            'luam.json': `${JSON.stringify({ name: 'luam-demo', sourceDirs: ['code'], output: { bundle: true, map: true } }, null, 4)}\n`,
+            [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', sourceDirs: ['code'], output: { bundle: true, map: true } }),
             'code/shared/config.luam': "#!shared\nlocal name: string = 'demo'\n",
             'code/server/main.luam': '#!server\nprint(1)\n',
         });
@@ -116,7 +116,7 @@ describe('bundle and map output', () => {
         fixture.write('code/server/main.luam', `#!server\n${fixture.read('src/server/main.luam')}`);
         fixture.write('code/client/hud.luam', `#!client\n${fixture.read('src/client/hud.luam')}`);
         fixture.remove('src');
-        fixture.write('luam.json', `${JSON.stringify({ name: 'luam-demo', sourceDirs: ['code'], output: { bundle: false, map: true } }, null, 4)}\n`);
+        fixture.write(MANIFEST_FILE, manifestSource({ name: 'luam-demo', sourceDirs: ['code'], output: { bundle: false, map: true } }));
 
         await runCli(['build', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger });
 
@@ -156,7 +156,7 @@ describe('bundle and map output', () => {
         },
     ])('reports the $name and leaves no build output', async ({ message, path = 'src/server/main.luam', source }) => {
         const fixture = createProjectFixture({
-            'luam.json': `${JSON.stringify({ name: 'luam-demo', output: { bundle: true, map: true } }, null, 4)}\n`,
+            [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', output: { bundle: true, map: true } }),
             [path]: source,
         });
         const logger = createMemoryLogger();

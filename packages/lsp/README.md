@@ -41,8 +41,17 @@ globals from `shared` modules, never from `client` modules.
 ## Workspace
 
 On `initialize` the server scans the workspace folders for `.luam` files and
-analyzes them. Open documents always win over the scanned copy, so unsaved edits
-drive diagnostics and navigation immediately.
+`.luam.manifest` files and analyzes them. Open documents always win over the
+scanned copy, so unsaved edits drive diagnostics and navigation immediately.
+
+A manifest is analyzed in manifest mode: it is parsed, checked, and evaluated
+against the field catalog, and it gets completion and hover for every field
+instead of the environment checks a source file gets. The dialect has no calls
+and no function values, so evaluating one is pure and total — the server starts
+when a folder is opened, before anyone has read the checkout, and it never runs
+project code. Project settings come from that analysis directly, so a change to
+`oop` rechecks the affected open documents on the next edit. A missing or invalid
+manifest means the defaults, with `oop` off.
 
 ## Running
 

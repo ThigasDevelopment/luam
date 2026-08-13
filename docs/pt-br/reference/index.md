@@ -9,7 +9,7 @@ linguagem realmente aceita.
 | [Palavras-chave](/pt-br/reference/keywords) | As 21 palavras-chave reservadas de Lua e as 10 que o Luam adiciona. |
 | [Operadores](/pt-br/reference/operators) | Cada operador e cada pontuação de tipo, com precedência. |
 | [Diretivas](/pt-br/reference/directives) | `#!strict`, `#!nonstrict`, `#!nocheck`, `#!server`, `#!client`, `#!shared`. |
-| [Campos de configuração](/pt-br/reference/configuration-fields) | Cada campo do `luam.json`, seu padrão e sua validação. |
+| [Campos de configuração](/pt-br/reference/configuration-fields) | Cada campo do `.luam.manifest`, seu padrão e sua validação. |
 | [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts) | Bundles de produção, árvores de desenvolvimento, mapas e resolução de traces. |
 | [Diagnósticos](/pt-br/reference/diagnostics) | Cada código de diagnóstico, agrupado pelo estágio que o produz. |
 | [Limitações](/pt-br/reference/limitations) | O que o compilador deliberadamente não faz. |
@@ -34,4 +34,4 @@ O prefixo nomeia o estágio que rejeitou o arquivo:
 | `check-` | Verificação de tipos. |
 | `project-` | Montagem do resource a partir de vários módulos. |
 | `build-` | Descoberta de fontes e leitura de arquivos. |
-| `config-` | Carregamento do `luam.json`. |
+| `config-` | Carregamento do `.luam.manifest`. |

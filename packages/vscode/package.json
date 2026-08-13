@@ -32,7 +32,7 @@
     ],
     "activationEvents": [
         "workspaceContains:**/*.luam",
-        "workspaceContains:luam.json"
+        "workspaceContains:.luam.manifest"
     ],
     "contributes": {
         "languages": [
@@ -50,6 +50,23 @@
                     "light": "./icons/luam-file-light.svg",
                     "dark": "./icons/luam-file-dark.svg"
                 }
+            },
+            {
+                "id": "luam-manifest",
+                "aliases": [
+                    "Luam Manifest"
+                ],
+                "filenames": [
+                    ".luam.manifest"
+                ],
+                "extensions": [
+                    ".luam.manifest"
+                ],
+                "configuration": "./manifest-language-configuration.json",
+                "icon": {
+                    "light": "./icons/luam-manifest-light.svg",
+                    "dark": "./icons/luam-manifest-dark.svg"
+                }
             }
         ],
         "grammars": [
@@ -57,9 +74,20 @@
                 "language": "luam",
                 "scopeName": "source.luam",
                 "path": "./syntaxes/luam.tmLanguage.json"
+            },
+            {
+                "language": "luam-manifest",
+                "scopeName": "source.luam-manifest",
+                "path": "./syntaxes/luam-manifest.tmLanguage.json"
             }
         ],
         "commands": [
+            {
+                "command": "luam.build",
+                "title": "Luam: Build",
+                "category": "Luam",
+                "icon": "$(play)"
+            },
             {
                 "command": "luam.ensure",
                 "title": "Luam: Ensure Resource",
@@ -71,6 +99,15 @@
                 "category": "Luam"
             }
         ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "luam.build",
+                    "when": "editorLangId == luam",
+                    "group": "navigation"
+                }
+            ]
+        },
         "keybindings": [
             {
                 "command": "luam.ensure",

@@ -11,6 +11,10 @@ const errorsRoot = join(snippetsRoot, 'errors');
 const outputRoot = join(snippetsRoot, 'output');
 const defaultCli = join(repositoryRoot, 'packages', 'cli', 'dist', 'luam.mjs');
 
+const MANIFEST_FILE = '.luam.manifest';
+
+const RESOURCE_NAME = /^name\s*=\s*'([^']+)'/m;
+
 const write = process.argv.includes('--write');
 
 interface Capture {
@@ -30,7 +34,7 @@ function projects(root: string): string[] {
     }
 
     return readdirSync(root, { withFileTypes: true })
-        .filter((entry) => entry.isDirectory() && existsSync(join(root, entry.name, 'luam.json')))
+        .filter((entry) => entry.isDirectory() && existsSync(join(root, entry.name, MANIFEST_FILE)))
         .map((entry) => entry.name)
         .sort();
 }
@@ -43,9 +47,14 @@ function run(cli: string, command: string, cwd: string): { output: string; statu
 }
 
 function resourceName(project: string): string {
-    const manifest = JSON.parse(readFileSync(join(snippetsRoot, project, 'luam.json'), 'utf8')) as { name: string };
+    const source = readFileSync(join(snippetsRoot, project, MANIFEST_FILE), 'utf8');
+    const found = RESOURCE_NAME.exec(source);
 
-    return manifest.name;
+    if (found?.[1] === undefined) {
+        throw new Error(`docs/snippets/${project}/${MANIFEST_FILE} declares no resource name.`);
+    }
+
+    return found[1];
 }
 
 function fileTree(root: string): string {

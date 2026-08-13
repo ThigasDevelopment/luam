@@ -4,7 +4,7 @@
 
 ```
 my-resource/
-├── luam.json          manifesto do projeto, o único arquivo que luam init escreve
+├── .luam.manifest          manifesto do projeto, o único arquivo que luam init escreve
 ├── .env               chaves de implantação e seus padrões, versionado
 ├── .env.local         sobrescritas locais, nunca versionado
 ├── config.lua         Lua puro que pertence ao autor do resource, copiado como está
@@ -15,7 +15,7 @@ my-resource/
     └── client/        roda apenas nos clientes
 ```
 
-Só `luam.json` e pelo menos um arquivo de código são obrigatórios. Todo o resto é
+Só `.luam.manifest` e pelo menos um arquivo de código são obrigatórios. Todo o resto é
 opcional e aparece na saída apenas quando existe.
 
 ### A pasta decide o ambiente
@@ -65,20 +65,28 @@ duas árvores completas, manifestos e sobrescritas.
   absoluto ou um segmento `..` é rejeitado com `config-escaping-path`.
 - Dois fontes que produziriam o mesmo caminho de saída falham o build com
   `project-duplicate-output`. Renomeie um deles.
-- `name` no `luam.json` nomeia a pasta de saída e o resource que o `ensure`
+- `name` no `.luam.manifest` nomeia a pasta de saída e o resource que o `ensure`
   reinicia. Ele nunca chega ao `meta.xml` — o MTA lê o nome de um resource a
   partir da pasta.
+
+## O que a CLI escreve ao lado do projeto
+
+O `build` guarda em `.luam/mta-version.json` a última versão do MTA que consultou,
+para que um build posterior sem rede ainda tenha sucesso. É a única coisa que a
+CLI escreve fora do `outDir`, e ela é gerada — ignore `.luam/` no controle de
+versão.
+
+Não há snapshot de configuração. O servidor de linguagem lê o `.luam.manifest`
+diretamente, então uma mudança em `oop` passa a valer assim que o arquivo é salvo.
 
 ## Configurando a estrutura
 
 Cada diretório acima é um padrão que você pode mudar no
-[`luam.json`](/pt-br/tooling/luam-json):
+[`.luam.manifest`](/pt-br/tooling/luam-manifest):
 
-```json
-{
-    "name": "my-resource",
-    "sourceDirs": ["src"],
-    "assetDirs": ["assets"],
-    "outDir": "build"
-}
+```luam
+name = 'my-resource'
+sourceDirs = { 'src' }
+assetDirs = { 'assets' }
+outDir = 'build'
 ```

@@ -9,11 +9,15 @@ export const CLIENT_NAME = 'Luam Language Server';
 
 export const LANGUAGE_ID = 'luam';
 
+export const MANIFEST_LANGUAGE_ID = 'luam-manifest';
+
 export const SERVER_MODULE = join('dist', 'server', 'luam-lsp.cjs');
 
 export const SOURCE_PATTERN = '**/*.luam';
 
-export const CONFIG_PATTERN = '**/luam.json';
+export const MANIFEST_PATTERN = '**/.luam.manifest';
+
+export const ENVIRONMENT_PATTERN = '**/.env';
 
 export function serverModulePath(context: ExtensionContext): string {
     return context.asAbsolutePath(SERVER_MODULE);
@@ -28,8 +32,17 @@ export function createServerOptions(modulePath: string): ServerOptions {
 
 export function createClientOptions(): LanguageClientOptions {
     return {
-        documentSelector: [{ scheme: 'file', language: LANGUAGE_ID }],
-        synchronize: { fileEvents: [workspace.createFileSystemWatcher(SOURCE_PATTERN), workspace.createFileSystemWatcher(CONFIG_PATTERN)] },
+        documentSelector: [
+            { scheme: 'file', language: LANGUAGE_ID },
+            { scheme: 'file', language: MANIFEST_LANGUAGE_ID },
+        ],
+        synchronize: {
+            fileEvents: [
+                workspace.createFileSystemWatcher(SOURCE_PATTERN),
+                workspace.createFileSystemWatcher(MANIFEST_PATTERN),
+                workspace.createFileSystemWatcher(ENVIRONMENT_PATTERN),
+            ],
+        },
     };
 }
 

@@ -40,7 +40,7 @@ export const ptBR: LocaleStrings = {
         'mta/security': 'Fronteiras de segurança',
         'tooling/index': 'Visão geral',
         'tooling/cli': 'Comandos da CLI',
-        'tooling/luam-json': 'luam.json',
+        'tooling/luam-manifest': '.luam.manifest',
         'tooling/editors': 'Editores',
         'tooling/language-server': 'Servidor de linguagem',
         'tooling/ci-and-deployment': 'CI e implantação',

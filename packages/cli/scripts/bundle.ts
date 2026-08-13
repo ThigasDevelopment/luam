@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { build } from 'esbuild';
@@ -22,6 +22,8 @@ function packageVersion(): string {
 }
 
 mkdirSync(distDir, { recursive: true });
+rmSync(`${distDir}/lua`, { recursive: true, force: true });
+rmSync(`${distDir}/template`, { recursive: true, force: true });
 cpSync(luaDir, `${distDir}/lua`, { recursive: true });
 cpSync(templateDir, `${distDir}/template`, { recursive: true });
 cpSync(`${workspaceRoot}/README.md`, `${distDir}/README.md`);

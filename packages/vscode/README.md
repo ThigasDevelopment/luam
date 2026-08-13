@@ -34,8 +34,16 @@ TextMate grammar that highlights Luam source.
 ## Activation
 
 The extension activates when the workspace contains a `.luam` file or a
-`luam.json`. It selects `file`-scheme documents with the `luam` language id and
-watches `**/*.luam` so the server sees files that change outside the editor.
+`.luam.manifest`. It selects `file`-scheme documents with the `luam` and
+`luam-manifest` language ids, and watches `**/*.luam`, `**/.luam.manifest` and
+`**/.env` so the server sees files that change outside the editor.
+
+The manifest dialect has no calls and no function values, so the server evaluates
+it in process and opening a folder never runs project code.
+
+`.luam.manifest` gets its own `luam-manifest` file association, with dedicated
+light and dark document icons, `#` comment configuration, and its own grammar for
+the dialect. The `.luam` language, its grammar, and its icon are untouched by it.
 
 ## Building
 

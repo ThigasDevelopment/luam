@@ -1,10 +1,10 @@
-import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { LanguageService } from '@lsp/server/language-service';
 import { normalizeFsPath, pathToUri, uriToPath } from '@lsp/workspace/document-uri';
+import { isManifestPath } from '@lsp/workspace/project-settings';
 import { scanSources } from '@lsp/workspace/source-scanner';
 
 import { createWorkspace, positionOf, removeWorkspace, uriFor } from './support/service-fixture';
@@ -121,17 +121,40 @@ describe('workspace loading', () => {
     });
 
     it('rechecks documents after the OOP setting changes', () => {
-        const root = workspace({ 'luam.json': '{"oop":true}', 'src/server/main.luam': 'class Player {\n}\n' });
+        const root = workspace({ '.luam.manifest': "name = 'demo'\noop = true\n", 'src/server/main.luam': 'class Player {\n}\n' });
         const service = new LanguageService();
         const uri = uriFor(root, 'src/server/main.luam');
 
         service.loadWorkspace([root]);
         expect(service.diagnostics(uri).map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
 
-        writeFileSync(join(root, 'luam.json'), '{"oop":false}', 'utf8');
-        service.reloadSettings();
+        service.update(uriFor(root, '.luam.manifest'), 2, "name = 'demo'\noop = false\n");
 
         expect(service.diagnostics(uri)).toEqual([]);
+    });
+
+    it('reads the OOP setting from the workspace manifest', () => {
+        const root = workspace({ '.luam.manifest': "name = 'demo'\noop = true\n", 'src/server/main.luam': 'class Player {\n}\n' });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        expect(service.diagnostics(uriFor(root, 'src/server/main.luam')).map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
+    });
+
+    it('falls back to the defaults when the manifest omits the flag', () => {
+        const root = workspace({ '.luam.manifest': "name = 'demo'\n", 'src/server/main.luam': 'class Player {\n}\n' });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        expect(service.diagnostics(uriFor(root, 'src/server/main.luam'))).toEqual([]);
+    });
+
+    it('recognizes a manifest by its file name', () => {
+        expect(isManifestPath(join('project', '.luam.manifest'))).toBe(true);
+        expect(isManifestPath(join('project', 'deploy.luam.manifest'))).toBe(true);
+        expect(isManifestPath(join('project', 'src', 'server', 'main.luam'))).toBe(false);
     });
 
     it('drops declarations from a deleted file before refreshing diagnostics', () => {

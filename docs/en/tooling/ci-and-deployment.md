@@ -40,7 +40,7 @@ transcript carries no control characters. `--no-color` forces that anywhere.
 | --- | --- | --- |
 | `0` | Succeeded | The job passes. |
 | `1` | Diagnostics reported | The job fails. |
-| `2` | Command line or configuration invalid | Fix the workflow or `luam.json`. |
+| `2` | Command line or configuration invalid | Fix the workflow or `.luam.manifest`. |
 
 ## Producing a resource artifact
 

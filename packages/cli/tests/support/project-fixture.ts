@@ -2,6 +2,11 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
+import { analyzeManifest } from '@compiler/manifest/manifest-analysis';
+
+import type { LuamConfig } from '@cli/config/config-schema';
+import { validateConfig } from '@cli/config/config-validation';
+
 export interface ProjectFixture {
     root: string;
     write(path: string, contents: string): void;
@@ -65,9 +70,48 @@ export function createProjectFixture(files: Readonly<Record<string, string>> = {
     return fixture;
 }
 
+export const MANIFEST_FILE = '.luam.manifest';
+
+function manifestValue(value: unknown, indent: string): string {
+    if (typeof value === 'string') {
+        return `'${value.replace(/(['\\])/g, '\\$1')}'`;
+    }
+
+    if (Array.isArray(value)) {
+        return `{ ${value.map((entry) => manifestValue(entry, indent)).join(', ')} }`;
+    }
+
+    if (typeof value === 'object' && value !== null) {
+        const inner = `${indent}    `;
+        const fields = Object.entries(value).map(([key, entry]) => `${inner}${key} = ${manifestValue(entry, inner)},`);
+
+        return ['{', ...fields, `${indent}}`].join('\n');
+    }
+
+    return String(value);
+}
+
+export function manifestSource(config: Readonly<Record<string, unknown>>): string {
+    return `${Object.entries(config)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => `${key} = ${manifestValue(value, '')}`)
+        .join('\n')}\n`;
+}
+
+export function manifestConfig(config: Readonly<Record<string, unknown>>, env: Readonly<Record<string, string>> = {}): LuamConfig {
+    const analysis = analyzeManifest(manifestSource(config), { mode: 'check', root: '/project', env });
+    const validated = validateConfig(analysis.value, analysis.positions, env);
+
+    if (validated.config === null) {
+        throw new Error(`The fixture manifest is invalid: ${[...analysis.diagnostics, ...validated.diagnostics].map((entry) => entry.message).join(' ')}`);
+    }
+
+    return validated.config;
+}
+
 export function defaultProjectFiles(config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     return {
-        'luam.json': `${JSON.stringify({ name: 'luam-demo', output: { bundle: false, map: true }, ...config }, null, 4)}\n`,
+        [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', output: { bundle: false, map: true }, ...config }),
         'src/shared/config.luam': VALID_SHARED,
         'src/server/main.luam': VALID_SERVER,
         'src/client/hud.luam': VALID_CLIENT,

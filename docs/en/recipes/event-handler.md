@@ -11,7 +11,7 @@ that owns the event.
 
 ```
 luam-docs-event-handler/
-├── luam.json
+├── .luam.manifest
 └── src/
     ├── server/join-listener.luam
     └── client/render-listener.luam
@@ -19,7 +19,7 @@ luam-docs-event-handler/
 
 ## Source
 
-<<< @/snippets/event-handler/luam.json
+<<< @/snippets/event-handler/.luam.manifest{js}
 
 <<< @/snippets/event-handler/src/server/join-listener.luam
 

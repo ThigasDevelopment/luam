@@ -1,6 +1,6 @@
-import { readTemplateSource } from '@cli/scaffold/template-files';
 import type { InitProjectDetails } from '@cli/commands/init-prompt';
-import { CONFIG_FILE_NAME } from '@cli/config/config-schema';
+import { renderManifest } from '@cli/scaffold/manifest-template';
+import { readTemplateSource } from '@cli/scaffold/template-files';
 import { TEMPLATE_FILES, type TemplateFile } from '@template/template';
 
 export interface ScaffoldFile {
@@ -13,30 +13,14 @@ export interface ScaffoldPlan {
     files: ScaffoldFile[];
 }
 
-function renderConfig(source: string, details: InitProjectDetails): string {
-    const parsed: unknown = JSON.parse(source);
-    const config = typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {};
-    const { name: _name, version: _version, description: _description, author: _author, ...template } = config;
-
-    const metadata = {
-        ...template,
-        name: details.name,
-        version: details.version,
-        ...(details.description === null ? {} : { description: details.description }),
-        ...(details.author === null ? {} : { author: details.author }),
-    };
-
-    return `${JSON.stringify(metadata, null, 4)}\n`;
-}
-
 function renderFile(file: TemplateFile, details: InitProjectDetails): ScaffoldFile {
     const source = readTemplateSource(file.source);
 
-    if (file.path !== CONFIG_FILE_NAME) {
+    if (file.kind !== 'manifest') {
         return { path: file.path, content: source };
     }
 
-    return { path: file.path, content: renderConfig(source, details) };
+    return { path: file.path, content: renderManifest(source, details) };
 }
 
 export function buildScaffoldPlan(details: InitProjectDetails): ScaffoldPlan {

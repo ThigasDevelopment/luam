@@ -9,7 +9,7 @@ actually accepts.
 | [Keywords](/en/reference/keywords) | The 21 reserved Lua keywords and the 10 Luam adds. |
 | [Operators](/en/reference/operators) | Every operator and every piece of type punctuation, with precedence. |
 | [Directives](/en/reference/directives) | `#!strict`, `#!nonstrict`, `#!nocheck`, `#!server`, `#!client`, `#!shared`. |
-| [Configuration fields](/en/reference/configuration-fields) | Every `luam.json` field, its default, and its validation. |
+| [Configuration fields](/en/reference/configuration-fields) | Every `.luam.manifest` field, its default, and its validation. |
 | [Output layouts and source maps](/en/reference/output-layouts) | Production bundles, development trees, map files, and trace resolution. |
 | [Diagnostics](/en/reference/diagnostics) | Every diagnostic code, grouped by the stage that produces it. |
 | [Limitations](/en/reference/limitations) | What the compiler deliberately does not do. |
@@ -33,4 +33,4 @@ The prefix names the stage that rejected the file:
 | `check-` | Type checking. |
 | `project-` | Assembling the resource from several modules. |
 | `build-` | Discovering sources and reading files. |
-| `config-` | Loading `luam.json`. |
+| `config-` | Loading `.luam.manifest`. |

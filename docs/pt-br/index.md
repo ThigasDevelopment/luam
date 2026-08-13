@@ -67,6 +67,6 @@ do Lua gerado.
 | Construir o primeiro resource | [Início rápido](/pt-br/guide/quick-start) |
 | Entender o sistema de tipos | [Tipos](/pt-br/language/types) |
 | Saber qual API do MTA um arquivo pode chamar | [Ambientes](/pt-br/mta/environments) |
-| Configurar um projeto | [luam.json](/pt-br/tooling/luam-json) |
+| Configurar um projeto | [.luam.manifest](/pt-br/tooling/luam-manifest) |
 | Copiar um exemplo que funciona | [Receitas](/pt-br/recipes/) |
 | Consultar uma palavra-chave ou um diagnóstico | [Referência](/pt-br/reference/) |

@@ -16,7 +16,7 @@ O prefixo nomeia o estágio que o produziu.
 | `check-` | Verificação de tipos. |
 | `project-` | Montagem do resource a partir de vários módulos. |
 | `build-` | Descoberta de fontes e leitura de arquivos. |
-| `config-` | Carregamento do `luam.json`. |
+| `config-` | Carregamento do `.luam.manifest`. |
 
 Um **warning** nunca falha um build. Um **error** falha, e um build com qualquer
 erro não escreve nada.
@@ -48,6 +48,7 @@ erro não escreve nada.
 | `parse-duplicate-key` | Um tipo de objeto declara a mesma chave mais de uma vez. |
 | `parse-unexpected-decorator` | Um decorador onde nenhum pode aparecer. |
 | `parse-decorator-arguments` | Um decorador recebeu argumentos. Ele não aceita nenhum. |
+| `parse-class-method-form` | Um membro de classe foi escrito como `name(...) { ... }`. A forma é `name = function (...) ... end`. |
 
 ## Ambiente
 
@@ -152,14 +153,15 @@ erro não escreve nada.
 
 | Código | Significado |
 | --- | --- |
-| `config-not-found` | Nenhum `luam.json` no diretório. |
-| `config-unreadable` | O arquivo existe, mas não pôde ser lido. |
-| `config-invalid-json` | O arquivo não é JSON válido. |
-| `config-missing-field` | Um campo obrigatório — `name` — está ausente. |
+| `config-not-found` | Nenhum `.luam.manifest` no diretório. |
+| `config-unsupported-manifest` | O arquivo selecionado não é um `.luam.manifest`. |
+| `config-unreadable-manifest` | O arquivo não pôde ser lido. |
+| `config-invalid-statement` | Uma instrução que o dialeto do manifesto não permite. Apenas declarações `local` e atribuições a campos de configuração. |
+| `config-invalid-expression` | Um valor que a linguagem de expressões do manifesto não permite — uma chamada, uma função, um índice por algo que não seja um nome. |
+| `config-missing-field` | Um campo obrigatório — `name`, ou `transport.kind` quando `transport` é escrito — está ausente. |
 | `config-invalid-name` | `name` não é um nome válido de resource do MTA. |
 | `config-invalid-type` | Um campo tem o tipo errado. |
-| `config-unknown-field` | Um campo não é reconhecido. Inclui o removido `helperDir`. |
-| `config-invalid-root` | A raiz do projeto não pôde ser resolvida. |
+| `config-unknown-field` | Um nome não é um campo de configuração. Inclui o removido `helperDir`. |
 | `config-escaping-path` | Um caminho é absoluto ou contém um segmento `..`. |
 | `config-unknown-helper` | `helpers` nomeia um helper inexistente. |
 | `config-invalid-transport` | O bloco de transporte tem formato inválido. |

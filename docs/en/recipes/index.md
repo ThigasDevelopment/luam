@@ -35,5 +35,5 @@ See [Installation](/en/guide/installation) if either command fails.
 ## Naming
 
 Recipe projects are named `luam-docs-<recipe>` so they never collide with a
-resource you already run. Rename `name` in `luam.json`, and the output folder
+resource you already run. Rename `name` in `.luam.manifest`, and the output folder
 follows.

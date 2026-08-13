@@ -40,7 +40,7 @@ are stable.
 ## Operating systems
 
 Windows, macOS and Linux are supported for the CLI and the editor extension. Path
-handling normalizes separators, so a `luam.json` written on one platform works on
+handling normalizes separators, so a `.luam.manifest` written on one platform works on
 another.
 
 `serverPath` points at the MTA server root on the machine running the CLI, so

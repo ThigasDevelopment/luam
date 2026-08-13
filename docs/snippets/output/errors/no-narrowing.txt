@@ -1,6 +1,6 @@
 Discovery: done in 1 ms.
-Compile: 1 file in 9 ms.
+Compile: 1 file in 7 ms.
 Assembly: failed in 0 ms.
 src/server/heal.luam:1:68 error parse-optional-position: Write optional parameters as "name?: Type", not "name: Type?".
 src/server/heal.luam:2:48 error check-type-mismatch: Variable "requested" expects "number" but received "number? | number".
-Check failed: 2 errors, 0 warnings in 11 ms.
+Check failed: 2 errors, 0 warnings in 9 ms.

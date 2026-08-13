@@ -17,7 +17,7 @@ export async function runDevCommand(context: CommandContext, options: EnsureOpti
     let map: ResourceMap | null = null;
 
     if (context.config.serverPath === null) {
-        reporter.error('luam dev requires "serverPath" in luam.json.');
+        reporter.error('luam dev requires "serverPath" in .luam.manifest.');
 
         return EXIT_DIAGNOSTICS;
     }

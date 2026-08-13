@@ -1,0 +1,2 @@
+name = 'luam-docs-server-command'
+description = 'A chat command handled on the server.'

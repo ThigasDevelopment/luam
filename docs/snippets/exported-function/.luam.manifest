@@ -1,0 +1,2 @@
+name = 'luam-docs-exported-function'
+description = 'Functions other resources may call through MTA exports.'
