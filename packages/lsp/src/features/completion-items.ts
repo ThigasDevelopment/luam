@@ -51,6 +51,14 @@ export function constructorItem(text: string, offset: number): CompletionItem {
     };
 }
 
+export function superItem(superClass: string): CompletionItem {
+    return {
+        label: 'super',
+        kind: CompletionItemKind.Method,
+        detail: `self:super(...) — call the "${superClass}" implementation of this method`,
+    };
+}
+
 export function decoratorItems(): CompletionItem[] {
     return [...KNOWN_DECORATORS.values()].map((decorator) => ({
         label: decorator.name,

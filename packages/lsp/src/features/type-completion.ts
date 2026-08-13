@@ -1,3 +1,4 @@
+import { FUNCTION_TYPE } from '@compiler/parser/type-annotation';
 import { ELEMENT_TYPES } from '@mta-types/generated/element-types';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
@@ -131,6 +132,9 @@ export function isTypePosition(text: string, offset: number): boolean {
 export function typeItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
     const items: CompletionItem[] = PRIMITIVES.map((label) => ({ label, kind: CompletionItemKind.Keyword, detail: 'primitive type' }));
     const seen = new Set(PRIMITIVES);
+
+    items.push({ label: FUNCTION_TYPE, kind: CompletionItemKind.Keyword, detail: 'function type — fun(string, number): void' });
+    seen.add(FUNCTION_TYPE);
 
     const push = (label: string, kind: CompletionItemKind, detail: string): void => {
         if (seen.has(label)) {

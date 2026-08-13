@@ -3,7 +3,7 @@ import type { TokenStream } from './token-stream';
 
 const TYPE_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
 
-const FUNCTION_TYPE = 'fun';
+export const FUNCTION_TYPE = 'fun';
 
 function parseTypeName(stream: TokenStream): TypeAnnotation {
     const token = stream.current();

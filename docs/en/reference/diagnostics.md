@@ -89,6 +89,8 @@ writes nothing.
 | `check-interface-cycle` | An interface inheritance cycle is declared. |
 | `check-unimplemented-interface` | A member the interface requires is missing. |
 | `check-explicit-self-parameter` | A class method explicitly declares the automatically injected `self`. |
+| `check-invalid-self` | `self` outside a class method or a `function Name:method()` declaration. |
+| `check-invalid-constructor` | A class declares `constructor` as a field instead of a method. |
 | `check-duplicate-enum` | Two enums with the same name in one file. |
 | `check-unknown-enum-member` | The enum has no such member. |
 | `check-invalid-super` | `self:super(...)` outside a class. |

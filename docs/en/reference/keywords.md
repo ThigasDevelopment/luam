@@ -84,6 +84,23 @@ local pool: table = { new = 1, type = 2, class = 3 }
 print(pool.new, pool.type, pool.class)
 ```
 
+`constructor` is the one exception inside a class body: it names the
+constructor, so it has to be a method. Declaring it as a field is
+`check-invalid-constructor`.
+
+## `self` and `super` are contextual
+
+Neither is reserved by the lexer, so both stay ordinary names outside a class.
+`self` is bound automatically inside a class method and inside a
+`function Name:method()` declaration; anywhere else it reads a global that is
+`nil`, which is `check-invalid-self`. Declaring your own `local self` is legal
+and silences the check.
+
+`super` only exists as `self:super(...)`, the parent implementation of the
+method it appears in. Outside a class method it is `check-invalid-super`, and a
+parent without that method is `check-unknown-super-method`. See
+[Classes](/en/language/classes).
+
 ## `type` stays callable
 
 `type` is a Lua 5.1 standard global. Reserving the word does not remove the

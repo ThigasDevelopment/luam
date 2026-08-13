@@ -29,6 +29,16 @@ function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     return declared;
 }
 
+function checkFieldName(context: CheckContext, member: ClassFieldDeclaration): void {
+    if (member.name !== 'constructor') {
+        return;
+    }
+
+    const message = 'A "constructor" is the class constructor, not a field. Write it as "constructor = function (...) ... end" or rename the field.';
+
+    context.report('check-invalid-constructor', message, member.position);
+}
+
 function generatedMethodType(member: ClassMethodDeclaration, fieldTypes: ReadonlyMap<ClassFieldDeclaration, Type>): Type {
     const fieldType = [...fieldTypes].find(([field]) => field.position.offset === member.position.offset)?.[1] ?? ANY_TYPE;
 
@@ -40,6 +50,7 @@ function registerMembers(context: CheckContext, info: ClassInfo, statement: Clas
 
     for (const member of statement.members) {
         if (member.kind === 'class-field') {
+            checkFieldName(context, member);
             fieldTypes.set(member, fieldType(context, member));
         }
     }

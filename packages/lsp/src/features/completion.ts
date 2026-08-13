@@ -17,6 +17,7 @@ import {
     isDecoratorPosition,
     isStatementStart,
     resolveReceiver,
+    type CompletionContext,
     type ReceiverTarget,
 } from '@lsp/features/completion-context';
 import {
@@ -30,6 +31,7 @@ import {
     libraryItems,
     memberItem,
     mtaMemberItem,
+    superItem,
     symbolItem,
 } from '@lsp/features/completion-items';
 import { eventItems, isEventArgument } from '@lsp/features/event-completion';
@@ -77,6 +79,16 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
     }
 
     return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
+}
+
+function superItems(analysis: DocumentAnalysis, target: ReceiverTarget, context: CompletionContext): CompletionItem[] {
+    if (context.trigger !== ':' || context.segments.length !== 1 || context.segments[0] !== 'self' || target.kind !== 'class') {
+        return [];
+    }
+
+    const superClass = analysis.declarations.lookupClass(target.name)?.superClass ?? null;
+
+    return superClass === null ? [] : [superItem(superClass)];
 }
 
 function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: ArgumentExpectation | null): CompletionItem[] {
@@ -177,7 +189,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         const target = resolveReceiver(analysis, offset, context.segments);
 
         if (target !== null) {
-            return deduplicate(memberItems(analysis, target, context.trigger));
+            return deduplicate([...memberItems(analysis, target, context.trigger), ...superItems(analysis, target, context)]);
         }
     }
 

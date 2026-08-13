@@ -10,6 +10,13 @@ When that version changes, the entry below says what moved.
 
 ### Changed
 
+- [Keywords](/en/reference/keywords) gains a section on `self` and `super`, the
+  two contextual names, and states that `constructor` is the one member name a
+  class must declare as a method.
+- [Language server](/en/tooling/language-server) lists where each reserved word
+  completes, including `fun` in a type annotation and `super` after `self:`.
+- [Diagnostics](/en/reference/diagnostics) lists `check-invalid-self` and
+  `check-invalid-constructor`.
 - [Output layouts](/en/reference/output-layouts) drops the `do ... end` blocks
   from the bundle description. A bundle is now the plain concatenation of its
   helpers and modules, so the page states what the shared chunk scope means for

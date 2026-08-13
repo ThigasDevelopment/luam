@@ -89,6 +89,8 @@ erro não escreve nada.
 | `check-interface-cycle` | Um ciclo de herança entre interfaces foi declarado. |
 | `check-unimplemented-interface` | Um membro exigido pela interface está faltando. |
 | `check-explicit-self-parameter` | Um método declara explicitamente o `self` que já é injetado automaticamente. |
+| `check-invalid-self` | `self` fora de um método de classe ou de uma declaração `function Nome:metodo()`. |
+| `check-invalid-constructor` | Uma classe declara `constructor` como campo em vez de método. |
 | `check-duplicate-enum` | Dois enums com o mesmo nome em um arquivo. |
 | `check-unknown-enum-member` | O enum não tem esse membro. |
 | `check-invalid-super` | `self:super(...)` fora de uma classe. |

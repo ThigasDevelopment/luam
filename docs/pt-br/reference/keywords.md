@@ -87,6 +87,23 @@ local pool: table = { new = 1, type = 2, class = 3 }
 print(pool.new, pool.type, pool.class)
 ```
 
+`constructor` é a única exceção dentro do corpo de uma classe: ele nomeia o
+construtor, então precisa ser um método. Declará-lo como campo é
+`check-invalid-constructor`.
+
+## `self` e `super` são contextuais
+
+Nenhum dos dois é reservado pelo lexer, então ambos continuam sendo nomes comuns
+fora de uma classe. `self` é vinculado automaticamente dentro de um método de
+classe e dentro de uma declaração `function Nome:metodo()`; em qualquer outro
+lugar ele lê um global que é `nil`, o que é `check-invalid-self`. Declarar o seu
+próprio `local self` é válido e desliga a verificação.
+
+`super` só existe como `self:super(...)`, a implementação do método na classe
+pai. Fora de um método de classe é `check-invalid-super`, e uma classe pai sem
+esse método é `check-unknown-super-method`. Veja
+[Classes](/pt-br/language/classes).
+
 ## `type` continua chamável
 
 `type` é um global padrão do Lua 5.1. Reservar a palavra não remove a função,

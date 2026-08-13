@@ -19,6 +19,22 @@ A completação dispara em `.` e `:` para membros: campos e métodos de classe
 `table` e as [extensões de objeto](/pt-br/language/extensions) que se aplicam ao
 tipo do receptor.
 
+### Palavras reservadas
+
+Toda palavra reservada é completada, cada uma na posição em que é válida:
+
+| O que você digitou | O que aparece |
+| --- | --- |
+| Um comando | As palavras-chave do Lua 5.1, mais `class`, `continue`, `declare`, `enum`, `export`, `interface`, `new` e `type` |
+| O corpo de uma classe | `constructor`, expandido no formato de método |
+| O cabeçalho de uma classe ou interface | `extends` e `implements` |
+| Uma anotação de tipo | Os tipos primitivos e `fun` |
+| `self:` dentro de um método de uma subclasse | `super` |
+
+`self`, `super` e `fun` são contextuais, não reservados, então a completação só
+os oferece onde eles significam algo. Veja
+[Palavras-chave](/pt-br/reference/keywords).
+
 ### Dentro do cabeçalho de uma classe
 
 A completação sabe onde está em uma declaração `class` e oferece apenas o que

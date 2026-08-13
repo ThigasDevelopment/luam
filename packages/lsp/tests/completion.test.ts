@@ -55,7 +55,7 @@ describe('completion', () => {
     });
 
     it('offers class fields after a dot on an instance', () => {
-        const text = ['class Player {', '    name: string', '    greet(): void {', '    }', '}', '', 'local one = new Player()', 'one.'].join(
+        const text = ['class Player {', '    name: string', '    greet = function (): void', '    end', '}', '', 'local one = new Player()', 'one.'].join(
             '\n',
         );
         const found = labels(new LanguageService(), SERVER_FILE, text, 'one.');
@@ -81,7 +81,7 @@ describe('completion', () => {
     });
 
     it('offers the keys of an aliased object type inside a constructor body', () => {
-        const text = ['type Args = { name: string }', 'class Teste {', '    constructor(args: Args) {', '        args.', '    }', '}'].join('\n');
+        const text = ['type Args = { name: string }', 'class Teste {', '    constructor = function (args: Args)', '        args.', '    end', '}'].join('\n');
         const found = labels(new LanguageService(), SERVER_FILE, text, 'args.');
 
         expect(found).toContain('name');
@@ -102,13 +102,37 @@ describe('completion', () => {
     });
 
     it('offers class methods after a colon on an instance', () => {
-        const text = ['class Player {', '    name: string', '    greet(): void {', '    }', '}', '', 'local one = new Player()', 'one:'].join(
+        const text = ['class Player {', '    name: string', '    greet = function (): void', '    end', '}', '', 'local one = new Player()', 'one:'].join(
             '\n',
         );
         const found = labels(new LanguageService(), SERVER_FILE, text, 'one:');
 
         expect(found).toContain('greet');
         expect(found).not.toContain('name');
+    });
+
+    it('offers super after self inside a method of a subclass', () => {
+        const base = ['class Base {', '    greet = function ()', '    end', '}', ''];
+        const child = ['class Vip extends Base {', '    greet = function ()', '        self:', '    end', '}'];
+        const found = labels(new LanguageService(), SERVER_FILE, [...base, ...child].join('\n'), 'self:');
+
+        expect(found).toContain('super');
+        expect(found).toContain('greet');
+    });
+
+    it('hides super after self when the class has no parent', () => {
+        const text = ['class Base {', '    greet = function ()', '        self:', '    end', '}'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'self:');
+
+        expect(found).not.toContain('super');
+    });
+
+    it('hides super after an instance that is not self', () => {
+        const base = ['class Base {', '    greet = function ()', '    end', '}', ''];
+        const child = ['class Vip extends Base {', '}', '', 'local vip = new Vip()', 'vip:'];
+        const found = labels(new LanguageService(), SERVER_FILE, [...base, ...child].join('\n'), 'vip:');
+
+        expect(found).not.toContain('super');
     });
 
     it('offers inherited class members', () => {

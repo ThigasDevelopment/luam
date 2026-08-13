@@ -19,6 +19,22 @@ Completion triggers on `.` and `:` for members: class fields and methods
 members, and the [object extensions](/en/language/extensions) that apply to the
 receiver's type.
 
+### Reserved words
+
+Every reserved word is completed, each in the position where it is legal:
+
+| You have typed | You get |
+| --- | --- |
+| A statement | The Lua 5.1 keywords, plus `class`, `continue`, `declare`, `enum`, `export`, `interface`, `new` and `type` |
+| A class body | `constructor`, expanded into the method form |
+| A class or interface header | `extends` and `implements` |
+| A type annotation | The primitive types and `fun` |
+| `self:` inside a method of a subclass | `super` |
+
+`self`, `super` and `fun` are contextual rather than reserved, so completion
+offers them only where they mean something. See
+[Keywords](/en/reference/keywords).
+
 ### Inside a class header
 
 Completion knows where it is in a `class` declaration and offers only what can

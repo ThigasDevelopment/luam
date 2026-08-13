@@ -212,6 +212,34 @@ describe('classes', () => {
         expect(emit(source)).toBe('local pool = { new = 1, type = 2, class = 3 }\nprint(pool.new, pool.type, pool.class)\n');
     });
 
+    it('rejects a class field named constructor', () => {
+        expect(codes('class Player {\n    constructor: number = 1\n}\n')).toEqual(['check-invalid-constructor']);
+        expect(codes('class Player {\n    constructor = bind(print, 1)\n}\n')).toEqual(['check-invalid-constructor']);
+    });
+
+    it('accepts the constructor written as a method', () => {
+        expect(codes(PLAYER)).toEqual([]);
+    });
+
+    it('rejects self outside a method', () => {
+        expect(codes('print(self)\n')).toEqual(['check-invalid-self']);
+        expect(codes('self.name = "Thigas"\n')).toEqual(['check-invalid-self']);
+        expect(codes('function greet(): void\n    print(self)\nend\n')).toEqual(['check-invalid-self']);
+    });
+
+    it('accepts self inside class methods, colon functions, and their closures', () => {
+        const body = ['    greet = function (): void', '        bind(function ()', '            print(self)', '        end, 1)', '    end'];
+        const closure = ['class Player {', ...body, '}', ''].join('\n');
+
+        expect(codes(PLAYER)).toEqual([]);
+        expect(codes('function Player:greet()\n    return self.name\nend\n')).toEqual([]);
+        expect(codes(closure)).toEqual([]);
+    });
+
+    it('keeps a local named self usable', () => {
+        expect(codes('local self: table = {}\nprint(self)\n')).toEqual([]);
+    });
+
     it('keeps the Lua "type" function callable', () => {
         expect(codes('local kind: string = type(1)\n')).toEqual([]);
         expect(emit('local kind: string = type(1)\n')).toBe('local kind = type(1)\n');

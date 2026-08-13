@@ -6,6 +6,27 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Every Reserved Word Completes
+
+Completion offered the 32 reserved words at a statement, `constructor` in a
+class body, and `extends` and `implements` in a class header, but never `fun` or
+`super` — the two contextual names, which are exactly the ones an author cannot
+guess from the grammar. Two misuses also compiled silently and failed only when
+the resource ran: `self` outside a method emitted a read of a global that is
+`nil`, and a class field named `constructor` replaced the constructor with a
+value, so `new` called it.
+
+#### Added
+
+- `fun` completes in type position, beside the primitive types.
+- `super` completes after `self:` inside a method of a class that extends
+  another, and nowhere else.
+- `check-invalid-self`, reported on `self` outside a class method and outside a
+  `function Name:method()` declaration. A `local self` and an explicit `self`
+  parameter both still resolve.
+- `check-invalid-constructor`, reported on a class member named `constructor`
+  that is declared as a field instead of as a method.
+
 ### One Class Method Form
 
 A class member could be written two ways. `name = function (...) ... end` is the

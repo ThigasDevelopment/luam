@@ -10,7 +10,7 @@ const SERVER_FILE = pathToUri('/project/src/server/main.luam');
 
 const CLIENT_FILE = pathToUri('/project/src/client/hud.luam');
 
-const ACCOUNT = ['class Account {', '    name: string', '', '    bump(amount: number): number {', '        return amount', '    }', '}', ''].join('\n');
+const ACCOUNT = ['class Account {', '    name: string', '', '    bump = function (amount: number): number', '        return amount', '    end', '}', ''].join('\n');
 
 function labels(text: string, marker: string, uri: string = SERVER_FILE): string[] {
     const service = new LanguageService();
@@ -115,6 +115,12 @@ describe('type completion', () => {
 
         expect(found).toContain('number');
         expect(found).not.toContain('outputChatBox');
+    });
+
+    it('offers the fun function type in an annotation', () => {
+        const found = labels('local handler: \n', 'local handler: ');
+
+        expect(found).toContain('fun');
     });
 
     it('keeps a statement level method call out of type position', () => {

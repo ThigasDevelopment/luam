@@ -11,6 +11,14 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
 ### Alterado
 
+- [Palavras-chave](/pt-br/reference/keywords) ganha uma seção sobre `self` e
+  `super`, os dois nomes contextuais, e diz que `constructor` é o único nome de
+  membro que uma classe precisa declarar como método.
+- [Servidor de linguagem](/pt-br/tooling/language-server) lista onde cada palavra
+  reservada é completada, incluindo `fun` em uma anotação de tipo e `super`
+  depois de `self:`.
+- [Diagnósticos](/pt-br/reference/diagnostics) lista o `check-invalid-self` e o
+  `check-invalid-constructor`.
 - [Layouts de saída](/pt-br/reference/output-layouts) deixa de descrever os
   blocos `do ... end` do bundle. Um bundle agora é a concatenação pura dos seus
   helpers e módulos, então a página diz o que o escopo de chunk compartilhado

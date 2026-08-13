@@ -12,6 +12,14 @@ function scopeLabel(environment: string): string {
 }
 
 export function checkGlobalReference(context: CheckContext, name: string, position: SourcePosition): void {
+    if (name === 'self') {
+        const message = 'A "self" is only bound inside a class method or a "function Name:method()"; here it reads a global that is "nil".';
+
+        context.report('check-invalid-self', message, position);
+
+        return;
+    }
+
     const project = context.projectEnvironmentOf(name);
 
     if (project !== null) {
