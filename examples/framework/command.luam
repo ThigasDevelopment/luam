@@ -4,14 +4,14 @@ class Command {
     aliases: string[] = {}
     description: string = ''
 
-    constructor(core: any) {
+    constructor = function (core: any)
         self.core = core
-    }
+    end
 
-    execute(player: any, ...): void {
-    }
+    execute = function (player: any, ...): void
+    end
 
-    names(): string[] {
+    names = function (): string[]
         local found: string[] = {}
 
         if self.name ~= '' then
@@ -23,9 +23,9 @@ class Command {
         end
 
         return found
-    }
+    end
 
-    handler(): any {
+    handler = function (): any
         local command: Command = self
 
         if self.core:isServer() then
@@ -37,9 +37,9 @@ class Command {
         return function(invoked: string, ...)
             command:execute(nil, ...)
         end
-    }
+    end
 
-    register(): number {
+    register = function (): number
         local registered: number = 0
         local found: string[] = self:names()
 
@@ -50,5 +50,5 @@ class Command {
         end
 
         return registered
-    }
+    end
 }

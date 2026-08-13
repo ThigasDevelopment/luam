@@ -58,9 +58,9 @@ print('done')
     @Getter
     name: string = ''
 
-    buy(): void {
+    buy = function (): void
         print(self.name)
-    }
+    end
 }
 `;
         const result = compile(source, { filePath: 'src/shared/shop.luam' });

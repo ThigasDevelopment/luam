@@ -7,13 +7,13 @@ import { compileProject } from '@compiler/project/project';
 const SHARED_CLASS = `class Config {
     name: string = ''
 
-    constructor(name: string) {
+    constructor = function (name: string)
         self.name = name
-    }
+    end
 
-    label(): string {
+    label = function (): string
         return self.name
-    }
+    end
 }
 `;
 

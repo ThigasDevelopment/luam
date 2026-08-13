@@ -7,38 +7,38 @@ class Player {
     name: string
     health: number = 100
 
-    constructor(name: string) {
+    constructor = function (name: string)
         self.name = name
-    }
+    end
 
-    takeDamage(amount: number): void {
+    takeDamage = function (amount: number): void
         self.health -= amount
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         return self.name
-    }
+    end
 }
 
 class VIPPlayer extends Player {
     level: number = 1
 
-    constructor(name: string, level: number) {
+    constructor = function (name: string, level: number)
         self:super(name)
         self.level = level
-    }
+    end
 
-    takeDamage(amount: number): void {
+    takeDamage = function (amount: number): void
         self:super(amount / 2)
-    }
+    end
 }
 
 class KickCommand implements Command {
     name: string = 'kick'
 
-    execute(player: Player): void {
+    execute = function (player: Player): void
         print(player.name)
-    }
+    end
 }
 
 local vip = new VIPPlayer('Thigas', 2)

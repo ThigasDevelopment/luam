@@ -78,16 +78,16 @@ describe('decorators', () => {
     });
 
     it('resolves generated accessors through self', () => {
-        const source = 'class Player {\n    @Getter\n    name: string\n    copy(): string {\n        return self:getName()\n    }\n}\n';
+        const source = 'class Player {\n    @Getter\n    name: string\n    copy = function (): string\n        return self:getName()\n    end\n}\n';
 
         expect(codes(source)).toEqual([]);
     });
 
     it.each([
         ['class Value {\n    @Unknown\n    name: string\n}\n', 'check-unknown-decorator'],
-        ['class Value {\n    @Getter\n    run(): void {\n    }\n}\n', 'check-decorator-target'],
+        ['class Value {\n    @Getter\n    run = function (): void\n    end\n}\n', 'check-decorator-target'],
         ['class Value {\n    @Getter\n    @Getter\n    name: string\n}\n', 'check-duplicate-decorator'],
-        ['class Value {\n    @Getter\n    name: string\n    getName(): string { return self.name }\n}\n', 'check-decorator-conflict'],
+        ['class Value {\n    @Getter\n    name: string\n    getName = function (): string return self.name end\n}\n', 'check-decorator-conflict'],
     ])('reports invalid decorator usage', (source, diagnostic) => {
         const [found] = result(source).diagnostics;
 
@@ -113,7 +113,7 @@ describe('decorators', () => {
     });
 
     it('emits accessors after authored members and erases decorator syntax', () => {
-        const emitted = code('class Value {\n    @Getter\n    first: string = "a"\n    constructor() {\n    }\n    run(): void {\n    }\n}\n');
+        const emitted = code('class Value {\n    @Getter\n    first: string = "a"\n    constructor = function ()\n    end\n    run = function (): void\n    end\n}\n');
 
         expect(emitted.indexOf('first =')).toBeLessThan(emitted.indexOf('getFirst ='));
         expect(emitted.indexOf('constructor =')).toBeLessThan(emitted.indexOf('getFirst ='));

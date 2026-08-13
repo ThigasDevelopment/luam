@@ -69,7 +69,7 @@ export class LanguageService {
     hover(uri: string, position: Position): Hover | null {
         const analysis = this.workspace.get(uri);
 
-        return analysis === null ? null : hoverAt(analysis, this.offset(analysis, position));
+        return analysis === null ? null : hoverAt(analysis, this.offset(analysis, position), this.workspace.others(uri));
     }
 
     definition(uri: string, position: Position): Location[] {

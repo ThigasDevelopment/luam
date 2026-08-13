@@ -1,5 +1,6 @@
 import { KNOWN_DECORATORS } from '@compiler/checker/decorators';
 import { typeToString } from '@compiler/checker/types';
+import { canReference } from '@compiler/environment/environment';
 import type { ClassDeclaration, ClassFieldDeclaration, Decorator } from '@compiler/parser/declaration-nodes';
 import { findDeclaration } from '@mta-types/catalog';
 import { memberDocumentation } from '@mta-types/documentation-lookup';
@@ -11,6 +12,7 @@ import { descriptorText, namedDescriptorText } from '@lsp/features/api-text';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
+import { declarationsIn } from '@lsp/features/symbol-lookup';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { isIdentifierChar, wordAt } from '@lsp/support/source-text';
 import type { SymbolDeclaration } from '@lsp/symbols/symbol';
@@ -55,6 +57,31 @@ function recordMemberHover(analysis: DocumentAnalysis, name: string): Hover | nu
 
             return { contents: { kind: 'markdown', value } };
         }
+    }
+
+    return null;
+}
+
+function workspaceHover(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[], offset: number): Hover | null {
+    const reference = analysis.index.findReferenceAt(offset);
+
+    if (reference === null) {
+        return null;
+    }
+
+    for (const other of others) {
+        const [declaration] = canReference(analysis.environment, other.environment) ? declarationsIn(other, reference.name) : [];
+
+        if (declaration === undefined) {
+            continue;
+        }
+
+        const scope = `declared in "${other.path}" (${other.environment})`;
+
+        return {
+            contents: { kind: 'markdown', value: `${markdown(declarationText(declaration))}\n\n${scope}` },
+            range: toWordRange(reference.position, reference.name),
+        };
     }
 
     return null;
@@ -196,7 +223,7 @@ function decoratorHover(analysis: DocumentAnalysis, offset: number): Hover | nul
     return null;
 }
 
-export function hoverAt(analysis: DocumentAnalysis, offset: number): Hover | null {
+export function hoverAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[] = []): Hover | null {
     if (analysis.manifest !== null) {
         return manifestHover(analysis, offset);
     }
@@ -210,7 +237,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number): Hover | nul
     const declaration = analysis.index.declarationFor(offset);
 
     if (declaration === null) {
-        return apiHover(analysis, offset);
+        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset);
     }
 
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;

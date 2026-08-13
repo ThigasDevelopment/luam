@@ -37,9 +37,12 @@ build/
 
 O diretório literal `src/` dos bundles não segue `sourceDirs`. Um ambiente vazio
 não tem bundle nem entrada `<script>`. Não existe diretório `lib/` nem árvore de
-módulos espelhada. Helpers de runtime e módulos ficam isolados em blocos
-`do ... end`; helpers vêm antes dos módulos, e `loadOrder` ainda controla a ordem
-dos módulos.
+módulos espelhada. Helpers de runtime e módulos são concatenados literalmente em
+um chunk por ambiente, sem bloco em volta; helpers vêm antes dos módulos, e
+`loadOrder` ainda controla a ordem dos módulos. Todo módulo compartilha o escopo
+do chunk do bundle, então um `local` de nível de arquivo fica visível para todos
+os módulos seguintes e o limite de 200 locals ativos do Lua 5.1 vale para o
+bundle inteiro.
 
 O manifesto lista `config.lua` primeiro quando presente, seguido pelos bundles
 não vazios na ordem shared, server, client:

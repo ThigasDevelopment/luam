@@ -6,6 +6,58 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### One Class Method Form
+
+A class member could be written two ways. `name = function (...) ... end` is the
+form the manual documents and the form the emitter mirrors; `name(...) { ... }`
+was still parsed and still compiled, silently, with nothing naming it as the
+older spelling. Two forms for one construct meant the editor accepted source the
+manual does not describe, and a project could carry both.
+
+#### Added
+
+- `parse-class-method-form`, reported on the member name when a class member is
+  written as `name(...) { ... }`. The message names the form to write instead.
+  The member is still parsed, so the rest of the class checks normally and one
+  diagnostic is reported rather than a cascade.
+
+#### Changed
+
+- Every class in `examples/`, `docs/snippets/`, and the compiler fixtures is
+  written in the `= function` form.
+
+#### Removed
+
+- `name(...) { ... }` as an accepted class member. Interface methods are
+  unchanged: they have no body and keep `name(parameters): type`.
+
+### Flat Bundle Output
+
+#### Changed
+
+- A bundle is the load-ordered concatenation of its helpers and modules, with no
+  wrapper. Each member was emitted inside `do ... end`, which cost two lines per
+  member and put scaffolding the author never wrote between a reader and the
+  shipped code.
+- Because the block is gone, every module in a bundle shares the bundle chunk
+  scope. A file-level `local` is visible to every module after it in the same
+  environment, and the Lua 5.1 limit of 200 active locals applies to the bundle
+  rather than to each module. Neither is checked by the compiler, and the `tree`
+  layout is unaffected, so a resource that relies on either builds correctly with
+  `--no-bundle`.
+
+### Hover Across Files
+
+#### Fixed
+
+- Hovering a class, interface, enum, function, or type alias declared in another
+  file showed nothing. `hover` was the only navigation feature not given the rest
+  of the workspace, so a name it could not resolve in the open document fell
+  through to the MTA catalog and returned nothing, while go-to-definition on the
+  same name worked. The hover now names the declaration and the file it comes
+  from, and respects the environment rules, so a server file does not see a class
+  declared under `src/client`.
+
 ### The `.luam.manifest` Dialect
 
 `luam.json` was the same on every machine and for every command, so a project

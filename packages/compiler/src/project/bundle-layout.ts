@@ -55,8 +55,8 @@ export function collectBundles(
     });
 }
 
-function wrapped(content: string): string {
-    return `do\n${content}${content.length > 0 && !content.endsWith('\n') ? '\n' : ''}end\n`;
+function terminated(content: string): string {
+    return content.length > 0 && !content.endsWith('\n') ? `${content}\n` : content;
 }
 
 function newlineCount(value: string): number {
@@ -74,9 +74,9 @@ function materializeBundle(bundle: ResourceBundle, resolveHelper: HelperContentR
 
     for (const member of bundle.members) {
         const content = member.kind === 'helper' ? resolveHelper(member.helper) : member.module.content;
-        const block = wrapped(content);
+        const block = terminated(content);
         const generatedEndLine = generatedStartLine + newlineCount(block) - 1;
-        const contentStartLine = generatedStartLine + 1;
+        const contentStartLine = generatedStartLine;
         const contentEndLine = contentStartLine + contentLineCount(content) - 1;
         const source = member.kind === 'helper' ? member.helper.file : member.module.source;
         const lines = member.kind === 'helper' ? [] : (member.module.lines ?? []);

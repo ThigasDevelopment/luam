@@ -42,11 +42,11 @@ describe('object types', () => {
     });
 
     it('accepts an alias of an object type as a constructor parameter', () => {
-        expect(codes(`${ARGS}\nclass Teste {\n    constructor(args: TesteArgs) {\n        print(args.name)\n    }\n}\n`)).toEqual([]);
+        expect(codes(`${ARGS}\nclass Teste {\n    constructor = function (args: TesteArgs)\n        print(args.name)\n    end\n}\n`)).toEqual([]);
     });
 
     it('accepts an inline object type as a constructor parameter', () => {
-        expect(codes('class Teste {\n    constructor(args: { name: string }) {\n        print(args.name)\n    }\n}\n')).toEqual([]);
+        expect(codes('class Teste {\n    constructor = function (args: { name: string })\n        print(args.name)\n    end\n}\n')).toEqual([]);
     });
 
     it('erases the annotation from the generated Lua', () => {

@@ -1,11 +1,11 @@
 class Loader {
     core: any = nil
 
-    constructor(core: any) {
+    constructor = function (core: any)
         self.core = core
-    }
+    end
 
-    inherits(definition: any, baseName: string): boolean {
+    inherits = function (definition: any, baseName: string): boolean
         local current: any = definition
 
         while current ~= nil do
@@ -23,9 +23,9 @@ class Loader {
         end
 
         return false
-    }
+    end
 
-    subclasses(baseName: string): string[] {
+    subclasses = function (baseName: string): string[]
         local found: string[] = {}
         local definitions: table = getClasses()
 
@@ -38,9 +38,9 @@ class Loader {
         table.sort(found)
 
         return found
-    }
+    end
 
-    instantiate(baseName: string): any {
+    instantiate = function (baseName: string): any
         local created: any = {}
         local names: string[] = self:subclasses(baseName)
 
@@ -49,9 +49,9 @@ class Loader {
         end
 
         return created
-    }
+    end
 
-    loadListeners(): any {
+    loadListeners = function (): any
         local listeners: any = self:instantiate('Listener')
 
         for index = 1, #listeners do
@@ -59,9 +59,9 @@ class Loader {
         end
 
         return listeners
-    }
+    end
 
-    loadCommands(): any {
+    loadCommands = function (): any
         local commands: any = self:instantiate('Command')
 
         for index = 1, #commands do
@@ -69,5 +69,5 @@ class Loader {
         end
 
         return commands
-    }
+    end
 }

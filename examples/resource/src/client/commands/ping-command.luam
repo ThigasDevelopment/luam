@@ -2,7 +2,7 @@ class PingCommand extends Command {
     name: string = 'ping'
     description: string = 'Writes a pong line into the debug console.'
 
-    execute(player: any, ...): void {
+    execute = function (player: any, ...): void
         outputDebugString(formatPlayerLabel('pong'))
-    }
+    end
 }

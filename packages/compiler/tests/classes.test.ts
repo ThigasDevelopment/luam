@@ -118,13 +118,13 @@ describe('classes', () => {
         expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: string = 'kick'\n}\n`)).toEqual([
             'check-unimplemented-interface',
         ]);
-        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: number = 1\n\n    execute(): void {\n    }\n}\n`)).toEqual([
+        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: number = 1\n\n    execute = function (): void\n    end\n}\n`)).toEqual([
             'check-unimplemented-interface',
         ]);
     });
 
     it('accepts a class that satisfies its interface', () => {
-        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: string = 'kick'\n\n    execute(): void {\n    }\n}\n`)).toEqual(
+        expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: string = 'kick'\n\n    execute = function (): void\n    end\n}\n`)).toEqual(
             [],
         );
     });
@@ -182,8 +182,8 @@ describe('classes', () => {
 
     it('reports a super call that cannot resolve a parent method', () => {
         expect(codes('local function helper(): void\n    self:super()\nend\n')).toEqual(['check-invalid-super']);
-        expect(codes('class Player {\n    greet(): void {\n        self:super()\n    }\n}\n')).toEqual(['check-invalid-super']);
-        expect(codes(`${PLAYER}class VIPPlayer extends Player {\n    greet(): void {\n        self:super()\n    }\n}\n`)).toEqual([
+        expect(codes('class Player {\n    greet = function (): void\n        self:super()\n    end\n}\n')).toEqual(['check-invalid-super']);
+        expect(codes(`${PLAYER}class VIPPlayer extends Player {\n    greet = function (): void\n        self:super()\n    end\n}\n`)).toEqual([
             'check-unknown-super-method',
         ]);
     });

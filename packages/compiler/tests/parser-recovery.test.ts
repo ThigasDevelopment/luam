@@ -41,7 +41,7 @@ describe('parser recovery', () => {
     });
 
     it('keeps the class when a statement in a method body does not parse', () => {
-        const source = 'class Player {\n    greet(): void {\n        self.\n    }\n}\n';
+        const source = 'class Player {\n    greet = function (): void\n        self.\n    end\n}\n';
 
         expect(kinds(source)).toEqual(['class-declaration']);
         expect(codes(source)).toEqual(['parse-unexpected-token']);

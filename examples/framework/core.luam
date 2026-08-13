@@ -4,26 +4,26 @@ class Core {
     commands: any = nil
     started: boolean = false
 
-    constructor(side: string) {
+    constructor = function (side: string)
         self.side = side
         self.listeners = {}
         self.commands = {}
         self.started = false
-    }
+    end
 
-    isServer(): boolean {
+    isServer = function (): boolean
         return self.side == 'server'
-    }
+    end
 
-    isClient(): boolean {
+    isClient = function (): boolean
         return self.side == 'client'
-    }
+    end
 
-    log(message: string): void {
+    log = function (message: string): void
         outputDebugString('[' .. self.side .. '] ' .. message)
-    }
+    end
 
-    start(): boolean {
+    start = function (): boolean
         if self.started then
             return false
         end
@@ -38,9 +38,9 @@ class Core {
         self:log('loaded ' .. #self.listeners .. ' listener(s) and ' .. #self.commands .. ' command(s)')
 
         return true
-    }
+    end
 
-    stop(): boolean {
+    stop = function (): boolean
         if not self.started then
             return false
         end
@@ -54,5 +54,5 @@ class Core {
         self.started = false
 
         return true
-    }
+    end
 }

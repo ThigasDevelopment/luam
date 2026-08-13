@@ -120,7 +120,7 @@ function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorat
     };
 }
 
-function parseLegacyClassMethod(stream: TokenStream, token: Token, decorators: Decorator[]): ClassMethodDeclaration {
+function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: Decorator[]): ClassMethodDeclaration {
     const parameters = parseParameters(stream);
     const returnAnnotation = parseOptionalAnnotation(stream);
     const body = parseBraceBlock(stream);
@@ -158,7 +158,9 @@ function parseClassMember(stream: TokenStream): ClassMember {
     const token = stream.expectName();
 
     if (stream.check('punctuation', '(')) {
-        return parseLegacyClassMethod(stream, token, decorators);
+        stream.report('parse-class-method-form', `Write class member "${token.value}" as "${token.value} = function (...) ... end".`, token.position);
+
+        return parseBraceClassMethod(stream, token, decorators);
     }
 
     if (stream.check('operator', '=') && stream.checkAhead(1, 'keyword', 'function')) {

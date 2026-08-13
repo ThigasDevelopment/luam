@@ -3,9 +3,9 @@ local joined: number = 0
 class Session {
     name: string = ''
 
-    constructor(name: string) {
+    constructor = function (name: string)
         self.name = name
-    }
+    end
 }
 
 function announceJoin(player: Player): void

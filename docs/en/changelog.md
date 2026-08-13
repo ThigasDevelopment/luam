@@ -10,6 +10,13 @@ When that version changes, the entry below says what moved.
 
 ### Changed
 
+- [Output layouts](/en/reference/output-layouts) drops the `do ... end` blocks
+  from the bundle description. A bundle is now the plain concatenation of its
+  helpers and modules, so the page states what the shared chunk scope means for
+  a file-level `local` and for the Lua 5.1 limit of 200 active locals.
+- [Diagnostics](/en/reference/diagnostics) lists `parse-class-method-form`, the
+  error raised when a class member is written as `name(...) { ... }` instead of
+  `name = function (...) ... end`.
 - `luam.json` became [`.luam.manifest`](/en/tooling/luam-manifest), a restricted
   Luam dialect the compiler parses, checks, and evaluates. The page is rebuilt
   around the two statements it allows, the expression language, the injected

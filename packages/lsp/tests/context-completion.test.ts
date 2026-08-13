@@ -83,7 +83,7 @@ describe('type completion', () => {
     });
 
     it('offers only types in a parameter annotation of a class method', () => {
-        const found = labels('class Account {\n    bump(amount: ) {\n    }\n}\n', 'bump(amount: ');
+        const found = labels('class Account {\n    bump = function (amount: )\n    end\n}\n', 'bump = function (amount: ');
 
         expect(found).toContain('number');
         expect(found).not.toContain('outputChatBox');

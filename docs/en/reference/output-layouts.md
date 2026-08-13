@@ -36,8 +36,11 @@ build/
 
 The literal `src/` bundle directory does not follow `sourceDirs`. An empty
 environment has no bundle and no `<script>` entry. There is no `lib/` directory
-or mirrored module tree. Runtime helpers and modules are isolated in `do ... end`
-blocks; helpers precede modules, and `loadOrder` still controls module order.
+or mirrored module tree. Runtime helpers and modules are concatenated verbatim
+into one chunk per environment, with no wrapper block; helpers precede modules,
+and `loadOrder` still controls module order. Every module therefore shares the
+bundle chunk scope, so a file-level `local` is visible to every module after it
+and the Lua 5.1 limit of 200 active locals applies to the bundle as a whole.
 
 The manifest lists `config.lua` first when present, followed by the non-empty
 bundles in shared, server, client order:

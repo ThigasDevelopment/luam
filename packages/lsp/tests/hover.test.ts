@@ -118,6 +118,35 @@ describe('hover', () => {
         expect(hover).toContain('mta api (shared)');
     });
 
+    it('shows a class declared in another file with its origin', () => {
+        const service = new LanguageService();
+        const shared = pathToUri('/project/src/shared/core.luam');
+        const text = "local core: Core = new Core('client')\n";
+
+        service.update(shared, 1, "class Core {\n    side: string = ''\n}\n");
+        service.update(SERVER_FILE, 1, text);
+
+        const annotation = service.hover(SERVER_FILE, positionOf(text, ': Core', 'Core'));
+        const instantiation = service.hover(SERVER_FILE, positionOf(text, 'new ', 'Core'));
+        const contents = annotation?.contents;
+        const value = contents !== undefined && typeof contents !== 'string' && !Array.isArray(contents) ? contents.value : '';
+
+        expect(value).toContain('class Core');
+        expect(value).toContain('declared in "/project/src/shared/core.luam" (shared)');
+        expect(instantiation).not.toBeNull();
+    });
+
+    it('does not show a class from an environment the file cannot reference', () => {
+        const service = new LanguageService();
+        const client = pathToUri('/project/src/client/hud.luam');
+        const text = 'local hud: Hud = new Hud()\n';
+
+        service.update(client, 1, 'class Hud {\n    visible: boolean = true\n}\n');
+        service.update(SERVER_FILE, 1, text);
+
+        expect(service.hover(SERVER_FILE, positionOf(text, ': Hud', 'Hud'))).toBeNull();
+    });
+
     it('returns nothing for a position without a symbol', () => {
         const service = new LanguageService();
 

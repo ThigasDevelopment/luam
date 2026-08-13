@@ -3,7 +3,7 @@ class HelloCommand extends Command {
     aliases: string[] = { 'hi', 'greet' }
     description: string = 'Greets the calling player with the configured message.'
 
-    execute(player: any, ...): void {
+    execute = function (player: any, ...): void
         outputChatBox(formatPlayerLabel(tostring(Config.greeting)), player)
-    }
+    end
 }

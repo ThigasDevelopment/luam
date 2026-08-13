@@ -4,23 +4,23 @@ class Listener {
     element: any = nil
     binding: any = nil
 
-    constructor(core: any) {
+    constructor = function (core: any)
         self.core = core
         self.binding = nil
-    }
+    end
 
-    target(): any {
+    target = function (): any
         if self.element == nil then
             return root
         end
 
         return self.element
-    }
+    end
 
-    handle(...): void {
-    }
+    handle = function (...): void
+    end
 
-    register(): boolean {
+    register = function (): boolean
         if self.event == '' then
             return false
         end
@@ -28,13 +28,13 @@ class Listener {
         self.binding = new Event(self.event, self:target(), bind(self.handle, self))
 
         return self.binding:attach()
-    }
+    end
 
-    unregister(): boolean {
+    unregister = function (): boolean
         if self.binding == nil then
             return false
         end
 
         return self.binding:detach()
-    }
+    end
 }

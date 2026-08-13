@@ -11,6 +11,14 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
 ### Alterado
 
+- [Layouts de saída](/pt-br/reference/output-layouts) deixa de descrever os
+  blocos `do ... end` do bundle. Um bundle agora é a concatenação pura dos seus
+  helpers e módulos, então a página diz o que o escopo de chunk compartilhado
+  significa para um `local` de nível de arquivo e para o limite de 200 locals
+  ativos do Lua 5.1.
+- [Diagnósticos](/pt-br/reference/diagnostics) lista o `parse-class-method-form`,
+  o erro levantado quando um membro de classe é escrito como `name(...) { ... }`
+  em vez de `name = function (...) ... end`.
 - O `luam.json` virou o [`.luam.manifest`](/pt-br/tooling/luam-manifest), um
   dialeto restrito do Luam que o compilador analisa, verifica e avalia. A página
   foi reescrita em torno das duas instruções permitidas, da linguagem de

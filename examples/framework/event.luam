@@ -4,14 +4,14 @@ class Event {
     handler: any = nil
     attached: boolean = false
 
-    constructor(name: string, element: any, handler: any) {
+    constructor = function (name: string, element: any, handler: any)
         self.name = name
         self.element = element
         self.handler = handler
         self.attached = false
-    }
+    end
 
-    attach(): boolean {
+    attach = function (): boolean
         if self.attached then
             return false
         end
@@ -19,9 +19,9 @@ class Event {
         self.attached = addEventHandler(self.name, self.element, self.handler)
 
         return self.attached
-    }
+    end
 
-    detach(): boolean {
+    detach = function (): boolean
         if not self.attached then
             return false
         end
@@ -31,9 +31,9 @@ class Event {
         self.attached = false
 
         return true
-    }
+    end
 
-    describe(): string {
+    describe = function (): string
         return self.name
-    }
+    end
 }
