@@ -11,7 +11,7 @@ A Luam resource scaffolded by `luam init`. Write `.luam` sources under `src`, ru
 | `luam build` | Writes the resource into `build/luam-resource`. |
 | `luam ensure` | Builds, syncs into the MTA server, restarts, and watches sources. |
 
-Set `serverPath` in `luam.json` before running `luam ensure`.
+Set `serverPath` in `.luam.manifest` before running `luam ensure`.
 
 ## Layout
 
@@ -111,10 +111,8 @@ parameter is `nil`.
 ### Threads
 
 `ThreadPool` wraps the `threads.lua` runtime helper, which is opt-in. Add it to
-`luam.json` before using the class:
+`.luam.manifest` before using the class:
 
-```json
-{
-    "helpers": ["threads"]
-}
+```luam
+helpers = { 'threads' }
 ```
