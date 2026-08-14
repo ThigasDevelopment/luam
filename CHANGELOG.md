@@ -6,6 +6,19 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Directives Complete
+
+`#` opens a comment, so the completion pass stopped at `#!` and offered nothing.
+The six directives the language has were the one thing you had to remember
+without help.
+
+#### Added
+
+- Completion after `#!`, offering `server`, `client`, `shared`, `strict`,
+  `nonstrict`, and `nocheck`, each with what it does. It fires while the name is
+  being typed, with or without a space after the marker, and on any line — not
+  just the first. `#items` and an ordinary `# comment` are left alone.
+
 ### A Nested Project Is Still a Project
 
 The editor read `.env` only from the workspace folders it was opened with, so a

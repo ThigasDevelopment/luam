@@ -11,6 +11,7 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Diagnósticos | Ao abrir e a cada tecla, limpos quando você corrige o arquivo. |
 | Completação | Símbolos do escopo, globais do workspace, APIs do MTA no ambiente do arquivo, palavras-chave. |
 | Completação de membros | `.` completa campos e métodos estáticos; `:` completa métodos de instância, incluindo membros herdados do MTA. |
+| Diretivas | Depois de `#!`, completa as diretivas de ambiente e de rigor, cada uma com o que faz. |
 | Cabeçalho de classe | Depois de `class Nome `, completa `extends` e `implements`, e então as classes ou interfaces declaradas que podem vir a seguir. |
 | Ordenação de argumentos | Dentro de uma chamada, candidatos do tipo esperado do parâmetro vêm primeiro, depois funções que o retornam. |
 | Hover | Tipo declarado ou inferido, assinatura da função e o ambiente de uma API do MTA. |

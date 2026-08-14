@@ -11,6 +11,7 @@ uses, so the editor and the build never disagree about a file.
 | Diagnostics | On open and on every keystroke, cleared when you fix the file. |
 | Completion | Scope symbols, workspace globals, MTA APIs scoped to the file's environment, keywords. |
 | Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members. |
+| Directives | After `#!`, completes the environment and strictness directives, each with what it does. |
 | Class headers | After `class Name `, completes `extends` and `implements`, then the declared classes or interfaces that can follow. |
 | Argument ranking | Inside a call, candidates matching the expected parameter type sort first, then functions returning it. |
 | Hover | Declared or inferred type, function signature, and the environment of an MTA API. |

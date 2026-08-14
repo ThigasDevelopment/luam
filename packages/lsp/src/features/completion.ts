@@ -11,6 +11,7 @@ import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
 import { classBodyNeedsConstructor } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
+import { directiveItems, isDirectivePosition } from '@lsp/features/directive-completion';
 import { tableLiteralMembers, writtenKeys } from '@lsp/features/table-literal';
 import {
     completionContext,
@@ -185,6 +186,10 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     }
 
     const lexical = scanContext(analysis.text, offset);
+
+    if (isDirectivePosition(analysis.text, offset)) {
+        return deduplicate(directiveItems());
+    }
 
     if (lexical.inComment) {
         return [];
