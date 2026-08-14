@@ -104,6 +104,36 @@ local players: Player[] = {}
 [object extensions](/en/language/extensions) for tables, so `scores.count` and
 `scores.isEmpty` work.
 
+## Maps
+
+`table` alone is any table. With two type arguments it is a map — the first is
+the key, the second is the value:
+
+```luam
+local ages: table<string, number> = {}
+
+ages['thigas'] = 27
+
+local age: number = ages['thigas']
+
+for name, value in pairs(ages) do
+    outputChatBox(name .. ' is ' .. value)
+end
+```
+
+Reading a key gives the value type, with `ages.thigas` and `ages['thigas']`
+treated the same. A key of another type is `check-type-mismatch`, and `pairs`
+types both loop variables (`ipairs` types the first one as `number`).
+
+A map is assignable to `table`, and `table` is assignable to a map, so code that
+still uses plain tables keeps working. Between two maps the key and the value
+must both be assignable.
+
+| You wrote | Diagnostic |
+| --- | --- |
+| `ages[1]` on `table<string, number>` | `check-type-mismatch: Key expects "string" but received "number".` |
+| `table<string>` | `check-generic-arity: Type "table" expects a key type and a value type but received 1.` |
+
 ## Object types
 
 `{ key: Type }` describes a table by the keys it declares. It is written inline,
@@ -180,6 +210,67 @@ local optional?: fun(string): void = nil
 Parameter names inside `fun(...)` are optional and documentary. See
 [Functions](/en/language/functions).
 
+## Type guards
+
+A condition narrows a name inside the block it guards:
+
+```luam
+function announce(name?: string, handler?: fun(text: string): void): void
+    if name ~= nil then
+        outputChatBox(name)
+    end
+
+    if type(handler) == 'function' then
+        handler('ready')
+    end
+end
+```
+
+- `type(value) == '...'` narrows to that type, for every name `type` returns.
+- `value ~= nil` and a plain `if value then` drop `nil`.
+- `value == nil` narrows to `nil`, and the `else` branch of that test drops it.
+- `and` chains apply every fact they carry.
+
+The narrowing ends with the block, and it is dropped as soon as the name is
+assigned or shadowed. An assignment is always checked against the declared type,
+so reassigning a narrowed name to its original type is accepted.
+
+A guard clause narrows the rest of the block when it always exits:
+
+```luam
+function announce(name?: string): void
+    if name == nil then
+        return
+    end
+
+    outputChatBox(name)
+end
+```
+
+An `or` keeps only what both sides agree on, and unions the two types:
+
+```luam
+if type(value) == 'string' or type(value) == 'number' then
+    outputChatBox(value .. '')
+end
+```
+
+### `and` and `or` results
+
+`a or b` is `b` whenever `a` is missing, so the result drops `nil` from the left
+side — `tonumber(amount) or 100` is `number`, not `number?`. `a and b` is `b`,
+plus `nil` when `a` itself can be missing. Together they type the usual
+one-liner:
+
+```luam
+local label: string = ok and 'yes' or 'no'
+```
+
+::: warning Names only
+A field like `self.connection` keeps its declared type. Copy it into a local
+first when you need the guard.
+:::
+
 ## A complete example
 
 <<< @/snippets/language/src/shared/types.luam
@@ -189,6 +280,6 @@ Parameter names inside `fun(...)` are optional and documentary. See
 | You wrote | Diagnostic |
 | --- | --- |
 | `local n: number = 'text'` | `check-type-mismatch: Variable "n" expects "number" but received "string".` |
-| `local x: number = tonumber(v) or 0` | `check-type-mismatch: ... received "number? \| number".` |
+| `local x: number = v and 1` where `v?: string` | `check-type-mismatch: ... received "number?".` |
 | `local p: Playr = source` | `parse-invalid-type` |
 | `key + 1` where `key: string \| number` | `check-invalid-operand` |

@@ -2,26 +2,37 @@
 
 O que o Luam deliberadamente não faz, e o que escrever no lugar.
 
-## Sem estreitamento de tipos
+## O estreitamento alcança nomes, não campos
 
-`if value ~= nil then` **não** refina `string?` para `string` dentro do bloco, e um
-padrão com `or` produz uma união:
-
-```luam
-local requested: number = tonumber(amount) or 100
-# check-type-mismatch: ... received "number? | number".
-```
-
-Anote o local que recebe como `any` quando você já garantiu que o valor está
-presente:
+Uma [guarda de tipo](/pt-br/language/types#guardas-de-tipo) refina um **nome**
+dentro do bloco que ela protege. Um campo mantém o tipo declarado, não importa
+como você testa:
 
 ```luam
-local requested: any = tonumber(amount) or 100
-local total: number = current + requested
+if self.connection ~= nil then
+    local handle: userdata = self.connection
+    # check-type-mismatch: o campo continua "userdata?".
+end
 ```
 
-O mesmo vale para uniões: uma operação precisa ser válida para a união inteira,
-porque nada a estreita.
+Copie o campo para um local antes:
+
+```luam
+local connection = self.connection
+
+if connection ~= nil then
+    local handle: userdata = connection
+end
+```
+
+Uma guarda com saída antecipada vale: quando o bloco sempre sai com `return` ou
+`break`, a condição negada estreita o resto do bloco que a contém. O que não vale
+é qualquer coisa mais sutil — um `while` que só às vezes dá `break`, uma flag
+definida em um ramo e lida em outro. Não há análise de fluxo além da guarda.
+
+Uma operação ainda precisa ser válida para a união inteira: `key + 1` em
+`string | number` é `check-invalid-operand`, porque um dos membros não soma. A
+concatenação é a exceção, já que todo membro de `string | number` concatena.
 
 ## A ordem de declaração importa para classes
 
@@ -50,14 +61,21 @@ deliberado: uma função nova do MTA nunca deve bloquear um build.
 
 ## Exports são nomeados, nunca verificados
 
-`export` escreve uma entrada `<export>` no `meta.xml`. Ele não verifica o lado que
-chama e não pode carregar um atributo extra como `http="true"`.
+`export` escreve uma entrada `<export>` no `meta.xml`, e `export http` marca
+`http="true"` nela. O que ele não faz é verificar o lado que chama: um
+`call(resource, 'name', ...)` de outro resource nunca é checado contra a
+assinatura que você exportou.
 
-## O editor não reverifica em mudanças entre arquivos
+## O editor reverifica por declaração, não por edição
 
-O servidor de linguagem não reanalisa um arquivo já aberto quando **outro** arquivo
-muda, então uma violação entre módulos pode aparecer só no `luam check`. Rode
-**Luam: Restart Language Server** para forçar uma nova varredura.
+Editar um arquivo reanalisa os outros só quando muda o que aquele arquivo
+**declara** — uma classe, uma interface, um enum ou um global, incluindo o tipo
+de qualquer membro. Editar o corpo de uma função republica diagnóstico só
+daquele arquivo, que é o que mantém a digitação barata em projeto grande.
+
+Um arquivo que o workspace nunca varreu continua invisível até ser salvo ou
+aberto. Rode **Luam: Restart Language Server** depois de mover arquivos fora do
+editor.
 
 ## O `config.lua` nunca é analisado
 

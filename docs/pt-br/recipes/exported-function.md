@@ -78,8 +78,8 @@ chamada.
 
 ## Limitações
 
-Um export é **nomeado, nunca verificado** contra o lado que chama, e não pode
-carregar um atributo extra como `http="true"`. Veja
+Um export é **nomeado, nunca verificado** contra o lado que chama. Escreva
+`export http function` quando a entrada precisar de `http="true"`. Veja
 [Limitações](/pt-br/reference/limitations).
 
 ## Nota de segurança

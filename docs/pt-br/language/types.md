@@ -105,6 +105,36 @@ local players: Player[] = {}
 [extensões de objeto](/pt-br/language/extensions) de tabela, então `scores.count`
 e `scores.isEmpty` funcionam.
 
+## Mapas
+
+`table` sozinho é qualquer tabela. Com dois argumentos de tipo ele vira um mapa —
+o primeiro é a chave, o segundo é o valor:
+
+```luam
+local ages: table<string, number> = {}
+
+ages['thigas'] = 27
+
+local age: number = ages['thigas']
+
+for name, value in pairs(ages) do
+    outputChatBox(name .. ' is ' .. value)
+end
+```
+
+Ler uma chave devolve o tipo do valor, e `ages.thigas` e `ages['thigas']` são
+tratados igual. Uma chave de outro tipo é `check-type-mismatch`, e `pairs` tipa
+as duas variáveis do laço (`ipairs` tipa a primeira como `number`).
+
+Um mapa é atribuível a `table`, e `table` é atribuível a um mapa, então o código
+que ainda usa tabelas simples continua funcionando. Entre dois mapas, a chave e o
+valor precisam ser atribuíveis.
+
+| Você escreveu | Diagnóstico |
+| --- | --- |
+| `ages[1]` em `table<string, number>` | `check-type-mismatch: Key expects "string" but received "number".` |
+| `table<string>` | `check-generic-arity: Type "table" expects a key type and a value type but received 1.` |
+
 ## Tipos de objeto
 
 `{ chave: Tipo }` descreve uma tabela pelas chaves que ela declara. Ele é escrito
@@ -182,6 +212,68 @@ local optional?: fun(string): void = nil
 Nomes de parâmetro dentro de `fun(...)` são opcionais e documentais. Veja
 [Funções](/pt-br/language/functions).
 
+## Guardas de tipo
+
+Uma condição estreita um nome dentro do bloco que ela protege:
+
+```luam
+function announce(name?: string, handler?: fun(text: string): void): void
+    if name ~= nil then
+        outputChatBox(name)
+    end
+
+    if type(handler) == 'function' then
+        handler('ready')
+    end
+end
+```
+
+- `type(value) == '...'` estreita para aquele tipo, para todo nome que `type`
+  devolve.
+- `value ~= nil` e um `if value then` simples descartam o `nil`.
+- `value == nil` estreita para `nil`, e o `else` desse teste descarta o `nil`.
+- Cadeias com `and` aplicam todos os fatos que carregam.
+
+O estreitamento termina com o bloco e cai assim que o nome é atribuído ou
+sombreado. Uma atribuição sempre é checada contra o tipo declarado, então
+reatribuir um nome estreitado ao tipo original é aceito.
+
+Uma guarda com saída antecipada estreita o resto do bloco:
+
+```luam
+function announce(name?: string): void
+    if name == nil then
+        return
+    end
+
+    outputChatBox(name)
+end
+```
+
+Um `or` mantém só o que os dois lados concordam, e une os dois tipos:
+
+```luam
+if type(value) == 'string' or type(value) == 'number' then
+    outputChatBox(value .. '')
+end
+```
+
+### Resultado de `and` e `or`
+
+`a or b` é `b` sempre que `a` está ausente, então o resultado descarta o `nil` do
+lado esquerdo — `tonumber(amount) or 100` é `number`, não `number?`. `a and b` é
+`b`, mais `nil` quando o próprio `a` pode faltar. Juntos eles tipam a linha de
+sempre:
+
+```luam
+local label: string = ok and 'yes' or 'no'
+```
+
+::: warning Só nomes
+Um campo como `self.connection` mantém o tipo declarado. Copie para um local
+antes quando precisar da guarda.
+:::
+
 ## Um exemplo completo
 
 <<< @/snippets/language/src/shared/types.luam
@@ -191,6 +283,6 @@ Nomes de parâmetro dentro de `fun(...)` são opcionais e documentais. Veja
 | Você escreveu | Diagnóstico |
 | --- | --- |
 | `local n: number = 'text'` | `check-type-mismatch: Variable "n" expects "number" but received "string".` |
-| `local x: number = tonumber(v) or 0` | `check-type-mismatch: ... received "number? \| number".` |
+| `local x: number = v and 1` com `v?: string` | `check-type-mismatch: ... received "number?".` |
 | `local p: Playr = source` | `parse-invalid-type` |
 | `key + 1` com `key: string \| number` | `check-invalid-operand` |

@@ -2,26 +2,37 @@
 
 What Luam deliberately does not do, and what to write instead.
 
-## No type narrowing
+## Narrowing reaches names, not fields
 
-`if value ~= nil then` does **not** refine `string?` to `string` inside the
-branch, and an `or` default produces a union:
-
-```luam
-local requested: number = tonumber(amount) or 100
-# check-type-mismatch: ... received "number? | number".
-```
-
-Annotate the receiving local as `any` when you have established the value is
-present:
+A [type guard](/en/language/types#type-guards) refines a **name** inside the
+block it guards. A field keeps its declared type, however you test it:
 
 ```luam
-local requested: any = tonumber(amount) or 100
-local total: number = current + requested
+if self.connection ~= nil then
+    local handle: userdata = self.connection
+    # check-type-mismatch: the field is still "userdata?".
+end
 ```
 
-The same applies to unions: an operation must be valid for the whole union,
-because nothing narrows it.
+Copy the field into a local first:
+
+```luam
+local connection = self.connection
+
+if connection ~= nil then
+    local handle: userdata = connection
+end
+```
+
+A guard clause does carry: when the block always exits with `return` or `break`,
+the negated condition narrows the rest of the enclosing block. What does not
+carry is anything subtler — a `while` that only sometimes breaks, a flag set in
+one branch and read in another. There is no flow analysis beyond the guard.
+
+An operation must still be valid for the whole union: `key + 1` on
+`string | number` is `check-invalid-operand`, because one of the members cannot
+be added. Concatenation is the exception, since every member of
+`string | number` concatenates.
 
 ## Declaration order matters for classes
 
@@ -50,14 +61,21 @@ function must never block a build.
 
 ## Exports are named, never verified
 
-`export` writes an `<export>` entry into `meta.xml`. It does not verify the
-calling side, and it cannot carry an extra attribute such as `http="true"`.
+`export` writes an `<export>` entry into `meta.xml`, and `export http` sets
+`http="true"` on it. What it does not do is verify the calling side: a
+`call(resource, 'name', ...)` from another resource is never checked against the
+signature you exported.
 
-## The editor does not re-check on a cross-file change
+## The editor re-checks by declaration, not by edit
 
-The language server does not re-analyze an already open file when a **different**
-file changes, so a cross-module violation can surface only in `luam check`. Run
-**Luam: Restart Language Server** to force a rescan.
+Editing a file re-analyzes the other files only when what that file **declares**
+changes — a class, an interface, an enum, or a global, including the type of any
+member. Editing a function body republishes diagnostics for that file alone,
+which is what keeps typing cheap in a large project.
+
+A file the workspace never scanned is still invisible until it is saved or
+opened. Run **Luam: Restart Language Server** after moving files around outside
+the editor.
 
 ## `config.lua` is never parsed
 

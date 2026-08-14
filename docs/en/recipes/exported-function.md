@@ -77,8 +77,8 @@ Both resources must be running, and MTA's ACL must permit the call.
 
 ## Limitations
 
-An export is **named, never verified** against the calling side, and it cannot
-carry an extra attribute such as `http="true"`. See
+An export is **named, never verified** against the calling side. Write
+`export http function` when the entry needs `http="true"`. See
 [Limitations](/en/reference/limitations).
 
 ## Security note
