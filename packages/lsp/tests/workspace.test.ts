@@ -139,6 +139,38 @@ describe('workspace loading', () => {
         expect(codes.map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
     });
 
+    it('rechecks the files that see a declaration when it changes', () => {
+        const root = workspace({
+            'src/shared/base.luam': 'class Base {\n    id: number = 0\n}\n',
+            'src/server/derived.luam': 'class Derived extends Base {\n}\n',
+        });
+        const service = new LanguageService();
+        const baseUri = uriFor(root, 'src/shared/base.luam');
+        const derivedUri = uriFor(root, 'src/server/derived.luam');
+
+        service.loadWorkspace([root]);
+        expect(service.diagnostics(derivedUri)).toEqual([]);
+
+        const affected = service.update(baseUri, 2, 'class Renamed {\n}\n');
+
+        expect(affected.map((analysis) => analysis.uri)).toContain(derivedUri);
+        expect(service.diagnostics(derivedUri).map((diagnostic) => diagnostic.code)).toEqual(['check-unknown-class']);
+    });
+
+    it('rechecks nothing else when an edit keeps the declarations', () => {
+        const root = workspace({
+            'src/shared/base.luam': 'class Base {\n    id: number = 0\n}\n',
+            'src/server/derived.luam': 'class Derived extends Base {\n}\n',
+        });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        const affected = service.update(uriFor(root, 'src/shared/base.luam'), 2, 'class Base {\n    id: number = 0\n}\n\nlocal unused = 1\n');
+
+        expect(affected.map((analysis) => analysis.uri)).toEqual([uriFor(root, 'src/shared/base.luam')]);
+    });
+
     it('keeps the open version of a file that was already scanned', () => {
         const root = workspace({ 'src/server/main.luam': 'local value: number = 1\n' });
         const service = new LanguageService();

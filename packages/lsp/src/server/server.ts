@@ -20,8 +20,11 @@ function workspaceRoots(params: InitializeParams): string[] {
 
 function registerDocuments(connection: Connection, documents: TextDocuments<TextDocument>, service: LanguageService): void {
     documents.onDidChangeContent((event) => {
-        service.update(event.document.uri, event.document.version, event.document.getText());
-        void connection.sendDiagnostics({ uri: event.document.uri, diagnostics: service.diagnostics(event.document.uri) });
+        const affected = service.update(event.document.uri, event.document.version, event.document.getText());
+
+        for (const analysis of affected) {
+            void connection.sendDiagnostics({ uri: analysis.uri, diagnostics: service.diagnostics(analysis.uri) });
+        }
     });
 
     documents.onDidClose((event) => {

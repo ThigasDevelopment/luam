@@ -1,6 +1,7 @@
 import { mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import { canReference, type Environment } from '@compiler/environment/environment';
+import { fingerprintDeclarations } from '@compiler/project/fingerprint';
 
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
@@ -61,18 +62,23 @@ export class WorkspaceIndex {
         return true;
     }
 
-    analyze(uri: string, version: number, text: string): DocumentAnalysis {
+    private rerunOthers(uri: string): DocumentAnalysis[] {
+        return this.others(uri).map((other) => this.run(other.uri, other.version, other.text));
+    }
+
+    private visibleTo(analysis: DocumentAnalysis | null): string {
+        return analysis === null || analysis.manifest !== null ? '' : `${analysis.environment}|${fingerprintDeclarations(analysis.own)}`;
+    }
+
+    analyze(uri: string, version: number, text: string): DocumentAnalysis[] {
+        const before = this.visibleTo(this.get(uri));
         const analysis = this.run(uri, version, text);
 
-        if (analysis.manifest === null || !this.applySettings()) {
-            return analysis;
+        if (analysis.manifest !== null) {
+            return this.applySettings() ? [analysis, ...this.rerunOthers(uri)] : [analysis];
         }
 
-        for (const other of this.all().filter((entry) => entry.manifest === null)) {
-            this.run(other.uri, other.version, other.text);
-        }
-
-        return analysis;
+        return before === this.visibleTo(analysis) ? [analysis] : [analysis, ...this.rerunOthers(uri)];
     }
 
     remove(uri: string): void {

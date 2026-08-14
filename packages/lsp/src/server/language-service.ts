@@ -18,7 +18,7 @@ export class LanguageService {
         this.workspace.load(roots);
     }
 
-    update(uri: string, version: number, text: string): DocumentAnalysis {
+    update(uri: string, version: number, text: string): DocumentAnalysis[] {
         return this.workspace.analyze(uri, version, text);
     }
 

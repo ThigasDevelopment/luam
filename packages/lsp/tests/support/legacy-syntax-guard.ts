@@ -25,12 +25,12 @@ const analyze = WorkspaceIndex.prototype.analyze;
 
 const load = WorkspaceIndex.prototype.load;
 
-WorkspaceIndex.prototype.analyze = function guardedAnalyze(this: WorkspaceIndex, uri: string, version: number, text: string): DocumentAnalysis {
-    const analysis = analyze.call(this, uri, version, text);
+WorkspaceIndex.prototype.analyze = function guardedAnalyze(this: WorkspaceIndex, uri: string, version: number, text: string): DocumentAnalysis[] {
+    const affected = analyze.call(this, uri, version, text);
 
-    assertCurrentSyntax(analysis);
+    affected.forEach(assertCurrentSyntax);
 
-    return analysis;
+    return affected;
 };
 
 WorkspaceIndex.prototype.load = function guardedLoad(this: WorkspaceIndex, roots: readonly string[]): void {
