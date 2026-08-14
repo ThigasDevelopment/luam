@@ -24,7 +24,7 @@ const PROVIDING_RANK = '1';
 
 const UNRELATED_RANK = '2';
 
-function localType(analysis: DocumentAnalysis, offset: number, name: string): Type | null {
+export function localType(analysis: DocumentAnalysis, offset: number, name: string): Type | null {
     const scopeId = analysis.index.scopes.innermostAt(offset);
     const accept = (candidate: SymbolDeclaration): boolean => matchesReferenceKind(candidate, 'value');
 

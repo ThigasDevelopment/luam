@@ -200,6 +200,14 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ],
     null,
     ),
+    oopClass('Connection', 'Element', [
+        oopMethod('exec', 'server', 'dbExec', fn([STRING, ANY], BOOLEAN, 1, true)),
+        oopMethod('prepareString', 'server', 'dbPrepareString', fn([STRING, ANY], STRING, 1, true)),
+        oopMethod('query', 'server', 'dbQuery', fn([ANY, ANY, ANY, ANY, ANY], ANY, 2, true)),
+    ], [
+    ],
+    oopConstructor('server', fn([STRING, STRING, STRING, STRING, STRING], named('Connection'), 2)),
+    ),
     oopClass('DxFont', null, [
         oopMethod('getHeight', 'client', 'dxGetFontHeight', fn([NUMBER, ANY], NUMBER, 0)),
         oopMethod('getSize', 'client', 'dxGetTextSize', fn([STRING, NUMBER, NUMBER, NUMBER, ANY, BOOLEAN, BOOLEAN], tupleOf([NUMBER, NUMBER]), 1)),

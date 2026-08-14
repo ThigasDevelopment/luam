@@ -14,22 +14,22 @@ function codes(source: string): string[] {
 
 describe('unknown types', () => {
     it('warns on a type that is never declared', () => {
-        const source = 'local handle: Connection = nil\n';
+        const source = 'local handle: NotAType = nil\n';
         const [diagnostic] = diagnostics(source);
 
         expect(diagnostic?.code).toBe('check-unknown-type');
         expect(diagnostic?.severity).toBe('warning');
-        expect(diagnostic?.message).toBe('Type "Connection" is not defined.');
+        expect(diagnostic?.message).toBe('Type "NotAType" is not defined.');
     });
 
     it('still emits code, because the warning is not an error', () => {
-        const result = compile('local handle: Connection = nil\n');
+        const result = compile('local handle: NotAType = nil\n');
 
         expect(result.code).not.toBeNull();
     });
 
     it('reports each unknown name once', () => {
-        expect(codes('local a: Connection = nil\nlocal b: Connection = nil\n')).toEqual(['check-unknown-type']);
+        expect(codes('local a: NotAType = nil\nlocal b: NotAType = nil\n')).toEqual(['check-unknown-type']);
     });
 
     it('accepts a type alias declared later in the file', () => {
@@ -71,7 +71,7 @@ describe('unknown types', () => {
     });
 
     it('warns inside a nested annotation', () => {
-        expect(codes('local rows: Connection[] = {}\n')).toEqual(['check-unknown-type']);
+        expect(codes('local rows: NotAType[] = {}\n')).toEqual(['check-unknown-type']);
     });
 
     it('warns inside a union and an intersection', () => {
@@ -80,10 +80,10 @@ describe('unknown types', () => {
     });
 
     it('warns on an unknown type argument of a map', () => {
-        expect(codes('local rows: table<string, Connection> = {}\n')).toEqual(['check-unknown-type']);
+        expect(codes('local rows: table<string, NotAType> = {}\n')).toEqual(['check-unknown-type']);
     });
 
     it('stays silent under a nocheck directive', () => {
-        expect(codes('#!nocheck\nlocal handle: Connection = nil\n')).toEqual([]);
+        expect(codes('#!nocheck\nlocal handle: NotAType = nil\n')).toEqual([]);
     });
 });

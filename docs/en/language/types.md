@@ -166,7 +166,7 @@ build still succeeds and the name still behaves as it always did — assignable 
 both directions, with no members checked — so existing sources keep compiling:
 
 ```
-warning  check-unknown-type  Type "Connection" is not defined.
+warning  check-unknown-type  Type "Databse" is not defined.
 ```
 
 A name counts as declared when it is a primitive, a type alias, an interface, a

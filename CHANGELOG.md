@@ -32,12 +32,22 @@ instead of the keys it expects.
 - Member completion on a union receiver, offering the keys every member declares.
 - `variable.language.vararg.luam` for `...`, which the grammar was colouring as
   the concatenation operator.
+- Value completion inside a string, offering the members of a literal type. It
+  reads the type from the annotated local, the key of a table literal, or the
+  parameter of the call it sits in.
+- `Connection`, the element `dbConnect` returns. It was excluded from the
+  generated catalog, so the connection was typed `Element` and there was no name
+  to annotate it with. `dbExec` and `dbPrepareString` now take it, and the OOP
+  surface carries its constructor, `exec`, `prepareString`, and `query`.
 
 #### Fixed
 
 - Completion on an intersection lost the keys it inherited. The editor re-derived
   types from annotations on its own and could not resolve a named part; it now
   reads the aliases the checker already resolved, exposed on the check result.
+- The catalog generator did not apply an element type alias to the return of a
+  generated constructor, so `Object` reported `MTASAObject`, a name nothing
+  declares.
 
 ### Shapes That Combine and Unions That Narrow
 
@@ -67,8 +77,8 @@ union, the shape the pattern exists for, compiled without a single check.
 - `check-conflicting-intersection-member`, reported when two parts declare the
   same key with different types.
 - `check-unknown-type`, a warning on a type name the file cannot reach. Nothing
-  reported an undeclared type, so `local handle: Connection` compiled silently
-  against an element MTA does not have. The check is deferred to the end of the
+  reported an undeclared type, so a misspelled element name compiled silently
+  against a type that does not exist. The check is deferred to the end of the
   file, so a type declared further down, a recursive alias, and a
   self-referencing interface stay silent, and the name still resolves the way it
   always did — no source stops compiling.

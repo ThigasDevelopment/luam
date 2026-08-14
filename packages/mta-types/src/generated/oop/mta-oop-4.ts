@@ -65,7 +65,7 @@ export const MTA_OOP_4: readonly OopClass[] = [
         oopMethod('toggleRespawn', 'client', 'toggleObjectRespawn', fn([BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('MTASAObject'), 4)),
+    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Object'), 4)),
     ),
     oopClass('Ped', 'Element', [
         oopMethod('addClothes', 'shared', 'addPedClothes', fn([STRING, STRING, NUMBER], BOOLEAN, 3)),

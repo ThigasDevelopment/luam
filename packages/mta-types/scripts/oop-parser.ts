@@ -77,7 +77,9 @@ function readMembers(declaration: ts.ClassDeclaration, contents: string, context
 
     for (const member of declaration.members) {
         if (ts.isConstructorDeclaration(member)) {
-            constructors.push({ type: signatureOf(member, context, named(declaration.name?.text ?? '')), environment });
+            const own = declaration.name?.text ?? '';
+
+            constructors.push({ type: signatureOf(member, context, named(context.aliases[own] ?? own)), environment });
 
             continue;
         }

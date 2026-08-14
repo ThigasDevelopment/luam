@@ -37,7 +37,8 @@ import {
 } from '@lsp/features/completion-items';
 import { eventItems, isEventArgument } from '@lsp/features/event-completion';
 import { manifestCompletion } from '@lsp/features/manifest-completion';
-import { scanContext, type CallFrame } from '@lsp/features/source-context';
+import { expectedStringType, literalItems, stringLiteralValues } from '@lsp/features/literal-completion';
+import { scanContext, type SourceContext } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
 
@@ -166,12 +167,16 @@ function deduplicate(items: readonly CompletionItem[]): CompletionItem[] {
     return unique;
 }
 
-function stringItems(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[], frame: CallFrame | null): CompletionItem[] {
-    if (frame === null || !frame.isCall || !isEventArgument(analysis.text, frame)) {
-        return [];
+function stringItems(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[], context: SourceContext): CompletionItem[] {
+    const frame = context.frame;
+
+    if (frame !== null && frame.isCall && isEventArgument(analysis.text, frame)) {
+        return eventItems(analysis, others);
     }
 
-    return eventItems(analysis, others);
+    const expected = expectedStringType(analysis, context.stringStart) ?? expectedArgument(analysis, offset, frame)?.type ?? null;
+
+    return expected === null ? [] : literalItems(stringLiteralValues(expected));
 }
 
 export function completionAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): CompletionItem[] {
@@ -186,7 +191,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     }
 
     if (lexical.inString) {
-        return deduplicate(stringItems(analysis, offset, others, lexical.frame));
+        return deduplicate(stringItems(analysis, offset, others, lexical));
     }
 
     if (isDecoratorPosition(analysis.text, offset)) {

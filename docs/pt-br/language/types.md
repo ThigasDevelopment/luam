@@ -168,7 +168,7 @@ nos dois sentidos, sem checagem de membros — então fontes existentes continua
 compilando:
 
 ```
-warning  check-unknown-type  Type "Connection" is not defined.
+warning  check-unknown-type  Type "Databse" is not defined.
 ```
 
 Um nome conta como declarado quando é um primitivo, um alias de tipo, uma

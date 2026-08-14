@@ -12,6 +12,7 @@ export const ELEMENT_TYPES: readonly ElementTypeDeclaration[] = [
     { name: 'Browser', parent: 'Element' },
     { name: 'Camera', parent: 'Element' },
     { name: 'ColShape', parent: 'Element' },
+    { name: 'Connection', parent: 'Element' },
     { name: 'DxFont', parent: null },
     { name: 'DxRenderTarget', parent: null },
     { name: 'DxScreenSource', parent: null },
