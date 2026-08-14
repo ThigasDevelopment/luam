@@ -1,4 +1,4 @@
-import { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver';
+import { CompletionItemKind, InsertTextFormat, InsertTextMode } from 'vscode-languageserver';
 import { describe, expect, it } from 'vitest';
 
 import { LanguageService } from '@lsp/server/language-service';
@@ -161,8 +161,9 @@ describe('class body completion', () => {
 
         expect(constructor).toMatchObject({
             kind: CompletionItemKind.Constructor,
-            insertText: 'constructor = function (${1})\n        ${0}\n    end',
+            insertText: 'constructor = function (${1})\n    ${0}\nend',
             insertTextFormat: InsertTextFormat.Snippet,
+            insertTextMode: InsertTextMode.adjustIndentation,
         });
     });
 

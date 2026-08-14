@@ -202,7 +202,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     }
 
     const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
-    const constructor = classBodyNeedsConstructor(analysis, lexical.frame, offset) ? [constructorItem(analysis.text, offset)] : [];
+    const constructor = classBodyNeedsConstructor(analysis, lexical.frame, offset) ? [constructorItem()] : [];
     const expectation = expectedArgument(analysis, offset, lexical.frame);
 
     return deduplicate([
