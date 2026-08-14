@@ -13,5 +13,6 @@ export default defineConfig({
     },
     test: {
         include: ['tests/**/*.test.ts'],
+        setupFiles: ['./tests/support/legacy-syntax-guard.ts'],
     },
 });

@@ -84,25 +84,25 @@ describe('native runtime libraries', () => {
         expect(labels('Threads.\n', 'Threads.')).toEqual(['new']);
     });
 
-    it('offers the members of an async runner built with Async.new', () => {
-        const found = labels('local runner = Async.new(50)\nrunner.\n', 'runner.');
+    it('offers the members of an async runner built with new Async', () => {
+        const found = labels('local runner = new Async(50)\nrunner.\n', 'runner.');
 
         expect(found).toEqual(['map', 'iterate', 'foreach', 'getInterval', 'setInterval']);
     });
 
-    it('offers the members of a scheduler built with Threads.new', () => {
-        const found = labels('local pool = Threads.new("work", "frame")\npool.\n', 'pool.');
+    it('offers the members of a scheduler built with new Threads', () => {
+        const found = labels('local pool = new Threads("work", "frame")\npool.\n', 'pool.');
 
         expect(found).toContain('add');
         expect(found).toContain('start');
     });
 
     it('describes the async library on hover', () => {
-        expect(hoverText('local runner = Async.new(50)\n', 'Async', 'Async')).toContain('walks a table or a numeric range a slice at a time');
+        expect(hoverText('local runner = new Async(50)\n', 'Async', 'Async')).toContain('walks a table or a numeric range a slice at a time');
     });
 
     it('describes an async member on hover', () => {
-        const hover = hoverText('local runner = Async.new(50)\nrunner.foreach({}, print)\n', 'runner.foreach', 'foreach');
+        const hover = hoverText('local runner = new Async(50)\nrunner.foreach({}, print)\n', 'runner.foreach', 'foreach');
 
         expect(hover).toContain('without building a result');
     });
