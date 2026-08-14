@@ -59,14 +59,18 @@ erro não escreve nada.
 
 ## Checker — tipos
 
-| Código | Significado |
-| --- | --- |
-| `check-type-mismatch` | Um valor não corresponde ao tipo declarado. |
-| `check-return-mismatch` | Um `return` não corresponde ao tipo de retorno declarado. |
-| `check-argument-count` | Argumentos de menos ou de mais. |
-| `check-invalid-operand` | Um operador não pode ser aplicado a esse tipo. |
-| `check-unknown-member` | O membro não existe no receptor. |
-| `check-unknown-record-key` | A chave não é declarada pelo tipo de objeto. Também usado por `process.env`. |
+| Código | Severidade | Significado |
+| --- | --- | --- |
+| `check-type-mismatch` | error | Um valor não corresponde ao tipo declarado. |
+| `check-return-mismatch` | error | Um `return` não corresponde ao tipo de retorno declarado. |
+| `check-argument-count` | error | Argumentos de menos ou de mais. |
+| `check-invalid-operand` | error | Um operador não pode ser aplicado a esse tipo. |
+| `check-unknown-member` | error | O membro não existe no receptor. |
+| `check-unknown-record-key` | error | A chave não é declarada pelo tipo de objeto. Também usado por `process.env`. |
+| `check-unknown-union-key` | error | A chave falta em pelo menos um membro da união. |
+| `check-invalid-intersection` | error | Uma parte da interseção não é um tipo objeto, uma interface ou uma classe. |
+| `check-conflicting-intersection-member` | error | Duas partes da interseção declaram a mesma chave com tipos diferentes. |
+| `check-unknown-type` | warning | O nome de tipo não é declarado em nenhum lugar que o arquivo alcance. |
 
 ## Checker — fluxo de controle
 

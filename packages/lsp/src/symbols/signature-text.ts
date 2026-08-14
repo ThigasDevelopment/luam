@@ -18,6 +18,10 @@ export function annotationText(annotation: TypeAnnotation | null): string {
         return annotation.options.map(annotationText).join(' | ');
     }
 
+    if (annotation.kind === 'type-intersection') {
+        return annotation.parts.map(annotationText).join(' & ');
+    }
+
     if (annotation.kind === 'type-string-literal') {
         return `'${annotation.value.replace(/(['\\])/g, '\\$1')}'`;
     }

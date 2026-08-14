@@ -1,4 +1,4 @@
-import { createDiagnostic, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
+import { createDiagnostic, type Diagnostic, type DiagnosticSeverity, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { Environment } from '@compiler/environment/environment';
 import type { Expression, TypeAnnotation } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
@@ -12,6 +12,7 @@ import { builtinSymbols } from './globals';
 import { mtaClassRegistry } from './oop-classes';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import { DeclarationRegistry } from './registry';
+import { mergeIntersection } from './type-intersection';
 import { substituteType } from './type-substitution';
 import {
     ANY_TYPE,
@@ -94,6 +95,10 @@ export class CheckContext {
     readonly declaredGlobals = new Map<string, SourcePosition>();
 
     readonly externalReferences = new Map<string, SourcePosition>();
+
+    readonly unknownTypes = new Map<string, SourcePosition>();
+
+    private readonly typeParameters = new Set<string>();
 
     readonly generatedMembers = new Map<ClassDeclaration, ClassMethodDeclaration[]>();
 
@@ -185,6 +190,14 @@ export class CheckContext {
     }
 
     report(code: string, message: string, position: SourcePosition): void {
+        this.push(code, message, position, 'error');
+    }
+
+    warn(code: string, message: string, position: SourcePosition): void {
+        this.push(code, message, position, 'warning');
+    }
+
+    private push(code: string, message: string, position: SourcePosition, severity: DiagnosticSeverity): void {
         if (this.mode === 'nocheck') {
             return;
         }
@@ -196,7 +209,23 @@ export class CheckContext {
         }
 
         this.reported.add(key);
-        this.diagnostics.push(createDiagnostic('checker', code, message, position));
+        this.diagnostics.push(createDiagnostic('checker', code, message, position, severity));
+    }
+
+    noteTypeParameters(names: readonly string[]): void {
+        for (const name of names) {
+            this.typeParameters.add(name);
+        }
+    }
+
+    isTypeParameter(name: string): boolean {
+        return this.typeParameters.has(name);
+    }
+
+    noteUnknownType(name: string, position: SourcePosition): void {
+        if (!this.unknownTypes.has(name)) {
+            this.unknownTypes.set(name, position);
+        }
     }
 
     record(expression: Expression, type: Type): Type {
@@ -275,6 +304,12 @@ export class CheckContext {
 
         if (annotation.kind === 'type-union') {
             return createUnion(annotation.options.map((option) => this.resolveAnnotation(option)));
+        }
+
+        if (annotation.kind === 'type-intersection') {
+            const parts = annotation.parts.map((part) => this.resolveAnnotation(part));
+
+            return mergeIntersection(this, parts, annotation.position);
         }
 
         if (annotation.kind === 'type-string-literal') {
@@ -387,6 +422,8 @@ export class CheckContext {
         const alias = this.binder.lookupAlias(name);
 
         if (alias === null) {
+            this.noteUnknownType(name, position);
+
             return createNamed(name);
         }
 

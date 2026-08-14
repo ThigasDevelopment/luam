@@ -59,14 +59,18 @@ writes nothing.
 
 ## Checker — types
 
-| Code | Meaning |
-| --- | --- |
-| `check-type-mismatch` | A value does not match the declared type. |
-| `check-return-mismatch` | A `return` does not match the declared return type. |
-| `check-argument-count` | Too few or too many arguments. |
-| `check-invalid-operand` | An operator cannot be applied to that type. |
-| `check-unknown-member` | The member does not exist on the receiver. |
-| `check-unknown-record-key` | The key is not declared by the object type. Also used by `process.env`. |
+| Code | Severity | Meaning |
+| --- | --- | --- |
+| `check-type-mismatch` | error | A value does not match the declared type. |
+| `check-return-mismatch` | error | A `return` does not match the declared return type. |
+| `check-argument-count` | error | Too few or too many arguments. |
+| `check-invalid-operand` | error | An operator cannot be applied to that type. |
+| `check-unknown-member` | error | The member does not exist on the receiver. |
+| `check-unknown-record-key` | error | The key is not declared by the object type. Also used by `process.env`. |
+| `check-unknown-union-key` | error | The key is missing from at least one member of the union. |
+| `check-invalid-intersection` | error | A part of an intersection is not an object type, an interface, or a class. |
+| `check-conflicting-intersection-member` | error | Two parts of an intersection declare the same key with different types. |
+| `check-unknown-type` | warning | The type name is not declared anywhere the file can reach. |
 
 ## Checker — control flow
 

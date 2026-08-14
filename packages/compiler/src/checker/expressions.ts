@@ -23,6 +23,7 @@ import {
 import { checkBinary, checkUnary } from './operators';
 import { buildFunctionType, checkFunctionBody } from './statements';
 import { collectInterpolations } from './template';
+import { resolveUnionMember } from './union-members';
 import {
     ANY_TYPE,
     BOOLEAN_TYPE,
@@ -97,6 +98,14 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
 
     if (objectType.kind === 'record') {
         return context.record(expression, resolveRecordMember(context, objectType, expression));
+    }
+
+    if (objectType.kind === 'union') {
+        const option = resolveUnionMember(context, objectType, expression);
+
+        if (option !== null) {
+            return context.record(expression, option);
+        }
     }
 
     if (objectType.kind === 'map' && isAssignable(STRING_TYPE, objectType.key)) {

@@ -77,11 +77,8 @@ marcador, porque não há outro lugar para colocá-lo:
 Ou seja, `?` no tipo continua fazendo parte da gramática; o que a regra proíbe é
 usá-lo onde existe um nome disponível.
 
-::: warning Sem estreitamento
-`if target ~= nil then` **não** refina `Player?` para `Player` dentro do bloco. O
-Luam não faz estreitamento de tipos. Quando você já garantiu que um valor está
-presente, anote o local que o recebe como `any`.
-:::
+`if target ~= nil then` refina `Player?` para `Player` dentro do bloco. Veja
+[guardas de tipo](#guardas-de-tipo).
 
 ## Uniões
 
@@ -89,9 +86,132 @@ presente, anote o local que o recebe como `any`.
 local key: string | number = 1
 ```
 
-Uma união aceita qualquer um dos seus membros. Como não há estreitamento, uma
-operação precisa ser válida para a união inteira — `key + 1` sobre
+Uma união aceita qualquer um dos seus membros. Para uma união de primitivos, uma
+operação precisa ser válida para todos os membros — `key + 1` sobre
 `string | number` é `check-invalid-operand`.
+
+Quando todos os membros são tipos objeto, interfaces ou classes, a leitura de uma
+chave é checada. Uma chave que todos os membros declaram devolve a união dos seus
+tipos; uma chave que só alguns declaram é `check-unknown-union-key`:
+
+```luam
+type Circle = {
+    kind: 'circle',
+    radius: number
+}
+
+type Square = {
+    kind: 'square',
+    side: number
+}
+
+type Shape = Circle | Square
+
+function area(shape: Shape): number
+    return shape.radius
+end
+```
+
+```
+error  check-unknown-union-key  "radius" is not a key of every member of
+       "Circle | Square". It is missing from "Square".
+```
+
+Uniões de qualquer outra coisa continuam sem checagem, então um receptor
+`string | number` segue aceitando qualquer chave.
+
+## Nomes que não estão declarados
+
+Um nome de tipo que o arquivo não alcança é `check-unknown-type`, um **warning**.
+O build continua passando e o nome segue se comportando como sempre — assinalável
+nos dois sentidos, sem checagem de membros — então fontes existentes continuam
+compilando:
+
+```
+warning  check-unknown-type  Type "Connection" is not defined.
+```
+
+Um nome conta como declarado quando é um primitivo, um alias de tipo, uma
+interface, uma classe, um enum, um tipo de elemento do MTA ou o parâmetro de tipo
+de um alias genérico. Ele não precisa aparecer antes do uso: a checagem roda
+depois que o arquivo é lido por inteiro, então um tipo declarado no fim, um alias
+recursivo e uma interface que se referencia continuam silenciosos. Declarações de
+um arquivo `.d.luam` contam quando o ambiente daquele arquivo alcança o que o
+usa.
+
+## Interseções
+
+`&` funde tipos objeto em um só:
+
+```luam
+type Base = {
+    id: string
+}
+
+type SQLite = Base & {
+    kind: 'sqlite',
+    sender: string
+}
+```
+
+`SQLite` declara `id`, `kind` e `sender`. Cada parte precisa ser um tipo objeto,
+uma interface ou uma classe — `string & { id: string }` é
+`check-invalid-intersection`. Duas partes só podem repetir uma chave quando a
+declaram com o mesmo tipo; caso contrário a fusão é
+`check-conflicting-intersection-member`.
+
+`&` liga mais forte que `|`, então `A & B | C` se lê como `(A & B) | C`.
+
+Uma interseção existe só no compilador. Ela funde o formato e não emite nada,
+então o Lua gerado é a mesma tabela que já seria.
+
+## Uniões discriminadas
+
+Uma união cujos membros compartilham uma chave tipada como literal de string
+estreita por essa chave. Comparar a chave com um literal mantém apenas os membros
+que podem casar:
+
+```luam
+type SQLite = Base & {
+    kind: 'sqlite',
+    sender: string
+}
+
+type MySQL = Base & {
+    kind: 'mysql',
+    host: string,
+    port: number
+}
+
+type Config = SQLite | MySQL
+
+function connect(config: Config): void
+    if config.kind == 'mysql' then
+        outputChatBox(config.host .. ':' .. config.port)
+    else
+        outputChatBox(config.sender)
+    end
+end
+```
+
+Dentro do primeiro bloco `config` é `MySQL`, então `host` e `port` resolvem e
+`sender` é `check-unknown-record-key`. O `else` recebe o membro restante. `~=`
+estreita para o outro lado, o que faz a forma com saída antecipada funcionar:
+
+```luam
+function connect(config: Config): void
+    if config.kind ~= 'mysql' then
+        return
+    end
+
+    outputChatBox(config.host)
+end
+```
+
+O receptor precisa ser um nome simples — `config.kind` estreita `config`, mas
+`state.config.kind` não estreita nada. O estreitamento termina com o bloco que o
+estabeleceu, e só literais de string discriminam, porque são os únicos tipos
+literais que o Luam tem.
 
 ## Arrays
 
@@ -232,6 +352,9 @@ end
   devolve.
 - `value ~= nil` e um `if value then` simples descartam o `nil`.
 - `value == nil` estreita para `nil`, e o `else` desse teste descarta o `nil`.
+- `value.key == '...'` escolhe os membros da união que declaram `key` com aquele
+  literal, e `~=` escolhe o resto. Veja
+  [uniões discriminadas](#unioes-discriminadas).
 - Cadeias com `and` aplicam todos os fatos que carregam.
 
 O estreitamento termina com o bloco e cai assim que o nome é atribuído ou

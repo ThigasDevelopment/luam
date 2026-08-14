@@ -12,6 +12,7 @@ import { checkJumps } from './jumps';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import type { DeclarationRegistry } from './registry';
 import { checkStatements } from './statements';
+import { reportUnknownTypes } from './type-names';
 import type { Type } from './types';
 
 export interface CheckResult {
@@ -57,6 +58,7 @@ export function check(program: Program, mode: StrictMode, environment: Environme
     const directives = collectDirectives(program.body, { isDeclarationFile: context.isDeclarationFile });
 
     checkStatements(context, program.body);
+    reportUnknownTypes(context);
 
     return {
         diagnostics: sortDiagnostics([...structure, ...directives.diagnostics, ...context.diagnostics]),

@@ -290,8 +290,10 @@ function checkStatement(context: CheckContext, statement: Statement): void {
             return checkGenericFor(context, statement);
         case 'type-alias-statement': {
             const resolved = context.resolveAnnotation(statement.annotation);
-            const named = statement.annotation.kind === 'type-object' ? renameRecord(resolved, statement.name) : resolved;
+            const shape = statement.annotation.kind === 'type-object' || statement.annotation.kind === 'type-intersection';
+            const named = shape ? renameRecord(resolved, statement.name) : resolved;
 
+            context.noteTypeParameters(statement.typeParameters);
             context.binder.declareAlias(statement.name, named, statement.typeParameters);
 
             return;

@@ -6,6 +6,46 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Shapes That Combine and Unions That Narrow
+
+`type SQLite = Base & { kind: 'sqlite' }` did not lex — `&` was not a character
+the language knew, so the only way to extend a shape was `interface ... extends`.
+A union of object types was worse than unchecked: it was accepted in an
+annotation and then dropped, so `config.anything` on a `SQLite | MySQL` resolved
+to `any` and no `if config.kind == 'mysql' then` ever refined it. The discriminated
+union, the shape the pattern exists for, compiled without a single check.
+
+#### Added
+
+- `&` in type position, merging object types, interfaces, and classes into one
+  record. It binds tighter than `|`, so `A & B | C` is `(A & B) | C`, and the
+  merge is erased by the build.
+- Key access on a union of object types, interfaces, and classes. A key every
+  member declares gives the union of its types. Unions of anything else stay
+  permissive.
+- Narrowing on a string-literal discriminant. `value.key == 'literal'` keeps the
+  members that can match, `~=` keeps the rest, and the `else` branch of a
+  single-clause `if` gets the complement, so a guard clause that returns early
+  narrows the rest of the block.
+- `check-unknown-union-key`, reported when a key is missing from at least one
+  member of the union.
+- `check-invalid-intersection`, reported on a part of an intersection that is not
+  an object type, an interface, or a class.
+- `check-conflicting-intersection-member`, reported when two parts declare the
+  same key with different types.
+- `check-unknown-type`, a warning on a type name the file cannot reach. Nothing
+  reported an undeclared type, so `local handle: Connection` compiled silently
+  against an element MTA does not have. The check is deferred to the end of the
+  file, so a type declared further down, a recursive alias, and a
+  self-referencing interface stay silent, and the name still resolves the way it
+  always did — no source stops compiling.
+
+#### Fixed
+
+- The types manual claimed Luam performs no type narrowing and told the reader to
+  annotate a checked value as `any`. Narrowing had already shipped, and the same
+  page documented it a few sections later.
+
 ### Every Reserved Word Completes
 
 Completion offered the 32 reserved words at a statement, `constructor` in a

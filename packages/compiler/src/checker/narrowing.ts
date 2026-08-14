@@ -1,6 +1,7 @@
 import type { Expression, Statement } from '@compiler/parser/ast';
 
 import type { CheckContext } from './context';
+import { discriminantFact } from './discriminant';
 import {
     ANY_TYPE,
     BOOLEAN_TYPE,
@@ -76,6 +77,14 @@ function mergeAlternatives(left: ReadonlyMap<string, Type>, right: ReadonlyMap<s
     }
 }
 
+function applyDiscriminant(context: CheckContext, left: Expression, right: Expression, keep: boolean, facts: Map<string, Type>): void {
+    const fact = discriminantFact(context, left, right, keep);
+
+    if (fact !== null) {
+        facts.set(fact[0], fact[1]);
+    }
+}
+
 function collectFacts(context: CheckContext, expression: Expression, facts: Map<string, Type>): void {
     if (expression.kind === 'group-expression') {
         collectFacts(context, expression.expression, facts);
@@ -114,6 +123,8 @@ function collectFacts(context: CheckContext, expression: Expression, facts: Map<
             facts.set(guard[0], guard[1]);
         } else if (missing !== null) {
             facts.set(missing, NIL_TYPE);
+        } else {
+            applyDiscriminant(context, expression.left, expression.right, true, facts);
         }
 
         return;
@@ -124,6 +135,8 @@ function collectFacts(context: CheckContext, expression: Expression, facts: Map<
 
         if (name !== null) {
             present(context, name, facts);
+        } else {
+            applyDiscriminant(context, expression.left, expression.right, false, facts);
         }
     }
 }
@@ -180,7 +193,13 @@ export function negatedFacts(context: CheckContext, condition: Expression): Map<
 
         if (name !== null) {
             present(context, name, facts);
+        } else {
+            applyDiscriminant(context, condition.left, condition.right, false, facts);
         }
+    }
+
+    if (condition.kind === 'binary-expression' && condition.operator === '~=') {
+        applyDiscriminant(context, condition.left, condition.right, true, facts);
     }
 
     if (condition.kind === 'unary-expression' && condition.operator === 'not' && condition.operand.kind === 'identifier') {

@@ -135,7 +135,7 @@ describe('declaration files', () => {
             { path: 'src/client/hud.luam', source: 'local vendor: Vendor = new Vendor()\n' },
         ]);
 
-        expect(result.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['check-unknown-class', 'project-environment-import']);
+        expect(result.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['check-unknown-type', 'check-unknown-class', 'project-environment-import']);
     });
 
     it('rejects a statement that would have an effect', () => {

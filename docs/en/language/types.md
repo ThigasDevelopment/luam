@@ -76,11 +76,8 @@ because there is nowhere else to put it:
 So `?` on a type is still part of the grammar; what the rule forbids is using it
 where a name is available.
 
-::: warning No narrowing
-`if target ~= nil then` does **not** refine `Player?` to `Player` inside the
-branch. Luam performs no type narrowing. When you have established a value is
-present, annotate the receiving local as `any`.
-:::
+`if target ~= nil then` refines `Player?` to `Player` inside the branch. See
+[type guards](#type-guards).
 
 ## Unions
 
@@ -88,9 +85,129 @@ present, annotate the receiving local as `any`.
 local key: string | number = 1
 ```
 
-A union accepts any of its members. Because there is no narrowing, an operation
-must be valid for the whole union — `key + 1` on `string | number` is
+A union accepts any of its members. For a union of primitives an operation must
+be valid for every member — `key + 1` on `string | number` is
 `check-invalid-operand`.
+
+When every member is an object type, an interface, or a class, reading a key is
+checked. A key that all members declare gives the union of its types; a key that
+only some declare is `check-unknown-union-key`:
+
+```luam
+type Circle = {
+    kind: 'circle',
+    radius: number
+}
+
+type Square = {
+    kind: 'square',
+    side: number
+}
+
+type Shape = Circle | Square
+
+function area(shape: Shape): number
+    return shape.radius
+end
+```
+
+```
+error  check-unknown-union-key  "radius" is not a key of every member of
+       "Circle | Square". It is missing from "Square".
+```
+
+Unions of anything else stay unchecked, so a `string | number` receiver keeps
+accepting any key.
+
+## Names that are not declared
+
+A type name the file cannot reach is `check-unknown-type`, a **warning**. The
+build still succeeds and the name still behaves as it always did — assignable in
+both directions, with no members checked — so existing sources keep compiling:
+
+```
+warning  check-unknown-type  Type "Connection" is not defined.
+```
+
+A name counts as declared when it is a primitive, a type alias, an interface, a
+class, an enum, an MTA element type, or the type parameter of a generic alias. It
+does not have to appear before its use: the check runs once the file is fully
+read, so a type declared at the bottom, a recursive alias, and a
+self-referencing interface all stay silent. Declarations from a `.d.luam` file
+count when that file's environment reaches the one using it.
+
+## Intersections
+
+`&` merges object types into one:
+
+```luam
+type Base = {
+    id: string
+}
+
+type SQLite = Base & {
+    kind: 'sqlite',
+    sender: string
+}
+```
+
+`SQLite` declares `id`, `kind`, and `sender`. Each part must be an object type,
+an interface, or a class — `string & { id: string }` is
+`check-invalid-intersection`. Two parts may repeat a key only when they declare
+it with the same type; otherwise the merge is
+`check-conflicting-intersection-member`.
+
+`&` binds tighter than `|`, so `A & B | C` reads as `(A & B) | C`.
+
+An intersection is compiler-only. It merges the shape and emits nothing, so the
+generated Lua is the same table it would have been.
+
+## Discriminated unions
+
+A union whose members share a key typed as a string literal narrows on that key.
+Comparing it against a literal keeps only the members that can match:
+
+```luam
+type SQLite = Base & {
+    kind: 'sqlite',
+    sender: string
+}
+
+type MySQL = Base & {
+    kind: 'mysql',
+    host: string,
+    port: number
+}
+
+type Config = SQLite | MySQL
+
+function connect(config: Config): void
+    if config.kind == 'mysql' then
+        outputChatBox(config.host .. ':' .. config.port)
+    else
+        outputChatBox(config.sender)
+    end
+end
+```
+
+Inside the first branch `config` is `MySQL`, so `host` and `port` resolve and
+`sender` is `check-unknown-record-key`. The `else` branch gets the remaining
+member. `~=` narrows the other way, which makes the early-return form work too:
+
+```luam
+function connect(config: Config): void
+    if config.kind ~= 'mysql' then
+        return
+    end
+
+    outputChatBox(config.host)
+end
+```
+
+The receiver must be a plain name — `config.kind` narrows `config`, but
+`state.config.kind` narrows nothing. Narrowing ends with the block that
+established it, and only string literals discriminate, because they are the only
+literal types Luam has.
 
 ## Arrays
 
@@ -229,6 +346,9 @@ end
 - `type(value) == '...'` narrows to that type, for every name `type` returns.
 - `value ~= nil` and a plain `if value then` drop `nil`.
 - `value == nil` narrows to `nil`, and the `else` branch of that test drops it.
+- `value.key == '...'` picks the members of a union that declare `key` with that
+  literal, and `~=` picks the rest. See
+  [discriminated unions](#discriminated-unions).
 - `and` chains apply every fact they carry.
 
 The narrowing ends with the block, and it is dropped as soon as the name is

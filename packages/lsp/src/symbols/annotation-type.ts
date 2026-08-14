@@ -40,6 +40,20 @@ function minimumOf(types: readonly Type[]): number {
     return optional === -1 ? types.length : optional;
 }
 
+function intersectionType(parts: readonly Type[]): Type {
+    const members = new Map<string, Type>();
+
+    for (const part of parts) {
+        if (part.kind === 'record') {
+            for (const [name, member] of part.members) {
+                members.set(name, member);
+            }
+        }
+    }
+
+    return createObjectType(members);
+}
+
 export function annotationType(annotation: TypeAnnotation | null): Type {
     if (annotation === null) {
         return ANY_TYPE;
@@ -55,6 +69,10 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
 
     if (annotation.kind === 'type-union') {
         return createUnion(annotation.options.map((option) => annotationType(option)));
+    }
+
+    if (annotation.kind === 'type-intersection') {
+        return intersectionType(annotation.parts.map((part) => annotationType(part)));
     }
 
     if (annotation.kind === 'type-string-literal') {

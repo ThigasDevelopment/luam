@@ -28,6 +28,11 @@ export interface TypeUnionAnnotation extends NodeBase {
     options: TypeAnnotation[];
 }
 
+export interface TypeIntersectionAnnotation extends NodeBase {
+    kind: 'type-intersection';
+    parts: TypeAnnotation[];
+}
+
 export interface TypeStringLiteralAnnotation extends NodeBase {
     kind: 'type-string-literal';
     value: string;
@@ -60,6 +65,7 @@ export type TypeAnnotation =
     | TypeArrayAnnotation
     | TypeOptionalAnnotation
     | TypeUnionAnnotation
+    | TypeIntersectionAnnotation
     | TypeStringLiteralAnnotation
     | TypeFunctionAnnotation
     | TypeObjectAnnotation

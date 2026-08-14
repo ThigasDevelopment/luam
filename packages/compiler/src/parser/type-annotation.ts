@@ -181,8 +181,24 @@ function parsePostfixType(stream: TokenStream): TypeAnnotation {
     }
 }
 
-export function parseTypeAnnotation(stream: TokenStream): TypeAnnotation {
+function parseIntersectionType(stream: TokenStream): TypeAnnotation {
     const first = parsePostfixType(stream);
+
+    if (!stream.check('operator', '&')) {
+        return first;
+    }
+
+    const parts: TypeAnnotation[] = [first];
+
+    while (stream.match('operator', '&')) {
+        parts.push(parsePostfixType(stream));
+    }
+
+    return { kind: 'type-intersection', parts, position: first.position };
+}
+
+export function parseTypeAnnotation(stream: TokenStream): TypeAnnotation {
+    const first = parseIntersectionType(stream);
 
     if (!stream.check('operator', '|')) {
         return first;
@@ -191,7 +207,7 @@ export function parseTypeAnnotation(stream: TokenStream): TypeAnnotation {
     const options: TypeAnnotation[] = [first];
 
     while (stream.match('operator', '|')) {
-        options.push(parsePostfixType(stream));
+        options.push(parseIntersectionType(stream));
     }
 
     return { kind: 'type-union', options, position: first.position };

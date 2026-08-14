@@ -39,6 +39,14 @@ export function collectAnnotation(state: CollectorState, block: BlockContext, an
         return;
     }
 
+    if (annotation.kind === 'type-intersection') {
+        for (const part of annotation.parts) {
+            collectAnnotation(state, block, part);
+        }
+
+        return;
+    }
+
     if (annotation.kind === 'type-object') {
         for (const member of annotation.members) {
             collectAnnotation(state, block, member.annotation);
