@@ -1,9 +1,0 @@
-{
-	"config": "path/config.luam",
-
-	"infos": {
-		"author": "name",
-		"version": "1.0.0",
-		"description": "description"
-	}
-}
