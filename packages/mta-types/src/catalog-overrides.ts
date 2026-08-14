@@ -20,6 +20,15 @@ export const ELEMENT_TYPE_PARENTS: Readonly<Record<string, string>> = {
 
 export const EXCLUDED_ELEMENT_TYPES: readonly string[] = ['QueryHandle'];
 
+export interface OopMemberAddition {
+    name: string;
+    procedural: string;
+}
+
+export const OOP_MEMBER_ADDITIONS: Readonly<Record<string, readonly OopMemberAddition[]>> = {
+    Connection: [{ name: 'destroy', procedural: 'destroyElement' }],
+};
+
 export const EXCLUDED_APIS: readonly string[] = ['exports'];
 
 export const CATALOG_OVERRIDES: Readonly<Record<string, CatalogOverride>> = {

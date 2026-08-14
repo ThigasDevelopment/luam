@@ -6,6 +6,26 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### A Nested Project Is Still a Project
+
+The editor read `.env` only from the workspace folders it was opened with, so a
+project living below one of them never found its own. Opening a repository that
+holds a resource in a subdirectory reported `env` as not in scope on every
+interpolation, while `luam check --cwd` on the same resource was clean — the CLI
+is pointed at the project, the editor was not.
+
+The lookup now walks up from the file to the nearest `.env`, bounded by the
+workspace folders so nothing outside them is ever read, and the result is cached
+per directory.
+
+#### Added
+
+- `destroy` on `Connection`, mapped to `destroyElement`. MTA does destroy the
+  connection that way; what it does not have is the rest of the element surface.
+- `OOP_MEMBER_ADDITIONS`, the override that declares a member the upstream class
+  omits, resolved against the catalog so a wrong procedural name fails the build
+  instead of shipping.
+
 ### The Editor Says What It Knows
 
 Signature help on an MTA constructor read `argument1: string, argument2: string`.

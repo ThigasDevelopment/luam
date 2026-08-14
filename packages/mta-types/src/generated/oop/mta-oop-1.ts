@@ -201,6 +201,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
     null,
     ),
     oopClass('Connection', null, [
+        oopMethod('destroy', 'shared', 'destroyElement', fn([], BOOLEAN, 0)),
         oopMethod('exec', 'server', 'dbExec', fn([STRING, ANY], BOOLEAN, 1, true)),
         oopMethod('prepareString', 'server', 'dbPrepareString', fn([STRING, ANY], STRING, 1, true)),
         oopMethod('query', 'server', 'dbQuery', fn([ANY, ANY, ANY, ANY, ANY], ANY, 2, true)),

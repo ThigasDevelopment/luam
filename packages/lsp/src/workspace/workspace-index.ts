@@ -6,7 +6,7 @@ import { fingerprintDeclarations } from '@compiler/project/fingerprint';
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
 import { pathKey, pathToUri, relativeToRoots, uriToPath } from './document-uri';
-import { loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
+import { documentDeclarations, documentEnvironment, forgetEnvironments, loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
 import { DEFAULT_PROJECT_SETTINGS, settingsFrom, type ProjectSettings } from './project-settings';
 import { scanSources } from './source-scanner';
 
@@ -35,8 +35,8 @@ export class WorkspaceIndex {
             relative: relativeToRoots(path, this.roots),
             version,
             text,
-            project: this.project,
-            env: this.env,
+            project: documentDeclarations(path, this.roots),
+            env: documentEnvironment(path, this.roots),
             oop: this.settings.oop,
             ambient: (environment) => this.ambientFor(uri, environment),
         });
@@ -96,6 +96,7 @@ export class WorkspaceIndex {
     }
 
     reloadSettings(): DocumentAnalysis[] {
+        forgetEnvironments();
         this.project = loadProjectDeclarations(this.roots);
         this.env = loadProjectEnvironment(this.roots);
 
@@ -117,6 +118,7 @@ export class WorkspaceIndex {
     }
 
     load(roots: readonly string[]): void {
+        forgetEnvironments();
         this.roots = roots;
         this.project = loadProjectDeclarations(roots);
         this.env = loadProjectEnvironment(roots);

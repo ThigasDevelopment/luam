@@ -1,10 +1,10 @@
 import type { ApiEnvironment } from '#mta-types/api-declaration';
-import { ELEMENT_TYPE_ALIASES, OOP_CONSTRUCTOR_OVERRIDES } from '#mta-types/catalog-overrides';
+import { ELEMENT_TYPE_ALIASES, OOP_CONSTRUCTOR_OVERRIDES, OOP_MEMBER_ADDITIONS } from '#mta-types/catalog-overrides';
 import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass, type OopMember } from '#mta-types/oop-declaration';
 import { ANY, type TypeDescriptor } from '#mta-types/type-descriptor';
 
 import { mergeDescriptor, type NormalizedCatalog } from './catalog-normalizer.ts';
-import type { ElementTypeEntry } from './generator-model.ts';
+import { GeneratorError, type ElementTypeEntry } from './generator-model.ts';
 import type { ParsedOopClass, ParsedOopConstructor, ParsedOopMethod } from './oop-parser.ts';
 
 export interface OopSurfaceResult {
@@ -147,6 +147,18 @@ function byName(left: OopMember, right: OopMember): number {
     return left.name.localeCompare(right.name, 'en');
 }
 
+function withoutReceiver(descriptor: TypeDescriptor): TypeDescriptor {
+    if (descriptor.kind !== 'function') {
+        return descriptor;
+    }
+
+    return {
+        ...descriptor,
+        parameters: descriptor.parameters.slice(1),
+        minimumArguments: Math.max(0, descriptor.minimumArguments - 1),
+    };
+}
+
 export function buildOopSurface(
     parsed: readonly ParsedOopClass[],
     elementTypes: readonly ElementTypeEntry[],
@@ -190,6 +202,17 @@ export function buildOopSurface(
             }
 
             statics.push(oopMethod(method.name, environment, method.procedural, method.type));
+        }
+
+        for (const addition of OOP_MEMBER_ADDITIONS[entry.name] ?? []) {
+            const environment = environments.get(addition.procedural);
+            const declared = [...catalog.shared, ...catalog.server, ...catalog.client].find((api) => api.name === addition.procedural);
+
+            if (environment === undefined || declared === undefined) {
+                throw new GeneratorError('oop surface', `"${entry.name}.${addition.name}" maps to "${addition.procedural}", which the catalog does not declare.`);
+            }
+
+            members.push(oopMethod(addition.name, environment, addition.procedural, withoutReceiver(declared.type)));
         }
 
         for (const [property, shapeEnvironment] of properties.get(entry.name) ?? new Map<string, ApiEnvironment>()) {
