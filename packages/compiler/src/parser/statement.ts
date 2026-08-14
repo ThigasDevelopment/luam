@@ -49,6 +49,8 @@ function parseReturnStatement(stream: TokenStream): Statement {
         (stream.current().kind === 'keyword' && BLOCK_END.has(stream.current().value));
     const values = stop || stream.check('punctuation', ';') ? [] : parseExpressionList(stream);
 
+    stream.match('punctuation', ';');
+
     return { kind: 'return-statement', values, position };
 }
 

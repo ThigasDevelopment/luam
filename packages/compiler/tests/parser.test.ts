@@ -135,6 +135,14 @@ describe('parser', () => {
         expect(statement).toMatchSnapshot();
     });
 
+    it('accepts a semicolon after a return statement', () => {
+        expect(kinds('local value = 1;\n')).toEqual(['local-statement']);
+        expect(kinds('function make(): number\n    return 1;\nend\n')).toEqual(['function-declaration']);
+        expect(kinds('function make(): void\n    return;\nend\n')).toEqual(['function-declaration']);
+        expect(kinds('class Example {\n    constructor = function ()\n        return self;\n    end\n}\n')).toEqual(['class-declaration']);
+        expect(kinds('while true do\n    break;\nend\n')).toEqual(['while-statement']);
+    });
+
     it('parses local functions and anonymous functions', () => {
         expect(kinds('local function double(value) return value * 2 end')).toEqual(['function-declaration']);
         expect(firstValue('local handler = function() return 1 end').kind).toBe('function-expression');
