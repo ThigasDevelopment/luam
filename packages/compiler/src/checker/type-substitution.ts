@@ -1,6 +1,7 @@
 import {
     createArray,
     createFunction,
+    createMap,
     createOptional,
     createRecord,
     createTuple,
@@ -15,6 +16,10 @@ export function substituteType(type: Type, substitutions: ReadonlyMap<string, Ty
 
     if (type.kind === 'array') {
         return createArray(substituteType(type.element, substitutions));
+    }
+
+    if (type.kind === 'map') {
+        return createMap(substituteType(type.key, substitutions), substituteType(type.value, substitutions));
     }
 
     if (type.kind === 'optional') {

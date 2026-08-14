@@ -15,6 +15,7 @@ import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration 
 import type { CheckContext } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor } from './control-flow';
 import { checkExpression, checkValueList } from './expressions';
+import { guardFacts } from './narrowing';
 import {
     ANY_TYPE,
     createFunction,
@@ -94,6 +95,8 @@ function checkLocal(context: CheckContext, statement: LocalStatement): void {
         const value = valueAt(statement.values, valueTypes, index);
         const valueType = valueTypes[index] ?? NIL_TYPE;
 
+        context.forgetNarrowing(declaration.name);
+
         if (declaration.annotation === null) {
             const inferred = context.allowNil || value === undefined ? ANY_TYPE : widenLiteral(valueType);
 
@@ -150,8 +153,14 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
             return;
         }
 
+        const declared = target.kind === 'identifier' ? (context.binder.lookup(target.name)?.type ?? targetType) : targetType;
+
         if (value !== undefined) {
-            context.expectAssignable(valueType, targetType, value.position, 'Assignment');
+            context.expectAssignable(valueType, declared, value.position, 'Assignment');
+        }
+
+        if (target.kind === 'identifier') {
+            context.forgetNarrowing(target.name);
         }
     });
 }
@@ -301,7 +310,21 @@ function checkStatement(context: CheckContext, statement: Statement): void {
 }
 
 export function checkStatements(context: CheckContext, statements: readonly Statement[]): void {
+    let guards = 0;
+
     for (const statement of statements) {
         checkStatement(context, statement);
+
+        const facts = guardFacts(context, statement);
+
+        if (facts.size > 0) {
+            context.pushNarrowing(facts);
+            guards += 1;
+        }
+    }
+
+    while (guards > 0) {
+        context.popNarrowing();
+        guards -= 1;
     }
 }

@@ -30,6 +30,7 @@ import {
     createStringLiteral,
     createUnion,
     firstValueOf,
+    isAssignable,
     isTableLike,
     NIL_TYPE,
     NUMBER_TYPE,
@@ -96,6 +97,10 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
 
     if (objectType.kind === 'record') {
         return context.record(expression, resolveRecordMember(context, objectType, expression));
+    }
+
+    if (objectType.kind === 'map' && isAssignable(STRING_TYPE, objectType.key)) {
+        return context.record(expression, objectType.value);
     }
 
     const named = objectType.kind === 'named' ? resolveNamedMember(context, objectType.name, expression) : null;
@@ -270,14 +275,19 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
                 checkGlobalReference(context, expression.name, expression.position);
             }
 
-            return context.record(expression, symbol?.type ?? ANY_TYPE);
+            return context.record(expression, context.narrowedType(expression.name) ?? symbol?.type ?? ANY_TYPE);
         }
         case 'member-expression':
             return checkMember(context, expression);
         case 'index-expression': {
             const objectType = checkExpression(context, expression.object);
+            const indexType = checkExpression(context, expression.index);
 
-            checkExpression(context, expression.index);
+            if (objectType.kind === 'map') {
+                context.expectAssignable(indexType, objectType.key, expression.index.position, 'Key');
+
+                return context.record(expression, objectType.value);
+            }
 
             return context.record(expression, objectType.kind === 'array' ? objectType.element : ANY_TYPE);
         }

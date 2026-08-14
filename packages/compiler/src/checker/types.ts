@@ -13,6 +13,12 @@ export interface ArrayType {
     element: Type;
 }
 
+export interface MapType {
+    kind: 'map';
+    key: Type;
+    value: Type;
+}
+
 export interface OptionalType {
     kind: 'optional';
     element: Type;
@@ -53,7 +59,18 @@ export interface RecordType {
     members: ReadonlyMap<string, Type>;
 }
 
-export type Type = PrimitiveType | TableType | ArrayType | OptionalType | UnionType | StringLiteralType | NamedType | FunctionType | TupleType | RecordType;
+export type Type =
+    | PrimitiveType
+    | TableType
+    | ArrayType
+    | MapType
+    | OptionalType
+    | UnionType
+    | StringLiteralType
+    | NamedType
+    | FunctionType
+    | TupleType
+    | RecordType;
 
 export interface AssignabilityOptions {
     allowNil: boolean;
@@ -76,6 +93,10 @@ export function createArray(element: Type): Type {
 
 export function createNamed(name: string): Type {
     return { kind: 'named', name };
+}
+
+export function createMap(key: Type, value: Type): Type {
+    return { kind: 'map', key, value };
 }
 
 export function createStringLiteral(value: string): Type {
@@ -181,6 +202,10 @@ export function typeToString(type: Type): string {
         return `${typeToString(type.element)}[]`;
     }
 
+    if (type.kind === 'map') {
+        return `table<${typeToString(type.key)}, ${typeToString(type.value)}>`;
+    }
+
     if (type.kind === 'optional') {
         return `${typeToString(type.element)}?`;
     }
@@ -214,8 +239,28 @@ export function typeToString(type: Type): string {
     return type.kind;
 }
 
+export function withoutNil(type: Type): Type {
+    if (type.kind === 'optional') {
+        return type.element;
+    }
+
+    if (type.kind === 'union') {
+        return createUnion(type.options.filter((option) => option.kind !== 'nil'));
+    }
+
+    return type;
+}
+
+export function acceptsNil(type: Type): boolean {
+    if (type.kind === 'nil' || type.kind === 'optional' || type.kind === 'any' || type.kind === 'unknown') {
+        return true;
+    }
+
+    return type.kind === 'union' && type.options.some((option) => option.kind === 'nil');
+}
+
 export function isTableLike(type: Type): boolean {
-    return type.kind === 'table' || type.kind === 'array';
+    return type.kind === 'table' || type.kind === 'array' || type.kind === 'map';
 }
 
 export function isBooleanType(type: Type | undefined): boolean {
@@ -225,10 +270,18 @@ export function isBooleanType(type: Type | undefined): boolean {
 }
 
 export function isNumeric(type: Type): boolean {
+    if (type.kind === 'union') {
+        return type.options.every(isNumeric);
+    }
+
     return type.kind === 'number' || type.kind === 'any' || type.kind === 'unknown' || type.kind === 'named';
 }
 
 export function isConcatenable(type: Type): boolean {
+    if (type.kind === 'union') {
+        return type.options.every(isConcatenable);
+    }
+
     return type.kind === 'string' || type.kind === 'string-literal' || isNumeric(type);
 }
 
@@ -249,6 +302,22 @@ function isFunctionAssignable(source: FunctionType, target: FunctionType, option
     }
 
     return target.returnType.kind === 'void' || isAssignable(source.returnType, target.returnType, options);
+}
+
+function isMapAssignable(source: Type, target: MapType, options: AssignabilityOptions): boolean {
+    if (source.kind === 'table') {
+        return true;
+    }
+
+    if (source.kind === 'array') {
+        return isAssignable(NUMBER_TYPE, target.key, options) && isAssignable(source.element, target.value, options);
+    }
+
+    if (source.kind === 'record') {
+        return isAssignable(STRING_TYPE, target.key, options) && [...source.members.values()].every((member) => isAssignable(member, target.value, options));
+    }
+
+    return source.kind === 'map' && isAssignable(source.key, target.key, options) && isAssignable(source.value, target.value, options);
 }
 
 function isRecordAssignable(source: RecordType, target: RecordType, options: AssignabilityOptions): boolean {
@@ -318,6 +387,10 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
 
     if (target.kind === 'array') {
         return source.kind === 'table' || (source.kind === 'array' && isAssignable(source.element, target.element, options));
+    }
+
+    if (target.kind === 'map') {
+        return isMapAssignable(source, target, options);
     }
 
     if (source.kind === 'function' && target.kind === 'function') {

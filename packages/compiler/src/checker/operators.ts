@@ -2,14 +2,17 @@ import type { Expression } from '@compiler/parser/ast';
 
 import type { CheckContext } from './context';
 import {
+    acceptsNil,
     ANY_TYPE,
     BOOLEAN_TYPE,
     createUnion,
     isConcatenable,
     isNumeric,
+    NIL_TYPE,
     NUMBER_TYPE,
     STRING_TYPE,
     typeToString,
+    withoutNil,
     type Type,
 } from './types';
 
@@ -22,8 +25,12 @@ function reportInvalidOperand(context: CheckContext, operator: string, operand: 
 }
 
 export function checkBinary(context: CheckContext, operator: string, left: Type, right: Type, expression: Expression): Type {
-    if (operator === 'and' || operator === 'or') {
-        return context.record(expression, createUnion([left, right]));
+    if (operator === 'or') {
+        return context.record(expression, createUnion([withoutNil(left), right]));
+    }
+
+    if (operator === 'and') {
+        return context.record(expression, acceptsNil(left) ? createUnion([right, NIL_TYPE]) : right);
     }
 
     if (operator === '==' || operator === '~=' || COMPARISON.has(operator)) {

@@ -18,6 +18,7 @@ import {
     BOOLEAN_TYPE,
     createArray,
     createFunction,
+    createMap,
     createNamed,
     createObjectType,
     createOptional,
@@ -51,6 +52,10 @@ const BUILTIN_TYPES: Readonly<Record<string, Type>> = {
     void: VOID_TYPE,
 };
 
+const TABLE_ANNOTATION = 'table';
+
+const MAP_ARGUMENTS = 2;
+
 const PROJECT_POSITION: SourcePosition = { line: 0, column: 0, offset: 0 };
 
 export interface ClassMethodFrame {
@@ -77,6 +82,10 @@ export class CheckContext {
     readonly declarations = new DeclarationRegistry();
 
     readonly diagnostics: Diagnostic[] = [];
+
+    private readonly reported = new Set<string>();
+
+    private readonly narrowings: Map<string, Type>[] = [];
 
     readonly types = new Map<Expression, Type>();
 
@@ -135,6 +144,32 @@ export class CheckContext {
         this.declaredGlobals.set(symbol.name, symbol.position);
     }
 
+    pushNarrowing(facts: ReadonlyMap<string, Type>): void {
+        this.narrowings.push(new Map(facts));
+    }
+
+    popNarrowing(): void {
+        this.narrowings.pop();
+    }
+
+    forgetNarrowing(name: string): void {
+        for (const frame of this.narrowings) {
+            frame.delete(name);
+        }
+    }
+
+    narrowedType(name: string): Type | null {
+        for (let index = this.narrowings.length - 1; index >= 0; index -= 1) {
+            const found = this.narrowings[index]?.get(name);
+
+            if (found !== undefined) {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     isAmbientClass(name: string): boolean {
         return this.ambientClasses.has(name);
     }
@@ -154,6 +189,13 @@ export class CheckContext {
             return;
         }
 
+        const key = `${code}|${position.offset}|${message}`;
+
+        if (this.reported.has(key)) {
+            return;
+        }
+
+        this.reported.add(key);
         this.diagnostics.push(createDiagnostic('checker', code, message, position));
     }
 
@@ -309,10 +351,32 @@ export class CheckContext {
         }
     }
 
+    private resolveMapAnnotation(typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {
+        const [key, value] = typeArguments;
+
+        if (key === undefined || value === undefined || typeArguments.length !== MAP_ARGUMENTS) {
+            const message = `Type "${TABLE_ANNOTATION}" expects a key type and a value type but received ${typeArguments.length}.`;
+
+            this.report('check-generic-arity', message, position);
+
+            for (const argument of typeArguments) {
+                this.resolveAnnotation(argument);
+            }
+
+            return TABLE_TYPE;
+        }
+
+        return createMap(this.resolveAnnotation(key), this.resolveAnnotation(value));
+    }
+
     private resolveNamedAnnotation(name: string, typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {
         const builtin = BUILTIN_TYPES[name];
 
         if (builtin !== undefined) {
+            if (name === TABLE_ANNOTATION && typeArguments.length > 0) {
+                return this.resolveMapAnnotation(typeArguments, position);
+            }
+
             if (typeArguments.length > 0) {
                 this.report('check-generic-arity', `Type "${name}" does not accept type arguments.`, position);
             }

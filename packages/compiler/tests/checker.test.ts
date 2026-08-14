@@ -15,6 +15,12 @@ describe('checker', () => {
         expect(codes("local name: string = 'Thigas'\nlocal total: number = 1 + 2\n")).toEqual([]);
     });
 
+    it('reports an annotation error once per position', () => {
+        expect(codes('function take(data: string<number>): void\nend\n')).toEqual(['check-generic-arity']);
+        expect(codes("function make(): string<number>\n    return ''\nend\n")).toEqual(['check-generic-arity']);
+        expect(codes('class A {\n    take = function (data: string<number>): void\n    end\n}\n')).toEqual(['check-generic-arity']);
+    });
+
     it('reports an incompatible local initializer', () => {
         expect(codes("local total: number = 'text'")).toEqual(['check-type-mismatch']);
         expect(messages("local total: number = 'text'")[0]).toBe('Variable "total" expects "number" but received "string".');
