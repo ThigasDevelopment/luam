@@ -108,6 +108,37 @@ describe('workspace loading', () => {
         expect(codes).toEqual(['check-unknown-class']);
     });
 
+    it('does not report a duplicate when another file only references the class', () => {
+        const root = workspace({
+            'src/server/core.luam': 'class Core {\n}\n',
+            'src/server/bootstrap.luam': 'local core: Core = new Core()\n',
+        });
+        const service = new LanguageService();
+        const uri = uriFor(root, 'src/server/core.luam');
+
+        service.loadWorkspace([root]);
+        expect(service.diagnostics(uri)).toEqual([]);
+
+        service.update(uri, 2, 'class Core {\n    id: number = 0\n}\n');
+        service.refresh();
+
+        expect(service.diagnostics(uri)).toEqual([]);
+    });
+
+    it('still reports a class two files declare', () => {
+        const root = workspace({
+            'src/server/core.luam': 'class Core {\n}\n',
+            'src/server/copy.luam': 'class Core {\n}\n',
+        });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+
+        const codes = [...service.diagnostics(uriFor(root, 'src/server/core.luam')), ...service.diagnostics(uriFor(root, 'src/server/copy.luam'))];
+
+        expect(codes.map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
+    });
+
     it('keeps the open version of a file that was already scanned', () => {
         const root = workspace({ 'src/server/main.luam': 'local value: number = 1\n' });
         const service = new LanguageService();

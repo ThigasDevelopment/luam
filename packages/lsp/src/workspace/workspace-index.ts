@@ -1,4 +1,4 @@
-import { ambientFromRegistry, mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
+import { mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import { canReference, type Environment } from '@compiler/environment/environment';
 
@@ -23,7 +23,7 @@ export class WorkspaceIndex {
     private ambientFor(uri: string, environment: Environment): AmbientDeclarations {
         const visible = this.others(uri).filter((analysis) => canReference(environment, analysis.environment));
 
-        return mergeAmbient(visible.map((analysis) => ambientFromRegistry(analysis.declarations)));
+        return mergeAmbient(visible.map((analysis) => analysis.own));
     }
 
     private run(uri: string, version: number, text: string): DocumentAnalysis {

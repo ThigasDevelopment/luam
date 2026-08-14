@@ -1,6 +1,6 @@
 import { dirname } from 'node:path';
 
-import { EMPTY_AMBIENT, type AmbientDeclarations } from '@compiler/checker/ambient';
+import { EMPTY_AMBIENT, ownDeclarations, type AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_DIRECTIVES, type SourceDirectives } from '@compiler/checker/build-directives';
 import { check } from '@compiler/checker/checker';
 import { resolveStrictMode, type StrictMode } from '@compiler/checker/directives';
@@ -38,6 +38,7 @@ export interface DocumentAnalysis {
     diagnostics: Diagnostic[];
     types: ReadonlyMap<Expression, Type>;
     declarations: DeclarationRegistry;
+    own: AmbientDeclarations;
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
     directives: SourceDirectives;
     project: ProjectDeclarations;
@@ -95,6 +96,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
         diagnostics,
         types: checked.types,
         declarations: checked.declarations,
+        own: ownDeclarations(checked.declarations, ambient),
         declaredGlobals: checked.declaredGlobals,
         directives: checked.directives,
         project,
@@ -124,6 +126,7 @@ function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
         diagnostics: manifest.diagnostics,
         types: new Map(),
         declarations,
+        own: EMPTY_AMBIENT,
         declaredGlobals: new Map(),
         directives: EMPTY_DIRECTIVES,
         project: input.project ?? EMPTY_PROJECT_DECLARATIONS,
