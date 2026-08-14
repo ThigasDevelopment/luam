@@ -21,6 +21,7 @@ export interface ParsedOopProperty {
 export interface ParsedOopConstructor {
     type: TypeDescriptor;
     environment: ApiEnvironment;
+    procedural: string | null;
 }
 
 export interface ParsedOopClass {
@@ -79,7 +80,9 @@ function readMembers(declaration: ts.ClassDeclaration, contents: string, context
         if (ts.isConstructorDeclaration(member)) {
             const own = declaration.name?.text ?? '';
 
-            constructors.push({ type: signatureOf(member, context, named(context.aliases[own] ?? own)), environment });
+            const type = signatureOf(member, context, named(context.aliases[own] ?? own));
+
+            constructors.push({ type, environment, procedural: proceduralOf(contents, member) });
 
             continue;
         }

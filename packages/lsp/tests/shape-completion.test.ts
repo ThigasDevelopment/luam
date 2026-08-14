@@ -162,3 +162,29 @@ describe('type position completion', () => {
         expect(found).toContain('outputChatBox');
     });
 });
+
+describe('type alias hover', () => {
+    function hoverText(text: string, marker: string): string {
+        const service = new LanguageService();
+
+        service.update(FILE, 1, text);
+
+        const hover = service.hover(FILE, markerAt(text, marker));
+
+        return JSON.stringify(hover?.contents ?? '');
+    }
+
+    it('shows the union a type alias resolves to', () => {
+        expect(hoverText(`${TYPES}local data: Config = {}\n`, 'local data: Confi')).toContain('type Config = SQLite | MySQL');
+    });
+
+    it('shows the intersection a type alias resolves to', () => {
+        expect(hoverText(`${TYPES}local one: SQLite = {}\n`, 'local one: SQLi')).toContain("type SQLite = Base & { kind: 'sqlite', sender: string }");
+    });
+
+    it('shows the type parameters of a generic alias', () => {
+        const text = 'type Result<T> = T | string\n\nlocal value: Result<number> = 1\n';
+
+        expect(hoverText(text, 'local value: Resul')).toContain('type Result<T> = T | string');
+    });
+});

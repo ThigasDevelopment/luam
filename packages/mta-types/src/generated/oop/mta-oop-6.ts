@@ -72,12 +72,12 @@ export const MTA_OOP_6: readonly OopClass[] = [
     ], [
         oopMethod('playFrontEnd', 'client', 'playSoundFrontEnd', fn([NUMBER], BOOLEAN, 1)),
     ],
-    oopConstructor('client', fn([STRING, BOOLEAN, BOOLEAN], named('Sound'), 1)),
+    oopConstructor('client', fn([STRING, BOOLEAN, BOOLEAN], named('Sound'), 1), 'playSound'),
     ),
     oopClass('Sound3D', 'Sound', [
     ], [
     ],
-    oopConstructor('client', fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Sound3D'), 4)),
+    oopConstructor('client', fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Sound3D'), 4), 'playSound3D'),
     ),
     oopClass('Team', 'Element', [
         oopMethod('countPlayers', 'shared', 'countPlayersInTeam', fn([], NUMBER, 0)),
@@ -105,6 +105,6 @@ export const MTA_OOP_6: readonly OopClass[] = [
         oopProperty('valid', 'shared', 'isTimer', BOOLEAN),
     ], [
     ],
-    oopConstructor('shared', fn([ANY, NUMBER, NUMBER], named('Timer'), 3, true)),
+    oopConstructor('shared', fn([ANY, NUMBER, NUMBER], named('Timer'), 3, true), 'setTimer'),
     ),
 ];

@@ -29,7 +29,7 @@ import {
 import { collectDeclaration } from './declaration-collector';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { assignedText, parameterText, signatureText, variableText } from './signature-text';
+import { annotationText, assignedText, parameterText, signatureText, variableText } from './signature-text';
 import { valueText } from './value-text';
 
 export interface FunctionScopeInput {
@@ -220,7 +220,10 @@ function collectTypeAlias(state: CollectorState, block: BlockContext, statement:
         const resolved = annotationType(statement.annotation);
         const type = statement.annotation.kind === 'type-object' ? renameRecord(resolved, statement.name) : resolved;
 
-        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'type-alias', position, detail: `type ${statement.name}`, type });
+        const parameters = statement.typeParameters.length === 0 ? '' : `<${statement.typeParameters.join(', ')}>`;
+        const detail = `type ${statement.name}${parameters} = ${annotationText(statement.annotation)}`;
+
+        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'type-alias', position, detail, type });
     }
 }
 

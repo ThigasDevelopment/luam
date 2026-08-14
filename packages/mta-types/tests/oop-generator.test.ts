@@ -106,7 +106,7 @@ describe('oop parser', () => {
             { name: 'getRandom', procedural: 'getRandomPlayer', type: fn([], { kind: 'named', name: 'Player' }, 0), environment: 'server' },
             { name: 'new', procedural: 'createPlayer', type: fn([STRING], { kind: 'named', name: 'Player' }, 1), environment: 'server' },
         ]);
-        expect(parsed?.constructors).toEqual([{ type: fn([STRING], { kind: 'named', name: 'Player' }, 1), environment: 'server' }]);
+        expect(parsed?.constructors).toEqual([{ type: fn([STRING], { kind: 'named', name: 'Player' }, 1), environment: 'server', procedural: null }]);
         expect(parsed?.properties).toEqual([{ name: 'name', environment: 'server' }]);
     });
 

@@ -92,7 +92,7 @@ export const MTA_OOP_5: readonly OopClass[] = [
         oopMethod('setMoney', 'client', 'setPlayerMoney', fn([NUMBER, BOOLEAN], BOOLEAN, 1)),
         oopMethod('takeMoney', 'client', 'takePlayerMoney', fn([NUMBER], BOOLEAN, 1)),
     ],
-    oopConstructor('shared', fn([STRING], named('Player'), 1)),
+    oopConstructor('shared', fn([STRING], named('Player'), 1), 'getPlayerFromName'),
     ),
     oopClass('Projectile', 'Element', [
         oopProperty('counter', 'client', 'getProjectileCounter', NUMBER),
@@ -108,26 +108,28 @@ export const MTA_OOP_5: readonly OopClass[] = [
         oopProperty('type', 'client', 'getProjectileType', NUMBER),
     ], [
     ],
-    oopConstructor('client',
+    oopConstructor(
+        'client',
         fn(
             [
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            named('Element'),
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                named('Element'),
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
+                NUMBER,
             ],
             named('Projectile'),
             1,
         ),
+        'createProjectile',
     ),
     ),
     oopClass('RadarArea', 'Element', [
@@ -141,7 +143,11 @@ export const MTA_OOP_5: readonly OopClass[] = [
         oopMethod('setSize', 'shared', 'setRadarAreaSize', fn([NUMBER, NUMBER], BOOLEAN, 2)),
     ], [
     ],
-    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, named('Element')], named('RadarArea'), 4)),
+    oopConstructor(
+        'shared',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, named('Element')], named('RadarArea'), 4),
+        'createRadarArea',
+    ),
     ),
     oopClass('RenderTarget', null, [
         oopMethod('setAsTarget', 'client', 'dxSetRenderTarget', fn([BOOLEAN], BOOLEAN, 0)),
@@ -201,7 +207,7 @@ export const MTA_OOP_5: readonly OopClass[] = [
         oopMethod('getFromName', 'shared', 'getResourceFromName', fn([STRING], named('Resource'), 1)),
         oopMethod('getThis', 'shared', 'getThisResource', fn([], named('Resource'), 0)),
     ],
-    oopConstructor('server', fn([STRING, STRING], named('Resource'), 1)),
+    oopConstructor('server', fn([STRING, STRING], named('Resource'), 1), 'createResource'),
     ),
     oopClass('Searchlight', 'Element', [
         oopProperty('endPosition', 'client', 'getSearchLightEndPosition', TABLE),
@@ -218,6 +224,10 @@ export const MTA_OOP_5: readonly OopClass[] = [
         oopProperty('startRadius', 'client', 'getSearchLightStartRadius', NUMBER),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Searchlight'), 8)),
+    oopConstructor(
+        'client',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Searchlight'), 8),
+        'createSearchLight',
+    ),
     ),
 ];

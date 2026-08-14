@@ -106,6 +106,7 @@ function collectConstructors(parsed: readonly ParsedOopClass[]): Map<string, Par
                 existing === undefined
                     ? constructor
                     : {
+                          procedural: existing.procedural ?? constructor.procedural,
                           type: mergeDescriptor(existing.type, constructor.type),
                           environment: mergedEnvironment(existing.environment, constructor.environment),
                       },
@@ -207,7 +208,10 @@ export function buildOopSurface(
 
         const parsedConstructor = constructors.get(entry.name);
         const constructorType = OOP_CONSTRUCTOR_OVERRIDES[entry.name] ?? parsedConstructor?.type;
-        const callable = parsedConstructor === undefined || constructorType === undefined ? null : oopConstructor(parsedConstructor.environment, constructorType);
+        const callable =
+            parsedConstructor === undefined || constructorType === undefined
+                ? null
+                : oopConstructor(parsedConstructor.environment, constructorType, parsedConstructor.procedural);
 
         classes.push(oopClass(entry.name, entry.parent, members.sort(byName), statics.sort(byName), callable));
     }

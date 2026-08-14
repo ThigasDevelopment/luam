@@ -30,7 +30,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('getAllByIP', 'server', 'getAccountsByIP', fn([STRING], TABLE, 1)),
         oopMethod('getAllBySerial', 'server', 'getAccountsBySerial', fn([STRING], TABLE, 1)),
     ],
-    oopConstructor('server', fn([STRING, STRING, BOOLEAN], named('Account'), 1)),
+    oopConstructor('server', fn([STRING, STRING, BOOLEAN], named('Account'), 1), 'getAccount'),
     ),
     oopClass('ACL', null, [
         oopMethod('destroy', 'server', 'aclDestroy', fn([], BOOLEAN, 0)),
@@ -47,7 +47,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('reload', 'server', 'aclReload', fn([], BOOLEAN, 0)),
         oopMethod('save', 'server', 'aclSave', fn([], BOOLEAN, 0)),
     ],
-    oopConstructor('server', fn([STRING], named('ACL'), 1)),
+    oopConstructor('server', fn([STRING], named('ACL'), 1), 'aclCreate'),
     ),
     oopClass('ACLGroup', null, [
         oopMethod('addACL', 'server', 'aclGroupAddACL', fn([named('ACL')], BOOLEAN, 1)),
@@ -64,7 +64,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('get', 'server', 'aclGetGroup', fn([STRING], named('ACLGroup'), 1)),
         oopMethod('list', 'server', 'aclGroupList', fn([], TABLE, 0)),
     ],
-    oopConstructor('server', fn([STRING], named('ACLGroup'), 1)),
+    oopConstructor('server', fn([STRING], named('ACLGroup'), 1), 'aclCreateGroup'),
     ),
     oopClass('Ban', null, [
         oopProperty('admin', 'server', 'getBanAdmin', STRING),
@@ -90,7 +90,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('getList', 'server', 'getBans', fn([], TABLE, 0)),
         oopMethod('reload', 'server', 'reloadBans', fn([], BOOLEAN, 0)),
     ],
-    oopConstructor('server', fn([STRING, STRING, STRING, named('Player'), STRING, NUMBER], named('Ban'), 0)),
+    oopConstructor('server', fn([STRING, STRING, STRING, named('Player'), STRING, NUMBER], named('Ban'), 0), 'addBan'),
     ),
     oopClass('Blip', 'Element', [
         oopMethod('getColor', 'shared', 'getBlipColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER]), 0)),
@@ -137,7 +137,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('isDomainBlocked', 'client', 'isBrowserDomainBlocked', fn([STRING, BOOLEAN], BOOLEAN, 1)),
         oopMethod('requestDomains', 'client', 'requestBrowserDomains', fn([TABLE, BOOLEAN, ANY], BOOLEAN, 1)),
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Browser'), 3)),
+    oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Browser'), 3), 'createBrowser'),
     ),
     oopClass('Camera', 'Element', [
     ], [
@@ -206,7 +206,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('query', 'server', 'dbQuery', fn([ANY, ANY, ANY, ANY, ANY], ANY, 2, true)),
     ], [
     ],
-    oopConstructor('server', fn([STRING, STRING, STRING, STRING, STRING], named('Connection'), 2)),
+    oopConstructor('server', fn([STRING, STRING, STRING, STRING, STRING], named('Connection'), 2), 'dbConnect'),
     ),
     oopClass('DxFont', null, [
         oopMethod('getHeight', 'client', 'dxGetFontHeight', fn([NUMBER, ANY], NUMBER, 0)),
@@ -214,23 +214,23 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('getTextWidth', 'client', 'dxGetTextWidth', fn([STRING, NUMBER, ANY, BOOLEAN], NUMBER, 1)),
     ], [
     ],
-    oopConstructor('client', fn([STRING, NUMBER, BOOLEAN, STRING], named('DxFont'), 1)),
+    oopConstructor('client', fn([STRING, NUMBER, BOOLEAN, STRING], named('DxFont'), 1), 'dxCreateFont'),
     ),
     oopClass('DxRenderTarget', null, [
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN], named('DxRenderTarget'), 2)),
+    oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN], named('DxRenderTarget'), 2), 'dxCreateRenderTarget'),
     ),
     oopClass('DxScreenSource', null, [
         oopMethod('update', 'client', 'dxUpdateScreenSource', fn([BOOLEAN], BOOLEAN, 0)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER], named('DxScreenSource'), 2)),
+    oopConstructor('client', fn([NUMBER, NUMBER], named('DxScreenSource'), 2), 'dxCreateScreenSource'),
     ),
     oopClass('DxShader', null, [
     ], [
     ],
-    oopConstructor('client', fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], named('DxShader'), 1)),
+    oopConstructor('client', fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], named('DxShader'), 1), 'dxCreateShader'),
     ),
     oopClass('DxTexture', null, [
         oopMethod('getPixels', 'client', 'dxGetTexturePixels', fn([ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], STRING, 1)),
@@ -238,6 +238,6 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('setPixels', 'client', 'dxSetTexturePixels', fn([ANY, ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], BOOLEAN, 2)),
     ], [
     ],
-    oopConstructor('client', fn([STRING, STRING, BOOLEAN, STRING], named('DxTexture'), 1)),
+    oopConstructor('client', fn([STRING, STRING, BOOLEAN, STRING], named('DxTexture'), 1), 'dxCreateTexture'),
     ),
 ];

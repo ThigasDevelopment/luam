@@ -14,6 +14,7 @@ let staticCache: ReadonlyMap<string, ReadonlyMap<string, MemberInfo>> | null = n
 export interface MtaConstructorInfo {
     type: FunctionType;
     environment: ApiEnvironment;
+    procedural: string | null;
 }
 
 let constructorCache: ReadonlyMap<string, MtaConstructorInfo> | null = null;
@@ -79,7 +80,9 @@ function buildConstructors(): ReadonlyMap<string, MtaConstructorInfo> {
         const type = declaration.constructor === null ? null : descriptorToType(declaration.constructor.type);
 
         if (type?.kind === 'function') {
-            constructors.set(declaration.name, { type, environment: declaration.constructor?.environment ?? 'shared' });
+            const environment = declaration.constructor?.environment ?? 'shared';
+
+            constructors.set(declaration.name, { type, environment, procedural: declaration.constructor?.procedural ?? null });
         }
     }
 

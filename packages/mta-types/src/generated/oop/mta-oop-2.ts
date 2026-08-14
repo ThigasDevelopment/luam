@@ -62,7 +62,7 @@ export const MTA_OOP_2: readonly OopClass[] = [
         oopMethod('addWaterSplash', 'client', 'fxAddWaterSplash', fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3)),
         oopMethod('addWood', 'client', 'fxAddWood', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 6)),
     ],
-    oopConstructor('client', fn([STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Effect'), 4)),
+    oopConstructor('client', fn([STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Effect'), 4), 'createEffect'),
     ),
     oopClass('Element', null, [
         oopMethod('addDataSubscriber', 'server', 'addElementDataSubscriber', fn([STRING, named('Player')], BOOLEAN, 2)),
@@ -174,7 +174,7 @@ export const MTA_OOP_2: readonly OopClass[] = [
         oopMethod('getByIndex', 'server', 'getElementByIndex', fn([STRING, NUMBER], named('Element'), 2)),
         oopMethod('getWithinRange', 'shared', 'getElementsWithinRange', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER], TABLE, 4)),
     ],
-    oopConstructor('shared', fn([STRING, STRING], named('Element'), 1)),
+    oopConstructor('shared', fn([STRING, STRING], named('Element'), 1), 'createElement'),
     ),
     oopClass('Engine', null, [
     ], [
@@ -195,19 +195,19 @@ export const MTA_OOP_2: readonly OopClass[] = [
         oopMethod('replace', 'client', 'engineReplaceCOL', fn([NUMBER], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([STRING], named('EngineCOL'), 1)),
+    oopConstructor('client', fn([STRING], named('EngineCOL'), 1), 'engineLoadCOL'),
     ),
     oopClass('EngineDFF', null, [
         oopMethod('replace', 'client', 'engineReplaceModel', fn([NUMBER, BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([STRING], named('EngineDFF'), 1)),
+    oopConstructor('client', fn([STRING], named('EngineDFF'), 1), 'engineLoadDFF'),
     ),
     oopClass('EngineTXD', null, [
         oopMethod('import', 'client', 'engineImportTXD', fn([NUMBER], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([STRING, BOOLEAN], named('EngineTXD'), 1)),
+    oopConstructor('client', fn([STRING, BOOLEAN], named('EngineTXD'), 1), 'engineLoadTXD'),
     ),
     oopClass('File', null, [
         oopMethod('close', 'shared', 'fileClose', fn([], BOOLEAN, 0)),
@@ -230,13 +230,6 @@ export const MTA_OOP_2: readonly OopClass[] = [
         oopMethod('new', 'shared', 'fileCreate', fn([STRING], named('File'), 1)),
         oopMethod('rename', 'shared', 'fileRename', fn([STRING, STRING], BOOLEAN, 2)),
     ],
-    oopConstructor('shared', fn([STRING], named('File'), 1)),
-    ),
-    oopClass('GuiBrowser', 'GuiElement', [
-        oopProperty('browser', 'client', 'guiGetBrowser', named('Browser')),
-        oopMethod('getBrowser', 'client', 'guiGetBrowser', fn([], named('Browser'), 0)),
-    ], [
-    ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, named('Element')], named('GuiBrowser'), 7)),
+    oopConstructor('shared', fn([STRING], named('File'), 1), 'fileOpen'),
     ),
 ];

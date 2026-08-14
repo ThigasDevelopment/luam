@@ -187,7 +187,7 @@ describe('oop signature help', () => {
         const workspace = openProject(true, { [SERVER_PATH]: source });
         const help = workspace.service.signatureHelp(workspace.uri(SERVER_PATH), markerAt(source, 'File('));
 
-        expect(help?.signatures[0]?.label).toBe('File(argument1: string): File');
+        expect(help?.signatures[0]?.label).toBe('File(filePath: string): File');
     });
 
     it('describes static MTA methods', () => {
@@ -240,5 +240,31 @@ describe('database connection', () => {
         const workspace = openProject(true, { [SERVER_PATH]: text });
 
         expect(labels(workspace, SERVER_PATH, text, 'conn:')).toEqual(['exec', 'prepareString', 'query']);
+    });
+});
+
+describe('constructor signature help', () => {
+    it('names the parameters of the procedural function it maps to', () => {
+        const text = "local conn = Connection('sqlite', ";
+        const workspace = openProject(true, { [SERVER_PATH]: text });
+        const uri = workspace.uri(SERVER_PATH);
+
+        workspace.service.update(uri, 2, text);
+
+        const help = workspace.service.signatureHelp(uri, markerAt(text, "'sqlite', "));
+
+        expect(help?.signatures[0]?.label).toBe(
+            'Connection(databaseType: string, host: string, username?: string, password?: string, options?: string): Connection',
+        );
+    });
+
+    it('names the parameters of an element constructor', () => {
+        const text = "local marker = Marker(0, ";
+        const workspace = openProject(true, { [SERVER_PATH]: text });
+        const uri = workspace.uri(SERVER_PATH);
+
+        workspace.service.update(uri, 2, text);
+
+        expect(workspace.service.signatureHelp(uri, markerAt(text, '(0, '))?.signatures[0]?.label).not.toContain('argument1');
     });
 });

@@ -6,6 +6,33 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### The Editor Says What It Knows
+
+Signature help on an MTA constructor read `argument1: string, argument2: string`.
+The names were in the upstream declaration and in the wiki documentation the
+catalog already ships; the OOP surface just had no field to carry the link. Every
+one of the 47 constructors was affected — `File(argument1: string)`,
+`Connection(argument1: string, argument2: string)`.
+
+Hovering a type alias showed `type Database` and stopped there, which is the one
+thing the reader already knows. The name was hardcoded and the annotation was
+never rendered.
+
+#### Added
+
+- `procedural` on an OOP constructor, linking it to the function it maps to, so
+  signature help names the parameters and carries their documentation.
+  `Connection('sqlite', ...)` now reads
+  `Connection(databaseType: string, host: string, username?: string, ...)`.
+- The definition in a type alias hover: `type Database = SQLite | MySQL`, with
+  the type parameters of a generic alias included.
+
+#### Fixed
+
+- The multi-line branch of the OOP constructor emitter dropped the type
+  descriptor entirely. It was unreachable until the procedural name made a
+  constructor line long enough to take it.
+
 ### A Table Literal Carries Its Shape
 
 A table literal was typed `table` whatever it held, so nothing compared it to the

@@ -2,6 +2,25 @@ import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from 
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_4: readonly OopClass[] = [
+    oopClass('Light', null, [
+        oopProperty('color', 'client', 'getLightColor', tupleOf([NUMBER, NUMBER, NUMBER])),
+        oopProperty('direction', 'client', 'getLightDirection', tupleOf([NUMBER, NUMBER, NUMBER])),
+        oopMethod('getColor', 'client', 'getLightColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER]), 0)),
+        oopMethod('getDirection', 'client', 'getLightDirection', fn([], tupleOf([NUMBER, NUMBER, NUMBER]), 0)),
+        oopMethod('getRadius', 'client', 'getLightRadius', fn([], NUMBER, 0)),
+        oopMethod('getType', 'client', 'getLightType', fn([], NUMBER, 0)),
+        oopProperty('radius', 'client', 'getLightRadius', NUMBER),
+        oopMethod('setColor', 'client', 'setLightColor', fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3)),
+        oopMethod('setDirection', 'client', 'setLightDirection', fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3)),
+        oopMethod('setRadius', 'client', 'setLightRadius', fn([NUMBER], BOOLEAN, 1)),
+    ], [
+    ],
+    oopConstructor(
+        'client',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Light'), 4),
+        'createLight',
+    ),
+    ),
     oopClass('Marker', 'Element', [
         oopMethod('getColor', 'shared', 'getMarkerColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER]), 0)),
         oopMethod('getIcon', 'shared', 'getMarkerIcon', fn([], STRING, 0)),
@@ -21,7 +40,7 @@ export const MTA_OOP_4: readonly OopClass[] = [
         oopProperty('target', 'shared', 'getMarkerTarget', TABLE),
     ], [
     ],
-    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, ANY], named('Marker'), 3)),
+    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, ANY], named('Marker'), 3), 'createMarker'),
     ),
     oopClass('Material', 'Element', [
         oopMethod('getSize', 'client', 'dxGetMaterialSize', fn([], tupleOf([NUMBER, NUMBER, ANY]), 0)),
@@ -65,7 +84,7 @@ export const MTA_OOP_4: readonly OopClass[] = [
         oopMethod('toggleRespawn', 'client', 'toggleObjectRespawn', fn([BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Object'), 4)),
+    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Object'), 4), 'createObject'),
     ),
     oopClass('Ped', 'Element', [
         oopMethod('addClothes', 'shared', 'addPedClothes', fn([STRING, STRING, NUMBER], BOOLEAN, 3)),
@@ -163,6 +182,6 @@ export const MTA_OOP_4: readonly OopClass[] = [
     oopClass('Pickup', 'Element', [
     ], [
     ],
-    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('Pickup'), 5)),
+    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('Pickup'), 5), 'createPickup'),
     ),
 ];

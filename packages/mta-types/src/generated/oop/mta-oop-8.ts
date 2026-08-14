@@ -26,14 +26,14 @@ export const MTA_OOP_8: readonly OopClass[] = [
         oopProperty('target', 'client', 'getWeaponTarget', ANY),
     ], [
     ],
-    oopConstructor('client', fn([STRING, NUMBER, NUMBER, NUMBER], named('Weapon'), 4)),
+    oopConstructor('client', fn([STRING, NUMBER, NUMBER, NUMBER], named('Weapon'), 4), 'createWeapon'),
     ),
     oopClass('XML', null, [
     ], [
         oopMethod('load', 'shared', 'xmlLoadFile', fn([STRING, BOOLEAN], named('XmlNode'), 1)),
         oopMethod('loadstring', 'shared', 'xmlLoadString', fn([STRING], named('XmlNode'), 1)),
     ],
-    oopConstructor('shared', fn([STRING, STRING], named('XML'), 2)),
+    oopConstructor('shared', fn([STRING, STRING], named('XML'), 2), 'xmlCreateFile'),
     ),
     oopClass('XmlNode', null, [
         oopProperty('attributes', 'shared', 'xmlNodeGetAttributes', TABLE),

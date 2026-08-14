@@ -2,10 +2,21 @@ import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from 
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_3: readonly OopClass[] = [
+    oopClass('GuiBrowser', 'GuiElement', [
+        oopProperty('browser', 'client', 'guiGetBrowser', named('Browser')),
+        oopMethod('getBrowser', 'client', 'guiGetBrowser', fn([], named('Browser'), 0)),
+    ], [
+    ],
+    oopConstructor(
+        'client',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, named('Element')], named('GuiBrowser'), 7),
+        'guiCreateBrowser',
+    ),
+    ),
     oopClass('GuiButton', null, [
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiButton'), 6)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiButton'), 6), 'guiCreateButton'),
     ),
     oopClass('GuiCheckbox', 'GuiElement', [
         oopMethod('getSelected', 'client', 'guiCheckBoxGetSelected', fn([], BOOLEAN, 0)),
@@ -13,7 +24,11 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopMethod('setSelected', 'client', 'guiCheckBoxSetSelected', fn([BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, BOOLEAN, named('Element')], named('GuiCheckbox'), 7)),
+    oopConstructor(
+        'client',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, BOOLEAN, named('Element')], named('GuiCheckbox'), 7),
+        'guiCreateCheckBox',
+    ),
     ),
     oopClass('GuiCombobox', 'GuiElement', [
         oopMethod('addItem', 'client', 'guiComboBoxAddItem', fn([STRING], NUMBER, 1)),
@@ -29,7 +44,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopMethod('setSelected', 'client', 'guiComboBoxSetSelected', fn([NUMBER], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiCombobox'), 6)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiCombobox'), 6), 'guiCreateComboBox'),
     ),
     oopClass('GuiEdit', 'GuiElement', [
         oopProperty('caretIndex', 'client', 'guiEditGetCaretIndex', NUMBER),
@@ -42,7 +57,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopMethod('setReadOnly', 'client', 'guiEditSetReadOnly', fn([BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiEdit'), 6)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiEdit'), 6), 'guiCreateEdit'),
     ),
     oopClass('GuiElement', null, [
         oopProperty('alpha', 'client', 'guiGetAlpha', NUMBER),
@@ -96,7 +111,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
     oopClass('GuiFont', null, [
     ], [
     ],
-    oopConstructor('client', fn([STRING, NUMBER], named('GuiFont'), 1)),
+    oopConstructor('client', fn([STRING, NUMBER], named('GuiFont'), 1), 'guiCreateFont'),
     ),
     oopClass('GuiGridList', 'GuiElement', [
         oopMethod('addColumn', 'client', 'guiGridListAddColumn', fn([STRING, NUMBER], NUMBER, 2)),
@@ -141,7 +156,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopProperty('verticalScrollPosition', 'client', 'guiGridListGetVerticalScrollPosition', NUMBER),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, named('Element')], named('GuiGridList'), 5)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, named('Element')], named('GuiGridList'), 5), 'guiCreateGridList'),
     ),
     oopClass('GuiLabel', 'GuiElement', [
         oopProperty('fontHeight', 'client', 'guiLabelGetFontHeight', NUMBER),
@@ -154,7 +169,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopProperty('textExtent', 'client', 'guiLabelGetTextExtent', NUMBER),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiLabel'), 6)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiLabel'), 6), 'guiCreateLabel'),
     ),
     oopClass('GuiMemo', 'GuiElement', [
         oopProperty('caretIndex', 'client', 'guiMemoGetCaretIndex', NUMBER),
@@ -168,7 +183,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopProperty('verticalScrollPosition', 'client', 'guiMemoGetVerticalScrollPosition', NUMBER),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiMemo'), 6)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiMemo'), 6), 'guiCreateMemo'),
     ),
     oopClass('GuiRadioButton', null, [
         oopMethod('getSelected', 'client', 'guiRadioButtonGetSelected', fn([], BOOLEAN, 0)),
@@ -176,66 +191,40 @@ export const MTA_OOP_3: readonly OopClass[] = [
         oopMethod('setSelected', 'client', 'guiRadioButtonSetSelected', fn([BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiRadioButton'), 6)),
+    oopConstructor(
+        'client',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiRadioButton'), 6),
+        'guiCreateRadioButton',
+    ),
     ),
     oopClass('GuiStaticImage', 'GuiElement', [
         oopMethod('loadImage', 'client', 'guiStaticImageLoadImage', fn([STRING], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiStaticImage'), 6)),
+    oopConstructor(
+        'client',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiStaticImage'), 6),
+        'guiCreateStaticImage',
+    ),
     ),
     oopClass('GuiTab', 'GuiElement', [
         oopMethod('delete', 'client', 'guiDeleteTab', fn([named('Element')], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([STRING, named('Element')], named('GuiTab'), 2)),
+    oopConstructor('client', fn([STRING, named('Element')], named('GuiTab'), 2), 'guiCreateTab'),
     ),
     oopClass('GuiTabPanel', 'GuiElement', [
         oopMethod('getSelectedTab', 'client', 'guiGetSelectedTab', fn([], named('Element'), 0)),
         oopProperty('selectedTab', 'client', 'guiGetSelectedTab', named('Element')),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, named('Element')], named('GuiTabPanel'), 5)),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, named('Element')], named('GuiTabPanel'), 5), 'guiCreateTabPanel'),
     ),
     oopClass('GuiWindow', 'GuiElement', [
         oopMethod('setMovable', 'client', 'guiWindowSetMovable', fn([BOOLEAN], BOOLEAN, 1)),
         oopMethod('setSizable', 'client', 'guiWindowSetSizable', fn([BOOLEAN], BOOLEAN, 1)),
     ], [
     ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN], named('GuiWindow'), 6)),
-    ),
-    oopClass('Light', null, [
-        oopProperty('color', 'client', 'getLightColor', tupleOf([NUMBER, NUMBER, NUMBER])),
-        oopProperty('direction', 'client', 'getLightDirection', tupleOf([NUMBER, NUMBER, NUMBER])),
-        oopMethod('getColor', 'client', 'getLightColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER]), 0)),
-        oopMethod('getDirection', 'client', 'getLightDirection', fn([], tupleOf([NUMBER, NUMBER, NUMBER]), 0)),
-        oopMethod('getRadius', 'client', 'getLightRadius', fn([], NUMBER, 0)),
-        oopMethod('getType', 'client', 'getLightType', fn([], NUMBER, 0)),
-        oopProperty('radius', 'client', 'getLightRadius', NUMBER),
-        oopMethod('setColor', 'client', 'setLightColor', fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3)),
-        oopMethod('setDirection', 'client', 'setLightDirection', fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3)),
-        oopMethod('setRadius', 'client', 'setLightRadius', fn([NUMBER], BOOLEAN, 1)),
-    ], [
-    ],
-    oopConstructor('client',
-        fn(
-            [
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            BOOLEAN,
-            ],
-            named('Light'),
-            4,
-        ),
-    ),
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN], named('GuiWindow'), 6), 'guiCreateWindow'),
     ),
 ];

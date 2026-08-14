@@ -199,7 +199,11 @@ export const MTA_OOP_7: readonly OopClass[] = [
         oopMethod('setModelWheelSize', 'client', 'setVehicleModelWheelSize', fn([NUMBER, STRING, NUMBER], BOOLEAN, 3)),
         oopMethod('setVehicleModelDummyPosition', 'client', 'setVehicleModelDummyPosition', fn([TABLE, NUMBER, NUMBER], BOOLEAN, 3)),
     ],
-    oopConstructor('shared', fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, NUMBER, NUMBER], named('Vehicle'), 4)),
+    oopConstructor(
+        'shared',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, NUMBER, NUMBER], named('Vehicle'), 4),
+        'createVehicle',
+    ),
     ),
     oopClass('Water', 'Element', [
         oopMethod('getColor', 'shared', 'getWaterColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER]), 0)),
@@ -213,26 +217,10 @@ export const MTA_OOP_7: readonly OopClass[] = [
         oopMethod('resetLevel', 'shared', 'resetWaterLevel', fn([], BOOLEAN, 0)),
         oopMethod('setWaveHeight', 'shared', 'setWaveHeight', fn([NUMBER], BOOLEAN, 1)),
     ],
-    oopConstructor('shared',
-        fn(
-            [
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            BOOLEAN,
-            ],
-            named('Water'),
-            9,
-        ),
+    oopConstructor(
+        'shared',
+        fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Water'), 9),
+        'createWater',
     ),
     ),
 ];

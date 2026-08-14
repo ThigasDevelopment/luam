@@ -14,6 +14,7 @@ export interface OopMember {
 export interface OopConstructor {
     environment: ApiEnvironment;
     type: TypeDescriptor;
+    procedural: string | null;
 }
 
 export interface OopClass {
@@ -32,8 +33,8 @@ export function oopProperty(name: string, environment: ApiEnvironment, procedura
     return { name, kind: 'property', environment, procedural, type };
 }
 
-export function oopConstructor(environment: ApiEnvironment, type: TypeDescriptor): OopConstructor {
-    return { environment, type };
+export function oopConstructor(environment: ApiEnvironment, type: TypeDescriptor, procedural: string | null = null): OopConstructor {
+    return { environment, type, procedural };
 }
 
 export function oopClass(

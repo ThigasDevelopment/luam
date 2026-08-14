@@ -1,4 +1,5 @@
 import type { OopClass, OopConstructor, OopMember } from '#mta-types/oop-declaration';
+import type { TypeDescriptor } from '#mta-types/type-descriptor';
 
 import { collectHelpers, printDescriptor } from './descriptor-printer.ts';
 import type { GeneratedFile } from './generator-model.ts';
@@ -13,6 +14,30 @@ const CONSTRUCTORS: Readonly<Record<OopMember['kind'], string>> = {
     method: 'oopMethod',
     property: 'oopProperty',
 };
+
+function descriptorLines(descriptor: TypeDescriptor, indent: string): string[] {
+    const single = `${indent}${printDescriptor(descriptor)},`;
+
+    if (single.length <= MAX_LINE_LENGTH || descriptor.kind !== 'function') {
+        return [single];
+    }
+
+    const parameters = descriptor.parameters.map((parameter) => `${indent}        ${printDescriptor(parameter)},`);
+    const tail = [printDescriptor(descriptor.returnType), String(descriptor.minimumArguments)];
+
+    if (descriptor.isVariadic) {
+        tail.push('true');
+    }
+
+    return [
+        `${indent}fn(`,
+        `${indent}    [`,
+        ...parameters,
+        `${indent}    ],`,
+        ...tail.map((part) => `${indent}    ${part},`),
+        `${indent}),`,
+    ];
+}
 
 function memberLines(member: OopMember): string[] {
     const head = `${CONSTRUCTORS[member.kind]}('${member.name}', '${member.environment}', '${member.procedural}'`;
@@ -50,19 +75,14 @@ function constructorLines(constructor: OopConstructor | null): string[] {
         return ['    null,'];
     }
 
-    const single = `    oopConstructor('${constructor.environment}', ${printDescriptor(constructor.type)}),`;
+    const procedural = constructor.procedural === null ? 'null' : `'${constructor.procedural}'`;
+    const single = `    oopConstructor('${constructor.environment}', ${printDescriptor(constructor.type)}, ${procedural}),`;
 
     if (single.length <= MAX_LINE_LENGTH) {
         return [single];
     }
 
-    return [
-        `    oopConstructor('${constructor.environment}',`,
-        ...memberLines({ name: '', kind: 'method', environment: constructor.environment, procedural: '', type: constructor.type })
-            .slice(1, -1)
-            .map((line) => line.slice(4)),
-        '    ),',
-    ];
+    return ['    oopConstructor(', `        '${constructor.environment}',`, ...descriptorLines(constructor.type, '        '), `        ${procedural},`, '    ),'];
 }
 
 function classLines(declaration: OopClass): string[] {

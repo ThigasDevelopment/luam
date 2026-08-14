@@ -20,15 +20,16 @@ export interface SignatureSource {
     parameterDocs: readonly string[];
 }
 
-function typeParameters(type: Type): { parameters: string[]; returnText: string } {
+function typeParameters(type: Type, names: readonly string[] = []): { parameters: string[]; returnText: string } {
     if (type.kind !== 'function') {
         return { parameters: [], returnText: typeToString(type) };
     }
 
     const parameters = type.parameters.map((parameter, index) => {
         const optional = index >= type.minimumArguments ? '?' : '';
+        const name = names[index] ?? `argument${index + 1}`;
 
-        return `argument${index + 1}${optional}: ${typeToString(parameter)}`;
+        return `${name}${optional}: ${typeToString(parameter)}`;
     });
 
     if (type.isVariadic) {
@@ -181,9 +182,28 @@ function fromMtaConstructor(analysis: DocumentAnalysis, name: string): Signature
         return null;
     }
 
-    const shape = typeParameters(constructor);
+    const procedural = found?.procedural ?? null;
 
-    return { name, parameters: shape.parameters, returnText: shape.returnText, documentation: [], parameterDocs: [] };
+    if (procedural === null) {
+        const shape = typeParameters(constructor);
+
+        return { name, parameters: shape.parameters, returnText: shape.returnText, documentation: [], parameterDocs: [] };
+    }
+
+    const documentation = apiDocumentation(procedural);
+    const named = documentation.parameters.filter((parameter) => !parameter.isVariadic);
+    const shape = typeParameters(
+        constructor,
+        named.map((parameter) => parameter.name),
+    );
+
+    return {
+        name,
+        parameters: shape.parameters,
+        returnText: shape.returnText,
+        documentation: documentationBody({ ...documentation, parameters: [] }),
+        parameterDocs: named.map((parameter) => parameter.summary),
+    };
 }
 
 function localSignature(analysis: DocumentAnalysis, offset: number, name: string): SignatureSource | null {
