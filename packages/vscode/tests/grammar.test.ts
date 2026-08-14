@@ -67,6 +67,7 @@ describe('grammar', () => {
         expect(matchesAny('comment', '#* block *#')).toBe(true);
         expect(matchesAny('directive', '#!server')).toBe(true);
         expect(matchesAny('directive', '#!strict')).toBe(true);
+        expect(matchesAny('directive', '#! server')).toBe(true);
     });
 
     it('highlights strings and template literals', () => {

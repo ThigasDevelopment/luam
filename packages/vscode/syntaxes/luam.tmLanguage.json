@@ -24,7 +24,7 @@
     ],
     "repository": {
         "directive": {
-            "match": "^\\s*(#!)(strict|nonstrict|nocheck|server|client|shared)\\b",
+            "match": "^\\s*(#!)[ \\t]*(strict|nonstrict|nocheck|server|client|shared)\\b",
             "captures": {
                 "1": { "name": "punctuation.definition.comment.luam" },
                 "2": { "name": "keyword.control.directive.luam" }
