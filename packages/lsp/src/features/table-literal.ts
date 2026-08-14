@@ -2,7 +2,7 @@ import type { Type } from '@compiler/checker/types';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
-import { shapeMembers } from './type-shape';
+import { constructionMembers } from './type-shape';
 
 const TYPE_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
@@ -72,29 +72,35 @@ export function tableLiteralMembers(analysis: DocumentAnalysis, offset: number):
         return null;
     }
 
-    return shapeMembers(analysis, { kind: 'named', name });
+    return constructionMembers(analysis, { kind: 'named', name }, writtenPairs(analysis.text, offset));
 }
 
-export function writtenKeys(text: string, offset: number): ReadonlySet<string> {
+const FIELD = /[{}]|([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?:'([^']*)'|"([^"]*)")?/g;
+
+export function writtenPairs(text: string, offset: number): ReadonlyMap<string, string | null> {
     const brace = openingBrace(text, offset);
 
     if (brace === -1) {
-        return new Set();
+        return new Map();
     }
 
-    const written = new Set<string>();
+    const written = new Map<string, string | null>();
     const body = text.slice(brace + 1, offset);
     let depth = 0;
 
-    for (const match of body.matchAll(/[{}]|([A-Za-z_][A-Za-z0-9_]*)\s*=/g)) {
+    for (const match of body.matchAll(FIELD)) {
         if (match[0] === '{') {
             depth += 1;
         } else if (match[0] === '}') {
             depth -= 1;
         } else if (depth === 0 && match[1] !== undefined) {
-            written.add(match[1]);
+            written.set(match[1], match[2] ?? match[3] ?? null);
         }
     }
 
     return written;
+}
+
+export function writtenKeys(text: string, offset: number): ReadonlySet<string> {
+    return new Set(writtenPairs(text, offset).keys());
 }

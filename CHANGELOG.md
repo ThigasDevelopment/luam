@@ -6,6 +6,36 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### A Table Literal Carries Its Shape
+
+A table literal was typed `table` whatever it held, so nothing compared it to the
+shape it was assigned to. `local data: Config = {}` compiled, a misspelled key
+compiled, and a literal missing half the keys of its type compiled. The manual
+documented this as a limitation rather than a gap.
+
+A literal written with named keys is now a record built from those keys, checked
+against the target the ordinary way. That is what reports the empty literal, the
+missing key, and the misspelling — the last one through the key that is missing
+rather than the one that is unexpected.
+
+#### Added
+
+- A shape for a table literal with named keys, with member types left unwidened
+  so a string value can pick a member of a discriminated union.
+- Completion inside a table literal now offers every key of a union until a
+  discriminant is written, then narrows to the member that matches it.
+
+#### Fixed
+
+- `examples/resource` had no `.luam.manifest`, so it was not a project. Nothing
+  loaded its `.env` and `env.SERVER_NAME` reported that `env` was not in scope.
+
+#### Notes
+
+- `{}` is unchanged in every container position: it still fits an array, a map,
+  and `table`, and an unannotated `local items = {}` still widens to `table` so
+  the object extensions keep working. Only a shape that requires a key rejects it.
+
 ### Literals Are Types, and the Editor Knows the Shape
 
 `true`, `false`, and a number were not types. The parser accepted `true` and

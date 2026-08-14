@@ -67,6 +67,7 @@ export interface RecordType {
     name: string;
     origin: string | null;
     members: ReadonlyMap<string, Type>;
+    isLiteral?: boolean;
 }
 
 export type Type =
@@ -153,6 +154,24 @@ export function createObjectType(members: ReadonlyMap<string, Type>): Type {
     );
 
     return createRecord(keys.length === 0 ? '{}' : `{ ${keys.join(', ')} }`, members);
+}
+
+export function createLiteralRecord(members: ReadonlyMap<string, Type>): Type {
+    const literal = createObjectType(members);
+
+    return literal.kind === 'record' ? { ...literal, isLiteral: true } : literal;
+}
+
+function isEmptyLiteral(type: Type): boolean {
+    return type.kind === 'record' && type.isLiteral === true && type.members.size === 0;
+}
+
+export function widenInferred(type: Type): Type {
+    if (type.kind !== 'record' || type.isLiteral !== true) {
+        return widenLiteral(type);
+    }
+
+    return type.members.size === 0 ? TABLE_TYPE : createRecord(type.name, type.members, type.origin);
 }
 
 export function createFunction(parameters: Type[], returnType: Type, minimumArguments?: number, isVariadic = false): FunctionType {
@@ -422,7 +441,7 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
     }
 
     if (target.kind === 'array') {
-        return source.kind === 'table' || (source.kind === 'array' && isAssignable(source.element, target.element, options));
+        return source.kind === 'table' || isEmptyLiteral(source) || (source.kind === 'array' && isAssignable(source.element, target.element, options));
     }
 
     if (target.kind === 'map') {

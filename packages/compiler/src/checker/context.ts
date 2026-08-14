@@ -39,6 +39,7 @@ import {
     UNKNOWN_TYPE,
     USERDATA_TYPE,
     VOID_TYPE,
+    widenInferred,
     widenLiteral,
     type Type,
 } from './types';
@@ -277,7 +278,7 @@ export class CheckContext {
     }
 
     inferReturnType(type: Type): void {
-        this.returnStack[this.returnStack.length - 1]?.inferred.push(widenLiteral(type));
+        this.returnStack[this.returnStack.length - 1]?.inferred.push(widenInferred(type));
     }
 
     pushClassMethod(frame: ClassMethodFrame): void {

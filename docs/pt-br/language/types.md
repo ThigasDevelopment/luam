@@ -344,13 +344,25 @@ Um tipo de objeto é aceito onde outro é esperado quando declara todas as chave
 que o alvo exige, com um tipo compatível. Uma chave que o alvo marca como
 opcional pode faltar.
 
-::: warning Sem inferência a partir de uma tabela literal
-Uma tabela literal tem o tipo `table`, não o das suas chaves, então
-`spawn({ nmae = 'a' })` é aceito — o argumento não carrega forma nenhuma para
-comparar. A forma é conhecida em dois lugares, e são esses os dois lugares em que
-ela é verificada: ao ler uma chave de um valor anotado e ao passar um valor
-anotado para outra posição anotada.
-:::
+Uma tabela literal escrita com chaves tem o tipo dessas chaves, então ela é
+verificada contra a forma para a qual é atribuída. Uma chave obrigatória faltando
+é `check-type-mismatch`, e é isso que pega um erro de digitação —
+`spawn({ nmae = 'a' })` é reportado porque `name` está faltando, não porque
+`nmae` sobra:
+
+```
+error  check-type-mismatch  Argument 1 expects "Args" but received "{ nmae: 'a' }".
+```
+
+Duas literais mantêm o significado antigo. `{}` não carrega forma nenhuma, então
+continua servindo para um array, um mapa ou `table`, e só falha contra uma forma
+que exige alguma chave. Uma literal com entradas posicionais é um array, e uma
+que mistura as duas é `table`.
+
+Sem anotação a literal mantém sua forma, então `local config = { name = 'a' }`
+tipa `config.name` e reporta `config.tag`. A exceção é `{}`, que alarga para
+`table` — é isso que mantém `local items = {}` funcionando com as
+[extensões de objeto](/pt-br/language/extensions).
 
 Um tipo de objeto é uma forma, não um contrato que uma classe possa implementar.
 Para isso, use uma [interface](/pt-br/language/enums-and-interfaces).

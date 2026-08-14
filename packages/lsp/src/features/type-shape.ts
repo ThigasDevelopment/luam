@@ -50,6 +50,74 @@ export function shapeMembers(analysis: DocumentAnalysis, type: Type, seen: Set<s
     return alias === null ? null : shapeMembers(analysis, alias, seen);
 }
 
+function resolveNamed(analysis: DocumentAnalysis, type: Type, seen: Set<string> = new Set()): Type {
+    if (type.kind !== 'named' || seen.has(type.name)) {
+        return type;
+    }
+
+    seen.add(type.name);
+
+    const alias = aliasType(analysis, type.name);
+
+    return alias === null ? type : resolveNamed(analysis, alias, seen);
+}
+
+function optionShapes(analysis: DocumentAnalysis, type: Type): ReadonlyMap<string, Type>[] | null {
+    const target = resolveNamed(analysis, type);
+    const options = target.kind === 'union' ? target.options : [target];
+    const shapes: ReadonlyMap<string, Type>[] = [];
+
+    for (const option of options) {
+        const members = shapeMembers(analysis, option);
+
+        if (members === null) {
+            return null;
+        }
+
+        shapes.push(members);
+    }
+
+    return shapes;
+}
+
+function matchesWritten(shape: ReadonlyMap<string, Type>, written: ReadonlyMap<string, string | null>): boolean {
+    for (const [key, value] of written) {
+        const member = shape.get(key);
+
+        if (member === undefined) {
+            return false;
+        }
+
+        if (value !== null && member.kind === 'string-literal' && member.value !== value) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function constructionMembers(analysis: DocumentAnalysis, type: Type, written: ReadonlyMap<string, string | null>): ReadonlyMap<string, Type> | null {
+    const shapes = optionShapes(analysis, type);
+
+    if (shapes === null) {
+        return null;
+    }
+
+    const matching = shapes.filter((shape) => matchesWritten(shape, written));
+    const chosen = matching.length === 0 ? shapes : matching;
+    const members = new Map<string, Type>();
+
+    for (const shape of chosen) {
+        for (const [name, member] of shape) {
+            if (!members.has(name)) {
+                members.set(name, member);
+            }
+        }
+    }
+
+    return members.size === 0 ? null : members;
+}
+
 export function sharedRecord(analysis: DocumentAnalysis, type: UnionType): RecordType | null {
     const collected: ReadonlyMap<string, Type>[] = [];
 

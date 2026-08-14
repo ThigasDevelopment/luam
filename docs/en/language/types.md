@@ -340,13 +340,24 @@ One object type is accepted where another is expected when it declares every key
 the target requires, with a compatible type. A key the target marks optional may
 be missing.
 
-::: warning No inference from a table literal
-A table literal is typed `table`, not by its keys, so `spawn({ nmae = 'a' })` is
-accepted — the argument carries no shape to compare against. A shape is known in
-two places, and those are the two places it is checked: reading a key off an
-annotated value, and passing one annotated value into another annotated
-position.
-:::
+A table literal written with keys is typed by those keys, so it is checked
+against the shape it is assigned to. A missing required key is
+`check-type-mismatch`, which is what catches a misspelling — `spawn({ nmae = 'a' })`
+is reported because `name` is missing, not because `nmae` is unexpected:
+
+```
+error  check-type-mismatch  Argument 1 expects "Args" but received "{ nmae: 'a' }".
+```
+
+Two literals keep their old meaning. `{}` carries no shape, so it still fits an
+array, a map, or `table`, and only fails a shape that requires a key. A literal
+with positional entries is an array, and a literal that mixes the two is
+`table`.
+
+Without an annotation the literal keeps its shape, so `local config = { name = 'a' }`
+types `config.name` and reports `config.tag`. The exception is `{}`, which
+widens to `table` — that is what keeps `local items = {}` working with the
+[object extensions](/en/language/extensions).
 
 An object type is a shape, not a contract a class can implement. Use an
 [interface](/en/language/enums-and-interfaces) for that.

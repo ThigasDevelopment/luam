@@ -80,10 +80,24 @@ describe('table literal completion', () => {
         expect(found.slice(0, 2)).toEqual(['kind', 'sender']);
     });
 
-    it('offers the shared keys inside a union literal', () => {
+    it('offers every key of the union before a discriminant is written', () => {
         const found = labels(`${TYPES}local data: Config = { `, '= { ');
 
-        expect(found.slice(0, 2)).toEqual(['id', 'kind']);
+        expect(found.slice(0, 4)).toEqual(['id', 'kind', 'sender', 'host']);
+    });
+
+    it('narrows to one member once the discriminant is written', () => {
+        const found = labels(`${TYPES}local data: Config = { kind = "mysql", `, '"mysql", ');
+
+        expect(found.slice(0, 2)).toEqual(['id', 'host']);
+        expect(found).not.toContain('sender');
+    });
+
+    it('narrows to the other member', () => {
+        const found = labels(`${TYPES}local data: Config = { kind = "sqlite", `, '"sqlite", ');
+
+        expect(found.slice(0, 2)).toEqual(['id', 'sender']);
+        expect(found).not.toContain('host');
     });
 
     it('keeps the scope items available after the keys', () => {

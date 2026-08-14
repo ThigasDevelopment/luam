@@ -1,4 +1,4 @@
-import { createNamed, renameRecord, typeToString, widenLiteral } from '@compiler/checker/types';
+import { createNamed, renameRecord, typeToString, widenInferred } from '@compiler/checker/types';
 import type {
     AssignmentStatement,
     DeclareStatement,
@@ -84,7 +84,7 @@ function collectLocal(state: CollectorState, block: BlockContext, statement: Loc
 
         const value = statement.values[index];
         const inferredType = value === undefined ? null : typeOf(state, value);
-        const inferred = inferredType === null ? null : widenLiteral(inferredType);
+        const inferred = inferredType === null ? null : widenInferred(inferredType);
         const type = declarator.annotation === null ? inferred : annotationType(declarator.annotation);
         const declared = variableText('local', declarator.name, declarator.annotation, inferred === null ? null : typeToString(inferred));
         const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1));

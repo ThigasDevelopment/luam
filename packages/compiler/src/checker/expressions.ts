@@ -29,6 +29,7 @@ import {
     BOOLEAN_TYPE,
     createArray,
     createBooleanLiteral,
+    createLiteralRecord,
     createNumberLiteral,
     createStringLiteral,
     createUnion,
@@ -235,9 +236,23 @@ function checkTable(context: CheckContext, expression: TableExpression): Type {
         return checkExpression(context, field.value);
     });
 
+    const isRecord = expression.fields.every((field) => field.name !== null);
+
+    if (isRecord) {
+        const members = new Map<string, Type>();
+
+        expression.fields.forEach((field, index) => {
+            if (field.name !== null) {
+                members.set(field.name, valueTypes[index] ?? ANY_TYPE);
+            }
+        });
+
+        return context.record(expression, createLiteralRecord(members));
+    }
+
     const isArray = expression.fields.every((field) => field.key === null && field.name === null);
 
-    if (!isArray || valueTypes.length === 0) {
+    if (!isArray) {
         return context.record(expression, TABLE_TYPE);
     }
 

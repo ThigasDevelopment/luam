@@ -67,14 +67,16 @@ describe('object types', () => {
     });
 
     it('separates keys with a comma, a semicolon, or a line break', () => {
-        expect(codes('local a: { id: number, tag: string } = {}\n')).toEqual([]);
-        expect(codes('local b: { id: number; tag: string } = {}\n')).toEqual([]);
-        expect(codes('local c: {\n    id: number\n    tag: string\n} = {}\n')).toEqual([]);
+        const value = "{ id = 1, tag = 'a' }";
+
+        expect(codes(`local a: { id: number, tag: string } = ${value}\n`)).toEqual([]);
+        expect(codes(`local b: { id: number; tag: string } = ${value}\n`)).toEqual([]);
+        expect(codes(`local c: {\n    id: number\n    tag: string\n} = ${value}\n`)).toEqual([]);
     });
 
     it('accepts an object type nested in another type', () => {
         expect(codes('local owners: { id: number }[] = {}\n')).toEqual([]);
-        expect(codes('type Args = { owner: { id: number } }\n\nlocal a: Args = {}\n')).toEqual([]);
+        expect(codes('type Args = { owner: { id: number } }\n\nlocal a: Args = { owner = { id = 1 } }\n')).toEqual([]);
         expect(codes('local pending?: { id: number } = nil\n')).toEqual([]);
         expect(codes('local read: fun(entry: { id: number }): void = print\n')).toEqual([]);
     });
@@ -89,26 +91,29 @@ describe('object types', () => {
     });
 
     it('compares two object types by their keys', () => {
-        const source = 'type A = { name: string }\ntype B = { name: number }\n\nlocal function take(value: A): void\nend\n\nlocal b: B = {}\n\ntake(b)\n';
+        const source = 'type A = { name: string }\ntype B = { name: number }\n\nlocal function take(value: A): void\nend\n\nlocal b: B = { name = 1 }\n\ntake(b)\n';
 
         expect(codes(source)).toEqual(['check-type-mismatch']);
         expect(messages(source)[0]).toBe('Argument 1 expects "A" but received "B".');
     });
 
     it('accepts a source that declares every required key of the target', () => {
-        const source = 'local function take(value: { name: string }): void\nend\n\nlocal a: { name: string, tag: string } = {}\n\ntake(a)\n';
+        const source =
+            "local function take(value: { name: string }): void\nend\n\nlocal a: { name: string, tag: string } = { name = 'a', tag = 'b' }\n\ntake(a)\n";
 
         expect(codes(source)).toEqual([]);
     });
 
     it('reports a source that is missing a required key of the target', () => {
-        const source = 'local function take(value: { name: string, tag: string }): void\nend\n\nlocal a: { name: string } = {}\n\ntake(a)\n';
+        const source = "local function take(value: { name: string, tag: string }): void\nend\n\nlocal a: { name: string } = { name = 'a' }\n\ntake(a)\n";
 
         expect(codes(source)).toEqual(['check-type-mismatch']);
     });
 
     it('ignores a missing key that the target declares optional', () => {
-        expect(codes('local function take(value: { name: string, tag?: string }): void\nend\n\nlocal a: { name: string } = {}\n\ntake(a)\n')).toEqual([]);
+        const source = "local function take(value: { name: string, tag?: string }): void\nend\n\nlocal a: { name: string } = { name = 'a' }\n\ntake(a)\n";
+
+        expect(codes(source)).toEqual([]);
     });
 
     it('reports a key declared more than once', () => {
