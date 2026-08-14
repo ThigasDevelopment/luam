@@ -225,3 +225,20 @@ describe('project settings', () => {
         expect(settingsFrom(null)).toEqual({ oop: false });
     });
 });
+
+describe('database connection', () => {
+    const source = "local conn: Connection = Connection('sqlite', 'database.db')\nconn:\n";
+
+    it('offers only its own members, not the element surface', () => {
+        const workspace = openProject(true, { [SERVER_PATH]: source });
+
+        expect(labels(workspace, SERVER_PATH, source, 'conn:')).toEqual(['exec', 'prepareString', 'query']);
+    });
+
+    it('types the connection dbConnect returns', () => {
+        const text = "local conn = dbConnect('sqlite', 'database.db')\nconn:\n";
+        const workspace = openProject(true, { [SERVER_PATH]: text });
+
+        expect(labels(workspace, SERVER_PATH, text, 'conn:')).toEqual(['exec', 'prepareString', 'query']);
+    });
+});

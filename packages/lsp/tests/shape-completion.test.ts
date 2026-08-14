@@ -119,3 +119,46 @@ describe('table literal completion', () => {
         expect(found.slice(0, 2)).toEqual(['id', 'name']);
     });
 });
+
+describe('type position completion', () => {
+    const TYPE_NAMES = ['Base', 'SQLite', 'MySQL', 'Config'];
+
+    function offersOnlyTypes(text: string, marker: string): void {
+        const found = labels(text, marker);
+
+        expect(found).toContain('string');
+        expect(found).not.toContain('outputChatBox');
+        expect(found).not.toContain('pairs');
+    }
+
+    it('offers types on the right of a type alias', () => {
+        offersOnlyTypes(`${TYPES}type Other = `, 'type Other = ');
+        expect(labels(`${TYPES}type Other = `, 'type Other = ')).toEqual(expect.arrayContaining(TYPE_NAMES));
+    });
+
+    it('offers types after a union bar in an alias', () => {
+        offersOnlyTypes(`${TYPES}type Other = SQLite | `, 'SQLite | ');
+    });
+
+    it('offers types after an intersection ampersand in an alias', () => {
+        offersOnlyTypes(`${TYPES}type Other = Base & `, 'Base & ');
+    });
+
+    it('offers types for a key of an object type', () => {
+        offersOnlyTypes(`${TYPES}type Other = {\n    id: `, 'id: ');
+    });
+
+    it('offers types for a key of a nested object type', () => {
+        offersOnlyTypes(`${TYPES}type Other = {\n    owner: {\n        id: `, 'owner: {\n        id: ');
+    });
+
+    it('offers types after an intersection inside an alias body', () => {
+        offersOnlyTypes(`${TYPES}type Other = Base & {\n    id: `, 'id: ');
+    });
+
+    it('still offers the scope where a value is expected', () => {
+        const found = labels(`${TYPES}local value = `, 'local value = ');
+
+        expect(found).toContain('outputChatBox');
+    });
+});

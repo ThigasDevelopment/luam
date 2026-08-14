@@ -12,7 +12,6 @@ export const ELEMENT_TYPE_ALIASES: Readonly<Record<string, string>> = {
 };
 
 export const ELEMENT_TYPE_PARENTS: Readonly<Record<string, string>> = {
-    Connection: 'Element',
     Object: 'Element',
     Pickup: 'Element',
     Projectile: 'Element',

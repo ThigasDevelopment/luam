@@ -91,3 +91,35 @@ describe('table literal shape', () => {
         expect(codes(source)).toEqual(['check-type-mismatch']);
     });
 });
+
+describe('missing key hint', () => {
+    it('names the key that is missing from the matching member', () => {
+        const source = `${TYPES}local data: Config = { id = 'a', kind = 'sqlite' }\n`;
+
+        expect(messages(source)[0]).toContain('Key "path" is missing from "SQLite".');
+    });
+
+    it('names the member the discriminant picked', () => {
+        const source = `${TYPES}local data: Config = { kind = 'mysql' }\n`;
+
+        expect(messages(source)[0]).toContain('Keys "id", "host" are missing from "MySQL".');
+    });
+
+    it('names the keys of a plain record target', () => {
+        const source = 'type Row = {\n    id: string,\n    name: string\n}\n\nlocal row: Row = {}\n';
+
+        expect(messages(source)[0]).toContain('Keys "id", "name" are missing from "Row".');
+    });
+
+    it('stays quiet when no member matches the discriminant', () => {
+        const source = `${TYPES}local data: Config = { id = 'a', kind = 'oracle' }\n`;
+
+        expect(messages(source)[0]).not.toContain('missing from');
+    });
+
+    it('stays quiet when the key is present but the wrong type', () => {
+        const source = "type Row = {\n    id: number\n}\n\nlocal row: Row = { id = 'a' }\n";
+
+        expect(messages(source)[0]).not.toContain('missing from');
+    });
+});

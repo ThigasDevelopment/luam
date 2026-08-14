@@ -19,6 +19,10 @@ const MEMBER_HEAD = /^\s*$/;
 
 const TYPE_BODY_HEAD = /\b(?:class|interface)\s+[A-Za-z_][A-Za-z0-9_]*[A-Za-z0-9_,\s]*$/;
 
+const ALIAS_HEAD = /\btype\s+[A-Za-z_][A-Za-z0-9_]*(?:\s*<[^>]*>)?\s*=\s*$/;
+
+const ALIAS_BODY_HEAD = /\btype\s+[A-Za-z_][A-Za-z0-9_]*(?:\s*<[^>]*>)?\s*=[^\n]*$/;
+
 const METHOD_HEAD = /(?:^|\n)[ \t]*[A-Za-z_][A-Za-z0-9_]*[ \t]*$/;
 
 function skipSpaces(text: string, from: number): number {
@@ -54,7 +58,7 @@ function skipMarks(text: string, from: number): number {
 function skipTypeText(text: string, from: number): number {
     let cursor = skipSpaces(text, from);
 
-    while (text[cursor - 1] === '|') {
+    while (text[cursor - 1] === '|' || text[cursor - 1] === '&') {
         const marks = skipMarks(text, skipSpaces(text, cursor - 1));
         const start = skipIdentifier(text, marks);
 
@@ -75,7 +79,13 @@ function lineHead(text: string, colon: number): string {
 }
 
 function isTypeBody(text: string, open: number): boolean {
-    return TYPE_BODY_HEAD.test(text.slice(Math.max(0, open - 160), open));
+    const head = text.slice(Math.max(0, open - 160), open);
+
+    if (TYPE_BODY_HEAD.test(head) || ALIAS_BODY_HEAD.test(head)) {
+        return true;
+    }
+
+    return text[open] === '{' && isTypePosition(text, open);
 }
 
 function isParameterList(text: string, inner: CallFrame, outer: CallFrame | undefined): boolean {
@@ -126,7 +136,11 @@ export function isTypePosition(text: string, offset: number): boolean {
     const wordStart = skipIdentifier(text, offset);
     const cursor = skipTypeText(text, wordStart);
 
-    return text[cursor - 1] === ':' && isAnnotationColon(text, cursor - 1);
+    if (text[cursor - 1] === ':') {
+        return isAnnotationColon(text, cursor - 1);
+    }
+
+    return ALIAS_HEAD.test(text.slice(Math.max(0, cursor - 120), cursor));
 }
 
 export function typeItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {

@@ -352,6 +352,17 @@ verificada contra a forma para a qual é atribuída. Uma chave obrigatória falt
 
 ```
 error  check-type-mismatch  Argument 1 expects "Args" but received "{ nmae: 'a' }".
+                            Key "name" is missing from "Args".
+```
+
+Quando o alvo é uma união, as chaves da literal que são tipadas como literais
+escolhem o membro contra o qual reportar, então a mensagem diz o que falta no
+ramo que você quis dizer:
+
+```
+error  check-type-mismatch  Variable "conn" expects "SQLite | MySQL" but received
+                            "{ id: 'a', type: 'sqlite' }".
+                            Key "path" is missing from "SQLite".
 ```
 
 Duas literais mantêm o significado antigo. `{}` não carrega forma nenhuma, então

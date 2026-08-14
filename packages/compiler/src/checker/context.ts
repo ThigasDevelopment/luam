@@ -12,6 +12,7 @@ import { builtinSymbols } from './globals';
 import { mtaClassRegistry } from './oop-classes';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import { DeclarationRegistry } from './registry';
+import { missingKeyHint } from './shape-hint';
 import { mergeIntersection } from './type-intersection';
 import { substituteType } from './type-substitution';
 import {
@@ -361,7 +362,9 @@ export class CheckContext {
         const received = isLiteralType(target) || target.kind === 'union' ? source : widenLiteral(source);
         const message = `${subject} expects "${typeToString(target)}" but received "${typeToString(received)}".`;
 
-        this.report('check-type-mismatch', `${message}${nilHint(source, target, this.mode)}`, position);
+        const hint = `${nilHint(source, target, this.mode)}${missingKeyHint(source, target)}`;
+
+        this.report('check-type-mismatch', `${message}${hint}`, position);
     }
 
     private declareProject(project: ProjectDeclarations): void {

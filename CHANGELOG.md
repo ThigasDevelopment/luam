@@ -24,6 +24,13 @@ rather than the one that is unexpected.
   so a string value can pick a member of a discriminated union.
 - Completion inside a table literal now offers every key of a union until a
   discriminant is written, then narrows to the member that matches it.
+- The mismatch names the key that is missing. Against a union, the literal-typed
+  keys already written pick the member to report against, so the message points
+  at the branch you meant rather than the whole union.
+- Type completion in the two positions that were falling through to the value
+  scope: the right of a type alias, including after `|` and `&`, and the keys of
+  an object type, nested ones included. Both offered every global and function
+  instead of the types.
 
 #### Fixed
 
@@ -68,7 +75,9 @@ instead of the keys it expects.
 - `Connection`, the element `dbConnect` returns. It was excluded from the
   generated catalog, so the connection was typed `Element` and there was no name
   to annotate it with. `dbExec` and `dbPrepareString` now take it, and the OOP
-  surface carries its constructor, `exec`, `prepareString`, and `query`.
+  surface carries its constructor, `exec`, `prepareString`, and `query` — and
+  nothing else, matching the upstream class, which declares no parent. A database
+  handle has no position, alpha, or attachment to offer.
 
 #### Fixed
 

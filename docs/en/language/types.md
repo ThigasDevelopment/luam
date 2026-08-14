@@ -347,6 +347,16 @@ is reported because `name` is missing, not because `nmae` is unexpected:
 
 ```
 error  check-type-mismatch  Argument 1 expects "Args" but received "{ nmae: 'a' }".
+                            Key "name" is missing from "Args".
+```
+
+When the target is a union, the literal keys that are typed as literals pick the
+member to report against, so you are told what the branch you meant is missing:
+
+```
+error  check-type-mismatch  Variable "conn" expects "SQLite | MySQL" but received
+                            "{ id: 'a', type: 'sqlite' }".
+                            Key "path" is missing from "SQLite".
 ```
 
 Two literals keep their old meaning. `{}` carries no shape, so it still fits an

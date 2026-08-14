@@ -200,7 +200,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ],
     null,
     ),
-    oopClass('Connection', 'Element', [
+    oopClass('Connection', null, [
         oopMethod('exec', 'server', 'dbExec', fn([STRING, ANY], BOOLEAN, 1, true)),
         oopMethod('prepareString', 'server', 'dbPrepareString', fn([STRING, ANY], STRING, 1, true)),
         oopMethod('query', 'server', 'dbQuery', fn([ANY, ANY, ANY, ANY, ANY], ANY, 2, true)),
