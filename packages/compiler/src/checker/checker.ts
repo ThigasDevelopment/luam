@@ -20,6 +20,7 @@ export interface CheckResult {
     types: Map<Expression, Type>;
     references: ReadonlySet<string>;
     declarations: DeclarationRegistry;
+    aliases: ReadonlyMap<string, Type>;
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
     externalReferences: ReadonlyMap<string, SourcePosition>;
     directives: SourceDirectives;
@@ -65,6 +66,7 @@ export function check(program: Program, mode: StrictMode, environment: Environme
         types: context.types,
         references: context.references,
         declarations: context.declarations,
+        aliases: context.binder.resolvedAliases(),
         declaredGlobals: context.declaredGlobals,
         externalReferences: externalReferences(context),
         directives: directives.directives,

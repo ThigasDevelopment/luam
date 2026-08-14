@@ -38,6 +38,16 @@ export interface TypeStringLiteralAnnotation extends NodeBase {
     value: string;
 }
 
+export interface TypeBooleanLiteralAnnotation extends NodeBase {
+    kind: 'type-boolean-literal';
+    value: boolean;
+}
+
+export interface TypeNumberLiteralAnnotation extends NodeBase {
+    kind: 'type-number-literal';
+    value: number;
+}
+
 export interface TypeFunctionAnnotation extends NodeBase {
     kind: 'type-function';
     parameters: TypeAnnotation[];
@@ -67,6 +77,8 @@ export type TypeAnnotation =
     | TypeUnionAnnotation
     | TypeIntersectionAnnotation
     | TypeStringLiteralAnnotation
+    | TypeBooleanLiteralAnnotation
+    | TypeNumberLiteralAnnotation
     | TypeFunctionAnnotation
     | TypeObjectAnnotation
     | TypeTupleAnnotation;

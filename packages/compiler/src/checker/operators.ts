@@ -5,6 +5,7 @@ import {
     acceptsNil,
     ANY_TYPE,
     BOOLEAN_TYPE,
+    createNumberLiteral,
     createUnion,
     isConcatenable,
     isNumeric,
@@ -67,6 +68,10 @@ export function checkUnary(context: CheckContext, operator: string, operand: Typ
 
     if (operator === '-' && !isNumeric(operand)) {
         reportInvalidOperand(context, operator, operand, expression);
+    }
+
+    if (operator === '-' && operand.kind === 'number-literal') {
+        return context.record(expression, createNumberLiteral(-operand.value));
     }
 
     return context.record(expression, NUMBER_TYPE);

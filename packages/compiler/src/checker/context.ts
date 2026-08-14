@@ -18,15 +18,18 @@ import {
     ANY_TYPE,
     BOOLEAN_TYPE,
     createArray,
+    createBooleanLiteral,
     createFunction,
     createMap,
     createNamed,
+    createNumberLiteral,
     createObjectType,
     createOptional,
     createStringLiteral,
     createTuple,
     createUnion,
     isAssignable,
+    isLiteralType,
     NIL_TYPE,
     NUMBER_TYPE,
     STRING_TYPE,
@@ -316,6 +319,14 @@ export class CheckContext {
             return createStringLiteral(annotation.value);
         }
 
+        if (annotation.kind === 'type-boolean-literal') {
+            return createBooleanLiteral(annotation.value);
+        }
+
+        if (annotation.kind === 'type-number-literal') {
+            return createNumberLiteral(annotation.value);
+        }
+
         if (annotation.kind === 'type-object') {
             const members = new Map<string, Type>();
 
@@ -346,7 +357,7 @@ export class CheckContext {
             return;
         }
 
-        const received = target.kind === 'string-literal' || target.kind === 'union' ? source : widenLiteral(source);
+        const received = isLiteralType(target) || target.kind === 'union' ? source : widenLiteral(source);
         const message = `${subject} expects "${typeToString(target)}" but received "${typeToString(received)}".`;
 
         this.report('check-type-mismatch', `${message}${nilHint(source, target, this.mode)}`, position);

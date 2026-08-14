@@ -6,6 +6,39 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Literals Are Types, and the Editor Knows the Shape
+
+`true`, `false`, and a number were not types. The parser accepted `true` and
+`false` in type position and the checker had nowhere to put them, so they
+resolved to a named type that matched anything — and once undeclared names
+warned, `local flag: true = true` warned about a form the grammar allows.
+
+The editor knew less than the compiler. A union receiver offered no keys at all,
+an intersection offered only the keys written inline and dropped everything it
+inherited, and a table literal annotated with a type offered the global scope
+instead of the keys it expects.
+
+#### Added
+
+- String, boolean, and number literal types, negative and decimal numbers
+  included. A literal is assignable to its base type and to the same literal,
+  never the reverse, and an unannotated local still widens, so `local flag = true`
+  stays `boolean`.
+- Booleans and numbers discriminate a union, so a two-case result written as
+  `ok: true` and `ok: false` narrows.
+- Key completion inside a table literal annotated with an object type, an
+  interface, a class, or a union of those. Keys already written are dropped, the
+  insert carries the `=`, and the surrounding scope stays available below them.
+- Member completion on a union receiver, offering the keys every member declares.
+- `variable.language.vararg.luam` for `...`, which the grammar was colouring as
+  the concatenation operator.
+
+#### Fixed
+
+- Completion on an intersection lost the keys it inherited. The editor re-derived
+  types from annotations on its own and could not resolve a named part; it now
+  reads the aliases the checker already resolved, exposed on the check result.
+
 ### Shapes That Combine and Unions That Narrow
 
 `type SQLite = Base & { kind: 'sqlite' }` did not lex — `&` was not a character

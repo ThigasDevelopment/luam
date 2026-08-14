@@ -249,6 +249,7 @@
         },
         "constant": {
             "patterns": [
+                { "name": "variable.language.vararg.luam", "match": "\\.\\.\\." },
                 { "name": "constant.language.luam", "match": "\\b(?:true|false|nil)\\b" },
                 {
                     "name": "support.type.primitive.luam",

@@ -2,7 +2,9 @@ import {
     ANY_TYPE,
     BOOLEAN_TYPE,
     createArray,
+    createBooleanLiteral,
     createFunction,
+    createNumberLiteral,
     createNamed,
     createObjectType,
     createOptional,
@@ -77,6 +79,14 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
 
     if (annotation.kind === 'type-string-literal') {
         return createStringLiteral(annotation.value);
+    }
+
+    if (annotation.kind === 'type-boolean-literal') {
+        return createBooleanLiteral(annotation.value);
+    }
+
+    if (annotation.kind === 'type-number-literal') {
+        return createNumberLiteral(annotation.value);
     }
 
     if (annotation.kind === 'type-function') {

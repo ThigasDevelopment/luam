@@ -34,6 +34,16 @@ export interface StringLiteralType {
     value: string;
 }
 
+export interface BooleanLiteralType {
+    kind: 'boolean-literal';
+    value: boolean;
+}
+
+export interface NumberLiteralType {
+    kind: 'number-literal';
+    value: number;
+}
+
 export interface NamedType {
     kind: 'named';
     name: string;
@@ -67,6 +77,8 @@ export type Type =
     | OptionalType
     | UnionType
     | StringLiteralType
+    | BooleanLiteralType
+    | NumberLiteralType
     | NamedType
     | FunctionType
     | TupleType
@@ -103,7 +115,27 @@ export function createStringLiteral(value: string): Type {
     return { kind: 'string-literal', value };
 }
 
+export function createBooleanLiteral(value: boolean): Type {
+    return { kind: 'boolean-literal', value };
+}
+
+export function createNumberLiteral(value: number): Type {
+    return { kind: 'number-literal', value };
+}
+
+export function isLiteralType(type: Type): boolean {
+    return type.kind === 'string-literal' || type.kind === 'boolean-literal' || type.kind === 'number-literal';
+}
+
 export function widenLiteral(type: Type): Type {
+    if (type.kind === 'boolean-literal') {
+        return BOOLEAN_TYPE;
+    }
+
+    if (type.kind === 'number-literal') {
+        return NUMBER_TYPE;
+    }
+
     return type.kind === 'string-literal' ? STRING_TYPE : type;
 }
 
@@ -218,6 +250,10 @@ export function typeToString(type: Type): string {
         return `'${type.value.replace(/(['\\])/g, '\\$1')}'`;
     }
 
+    if (type.kind === 'boolean-literal' || type.kind === 'number-literal') {
+        return String(type.value);
+    }
+
     if (type.kind === 'named' || type.kind === 'record') {
         return type.name;
     }
@@ -266,7 +302,7 @@ export function isTableLike(type: Type): boolean {
 export function isBooleanType(type: Type | undefined): boolean {
     const resolved = type?.kind === 'optional' ? type.element : type;
 
-    return resolved?.kind === 'boolean';
+    return resolved?.kind === 'boolean' || resolved?.kind === 'boolean-literal';
 }
 
 export function isNumeric(type: Type): boolean {
@@ -274,7 +310,7 @@ export function isNumeric(type: Type): boolean {
         return type.options.every(isNumeric);
     }
 
-    return type.kind === 'number' || type.kind === 'any' || type.kind === 'unknown' || type.kind === 'named';
+    return type.kind === 'number' || type.kind === 'number-literal' || type.kind === 'any' || type.kind === 'unknown' || type.kind === 'named';
 }
 
 export function isConcatenable(type: Type): boolean {
@@ -401,7 +437,15 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
         return target.kind === 'string' || (target.kind === 'string-literal' && source.value === target.value);
     }
 
-    if (target.kind === 'string-literal') {
+    if (source.kind === 'boolean-literal') {
+        return target.kind === 'boolean' || (target.kind === 'boolean-literal' && source.value === target.value);
+    }
+
+    if (source.kind === 'number-literal') {
+        return target.kind === 'number' || (target.kind === 'number-literal' && source.value === target.value);
+    }
+
+    if (isLiteralType(target)) {
         return false;
     }
 

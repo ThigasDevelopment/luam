@@ -39,6 +39,7 @@ export interface DocumentAnalysis {
     diagnostics: Diagnostic[];
     types: ReadonlyMap<Expression, Type>;
     declarations: DeclarationRegistry;
+    aliases: ReadonlyMap<string, Type>;
     own: AmbientDeclarations;
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
     directives: SourceDirectives;
@@ -99,6 +100,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
         diagnostics,
         types: checked.types,
         declarations: checked.declarations,
+        aliases: checked.aliases,
         own: ownDeclarations(checked.declarations, ambient),
         declaredGlobals: checked.declaredGlobals,
         directives: checked.directives,
@@ -130,6 +132,7 @@ function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
         diagnostics: manifest.diagnostics,
         types: new Map(),
         declarations,
+        aliases: new Map(),
         own: EMPTY_AMBIENT,
         declaredGlobals: new Map(),
         directives: EMPTY_DIRECTIVES,

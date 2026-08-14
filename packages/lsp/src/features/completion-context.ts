@@ -10,6 +10,8 @@ import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { isIdentifierChar } from '@lsp/support/source-text';
 import { matchesReferenceKind, type SymbolDeclaration } from '@lsp/symbols/symbol';
 
+import { aliasType, sharedRecord } from './type-shape';
+
 export type ReceiverTarget =
     | { kind: 'library'; library: LibraryName }
     | { kind: 'class'; name: string }
@@ -111,14 +113,6 @@ export function completionContext(text: string, offset: number): CompletionConte
     return { trigger: separator, segments };
 }
 
-function aliasType(analysis: DocumentAnalysis, name: string): Type | null {
-    if (analysis.declarations.lookupClass(name) !== null || analysis.declarations.lookupInterface(name) !== null) {
-        return null;
-    }
-
-    return analysis.index.declarations.find((declaration) => declaration.kind === 'type-alias' && declaration.name === name)?.type ?? null;
-}
-
 function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<string> = new Set()): ReceiverTarget | null {
     if (type === null) {
         return null;
@@ -150,6 +144,12 @@ function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<strin
 
     if (type.kind === 'record') {
         return { kind: 'record', record: type };
+    }
+
+    if (type.kind === 'union') {
+        const record = sharedRecord(analysis, type);
+
+        return record === null ? null : { kind: 'record', record };
     }
 
     return null;

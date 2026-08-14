@@ -70,4 +70,8 @@ export class Binder {
     lookupAlias(name: string): TypeAliasInfo | null {
         return this.aliases.get(name) ?? null;
     }
+
+    resolvedAliases(): ReadonlyMap<string, Type> {
+        return new Map([...this.aliases].map(([name, info]) => [name, info.type]));
+    }
 }

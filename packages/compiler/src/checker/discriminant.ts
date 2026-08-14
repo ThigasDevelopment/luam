@@ -2,7 +2,7 @@ import type { Expression } from '@compiler/parser/ast';
 
 import type { CheckContext } from './context';
 import { optionMemberType } from './union-members';
-import { createStringLiteral, createUnion, isAssignable, withoutNil, type Type } from './types';
+import { createBooleanLiteral, createNumberLiteral, createStringLiteral, createUnion, isAssignable, withoutNil, type Type } from './types';
 
 interface DiscriminantTest {
     name: string;
@@ -10,12 +10,26 @@ interface DiscriminantTest {
     value: Type;
 }
 
+function literalValue(expression: Expression): Type | null {
+    if (expression.kind === 'string-literal') {
+        return createStringLiteral(expression.value);
+    }
+
+    if (expression.kind === 'boolean-literal') {
+        return createBooleanLiteral(expression.value);
+    }
+
+    return expression.kind === 'number-literal' ? createNumberLiteral(expression.value) : null;
+}
+
 function discriminantTest(left: Expression, right: Expression): DiscriminantTest | null {
-    if (left.kind !== 'member-expression' || left.object.kind !== 'identifier' || right.kind !== 'string-literal') {
+    if (left.kind !== 'member-expression' || left.object.kind !== 'identifier') {
         return null;
     }
 
-    return { name: left.object.name, property: left.property, value: createStringLiteral(right.value) };
+    const value = literalValue(right);
+
+    return value === null ? null : { name: left.object.name, property: left.property, value };
 }
 
 function subjectType(context: CheckContext, name: string): Type | null {

@@ -1,7 +1,9 @@
 import type { TypeAnnotation, TypeObjectMember } from './ast';
 import type { TokenStream } from './token-stream';
 
-const TYPE_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
+const TYPE_KEYWORDS: ReadonlySet<string> = new Set(['nil']);
+
+const BOOLEAN_KEYWORDS: ReadonlySet<string> = new Set(['true', 'false']);
 
 export const FUNCTION_TYPE = 'fun';
 
@@ -132,11 +134,29 @@ function parseObjectType(stream: TokenStream): TypeAnnotation {
     return { kind: 'type-object', members, position };
 }
 
+function parseNumberLiteralType(stream: TokenStream): TypeAnnotation {
+    const sign = stream.check('operator', '-') ? stream.next() : null;
+    const token = stream.expect('number');
+    const value = Number(token.value);
+
+    return { kind: 'type-number-literal', value: sign === null ? value : -value, position: sign?.position ?? token.position };
+}
+
 function parsePrimaryType(stream: TokenStream): TypeAnnotation {
     if (stream.check('string')) {
         const token = stream.next();
 
         return { kind: 'type-string-literal', value: token.value, position: token.position };
+    }
+
+    if (stream.check('number') || (stream.check('operator', '-') && stream.checkAhead(1, 'number'))) {
+        return parseNumberLiteralType(stream);
+    }
+
+    if (stream.check('keyword') && BOOLEAN_KEYWORDS.has(stream.current().value)) {
+        const token = stream.next();
+
+        return { kind: 'type-boolean-literal', value: token.value === 'true', position: token.position };
     }
 
     if (stream.check('keyword', 'function')) {

@@ -182,4 +182,16 @@ describe('grammar', () => {
         expect(matchesAny('operator', 'a ~= b')).toBe(true);
         expect(matchesAny('operator', 'name?: string')).toBe(true);
     });
+
+    it('gives the vararg its own scope ahead of concatenation', () => {
+        const [vararg] = rulePatterns('constant');
+
+        expect(vararg?.name).toBe('variable.language.vararg.luam');
+        expect(new RegExp(vararg?.match ?? '').test('function take(...)')).toBe(true);
+        expect(matchesAny('constant', 'local rest = ...')).toBe(true);
+    });
+
+    it('highlights an intersection in an annotation', () => {
+        expect(matchesAny('annotation', 'local row: Base & Extra = {}')).toBe(true);
+    });
 });

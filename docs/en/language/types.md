@@ -31,6 +31,46 @@ annotation takes the type of its initializer.
 MTA element types — `Player`, `Vehicle`, `Element`, `Marker` and the rest of the
 catalog — are types too. See [APIs and events](/en/mta/apis-and-events).
 
+## Literal types
+
+A literal value is a type of its own — one that accepts exactly that value:
+
+```luam
+local mode: 'auto' = 'auto'
+local ready: true = true
+local port: 3306 = 3306
+local nothing: nil = nil
+```
+
+Strings, booleans, and numbers all work, and a number may be negative or
+decimal (`-1`, `0.5`). Assigning anything else is `check-type-mismatch`:
+
+```
+error  check-type-mismatch  Variable "ready" expects "true" but received "false".
+```
+
+Every literal is assignable to its base type, so `local flag: boolean = true`
+is fine. The reverse is not: a `boolean` does not fit a `true`.
+
+A literal type only appears where you write one. A local with no annotation
+widens, so `local flag = true` is `boolean` and can be reassigned:
+
+```luam
+local flag = true
+
+flag = false
+```
+
+Literals are most useful in a union, which is how you write a closed set of
+values:
+
+```luam
+local level: 1 | 2 | 3 = 2
+local mode: 'auto' | 'manual' | false = 'auto'
+```
+
+They are also what makes a [discriminated union](#discriminated-unions) narrow.
+
 ## Optionals
 
 A trailing `?` allows `nil`:
@@ -164,7 +204,7 @@ generated Lua is the same table it would have been.
 
 ## Discriminated unions
 
-A union whose members share a key typed as a string literal narrows on that key.
+A union whose members share a key typed as a literal narrows on that key.
 Comparing it against a literal keeps only the members that can match:
 
 ```luam
@@ -206,8 +246,30 @@ end
 
 The receiver must be a plain name — `config.kind` narrows `config`, but
 `state.config.kind` narrows nothing. Narrowing ends with the block that
-established it, and only string literals discriminate, because they are the only
-literal types Luam has.
+established it.
+
+A string is the usual discriminant, but any [literal type](#literal-types) works,
+which makes the two-case result a natural shape:
+
+```luam
+type Ok = {
+    ok: true,
+    value: string
+}
+
+type Err = {
+    ok: false,
+    reason: string
+}
+
+function report(result: Ok | Err): string
+    if result.ok == false then
+        return result.reason
+    end
+
+    return result.value
+end
+```
 
 ## Arrays
 

@@ -32,6 +32,46 @@ Os tipos de elemento do MTA — `Player`, `Vehicle`, `Element`, `Marker` e o res
 do catálogo — também são tipos. Veja
 [APIs e eventos](/pt-br/mta/apis-and-events).
 
+## Tipos literais
+
+Um valor literal é um tipo por si só — um que aceita exatamente aquele valor:
+
+```luam
+local mode: 'auto' = 'auto'
+local ready: true = true
+local port: 3306 = 3306
+local nothing: nil = nil
+```
+
+Strings, booleanos e números funcionam, e um número pode ser negativo ou decimal
+(`-1`, `0.5`). Atribuir qualquer outra coisa é `check-type-mismatch`:
+
+```
+error  check-type-mismatch  Variable "ready" expects "true" but received "false".
+```
+
+Todo literal é assinalável ao seu tipo base, então `local flag: boolean = true`
+funciona. O contrário não: um `boolean` não cabe em um `true`.
+
+Um tipo literal só aparece onde você escreve um. Um local sem anotação alarga,
+então `local flag = true` é `boolean` e pode ser reatribuído:
+
+```luam
+local flag = true
+
+flag = false
+```
+
+Literais são mais úteis em uma união, que é como se escreve um conjunto fechado
+de valores:
+
+```luam
+local level: 1 | 2 | 3 = 2
+local mode: 'auto' | 'manual' | false = 'auto'
+```
+
+São também o que faz uma [união discriminada](#unioes-discriminadas) estreitar.
+
 ## Opcionais
 
 Um `?` no final permite `nil`:
@@ -167,8 +207,8 @@ então o Lua gerado é a mesma tabela que já seria.
 
 ## Uniões discriminadas
 
-Uma união cujos membros compartilham uma chave tipada como literal de string
-estreita por essa chave. Comparar a chave com um literal mantém apenas os membros
+Uma união cujos membros compartilham uma chave tipada como literal estreita por
+essa chave. Comparar a chave com um literal mantém apenas os membros
 que podem casar:
 
 ```luam
@@ -210,8 +250,30 @@ end
 
 O receptor precisa ser um nome simples — `config.kind` estreita `config`, mas
 `state.config.kind` não estreita nada. O estreitamento termina com o bloco que o
-estabeleceu, e só literais de string discriminam, porque são os únicos tipos
-literais que o Luam tem.
+estabeleceu.
+
+Uma string é o discriminante usual, mas qualquer [tipo literal](#tipos-literais)
+funciona, o que torna o resultado de dois casos uma forma natural:
+
+```luam
+type Ok = {
+    ok: true,
+    value: string
+}
+
+type Err = {
+    ok: false,
+    reason: string
+}
+
+function report(result: Ok | Err): string
+    if result.ok == false then
+        return result.reason
+    end
+
+    return result.value
+end
+```
 
 ## Arrays
 

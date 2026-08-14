@@ -1,0 +1,100 @@
+import type { Type } from '@compiler/checker/types';
+
+import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+
+import { shapeMembers } from './type-shape';
+
+const TYPE_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+function openingBrace(text: string, offset: number): number {
+    let depth = 0;
+
+    for (let index = offset - 1; index >= 0; index -= 1) {
+        const char = text[index];
+
+        if (char === '}') {
+            depth += 1;
+
+            continue;
+        }
+
+        if (char !== '{') {
+            continue;
+        }
+
+        if (depth === 0) {
+            return index;
+        }
+
+        depth -= 1;
+    }
+
+    return -1;
+}
+
+function skipSpaceBack(text: string, from: number): number {
+    let index = from;
+
+    while (index >= 0 && (text[index] === ' ' || text[index] === '\t')) {
+        index -= 1;
+    }
+
+    return index;
+}
+
+function annotationBefore(text: string, brace: number): string | null {
+    const assign = skipSpaceBack(text, brace - 1);
+
+    if (text[assign] !== '=') {
+        return null;
+    }
+
+    const end = skipSpaceBack(text, assign - 1);
+    let start = end;
+
+    while (start >= 0 && text[start] !== ':' && text[start] !== '\n') {
+        start -= 1;
+    }
+
+    return text[start] === ':' ? text.slice(start + 1, end + 1).trim() : null;
+}
+
+export function tableLiteralMembers(analysis: DocumentAnalysis, offset: number): ReadonlyMap<string, Type> | null {
+    const brace = openingBrace(analysis.text, offset);
+
+    if (brace === -1) {
+        return null;
+    }
+
+    const name = annotationBefore(analysis.text, brace);
+
+    if (name === null || !TYPE_NAME.test(name)) {
+        return null;
+    }
+
+    return shapeMembers(analysis, { kind: 'named', name });
+}
+
+export function writtenKeys(text: string, offset: number): ReadonlySet<string> {
+    const brace = openingBrace(text, offset);
+
+    if (brace === -1) {
+        return new Set();
+    }
+
+    const written = new Set<string>();
+    const body = text.slice(brace + 1, offset);
+    let depth = 0;
+
+    for (const match of body.matchAll(/[{}]|([A-Za-z_][A-Za-z0-9_]*)\s*=/g)) {
+        if (match[0] === '{') {
+            depth += 1;
+        } else if (match[0] === '}') {
+            depth -= 1;
+        } else if (depth === 0 && match[1] !== undefined) {
+            written.add(match[1]);
+        }
+    }
+
+    return written;
+}

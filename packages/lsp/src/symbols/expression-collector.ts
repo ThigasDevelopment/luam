@@ -21,7 +21,7 @@ export function collectAnnotation(state: CollectorState, block: BlockContext, an
         return;
     }
 
-    if (annotation.kind === 'type-string-literal') {
+    if (annotation.kind === 'type-string-literal' || annotation.kind === 'type-boolean-literal' || annotation.kind === 'type-number-literal') {
         return;
     }
 

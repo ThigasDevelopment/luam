@@ -28,6 +28,8 @@ import {
     ANY_TYPE,
     BOOLEAN_TYPE,
     createArray,
+    createBooleanLiteral,
+    createNumberLiteral,
     createStringLiteral,
     createUnion,
     firstValueOf,
@@ -50,7 +52,8 @@ const EXTENSION_RESULTS: Readonly<Record<ExtensionResult, Type>> = {
 };
 
 function extensionType(receiver: Type, property: string): Type | null {
-    const kind = receiver.kind === 'string-literal' ? 'string' : receiver.kind === 'string' || receiver.kind === 'number' ? receiver.kind : null;
+    const literal = receiver.kind === 'string-literal' ? 'string' : receiver.kind === 'number-literal' ? 'number' : null;
+    const kind = literal ?? (receiver.kind === 'string' || receiver.kind === 'number' ? receiver.kind : null);
     const target = kind ?? (isTableLike(receiver) ? 'table' : null);
 
     if (target === null) {
@@ -266,9 +269,9 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'nil-literal':
             return context.record(expression, NIL_TYPE);
         case 'boolean-literal':
-            return context.record(expression, BOOLEAN_TYPE);
+            return context.record(expression, createBooleanLiteral(expression.value));
         case 'number-literal':
-            return context.record(expression, NUMBER_TYPE);
+            return context.record(expression, createNumberLiteral(expression.value));
         case 'string-literal':
             return context.record(expression, createStringLiteral(expression.value));
         case 'template-literal':

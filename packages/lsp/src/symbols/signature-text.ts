@@ -26,6 +26,10 @@ export function annotationText(annotation: TypeAnnotation | null): string {
         return `'${annotation.value.replace(/(['\\])/g, '\\$1')}'`;
     }
 
+    if (annotation.kind === 'type-boolean-literal' || annotation.kind === 'type-number-literal') {
+        return String(annotation.value);
+    }
+
     if (annotation.kind === 'type-function') {
         const parameters = annotation.parameters.map(annotationText);
 

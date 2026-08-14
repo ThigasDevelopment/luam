@@ -1,7 +1,7 @@
 import { descriptorToType } from '@compiler/checker/api-types';
 import { mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
-import type { RecordType } from '@compiler/checker/types';
+import { typeToString, type RecordType } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
 import { globalsFor } from '@mta-types/catalog';
 import { oopClassesFor } from '@mta-types/oop-surface';
@@ -11,6 +11,7 @@ import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
 import { classBodyNeedsConstructor } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
+import { tableLiteralMembers, writtenKeys } from '@lsp/features/table-literal';
 import {
     completionContext,
     hasDecoratorPrefix,
@@ -59,6 +60,25 @@ function enumItems(analysis: DocumentAnalysis, name: string): CompletionItem[] {
 
 function recordItems(record: RecordType): CompletionItem[] {
     return [...record.members].map(([name, type]) => memberItem(name, type, false, record.name));
+}
+
+function tableKeyItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
+    const members = tableLiteralMembers(analysis, offset);
+
+    if (members === null) {
+        return [];
+    }
+
+    const written = writtenKeys(analysis.text, offset);
+
+    return [...members]
+        .filter(([name]) => !written.has(name))
+        .map(([name, type]) => ({
+            label: name,
+            kind: CompletionItemKind.Field,
+            detail: `${name}: ${typeToString(type)}`,
+            insertText: `${name} = `,
+        }));
 }
 
 function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger: '.' | ':'): CompletionItem[] {
@@ -206,6 +226,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     const expectation = expectedArgument(analysis, offset, lexical.frame);
 
     return deduplicate([
+        ...plainItems(tableKeyItems(analysis, offset), expectation),
         ...scopeItems(analysis, offset, expectation),
         ...plainItems(workspaceItems(analysis, others), expectation),
         ...plainItems(mtaClassItems(analysis), expectation),
