@@ -1,0 +1,11 @@
+class Adapter {
+    connection?: userdata
+
+    use = function (): void
+        if self.connection ~= nil then
+            local handle: userdata = self.connection
+
+            outputDebugString(tostring(handle))
+        end
+    end
+}

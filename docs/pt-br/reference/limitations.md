@@ -8,12 +8,9 @@ Uma [guarda de tipo](/pt-br/language/types#guardas-de-tipo) refina um **nome**
 dentro do bloco que ela protege. Um campo mantém o tipo declarado, não importa
 como você testa:
 
-```luam
-if self.connection ~= nil then
-    local handle: userdata = self.connection
-    # check-type-mismatch: o campo continua "userdata?".
-end
-```
+<<< @/snippets/errors/field-narrowing/src/server/adapter.luam{luam}
+
+<<< @/snippets/output/errors/field-narrowing.txt{text}
 
 Copie o campo para um local antes:
 

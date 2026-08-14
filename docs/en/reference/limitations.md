@@ -7,12 +7,9 @@ What Luam deliberately does not do, and what to write instead.
 A [type guard](/en/language/types#type-guards) refines a **name** inside the
 block it guards. A field keeps its declared type, however you test it:
 
-```luam
-if self.connection ~= nil then
-    local handle: userdata = self.connection
-    # check-type-mismatch: the field is still "userdata?".
-end
-```
+<<< @/snippets/errors/field-narrowing/src/server/adapter.luam{luam}
+
+<<< @/snippets/output/errors/field-narrowing.txt{text}
 
 Copy the field into a local first:
 
