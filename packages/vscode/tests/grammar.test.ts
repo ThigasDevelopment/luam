@@ -135,6 +135,45 @@ describe('grammar', () => {
         expect(matchesAny('identifier', 'local export = 1')).toBe(true);
     });
 
+    it('scopes a method call after a colon as a function, not as a type', () => {
+        const rule = rulePatterns('method')[0];
+
+        expect(matchesAny('method', 'return self:query(str)')).toBe(true);
+        expect(matchesAny('method', "self:log('ready')")).toBe(true);
+        expect(rule?.captures?.['2']?.name).toBe('support.function.any-method.luam');
+        expect(matchesAny('method', 'local player: Player = nil')).toBe(false);
+        expect(matchesAny('method', 'local run: fun(id: number): void = nil')).toBe(false);
+    });
+
+    it('scopes the lua standard library the way lua does', () => {
+        expect(matchesAny('support', 'table.insert(values, value)')).toBe(true);
+        expect(matchesAny('support', 'local text = string.format(mask)')).toBe(true);
+        expect(matchesAny('support', 'for key, value in pairs(data) do')).toBe(true);
+        expect(matchesAny('support', 'local kind = type(1)')).toBe(true);
+        expect(matchesAny('support', 'local pairs = 1')).toBe(false);
+        expect(matchesAny('support', 'self.type(1)')).toBe(false);
+    });
+
+    it('keeps the type keyword for type aliases only', () => {
+        const rule = rulePatterns('keyword').find((pattern) => pattern.name === 'storage.type.luam');
+
+        expect(new RegExp(rule?.match ?? '').test('type PlayerId = number')).toBe(true);
+        expect(new RegExp(rule?.match ?? '').test('local kind = type(1)')).toBe(false);
+    });
+
+    it('scopes local, calls, and fields with the lua scope names', () => {
+        const local = rulePatterns('keyword').find((pattern) => pattern.name === 'keyword.local.luam');
+
+        expect(new RegExp(local?.match ?? '').test('local health = 100')).toBe(true);
+        expect(rulePatterns('call')[0]?.captures?.['1']?.name).toBe('support.function.any-method.luam');
+        expect(rulePatterns('attribute')[0]?.name).toBe('entity.other.attribute.luam');
+        expect(matchesAny('attribute', 'self.side = side')).toBe(true);
+        const assigned = new RegExp(rulePatterns('function')[1]?.match ?? '');
+
+        expect(assigned.test('insert = function (data: table)')).toBe(true);
+        expect(assigned.test('constructor = function (side: string)')).toBe(false);
+    });
+
     it('highlights numbers and lua operators', () => {
         expect(matchesAny('number', '0xFF')).toBe(true);
         expect(matchesAny('number', '10.5')).toBe(true);
