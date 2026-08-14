@@ -18,6 +18,10 @@ import { isIdentifierChar, wordAt } from '@lsp/support/source-text';
 import type { SymbolDeclaration } from '@lsp/symbols/symbol';
 import { annotationText } from '@lsp/symbols/signature-text';
 
+const FIELD_PREFIX = 'field ';
+
+const MEMBER_LIMIT = 24;
+
 function markdown(value: string): string {
     return ['```luam', value, '```'].join('\n');
 }
@@ -28,6 +32,49 @@ function declarationText(declaration: SymbolDeclaration): string {
     }
 
     return declaration.type === null ? declaration.name : `${declaration.name}: ${typeToString(declaration.type)}`;
+}
+
+function memberText(member: SymbolDeclaration): string {
+    if (member.kind === 'field') {
+        return member.detail.startsWith(FIELD_PREFIX) ? member.detail.slice(FIELD_PREFIX.length) : member.detail;
+    }
+
+    return member.name === 'constructor' ? `constructor(${member.parameters.join(', ')})` : member.detail;
+}
+
+function bodyText(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {
+    if (declaration.kind !== 'class' && declaration.kind !== 'interface') {
+        return '';
+    }
+
+    const members = analysis.index.membersOf(declaration.name);
+
+    if (members.length === 0) {
+        return ' {}';
+    }
+
+    const visible = members.slice(0, MEMBER_LIMIT);
+    const shown = visible.flatMap((member, index) => {
+        const previous = visible[index - 1];
+        const separated = previous !== undefined && previous.kind === 'field' && member.kind !== 'field';
+
+        return separated ? ['', `    ${memberText(member)}`] : [`    ${memberText(member)}`];
+    });
+    const hidden = members.length - visible.length;
+
+    if (hidden > 0) {
+        shown.push(`    # ${hidden} more`);
+    }
+
+    return ` {\n${shown.join('\n')}\n}`;
+}
+
+function summaryText(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {
+    return `${declarationText(declaration)}${bodyText(analysis, declaration)}`;
+}
+
+function originNote(analysis: DocumentAnalysis): string {
+    return `declared in ${analysis.relative} (${analysis.environment})`;
 }
 
 function projectHover(analysis: DocumentAnalysis, name: string): Hover | null {
@@ -76,10 +123,8 @@ function workspaceHover(analysis: DocumentAnalysis, others: readonly DocumentAna
             continue;
         }
 
-        const scope = `declared in "${other.path}" (${other.environment})`;
-
         return {
-            contents: { kind: 'markdown', value: `${markdown(declarationText(declaration))}\n\n${scope}` },
+            contents: { kind: 'markdown', value: `${markdown(summaryText(other, declaration))}\n\n${originNote(other)}` },
             range: toWordRange(reference.position, reference.name),
         };
     }
@@ -243,7 +288,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;
 
     return {
-        contents: { kind: 'markdown', value: `${markdown(declarationText(declaration))}${exportNote(analysis, declaration)}` },
+        contents: { kind: 'markdown', value: `${markdown(summaryText(analysis, declaration))}${exportNote(analysis, declaration)}` },
         range: toWordRange(anchor.position, anchor.name),
     };
 }

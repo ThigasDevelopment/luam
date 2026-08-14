@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { LanguageService } from '@lsp/server/language-service';
 import { pathToUri } from '@lsp/workspace/document-uri';
 
-import { positionOf } from './support/service-fixture';
+import { createWorkspace, positionOf, removeWorkspace, uriFor } from './support/service-fixture';
 
 const SERVER_FILE = pathToUri('/project/src/server/main.luam');
 
@@ -118,12 +118,13 @@ describe('hover', () => {
         expect(hover).toContain('mta api (shared)');
     });
 
-    it('shows a class declared in another file with its origin', () => {
+    it('shows a class declared in another file with its constructor and origin', () => {
         const service = new LanguageService();
         const shared = pathToUri('/project/src/shared/core.luam');
         const text = "local core: Core = new Core('client')\n";
+        const source = ["class Core {", "    side: string = ''", '', '    constructor = function (side: string)', '        self.side = side', '    end', '}', ''];
 
-        service.update(shared, 1, "class Core {\n    side: string = ''\n}\n");
+        service.update(shared, 1, source.join('\n'));
         service.update(SERVER_FILE, 1, text);
 
         const annotation = service.hover(SERVER_FILE, positionOf(text, ': Core', 'Core'));
@@ -131,9 +132,67 @@ describe('hover', () => {
         const contents = annotation?.contents;
         const value = contents !== undefined && typeof contents !== 'string' && !Array.isArray(contents) ? contents.value : '';
 
-        expect(value).toContain('class Core');
-        expect(value).toContain('declared in "/project/src/shared/core.luam" (shared)');
+        expect(value).toContain('class Core {\n    side: string\n\n    constructor(side: string)\n}');
+        expect(value).toContain('declared in /project/src/shared/core.luam (shared)');
         expect(instantiation).not.toBeNull();
+    });
+
+    it('lists the members of a class and of an interface', () => {
+        const source = [
+            'interface Named {',
+            '    name: string',
+            '    describe(): string',
+            '}',
+            '',
+            'class Account implements Named {',
+            "    name: string = ''",
+            '',
+            '    describe = function (): string',
+            '        return self.name',
+            '    end',
+            '}',
+            '',
+            'local account: Account = nil',
+            'local named: Named = nil',
+            '',
+        ].join('\n');
+
+        expect(hoverText(source, 'local account: ', 'Account')).toContain('class Account implements Named {\n    name: string\n\n    describe(): string\n}');
+        expect(hoverText(source, 'local named: ', 'Named')).toContain('interface Named {\n    name: string\n\n    describe(): string\n}');
+    });
+
+    it('shows an empty body for a class without members', () => {
+        const source = 'class Marker {\n}\n\nlocal marker: Marker = nil\n';
+
+        expect(hoverText(source, 'local marker: ', 'Marker')).toContain('class Marker {}');
+    });
+
+    it('names the origin relative to the workspace root', () => {
+        const root = createWorkspace({
+            'src/shared/core.luam': 'class Core {\n}\n',
+            'src/server/main.luam': 'local core: Core = new Core()\n',
+        });
+        const service = new LanguageService();
+        const text = 'local core: Core = new Core()\n';
+
+        try {
+            service.loadWorkspace([root]);
+
+            const hover = service.hover(uriFor(root, 'src/server/main.luam'), positionOf(text, ': Core', 'Core'));
+            const contents = hover?.contents;
+            const value = contents !== undefined && typeof contents !== 'string' && !Array.isArray(contents) ? contents.value : '';
+
+            expect(value).toContain('declared in src/shared/core.luam (shared)');
+            expect(value).not.toContain(root);
+        } finally {
+            removeWorkspace(root);
+        }
+    });
+
+    it('shows the interfaces a class implements', () => {
+        const text = 'interface Named {\n    name: string\n}\n\nclass Player implements Named {\n    name: string = \'\'\n}\n\nlocal player: Player = nil\n';
+
+        expect(hoverText(text, 'local player', 'Player')).toContain('class Player implements Named');
     });
 
     it('does not show a class from an environment the file cannot reference', () => {

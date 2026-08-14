@@ -28,6 +28,7 @@ const EMPTY_PROGRAM: Program = { kind: 'program', body: [], position: createPosi
 export interface DocumentAnalysis {
     uri: string;
     path: string;
+    relative: string;
     version: number;
     text: string;
     tokens: Token[];
@@ -51,6 +52,7 @@ export interface DocumentAnalysis {
 export interface AnalysisInput {
     uri: string;
     path: string;
+    relative?: string;
     version: number;
     text: string;
     project?: ProjectDeclarations;
@@ -86,6 +88,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
     return {
         uri: input.uri,
         path: input.path,
+        relative: input.relative ?? input.path,
         version: input.version,
         text: input.text,
         tokens: parsed.tokens,
@@ -116,6 +119,7 @@ function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
     return {
         uri: input.uri,
         path: input.path,
+        relative: input.relative ?? input.path,
         version: input.version,
         text: input.text,
         tokens: manifest.tokens,

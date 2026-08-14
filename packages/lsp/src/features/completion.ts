@@ -125,7 +125,7 @@ function workspaceItems(analysis: DocumentAnalysis, others: readonly DocumentAna
         }
 
         for (const name of other.declaredGlobals.keys()) {
-            items.push({ label: name, kind: CompletionItemKind.Variable, detail: `declared in ${other.path}` });
+            items.push({ label: name, kind: CompletionItemKind.Variable, detail: `declared in ${other.relative}` });
         }
     }
 

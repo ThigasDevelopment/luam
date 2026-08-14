@@ -133,12 +133,13 @@ function collectInterfaceMember(state: CollectorState, block: BlockContext, owne
 function collectClass(state: CollectorState, block: BlockContext, statement: ClassDeclaration): void {
     const position = namePosition(state, statement);
     const extendsText = statement.superClass === null ? '' : ` extends ${statement.superClass}`;
+    const implementsText = statement.interfaces.length === 0 ? '' : ` implements ${statement.interfaces.join(', ')}`;
 
     declareSymbol(state, ROOT_SCOPE, {
         name: statement.name,
         kind: 'class',
         position,
-        detail: `class ${statement.name}${extendsText}`,
+        detail: `class ${statement.name}${extendsText}${implementsText}`,
     });
     const names = statement.superClass === null ? statement.interfaces : [statement.superClass, ...statement.interfaces];
 

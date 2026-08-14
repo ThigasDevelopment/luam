@@ -4,7 +4,7 @@ import { canReference, type Environment } from '@compiler/environment/environmen
 
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
-import { pathKey, pathToUri, uriToPath } from './document-uri';
+import { pathKey, pathToUri, relativeToRoots, uriToPath } from './document-uri';
 import { loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
 import { DEFAULT_PROJECT_SETTINGS, settingsFrom, type ProjectSettings } from './project-settings';
 import { scanSources } from './source-scanner';
@@ -31,6 +31,7 @@ export class WorkspaceIndex {
         const analysis = analyzeDocument({
             uri,
             path,
+            relative: relativeToRoots(path, this.roots),
             version,
             text,
             project: this.project,

@@ -38,3 +38,19 @@ export function pathToUri(path: string): string {
 export function pathKey(path: string): string {
     return normalizeFsPath(path).toLowerCase();
 }
+
+export function relativeToRoots(path: string, roots: readonly string[]): string {
+    const normalized = normalizeFsPath(path);
+    const key = pathKey(normalized);
+    let longest = '';
+
+    for (const root of roots) {
+        const rootKey = pathKey(root).replace(/\/$/, '');
+
+        if (key.startsWith(`${rootKey}/`) && rootKey.length > longest.length) {
+            longest = rootKey;
+        }
+    }
+
+    return longest === '' ? normalized : normalized.slice(longest.length + 1);
+}
