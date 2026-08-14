@@ -1,3 +1,5 @@
+#!server
+
 local core: Core = new Core('server')
 
 addEventHandler('onResourceStart', resourceRoot, function()

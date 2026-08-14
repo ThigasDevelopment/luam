@@ -8,3 +8,4 @@ dist/
 .env.local
 .claude/
 docs/.vitepress/cache/
+tmp/

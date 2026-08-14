@@ -45,7 +45,14 @@ class Loader {
         local names: string[] = self:subclasses(baseName)
 
         for index = 1, #names do
-            table.insert(created, new(names[index])(self.core))
+            local definition: any = getClass(names[index])
+            local instance: any = setmetatable({}, { __index = definition })
+
+            if type(instance.constructor) == 'function' then
+                instance:constructor(self.core)
+            end
+
+            table.insert(created, instance)
         end
 
         return created
