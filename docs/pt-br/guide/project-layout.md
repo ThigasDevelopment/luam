@@ -33,8 +33,10 @@ Veja [Ambientes](/pt-br/mta/environments) para a regra completa.
 | --- | --- |
 | `.luam` | Código. Verificado, compilado e escrito como `.lua`. |
 | `.d.luam` | [Arquivo de declaração](/pt-br/language/declaration-files). Verificado, descreve tipos para Lua que o compilador não controla, não emite nada. |
-| qualquer outra em `sourceDirs` | Copiada, mas não declarada no `meta.xml`. |
-| qualquer coisa em `assetDirs` | Copiada e declarada como `<file>`, então os clientes baixam. |
+| qualquer coisa que um mapeamento de `assets` nomeia | Copiada e declarada como `<file>`, então os clientes baixam. |
+
+Um arquivo que nenhum padrão de `sources` e nenhum mapeamento de `assets` nomeia
+não faz parte do build. Nada é copiado por acidente.
 
 ## O que um build escreve
 
@@ -60,7 +62,7 @@ duas árvores completas, manifestos e sobrescritas.
 
 ## Regras de nome e de caminho
 
-- `outDir`, `resourcesDir` e cada entrada de `sourceDirs`, `assetDirs` e
+- `outDir`, `resourcesDir` e cada entrada de `sources`, `assets` e
   `loadOrder` precisam permanecer dentro do seu diretório base. Um caminho
   absoluto ou um segmento `..` é rejeitado com `config-escaping-path`.
 - Dois fontes que produziriam o mesmo caminho de saída falham o build com
@@ -77,7 +79,8 @@ CLI escreve fora do `outDir`, e ela é gerada — ignore `.luam/` no controle de
 versão.
 
 Não há snapshot de configuração. O servidor de linguagem lê o `.luam.manifest`
-diretamente, então uma mudança em `oop` passa a valer assim que o arquivo é salvo.
+diretamente, então uma mudança em `compilerOptions` passa a valer assim que o
+arquivo é salvo.
 
 ## Configurando a estrutura
 
@@ -86,7 +89,16 @@ Cada diretório acima é um padrão que você pode mudar no
 
 ```luam
 name = 'my-resource'
-sourceDirs = { 'src' }
-assetDirs = { 'assets' }
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = {
+    { from = 'assets/**/*', to = 'assets' },
+}
+
 outDir = 'build'
 ```

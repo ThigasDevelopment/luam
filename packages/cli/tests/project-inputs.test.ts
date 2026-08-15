@@ -4,6 +4,7 @@ import { renderEnvironmentTemplate } from '@cli/build/env-template';
 import { readProjectInputs } from '@cli/build/project-inputs';
 import { generatedRoots } from '@cli/build/write-options';
 import type { LuamConfig } from '@cli/config/config-schema';
+import { DEFAULT_ENVIRONMENT_FILES, type AssetMapping } from '@compiler/manifest/manifest-defaults';
 import { parseEnvFile } from '@compiler/project/env-file';
 
 import { createProjectFixture, defaultProjectFiles, manifestConfig, type ProjectFixture } from './support/project-fixture';
@@ -28,33 +29,45 @@ afterEach(() => {
     }
 });
 
+const ASSETS: AssetMapping[] = [{ from: 'assets/**/*', to: 'assets' }];
+
+function inputsOf(root: string, assets: readonly AssetMapping[] = ASSETS) {
+    return readProjectInputs(root, { assets, environment: DEFAULT_ENVIRONMENT_FILES });
+}
+
 describe('project inputs', () => {
-    it('declares asset directory files and leaves source directory files undeclared', () => {
-        const files = { ...defaultProjectFiles(), 'assets/logo.png': 'binary', 'src/server/data/spawns.json': '[]' };
-        const inputs = readProjectInputs(fixture(files).root, ['src'], ['assets']);
+    it('declares the files a mapping names and keeps their destination', () => {
+        const files = { ...defaultProjectFiles(), 'assets/logo.png': 'binary', 'assets/ui/panel.png': 'binary' };
+        const inputs = inputsOf(fixture(files).root);
 
         expect(inputs.assets).toEqual([
             { path: 'assets/logo.png', source: 'assets/logo.png', isDownloaded: true },
-            { path: 'src/server/data/spawns.json', source: 'src/server/data/spawns.json', isDownloaded: false },
+            { path: 'assets/ui/panel.png', source: 'assets/ui/panel.png', isDownloaded: true },
         ]);
     });
 
-    it('never treats a Luam source as an asset', () => {
-        const inputs = readProjectInputs(fixture(defaultProjectFiles()).root, ['src'], ['assets']);
+    it('rewrites the destination when the mapping renames it', () => {
+        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), 'media/logo.png': 'binary' }).root, [{ from: 'media/**/*', to: 'images' }]);
+
+        expect(inputs.assets).toEqual([{ path: 'images/logo.png', source: 'media/logo.png', isDownloaded: true }]);
+    });
+
+    it('declares nothing when no mapping is listed', () => {
+        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), 'assets/logo.png': 'binary' }).root, []);
 
         expect(inputs.assets).toEqual([]);
     });
 
     it('reads the configuration only when the project has one', () => {
-        const withConfig = readProjectInputs(fixture({ ...defaultProjectFiles(), 'config.lua': 'Config = {}\n' }).root, ['src'], ['assets']);
-        const without = readProjectInputs(fixture(defaultProjectFiles()).root, ['src'], ['assets']);
+        const withConfig = inputsOf(fixture({ ...defaultProjectFiles(), 'config.lua': 'Config = {}\n' }).root);
+        const without = inputsOf(fixture(defaultProjectFiles()).root);
 
         expect(withConfig.configuration).toEqual({ path: 'config.lua', source: 'config.lua', content: 'Config = {}\n' });
         expect(without.configuration).toBeNull();
     });
 
     it('reports a malformed env entry with the file that holds it', () => {
-        const inputs = readProjectInputs(fixture({ ...defaultProjectFiles(), '.env': 'PORT 3306\n' }).root, ['src'], ['assets']);
+        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), '.env': 'PORT 3306\n' }).root);
 
         expect(inputs.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['build-env-malformed']);
         expect(inputs.diagnostics[0]?.message).toBe('".env" is malformed: Malformed entry on line 1. Expected "KEY=value".');
@@ -77,8 +90,14 @@ describe('deployment env template', () => {
 });
 
 describe('generated roots', () => {
-    it('covers asset directories and the runtime library without owning source directories', () => {
-        const config = { ...defaultConfig(), sourceDirs: ['src'], assetDirs: ['assets', 'media'] };
+    it('covers asset destinations and the runtime library without owning source directories', () => {
+        const config: LuamConfig = {
+            ...defaultConfig(),
+            assets: [
+                { from: 'assets/**/*', to: 'assets' },
+                { from: 'media/**/*', to: 'media' },
+            ],
+        };
 
         expect(generatedRoots(config)).toEqual(['assets', 'media', 'lib']);
     });

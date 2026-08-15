@@ -1,3 +1,5 @@
+import { dirname } from 'node:path';
+
 import { mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import { canReference, type Environment } from '@compiler/environment/environment';
@@ -6,8 +8,8 @@ import { fingerprintDeclarations } from '@compiler/project/fingerprint';
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
 import { pathKey, pathToUri, relativeToRoots, uriToPath } from './document-uri';
-import { documentDeclarations, documentEnvironment, forgetEnvironments, loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
-import { DEFAULT_PROJECT_SETTINGS, settingsFrom, type ProjectSettings } from './project-settings';
+import { forgetEnvironments, isEnvironmentPath, loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
+import { DEFAULT_PROJECT_SETTINGS, settingsFrom, settingsKey, type ProjectSettings } from './project-settings';
 import { scanSources } from './source-scanner';
 
 export class WorkspaceIndex {
@@ -21,6 +23,8 @@ export class WorkspaceIndex {
 
     private settings: ProjectSettings = DEFAULT_PROJECT_SETTINGS;
 
+    private key = '';
+
     private ambientFor(uri: string, environment: Environment): AmbientDeclarations {
         const visible = this.others(uri).filter((analysis) => canReference(environment, analysis.environment));
 
@@ -29,15 +33,17 @@ export class WorkspaceIndex {
 
     private run(uri: string, version: number, text: string): DocumentAnalysis {
         const path = uriToPath(uri);
+        const relative = relativeToRoots(path, this.roots);
         const analysis = analyzeDocument({
             uri,
             path,
-            relative: relativeToRoots(path, this.roots),
+            relative,
             version,
             text,
-            project: documentDeclarations(path, this.roots),
-            env: documentEnvironment(path, this.roots),
-            oop: this.settings.oop,
+            project: this.project,
+            env: this.env,
+            compilerOptions: this.settings.compilerOptions,
+            environment: this.settings.resolver.side(relative),
             ambient: (environment) => this.ambientFor(uri, environment),
         });
 
@@ -50,14 +56,30 @@ export class WorkspaceIndex {
         return this.all().find((analysis) => analysis.manifest !== null) ?? null;
     }
 
+    private environmentRoots(): string[] {
+        const manifest = this.manifest();
+
+        return manifest === null ? [...this.roots] : [dirname(manifest.path), ...this.roots];
+    }
+
+    private loadEnvironment(): void {
+        const roots = this.environmentRoots();
+
+        this.project = loadProjectDeclarations(roots, this.settings.environment);
+        this.env = loadProjectEnvironment(roots, this.settings.environment);
+    }
+
     private applySettings(): boolean {
         const settings = settingsFrom(this.manifest()?.manifest ?? null);
+        const key = `${settingsKey(settings)}|${this.environmentRoots().join(',')}`;
 
-        if (settings.oop === this.settings.oop) {
+        if (key === this.key) {
             return false;
         }
 
         this.settings = settings;
+        this.key = key;
+        this.loadEnvironment();
 
         return true;
     }
@@ -81,6 +103,10 @@ export class WorkspaceIndex {
         return before === this.visibleTo(analysis) ? [analysis] : [analysis, ...this.rerunOthers(uri)];
     }
 
+    isEnvironmentFile(path: string): boolean {
+        return isEnvironmentPath(path, this.settings.environment);
+    }
+
     remove(uri: string): void {
         this.analyses.delete(pathKey(uriToPath(uri)));
     }
@@ -97,8 +123,7 @@ export class WorkspaceIndex {
 
     reloadSettings(): DocumentAnalysis[] {
         forgetEnvironments();
-        this.project = loadProjectDeclarations(this.roots);
-        this.env = loadProjectEnvironment(this.roots);
+        this.loadEnvironment();
 
         return this.refresh();
     }
@@ -120,8 +145,7 @@ export class WorkspaceIndex {
     load(roots: readonly string[]): void {
         forgetEnvironments();
         this.roots = roots;
-        this.project = loadProjectDeclarations(roots);
-        this.env = loadProjectEnvironment(roots);
+        this.key = '';
 
         const loaded: DocumentAnalysis[] = [];
 

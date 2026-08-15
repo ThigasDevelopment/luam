@@ -67,7 +67,7 @@ export function checkFunctionBody(
     for (const parameter of parameters) {
         const type = parameter.isVararg ? ANY_TYPE : context.resolveAnnotation(parameter.annotation);
 
-        context.binder.declare({ name: parameter.name, type, isLocal: true, position: parameter.position });
+        context.binder.declare({ name: parameter.name, type, isLocal: true, position: parameter.position, origin: 'parameter' });
     }
 
     checkStatements(context, body);
@@ -100,7 +100,7 @@ function checkLocal(context: CheckContext, statement: LocalStatement): void {
         if (declaration.annotation === null) {
             const inferred = context.allowNil || value === undefined ? ANY_TYPE : widenInferred(valueType);
 
-            context.binder.declare({ name: declaration.name, type: inferred, isLocal: true, position: declaration.position });
+            context.binder.declare({ name: declaration.name, type: inferred, isLocal: true, position: declaration.position, origin: 'local' });
 
             return;
         }
@@ -111,7 +111,7 @@ function checkLocal(context: CheckContext, statement: LocalStatement): void {
             context.expectAssignable(valueType, declared, value.position, `Variable "${declaration.name}"`);
         }
 
-        context.binder.declare({ name: declaration.name, type: declared, isLocal: true, position: declaration.position });
+        context.binder.declare({ name: declaration.name, type: declared, isLocal: true, position: declaration.position, origin: 'local' });
     });
 }
 
@@ -172,7 +172,7 @@ function checkFunctionDeclaration(context: CheckContext, statement: FunctionDecl
         const symbol = { name: statement.name.name, type, isLocal: statement.isLocal, position: statement.position };
 
         if (statement.isLocal) {
-            context.binder.declare(symbol);
+            context.binder.declare({ ...symbol, origin: 'local' });
         } else {
             context.declareModuleGlobal(symbol);
         }

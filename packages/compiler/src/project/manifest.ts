@@ -37,6 +37,7 @@ export interface ManifestInfo {
 export interface ManifestOptions {
     oop?: boolean;
     minMtaVersion?: string | null;
+    dependencies?: readonly string[];
 }
 
 export type ScriptGroup = 'library' | 'configuration' | 'source';
@@ -74,6 +75,8 @@ const EXPORT_COMMENT = 'Exported functions';
 const ASSET_COMMENT = 'Assets';
 
 const VERSION_COMMENT = 'Minimum MTA version';
+
+const DEPENDENCY_COMMENT = 'Required resources';
 
 const ESCAPES: Readonly<Record<string, string>> = {
     '&': '&amp;',
@@ -139,6 +142,10 @@ function exportElement(contribution: ExportContribution): string {
     return `${INDENT}<export ${attributes.join(' ')} />`;
 }
 
+function includeElement(resource: string): string {
+    return `${INDENT}<include ${attribute('resource', resource)} />`;
+}
+
 function versionElement(version: string): string {
     return `${INDENT}<min_mta_version ${attribute('server', version)} ${attribute('client', version)} />`;
 }
@@ -161,10 +168,12 @@ export function generateManifest(
     options: ManifestOptions = {},
 ): string {
     const version = options.minMtaVersion ?? null;
+    const dependencies = [...new Set(options.dependencies ?? [])].sort();
     const lines = [
         '<meta>',
         ...(options.oop === true ? [textElement('oop', 'true')] : []),
         ...section(INFO_COMMENT, [infoElement(info)]),
+        ...section(DEPENDENCY_COMMENT, dependencies.map(includeElement)),
         ...scriptSections(scripts),
         ...section(EXPORT_COMMENT, exportElements(contributions)),
         ...section(ASSET_COMMENT, files.map(fileElement)),

@@ -101,6 +101,8 @@ writes nothing.
 | `check-unknown-super-method` | The parent has no method of that name. |
 | `check-declare-outside-declaration-file` | `declare` outside a `.d.luam` file. |
 | `check-declaration-file-statement` | A `.d.luam` file contains a statement. |
+| `check-unused-local` | A local is never read, with `compilerOptions.noUnusedLocals` on. |
+| `check-unused-parameter` | A parameter is never read, with `compilerOptions.noUnusedParameters` on. |
 
 ## Checker — decorators
 
@@ -117,7 +119,7 @@ writes nothing.
 | --- | --- |
 | `check-environment-api` | The API belongs to another environment. |
 | `check-environment-event` | The event belongs to another environment. |
-| `check-oop-disabled` | An OOP call with `"oop": false`. |
+| `check-oop-disabled` | An OOP call with `compilerOptions.oop` off. |
 | `check-not-callable-class` | A class used as a constructor that MTA does not make callable. |
 | `check-native-constructor` | Wrong arguments to a native constructor. |
 | `check-native-class-inheritance` | A project class tried to extend a native class. |
@@ -147,9 +149,6 @@ writes nothing.
 
 | Code | Meaning |
 | --- | --- |
-| `build-no-sources` | No `.luam` file was found under `sourceDirs`. |
-| `build-source-dir-missing` | A configured source directory does not exist. |
-| `build-source-dir-outside-root` | A source directory resolves outside the project root. |
 | `build-source-unreadable` | A source file could not be read. |
 | `build-asset-unreadable` | An asset could not be read. |
 | `build-env-malformed` | `.env` could not be parsed. |
@@ -168,7 +167,17 @@ writes nothing.
 | `config-invalid-name` | `name` is not a valid MTA resource name. |
 | `config-invalid-type` | A field has the wrong type. |
 | `config-unknown-field` | A name is not a configuration field. Includes the removed `helperDir`. |
+| `config-removed-field` | A name that used to be a field. The message names its replacement. |
 | `config-escaping-path` | A path is absolute or contains a `..` segment. |
+| `config-invalid-pattern` | A pattern uses something the glob grammar does not allow. |
+| `config-missing-source` | A literal `sources` entry names a file that does not exist. |
+| `config-no-sources` | No `.luam` file matched `sources`. |
+| `config-source-side-conflict` | One file is matched by more than one side of `sources`. |
+| `config-missing-asset` | A literal `assets` entry names a file that does not exist. |
+| `config-output-collision` | Two assets land on the same destination, or one would overwrite a generated path. |
+| `config-invalid-dependency` | A `dependencies` entry is not a valid resource name, or names this resource. |
+| `config-invalid-engine-version` | `engine.minVersion` is neither `'latest'` nor a version. |
+| `config-missing-env-file` | A configured `environment` file does not exist. |
 | `config-unknown-helper` | `helpers` names a helper that does not exist. |
 | `config-invalid-transport` | The transport block has an invalid shape. |
 | `config-invalid-url-segment` | A transport value contains `/`, `?`, `#` or `..`. |

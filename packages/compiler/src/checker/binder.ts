@@ -2,11 +2,15 @@ import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 
 import type { Type } from './types';
 
+export type SymbolOrigin = 'local' | 'parameter';
+
 export interface SymbolInfo {
     name: string;
     type: Type;
     isLocal: boolean;
     position: SourcePosition;
+    origin?: SymbolOrigin;
+    read?: boolean;
 }
 
 export interface TypeAliasInfo {
@@ -19,6 +23,8 @@ export class Binder {
 
     private readonly aliases = new Map<string, TypeAliasInfo>();
 
+    private readonly discarded: SymbolInfo[] = [];
+
     private builtins: ReadonlyMap<string, SymbolInfo> = new Map();
 
     useBuiltins(symbols: ReadonlyMap<string, SymbolInfo>): void {
@@ -30,9 +36,17 @@ export class Binder {
     }
 
     popScope(): void {
-        if (this.scopes.length > 1) {
-            this.scopes.pop();
+        if (this.scopes.length <= 1) {
+            return;
         }
+
+        for (const symbol of this.scopes.pop()?.values() ?? []) {
+            this.discarded.push(symbol);
+        }
+    }
+
+    declaredSymbols(): SymbolInfo[] {
+        return [...this.discarded, ...this.scopes.flatMap((scope) => [...scope.values()])];
     }
 
     declare(symbol: SymbolInfo): void {
@@ -52,6 +66,8 @@ export class Binder {
             const symbol = this.scopes[index]?.get(name);
 
             if (symbol !== undefined) {
+                symbol.read = true;
+
                 return symbol;
             }
         }

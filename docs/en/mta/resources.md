@@ -43,7 +43,8 @@ default; every client and shared entry carries `cache="false"`. Tree output list
 helpers, `config.lua`, pinned `loadOrder` entries, and source groups instead.
 
 `<export>` entries come from [`export` functions](/en/language/exports), and
-`<file>` entries from `assetDirs`.
+`<file>` entries from the `assets` mappings. `<include>` entries come from
+`dependencies`.
 
 ## Runtime helpers
 

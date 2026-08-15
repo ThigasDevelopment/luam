@@ -3,6 +3,6 @@ Discovery: done in 14 ms.
 Compile: 3 files in 12 ms.
 Assembly: done in 1 ms.
 Manifest: done in 2 ms.
-Write: 4 files in 7 ms.
-Build passed: 3 files, 0 errors, 0 warnings in 30 ms (bundle layout).
+Write: 4 files in 6 ms.
+Build passed: 3 files, 0 errors, 0 warnings in 29 ms (bundle layout).
 Wrote 4 files to "build/luam-docs-shared-function" (0 unchanged, 0 removed).

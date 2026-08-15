@@ -1,7 +1,7 @@
 import type { ManifestObject } from '@compiler/manifest/manifest-value';
 
 import { NONE_TRANSPORT, type TransportConfig } from '@cli/config/config-schema';
-import { readNumber, readString } from '@cli/config/value-readers';
+import { readNumber, readString } from '@compiler/manifest/manifest-readers';
 import type { ValidationContext } from '@cli/config/validation-context';
 
 const MISSING_FIELD = 'config-missing-field';

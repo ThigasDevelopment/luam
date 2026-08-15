@@ -16,6 +16,14 @@ export const ESCAPING_PATH = 'config-escaping-path';
 
 export const UNKNOWN_HELPER = 'config-unknown-helper';
 
+export const INVALID_PATTERN = 'config-invalid-pattern';
+
+export const INVALID_DEPENDENCY = 'config-invalid-dependency';
+
+export const INVALID_ENGINE_VERSION = 'config-invalid-engine-version';
+
+export const REMOVED_FIELD = 'config-removed-field';
+
 export const ALLOWED_STATEMENTS = 'A manifest holds only "local" declarations and assignments to configuration fields.';
 
 export const ALLOWED_EXPRESSIONS = 'A manifest value is a literal, a table, or those combined with "and", "or", "not", comparison, arithmetic, and concatenation.';

@@ -14,6 +14,7 @@ import type { DeclarationRegistry } from './registry';
 import { checkStatements } from './statements';
 import { reportUnknownTypes } from './type-names';
 import type { Type } from './types';
+import { reportUnusedSymbols } from './unused';
 
 export interface CheckResult {
     diagnostics: Diagnostic[];
@@ -46,6 +47,8 @@ export interface CheckOptions {
     project?: ProjectDeclarations;
     isDeclarationFile?: boolean;
     oop?: boolean;
+    noUnusedLocals?: boolean;
+    noUnusedParameters?: boolean;
 }
 
 export function check(program: Program, mode: StrictMode, environment: Environment = DEFAULT_ENVIRONMENT, options: CheckOptions = {}): CheckResult {
@@ -60,6 +63,7 @@ export function check(program: Program, mode: StrictMode, environment: Environme
 
     checkStatements(context, program.body);
     reportUnknownTypes(context);
+    reportUnusedSymbols(context, options.noUnusedLocals === true, options.noUnusedParameters === true);
 
     return {
         diagnostics: sortDiagnostics([...structure, ...directives.diagnostics, ...context.diagnostics]),

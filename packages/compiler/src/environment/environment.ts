@@ -15,6 +15,7 @@ const SOURCE_ROOT = 'src';
 export interface EnvironmentResolution {
     environment: Environment;
     fromPath: Environment | null;
+    fromMapping: Environment | null;
     fromDirective: Environment | null;
     diagnostics: Diagnostic[];
 }
@@ -76,29 +77,31 @@ function reportConflictingDirectives(found: readonly Environment[], diagnostics:
     diagnostics.push(createDiagnostic('checker', 'env-conflicting-directive', message, FILE_START));
 }
 
-function reportPathConflict(fromPath: Environment, fromDirective: Environment, diagnostics: Diagnostic[]): void {
-    if (fromPath === fromDirective) {
+function reportAssignedConflict(assigned: Environment, fromDirective: Environment, mapped: boolean, diagnostics: Diagnostic[]): void {
+    if (assigned === fromDirective) {
         return;
     }
 
-    const message = `The path resolves to the "${fromPath}" environment but the directive declares "${fromDirective}". The directive wins.`;
+    const origin = mapped ? 'The "sources" mapping assigns the' : 'The path resolves to the';
+    const message = `${origin} "${assigned}" environment but the directive declares "${fromDirective}". The directive wins.`;
 
     diagnostics.push(createDiagnostic('checker', 'env-path-directive-conflict', message, FILE_START, 'warning'));
 }
 
-export function resolveEnvironment(filePath: string | null, directives: readonly string[]): EnvironmentResolution {
+export function resolveEnvironment(filePath: string | null, directives: readonly string[], fromMapping: Environment | null = null): EnvironmentResolution {
     const diagnostics: Diagnostic[] = [];
     const fromPath = filePath === null ? null : environmentFromPath(filePath);
     const found = collectDirectiveEnvironments(directives);
     const fromDirective = found[0] ?? null;
+    const assigned = fromMapping ?? fromPath;
 
     reportConflictingDirectives(found, diagnostics);
 
-    if (fromPath !== null && fromDirective !== null) {
-        reportPathConflict(fromPath, fromDirective, diagnostics);
+    if (assigned !== null && fromDirective !== null) {
+        reportAssignedConflict(assigned, fromDirective, fromMapping !== null, diagnostics);
     }
 
-    return { environment: fromDirective ?? fromPath ?? DEFAULT_ENVIRONMENT, fromPath, fromDirective, diagnostics };
+    return { environment: fromDirective ?? assigned ?? DEFAULT_ENVIRONMENT, fromPath, fromMapping, fromDirective, diagnostics };
 }
 
 export function canReference(consumer: Environment, provider: Environment): boolean {

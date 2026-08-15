@@ -7,6 +7,7 @@ import { hasErrors, sortDiagnostics, type Diagnostic, type SourcePosition } from
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import { emit } from '@compiler/emitter/emitter';
 import type { RuntimeHelper, SourceLineMapping } from '@compiler/emitter/state';
+import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 import { parse } from '@compiler/parser/parser';
 import { isDeclarationPath } from '@compiler/project/source-kind';
 import { expandHelpers, helperForGlobal } from '@runtime/helpers';
@@ -18,7 +19,7 @@ export interface CompileOptions {
     environment?: Environment;
     ambient?: AmbientDeclarations;
     project?: ProjectDeclarations;
-    oop?: boolean;
+    compilerOptions?: CompilerOptions;
     emitCode?: boolean;
 }
 
@@ -70,16 +71,19 @@ function findTopLevelReturn(statements: readonly Statement[]): SourcePosition | 
 }
 
 export function compile(source: string, options: CompileOptions = {}): CompileResult {
+    const settings = options.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
     const parsed = parse(source);
-    const mode = resolveStrictMode(parsed.directives);
-    const resolved = resolveEnvironment(options.filePath ?? null, parsed.directives);
-    const environment = options.environment ?? resolved.environment;
+    const mode = resolveStrictMode(parsed.directives, settings.strict);
+    const resolved = resolveEnvironment(options.filePath ?? null, parsed.directives, options.environment ?? null);
+    const environment = resolved.environment;
     const isDeclarationFile = options.filePath !== undefined && isDeclarationPath(options.filePath);
     const checked = check(parsed.program, mode, environment, {
         ambient: options.ambient ?? EMPTY_AMBIENT,
         project: options.project ?? EMPTY_PROJECT_DECLARATIONS,
         isDeclarationFile,
-        oop: options.oop === true,
+        oop: settings.oop,
+        noUnusedLocals: settings.noUnusedLocals,
+        noUnusedParameters: settings.noUnusedParameters,
     });
     const diagnostics = sortDiagnostics([...parsed.diagnostics, ...resolved.diagnostics, ...checked.diagnostics]);
     const shared = {

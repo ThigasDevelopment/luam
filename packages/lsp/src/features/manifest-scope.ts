@@ -18,6 +18,8 @@ const IDENTIFIER_PART = /[A-Za-z0-9_]/;
 
 const QUOTES: readonly string[] = ["'", '"', '`'];
 
+const ELEMENT_SEGMENT = '0';
+
 function readIdentifier(text: string, start: number): number {
     let index = start;
 
@@ -161,5 +163,5 @@ function current(stack: readonly Frame[]): Frame {
 }
 
 function framePath(stack: readonly Frame[]): string[] {
-    return stack.slice(1).map((frame) => frame.field ?? '');
+    return stack.slice(1).map((frame) => frame.field ?? ELEMENT_SEGMENT);
 }

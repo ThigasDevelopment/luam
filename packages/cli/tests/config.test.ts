@@ -35,15 +35,18 @@ describe('configuration validation', () => {
             author: null,
             version: null,
             description: null,
-            sourceDirs: ['src'],
-            assetDirs: ['assets'],
+            compilerOptions: { strict: true, oop: false, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false },
+            sources: { server: ['src/server/**/*.luam'], client: ['src/client/**/*.luam'], shared: ['src/shared/**/*.luam'] },
+            assets: [],
+            dependencies: [],
+            engine: { minVersion: 'latest' },
+            environment: { file: '.env', localFile: '.env.local' },
             outDir: 'build',
             loadOrder: [],
-            oop: false,
             helpers: [],
             serverPath: null,
             resourcesDir: 'mods/deathmatch/resources',
-            output: { bundle: true, map: true },
+            output: { bundle: true, map: true, minify: true },
             transport: { kind: 'none' },
             development: {
                 logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 },
@@ -60,7 +63,7 @@ describe('configuration validation', () => {
     });
 
     it('rejects fields with the wrong type', () => {
-        expect(codes(load("name = 'demo'\nsourceDirs = { }\n").diagnostics)).toEqual(['config-invalid-type']);
+        expect(codes(load("name = 'demo'\nsources = { server = 'src' }\n").diagnostics)).toEqual(['config-invalid-type']);
         expect(codes(load("name = 'demo'\noutDir = 5\n").diagnostics)).toEqual(['config-invalid-type']);
         expect(codes(load("name = 'demo'\ntransport = 'http'\n").diagnostics)).toEqual(['config-invalid-type']);
     });
@@ -71,7 +74,7 @@ describe('configuration validation', () => {
 
     it('rejects a path that escapes the project directory', () => {
         expect(codes(load("name = 'demo'\noutDir = '../elsewhere'\n").diagnostics)).toEqual(['config-escaping-path']);
-        expect(codes(load("name = 'demo'\nsourceDirs = { '/etc' }\n").diagnostics)).toEqual(['config-escaping-path']);
+        expect(codes(load("name = 'demo'\nsources = { server = { '/etc/**/*.luam' } }\n").diagnostics)).toEqual(['config-escaping-path']);
     });
 
     it('reads the opt-in runtime helpers', () => {
@@ -79,12 +82,12 @@ describe('configuration validation', () => {
     });
 
     it('reads the oop flag', () => {
-        expect(manifestConfig({ name: 'demo', oop: true }).oop).toBe(true);
-        expect(manifestConfig({ name: 'demo', oop: false }).oop).toBe(false);
+        expect(manifestConfig({ name: 'demo', compilerOptions: { oop: true } }).compilerOptions.oop).toBe(true);
+        expect(manifestConfig({ name: 'demo', compilerOptions: { oop: false } }).compilerOptions.oop).toBe(false);
     });
 
     it('reads output switches and rejects invalid output fields', () => {
-        expect(manifestConfig({ name: 'demo', output: { bundle: false, map: false } }).output).toEqual({ bundle: false, map: false });
+        expect(manifestConfig({ name: 'demo', output: { bundle: false, map: false } }).output).toEqual({ bundle: false, map: false, minify: true });
         expect(codes(load("name = 'demo'\noutput = { bundle = 'yes', extra = true }\n").diagnostics).sort()).toEqual([
             'config-invalid-type',
             'config-unknown-field',
@@ -92,11 +95,18 @@ describe('configuration validation', () => {
     });
 
     it('rejects an oop flag that is not a boolean', () => {
-        const loaded = load("name = 'demo'\noop = 'true'\n");
+        const loaded = load("name = 'demo'\ncompilerOptions = { oop = 'true' }\n");
 
         expect(loaded.config).toBeNull();
         expect(codes(loaded.diagnostics)).toEqual(['config-invalid-type']);
-        expect(loaded.diagnostics[0]?.message).toBe('"oop" must be a boolean but received a string.');
+        expect(loaded.diagnostics[0]?.message).toBe('"compilerOptions.oop" must be a boolean but received a string.');
+    });
+
+    it('rejects a removed field and names its replacement', () => {
+        const loaded = load("name = 'demo'\nsourceDirs = { 'src' }\n");
+
+        expect(codes(loaded.diagnostics)).toEqual(['config-removed-field']);
+        expect(loaded.diagnostics[0]?.message).toContain('sources');
     });
 
     it('qualifies a nested field with its scope when the type is wrong', () => {

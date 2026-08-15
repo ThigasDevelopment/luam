@@ -45,7 +45,8 @@ em árvore lista helpers, `config.lua`, entradas fixadas por `loadOrder` e grupo
 de código.
 
 Entradas `<export>` vêm de [funções `export`](/pt-br/language/exports), e entradas
-`<file>` vêm de `assetDirs`.
+`<file>` vêm dos mapeamentos de `assets`. Entradas `<include>` vêm de
+`dependencies`.
 
 ## Helpers de runtime
 

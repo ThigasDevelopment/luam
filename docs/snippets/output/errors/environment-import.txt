@@ -1,5 +1,5 @@
-Discovery: done in 12 ms.
-Compile: 2 files in 8 ms.
+Discovery: done in 13 ms.
+Compile: 2 files in 9 ms.
 Assembly: failed in 0 ms.
 src/client/greet.luam:1:1 error project-environment-import: "announceJoin" is declared in the "server" module "src/server/greet.luam" and cannot be used from a "client" file.
-Check failed: 1 error, 0 warnings in 21 ms.
+Check failed: 1 error, 0 warnings in 22 ms.

@@ -1,7 +1,7 @@
 <meta>
     <oop>true</oop>
     <!-- Resource information -->
-    <info type="script" description="The MTA OOP API enabled through the oop flag." />
+    <info type="script" description="The MTA OOP API enabled through the oop compiler option." />
     <!-- Source scripts -->
     <script src="src/server.lua" />
 </meta>

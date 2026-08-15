@@ -6,6 +6,80 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### The Manifest Is the Project Contract
+
+`.luam.manifest` described a little of the project and left the rest implicit.
+`sourceDirs` named a directory and the environment came from the folder inside
+it; `assetDirs` copied one tree and a second, undeclared rule copied whatever
+else lived beside the source; `oop` sat at the top level next to `outDir` as if
+the two were the same kind of thing. There was no way to say which MTA version a
+resource needs, which resources it depends on, or which `.env` a build should
+read.
+
+It is now a closed set of typed domains, each owning one thing and each read by
+one implemented consumer. `compilerOptions` says how the checker reads the
+project, `sources` says which files belong to it and on which side, `assets` says
+what is copied and where it lands, `dependencies` and `engine` say what the
+resource needs at run time, and `environment` says which files carry its
+configuration. A field is only there because something reads it.
+
+Nothing is copied by accident any more. The rule that swept non-source files out
+of `sourceDirs` is gone — a data file beside server code needs a mapping, and in
+exchange the contents of a built resource are what the manifest says they are.
+
+#### Added
+
+- `compilerOptions` with `strict`, `oop`, `noUnusedLocals`,
+  `noUnusedParameters`, and `warningsAsErrors`. A file directive still wins over
+  the project's strict mode, and a name starting with `_` is never reported as
+  unused.
+- `check-unused-local` and `check-unused-parameter`, off unless asked for.
+- `sources`, mapping patterns to `server`, `client`, and `shared`. The side that
+  matches a file is its environment unless the file says otherwise, and a
+  disagreement is reported instead of resolved in silence. A file two sides claim
+  is `config-source-side-conflict`.
+- One path-pattern engine behind the compiler, the CLI, and the editor. It takes
+  `*`, `**`, and `?` with `/` as the separator, and matches without backtracking,
+  so no pattern can hang a build. Regex, negation, brace expansion, and extglobs
+  are `config-invalid-pattern`.
+- `assets`, a list of `{ from, to }` mappings. Everything a mapping names is
+  copied and declared as `<file>`. A duplicate destination, or one that would
+  overwrite `meta.xml` or the generated `lib/`, is `config-output-collision`.
+- `dependencies`, written as `<include resource="..." />` and sorted, so MTA
+  starts what the resource needs first.
+- `engine.minVersion`, which becomes `min_mta_version`. Pinning a version keeps
+  the build off the network entirely; the default still looks the latest release
+  up and still succeeds without one.
+- `environment`, selecting the file that declares the keys behind `env` and
+  `process.env` and the file that overrides their values. The local file may
+  never add a key, and it no longer reaches the deployment template — a value set
+  on one machine stops there.
+- `output.minify`, with `--minify` and `--no-minify`. `dev` and `ensure` never
+  minify, so a stack trace stays readable while you work.
+- Completion and hover for every domain, including the members of an `assets`
+  entry, which the catalog could describe but the editor could not reach.
+
+#### Changed
+
+- The declaration and module caches are keyed on the compiler options and on each
+  file's environment, so changing an option or moving a file between sides
+  recompiles what it affects and nothing else.
+- The language server resolves environment files from the manifest that selects
+  them, rooted at the manifest's own directory. A project nested below a
+  workspace folder still finds its own configuration, now because it is declared
+  rather than because a search walked up to it.
+- The watcher observes the roots the `sources` patterns imply.
+
+#### Removed
+
+- `oop`, `sourceDirs`, `assetDirs`, and `mta`. Each is rejected with
+  `config-removed-field` naming its replacement rather than quietly aliased, so a
+  stale manifest fails instead of building something other than what it says.
+- `build-no-sources`, `build-source-dir-missing`, and
+  `build-source-dir-outside-root`, replaced by `config-no-sources`,
+  `config-missing-source`, and `config-escaping-path` — the manifest is where the
+  mistake is, so that is where it is reported.
+
 ### Directives Complete
 
 `#` opens a comment, so the completion pass stopped at `#!` and offered nothing.

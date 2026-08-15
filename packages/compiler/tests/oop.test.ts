@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { compile } from '@compiler/index';
+import { compilerOptions } from '@compiler/manifest/manifest-defaults';
 import type { ProjectFile } from '@compiler/project/module';
 import { compileProject } from '@compiler/project/project';
 import { createProjectCache } from '@compiler/project/project-cache';
@@ -34,15 +35,15 @@ function readProject(name: string): ProjectFile[] {
 }
 
 function codes(source: string, filePath = SERVER_FILE, oop = true): string[] {
-    return compile(source, { filePath, oop }).diagnostics.map((diagnostic) => diagnostic.code);
+    return compile(source, { filePath, compilerOptions: compilerOptions({ oop }) }).diagnostics.map((diagnostic) => diagnostic.code);
 }
 
 function messages(source: string, filePath = SERVER_FILE, oop = true): string[] {
-    return compile(source, { filePath, oop }).diagnostics.map((diagnostic) => diagnostic.message);
+    return compile(source, { filePath, compilerOptions: compilerOptions({ oop }) }).diagnostics.map((diagnostic) => diagnostic.message);
 }
 
 function typeOfLocal(source: string): string {
-    const result = compile(source, { filePath: SERVER_FILE, oop: true });
+    const result = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: true }) });
 
     return result.diagnostics.map((diagnostic) => diagnostic.code).join(',');
 }
@@ -119,7 +120,7 @@ describe('mta oop gate', () => {
     it('reports check-oop-disabled and names the procedural function', () => {
         expect(codes(`${PLAYER}player:getName()\n`, SERVER_FILE, false)).toEqual(['check-oop-disabled']);
         expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Call "getPlayerName" instead.');
-        expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Set "oop = true" in .luam.manifest');
+        expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Set "compilerOptions = { oop = true }" in .luam.manifest');
     });
 
     it('reports check-oop-disabled for a property too', () => {
@@ -138,15 +139,15 @@ describe('mta oop gate', () => {
 describe('mta oop emitter', () => {
     it('emits an OOP call verbatim', () => {
         const source = `${PLAYER}local name = player:getName()\nplayer:setNametagText(name)\n`;
-        const emitted = compile(source, { filePath: SERVER_FILE, oop: true }).code;
+        const emitted = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: true }) }).code;
 
         expect(emitted).toBe("local player = getPlayerFromName('bob')\nlocal name = player:getName()\nplayer:setNametagText(name)\n");
     });
 
     it('emits the same Lua whether or not the flag is on', () => {
         const source = `${PLAYER}local name = getPlayerName(player)\n`;
-        const enabled = compile(source, { filePath: SERVER_FILE, oop: true }).code;
-        const disabled = compile(source, { filePath: SERVER_FILE, oop: false }).code;
+        const enabled = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: true }) }).code;
+        const disabled = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: false }) }).code;
 
         expect(enabled).toBe(disabled);
     });
@@ -172,7 +173,7 @@ describe('mta oop class values', () => {
 
     it('types callable MTA constructors and preserves their Lua syntax', () => {
         const source = 'local file: File = File("data.txt")\nfile:close()\n';
-        const result = compile(source, { filePath: SERVER_FILE, oop: true });
+        const result = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: true }) });
 
         expect(result.diagnostics).toEqual([]);
         expect(result.code).toBe("local file = File('data.txt')\nfile:close()\n");
@@ -217,19 +218,19 @@ describe('mta oop project cache', () => {
     it('rechecks every module when the flag flips', () => {
         const cache = createProjectCache();
 
-        expect(cache.compile(files, { oop: true }).stats.modulesReused).toBe(0);
-        expect(cache.compile(files, { oop: true }).stats.modulesReused).toBe(files.length);
-        expect(cache.compile(files, { oop: false }).stats.modulesReused).toBe(0);
+        expect(cache.compile(files, { compilerOptions: compilerOptions({ oop: true }) }).stats.modulesReused).toBe(0);
+        expect(cache.compile(files, { compilerOptions: compilerOptions({ oop: true }) }).stats.modulesReused).toBe(files.length);
+        expect(cache.compile(files, { compilerOptions: compilerOptions({ oop: false }) }).stats.modulesReused).toBe(0);
     });
 
     it('turns the same source into a diagnostic when the flag is off', () => {
-        expect(compileProject(files, { oop: true }).hasErrors).toBe(false);
-        expect(compileProject(files, { oop: false }).diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['check-oop-disabled']);
+        expect(compileProject(files, { compilerOptions: compilerOptions({ oop: true }) }).hasErrors).toBe(false);
+        expect(compileProject(files, { compilerOptions: compilerOptions({ oop: false }) }).diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['check-oop-disabled']);
     });
 });
 
 describe('mta oop fixture resource', () => {
-    const project = compileProject(readProject('mta-oop'), { oop: true });
+    const project = compileProject(readProject('mta-oop'), { compilerOptions: compilerOptions({ oop: true }) });
 
     it('compiles a resource written against the OOP API without diagnostics', () => {
         expect(project.diagnostics).toEqual([]);

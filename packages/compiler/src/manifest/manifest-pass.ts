@@ -4,7 +4,8 @@ import type { Expression, TableExpression } from '@compiler/parser/ast';
 
 import { ALLOWED_EXPRESSIONS, INVALID_EXPRESSION, INVALID_TYPE, MISSING_FIELD, UNKNOWN_FIELD, manifestError } from './manifest-diagnostics';
 import { booleanValue, errorValue, nilValue, numberValue, resolved, stringValue, type Evaluated } from './manifest-evaluated';
-import { ENV_MEMBER_TYPE, findField, type ManifestField } from './manifest-fields';
+import { elementField, findField, type ManifestField } from './manifest-field';
+import { ENV_MEMBER_TYPE } from './manifest-fields';
 import { closedSetMessage, missingMessage, typeMessage, unknownNameMessage } from './manifest-messages';
 import { applyBinary, applyUnary } from './manifest-operators';
 import { describeReceived, isManifestObject, type ManifestObject, type ManifestValue } from './manifest-value';
@@ -237,7 +238,7 @@ export class ManifestPass {
                 continue;
             }
 
-            const nested = element === null || target === null ? null : { field: { ...target.field, type: element }, path: target.path, key: `${target.key}.${index}` };
+            const nested = element === null || target === null ? null : { field: elementField(target.field, element), path: target.path, key: `${target.key}.${index}` };
             const evaluated = this.expression(entry.value, nested);
 
             value.push(evaluated.value);

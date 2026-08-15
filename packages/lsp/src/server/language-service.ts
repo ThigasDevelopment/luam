@@ -34,6 +34,10 @@ export class LanguageService {
         return this.workspace.reloadSettings();
     }
 
+    isEnvironmentFile(path: string): boolean {
+        return this.workspace.isEnvironmentFile(path);
+    }
+
     analysis(uri: string): DocumentAnalysis | null {
         return this.workspace.get(uri);
     }

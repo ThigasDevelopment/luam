@@ -1,7 +1,7 @@
 Discovery: done in 2 ms.
-Compile: 1 file in 6 ms.
+Compile: 1 file in 7 ms.
 Assembly: failed in 0 ms.
 src/shared/shapes.luam:2:16 error parse-optional-position: Write optional fields as "name?: Type", not "name: Type?".
 src/shared/shapes.luam:5:41 error parse-optional-position: Write optional parameters as "name?: Type", not "name: Type?".
 src/shared/shapes.luam:9:20 error parse-optional-position: Write optional locals as "name?: Type", not "name: Type?".
-Check failed: 3 errors, 0 warnings in 8 ms.
+Check failed: 3 errors, 0 warnings in 9 ms.

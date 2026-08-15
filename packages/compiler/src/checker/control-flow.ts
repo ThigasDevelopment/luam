@@ -47,7 +47,7 @@ export function checkNumericFor(context: CheckContext, statement: NumericForStat
     }
 
     context.binder.pushScope();
-    context.binder.declare({ name: statement.variable.name, type: NUMBER_TYPE, isLocal: true, position: statement.variable.position });
+    context.binder.declare({ name: statement.variable.name, type: NUMBER_TYPE, isLocal: true, position: statement.variable.position, origin: 'local' });
     checkStatements(context, statement.body);
     context.binder.popScope();
 }
@@ -85,7 +85,7 @@ export function checkGenericFor(context: CheckContext, statement: GenericForStat
         const inferred = iterated[index] ?? ANY_TYPE;
         const declared = variable.annotation === null ? inferred : context.resolveAnnotation(variable.annotation);
 
-        context.binder.declare({ name: variable.name, type: declared, isLocal: true, position: variable.position });
+        context.binder.declare({ name: variable.name, type: declared, isLocal: true, position: variable.position, origin: 'local' });
     });
 
     checkStatements(context, statement.body);

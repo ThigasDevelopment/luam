@@ -14,10 +14,11 @@ import type { OutputLayout, ResourceMap } from '@compiler/project/resource';
 export interface BuildCommandOptions {
     layout?: OutputLayout;
     map?: boolean;
+    minify?: boolean;
 }
 
-function minifiedMap(map: ResourceMap | null): ResourceMap | null {
-    return map === null ? null : { ...map, minified: true };
+function writtenMap(map: ResourceMap | null, minified: boolean): ResourceMap | null {
+    return map === null ? null : { ...map, minified };
 }
 
 export async function runBuildCommand(context: CommandContext, options: BuildCommandOptions = {}): Promise<number> {
@@ -53,7 +54,8 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
 
     tracker.begin('write');
 
-    const writeOptions = productionWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
+    const minify = options.minify ?? context.config.output.minify;
+    const writeOptions = productionWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker, minify);
     let result: WriteResult;
 
     try {
@@ -66,7 +68,7 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
         return EXIT_DIAGNOSTICS;
     }
 
-    writeResourceMap(context.root, context.config, minifiedMap(outcome.map));
+    writeResourceMap(context.root, context.config, writtenMap(outcome.map, minify));
 
     tracker.end();
     renderer.clear();

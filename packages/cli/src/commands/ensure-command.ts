@@ -4,7 +4,7 @@ import type { DevelopmentLogsConfig } from '@cli/config/config-schema';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
 import type { MtaTransport } from '@cli/transport/transport';
-import { watchSources } from '@cli/watch/source-watcher';
+import { watchedRoots, watchSources } from '@cli/watch/source-watcher';
 import type { BuildOutcome } from '@cli/build/build-runner';
 import type { OutputLayout } from '@compiler/project/resource';
 
@@ -68,11 +68,12 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, options:
         running = false;
     };
 
-    const watcher = watchSources(context.root, context.config.sourceDirs, () => {
+    const watcher = watchSources(context.root, context.config.sources, () => {
         void rebuild();
     });
+    const roots = watchedRoots(context.config.sources).map((entry) => `"${entry.length === 0 ? '.' : entry}"`);
 
-    reporter.info(`Watching ${context.config.sourceDirs.map((entry) => `"${entry}"`).join(', ')} for changes. Press Ctrl+C to stop.`);
+    reporter.info(`Watching ${roots.join(', ')} for changes. Press Ctrl+C to stop.`);
 
     await untilAborted(options.signal);
     watcher.close();

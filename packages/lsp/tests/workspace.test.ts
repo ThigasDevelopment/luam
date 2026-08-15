@@ -184,20 +184,20 @@ describe('workspace loading', () => {
     });
 
     it('rechecks documents after the OOP setting changes', () => {
-        const root = workspace({ '.luam.manifest': "name = 'demo'\noop = true\n", 'src/server/main.luam': 'class Player {\n}\n' });
+        const root = workspace({ '.luam.manifest': "name = 'demo'\ncompilerOptions = { oop = true }\n", 'src/server/main.luam': 'class Player {\n}\n' });
         const service = new LanguageService();
         const uri = uriFor(root, 'src/server/main.luam');
 
         service.loadWorkspace([root]);
         expect(service.diagnostics(uri).map((diagnostic) => diagnostic.code)).toEqual(['check-duplicate-class']);
 
-        service.update(uriFor(root, '.luam.manifest'), 2, "name = 'demo'\noop = false\n");
+        service.update(uriFor(root, '.luam.manifest'), 2, "name = 'demo'\ncompilerOptions = { oop = false }\n");
 
         expect(service.diagnostics(uri)).toEqual([]);
     });
 
     it('reads the OOP setting from the workspace manifest', () => {
-        const root = workspace({ '.luam.manifest': "name = 'demo'\noop = true\n", 'src/server/main.luam': 'class Player {\n}\n' });
+        const root = workspace({ '.luam.manifest': "name = 'demo'\ncompilerOptions = { oop = true }\n", 'src/server/main.luam': 'class Player {\n}\n' });
         const service = new LanguageService();
 
         service.loadWorkspace([root]);

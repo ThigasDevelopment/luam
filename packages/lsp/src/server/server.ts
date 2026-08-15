@@ -6,7 +6,6 @@ import { FileChangeType, TextDocuments, type Connection, type FileEvent, type In
 import { LanguageService } from '@lsp/server/language-service';
 import { SERVER_CAPABILITIES } from '@lsp/server/capabilities';
 import { uriToPath } from '@lsp/workspace/document-uri';
-import { isEnvironmentPath } from '@lsp/workspace/project-environment';
 
 function workspaceRoots(params: InitializeParams): string[] {
     const folders = params.workspaceFolders ?? [];
@@ -52,7 +51,7 @@ function registerWorkspace(connection: Connection, documents: TextDocuments<Text
         let environmentChanged = false;
 
         for (const change of params.changes) {
-            if (isEnvironmentPath(uriToPath(change.uri))) {
+            if (service.isEnvironmentFile(uriToPath(change.uri))) {
                 environmentChanged = true;
 
                 continue;
@@ -65,7 +64,7 @@ function registerWorkspace(connection: Connection, documents: TextDocuments<Text
         }
 
         for (const change of params.changes) {
-            if (!isEnvironmentPath(uriToPath(change.uri)) && change.type !== FileChangeType.Deleted) {
+            if (!service.isEnvironmentFile(uriToPath(change.uri)) && change.type !== FileChangeType.Deleted) {
                 updateWatchedDocument(documents, service, change);
             }
         }

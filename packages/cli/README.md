@@ -87,17 +87,44 @@ author = 'Thigas'
 version = '1.0.0'
 description = 'A demo resource'
 
-sourceDirs = { 'src' }
-assetDirs = { 'assets' }
+compilerOptions = {
+    strict = true,
+    oop = false,
+    noUnusedLocals = false,
+    noUnusedParameters = false,
+    warningsAsErrors = false,
+}
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = {
+    { from = 'assets/**/*', to = 'assets' },
+}
+
+dependencies = { 'scoreboard' }
+
+engine = {
+    minVersion = '1.6.0',
+}
+
+environment = {
+    file = '.env',
+    localFile = '.env.local',
+}
+
 outDir = 'build'
 loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
 
 output = {
     bundle = true,
     map = true,
+    minify = true,
 }
 
-oop = false
 helpers = { 'threads' }
 serverPath = 'C:/MTA Server'
 resourcesDir = 'mods/deathmatch/resources'
@@ -125,22 +152,30 @@ transport = {
 | ----- | ------- | ------- |
 | `name` | required | Resource name. Names the output folder and the resource `ensure` restarts. It never reaches `meta.xml` — MTA reads the name from the folder. |
 | `author`, `version`, `description` | unset | Optional `meta.xml` info attributes. |
-| `sourceDirs` | `{ 'src' }` | Directories scanned for `.luam` and `.d.luam` files. Non-source files here are copied but not declared. |
-| `assetDirs` | `{ 'assets' }` | Directories copied verbatim and declared as `<file>` entries, so clients download them. |
+| `compilerOptions` | see below | How the checker reads the project: `strict`, `oop`, `noUnusedLocals`, `noUnusedParameters`, `warningsAsErrors`. |
+| `sources` | `src/<side>/**/*.luam` | Patterns per side. The matched side is the file's environment unless a directive overrides it. |
+| `assets` | `{ }` | `{ from, to }` mappings. Everything a mapping names is copied and declared as `<file>`; nothing else is copied. |
+| `dependencies` | `{ }` | Resources written as `<include resource="..." />`. |
+| `engine.minVersion` | `'latest'` | Becomes `min_mta_version`. An explicit version keeps the build network-free. |
+| `environment` | `.env`, `.env.local` | Which files declare and override the keys behind `env` and `process.env`. |
 | `outDir` | `'build'` | Directory that receives `<outDir>/<name>`. |
 | `loadOrder` | `{ }` | Source paths pinned ahead of their group in `meta.xml`. Order is meaningful, and an entry matching no file fails the build. |
 | `output.bundle` | `true` | Default `build` layout. `ensure` still defaults to tree and `dev` always uses tree. |
 | `output.map` | `true` | Generates position maps. Only `build` writes a map file. |
-| `oop` | `false` | Enables the MTA OOP API. Writes `<oop>true</oop>` and lets the checker resolve `player:getName()`. |
+| `output.minify` | `true` | Writes each generated script on one line during `build`. `dev` and `ensure` never minify. |
 | `helpers` | `{ }` | Runtime helpers to copy even when no language feature requires them. |
 | `serverPath` | unset | MTA server root. `ensure` syncs the resource there. |
 | `resourcesDir` | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
 | `transport` | absent | How `ensure` restarts the resource. Omitting the table means `kind = 'none'`; writing it without `kind` is `config-missing-field`. |
 | `development.logs` | disabled, safe limits | Development log capture and client relay limits. `dev` enables capture even when this section is omitted. |
 
-`outDir`, `resourcesDir`, and every `sourceDirs`, `assetDirs`, and `loadOrder`
-entry must stay inside their base directory. An absolute path or a `..` segment
-is rejected.
+`outDir`, `resourcesDir`, and every `sources`, `assets`, and `loadOrder` entry
+must stay inside their base directory. An absolute path or a `..` segment is
+rejected. A pattern accepts `*`, `**`, and `?` only — regex, negation, and brace
+expansion are rejected.
+
+`oop`, `sourceDirs`, `assetDirs`, and `mta` were removed. Each one reports
+`config-removed-field` and names its replacement.
 
 `loadOrder` is an ordered list of source paths relative to the project root. Each
 entry is emitted ahead of its group in `meta.xml` — a script as its compiled
@@ -149,7 +184,7 @@ so. Order is meaningful for assets too, since a shader can depend on another. An
 entry that names a file the project does not produce is a build error that names
 the entry, so a rename cannot break the order silently.
 
-`oop` is off by default. With it on, the compiler writes `<oop>true</oop>` above
+`compilerOptions.oop` is off by default. With it on, the compiler writes `<oop>true</oop>` above
 `<info>` and types the object form of the MTA API, so `player:getName()` returns
 `string` and a typo is a build error. With it off, the same call is
 `check-oop-disabled` and the message names the procedural function to use

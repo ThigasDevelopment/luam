@@ -44,7 +44,7 @@ import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
 
 function classItems(analysis: DocumentAnalysis, name: string, isMethod: boolean): CompletionItem[] {
-    if (analysis.oop && isMtaElementName(analysis.declarations, name)) {
+    if (analysis.compilerOptions.oop && isMtaElementName(analysis.declarations, name)) {
         return mtaMembersFor(name, analysis.environment)
             .filter((member) => member.isMethod === isMethod)
             .map((member) => mtaMemberItem(member, name));
@@ -129,7 +129,7 @@ function plainItems(items: readonly CompletionItem[], expectation: ArgumentExpec
 }
 
 function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
-    if (!analysis.oop) {
+    if (!analysis.compilerOptions.oop) {
         return [];
     }
 

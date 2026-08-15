@@ -5,6 +5,7 @@ import { builtinSymbols, clearBuiltinCache } from '@compiler/checker/globals';
 import { clearMtaClassCache, mtaClassRegistry } from '@compiler/checker/oop-classes';
 import { emit } from '@compiler/emitter/emitter';
 import { parse } from '@compiler/parser/parser';
+import { compilerOptions } from '@compiler/manifest/manifest-defaults';
 import { createProjectCache } from '@compiler/project/project-cache';
 
 import { editBody, editDeclaration, generateProject } from './project-generator';
@@ -46,7 +47,7 @@ describe('project build', () => {
     bench(
         'cold full build with the oop api enabled',
         () => {
-            createProjectCache().compile(project.files, { oop: true });
+            createProjectCache().compile(project.files, { compilerOptions: compilerOptions({ oop: true }) });
         },
         OPTIONS,
     );

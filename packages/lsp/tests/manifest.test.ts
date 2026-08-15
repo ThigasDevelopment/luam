@@ -80,7 +80,7 @@ describe('manifest completion', () => {
         const found = labels(manifest, '\nout');
 
         expect(found).toContain('outDir');
-        expect(found).toContain('sourceDirs');
+        expect(found).toContain('sources');
         expect(found).toContain('transport');
     });
 
@@ -119,7 +119,7 @@ describe('manifest completion', () => {
     });
 
     it('offers booleans for a boolean field and the injected values elsewhere', () => {
-        const manifest = openManifest("name = 'demo'\noop = \nresourcesDir = \n");
+        const manifest = openManifest("name = 'demo'\ncompilerOptions = {\n    oop = \n}\nresourcesDir = \n");
 
         expect(labels(manifest, 'oop = ')).toEqual(['true', 'false']);
         expect(labels(manifest, 'resourcesDir = ')).toEqual(['mode', 'env', 'root']);

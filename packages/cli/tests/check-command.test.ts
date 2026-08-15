@@ -66,17 +66,17 @@ describe('check command', () => {
         expect(logger.errors.join('\n')).toContain('project-environment-import');
     });
 
-    it('reports a missing source directory', () => {
+    it('reports a source mapping that matches nothing', () => {
         const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }) });
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
-        expect(logger.errors[0]).toContain('build-source-dir-missing');
+        expect(logger.errors[0]).toContain('config-no-sources');
     });
 
     it('reports a project without source files', () => {
         const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'src/shared/notes.md': 'ignored\n' });
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
-        expect(logger.errors[0]).toContain('build-no-sources');
+        expect(logger.errors[0]).toContain('config-no-sources');
     });
 });

@@ -17,7 +17,7 @@ export const SOURCE_PATTERN = '**/*.luam';
 
 export const MANIFEST_PATTERN = '**/.luam.manifest';
 
-export const ENVIRONMENT_PATTERN = '**/.env';
+export const ENVIRONMENT_PATTERN = '**/.env*';
 
 export function serverModulePath(context: ExtensionContext): string {
     return context.asAbsolutePath(SERVER_MODULE);

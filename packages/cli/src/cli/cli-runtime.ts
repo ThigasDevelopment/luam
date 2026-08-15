@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 
-import { resolveMtaVersion } from '@cli/build/mta-release';
+import { resolveEngineVersion } from '@cli/build/mta-release';
 import { EXIT_USAGE } from '@cli/cli/exit-codes';
 import { manifestMode } from '@cli/config/manifest-context';
 import { loadManifest } from '@cli/config/manifest-loader';
@@ -98,6 +98,7 @@ export function createProjectContext(runtime: CliRuntime, command: string, optio
     }
 
     const skip = options.offline === true || runtime.env.LUAM_OFFLINE !== undefined;
+    const engine = loaded.config.engine.minVersion;
 
     return {
         context: {
@@ -105,7 +106,7 @@ export function createProjectContext(runtime: CliRuntime, command: string, optio
             config: loaded.config,
             logger: runtime.logger,
             reporter: runtime.reporter,
-            resolveVersion: () => resolveMtaVersion(root, { skip }),
+            resolveVersion: () => resolveEngineVersion(root, engine, { skip }),
         },
         error: null,
     };

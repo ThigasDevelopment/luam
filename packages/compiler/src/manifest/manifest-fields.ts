@@ -1,55 +1,23 @@
-import {
-    BOOLEAN_TYPE,
-    createArray,
-    createOptional,
-    createRecord,
-    createStringLiteral,
-    createUnion,
-    NUMBER_TYPE,
-    STRING_TYPE,
-    type Type,
-} from '@compiler/checker/types';
+import { BOOLEAN_TYPE, createArray, createOptional, createStringLiteral, createUnion, NUMBER_TYPE, STRING_TYPE, type Type } from '@compiler/checker/types';
 import { RUNTIME_HELPERS } from '@runtime/helpers';
 
-import type { ManifestValue } from './manifest-value';
-
-export type ManifestRuleKind = 'resource-name' | 'contained-path' | 'positive-integer';
-
-export interface ManifestField {
-    name: string;
-    type: Type;
-    summary: string;
-    required: boolean;
-    defaultValue: ManifestValue | null;
-    rule: ManifestRuleKind | null;
-    values: readonly string[] | null;
-    valueCode: string | null;
-    members: readonly ManifestField[] | null;
-}
+import { elementField, field, findField, recordType, table, type ManifestField } from './manifest-field';
+import {
+    DEFAULT_ASSET_DESTINATION,
+    DEFAULT_COMPILER_OPTIONS,
+    DEFAULT_ENGINE,
+    DEFAULT_ENVIRONMENT_FILES,
+    DEFAULT_OUT_DIR,
+    DEFAULT_OUTPUT,
+    DEFAULT_RESOURCES_DIR,
+    DEFAULT_SOURCE_MAPPING,
+} from './manifest-defaults';
 
 export const HELPER_NAMES: readonly string[] = Object.keys(RUNTIME_HELPERS).sort();
 
 export const TRANSPORT_KINDS: readonly string[] = ['none', 'http'];
 
 export const MANIFEST_MODES: readonly string[] = ['development', 'production'];
-
-const RULE_TEXT: Readonly<Record<ManifestRuleKind, string>> = {
-    'resource-name': 'Letters, digits, dots, dashes, and underscores, starting with a letter or a digit.',
-    'contained-path': 'A relative path that stays inside the project directory.',
-    'positive-integer': 'A positive integer.',
-};
-
-function field(name: string, type: Type, summary: string, options: Partial<ManifestField> = {}): ManifestField {
-    return { name, type, summary, required: false, defaultValue: null, rule: null, values: null, valueCode: null, members: null, ...options };
-}
-
-function record(name: string, members: readonly ManifestField[]): Type {
-    return createRecord(name, new Map(members.map((member) => [member.name, member.required ? member.type : createOptional(member.type)])));
-}
-
-function table(name: string, summary: string, members: readonly ManifestField[], options: Partial<ManifestField> = {}): ManifestField {
-    return field(name, record(name.charAt(0).toUpperCase() + name.slice(1), members), summary, { ...options, members });
-}
 
 const OPTIONAL_STRING = createOptional(STRING_TYPE);
 
@@ -59,9 +27,60 @@ const HELPER_LIST = createArray(createUnion(HELPER_NAMES.map((name) => createStr
 
 const TRANSPORT_KIND = createUnion(TRANSPORT_KINDS.map((kind) => createStringLiteral(kind)));
 
+const COMPILER_OPTION_FIELDS: readonly ManifestField[] = [
+    field('strict', BOOLEAN_TYPE, 'Checks the project under the strict rules unless a file directive says otherwise.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.strict,
+    }),
+    field('oop', BOOLEAN_TYPE, 'Enables the MTA OOP API in the checker and the generated meta.xml.', { defaultValue: DEFAULT_COMPILER_OPTIONS.oop }),
+    field('noUnusedLocals', BOOLEAN_TYPE, 'Reports local declarations that are never read.', { defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedLocals }),
+    field('noUnusedParameters', BOOLEAN_TYPE, 'Reports function and method parameters that are never read.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedParameters,
+    }),
+    field('warningsAsErrors', BOOLEAN_TYPE, 'Promotes every compiler warning to an error.', { defaultValue: DEFAULT_COMPILER_OPTIONS.warningsAsErrors }),
+];
+
+function side(name: string, summary: string, defaultValue: readonly string[]): ManifestField {
+    return field(name, STRING_LIST, summary, { defaultValue: [...defaultValue], rule: 'source-pattern', owner: 'sources', allowEmpty: true });
+}
+
+const SOURCE_FIELDS: readonly ManifestField[] = [
+    side('server', 'Paths and patterns compiled as server sources.', DEFAULT_SOURCE_MAPPING.server),
+    side('client', 'Paths and patterns compiled as client sources.', DEFAULT_SOURCE_MAPPING.client),
+    side('shared', 'Paths and patterns compiled as shared sources.', DEFAULT_SOURCE_MAPPING.shared),
+];
+
+const ASSET_FIELDS: readonly ManifestField[] = [
+    field('from', STRING_TYPE, 'File, directory, or pattern copied from the project.', { required: true, rule: 'source-pattern', owner: 'assets' }),
+    field('to', STRING_TYPE, 'Destination inside the generated resource.', { defaultValue: DEFAULT_ASSET_DESTINATION, rule: 'static-path', owner: 'assets' }),
+];
+
+const ASSET_LIST = createArray(recordType('Asset', ASSET_FIELDS));
+
+const ENGINE_FIELDS: readonly ManifestField[] = [
+    field('minVersion', STRING_TYPE, 'Lowest MTA version the resource declares support for.', {
+        defaultValue: DEFAULT_ENGINE.minVersion,
+        rule: 'engine-version',
+        owner: 'engine',
+    }),
+];
+
+const ENVIRONMENT_FIELDS: readonly ManifestField[] = [
+    field('file', STRING_TYPE, 'File that declares the environment keys and their types.', {
+        defaultValue: DEFAULT_ENVIRONMENT_FILES.file,
+        rule: 'static-path',
+        owner: 'environment',
+    }),
+    field('localFile', STRING_TYPE, 'File that overrides declared values without adding keys.', {
+        defaultValue: DEFAULT_ENVIRONMENT_FILES.localFile,
+        rule: 'static-path',
+        owner: 'environment',
+    }),
+];
+
 const OUTPUT_FIELDS: readonly ManifestField[] = [
-    field('bundle', BOOLEAN_TYPE, 'Writes one Lua file per side instead of mirroring the source tree.', { defaultValue: true }),
-    field('map', BOOLEAN_TYPE, 'Writes a resource map that traces generated lines back to their source.', { defaultValue: true }),
+    field('bundle', BOOLEAN_TYPE, 'Writes one Lua file per side instead of mirroring the source tree.', { defaultValue: DEFAULT_OUTPUT.bundle, owner: 'output' }),
+    field('map', BOOLEAN_TYPE, 'Writes a resource map that traces generated lines back to their source.', { defaultValue: DEFAULT_OUTPUT.map, owner: 'output' }),
+    field('minify', BOOLEAN_TYPE, 'Shrinks the generated Lua before it is written.', { defaultValue: DEFAULT_OUTPUT.minify, owner: 'output' }),
 ];
 
 const TRANSPORT_FIELDS: readonly ManifestField[] = [
@@ -69,88 +88,101 @@ const TRANSPORT_FIELDS: readonly ManifestField[] = [
         required: true,
         values: TRANSPORT_KINDS,
         valueCode: 'config-invalid-transport',
+        owner: 'deployment',
     }),
-    field('host', STRING_TYPE, 'Host the MTA HTTP interface listens on.', { defaultValue: '127.0.0.1' }),
-    field('port', NUMBER_TYPE, 'Port the MTA HTTP interface listens on.', { defaultValue: 22005, rule: 'positive-integer' }),
-    field('resource', STRING_TYPE, 'Resource that exposes the refresh and restart functions.'),
-    field('username', STRING_TYPE, 'Account used to call the MTA HTTP interface.'),
-    field('password', STRING_TYPE, 'Password stored in plain text. Prefer "passwordEnv".'),
-    field('passwordEnv', STRING_TYPE, 'Environment variable holding the password.'),
-    field('refreshFunction', STRING_TYPE, 'Exported function that refreshes the resource list.', { defaultValue: 'refreshResources' }),
-    field('restartFunction', STRING_TYPE, 'Exported function that restarts a resource.', { defaultValue: 'restartResource' }),
+    field('host', STRING_TYPE, 'Host the MTA HTTP interface listens on.', { defaultValue: '127.0.0.1', owner: 'deployment' }),
+    field('port', NUMBER_TYPE, 'Port the MTA HTTP interface listens on.', { defaultValue: 22005, rule: 'positive-integer', owner: 'deployment' }),
+    field('resource', STRING_TYPE, 'Resource that exposes the refresh and restart functions.', { owner: 'deployment' }),
+    field('username', STRING_TYPE, 'Account used to call the MTA HTTP interface.', { owner: 'deployment' }),
+    field('password', STRING_TYPE, 'Password stored in plain text. Prefer "passwordEnv".', { owner: 'deployment' }),
+    field('passwordEnv', STRING_TYPE, 'Environment variable holding the password.', { owner: 'deployment' }),
+    field('refreshFunction', STRING_TYPE, 'Exported function that refreshes the resource list.', { defaultValue: 'refreshResources', owner: 'deployment' }),
+    field('restartFunction', STRING_TYPE, 'Exported function that restarts a resource.', { defaultValue: 'restartResource', owner: 'deployment' }),
 ];
 
 const LOG_FIELDS: readonly ManifestField[] = [
-    field('enabled', BOOLEAN_TYPE, 'Streams server and client logs into "luam dev".', { defaultValue: false }),
-    field('maxMessageLength', NUMBER_TYPE, 'Longest log message kept before it is truncated.', { defaultValue: 4096, rule: 'positive-integer' }),
-    field('rateLimit', NUMBER_TYPE, 'Log messages accepted inside one window.', { defaultValue: 30, rule: 'positive-integer' }),
-    field('rateWindowMs', NUMBER_TYPE, 'Length of the rate window in milliseconds.', { defaultValue: 1000, rule: 'positive-integer' }),
+    field('enabled', BOOLEAN_TYPE, 'Streams server and client logs into "luam dev".', { defaultValue: false, owner: 'development' }),
+    field('maxMessageLength', NUMBER_TYPE, 'Longest log message kept before it is truncated.', { defaultValue: 4096, rule: 'positive-integer', owner: 'development' }),
+    field('rateLimit', NUMBER_TYPE, 'Log messages accepted inside one window.', { defaultValue: 30, rule: 'positive-integer', owner: 'development' }),
+    field('rateWindowMs', NUMBER_TYPE, 'Length of the rate window in milliseconds.', { defaultValue: 1000, rule: 'positive-integer', owner: 'development' }),
 ];
 
-const DEVELOPMENT_FIELDS: readonly ManifestField[] = [table('logs', 'Log capture used by "luam dev".', LOG_FIELDS, { defaultValue: {} })];
+const DEVELOPMENT_FIELDS: readonly ManifestField[] = [
+    table('logs', 'Log capture used by "luam dev".', LOG_FIELDS, { defaultValue: {}, owner: 'development' }),
+];
 
 export const MANIFEST_FIELDS: readonly ManifestField[] = [
-    field('name', STRING_TYPE, 'The MTA resource name.', { required: true, rule: 'resource-name' }),
-    field('author', OPTIONAL_STRING, 'Author written to the generated meta.xml.'),
-    field('version', OPTIONAL_STRING, 'Version written to the generated meta.xml.'),
-    field('description', OPTIONAL_STRING, 'Description written to the generated meta.xml.'),
-    field('sourceDirs', STRING_LIST, 'Directories scanned for Luam sources.', { defaultValue: ['src'], rule: 'contained-path' }),
-    field('assetDirs', STRING_LIST, 'Directories copied into the resource untouched.', { defaultValue: ['assets'], rule: 'contained-path' }),
-    field('outDir', STRING_TYPE, 'Directory the built resource is written to.', { defaultValue: 'build', rule: 'contained-path' }),
-    field('loadOrder', STRING_LIST, 'Files listed first in the generated meta.xml.', { defaultValue: [], rule: 'contained-path' }),
-    field('oop', BOOLEAN_TYPE, 'Enables the MTA OOP API in the checker and the generated meta.xml.', { defaultValue: false }),
+    field('name', STRING_TYPE, 'The MTA resource name.', { required: true, rule: 'resource-name', owner: 'identity' }),
+    field('author', OPTIONAL_STRING, 'Author written to the generated meta.xml.', { owner: 'identity' }),
+    field('version', OPTIONAL_STRING, 'Version written to the generated meta.xml.', { owner: 'identity' }),
+    field('description', OPTIONAL_STRING, 'Description written to the generated meta.xml.', { owner: 'identity' }),
+    table('compilerOptions', 'Settings that change how the source is checked and emitted.', COMPILER_OPTION_FIELDS, { defaultValue: {}, owner: 'compiler' }),
+    table('sources', 'Paths and patterns that make up the project, grouped by the side each file runs on.', SOURCE_FIELDS, {
+        defaultValue: {},
+        owner: 'sources',
+    }),
+    field('assets', ASSET_LIST, 'Files copied into the generated resource, each with a destination.', {
+        defaultValue: [],
+        elements: ASSET_FIELDS,
+        owner: 'assets',
+        allowEmpty: true,
+    }),
+    field('dependencies', STRING_LIST, 'Resources that must be present, written as includes in the generated meta.xml.', {
+        defaultValue: [],
+        rule: 'dependency-name',
+        owner: 'dependencies',
+        allowEmpty: true,
+    }),
+    table('engine', 'Requirements the MTA server and client must meet.', ENGINE_FIELDS, { defaultValue: {}, owner: 'engine' }),
+    table('environment', 'Files that declare and override the project environment.', ENVIRONMENT_FIELDS, { defaultValue: {}, owner: 'environment' }),
+    field('outDir', STRING_TYPE, 'Directory the built resource is written to.', { defaultValue: DEFAULT_OUT_DIR, rule: 'static-path', owner: 'output' }),
+    field('loadOrder', STRING_LIST, 'Files listed first in the generated meta.xml.', {
+        defaultValue: [],
+        rule: 'static-path',
+        owner: 'assembly',
+        allowEmpty: true,
+    }),
     field('helpers', HELPER_LIST, 'Runtime helpers bundled into the resource.', {
         defaultValue: [],
         values: HELPER_NAMES,
         valueCode: 'config-unknown-helper',
+        owner: 'assembly',
+        allowEmpty: true,
     }),
-    field('serverPath', OPTIONAL_STRING, 'Path to the MTA server installation used by "luam dev".'),
+    field('serverPath', OPTIONAL_STRING, 'Path to the MTA server installation used by "luam dev".', { owner: 'deployment' }),
     field('resourcesDir', STRING_TYPE, 'Resource directory inside the server installation.', {
-        defaultValue: 'mods/deathmatch/resources',
+        defaultValue: DEFAULT_RESOURCES_DIR,
         rule: 'contained-path',
+        owner: 'deployment',
     }),
-    table('output', 'Switches for the generated output.', OUTPUT_FIELDS, { defaultValue: {} }),
-    table('transport', 'How "luam ensure" reaches the running server.', TRANSPORT_FIELDS),
-    table('development', 'Behaviour that only applies while developing.', DEVELOPMENT_FIELDS, { defaultValue: {} }),
+    table('output', 'Switches for the generated output.', OUTPUT_FIELDS, { defaultValue: {}, owner: 'output' }),
+    table('transport', 'How "luam ensure" reaches the running server.', TRANSPORT_FIELDS, { owner: 'deployment' }),
+    table('development', 'Behaviour that only applies while developing.', DEVELOPMENT_FIELDS, { defaultValue: {}, owner: 'development' }),
 ];
 
-export const MANIFEST_RECORD: Type = record('Manifest', MANIFEST_FIELDS);
+export const MANIFEST_RECORD: Type = recordType('Manifest', MANIFEST_FIELDS);
 
 export const ENV_MEMBER_TYPE: Type = OPTIONAL_STRING;
 
-export function ruleText(field: ManifestField): string | null {
-    return field.rule === null ? null : RULE_TEXT[field.rule];
-}
-
-function literalText(value: ManifestValue): string {
-    if (typeof value === 'string') {
-        return `'${value}'`;
-    }
-
-    if (Array.isArray(value)) {
-        return value.length === 0 ? '{ }' : `{ ${value.map(literalText).join(', ')} }`;
-    }
-
-    return String(value);
-}
-
-export function defaultText(field: ManifestField): string | null {
-    if (field.defaultValue === null || field.members !== null) {
-        return null;
-    }
-
-    return literalText(field.defaultValue);
-}
-
-export function findField(fields: readonly ManifestField[], name: string): ManifestField | null {
-    return fields.find((entry) => entry.name === name) ?? null;
-}
+export const REMOVED_FIELDS: Readonly<Record<string, string>> = {
+    oop: 'Move it to "compilerOptions = { oop = true }".',
+    sourceDirs: 'Replace it with "sources = { server = { ... }, client = { ... }, shared = { ... } }", listing paths or patterns per side.',
+    assetDirs: 'Replace it with "assets = { { from = \'assets/**/*\', to = \'assets\' } }", naming a destination for each entry.',
+    mta: 'Replace it with "engine = { minVersion = \'1.6.0\' }".',
+};
 
 export function findManifestField(path: readonly string[]): ManifestField | null {
     let fields: readonly ManifestField[] | null = MANIFEST_FIELDS;
     let found: ManifestField | null = null;
 
     for (const segment of path) {
+        if (found !== null && found.elements !== null && /^[0-9]+$/.test(segment)) {
+            found = elementField(found, found.type);
+            fields = found.members;
+
+            continue;
+        }
+
         found = fields === null ? null : findField(fields, segment);
 
         if (found === null) {
@@ -163,6 +195,4 @@ export function findManifestField(path: readonly string[]): ManifestField | null
     return found;
 }
 
-export function requiredFields(fields: readonly ManifestField[]): ManifestField[] {
-    return fields.filter((entry) => entry.required);
-}
+export { defaultText, findField, requiredFields, ruleText, type ManifestField, type ManifestRuleKind } from './manifest-field';

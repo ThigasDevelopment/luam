@@ -1,26 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { basename, dirname, resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 
 import { EMPTY_PROJECT_DECLARATIONS, projectDeclarations, type ProjectDeclarations } from '@compiler/checker/project-declarations';
-import { parseEnvFile } from '@compiler/project/env-file';
-
-import { pathKey } from '@lsp/workspace/document-uri';
-
-const ENVIRONMENT_FILE = '.env';
-
-function readEnvironment(root: string): string | null {
-    const path = resolve(root, ENVIRONMENT_FILE);
-
-    try {
-        return existsSync(path) ? readFileSync(path, 'utf8') : null;
-    } catch {
-        return null;
-    }
-}
-
-export function isEnvironmentPath(path: string): boolean {
-    return basename(path) === ENVIRONMENT_FILE;
-}
+import type { EnvironmentFiles } from '@compiler/manifest/manifest-defaults';
+import { EMPTY_ENV_FILE, mergeEnvFiles, parseEnvFile, type EnvFile } from '@compiler/project/env-file';
 
 const sources = new Map<string, string | null>();
 
@@ -28,81 +11,58 @@ export function forgetEnvironments(): void {
     sources.clear();
 }
 
-function withinRoots(directory: string, roots: readonly string[]): boolean {
-    if (roots.length === 0) {
-        return true;
+function readFile(path: string): string | null {
+    const cached = sources.get(path);
+
+    if (cached !== undefined) {
+        return cached;
     }
 
-    const key = pathKey(directory);
+    let source: string | null = null;
 
-    return roots.some((root) => {
-        const rootKey = pathKey(root);
+    try {
+        source = existsSync(path) ? readFileSync(path, 'utf8') : null;
+    } catch {
+        source = null;
+    }
 
-        return key === rootKey || key.startsWith(`${rootKey}/`);
-    });
+    sources.set(path, source);
+
+    return source;
 }
 
-function nearestEnvironment(path: string, roots: readonly string[]): string | null {
-    let current = dirname(path);
+function parseAt(root: string, file: string): EnvFile | null {
+    const source = readFile(resolve(root, file));
 
-    while (withinRoots(current, roots)) {
-        const cached = sources.get(current);
-        const source = cached === undefined ? readEnvironment(current) : cached;
+    return source === null ? null : parseEnvFile(source);
+}
 
-        sources.set(current, source);
+export function isEnvironmentPath(path: string, environment: EnvironmentFiles): boolean {
+    const name = basename(path);
 
-        if (source !== null) {
-            return source;
+    return name === basename(environment.file) || name === basename(environment.localFile);
+}
+
+function firstRoot(roots: readonly string[], environment: EnvironmentFiles): EnvFile | null {
+    for (const root of roots) {
+        const declared = parseAt(root, environment.file);
+
+        if (declared !== null) {
+            return mergeEnvFiles(declared, parseAt(root, environment.localFile) ?? EMPTY_ENV_FILE);
         }
-
-        const parent = dirname(current);
-
-        if (parent === current) {
-            return null;
-        }
-
-        current = parent;
     }
 
     return null;
 }
 
-export function documentDeclarations(path: string, roots: readonly string[]): ProjectDeclarations {
-    const source = nearestEnvironment(path, roots);
+export function loadProjectDeclarations(roots: readonly string[], environment: EnvironmentFiles): ProjectDeclarations {
+    const declared = firstRoot(roots, environment);
 
-    return source === null ? loadProjectDeclarations(roots) : projectDeclarations(parseEnvFile(source).entries, ENVIRONMENT_FILE);
+    return declared === null ? EMPTY_PROJECT_DECLARATIONS : projectDeclarations(declared.entries, environment.file);
 }
 
-export function documentEnvironment(path: string, roots: readonly string[]): Record<string, string> {
-    const source = nearestEnvironment(path, roots);
+export function loadProjectEnvironment(roots: readonly string[], environment: EnvironmentFiles): Record<string, string> {
+    const declared = firstRoot(roots, environment);
 
-    if (source === null) {
-        return loadProjectEnvironment(roots);
-    }
-
-    return Object.fromEntries(parseEnvFile(source).entries.map((entry) => [entry.key, entry.value]));
-}
-
-export function loadProjectDeclarations(roots: readonly string[]): ProjectDeclarations {
-    for (const root of roots) {
-        const source = readEnvironment(root);
-
-        if (source !== null) {
-            return projectDeclarations(parseEnvFile(source).entries, ENVIRONMENT_FILE);
-        }
-    }
-
-    return EMPTY_PROJECT_DECLARATIONS;
-}
-
-export function loadProjectEnvironment(roots: readonly string[]): Record<string, string> {
-    for (const root of roots) {
-        const source = readEnvironment(root);
-
-        if (source !== null) {
-            return Object.fromEntries(parseEnvFile(source).entries.map((entry) => [entry.key, entry.value]));
-        }
-    }
-
-    return {};
+    return declared === null ? {} : Object.fromEntries(declared.entries.map((entry) => [entry.key, entry.value]));
 }

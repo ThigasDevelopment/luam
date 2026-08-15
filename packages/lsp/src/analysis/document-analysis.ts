@@ -11,6 +11,7 @@ import { createPosition, sortDiagnostics, type Diagnostic, type SourcePosition }
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import type { Token } from '@compiler/lexer/token';
 import { analyzeManifest, type ManifestAnalysis } from '@compiler/manifest/manifest-analysis';
+import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 import type { Expression, Program } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { parse } from '@compiler/parser/parser';
@@ -44,7 +45,7 @@ export interface DocumentAnalysis {
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
     directives: SourceDirectives;
     project: ProjectDeclarations;
-    oop: boolean;
+    compilerOptions: CompilerOptions;
     index: SymbolIndex;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
     manifest: ManifestAnalysis | null;
@@ -57,7 +58,8 @@ export interface AnalysisInput {
     version: number;
     text: string;
     project?: ProjectDeclarations;
-    oop?: boolean;
+    compilerOptions?: CompilerOptions;
+    environment?: Environment | null;
     env?: Readonly<Record<string, string>>;
     ambient?: (environment: Environment) => AmbientDeclarations;
 }
@@ -71,17 +73,19 @@ export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
 }
 
 function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
+    const compilerOptions = input.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
     const parsed = parse(input.text);
-    const mode = resolveStrictMode(parsed.directives);
-    const resolved = resolveEnvironment(input.path, parsed.directives);
+    const mode = resolveStrictMode(parsed.directives, compilerOptions.strict);
+    const resolved = resolveEnvironment(input.path, parsed.directives, input.environment ?? null);
     const project = input.project ?? EMPTY_PROJECT_DECLARATIONS;
-    const oop = input.oop === true;
     const ambient = input.ambient?.(resolved.environment) ?? EMPTY_AMBIENT;
     const checked = check(parsed.program, mode, resolved.environment, {
         ambient,
         project,
         isDeclarationFile: isDeclarationPath(input.path),
-        oop,
+        oop: compilerOptions.oop,
+        noUnusedLocals: compilerOptions.noUnusedLocals,
+        noUnusedParameters: compilerOptions.noUnusedParameters,
     });
     const diagnostics = sortDiagnostics([...parsed.diagnostics, ...resolved.diagnostics, ...checked.diagnostics]);
     const starts = lineStarts(input.text);
@@ -105,7 +109,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
         declaredGlobals: checked.declaredGlobals,
         directives: checked.directives,
         project,
-        oop,
+        compilerOptions,
         index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.declarations, checked.generatedMembers),
         generatedMembers: checked.generatedMembers,
         manifest: null,
@@ -137,7 +141,7 @@ function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
         declaredGlobals: new Map(),
         directives: EMPTY_DIRECTIVES,
         project: input.project ?? EMPTY_PROJECT_DECLARATIONS,
-        oop: false,
+        compilerOptions: DEFAULT_COMPILER_OPTIONS,
         index: buildSymbolIndex(input.text, starts, EMPTY_PROGRAM, new Map(), declarations),
         generatedMembers: new Map(),
         manifest,

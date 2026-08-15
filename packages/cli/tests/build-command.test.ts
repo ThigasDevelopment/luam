@@ -140,18 +140,27 @@ describe('build command', () => {
         expect(fixture.exists('build/luam-demo/images/logo.png')).toBe(true);
     });
 
-    it('copies assets at their relative path and declares them in the manifest', async () => {
+    it('copies only the files a mapping names and declares them in the manifest', async () => {
         const files = { ...defaultProjectFiles(), 'assets/images/logo.png': 'binary', 'src/server/data/spawns.json': '[]' };
         const { context, fixture } = harness(files);
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
         expect(fixture.read('build/luam-demo/assets/images/logo.png')).toBe('binary');
-        expect(fixture.read('build/luam-demo/src/server/data/spawns.json')).toBe('[]');
+        expect(fixture.exists('build/luam-demo/src/server/data/spawns.json')).toBe(false);
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
 
         expect(manifest).toContain('<file src="assets/images/logo.png" />');
         expect(manifest).not.toContain('spawns.json');
+    });
+
+    it('rewrites the destination a mapping names', async () => {
+        const files = defaultProjectFiles({ assets: [{ from: 'media/**/*', to: 'assets/images' }] });
+        const { context, fixture } = harness({ ...files, 'media/logo.png': 'binary' });
+
+        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+        expect(fixture.read('build/luam-demo/assets/images/logo.png')).toBe('binary');
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<file src="assets/images/logo.png" />');
     });
 
     it('removes a copied asset when its source disappears', async () => {
@@ -199,13 +208,14 @@ describe('build command', () => {
         expect(fixture.read('build/luam-demo/.env')).toBe('MAX_PLAYERS=64\n');
     });
 
-    it('layers the local override onto the generated deployment values', async () => {
+    it('keeps a local override out of the generated deployment values', async () => {
         const files = { ...defaultProjectFiles(), '.env': 'MAX_PLAYERS=32\n', '.env.local': 'MAX_PLAYERS=64\n' };
         const { context, fixture } = harness(files);
 
         await runBuildCommand(context);
 
-        expect(fixture.read('build/luam-demo/.env')).toContain('MAX_PLAYERS=64');
+        expect(fixture.read('build/luam-demo/.env')).toContain('MAX_PLAYERS=32');
+        expect(fixture.read('build/luam-demo/.env')).not.toContain('64');
     });
 
     it('never declares the env file in the manifest and never prunes it', async () => {
@@ -255,12 +265,19 @@ describe('build command', () => {
         expect(logger.text()).toContain('Declared keys: "MAX_PLAYERS"');
     });
 
-    it('refuses a source directory that resolves outside the project root', async () => {
+    it('reports a source pattern that matches nothing', async () => {
         const { fixture } = harness(defaultProjectFiles());
-        const discovered = discoverSources(fixture.root, ['src', '../elsewhere']);
+        const discovered = discoverSources(fixture.root, { server: ['src/server/**/*.luam'], client: ['missing/**/*.luam'], shared: [] });
 
-        expect(discovered.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['build-source-dir-outside-root']);
-        expect(discovered.files.every((file) => file.path.startsWith('src/'))).toBe(true);
+        expect(discovered.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([]);
+        expect(discovered.files.every((file) => file.path.startsWith('src/server/'))).toBe(true);
+    });
+
+    it('reports a source file listed by a literal pattern that does not exist', async () => {
+        const { fixture } = harness(defaultProjectFiles());
+        const discovered = discoverSources(fixture.root, { server: ['src/server/missing.luam'], client: [], shared: [] });
+
+        expect(discovered.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['config-missing-source']);
     });
 });
 

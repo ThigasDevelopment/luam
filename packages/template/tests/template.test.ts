@@ -35,11 +35,13 @@ describe('template catalog', () => {
         expect(source).toContain("outDir = 'build'");
     });
 
-    it('declares the directories a new project builds from', () => {
+    it('declares the sources and assets a new project builds from', () => {
         const source = read('luam.manifest');
 
-        expect(source).toContain("sourceDirs = { 'src' }");
-        expect(source).toContain("assetDirs = { 'assets' }");
+        expect(source).toContain("server = { 'src/server/**/*.luam' },");
+        expect(source).toContain("client = { 'src/client/**/*.luam' },");
+        expect(source).toContain("shared = { 'src/shared/**/*.luam' },");
+        expect(source).toContain("{ from = 'assets/**/*', to = 'assets' },");
         expect(source).toContain("    kind = 'none',");
     });
 });

@@ -191,7 +191,7 @@ function rootTarget(analysis: DocumentAnalysis, offset: number, name: string): R
             return { kind: 'library', library: name };
         }
 
-        if (analysis.oop && isMtaClass(name)) {
+        if (analysis.compilerOptions.oop && isMtaClass(name)) {
             return { kind: 'static-class', name };
         }
 
@@ -218,7 +218,7 @@ function memberTarget(analysis: DocumentAnalysis, target: ReceiverTarget, name: 
         return target.kind === 'static-class' ? fromType(analysis, mtaStaticMember(target.name, name)?.type ?? null) : null;
     }
 
-    if (analysis.oop && isMtaElementName(analysis.declarations, target.name)) {
+    if (analysis.compilerOptions.oop && isMtaElementName(analysis.declarations, target.name)) {
         return fromType(analysis, mtaMember(target.name, name)?.type ?? null);
     }
 

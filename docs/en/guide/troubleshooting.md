@@ -33,14 +33,16 @@ The npm global bin directory is not on your `PATH`. See
 ## The build reports no sources
 
 ```
-build-no-sources: No .luam source file was found.
+config-no-sources: No ".luam" source files matched "sources".
 ```
 
-The compiler scans `sourceDirs`, which defaults to `["src"]`. Either create
-`src/`, or point `sourceDirs` at the directory you actually use.
+The compiler compiles what `sources` matches, which defaults to
+`src/server/**/*.luam`, `src/client/**/*.luam`, and `src/shared/**/*.luam`.
+Either create those directories, or point each side of `sources` at the patterns
+you actually use.
 
-A missing directory that *is* configured is `build-source-dir-missing` instead,
-which names the directory.
+A literal path that names a file the project does not have is
+`config-missing-source` instead, which names the path.
 
 ## An MTA function is "not available"
 
@@ -68,10 +70,10 @@ completion and argument checking for that call.
 ## `player:getName()` is rejected
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "oop = true" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compilerOptions = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Set `oop = true` in `.luam.manifest`. That also writes `<oop>true</oop>` into
+Set `compilerOptions = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
 `meta.xml`, which is what makes the object form exist at runtime. See
 [OOP API](/en/mta/oop).
 

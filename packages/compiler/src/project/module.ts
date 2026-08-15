@@ -8,6 +8,7 @@ import type { ManifestContribution } from './manifest';
 export interface ProjectFile {
     path: string;
     source: string;
+    environment?: Environment;
 }
 
 export interface CompiledModule {

@@ -241,7 +241,7 @@ function memberSignature(analysis: DocumentAnalysis, offset: number, segments: r
         return null;
     }
 
-    if (analysis.oop && isMtaElementName(analysis.declarations, target.name)) {
+    if (analysis.compilerOptions.oop && isMtaElementName(analysis.declarations, target.name)) {
         return fromMtaMember(target.name, member, isMethodCall);
     }
 
@@ -271,7 +271,7 @@ export function resolveSignature(
     }
 
     if (segments.length === 1) {
-        return localSignature(analysis, offset, first) ?? (analysis.oop ? fromMtaConstructor(analysis, first) : null) ?? fromApi(first);
+        return localSignature(analysis, offset, first) ?? (analysis.compilerOptions.oop ? fromMtaConstructor(analysis, first) : null) ?? fromApi(first);
     }
 
     return memberSignature(analysis, offset, segments, trigger === ':');

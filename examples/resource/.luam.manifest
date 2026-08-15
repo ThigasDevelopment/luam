@@ -2,8 +2,21 @@ name = 'luam-resource'
 version = '1.0.0'
 description = 'A Luam resource showing the layout luam init scaffolds.'
 
-sourceDirs = { 'src' }
-assetDirs = { 'assets' }
+compilerOptions = {
+    strict = true,
+    oop = false,
+}
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = {
+    { from = 'assets/**/*', to = 'assets' },
+}
+
 outDir = 'build'
 
 transport = {

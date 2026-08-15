@@ -8,7 +8,7 @@ export function isStrictMode(value: string): value is StrictMode {
     return STRICT_MODES.has(value);
 }
 
-export function resolveStrictMode(directives: readonly string[]): StrictMode {
+export function resolveStrictMode(directives: readonly string[], projectStrict: boolean | null = null): StrictMode {
     for (const directive of directives) {
         const value = directive.trim();
 
@@ -17,5 +17,9 @@ export function resolveStrictMode(directives: readonly string[]): StrictMode {
         }
     }
 
-    return DEFAULT_STRICT_MODE;
+    if (projectStrict === null) {
+        return DEFAULT_STRICT_MODE;
+    }
+
+    return projectStrict ? 'strict' : 'nonstrict';
 }

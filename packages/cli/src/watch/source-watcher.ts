@@ -1,5 +1,10 @@
 import { existsSync, watch, type FSWatcher } from 'node:fs';
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
+
+import type { SourceMapping } from '@compiler/manifest/manifest-contract';
+import { normalizePattern } from '@compiler/project/path-pattern';
+import { createSourceResolver } from '@compiler/project/source-mapping';
+import { SOURCE_EXTENSION } from '@compiler/project/source-kind';
 
 export interface SourceWatcher {
     close(): void;
@@ -7,9 +12,8 @@ export interface SourceWatcher {
 
 export const DEFAULT_DEBOUNCE_MS = 120;
 
-const SOURCE_EXTENSION = '.luam';
-
-export function watchSources(root: string, sourceDirs: readonly string[], onChange: () => void, debounceMs = DEFAULT_DEBOUNCE_MS): SourceWatcher {
+export function watchSources(root: string, sources: SourceMapping, onChange: () => void, debounceMs = DEFAULT_DEBOUNCE_MS): SourceWatcher {
+    const resolver = createSourceResolver(sources);
     const watchers: FSWatcher[] = [];
     let timer: NodeJS.Timeout | null = null;
 
@@ -24,8 +28,14 @@ export function watchSources(root: string, sourceDirs: readonly string[], onChan
         }, debounceMs);
     };
 
-    for (const directory of sourceDirs) {
-        const absolute = resolve(root, directory);
+    const isWatched = (directory: string, filename: string): boolean => {
+        const path = normalizePattern(relative(root, resolve(directory, filename)));
+
+        return path.endsWith(SOURCE_EXTENSION) && resolver.resolve(path).matches.length > 0;
+    };
+
+    for (const entry of resolver.roots) {
+        const absolute = resolve(root, entry);
 
         if (!existsSync(absolute)) {
             continue;
@@ -33,11 +43,9 @@ export function watchSources(root: string, sourceDirs: readonly string[], onChan
 
         watchers.push(
             watch(absolute, { recursive: true }, (_event, filename) => {
-                if (filename === null || !filename.toString().endsWith(SOURCE_EXTENSION)) {
-                    return;
+                if (filename !== null && isWatched(absolute, filename.toString())) {
+                    schedule();
                 }
-
-                schedule();
             }),
         );
     }
@@ -54,4 +62,8 @@ export function watchSources(root: string, sourceDirs: readonly string[], onChan
             }
         },
     };
+}
+
+export function watchedRoots(sources: SourceMapping): readonly string[] {
+    return createSourceResolver(sources).roots;
 }

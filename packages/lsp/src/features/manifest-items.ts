@@ -1,5 +1,5 @@
 import { typeToString } from '@compiler/checker/types';
-import { defaultText, ruleText, type ManifestField } from '@compiler/manifest/manifest-fields';
+import { defaultText, ruleText, type ManifestField } from '@compiler/manifest/manifest-field';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
 export function fieldDocumentation(field: ManifestField): string {

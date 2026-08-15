@@ -101,6 +101,8 @@ erro não escreve nada.
 | `check-unknown-super-method` | A classe pai não tem método com esse nome. |
 | `check-declare-outside-declaration-file` | `declare` fora de um arquivo `.d.luam`. |
 | `check-declaration-file-statement` | Um arquivo `.d.luam` contém um comando. |
+| `check-unused-local` | Um local nunca é lido, com `compilerOptions.noUnusedLocals` ligado. |
+| `check-unused-parameter` | Um parâmetro nunca é lido, com `compilerOptions.noUnusedParameters` ligado. |
 
 ## Checker — decoradores
 
@@ -117,7 +119,7 @@ erro não escreve nada.
 | --- | --- |
 | `check-environment-api` | A API pertence a outro ambiente. |
 | `check-environment-event` | O evento pertence a outro ambiente. |
-| `check-oop-disabled` | Uma chamada OOP com `"oop": false`. |
+| `check-oop-disabled` | Uma chamada OOP com `compilerOptions.oop` desligado. |
 | `check-not-callable-class` | Uma classe usada como construtor que o MTA não torna chamável. |
 | `check-native-constructor` | Argumentos errados para um construtor nativo. |
 | `check-native-class-inheritance` | Uma classe de projeto tentou estender uma classe nativa. |
@@ -147,9 +149,6 @@ erro não escreve nada.
 
 | Código | Significado |
 | --- | --- |
-| `build-no-sources` | Nenhum arquivo `.luam` foi encontrado em `sourceDirs`. |
-| `build-source-dir-missing` | Um diretório de código configurado não existe. |
-| `build-source-dir-outside-root` | Um diretório de código resolve fora da raiz do projeto. |
 | `build-source-unreadable` | Um arquivo de código não pôde ser lido. |
 | `build-asset-unreadable` | Um asset não pôde ser lido. |
 | `build-env-malformed` | O `.env` não pôde ser interpretado. |
@@ -168,7 +167,17 @@ erro não escreve nada.
 | `config-invalid-name` | `name` não é um nome válido de resource do MTA. |
 | `config-invalid-type` | Um campo tem o tipo errado. |
 | `config-unknown-field` | Um nome não é um campo de configuração. Inclui o removido `helperDir`. |
+| `config-removed-field` | Um nome que já foi um campo. A mensagem nomeia seu substituto. |
 | `config-escaping-path` | Um caminho é absoluto ou contém um segmento `..`. |
+| `config-invalid-pattern` | Um padrão usa algo que a gramática de glob não permite. |
+| `config-missing-source` | Uma entrada literal de `sources` nomeia um arquivo que não existe. |
+| `config-no-sources` | Nenhum arquivo `.luam` casou com `sources`. |
+| `config-source-side-conflict` | Um arquivo é casado por mais de um lado de `sources`. |
+| `config-missing-asset` | Uma entrada literal de `assets` nomeia um arquivo que não existe. |
+| `config-output-collision` | Dois assets caem no mesmo destino, ou um sobrescreveria um caminho gerado. |
+| `config-invalid-dependency` | Uma entrada de `dependencies` não é um nome de resource válido, ou nomeia este resource. |
+| `config-invalid-engine-version` | `engine.minVersion` não é `'latest'` nem uma versão. |
+| `config-missing-env-file` | Um arquivo configurado em `environment` não existe. |
 | `config-unknown-helper` | `helpers` nomeia um helper inexistente. |
 | `config-invalid-transport` | O bloco de transporte tem formato inválido. |
 | `config-invalid-url-segment` | Um valor de transporte contém `/`, `?`, `#` ou `..`. |

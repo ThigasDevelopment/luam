@@ -2,6 +2,7 @@ import { EMPTY_AMBIENT, mergeAmbient, type AmbientDeclarations } from '@compiler
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import { ALL_ENVIRONMENTS, canReference, type Environment } from '@compiler/environment/environment';
 import { compile } from '@compiler/index';
+import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 
 import { fingerprintDeclarations, hashString } from './fingerprint';
 import { toContributions } from './manifest';
@@ -31,7 +32,7 @@ interface CompilationPair {
 
 export interface CompileProjectOptions {
     project?: ProjectDeclarations;
-    oop?: boolean;
+    compilerOptions?: CompilerOptions;
     onProgress?: ProgressReporter;
 }
 
@@ -48,16 +49,20 @@ interface ModuleContext {
     keys: AmbientKeys;
     resolve: AmbientResolver;
     project: ProjectDeclarations;
-    oop: boolean;
+    compilerOptions: CompilerOptions;
 }
 
 function flattenDiagnostics(modules: readonly CompiledModule[]): FileDiagnostic[] {
     return modules.flatMap((module) => module.diagnostics.map((diagnostic) => ({ path: module.path, diagnostic })));
 }
 
-function ambientKeys(collected: readonly DeclarationEntry[], project: ProjectDeclarations, oop: boolean): AmbientKeys {
+function optionsKey(options: CompilerOptions): string {
+    return `${options.strict ? 'strict' : ''}|${options.oop ? 'oop' : ''}|${options.noUnusedLocals ? 'nul' : ''}|${options.noUnusedParameters ? 'nup' : ''}`;
+}
+
+function ambientKeys(collected: readonly DeclarationEntry[], project: ProjectDeclarations, options: CompilerOptions): AmbientKeys {
     const keys: Partial<Record<Environment, string>> = {};
-    const projectKey = `${oop ? 'oop' : ''}|${JSON.stringify(project.globals)}`;
+    const projectKey = `${optionsKey(options)}|${JSON.stringify(project.globals)}`;
 
     for (const environment of ALL_ENVIRONMENTS) {
         const visible = collected.filter((entry) => canReference(environment, entry.environment));
@@ -99,9 +104,10 @@ function createAmbientResolver(collected: readonly DeclarationEntry[]): AmbientR
 function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context: ModuleContext): CompiledModule {
     const result = compile(file.source, {
         filePath: file.path,
+        ...(file.environment === undefined ? {} : { environment: file.environment }),
         ambient,
         project: context.project,
-        oop: context.oop,
+        compilerOptions: context.compilerOptions,
     });
 
     return {
@@ -119,6 +125,12 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
     };
 }
 
+function promoteWarnings(diagnostics: readonly FileDiagnostic[]): FileDiagnostic[] {
+    return diagnostics.map((entry) =>
+        entry.diagnostic.severity === 'warning' ? { path: entry.path, diagnostic: { ...entry.diagnostic, severity: 'error' as const } } : entry,
+    );
+}
+
 function prune(cache: Map<string, unknown>, paths: ReadonlySet<string>): void {
     for (const path of [...cache.keys()]) {
         if (!paths.has(path)) {
@@ -131,8 +143,8 @@ export function createProjectCache(): ProjectCache {
     const declarationCache = new Map<string, DeclarationEntry>();
     const moduleCache = new Map<string, ModuleEntry>();
 
-    function declarationsFor(file: ProjectFile, reused: { count: number }): DeclarationEntry {
-        const hash = hashString(file.source);
+    function declarationsFor(file: ProjectFile, options: CompilerOptions, reused: { count: number }): DeclarationEntry {
+        const hash = hashString(`${file.environment ?? ''}|${optionsKey(options)}|${file.source}`);
         const cached = declarationCache.get(file.path);
 
         if (cached !== undefined && cached.hash === hash) {
@@ -141,7 +153,12 @@ export function createProjectCache(): ProjectCache {
             return cached;
         }
 
-        const result = compile(file.source, { filePath: file.path, emitCode: false });
+        const result = compile(file.source, {
+            filePath: file.path,
+            ...(file.environment === undefined ? {} : { environment: file.environment }),
+            compilerOptions: options,
+            emitCode: false,
+        });
         const entry: DeclarationEntry = {
             path: file.path,
             hash,
@@ -178,14 +195,14 @@ export function createProjectCache(): ProjectCache {
             const declarationsReused = { count: 0 };
             const modulesReused = { count: 0 };
             const project = options.project ?? EMPTY_PROJECT_DECLARATIONS;
-            const oop = options.oop === true;
-            const pairs = files.map((file) => ({ file, entry: declarationsFor(file, declarationsReused) }));
+            const compilerOptions = options.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
+            const pairs = files.map((file) => ({ file, entry: declarationsFor(file, compilerOptions, declarationsReused) }));
             const collected = pairs.map((pair) => pair.entry);
             const context = {
-                keys: ambientKeys(collected, project, oop),
+                keys: ambientKeys(collected, project, compilerOptions),
                 resolve: createAmbientResolver(collected),
                 project,
-                oop,
+                compilerOptions,
             };
             const modules = pairs.map((pair, index) => {
                 const module = moduleFor(pair, context, modulesReused);
@@ -196,7 +213,8 @@ export function createProjectCache(): ProjectCache {
             });
             const references = validateModuleReferences(modules);
             const contributions = validateContributions(modules);
-            const diagnostics = sortFileDiagnostics([...flattenDiagnostics(modules), ...references, ...contributions]);
+            const collectedDiagnostics = sortFileDiagnostics([...flattenDiagnostics(modules), ...references, ...contributions]);
+            const diagnostics = compilerOptions.warningsAsErrors ? promoteWarnings(collectedDiagnostics) : collectedDiagnostics;
             const paths = new Set(files.map((file) => file.path));
 
             prune(declarationCache, paths);

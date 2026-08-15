@@ -139,12 +139,12 @@ describe('manifest evaluation', () => {
     });
 
     it('evaluates arithmetic, concatenation and comparison', () => {
-        const source = [NAME, "version = '1.' .. 2 .. '.' .. 3", 'oop = 2 > 1', 'development = { logs = { rateLimit = 10 * 3 } }'].join('\n');
+        const source = [NAME, "version = '1.' .. 2 .. '.' .. 3", 'compilerOptions = { oop = 2 > 1 }', 'development = { logs = { rateLimit = 10 * 3 } }'].join('\n');
         const analysis = analyze(source);
 
         expect(analysis.diagnostics).toEqual([]);
         expect(analysis.value.version).toBe('1.2.3');
-        expect(analysis.value.oop).toBe(true);
+        expect(analysis.value.compilerOptions).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false });
         expect(analysis.value.development).toEqual({ logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 } });
     });
 
@@ -164,9 +164,9 @@ describe('manifest evaluation', () => {
     });
 
     it('records a position for every assigned field', () => {
-        const analysis = analyze(`${NAME}sourceDirs = { 'src', 'shared' }`);
+        const analysis = analyze(`${NAME}dependencies = { 'scoreboard', 'admin' }`);
 
         expect(analysis.positions.get('name')?.line).toBe(1);
-        expect(analysis.positions.get('sourceDirs.1')?.column).toBe(23);
+        expect(analysis.positions.get('dependencies.1')?.column).toBe(32);
     });
 });

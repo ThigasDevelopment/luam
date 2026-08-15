@@ -32,6 +32,12 @@ export function noMapOption(): Option {
     return new Option('--no-map', 'Disable resource map generation.');
 }
 
+export function addMinifyOptions(command: Command): Command {
+    return command
+        .addOption(new Option('--minify', 'Shrink the generated Lua before it is written.'))
+        .addOption(new Option('--no-minify', 'Write the generated Lua unchanged.'));
+}
+
 export function addLayoutOptions(command: Command): Command {
     return command.addOption(new Option('--bundle', 'Write bundled output.')).addOption(new Option('--no-bundle', 'Write tree output.'));
 }

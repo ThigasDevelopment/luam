@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { analyzeManifest } from '@compiler/manifest/manifest-analysis';
+import { DEFAULT_COMPILER_OPTIONS } from '@compiler/manifest/manifest-defaults';
 import { LanguageService } from '@lsp/server/language-service';
 import { settingsFrom } from '@lsp/workspace/project-settings';
 
@@ -18,7 +19,7 @@ interface Workspace {
 }
 
 function openProject(oop: boolean, files: Readonly<Record<string, string>>): Workspace {
-    const root = createWorkspace({ '.luam.manifest': `name = 'demo'\noop = ${oop}\n`, ...files });
+    const root = createWorkspace({ '.luam.manifest': `name = 'demo'\ncompilerOptions = { oop = ${oop} }\n`, ...files });
     const service = new LanguageService();
 
     roots.push(root);
@@ -211,18 +212,18 @@ describe('oop diagnostics in the editor', () => {
 });
 
 describe('project settings', () => {
-    function settingsOf(source: string): { oop: boolean } {
-        return settingsFrom(analyzeManifest(source, { mode: 'check', root: 'project', env: {} }));
+    function oopOf(source: string): boolean {
+        return settingsFrom(analyzeManifest(source, { mode: 'check', root: 'project', env: {} })).compilerOptions.oop;
     }
 
     it('reads the oop flag from the manifest', () => {
-        expect(settingsOf("name = 'demo'\noop = true\n")).toEqual({ oop: true });
-        expect(settingsOf("name = 'demo'\noop = false\n")).toEqual({ oop: false });
+        expect(oopOf("name = 'demo'\ncompilerOptions = { oop = true }\n")).toBe(true);
+        expect(oopOf("name = 'demo'\ncompilerOptions = { oop = false }\n")).toBe(false);
     });
 
     it('falls back to the default when the manifest says nothing', () => {
-        expect(settingsOf("name = 'demo'\n")).toEqual({ oop: false });
-        expect(settingsFrom(null)).toEqual({ oop: false });
+        expect(oopOf("name = 'demo'\n")).toBe(false);
+        expect(settingsFrom(null).compilerOptions).toEqual(DEFAULT_COMPILER_OPTIONS);
     });
 });
 

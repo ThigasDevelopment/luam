@@ -8,17 +8,44 @@ author = 'Thigas'
 version = '1.0.0'
 description = 'A demo resource'
 
-sourceDirs = { 'src' }
-assetDirs = { 'assets' }
+compilerOptions = {
+    strict = true,
+    oop = false,
+    noUnusedLocals = false,
+    noUnusedParameters = false,
+    warningsAsErrors = false,
+}
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = {
+    { from = 'assets/**/*', to = 'assets' },
+}
+
+dependencies = { 'scoreboard' }
+
+engine = {
+    minVersion = '1.6.0',
+}
+
+environment = {
+    file = '.env',
+    localFile = '.env.local',
+}
+
 outDir = 'build'
 loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
 
 output = {
     bundle = true,
     map = true,
+    minify = true,
 }
 
-oop = false
 helpers = { 'threads' }
 serverPath = 'C:/MTA Server'
 resourcesDir = 'mods/deathmatch/resources'
@@ -97,6 +124,9 @@ qualquer lugar. O compilador o avalia no próprio processo, e o servidor de
 linguagem também, a cada tecla — abrir uma pasta nunca executa código do projeto e
 nunca cria um processo.
 
+Não há hooks nem plugins pelo mesmo motivo. Um manifesto declara o que o projeto
+é; ele nunca descreve como construí-lo.
+
 ### Valores injetados
 
 Três nomes estão em escopo além dos campos de configuração:
@@ -130,35 +160,142 @@ aparecem enquanto você digita, o autocompletar oferece os campos válidos no cu
 (`transport.kind`, `helpers` e os valores de `mode`) completam dentro das aspas. O
 hover nomeia o caminho completo do campo e seu tipo.
 
-Como o servidor lê o arquivo diretamente, mudar `oop` passa a valer ao salvar. Não
-há snapshot para atualizar nem execução da CLI para esperar; o
-`.luam/settings.json` deixou de existir.
+Como o servidor lê o arquivo diretamente, mudar `compilerOptions.oop` passa a
+valer ao salvar. Não há snapshot para atualizar nem execução da CLI para esperar;
+o `.luam/settings.json` deixou de existir.
 
-## Campos
+## Domínios
 
-| Campo | Obrigatório | Padrão | Significado |
-| --- | --- | --- | --- |
-| `name` | sim | — | Nomeia `<outDir>/<name>` e o resource que o `ensure` reinicia. Nunca chega ao `meta.xml` — o MTA lê o nome da pasta. |
-| `author`, `version`, `description` | não | não definido | Atributos de info do `meta.xml`. |
-| `sourceDirs` | não | `{ 'src' }` | Varridos em busca de `.luam` e `.d.luam`. Outros arquivos aqui são copiados, mas não declarados. |
-| `assetDirs` | não | `{ 'assets' }` | Copiados como estão e declarados como `<file>`, para os clientes baixarem. |
-| `outDir` | não | `'build'` | Recebe `<outDir>/<name>`. |
-| `loadOrder` | não | `{ }` | Caminhos fixados à frente do seu grupo no `meta.xml`. |
-| `output.bundle` | não | `true` | Usa bundles de produção para `build`; `false` seleciona a árvore. |
-| `output.map` | não | `true` | Gera mapas de posição de código. Apenas `build` escreve o arquivo de mapa. |
-| `oop` | não | `false` | Liga a API OOP do MTA e escreve `<oop>true</oop>`. |
-| `helpers` | não | `{ }` | Helpers de runtime a copiar mesmo quando nenhum recurso os exige. |
-| `serverPath` | não | não definido | Raiz do servidor MTA. Exigido por `ensure` e `dev`. |
-| `resourcesDir` | não | `'mods/deathmatch/resources'` | Diretório de resources relativo a `serverPath`. |
-| `transport` | não | ausente | Como o `ensure` reinicia o resource. `kind` é obrigatório assim que a tabela é escrita. |
-| `development.logs` | não | desligado, limites seguros | Comprimento e limites de taxa do relay usados pelo `dev`. |
+O manifesto é um conjunto fechado de domínios tipados. Cada um tem um único dono
+e um único consumidor implementado, então um campo nunca significa duas coisas em
+dois lugares.
+
+| Domínio | Possui |
+| --- | --- |
+| identidade | `name`, `author`, `version`, `description` |
+| `compilerOptions` | Como o verificador lê o projeto. |
+| `sources` | Quais arquivos pertencem ao projeto e a qual ambiente. |
+| `assets` | Quais arquivos são copiados para o resource e onde eles ficam. |
+| `dependencies` | Resources que este exige em tempo de execução. |
+| `engine` | A versão do MTA que o resource exige. |
+| `environment` | Quais arquivos `.env` alimentam `env` e `process.env`. |
+| saída | `outDir`, `loadOrder`, `output`, `helpers`. |
+| implantação | `serverPath`, `resourcesDir`, `transport`, `development`. |
 
 Uma tabela campo a campo completa, incluindo cada regra de validação, está em
 [Campos de configuração](/pt-br/reference/configuration-fields).
 
+## `compilerOptions`
+
+| Chave | Padrão | Significado |
+| --- | --- | --- |
+| `strict` | `true` | Modo estrito de todo o projeto. Uma diretiva `#!strict` ou `#!nonstrict` no arquivo ainda vence para aquele arquivo. |
+| `oop` | `false` | Liga a API OOP do MTA e escreve `<oop>true</oop>`. |
+| `noUnusedLocals` | `false` | Reporta um local que nunca é lido como `check-unused-local`. |
+| `noUnusedParameters` | `false` | Reporta um parâmetro que nunca é lido como `check-unused-parameter`. |
+| `warningsAsErrors` | `false` | Promove todo aviso a erro, então um aviso reprova o build. |
+
+Um nome iniciado por `_` nunca é reportado como não usado, que é a forma de manter
+um vínculo de propósito.
+
+## `sources`
+
+Cada lado lista os padrões que pertencem a ele:
+
+```luam
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam', 'ui/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+```
+
+Um padrão usa `*` (qualquer coisa dentro de um segmento), `**` (qualquer número de
+segmentos) e `?` (um caractere). `/` separa segmentos. Não há regex, negação,
+expansão de chaves nem extglob — um valor com essa forma é
+`config-invalid-pattern`. `.git`, `.luam`, `node_modules` e `outDir` nunca são
+varridos.
+
+O lado de um arquivo é o lado que o casou. Uma diretiva `#!server`, `#!client` ou
+`#!shared` no arquivo ainda vence, e a divergência é reportada como
+`env-path-directive-conflict`, para ficar visível em vez de silenciosa. Um
+arquivo casado por dois lados é `config-source-side-conflict`; um caminho literal
+que não nomeia arquivo algum é `config-missing-source`; um projeto onde nada casou
+é `config-no-sources`.
+
+Omitir `sources` mantém a estrutura padrão, que são os três padrões acima.
+
+## `assets`
+
+Cada entrada nomeia o que copiar e onde isso fica dentro do resource:
+
+```luam
+assets = {
+    { from = 'assets/**/*', to = 'assets' },
+    { from = 'media/logo.png', to = 'images' },
+}
+```
+
+Tudo que um mapeamento nomeia é copiado e declarado como `<file>`, para os
+clientes baixarem. Nada mais é copiado — um arquivo de dados ao lado do código do
+servidor precisa do próprio mapeamento, que é o que torna o conteúdo do resource
+previsível.
+
+`to` é um diretório de destino dentro do resource. Duas entradas que resolvem para
+o mesmo destino são `config-output-collision`, assim como um destino que
+sobrescreveria o `meta.xml` ou o diretório gerado `lib/`. Um `from` literal que não
+nomeia arquivo algum é `config-missing-asset`.
+
+## `dependencies`
+
+```luam
+dependencies = { 'scoreboard', 'admin' }
+```
+
+Cada nome vira `<include resource="..." />` no `meta.xml`, então o MTA inicia o
+resource nomeado primeiro. Os nomes são deduplicados e ordenados. Um valor que não
+é um nome de resource válido, ou que nomeia este resource, é
+`config-invalid-dependency`. Dependências opcionais não são suportadas — o MTA não
+tem esse conceito.
+
+## `engine`
+
+```luam
+engine = {
+    minVersion = '1.6.0',
+}
+```
+
+`minVersion` vira `min_mta_version` no `meta.xml`. O padrão é `'latest'`, que
+consulta a lista de releases do MTA no momento do build; `--offline` e
+`LUAM_OFFLINE` pulam essa consulta e o build ainda passa. Fixar uma versão
+explícita deixa o build sem rede. Um valor que não é uma versão é
+`config-invalid-engine-version`.
+
+`mta.minVersion` não é aceito. O domínio é `engine`.
+
+## `environment`
+
+```luam
+environment = {
+    file = '.env.development',
+    localFile = '.env.development.local',
+}
+```
+
+`file` declara as chaves e seus tipos — é contra ele que `env.X` e `process.env.X`
+são tipados, e é dele que o template `.env` de implantação é gerado. `localFile`
+sobrescreve os *valores* das chaves que o arquivo base já declara; uma chave só no
+arquivo local é ignorada, então um ajuste local da máquina nunca muda a forma do
+projeto. Os padrões são `.env` e `.env.local`.
+
+Um arquivo configurado que não existe é `config-missing-env-file`; os padrões são
+opcionais, então um projeto sem `.env` não é um erro. O servidor de linguagem
+observa os dois arquivos e reanalisa ao salvar.
+
 ## Segurança de caminhos
 
-`outDir`, `resourcesDir` e cada entrada de `sourceDirs`, `assetDirs` e `loadOrder`
+`outDir`, `resourcesDir` e cada entrada de `sources`, `assets` e `loadOrder`
 precisam permanecer **dentro do seu diretório base**. Um caminho absoluto ou um
 segmento `..` é `config-escaping-path` e a configuração não carrega.
 
@@ -172,14 +309,6 @@ A ordem também importa para assets, já que um shader pode depender de outro. U
 entrada que nomeia um arquivo que o projeto não produz é
 `project-load-order-missing`, então uma renomeação não quebra a ordem em silêncio.
 
-## `oop`
-
-Desligado por padrão. Ligado, o compilador escreve `<oop>true</oop>` acima de
-`<info>` e tipa a forma de objeto da API do MTA, então `player:getName()` retorna
-`string`. Desligado, a mesma chamada é `check-oop-disabled` e a mensagem nomeia a
-função procedural a usar. O Lua emitido é idêntico nos dois casos. Veja
-[API OOP](/pt-br/mta/oop).
-
 ## `output`
 
 `output.bundle` define o padrão de `build`. `--bundle` e `--no-bundle` o
@@ -191,12 +320,17 @@ enquanto `dev` sempre usa árvore.
 escrevem esse arquivo. `--no-map` desliga a geração no comando atual. Veja
 [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts).
 
+`output.minify` controla se o `build` escreve cada script em uma linha. `--minify`
+e `--no-minify` o sobrescrevem. O `dev` nunca minifica, então um stack trace
+continua legível enquanto você trabalha.
+
 ## `helpers`
 
 Nomeia helpers de runtime que o compilador não injetaria por conta própria.
 
 - `threads` é opcional e explícito.
-- `env` é injetado automaticamente quando o projeto tem um `.env`, então listá-lo
+- `env` é injetado automaticamente quando o projeto tem um arquivo de ambiente,
+  então listá-lo
   só é necessário para publicar a biblioteca sem um.
 - Listar um helper automático é inofensivo; listar um nome desconhecido é
   `config-unknown-helper`, e o autocompletar oferece os nomes conhecidos dentro
@@ -265,37 +399,25 @@ desenvolvimento.
 | `name` não é um nome de resource válido | `config-invalid-name` |
 | Um campo tem o tipo errado | `config-invalid-type` |
 | Um nome não é um campo de configuração | `config-unknown-field` |
+| Um campo que não existe mais | `config-removed-field` |
 | Um caminho escapa da sua base | `config-escaping-path` |
+| Um padrão que a gramática de glob não permite | `config-invalid-pattern` |
 | `passwordEnv` nomeia uma variável não definida | `config-missing-secret` |
 
 Todos os códigos estão em [Diagnósticos](/pt-br/reference/diagnostics).
 
-## Migrando do `luam.json`
+## Campos removidos
 
-O `luam.json` não é lido, não é mesclado e não é reportado. Um projeto que ainda
-tem um falha com `config-not-found` até ser migrado. Três passos:
+Estes nomes são rejeitados em vez de virarem apelidos, então um manifesto
+desatualizado falha em alto e bom som em vez de construir algo diferente do que
+diz:
 
-1. Renomeie `luam.json` para `.luam.manifest`.
-2. Remova as chaves externas, tire as aspas dos nomes dos campos e escreva `=` no
-   lugar de `:`. Arrays JSON viram tabelas Luam: `["src"]` é `{ 'src' }`.
-3. Renomeie `--config` para `--manifest` em todo script ou job de CI que o passe.
+| Removido | Substituto |
+| --- | --- |
+| `oop` | `compilerOptions = { oop = true }` |
+| `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
+| `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
+| `mta` | `engine = { minVersion = '1.6.0' }` |
+| `helperDir` | Nada. Os helpers vão para `lib/<ambiente>` ou para dentro dos bundles. |
 
-```json
-{
-    "name": "luam-demo",
-    "sourceDirs": ["src"],
-    "outDir": "build"
-}
-```
-
-vira
-
-```luam
-name = 'luam-demo'
-sourceDirs = { 'src' }
-outDir = 'build'
-```
-
-Os nomes dos campos, seus padrões e cada regra de validação continuam iguais. Com
-o arquivo carregando, `mode` e `env` ficam disponíveis sempre que um valor
-precisar variar por ambiente.
+Cada um reporta `config-removed-field` e nomeia seu substituto na mensagem.

@@ -419,13 +419,17 @@ Only `name` is required.
 | --- | --- | --- |
 | `name` | required | Names the output folder and the resource `ensure` restarts. MTA reads the resource name from the folder, so it never reaches `meta.xml` |
 | `author`, `version`, `description` | unset | `meta.xml` info attributes |
-| `sourceDirs` | `["src"]` | Scanned for `.luam` and `.d.luam` files |
-| `assetDirs` | `["assets"]` | Copied verbatim and declared `<file>`, so clients download them |
+| `compilerOptions` | `strict` on, the rest off | How the checker reads the project: `strict`, `oop`, `noUnusedLocals`, `noUnusedParameters`, `warningsAsErrors` |
+| `sources` | `src/<side>/**/*.luam` | Patterns per side. The side that matches a file is its environment, unless a directive overrides it |
+| `assets` | `{ }` | `{ from, to }` mappings. Only what a mapping names is copied and declared `<file>` |
+| `dependencies` | `{ }` | Resources written as `<include resource="..." />` |
+| `engine.minVersion` | `"latest"` | Becomes `min_mta_version`. An explicit version keeps the build network-free |
+| `environment` | `.env`, `.env.local` | Which files declare and override the keys behind `env` and `process.env` |
 | `outDir` | `"build"` | Receives `<outDir>/<name>` |
 | `loadOrder` | `[]` | Source paths pinned ahead of their group in `meta.xml`. An entry matching no file fails the build |
 | `output.bundle` | `true` | Default `build` layout; command flags override it |
 | `output.map` | `true` | Generate source position maps; only `build` writes one to disk |
-| `oop` | `false` | Enables the MTA OOP API (`player:getName()`) and writes `<oop>true</oop>` |
+| `output.minify` | `true` | Write each generated script on one line during `build`; `dev` and `ensure` never minify |
 | `helpers` | `[]` | Runtime helpers to copy even when no feature requires them |
 | `serverPath` | unset | MTA server root, for `ensure` |
 | `resourcesDir` | `"mods/deathmatch/resources"` | Resource directory relative to `serverPath` |
@@ -433,7 +437,9 @@ Only `name` is required.
 | `development.logs` | disabled, safe limits | Client relay message length and rate limits used by `dev` |
 
 Paths must stay inside their base directory — an absolute path or a `..` segment
-is rejected.
+is rejected. A pattern accepts `*`, `**`, and `?` only. `oop`, `sourceDirs`,
+`assetDirs`, and `mta` were removed; each reports `config-removed-field` and
+names its replacement.
 
 Every field, the transport in detail, `.env` handling and declaration files:
 **[.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)**

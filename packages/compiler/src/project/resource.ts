@@ -46,6 +46,7 @@ export interface ResourceOptions {
     version?: string;
     description?: string;
     oop?: boolean;
+    dependencies?: readonly string[];
     helpers?: readonly RuntimeHelperName[];
     assets?: readonly ResourceAsset[];
     configuration?: ResourceConfiguration | null;
@@ -223,7 +224,7 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
         manifestScripts(manifestHelpers, configuration, sources),
         manifestFiles(assets),
         collectContributions(project),
-        { oop: options.oop === true, minMtaVersion: options.minMtaVersion ?? null },
+        { oop: options.oop === true, minMtaVersion: options.minMtaVersion ?? null, dependencies: options.dependencies ?? [] },
     );
 
     onStep?.('manifest');

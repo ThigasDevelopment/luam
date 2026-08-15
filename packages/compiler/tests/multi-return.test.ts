@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import { compile } from '@compiler/index';
+import { compilerOptions } from '@compiler/manifest/manifest-defaults';
 
 const SERVER_FILE = 'src/server/main.luam';
 
 function codes(source: string, filePath = SERVER_FILE, oop = false): string[] {
-    return compile(source, { filePath, oop }).diagnostics.map((diagnostic) => diagnostic.code);
+    return compile(source, { filePath, compilerOptions: compilerOptions({ oop }) }).diagnostics.map((diagnostic) => diagnostic.code);
 }
 
 function messages(source: string, filePath = SERVER_FILE, oop = false): string[] {
-    return compile(source, { filePath, oop }).diagnostics.map((diagnostic) => diagnostic.message);
+    return compile(source, { filePath, compilerOptions: compilerOptions({ oop }) }).diagnostics.map((diagnostic) => diagnostic.message);
 }
 
 describe('multi-return functions', () => {

@@ -2,4 +2,4 @@ Discovery: done in 2 ms.
 Compile: 1 file in 6 ms.
 Assembly: failed in 0 ms.
 src/server/api.luam:3:8 error check-export-member: MTA exports a single global name, so "export" cannot be applied to a function declared on a table.
-Check failed: 1 error, 0 warnings in 8 ms.
+Check failed: 1 error, 0 warnings in 9 ms.

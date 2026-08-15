@@ -54,7 +54,7 @@ function memberType(analysis: DocumentAnalysis, target: ReceiverTarget, member: 
         return null;
     }
 
-    if (analysis.oop && isMtaElementName(analysis.declarations, target.name)) {
+    if (analysis.compilerOptions.oop && isMtaElementName(analysis.declarations, target.name)) {
         return mtaMember(target.name, member)?.type ?? null;
     }
 

@@ -58,8 +58,8 @@ describe('scaffold plan', () => {
         expect(content).toContain("description = 'A prompt description'");
         expect(content).toContain("author = 'Luam Team'");
         expect(content).toContain("outDir = 'build'");
-        expect(content).toContain("sourceDirs = { 'src' }");
-        expect(content).toContain("assetDirs = { 'assets' }");
+        expect(content).toContain("server = { 'src/server/**/*.luam' },");
+        expect(content).toContain("{ from = 'assets/**/*', to = 'assets' },");
     });
 
     it('scaffolds the project manifest and nothing else', async () => {

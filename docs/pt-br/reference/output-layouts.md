@@ -35,7 +35,7 @@ build/
         └── client.lua            quando há código ou helpers de cliente
 ```
 
-O diretório literal `src/` dos bundles não segue `sourceDirs`. Um ambiente vazio
+O diretório literal `src/` dos bundles não segue `sources`. Um ambiente vazio
 não tem bundle nem entrada `<script>`. Não existe diretório `lib/` nem árvore de
 módulos espelhada. Helpers de runtime e módulos são concatenados literalmente em
 um chunk por ambiente, sem bloco em volta; helpers vêm antes dos módulos, e

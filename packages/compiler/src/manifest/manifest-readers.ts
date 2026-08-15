@@ -1,4 +1,4 @@
-import { isManifestObject, type ManifestObject } from '@compiler/manifest/manifest-value';
+import { isManifestObject, type ManifestObject } from './manifest-value';
 
 export function readString(source: ManifestObject, field: string): string | null {
     const value = source[field];
@@ -28,4 +28,10 @@ export function readTable(source: ManifestObject, field: string): ManifestObject
     const value = source[field];
 
     return isManifestObject(value) ? value : null;
+}
+
+export function readTables(source: ManifestObject, field: string): ManifestObject[] {
+    const value = source[field];
+
+    return Array.isArray(value) ? value.filter(isManifestObject) : [];
 }

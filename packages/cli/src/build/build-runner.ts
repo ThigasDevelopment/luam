@@ -2,7 +2,7 @@ import type { PhaseDuration } from '@cli/build/build-phase';
 import { renderEnvironmentTemplate } from '@cli/build/env-template';
 import { readHelperSource } from '@cli/build/helper-files';
 import { createPhaseTracker, type PhaseTracker } from '@cli/build/phase-tracker';
-import { readProjectInputs, ENVIRONMENT_FILE, type ProjectInputs } from '@cli/build/project-inputs';
+import { readProjectInputs, type ProjectInputs } from '@cli/build/project-inputs';
 import { discoverSources } from '@cli/build/source-discovery';
 import type { LuamConfig } from '@cli/config/config-schema';
 import { hasCliErrors, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
@@ -53,7 +53,8 @@ function resourceOptions(
     layout: OutputLayout,
 ): ResourceOptions {
     const options: ResourceOptions = {
-        oop: config.oop,
+        oop: config.compilerOptions.oop,
+        dependencies: config.dependencies,
         helpers: helperList(config, inputs),
         assets: inputs.assets,
         configuration: inputs.configuration,
@@ -112,8 +113,9 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('discovery');
 
-    const sources = discoverSources(root, config.sourceDirs);
-    const inputs = readProjectInputs(root, config.sourceDirs, config.assetDirs);
+    const excluded = [config.outDir];
+    const sources = discoverSources(root, config.sources, excluded);
+    const inputs = readProjectInputs(root, { assets: config.assets, environment: config.environment, excluded });
     const diagnostics = [...sources.diagnostics, ...inputs.diagnostics];
 
     if (hasCliErrors(diagnostics)) {
@@ -135,10 +137,10 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('compile', sources.files.length);
 
-    const declarations = projectDeclarations(inputs.declared?.entries ?? null, ENVIRONMENT_FILE);
+    const declarations = projectDeclarations(inputs.declared?.entries ?? null, config.environment.file);
     const project = cache.compile(sources.files, {
         project: declarations,
-        oop: config.oop,
+        compilerOptions: config.compilerOptions,
         onProgress: (event) => tracker.advance(event.item, event.index, event.total),
     });
 

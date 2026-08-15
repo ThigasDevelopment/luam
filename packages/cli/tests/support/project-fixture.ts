@@ -111,7 +111,12 @@ export function manifestConfig(config: Readonly<Record<string, unknown>>, env: R
 
 export function defaultProjectFiles(config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     return {
-        [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', output: { bundle: false, map: true }, ...config }),
+        [MANIFEST_FILE]: manifestSource({
+            name: 'luam-demo',
+            output: { bundle: false, map: true },
+            assets: [{ from: 'assets/**/*', to: 'assets' }],
+            ...config,
+        }),
         'src/shared/config.luam': VALID_SHARED,
         'src/server/main.luam': VALID_SERVER,
         'src/client/hud.luam': VALID_CLIENT,

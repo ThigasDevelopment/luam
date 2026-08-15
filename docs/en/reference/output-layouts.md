@@ -34,7 +34,7 @@ build/
         └── client.lua            when client code or helpers exist
 ```
 
-The literal `src/` bundle directory does not follow `sourceDirs`. An empty
+The literal `src/` bundle directory does not follow `sources`. An empty
 environment has no bundle and no `<script>` entry. There is no `lib/` directory
 or mirrored module tree. Runtime helpers and modules are concatenated verbatim
 into one chunk per environment, with no wrapper block; helpers precede modules,

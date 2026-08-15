@@ -1,6 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
+import { LATEST_ENGINE_VERSION } from '@compiler/manifest/manifest-defaults';
+
 export type ReleaseFetch = (input: string, init: RequestInit) => Promise<Response>;
 
 export interface MtaVersion {
@@ -99,6 +101,14 @@ async function fetchLatest(request: ReleaseFetch): Promise<string | null> {
     } catch {
         return null;
     }
+}
+
+export async function resolveEngineVersion(root: string, minVersion: string, options: ReleaseOptions = {}): Promise<MtaVersion> {
+    if (minVersion === LATEST_ENGINE_VERSION) {
+        return resolveMtaVersion(root, options);
+    }
+
+    return { version: normalizeTag(minVersion), warning: null };
 }
 
 export async function resolveMtaVersion(root: string, options: ReleaseOptions = {}): Promise<MtaVersion> {

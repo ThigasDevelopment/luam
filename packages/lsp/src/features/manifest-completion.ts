@@ -1,5 +1,6 @@
 import { ENV_GLOBAL, type ProjectDeclarations } from '@compiler/checker/project-declarations';
-import { findManifestField, MANIFEST_FIELDS, MANIFEST_MODES, type ManifestField } from '@compiler/manifest/manifest-fields';
+import type { ManifestField } from '@compiler/manifest/manifest-field';
+import { findManifestField, MANIFEST_FIELDS, MANIFEST_MODES } from '@compiler/manifest/manifest-fields';
 import type { CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';

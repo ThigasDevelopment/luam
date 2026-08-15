@@ -2,7 +2,7 @@ import type { Type } from '@compiler/checker/types';
 
 import { UNKNOWN_HELPER } from './manifest-diagnostics';
 import { describeReceived, describeType, quoteList } from './manifest-value';
-import type { ManifestField } from './manifest-fields';
+import type { ManifestField } from './manifest-field';
 
 export function quoteOr(values: readonly string[]): string {
     return values.map((value) => `"${value}"`).join(' or ');

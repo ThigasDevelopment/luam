@@ -3,9 +3,10 @@ import type { Token } from '@compiler/lexer/token';
 import type { AssignmentStatement, Expression, LocalStatement, Program, Statement } from '@compiler/parser/ast';
 import { parse } from '@compiler/parser/parser';
 
-import { ALLOWED_STATEMENTS, INVALID_STATEMENT, MISSING_FIELD, UNKNOWN_FIELD, manifestError } from './manifest-diagnostics';
+import { ALLOWED_STATEMENTS, INVALID_STATEMENT, MISSING_FIELD, REMOVED_FIELD, UNKNOWN_FIELD, manifestError } from './manifest-diagnostics';
 import { nilValue } from './manifest-evaluated';
-import { findField, MANIFEST_FIELDS, requiredFields } from './manifest-fields';
+import { findField, requiredFields } from './manifest-field';
+import { MANIFEST_FIELDS, REMOVED_FIELDS } from './manifest-fields';
 import { unknownNameMessage } from './manifest-messages';
 import { ManifestPass, type ManifestContext } from './manifest-pass';
 import { normalizeManifest } from './manifest-rules';
@@ -79,7 +80,13 @@ function readAssignment(pass: ManifestPass, statement: AssignmentStatement, assi
     const field = findField(MANIFEST_FIELDS, target.name);
 
     if (field === null) {
-        pass.report(UNKNOWN_FIELD, unknownNameMessage(target.name), target.position);
+        const replacement = REMOVED_FIELDS[target.name];
+
+        if (replacement === undefined) {
+            pass.report(UNKNOWN_FIELD, unknownNameMessage(target.name), target.position);
+        } else {
+            pass.report(REMOVED_FIELD, `"${target.name}" is no longer a manifest field. ${replacement}`, target.position);
+        }
 
         return;
     }

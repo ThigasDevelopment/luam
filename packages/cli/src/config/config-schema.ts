@@ -1,3 +1,4 @@
+import type { AssetMapping, CompilerOptions, EngineRequirement, EnvironmentFiles, OutputSettings, SourceMapping } from '@compiler/manifest/manifest-contract';
 import { isValidResourceName } from '@compiler/manifest/manifest-rules';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
@@ -29,25 +30,23 @@ export interface DevelopmentConfig {
     logs: DevelopmentLogsConfig;
 }
 
-export interface OutputConfig {
-    bundle: boolean;
-    map: boolean;
-}
-
 export interface LuamConfig {
     name: string;
     author: string | null;
     version: string | null;
     description: string | null;
-    sourceDirs: string[];
-    assetDirs: string[];
+    compilerOptions: CompilerOptions;
+    sources: SourceMapping;
+    assets: AssetMapping[];
+    dependencies: string[];
+    engine: EngineRequirement;
+    environment: EnvironmentFiles;
     outDir: string;
     loadOrder: string[];
-    oop: boolean;
     helpers: RuntimeHelperName[];
     serverPath: string | null;
     resourcesDir: string;
-    output: OutputConfig;
+    output: OutputSettings;
     transport: TransportConfig;
     development: DevelopmentConfig;
 }
@@ -55,5 +54,7 @@ export interface LuamConfig {
 export const MANIFEST_FILE_NAME = '.luam.manifest';
 
 export const NONE_TRANSPORT: NoneTransportConfig = { kind: 'none' };
+
+export type { AssetMapping, CompilerOptions, EngineRequirement, EnvironmentFiles, OutputSettings, SourceMapping };
 
 export { isValidResourceName };

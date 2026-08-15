@@ -50,7 +50,7 @@ function staticReceiver(text: string, offset: number): string | null {
 }
 
 export function mtaMemberHover(analysis: DocumentAnalysis, name: string, offset: number): Hover | null {
-    if (!analysis.oop) {
+    if (!analysis.compilerOptions.oop) {
         return null;
     }
 

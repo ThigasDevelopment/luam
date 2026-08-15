@@ -1,10 +1,12 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
+import { resolveAssets } from '@cli/build/asset-resolution';
 import { cliError, cliWarning, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
+import type { AssetMapping, EnvironmentFiles } from '@compiler/manifest/manifest-contract';
+import { DEFAULT_ENVIRONMENT_FILE, DEFAULT_LOCAL_ENVIRONMENT_FILE } from '@compiler/manifest/manifest-defaults';
 import { EMPTY_ENV_FILE, mergeEnvFiles, parseEnvFile, type EnvFile } from '@compiler/project/env-file';
 import type { ResourceAsset, ResourceConfiguration } from '@compiler/project/resource';
-import { SOURCE_EXTENSION } from '@compiler/project/source-kind';
 
 export interface ProjectInputs {
     configuration: ResourceConfiguration | null;
@@ -14,66 +16,32 @@ export interface ProjectInputs {
     diagnostics: CliDiagnostic[];
 }
 
+export interface ProjectInputOptions {
+    assets: readonly AssetMapping[];
+    environment: EnvironmentFiles;
+    excluded?: readonly string[];
+}
+
 export const CONFIGURATION_FILE = 'config.lua';
 
-export const ENVIRONMENT_FILE = '.env';
-
-export const LOCAL_ENVIRONMENT_FILE = '.env.local';
+export { DEFAULT_ENVIRONMENT_FILE as ENVIRONMENT_FILE, DEFAULT_LOCAL_ENVIRONMENT_FILE as LOCAL_ENVIRONMENT_FILE };
 
 const MALFORMED_ENV = 'build-env-malformed';
 
-const UNREADABLE_ASSET = 'build-asset-unreadable';
-
-function normalize(path: string): string {
-    return path.replace(/\\/g, '/');
-}
-
-function isDirectory(path: string): boolean {
-    try {
-        return statSync(path).isDirectory();
-    } catch {
-        return false;
-    }
-}
+const MISSING_ENV = 'config-missing-env-file';
 
 function readTextFile(path: string): string | null {
     return existsSync(path) ? readFileSync(path, 'utf8') : null;
 }
 
-function collectFiles(root: string, directory: string, isDownloaded: boolean, assets: ResourceAsset[]): void {
-    for (const entry of readdirSync(directory, { recursive: true, withFileTypes: true })) {
-        if (!entry.isFile() || entry.name.endsWith(SOURCE_EXTENSION)) {
-            continue;
-        }
-
-        const path = normalize(relative(root, join(entry.parentPath, entry.name)));
-
-        assets.push({ path, source: path, isDownloaded });
-    }
-}
-
-function collectAssets(root: string, directories: readonly string[], isDownloaded: boolean, assets: ResourceAsset[], diagnostics: CliDiagnostic[]): void {
-    for (const directory of directories) {
-        const absolute = resolve(root, directory);
-
-        if (!isDirectory(absolute)) {
-            continue;
-        }
-
-        try {
-            collectFiles(root, absolute, isDownloaded, assets);
-        } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : String(error);
-
-            diagnostics.push(cliError(UNREADABLE_ASSET, `The directory "${directory}" could not be read: ${message}`));
-        }
-    }
-}
-
-function readEnvironment(root: string, file: string, diagnostics: CliDiagnostic[]): EnvFile | null {
+function readEnvironment(root: string, file: string, required: boolean, diagnostics: CliDiagnostic[]): EnvFile | null {
     const source = readTextFile(resolve(root, file));
 
     if (source === null) {
+        if (required) {
+            diagnostics.push(cliError(MISSING_ENV, `"${file}" is configured under "environment" but does not exist. Create it or remove the setting.`));
+        }
+
         return null;
     }
 
@@ -100,16 +68,12 @@ function readConfiguration(root: string, diagnostics: CliDiagnostic[]): Resource
     return { path: CONFIGURATION_FILE, source: CONFIGURATION_FILE, content };
 }
 
-export function readProjectInputs(root: string, sourceDirs: readonly string[], assetDirs: readonly string[]): ProjectInputs {
-    const diagnostics: CliDiagnostic[] = [];
-    const assets: ResourceAsset[] = [];
+export function readProjectInputs(root: string, options: ProjectInputOptions): ProjectInputs {
+    const resolved = resolveAssets(root, options.assets, options.excluded ?? []);
+    const diagnostics: CliDiagnostic[] = [...resolved.diagnostics];
+    const base = readEnvironment(root, options.environment.file, options.environment.file !== DEFAULT_ENVIRONMENT_FILE, diagnostics);
+    const local = readEnvironment(root, options.environment.localFile, false, diagnostics);
+    const declared = base === null ? null : mergeEnvFiles(base, local ?? EMPTY_ENV_FILE);
 
-    collectAssets(root, assetDirs, true, assets, diagnostics);
-    collectAssets(root, sourceDirs, false, assets, diagnostics);
-
-    const declared = readEnvironment(root, ENVIRONMENT_FILE, diagnostics);
-    const local = readEnvironment(root, LOCAL_ENVIRONMENT_FILE, diagnostics);
-    const deployed = declared === null ? null : mergeEnvFiles(declared, local ?? EMPTY_ENV_FILE);
-
-    return { configuration: readConfiguration(root, diagnostics), assets, declared, deployed, diagnostics };
+    return { configuration: readConfiguration(root, diagnostics), assets: resolved.assets, declared, deployed: base, diagnostics };
 }

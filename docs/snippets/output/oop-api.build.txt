@@ -1,8 +1,8 @@
 Version: done in 0 ms.
 Discovery: done in 2 ms.
-Compile: 1 file in 10 ms.
+Compile: 1 file in 12 ms.
 Assembly: done in 1 ms.
 Manifest: done in 2 ms.
 Write: 2 files in 16 ms.
-Build passed: 1 file, 0 errors, 0 warnings in 15 ms (bundle layout).
+Build passed: 1 file, 0 errors, 0 warnings in 18 ms (bundle layout).
 Wrote 2 files to "build/luam-docs-oop-api" (0 unchanged, 0 removed).

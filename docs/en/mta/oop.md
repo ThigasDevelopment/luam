@@ -8,10 +8,10 @@ configuration flag.
 
 ```luam
 name = 'my-resource'
-oop = true
+compilerOptions = { oop = true }
 ```
 
-`oop` is `false` by default. With it on the compiler:
+`compilerOptions.oop` is `false` by default. With it on the compiler:
 
 - writes `<oop>true</oop>` into `meta.xml`, above `<info>` — which is what makes
   the object form exist at runtime;
@@ -22,7 +22,7 @@ With it off, the same call is `check-oop-disabled`, and the message names the
 procedural function to use instead.
 
 ::: tip The emitted Lua is identical either way
-The compiler never rewrites an OOP call into its procedural form. `oop` decides
+The compiler never rewrites an OOP call into its procedural form. The option decides
 what the checker accepts and what the manifest declares, nothing else.
 :::
 
@@ -70,7 +70,7 @@ required.
 ## Which form should I use?
 
 Both compile to the same Lua. The object form is shorter and gives better
-completion; the procedural form works with `oop` off and matches most existing
+completion; the procedural form works with `compilerOptions.oop` off and matches most existing
 MTA code. Pick one per project and stay with it — mixing them is legal but makes
 a codebase harder to read.
 
@@ -84,7 +84,7 @@ a codebase harder to read.
 
 | You wrote | Diagnostic |
 | --- | --- |
-| `player:getName()` with `"oop": false` | `check-oop-disabled` |
+| `player:getName()` with `compilerOptions.oop` off | `check-oop-disabled` |
 | `player:getNmae()` | `check-unknown-member` |
 | `class Mine extends Player` | `check-native-class-inheritance` |
 | `Player('x')` where `Player` is not callable | `check-not-callable-class` |

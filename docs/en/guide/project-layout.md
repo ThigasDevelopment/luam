@@ -33,8 +33,10 @@ See [Environments](/en/mta/environments) for the full rule.
 | --- | --- |
 | `.luam` | Source. Checked, compiled, and written as `.lua`. |
 | `.d.luam` | [Declaration file](/en/language/declaration-files). Checked, describes types for Lua the compiler does not own, emits nothing. |
-| anything else under `sourceDirs` | Copied, but not declared in `meta.xml`. |
-| anything under `assetDirs` | Copied and declared as `<file>`, so clients download it. |
+| anything an `assets` mapping names | Copied and declared as `<file>`, so clients download it. |
+
+A file no `sources` pattern and no `assets` mapping names is not part of the
+build. Nothing is copied by accident.
 
 ## What a build writes
 
@@ -60,7 +62,7 @@ trees, manifests, and overrides.
 
 ## Naming and path rules
 
-- `outDir`, `resourcesDir`, and every `sourceDirs`, `assetDirs` and `loadOrder`
+- `outDir`, `resourcesDir`, and every `sources`, `assets`, and `loadOrder`
   entry must stay inside their base directory. An absolute path or a `..`
   segment is rejected with `config-escaping-path`.
 - Two sources that would produce the same output path fail the build with
@@ -76,7 +78,8 @@ a later build with no network still succeeds. That is the only thing the CLI
 writes outside `outDir`, and it is generated — ignore `.luam/` in version control.
 
 There is no settings snapshot. The language server reads `.luam.manifest`
-directly, so a change to `oop` takes effect as soon as the file is saved.
+directly, so a change to `compilerOptions` takes effect as soon as the file is
+saved.
 
 ## Configuring the layout
 
@@ -85,7 +88,16 @@ Every directory above is a default you can change in
 
 ```luam
 name = 'my-resource'
-sourceDirs = { 'src' }
-assetDirs = { 'assets' }
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = {
+    { from = 'assets/**/*', to = 'assets' },
+}
+
 outDir = 'build'
 ```
