@@ -129,6 +129,40 @@ describe('classes', () => {
         );
     });
 
+    it('checks implements against the interface when a class shares its name', () => {
+        const source = [
+            'interface Command { name: string execute(): void }',
+            'class Command {',
+            '    core: any = nil',
+            '',
+            '    execute = function (): void',
+            '    end',
+            '}',
+            'class KickCommand implements Command {',
+            "    name: string = 'kick'",
+            '',
+            '    execute = function (): void',
+            '    end',
+            '}',
+        ].join('\n');
+
+        expect(codes(source)).toEqual([]);
+        expect(codes(source.replace("    name: string = 'kick'\n", ''))).toEqual(['check-unimplemented-interface']);
+    });
+
+    it('extends the interface when a class shares the parent name', () => {
+        const source = [
+            'interface Named { name: string }',
+            'class Named { id: number = 1 }',
+            'interface Entity extends Named {}',
+            'class Player implements Entity {',
+            "    name: string = 'Thigas'",
+            '}',
+        ].join('\n');
+
+        expect(codes(source)).toEqual([]);
+    });
+
     it('checks classes against inherited interface members', () => {
         const source = [
             'interface Named { name: string }',

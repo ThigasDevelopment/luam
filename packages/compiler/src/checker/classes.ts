@@ -89,7 +89,7 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
 }
 
 function checkContract(context: CheckContext, info: ClassInfo, contract: string, member: MemberInfo): void {
-    const actual = context.declarations.lookupMember(info.name, member.name);
+    const actual = context.declarations.lookupClassMember(info.name, member.name);
 
     if (actual === null) {
         const message = `Class "${info.name}" does not implement "${member.name}" required by interface "${contract}".`;
@@ -120,7 +120,7 @@ function checkInterfaces(context: CheckContext, info: ClassInfo): void {
             continue;
         }
 
-        for (const member of context.declarations.collectMembers(contract.name)) {
+        for (const member of context.declarations.collectInterfaceContract(contract.name)) {
             checkContract(context, info, name, member);
         }
     }
@@ -235,7 +235,7 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
     const inherited = new Map<string, MemberInfo>();
 
     for (const parent of statement.superInterfaces) {
-        for (const member of context.declarations.collectMembers(parent)) {
+        for (const member of context.declarations.collectInterfaceContract(parent)) {
             const existing = members.get(member.name) ?? inherited.get(member.name);
 
             if (existing !== undefined && (existing.isMethod !== member.isMethod || typeToString(existing.type) !== typeToString(member.type))) {

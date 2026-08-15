@@ -6,7 +6,27 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
-### The Manifest Is the Project Contract
+### A Contract Comes From the Interface That Names It
+
+A class and an interface may carry the same name, and `implements` resolved the
+contract through a lookup that answers with a class first. The interface was
+found; its members were not. A class implementing `Command` was checked against
+the fields of a class called `Command` and told to implement `core` — a field no
+interface ever declared, on a class that satisfied its actual contract
+completely. The same lookup backed `interface extends`, so a class could stand in
+for an inherited contract as well.
+
+A name means what the position it sits in says it means. `implements Command`,
+and `Command` after `extends` on an interface, now read the interface namespace
+alone, and the member a class is checked for is looked up through the class
+hierarchy alone.
+
+#### Fixed
+
+- `implements` collected the members of a class sharing the interface's name,
+  reporting `check-unimplemented-interface` for fields the interface never
+  declared and passing over the ones it did.
+- `interface extends` inherited from a class of the same name.
 
 `.luam.manifest` described a little of the project and left the rest implicit.
 `sourceDirs` named a directory and the environment came from the folder inside

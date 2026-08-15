@@ -124,6 +124,14 @@ export class DeclarationRegistry {
         }
     }
 
+    collectInterfaceContract(name: string): MemberInfo[] {
+        const collected = new Map<string, MemberInfo>();
+
+        this.collectInterfaceMembers(name, collected, new Set());
+
+        return [...collected.values()];
+    }
+
     collectMembers(name: string): MemberInfo[] {
         const collected = new Map<string, MemberInfo>();
         const visited = new Set<string>();
@@ -149,9 +157,7 @@ export class DeclarationRegistry {
         return [...collected.values()];
     }
 
-    lookupMember(name: string, member: string): MemberInfo | null {
-        const visited = new Set<string>();
-
+    lookupClassMember(name: string, member: string, visited: Set<string> = new Set()): MemberInfo | null {
         let current = this.lookupClass(name);
 
         while (current !== null && !visited.has(current.name)) {
@@ -164,6 +170,17 @@ export class DeclarationRegistry {
             visited.add(current.name);
 
             current = current.superClass === null ? null : this.lookupClass(current.superClass);
+        }
+
+        return null;
+    }
+
+    lookupMember(name: string, member: string): MemberInfo | null {
+        const visited = new Set<string>();
+        const found = this.lookupClassMember(name, member, visited);
+
+        if (found !== null) {
+            return found;
         }
 
         const collected = new Map<string, MemberInfo>();
