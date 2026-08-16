@@ -9,6 +9,7 @@ import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { descriptorShapeText, namedDescriptorText } from '@lsp/features/api-text';
+import { declarationDocumentation } from '@lsp/features/declaration-documentation';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
@@ -73,6 +74,13 @@ function summaryText(analysis: DocumentAnalysis, declaration: SymbolDeclaration)
     return `${declarationText(declaration)}${bodyText(analysis, declaration)}`;
 }
 
+function declarationMarkdown(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {
+    const signature = markdown(summaryText(analysis, declaration));
+    const documentation = declarationDocumentation(analysis.text, declaration);
+
+    return documentation.length === 0 ? signature : `${signature}\n\n${documentation}`;
+}
+
 function originNote(analysis: DocumentAnalysis): string {
     return `declared in ${analysis.relative} (${analysis.environment})`;
 }
@@ -124,7 +132,7 @@ function workspaceHover(analysis: DocumentAnalysis, others: readonly DocumentAna
         }
 
         return {
-            contents: { kind: 'markdown', value: `${markdown(summaryText(other, declaration))}\n\n${originNote(other)}` },
+            contents: { kind: 'markdown', value: `${declarationMarkdown(other, declaration)}\n\n${originNote(other)}` },
             range: toWordRange(reference.position, reference.name),
         };
     }
@@ -288,7 +296,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;
 
     return {
-        contents: { kind: 'markdown', value: `${markdown(summaryText(analysis, declaration))}${exportNote(analysis, declaration)}` },
+        contents: { kind: 'markdown', value: `${declarationMarkdown(analysis, declaration)}${exportNote(analysis, declaration)}` },
         range: toWordRange(anchor.position, anchor.name),
     };
 }
