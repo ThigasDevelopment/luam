@@ -9,6 +9,7 @@ import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { descriptorShapeText, namedDescriptorText } from '@lsp/features/api-text';
+import { contextualHover } from '@lsp/features/contextual-hover';
 import { declarationDocumentation } from '@lsp/features/declaration-documentation';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
@@ -279,6 +280,12 @@ function decoratorHover(analysis: DocumentAnalysis, offset: number): Hover | nul
 export function hoverAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[] = []): Hover | null {
     if (analysis.manifest !== null) {
         return manifestHover(analysis, offset);
+    }
+
+    const contextual = contextualHover(analysis.text, offset);
+
+    if (contextual !== null) {
+        return contextual;
     }
 
     const decorator = decoratorHover(analysis, offset);

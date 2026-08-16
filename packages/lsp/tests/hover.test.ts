@@ -81,6 +81,27 @@ describe('hover', () => {
         expect(hoverText(text, 'class Thigas', 'Thigas')).toContain('constructor(): void');
     });
 
+    it('explains how super resolves and validates parent calls', () => {
+        const text = [
+            'class Person {',
+            '    constructor = function (age: number)',
+            '    end',
+            '}',
+            'class Thigas extends Person {',
+            '    constructor = function ()',
+            '        super(1)',
+            '    end',
+            '}',
+        ].join('\n');
+        const hover = hoverText(text, '        super', 'super');
+
+        expect(hover).toContain('super(...): ParentReturnType');
+        expect(hover).toContain('In a constructor, it invokes the parent-class constructor.');
+        expect(hover).toContain('Arguments are checked against the selected parent constructor or method parameters.');
+        expect(hover).toContain('the legacy form `self:super(...)` is invalid');
+        expect(hover).toContain('check-invalid-super');
+    });
+
     it('shows a class member with its owner', () => {
         const text = 'class Player {\n    name: string\n}\n\nlocal one = new Player()\nlocal value = one.name\n';
 
