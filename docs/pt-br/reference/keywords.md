@@ -136,6 +136,6 @@ ali é `check-unknown-decorator`. Veja
 
 ## Globais de runtime
 
-`sleep`, `Threads`, `Async`, `Dotenv` e `process` são **globais declarados pelo
+`sleep`, `Threads`, `Async`, `env` e `process` são **globais declarados pelo
 runtime**, não palavras-chave. Nomear um deles traz o helper correspondente para o
 build; sombrear um com um local seu é Lua válido e simplesmente o esconde.

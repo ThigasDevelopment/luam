@@ -124,7 +124,7 @@ describe('configuration validation', () => {
 
         expect(loaded.config).toBeNull();
         expect(codes(loaded.diagnostics)).toEqual(['config-unknown-helper']);
-        expect(loaded.diagnostics[0]?.message).toContain('Known helpers: "async", "class", "dotenv", "env", "math", "string", "table", "threads"');
+        expect(loaded.diagnostics[0]?.message).toContain('Known helpers: "async", "class", "math", "string", "table", "threads"');
     });
 
     it('reads development log capture limits', () => {

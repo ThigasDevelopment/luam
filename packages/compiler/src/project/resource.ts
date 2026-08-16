@@ -22,6 +22,7 @@ import { FILE_START } from '@compiler/environment/environment';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
 export { LIBRARY_DIRECTORY, libraryPath, outputPath, type ResourceAsset, type ResourceHelper, type ResourceScript } from './resource-layout';
+export { renderEnvironmentScript } from './env-script';
 export { BUNDLE_DIRECTORY, bundlePath, materializeBundles, type BundleMember, type HelperContentResolver, type ResourceBundle } from './bundle-layout';
 export {
     RESOURCE_MAP_VERSION,
@@ -50,6 +51,7 @@ export interface ResourceOptions {
     helpers?: readonly RuntimeHelperName[];
     assets?: readonly ResourceAsset[];
     configuration?: ResourceConfiguration | null;
+    environmentScript?: string | null;
     loadOrder?: readonly string[];
     minMtaVersion?: string | null;
     developmentLogs?: DevelopmentLogHelpers | null;
@@ -62,6 +64,7 @@ export interface ResourceBuild {
     scripts: ResourceScript[];
     helpers: ResourceHelper[];
     configuration: ResourceScript | null;
+    environmentScript: ResourceScript | null;
     assets: ResourceAsset[];
     bundles: ResourceBundle[];
     layout: OutputLayout;
@@ -77,6 +80,8 @@ export const CONFIGURATION_FILE = 'config.lua';
 
 export const ENVIRONMENT_FILE = '.env';
 
+export const ENVIRONMENT_SCRIPT = 'env.lua';
+
 type ResourceInfo = { author?: string; version?: string; description?: string };
 
 function configurationScript(configuration: ResourceConfiguration | null | undefined): ResourceScript | null {
@@ -87,14 +92,28 @@ function configurationScript(configuration: ResourceConfiguration | null | undef
     return { path: configuration.path, source: configuration.source, environment: 'shared', content: configuration.content, lines: [] };
 }
 
+function environmentScript(content: string | null | undefined): ResourceScript | null {
+    if (content === null || content === undefined) {
+        return null;
+    }
+
+    return { path: ENVIRONMENT_SCRIPT, source: ENVIRONMENT_FILE, environment: 'server', content, lines: [] };
+}
+
 function helperEntry(helper: ResourceHelper): ManifestScript {
     return { src: helper.path, environment: helper.environment, group: 'library' };
 }
 
-function manifestScripts(helpers: readonly ResourceHelper[], configuration: ResourceScript | null, sources: readonly ManifestScript[]): ManifestScript[] {
+function manifestScripts(
+    helpers: readonly ResourceHelper[],
+    environment: ResourceScript | null,
+    configuration: ResourceScript | null,
+    sources: readonly ManifestScript[],
+): ManifestScript[] {
+    const deployment: ManifestScript[] = environment === null ? [] : [{ src: environment.path, environment: 'server', group: 'configuration' }];
     const settings: ManifestScript[] = configuration === null ? [] : [{ src: configuration.path, environment: 'shared', group: 'configuration' }];
 
-    return [...helpers.map(helperEntry), ...settings, ...sources];
+    return [...helpers.map(helperEntry), ...deployment, ...settings, ...sources];
 }
 
 function collectContributions(project: ProjectResult): ManifestContribution[] {
@@ -192,18 +211,16 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
     const helpers = [...collectHelpers(project.modules, options.helpers ?? []), ...collectDevelopmentLogHelpers(options.developmentLogs)];
     const scripts = collectScripts(project.modules);
     const configuration = configurationScript(options.configuration);
+    const environment = environmentScript(options.environmentScript);
+    const deployment = [configuration, environment].filter((script): script is ResourceScript => script !== null);
     const sorted = [...(options.assets ?? [])].sort((left, right) => left.path.localeCompare(right.path));
     const order = resolveLoadOrder(options.loadOrder ?? [], scripts, sorted);
     const layout = options.layout ?? 'tree';
     const bundles = layout === 'bundle' ? collectBundles(helpers, scripts, order.scripts) : [];
-    const outputs = configuration === null ? scripts : [...scripts, configuration];
     const duplicates =
         layout === 'tree'
-            ? findDuplicateOutputs(outputs, sorted)
-            : [
-                  ...findDuplicateOutputs(scripts, []),
-                  ...findDuplicateOutputs(configuration === null ? [] : [configuration], sorted),
-              ];
+            ? findDuplicateOutputs([...scripts, ...deployment], sorted)
+            : [...findDuplicateOutputs(scripts, []), ...findDuplicateOutputs(deployment, sorted)];
     const collisions = layout === 'bundle' ? bundleDiagnostics(project, bundles, scripts, sorted) : [];
     const diagnostics = sortFileDiagnostics([...project.diagnostics, ...duplicates, ...collisions, ...order.diagnostics]);
 
@@ -221,7 +238,7 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
     const manifestHelpers = layout === 'tree' ? helpers : [];
     const manifest = generateManifest(
         manifestInfo(options),
-        manifestScripts(manifestHelpers, configuration, sources),
+        manifestScripts(manifestHelpers, environment, configuration, sources),
         manifestFiles(assets),
         collectContributions(project),
         { oop: options.oop === true, minMtaVersion: options.minMtaVersion ?? null, dependencies: options.dependencies ?? [] },
@@ -231,5 +248,8 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
 
     const map = layout === 'tree' ? treeResourceMap(options.resourceName ?? '', scripts) : null;
 
-    return { build: { manifest, scripts: layout === 'tree' ? scripts : [], helpers, configuration, assets, bundles, layout, map }, diagnostics };
+    return {
+        build: { manifest, scripts: layout === 'tree' ? scripts : [], helpers, configuration, environmentScript: environment, assets, bundles, layout, map },
+        diagnostics,
+    };
 }

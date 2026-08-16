@@ -15,8 +15,8 @@ player's machine** and can be read there:
 | `config.lua` | **yes** — it is a shared script |
 | `assets/**` | yes |
 | `src/server/**` | no |
-| `lib/server/**` | no |
-| `.env` | no — it never gets a `<file>` entry |
+| `lib/*.lua` | only the helpers declared `client` or `shared` in `meta.xml` |
+| `env.lua` | no — it is declared a server script |
 
 Assume anything downloaded is public. Obfuscation is not a boundary.
 
@@ -27,8 +27,11 @@ Assume anything downloaded is public. Obfuscation is not a boundary.
   `project-environment-import`.
 - `process` is declared `server`, so `.env` values cannot be read from a client
   or shared file.
-- Server-only runtime helpers are written to `lib/server/`, never to a location
-  clients download.
+- Every runtime helper is written flat to `lib/`, and its `meta.xml` entry
+  carries the environment.
+- Deployment values are compiled into `env.lua`, which is declared a server
+  script and never sent to a client. Keys whose name looks sensitive are written
+  blank, so a secret never travels in a build artifact.
 
 ## What stays your decision
 

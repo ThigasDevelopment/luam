@@ -5,9 +5,9 @@ exports[`resource assembly > generates a manifest that matches the authored stan
     <!-- Resource information -->
     <info author="Thigas" type="script" version="1.0.0" />
     <!-- Runtime library -->
-    <script src="lib/client/string.lua" type="client" cache="false" />
-    <script src="lib/shared/class.lua" type="shared" cache="false" />
-    <script src="lib/shared/table.lua" type="shared" cache="false" />
+    <script src="lib/class.lua" type="shared" cache="false" />
+    <script src="lib/string.lua" type="client" cache="false" />
+    <script src="lib/table.lua" type="shared" cache="false" />
     <!-- Source scripts -->
     <script src="src/shared/**/*.lua" type="shared" cache="false" />
     <script src="src/server/**/*.lua" />

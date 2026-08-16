@@ -53,14 +53,15 @@ O `luam build` informa cada fase e onde escreveu:
 
 <<< @/snippets/output/first-resource.build.txt{text}
 
-Ele produziu exatamente três arquivos:
+Ele produziu exatamente dois arquivos:
 
 <<< @/snippets/output/first-resource.tree.txt{text}
 
-O `lib/server/string.lua` está ali por causa das strings de template. O
-`string.lua` é o helper por trás da interpolação com `` ` ``, então até este
-resource de um arquivo puxa um helper de runtime — e ele fica em `lib/server/`,
-não na sua árvore de código.
+As strings de template puxaram o `string.lua`, o helper por trás da interpolação
+com `` ` ``, então até este resource de um arquivo precisa de um helper de
+runtime. Este build empacota, então o helper é embutido no topo de
+`src/server.lua`. Um build em árvore escreve `lib/string.lua` no lugar — nunca
+dentro da sua árvore de código.
 
 Não há `.env` na saída, porque o projeto não tem um `.env` de onde declarar
 chaves. Adicione um e o build escreve uma cópia implantada; veja

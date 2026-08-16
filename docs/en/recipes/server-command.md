@@ -33,7 +33,7 @@ luam-docs-server-command/
   `any`. That is the idiom for an `or` default. See
   [Limitations](/en/reference/limitations).
 - **`target.clamp(0, MAX_HEALTH)`** is a [number extension](/en/language/extensions)
-  compiling to `math.clamp`, which pulls `lib/shared/math.lua` into the build.
+  compiling to `math.clamp`, which pulls `lib/math.lua` into the build.
 
 ## Commands
 
@@ -51,7 +51,7 @@ The build writes the `math` helper because `clamp` is used:
 ```
 build/luam-docs-server-command/
 ├── meta.xml
-├── lib/shared/math.lua
+├── lib/math.lua
 └── src/server/heal-command.lua
 ```
 

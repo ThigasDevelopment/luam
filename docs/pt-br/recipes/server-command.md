@@ -34,7 +34,7 @@ luam-docs-server-command/
   [Limitações](/pt-br/reference/limitations).
 - **`target.clamp(0, MAX_HEALTH)`** é uma
   [extensão de número](/pt-br/language/extensions) que compila para `math.clamp`,
-  o que traz `lib/shared/math.lua` para o build.
+  o que traz `lib/math.lua` para o build.
 
 ## Comandos
 
@@ -52,7 +52,7 @@ O build escreve o helper `math` porque `clamp` é usado:
 ```
 build/luam-docs-server-command/
 ├── meta.xml
-├── lib/shared/math.lua
+├── lib/math.lua
 └── src/server/heal-command.lua
 ```
 

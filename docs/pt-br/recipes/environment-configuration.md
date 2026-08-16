@@ -50,19 +50,37 @@ luam build
 
 <<< @/snippets/output/environment-configuration.check.txt{text}
 
-O build traz os helpers de env só de servidor e escreve o arquivo implantado:
+O build transforma as chaves declaradas em um script de servidor:
 
 ```
 build/luam-docs-environment-configuration/
 ├── meta.xml
-├── .env                      ← escrito uma vez, nunca sobrescrito
-├── lib/server/dotenv.lua
-├── lib/server/env.lua
+├── env.lua                   ← escrito uma vez, nunca sobrescrito
 └── src/server/startup.lua
 ```
 
-O `.env` nunca recebe uma entrada `<file>`, então nunca é transmitido a um jogador,
-e os helpers só de servidor ficam em `lib/server/`, que os clientes nunca baixam.
+O `env.lua` guarda os valores como uma tabela Lua e os publica como `env` e
+`process.env`. Ele é declarado script de servidor, então um cliente nunca o
+baixa. Não há parser em runtime nem `.env` dentro do resource — o compilador lê
+seu `.env` em tempo de build e escreve a tabela.
+
+O arquivo gerado é de posse do administrador do servidor: o build escreve uma vez
+e nunca sobrescreve, e o `ensure` não encosta nele. É isso que impede um deploy
+de substituir os valores de produção pelos da sua máquina. Chaves com nome de
+aparência sensível — `password`, `secret`, `token`, `key`, `credential`, `dsn`,
+`private` — são escritas em branco para o administrador preencher:
+
+```lua
+local values = {
+    DEBUG = false,
+    MAX_PLAYERS = 32,
+    SERVER_NAME = 'Luam Docs Server',
+    WEBHOOK_TOKEN = '',
+}
+```
+
+Ler uma chave que o arquivo não declara levanta um erro nomeando a chave, e a
+tabela é somente leitura.
 
 Na inicialização, o `server.log` ganha:
 

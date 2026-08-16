@@ -49,20 +49,37 @@ luam build
 
 <<< @/snippets/output/environment-configuration.check.txt{text}
 
-The build pulls in the server-only env helpers and writes the deployed file:
+The build turns the declared keys into a server script:
 
 ```
 build/luam-docs-environment-configuration/
 ├── meta.xml
-├── .env                      ← written once, never overwritten
-├── lib/server/dotenv.lua
-├── lib/server/env.lua
+├── env.lua                   ← written once, never overwritten
 └── src/server/startup.lua
 ```
 
-`.env` never receives a `<file>` entry, so it is never transmitted to a player,
-and the server-only helpers land under `lib/server/`, which clients never
-download.
+`env.lua` holds the values as a Lua table and publishes them as `env` and
+`process.env`. It is declared a server script, so a client never downloads it.
+There is no runtime parser and no `.env` in the resource — the compiler reads
+your `.env` at build time and writes the table.
+
+The generated file is owned by the server administrator: the build writes it
+once and never overwrites it, and `ensure` leaves it alone. That is what keeps a
+deploy from replacing production values with the ones on your machine. Keys
+whose name looks sensitive — `password`, `secret`, `token`, `key`, `credential`,
+`dsn`, `private` — are written blank for the administrator to fill in:
+
+```lua
+local values = {
+    DEBUG = false,
+    MAX_PLAYERS = 32,
+    SERVER_NAME = 'Luam Docs Server',
+    WEBHOOK_TOKEN = '',
+}
+```
+
+Reading a key the file does not declare raises an error naming the key, and the
+table is read-only.
 
 On start, `server.log` gains:
 

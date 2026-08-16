@@ -46,7 +46,7 @@ describe('build command', () => {
         expect(fixture.exists('build/luam-demo/src/shared/config.lua')).toBe(true);
         expect(fixture.exists('build/luam-demo/src/server/main.lua')).toBe(true);
         expect(fixture.exists('build/luam-demo/src/client/hud.lua')).toBe(true);
-        expect(fixture.exists('build/luam-demo/lib/client/string.lua')).toBe(true);
+        expect(fixture.exists('build/luam-demo/lib/string.lua')).toBe(true);
     });
 
     it('lists every script in the manifest with its environment', async () => {
@@ -67,7 +67,7 @@ describe('build command', () => {
         const { context, fixture } = harness(defaultProjectFiles(config));
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.exists('dist/luam-demo/lib/client/string.lua')).toBe(true);
+        expect(fixture.exists('dist/luam-demo/lib/string.lua')).toBe(true);
         expect(fixture.read('dist/luam-demo/meta.xml')).toContain('<info author="Thigas" type="script" version="1.2.3" description="A demo resource" />');
     });
 
@@ -83,8 +83,8 @@ describe('build command', () => {
         const { context, fixture } = harness(defaultProjectFiles({ helpers: ['threads'] }));
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.exists('build/luam-demo/lib/shared/threads.lua')).toBe(true);
-        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="lib/shared/threads.lua" type="shared" cache="false" />');
+        expect(fixture.exists('build/luam-demo/lib/threads.lua')).toBe(true);
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="lib/threads.lua" type="shared" cache="false" />');
     });
 
     it('produces no output when the build fails', async () => {
@@ -187,7 +187,7 @@ describe('build command', () => {
         const entries: string[] = fixture.read('build/luam-demo/meta.xml').match(/src="[^"]+"/g) ?? [];
 
         expect(entries.indexOf('src="config.lua"')).toBeLessThan(entries.indexOf('src="src/shared/**/*.lua"'));
-        expect(entries.indexOf('src="config.lua"')).toBeGreaterThan(entries.indexOf('src="lib/client/string.lua"'));
+        expect(entries.indexOf('src="config.lua"')).toBeGreaterThan(entries.indexOf('src="lib/string.lua"'));
     });
 
     it('generates the deployment env file once and never overwrites it', async () => {
@@ -196,16 +196,16 @@ describe('build command', () => {
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
 
-        const generated = fixture.read('build/luam-demo/.env');
+        const generated = fixture.read('build/luam-demo/env.lua');
 
-        expect(generated).toContain('MAX_PLAYERS=32');
-        expect(generated).toContain('DB_PASSWORD=');
+        expect(generated).toContain('MAX_PLAYERS = 32,');
+        expect(generated).toContain("DB_PASSWORD = '',");
         expect(generated).not.toContain('changeme');
 
-        fixture.write('build/luam-demo/.env', 'MAX_PLAYERS=64\n');
+        fixture.write('build/luam-demo/env.lua', 'local values = {}\n');
         await runBuildCommand(context);
 
-        expect(fixture.read('build/luam-demo/.env')).toBe('MAX_PLAYERS=64\n');
+        expect(fixture.read('build/luam-demo/env.lua')).toBe('local values = {}\n');
     });
 
     it('keeps a local override out of the generated deployment values', async () => {
@@ -214,22 +214,25 @@ describe('build command', () => {
 
         await runBuildCommand(context);
 
-        expect(fixture.read('build/luam-demo/.env')).toContain('MAX_PLAYERS=32');
-        expect(fixture.read('build/luam-demo/.env')).not.toContain('64');
+        expect(fixture.read('build/luam-demo/env.lua')).toContain('MAX_PLAYERS = 32,');
+        expect(fixture.read('build/luam-demo/env.lua')).not.toContain('64');
     });
 
-    it('never declares the env file in the manifest and never prunes it', async () => {
+    it('declares the env script as a server script and never prunes it', async () => {
         const files = { ...defaultProjectFiles(), '.env': 'MAX_PLAYERS=32\n' };
         const { context, fixture } = harness(files);
 
         await runBuildCommand(context);
         await runBuildCommand(context);
 
-        expect(fixture.read('build/luam-demo/meta.xml')).not.toContain('.env');
-        expect(fixture.exists('build/luam-demo/.env')).toBe(true);
+        const manifest = fixture.read('build/luam-demo/meta.xml');
+
+        expect(manifest).toContain('<script src="env.lua" />');
+        expect(manifest).not.toContain('".env"');
+        expect(fixture.exists('build/luam-demo/env.lua')).toBe(true);
     });
 
-    it('injects the server side env library when the project declares keys', async () => {
+    it('loads the env script before the sources and ships no env helper', async () => {
         const files = { ...defaultProjectFiles(), '.env': 'MAX_PLAYERS=32\n' };
         const { context, fixture } = harness(files);
 
@@ -237,19 +240,17 @@ describe('build command', () => {
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
 
-        expect(fixture.exists('build/luam-demo/lib/server/env.lua')).toBe(true);
-        expect(fixture.exists('build/luam-demo/lib/server/dotenv.lua')).toBe(true);
-        expect(manifest).toContain('<script src="lib/server/env.lua" />');
-        expect(manifest.indexOf('lib/server/dotenv.lua')).toBeLessThan(manifest.indexOf('lib/server/env.lua'));
+        expect(fixture.exists('build/luam-demo/lib/env.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/lib/dotenv.lua')).toBe(false);
+        expect(manifest.indexOf('src="env.lua"')).toBeLessThan(manifest.indexOf('src="src/'));
     });
 
-    it('ships no env library when the project declares no keys', async () => {
+    it('ships no env script when the project declares no keys', async () => {
         const { context, fixture } = harness(defaultProjectFiles());
 
         await runBuildCommand(context);
 
-        expect(fixture.exists('build/luam-demo/lib/server/env.lua')).toBe(false);
-        expect(fixture.exists('build/luam-demo/lib/server/dotenv.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/env.lua')).toBe(false);
         expect(fixture.exists('build/luam-demo/.env')).toBe(false);
     });
 
@@ -370,11 +371,11 @@ describe('build command pruning without the manifest enumeration', () => {
 
         await runBuildCommand(context);
 
-        expect(fixture.exists('build/luam-demo/lib/shared/threads.lua')).toBe(true);
+        expect(fixture.exists('build/luam-demo/lib/threads.lua')).toBe(true);
 
         await runBuildCommand({ ...context, config: { ...context.config, helpers: [] } });
 
-        expect(fixture.exists('build/luam-demo/lib/shared/threads.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/lib/threads.lua')).toBe(false);
     });
 
     it('leaves a file the build never wrote alone', async () => {

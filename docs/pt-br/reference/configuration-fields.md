@@ -92,14 +92,15 @@ escolher a estrutura. `--no-map` sobrescreve `output.map`, e `--minify` /
 `--no-minify` sobrescrevem `output.minify`. Veja
 [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts).
 
-Nenhuma estrutura inclui `config.lua`, `.env` ou assets em bundles. `config.lua`
-e `.env` permanecem na raiz do resource, enquanto assets ficam onde seu mapeamento
-os coloca. O arquivo de mapa fica fora do resource, dentro de `outDir`.
+Nenhuma estrutura inclui `config.lua`, `env.lua` ou assets em bundles.
+`config.lua` e `env.lua` permanecem na raiz do resource, enquanto assets ficam
+onde seu mapeamento os coloca. O arquivo de mapa fica fora do resource, dentro de
+`outDir`.
 
-Nomes de helper aceitos: `async`, `class`, `dotenv`, `env`, `math`, `string`,
-`table`, `threads`. A maioria é injetada automaticamente quando algum recurso
-precisa; `threads` é o que exige escolha explícita, e `env` é automático quando o
-projeto tem um arquivo de ambiente.
+Nomes de helper aceitos: `async`, `class`, `math`, `string`, `table`, `threads`.
+A maioria é injetada automaticamente quando algum recurso precisa; `threads` é o
+que exige escolha explícita. Valores de implantação não são um helper — um
+projeto com `.env` recebe um `env.lua` gerado no lugar.
 
 ## Sincronização com o servidor
 

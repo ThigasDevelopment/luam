@@ -132,6 +132,6 @@ They are not identifiers you can shadow, and an unknown name there is
 
 ## Runtime globals
 
-`sleep`, `Threads`, `Async`, `Dotenv` and `process` are **globals declared by the
+`sleep`, `Threads`, `Async`, `env` and `process` are **globals declared by the
 runtime**, not keywords. Naming one pulls its helper into the build; shadowing
 one with your own local is legal Lua and simply hides it.

@@ -53,8 +53,8 @@ export function outputPath(sourcePath: string): string {
         .replace(/\.luam$/, '.lua');
 }
 
-export function libraryPath(environment: Environment, file: string): string {
-    return `${LIBRARY_DIRECTORY}/${environment}/${file}`;
+export function libraryPath(file: string): string {
+    return `${LIBRARY_DIRECTORY}/${file}`;
 }
 
 function mergeEnvironment(current: Environment | undefined, environment: Environment): Environment {
@@ -86,7 +86,7 @@ export function collectHelpers(modules: readonly CompiledModule[], manual: reado
         .map(([helper, environment]) => {
             const file = RUNTIME_HELPERS[helper].file;
 
-            return { helper, file, path: libraryPath(environment, file), environment };
+            return { helper, file, path: libraryPath(file), environment };
         })
         .sort((left, right) => helperDepth(left.helper) - helperDepth(right.helper) || left.path.localeCompare(right.path));
 }
@@ -105,7 +105,7 @@ export function collectDevelopmentLogHelpers(options: DevelopmentLogHelpers | nu
     return Object.values(DEVELOPMENT_RUNTIME_HELPERS).map((helper) => ({
         helper: helper.name,
         file: helper.file,
-        path: libraryPath(helper.environment, helper.file),
+        path: libraryPath(helper.file),
         environment: helper.environment,
         replacements,
     }));

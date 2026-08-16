@@ -53,7 +53,7 @@ The build copies the class runtime helper, because the resource declares a class
 ```
 build/luam-docs-typed-class/
 ├── meta.xml
-├── lib/shared/class.lua
+├── lib/class.lua
 └── src/shared/vehicle-slot.lua
 ```
 
@@ -76,6 +76,6 @@ Move the parent declaration above the child.
 ## What is emitted
 
 The interface disappears entirely. The classes become calls into
-`lib/shared/class.lua`, and the accessors become real methods — so
+`lib/class.lua`, and the accessors become real methods — so
 `slot:setModel(541)` at runtime is an ordinary method call, not a metatable
 trick.

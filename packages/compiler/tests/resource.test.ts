@@ -61,14 +61,14 @@ describe('resource assembly', () => {
         const helpers = sources.filter((entry) => entry.includes('src="lib/'));
 
         expect(sources.slice(0, helpers.length)).toEqual(helpers);
-        expect(helpers).toEqual(['src="lib/client/string.lua"', 'src="lib/shared/class.lua"', 'src="lib/shared/table.lua"']);
+        expect(helpers).toEqual(['src="lib/class.lua"', 'src="lib/string.lua"', 'src="lib/table.lua"']);
     });
 
-    it('places each runtime helper under the environment that requires it', () => {
+    it('writes every runtime helper flat in the library directory', () => {
         expect(assembly.build?.helpers).toEqual([
-            { helper: 'string', file: 'string.lua', path: 'lib/client/string.lua', environment: 'client' },
-            { helper: 'class', file: 'class.lua', path: 'lib/shared/class.lua', environment: 'shared' },
-            { helper: 'table', file: 'table.lua', path: 'lib/shared/table.lua', environment: 'shared' },
+            { helper: 'class', file: 'class.lua', path: 'lib/class.lua', environment: 'shared' },
+            { helper: 'string', file: 'string.lua', path: 'lib/string.lua', environment: 'client' },
+            { helper: 'table', file: 'table.lua', path: 'lib/table.lua', environment: 'shared' },
         ]);
     });
 
@@ -84,20 +84,25 @@ describe('resource assembly', () => {
 
         expect(normal?.helpers.some((helper) => helper.helper.startsWith('development-'))).toBe(false);
         expect(development?.helpers.filter((helper) => helper.helper.startsWith('development-')).map((helper) => helper.path)).toEqual([
-            'lib/client/development-logs-client.lua',
-            'lib/server/development-logs-server.lua',
+            'lib/development-logs-client.lua',
+            'lib/development-logs-server.lua',
         ]);
     });
 
-    it('pins a helper that declares an environment regardless of where it is used', () => {
-        const build = assembleResource(project, { helpers: ['env'] }).build;
+    it('deploys the environment script as a server configuration file, never as a helper', () => {
+        const build = assembleResource(project, { environmentScript: 'local values = {}\n' }).build;
 
-        expect(build?.helpers.find((helper) => helper.helper === 'env')).toEqual({
-            helper: 'env',
-            file: 'env.lua',
-            path: 'lib/server/env.lua',
-            environment: 'server',
-        });
+        expect(build?.environmentScript).toEqual({ path: 'env.lua', source: '.env', environment: 'server', content: 'local values = {}\n', lines: [] });
+        expect(build?.helpers.some((helper) => helper.path === 'env.lua')).toBe(false);
+        expect(build?.manifest).toContain('<script src="env.lua" />');
+    });
+
+    it('loads the environment script after the runtime library and before the sources', () => {
+        const build = assembleResource(project, { environmentScript: 'local values = {}\n' }).build;
+        const sources = (build?.manifest.match(/src="[^"]+"/g) ?? []).map((entry) => entry.slice(5, -1));
+
+        expect(sources.indexOf('env.lua')).toBeGreaterThan(sources.indexOf('lib/table.lua'));
+        expect(sources.indexOf('env.lua')).toBeLessThan(sources.indexOf('src/shared/**/*.lua'));
     });
 
     it('emits shared executable code for both sides', () => {
@@ -154,7 +159,7 @@ describe('resource assembly', () => {
         expect(decorated.diagnostics).toEqual([]);
         expect(built?.scripts[0]?.content).toContain('getName = function(self)');
         expect(built?.scripts[0]?.content).toContain('setName = function(self, value)');
-        expect(built?.helpers.map((helper) => helper.path)).toContain('lib/shared/class.lua');
+        expect(built?.helpers.map((helper) => helper.path)).toContain('lib/class.lua');
     });
 });
 
@@ -283,7 +288,7 @@ describe('resource load order', () => {
         const built = assembleResource(compileProject(files), { configuration, helpers: ['class'] }).build?.manifest ?? '';
         const sources = (built.match(/src="[^"]+"/g) ?? []).map((entry) => entry.slice(5, -1));
 
-        expect(sources).toEqual(['lib/shared/class.lua', 'config.lua', 'src/shared/**/*.lua', 'src/server/**/*.lua']);
+        expect(sources).toEqual(['lib/class.lua', 'config.lua', 'src/shared/**/*.lua', 'src/server/**/*.lua']);
     });
 });
 

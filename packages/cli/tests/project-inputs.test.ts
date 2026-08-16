@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { renderEnvironmentTemplate } from '@cli/build/env-template';
 import { readProjectInputs } from '@cli/build/project-inputs';
 import { generatedRoots } from '@cli/build/write-options';
 import type { LuamConfig } from '@cli/config/config-schema';
 import { DEFAULT_ENVIRONMENT_FILES, type AssetMapping } from '@compiler/manifest/manifest-defaults';
 import { parseEnvFile } from '@compiler/project/env-file';
+import { renderEnvironmentScript } from '@compiler/project/resource';
 
 import { createProjectFixture, defaultProjectFiles, manifestConfig, type ProjectFixture } from './support/project-fixture';
 
@@ -74,18 +74,31 @@ describe('project inputs', () => {
     });
 });
 
-describe('deployment env template', () => {
+describe('deployment env script', () => {
     it('blanks a sensitive value and keeps a safe default', () => {
-        const rendered = renderEnvironmentTemplate(parseEnvFile('MAX_PLAYERS=32\nDB_PASSWORD=changeme\nSERVER_NAME="Luam Server"\n'));
+        const rendered = renderEnvironmentScript(parseEnvFile('MAX_PLAYERS=32\nDB_PASSWORD=changeme\nSERVER_NAME="Luam Server"\nDEBUG=true\n'));
 
-        expect(rendered).toContain('MAX_PLAYERS=32');
-        expect(rendered).toContain('DB_PASSWORD=\n');
-        expect(rendered).toContain('SERVER_NAME="Luam Server"');
+        expect(rendered).toContain('    MAX_PLAYERS = 32,');
+        expect(rendered).toContain("    DB_PASSWORD = '',");
+        expect(rendered).toContain("    SERVER_NAME = 'Luam Server',");
+        expect(rendered).toContain('    DEBUG = true,');
         expect(rendered).not.toContain('changeme');
     });
 
+    it('escapes a value that would break out of its Lua literal', () => {
+        expect(renderEnvironmentScript(parseEnvFile('MOTD="it\'s here"\n'))).toContain("MOTD = 'it\\'s here',");
+    });
+
     it('states who owns the generated file', () => {
-        expect(renderEnvironmentTemplate(parseEnvFile('PORT=1\n'))).toContain('owned by the server administrator');
+        expect(renderEnvironmentScript(parseEnvFile('PORT=1\n'))).toContain('owned by the server administrator');
+    });
+
+    it('guards an undeclared key and keeps the table read-only', () => {
+        const rendered = renderEnvironmentScript(parseEnvFile('PORT=1\n'));
+
+        expect(rendered).toContain('is not declared in "env.lua"');
+        expect(rendered).toContain('The environment is read-only');
+        expect(rendered).toContain('process.env = env');
     });
 });
 

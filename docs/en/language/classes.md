@@ -103,7 +103,7 @@ and annotations contribute nothing.
 
 ## Native classes
 
-`Threads`, `Async` and `Dotenv` are runtime classes Luam ships. They use the same
+`Threads` and `Async` are runtime classes Luam ships. They use the same
 `new`:
 
 ```luam

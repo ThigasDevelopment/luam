@@ -32,9 +32,6 @@ export const RUNTIME_DOCS: ApiDocumentationCatalog = {
     Async: valueDoc(
         `The async class. \`new Async(interval)\` creates a runner that walks a table or a numeric range a slice at a time — \`map\`, \`foreach\`, \`iterate\` — so heavy iteration never blocks a frame. ${NATIVE}`,
     ),
-    Dotenv: valueDoc(
-        `The environment class. \`new Dotenv(path)\` reads a \`.env\` file and answers \`get\`, \`has\` and \`all\`; \`apply\` publishes its keys as \`env\`. Server-only, and the project's own \`.env\` is already loaded as \`env\`. ${NATIVE}`,
-    ),
 };
 
 export const THREAD_DOCS: ApiDocumentationCatalog = {
@@ -94,19 +91,4 @@ export const ASYNC_DOCS: ApiDocumentationCatalog = {
     ),
     getInterval: doc('Reads how long the runner waits between two slices.', [], 'returns the interval in milliseconds.'),
     setInterval: doc('Changes how long the runner waits between two slices.', [['interval', false, 'The new interval in milliseconds.']], 'returns true when the interval was applied.'),
-};
-
-export const DOTENV_DOCS: ApiDocumentationCatalog = {
-    path: valueDoc('The path this instance was loaded from.'),
-    get: doc(
-        'Reads one key from the loaded file.',
-        [
-            ['key', false, 'The key to read.'],
-            ['fallback', true, 'Returned when the file does not declare the key.'],
-        ],
-        'returns the declared value, or the fallback.',
-    ),
-    has: doc('Tests whether the loaded file declares a key.', [['key', false, 'The key to test.']], 'returns true when the key is declared.'),
-    all: doc('Copies every loaded key into a fresh table.', [], 'returns a table of the declared keys.'),
-    apply: doc('Publishes the loaded keys as the global environment, replacing "env" and "process.env".', [], 'returns the published table.'),
 };

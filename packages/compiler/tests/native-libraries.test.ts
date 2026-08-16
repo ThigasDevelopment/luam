@@ -25,10 +25,6 @@ describe('native libraries', () => {
         expect(helpers('local task = new Async(100)\n')).toEqual(['async', 'threads']);
     });
 
-    it('injects dotenv when the module constructs one', () => {
-        expect(helpers("local values = new Dotenv('.env.production')\n")).toEqual(['dotenv']);
-    });
-
     it('keeps injecting the helpers a language feature requires', () => {
         expect(helpers('class Session {\n    name: string = %s\n}\n'.replace('%s', "''"))).toEqual(['class']);
     });
@@ -44,7 +40,6 @@ describe('native libraries', () => {
     it('knows the members a library declares', () => {
         expect(compile('local task = new Async(100)\ntask:setInterval(50)\n', { filePath: SERVER_FILE }).diagnostics).toEqual([]);
         expect(compile('local pool = new Threads()\npool:start()\n', { filePath: SERVER_FILE }).diagnostics).toEqual([]);
-        expect(compile("local values = new Dotenv()\nvalues:get('PORT')\n", { filePath: SERVER_FILE }).diagnostics).toEqual([]);
     });
 
     it('reports a member no library declares', () => {
@@ -71,14 +66,6 @@ describe('native libraries', () => {
         const codes = compile("local task = new Async('fast')\n", { filePath: SERVER_FILE }).diagnostics.map((diagnostic) => diagnostic.code);
 
         expect(codes).toEqual(['check-type-mismatch']);
-    });
-
-    it('keeps Dotenv off the client', () => {
-        const codes = compile("local values = new Dotenv()\n", { filePath: 'src/client/main.luam' }).diagnostics.map(
-            (diagnostic) => diagnostic.code,
-        );
-
-        expect(codes).toEqual(['check-unknown-class']);
     });
 
     it('emits the library call untouched', () => {

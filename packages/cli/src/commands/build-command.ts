@@ -55,7 +55,7 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
     tracker.begin('write');
 
     const minify = options.minify ?? context.config.output.minify;
-    const writeOptions = productionWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker, minify);
+    const writeOptions = productionWriteOptions(context.root, context.config, tracker, minify);
     let result: WriteResult;
 
     try {

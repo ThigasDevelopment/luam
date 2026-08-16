@@ -103,7 +103,7 @@ Interfaces e anotações não contribuem com nada.
 
 ## Classes nativas
 
-`Threads`, `Async` e `Dotenv` são classes de runtime que o Luam fornece. Elas usam
+`Threads` e `Async` são classes de runtime que o Luam fornece. Elas usam
 o mesmo `new`:
 
 ```luam

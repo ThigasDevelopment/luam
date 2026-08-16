@@ -82,7 +82,7 @@ describe('write progress', () => {
             root: fixture.root,
             generatedFiles: generatedFiles(),
             generatedRoots: generatedRoots(config),
-            environmentTemplate: null,
+
             onProgress: (event) => events.push(event),
         });
 
@@ -91,7 +91,7 @@ describe('write progress', () => {
         expect(new Set(events.map((event) => event.total))).toEqual(new Set([events.length]));
     });
 
-    it('counts the deployment env file it generates', () => {
+    it('counts the deployment env script it generates', () => {
         const { fixture, config } = harness({ ...defaultProjectFiles(), '.env': 'MAX_PLAYERS=32\n' });
         const outcome = runCompile(fixture.root, config);
         const events: ProgressEvent[] = [];
@@ -102,11 +102,11 @@ describe('write progress', () => {
             root: fixture.root,
             generatedFiles: generatedFiles(),
             generatedRoots: generatedRoots(config),
-            environmentTemplate: outcome.environmentTemplate,
+
             onProgress: (event) => events.push(event),
         });
 
-        expect(events.at(-1)).toEqual({ item: '.env', index: events.length, total: events.length });
+        expect(events.at(-1)).toEqual({ item: 'env.lua', index: events.length, total: events.length });
     });
 });
 

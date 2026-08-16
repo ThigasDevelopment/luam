@@ -141,8 +141,8 @@ describe('command dispatch', () => {
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
         expect(await runCli(['dev', '--no-watch'], { logger, cwd: fixture.root, env: OFFLINE, transport })).toBe(EXIT_OK);
-        expect(fixture.exists(`${resource}/lib/client/development-logs-client.lua`)).toBe(true);
-        expect(fixture.exists(`${resource}/lib/server/development-logs-server.lua`)).toBe(true);
+        expect(fixture.exists(`${resource}/lib/development-logs-client.lua`)).toBe(true);
+        expect(fixture.exists(`${resource}/lib/development-logs-server.lua`)).toBe(true);
     });
 
     it('rejects an option that the command does not own', async () => {

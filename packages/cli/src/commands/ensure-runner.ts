@@ -104,7 +104,7 @@ async function runOnce(scope: RunScope, transport: MtaTransport, target: string,
         return failed(outcome);
     }
 
-    const writeOptions = trackedWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker);
+    const writeOptions = trackedWriteOptions(context.root, context.config, tracker);
 
     reportBuildOutcome(context, outcome, 'Build');
 

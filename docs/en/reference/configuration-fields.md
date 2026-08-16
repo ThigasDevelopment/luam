@@ -92,14 +92,14 @@ layout choice. `--no-map` overrides `output.map`, and `--minify` / `--no-minify`
 override `output.minify`. See
 [Output layouts and source maps](/en/reference/output-layouts).
 
-Neither layout bundles `config.lua`, `.env`, or assets. `config.lua` and `.env`
-stay at the resource root, while assets land where their mapping puts them. The
-map file stays outside the resource under `outDir`.
+Neither layout bundles `config.lua`, `env.lua`, or assets. `config.lua` and
+`env.lua` stay at the resource root, while assets land where their mapping puts
+them. The map file stays outside the resource under `outDir`.
 
-Accepted helper names: `async`, `class`, `dotenv`, `env`, `math`, `string`,
-`table`, `threads`. Most are injected automatically when a feature needs them;
-`threads` is the one that is opt-in, and `env` is automatic when the project has
-a `.env`.
+Accepted helper names: `async`, `class`, `math`, `string`, `table`, `threads`.
+Most are injected automatically when a feature needs them; `threads` is the one
+that is opt-in. Deployment values are not a helper — a project with a `.env`
+gets a generated `env.lua` instead.
 
 ## Server sync
 

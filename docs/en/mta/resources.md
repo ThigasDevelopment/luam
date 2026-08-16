@@ -60,10 +60,10 @@ them under `lib/<environment>/`, outside the source tree:
 | `math.lua` | A number extension such as `clamp` is used. |
 | `threads.lua` | `sleep` or `Threads` is named. Also selectable through `helpers`. |
 | `async.lua` | `Async` is named. |
-| `dotenv.lua`, `env.lua` | The project has a `.env`. Server-only. |
 
 A resource with no classes never carries `class.lua`, and a server-only helper is
-never downloaded by a client.
+never downloaded by a client. Deployment values are not a helper: a project with
+a `.env` gets a generated `env.lua` at the resource root instead.
 
 ## `min_mta_version`
 

@@ -53,7 +53,7 @@ O build copia o helper de runtime de classe, porque o resource declara uma class
 ```
 build/luam-docs-typed-class/
 ├── meta.xml
-├── lib/shared/class.lua
+├── lib/class.lua
 └── src/shared/vehicle-slot.lua
 ```
 
@@ -76,6 +76,6 @@ Mova a declaração da classe pai para cima.
 ## O que é emitido
 
 A interface desaparece por completo. As classes viram chamadas a
-`lib/shared/class.lua`, e os acessores viram métodos reais — então
+`lib/class.lua`, e os acessores viram métodos reais — então
 `slot:setModel(541)` em tempo de execução é uma chamada de método comum, não um
 truque de metatabela.

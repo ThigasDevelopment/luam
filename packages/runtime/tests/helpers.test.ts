@@ -12,7 +12,6 @@ import {
     helperForFeature,
     helperForGlobal,
     isRuntimeHelperName,
-    manualHelpers,
     referenceHelpers,
     resolveHelperUrl,
     resolveDevelopmentHelperUrl,
@@ -73,15 +72,13 @@ describe('runtime helpers', () => {
         }
     });
 
-    it('injects a helper from a language feature, a referenced global, or an opt-in', () => {
+    it('injects a helper from a language feature or a referenced global', () => {
         expect(automaticHelpers()).toEqual(['class', 'math', 'string', 'table']);
-        expect(manualHelpers()).toEqual(['env']);
-        expect(referenceHelpers()).toEqual(['async', 'dotenv', 'threads']);
+        expect(referenceHelpers()).toEqual(['async', 'threads']);
     });
 
     it('names the globals that pull a library in', () => {
-        expect(runtimeGlobals()).toEqual(['Async', 'Dotenv', 'Threads', 'sleep']);
-        expect(helperForGlobal('Dotenv')).toBe('dotenv');
+        expect(runtimeGlobals()).toEqual(['Async', 'Threads', 'sleep']);
         expect(helperForGlobal('sleep')).toBe('threads');
         expect(helperForGlobal('Threads')).toBe('threads');
         expect(helperForGlobal('Async')).toBe('async');
@@ -99,15 +96,12 @@ describe('runtime helpers', () => {
         expect(helperDepth('class')).toBe(0);
     });
 
-    it('pins the environment helpers to the server so deployment values never reach a client', () => {
-        expect(RUNTIME_HELPERS.env.environment).toBe('server');
-        expect(RUNTIME_HELPERS.env.features).toEqual([]);
-        expect(RUNTIME_HELPERS.dotenv.environment).toBe('server');
-        expect(expandHelpers(['env']).sort()).toEqual(['dotenv', 'env']);
-
+    it('ships no helper that reads deployment values, so none is pinned to an environment', () => {
         const pinned = Object.values(RUNTIME_HELPERS).filter((helper) => helper.environment !== undefined);
 
-        expect(pinned.map((helper) => helper.name).sort()).toEqual(['dotenv', 'env']);
+        expect(pinned).toEqual([]);
+        expect(names).not.toContain('env');
+        expect(names).not.toContain('dotenv');
     });
 
     it('recognizes only the helpers it ships', () => {

@@ -21,24 +21,17 @@ export function generatedRoots(config: LuamConfig): string[] {
     return [...new Set([...roots, LIBRARY_DIRECTORY])];
 }
 
-export function trackedWriteOptions(root: string, config: LuamConfig, environmentTemplate: string | null, tracker: PhaseTracker): WriteOptions {
+export function trackedWriteOptions(root: string, config: LuamConfig, tracker: PhaseTracker): WriteOptions {
     return {
         root,
         generatedFiles: generatedFiles(),
         generatedRoots: generatedRoots(config),
-        environmentTemplate,
         onProgress: (event): void => {
             tracker.advance(event.item, event.index, event.total);
         },
     };
 }
 
-export function productionWriteOptions(
-    root: string,
-    config: LuamConfig,
-    environmentTemplate: string | null,
-    tracker: PhaseTracker,
-    minify?: boolean,
-): WriteOptions {
-    return { ...trackedWriteOptions(root, config, environmentTemplate, tracker), minify: minify ?? config.output.minify };
+export function productionWriteOptions(root: string, config: LuamConfig, tracker: PhaseTracker, minify?: boolean): WriteOptions {
+    return { ...trackedWriteOptions(root, config, tracker), minify: minify ?? config.output.minify };
 }

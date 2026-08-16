@@ -49,8 +49,8 @@ describe('development command', () => {
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
         expect(await runDevCommand(harness.context, { transport, watch: false, signal: null })).toBe(EXIT_OK);
-        expect(harness.fixture.read(`${resource}/lib/client/development-logs-client.lua`)).toContain('local luamMaximumMessageLength = 300');
-        expect(harness.fixture.read(`${resource}/lib/server/development-logs-server.lua`)).toContain('local luamRateLimit = 4');
+        expect(harness.fixture.read(`${resource}/lib/development-logs-client.lua`)).toContain('local luamMaximumMessageLength = 300');
+        expect(harness.fixture.read(`${resource}/lib/development-logs-server.lua`)).toContain('local luamRateLimit = 4');
         expect(harness.fixture.read(`${resource}/meta.xml`).indexOf('development-logs-server.lua')).toBeLessThan(
             harness.fixture.read(`${resource}/meta.xml`).indexOf('src/server'),
         );
@@ -65,8 +65,8 @@ describe('development command', () => {
         await runDevCommand(harness.context, { transport, watch: false, signal: null });
         await runEnsureCommand(harness.context, { transport, watch: false, signal: null });
 
-        expect(harness.fixture.exists(`${resource}/lib/client/development-logs-client.lua`)).toBe(false);
-        expect(harness.fixture.exists(`${resource}/lib/server/development-logs-server.lua`)).toBe(false);
+        expect(harness.fixture.exists(`${resource}/lib/development-logs-client.lua`)).toBe(false);
+        expect(harness.fixture.exists(`${resource}/lib/development-logs-server.lua`)).toBe(false);
         expect(harness.fixture.read(`${resource}/meta.xml`)).not.toContain('development-logs');
     });
 

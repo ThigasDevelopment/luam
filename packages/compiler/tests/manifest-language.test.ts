@@ -103,7 +103,7 @@ describe('manifest checking', () => {
 
     it('rejects a helper the runtime does not ship', () => {
         expect(codes(`${NAME}helpers = { 'promise' }`)).toEqual(['config-unknown-helper']);
-        expect(messages(`${NAME}helpers = { 'promise' }`)[0]).toContain('Known helpers: "async", "class", "dotenv"');
+        expect(messages(`${NAME}helpers = { 'promise' }`)[0]).toContain('Known helpers: "async", "class", "math"');
     });
 
     it('types env members as optional strings', () => {

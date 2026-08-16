@@ -27,17 +27,7 @@ const ASYNC = record('Async', [
     { name: 'setInterval', type: fn([NUMBER], BOOLEAN, 1) },
 ]);
 
-const DOTENV = record('Dotenv', [
-    { name: 'path', type: STRING },
-    { name: 'get', type: fn([STRING, ANY], ANY, 1) },
-    { name: 'has', type: fn([STRING], BOOLEAN, 1) },
-    { name: 'all', type: fn([], TABLE, 0) },
-    { name: 'apply', type: fn([], TABLE, 0) },
-]);
-
-export const LUAM_RUNTIME_SERVER_GLOBALS: ApiCatalog = {
-    Dotenv: record('DotenvLibrary', [{ name: 'new', type: fn([STRING], DOTENV, 0) }]),
-};
+export const LUAM_RUNTIME_SERVER_GLOBALS: ApiCatalog = {};
 
 export const LUAM_RUNTIME_GLOBALS: ApiCatalog = {
     bind: fn([ANY, ANY], ANY, 2),

@@ -37,7 +37,7 @@ describe('bundle and map output', () => {
         expect(await runCli(['build'], { cwd: fixture.root, env: OFFLINE, logger })).toBe(EXIT_OK);
         expect(fixture.exists('build/luam-demo/src/server.lua')).toBe(true);
         expect(fixture.exists('build/luam-demo/src/client.lua')).toBe(true);
-        expect(fixture.exists('build/luam-demo/lib/client/string.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/lib/string.lua')).toBe(false);
         expect(fixture.read('build/luam-demo/src/client.lua')).toContain('function string.template');
         expect(JSON.parse(fixture.read('build/luam-demo.luam-map.json'))).toMatchObject({ resource: 'luam-demo', layout: 'bundle', version: 1 });
         expect(logger.text()).toContain('(bundle layout)');

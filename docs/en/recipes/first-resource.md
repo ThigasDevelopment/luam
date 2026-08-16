@@ -53,13 +53,14 @@ documentation build.
 
 <<< @/snippets/output/first-resource.build.txt{text}
 
-It produced exactly three files:
+It produced exactly two files:
 
 <<< @/snippets/output/first-resource.tree.txt{text}
 
-`lib/server/string.lua` is there because of the template strings. `string.lua`
-is the helper behind `` ` ` `` interpolation, so even this one-file resource pulls
-in a runtime helper — and it lands under `lib/server/`, not in your source tree.
+The template strings pulled in `string.lua`, the helper behind `` ` ` ``
+interpolation, so even this one-file resource needs a runtime helper. This build
+bundles, so the helper is inlined at the top of `src/server.lua`. A tree build
+writes it to `lib/string.lua` instead — never into your source tree.
 
 There is no `.env` in the output, because the project has no `.env` to declare
 keys from. Add one and the build writes a deployed copy; see

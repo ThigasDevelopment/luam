@@ -1,8 +1,8 @@
-export type RuntimeHelperName = 'async' | 'class' | 'dotenv' | 'env' | 'math' | 'string' | 'table' | 'threads';
+export type RuntimeHelperName = 'async' | 'class' | 'math' | 'string' | 'table' | 'threads';
 
 export type DevelopmentRuntimeHelperName = 'development-logs-client' | 'development-logs-server';
 
-export type RuntimeInjection = 'automatic' | 'manual' | 'reference';
+export type RuntimeInjection = 'automatic' | 'reference';
 
 export type RuntimeHelperEnvironment = 'server' | 'client' | 'shared';
 
@@ -49,15 +49,6 @@ export const RUNTIME_HELPERS: Readonly<Record<RuntimeHelperName, RuntimeHelperMo
         injection: 'automatic',
         features: ['class-declaration', 'class-inheritance', 'class-instantiation', 'super-call', 'enum-declaration'],
     },
-    dotenv: {
-        name: 'dotenv',
-        file: 'dotenv.lua',
-        injection: 'reference',
-        features: [],
-        globals: ['Dotenv'],
-        environment: 'server',
-    },
-    env: { name: 'env', file: 'env.lua', injection: 'manual', features: [], requires: ['dotenv'], environment: 'server' },
     math: { name: 'math', file: 'math.lua', injection: 'automatic', features: ['number-extension'] },
     string: { name: 'string', file: 'string.lua', injection: 'automatic', features: ['string-extension', 'template-string'] },
     table: { name: 'table', file: 'table.lua', injection: 'automatic', features: ['table-extension'] },
@@ -92,13 +83,6 @@ export const FEATURE_HELPERS: Readonly<Record<RuntimeFeature, RuntimeHelperName>
 
 export function isRuntimeHelperName(value: string): value is RuntimeHelperName {
     return Object.hasOwn(RUNTIME_HELPERS, value);
-}
-
-export function manualHelpers(): RuntimeHelperName[] {
-    return Object.values(RUNTIME_HELPERS)
-        .filter((helper) => helper.injection === 'manual')
-        .map((helper) => helper.name)
-        .sort();
 }
 
 export function helperForFeature(feature: RuntimeFeature): RuntimeHelperName {

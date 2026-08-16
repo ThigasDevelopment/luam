@@ -16,8 +16,8 @@ do jogador** e pode ser lido lá:
 | `config.lua` | **sim** — é um script compartilhado |
 | `assets/**` | sim |
 | `src/server/**` | não |
-| `lib/server/**` | não |
-| `.env` | não — ele nunca recebe uma entrada `<file>` |
+| `lib/*.lua` | só os helpers declarados `client` ou `shared` no `meta.xml` |
+| `env.lua` | não — ele é declarado como script de servidor |
 
 Considere público tudo que é baixado. Ofuscação não é fronteira.
 
@@ -29,8 +29,11 @@ Considere público tudo que é baixado. Ofuscação não é fronteira.
   `project-environment-import`.
 - `process` é declarado `server`, então valores do `.env` não podem ser lidos de um
   arquivo de cliente ou compartilhado.
-- Helpers de runtime só de servidor são escritos em `lib/server/`, nunca em um
-  local que clientes baixam.
+- Todo helper de runtime é escrito direto em `lib/`, e a entrada dele no
+  `meta.xml` carrega o ambiente.
+- Valores de implantação são compilados em `env.lua`, declarado como script de
+  servidor e nunca enviado a um cliente. Chaves com nome de aparência sensível
+  são escritas em branco, então um segredo nunca viaja num artefato de build.
 
 ## O que continua sendo decisão sua
 

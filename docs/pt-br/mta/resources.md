@@ -62,10 +62,10 @@ os escreve em `lib/<ambiente>/`, fora da árvore de código:
 | `math.lua` | Uma extensão de número como `clamp` é usada. |
 | `threads.lua` | `sleep` ou `Threads` é nomeado. Também selecionável por `helpers`. |
 | `async.lua` | `Async` é nomeado. |
-| `dotenv.lua`, `env.lua` | O projeto tem um `.env`. Só de servidor. |
 
 Um resource sem classes nunca carrega `class.lua`, e um helper só de servidor
-nunca é baixado por um cliente.
+nunca é baixado por um cliente. Valores de implantação não são um helper: um
+projeto com `.env` recebe um `env.lua` gerado na raiz do resource.
 
 ## `min_mta_version`
 

@@ -6,6 +6,65 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Deployment Values Are Compiled, Not Parsed
+
+A resource carried 178 lines of Lua to read its own `.env` at start. `dotenv.lua`
+held a parser — quoting, escapes, type casting, a sealed table — and `env.lua`
+decided which file to read and when. The compiler already knew every key and its
+type: it reads `.env` at build time to declare `env` and `process.env` for the
+checker. The resource spent run time re-deriving what the build already had.
+
+The keys are now written as Lua. A project with a `.env` gets a generated
+`env.lua` at the resource root holding the values as a table, publishing `env`
+and `process.env` behind a metatable that raises on an undeclared key and refuses
+assignment. Nothing parses anything at run time.
+
+The file belongs to the server administrator. It is written once and never
+overwritten, so a later `build` or `ensure` replaces the code and leaves the
+deployed values alone — a deploy from one machine can no longer overwrite another
+server's configuration. A key whose name reads as sensitive is written blank for
+the administrator to fill, so a secret never travels inside a build artifact, and
+`.env.local` still reaches the checker and never the generated file.
+
+#### Added
+
+- `env.lua`, generated from the project's `.env` and declared a server script in
+  the configuration slot of `meta.xml` — after the runtime library, before the
+  sources. Written once, never overwritten, and never pruned.
+
+#### Changed
+
+- `env` and `process.env` are published by the generated file rather than by a
+  runtime helper. Their types still come from `.env` through the checker, so a
+  key the file does not declare is still `check-unknown-record-key` and no
+  declaration file is needed to describe them.
+- A resource no longer ships a `.env`. The values live in `env.lua`, and an
+  already deployed `.env` is still protected from pruning.
+
+#### Removed
+
+- The `dotenv` and `env` runtime helpers, and `dotenv.lua` and `env.lua` from the
+  runtime package. `helpers = { 'env' }` in a manifest is now
+  `config-unknown-helper`.
+- The `Dotenv` native class, with its constructor, members, and documentation.
+  Reading a second environment file at run time is no longer part of the
+  language.
+- The `manual` helper injection kind, which had no remaining member.
+
+### The Runtime Library Is One Directory
+
+Runtime helpers were written to `lib/<environment>/`, so `class.lua` landed in
+`lib/shared/` and a client-only `string.lua` in `lib/client/`. The directory
+repeated what each `meta.xml` entry already carried, and it could never
+disambiguate anything: a helper resolves to exactly one environment per build, so
+two files with one name never existed.
+
+#### Changed
+
+- Runtime helpers are written flat to `lib/`. Each `meta.xml` entry still carries
+  its helper's environment, and load order is unchanged — a helper still loads
+  after everything it requires.
+
 ### A Contract Comes From the Interface That Names It
 
 A class and an interface may carry the same name, and `implements` resolved the
