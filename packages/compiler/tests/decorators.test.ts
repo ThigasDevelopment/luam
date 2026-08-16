@@ -121,4 +121,28 @@ describe('decorators', () => {
         expect(emitted).not.toContain('@');
         expect(result('class Value {\n    @Getter\n    name: string\n}\n').requiredHelpers).toEqual(['class']);
     });
+
+    it('generates the confirmed class and field decorator APIs', () => {
+        const source = '@ToString\n@Equals\n@Clone\n@Serializable\n@Deserialize\n@Builder\nclass Profile {\n    @FluentSetter\n    name: string = \'Luam\'\n    @Lazy\n    token: string = \'token\'\n    @Observable\n    online: boolean = false\n}\nlocal builder = new ProfileBuilder()\nlocal profile = builder:withName(\'Thigas\'):build()\n';
+        const emitted = code(source);
+
+        expect(emitted).toContain('toString = function(self)');
+        expect(emitted).toContain('equals = function(self, other)');
+        expect(emitted).toContain('clone = function(self)');
+        expect(emitted).toContain('toTable = function(self)');
+        expect(emitted).toContain('fromTable = function(self, values)');
+        expect(emitted).toContain('onOnlineChanged = function(self, listener)');
+        expect(emitted).toContain("class 'ProfileBuilder'");
+        expect(emitted).toContain('withName = function(self, value)');
+    });
+
+    it('enforces readonly fields, warns on deprecated use, and validates overrides', () => {
+        const readOnly = 'class Value {\n    @ReadOnly\n    value: number\n}\nlocal value = new Value()\nvalue.value = 1\n';
+        const deprecated = 'class Value {\n    @Deprecated\n    run = function (): void\n    end\n}\nlocal value = new Value()\nvalue:run()\n';
+        const invalidOverride = 'class Parent {\n    run = function (value: string): void\n    end\n}\nclass Child extends Parent {\n    @Override\n    run = function (value: number): void\n    end\n}\n';
+
+        expect(codes(readOnly)).toEqual(['check-readonly-assignment']);
+        expect(codes(deprecated)).toEqual(['check-deprecated-use']);
+        expect(codes(invalidOverride)).toEqual(['check-invalid-override']);
+    });
 });

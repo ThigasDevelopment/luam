@@ -17,7 +17,6 @@ import { tableLiteralMembers, writtenKeys } from '@lsp/features/table-literal';
 import {
     completionContext,
     hasDecoratorPrefix,
-    isDecoratorPosition,
     isStatementStart,
     resolveReceiver,
     type CompletionContext,
@@ -211,11 +210,11 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         return deduplicate(stringItems(analysis, offset, others, lexical));
     }
 
-    if (isDecoratorPosition(analysis.text, offset)) {
+    if (hasDecoratorPrefix(analysis.text, offset)) {
         return decoratorItems();
     }
 
-    if (hasDecoratorPrefix(analysis.text, offset) || analysis.text[offset - 1] === '@') {
+    if (analysis.text[offset - 1] === '@') {
         return [];
     }
 

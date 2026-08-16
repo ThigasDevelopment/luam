@@ -137,6 +137,19 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
         const valueType = valueTypes[index] ?? NIL_TYPE;
         const value = valueAt(statement.values, valueTypes, index);
 
+        if (target.kind === 'member-expression') {
+            const object = context.typeOf(target.object);
+            const frame = context.currentClassMethod();
+
+            if (object.kind === 'named') {
+                const member = context.declarations.lookupMember(object.name, target.property);
+
+                if (member?.readOnly === true && (frame === null || frame.className !== object.name)) {
+                    context.report('check-readonly-assignment', `Field "${target.property}" is read-only outside class "${object.name}".`, target.position);
+                }
+            }
+        }
+
         if (statement.operator !== '=') {
             checkCompoundOperand(context, statement.operator, targetType, target.position);
 

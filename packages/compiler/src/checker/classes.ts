@@ -1,17 +1,12 @@
-import type {
-    ClassDeclaration,
-    ClassFieldDeclaration,
-    ClassMethodDeclaration,
-    EnumDeclaration,
-    InterfaceDeclaration,
-} from '@compiler/parser/declaration-nodes';
+import type { ClassDeclaration, ClassFieldDeclaration, ClassMethodDeclaration, EnumDeclaration, InterfaceDeclaration } from '@compiler/parser/declaration-nodes';
 
 import type { CheckContext } from './context';
+import { checkInterfaces, checkOverrides } from './class-contracts';
 import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
 import { buildFunctionType, checkFunctionBody } from './statements';
-import { ANY_TYPE, createFunction, createNamed, isAssignable, typeToString, VOID_TYPE, type Type } from './types';
+import { ANY_TYPE, createNamed, typeToString, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     const valueType = member.value === null ? null : checkExpression(context, member.value);
@@ -39,12 +34,6 @@ function checkFieldName(context: CheckContext, member: ClassFieldDeclaration): v
     context.report('check-invalid-constructor', message, member.position);
 }
 
-function generatedMethodType(member: ClassMethodDeclaration, fieldTypes: ReadonlyMap<ClassFieldDeclaration, Type>): Type {
-    const fieldType = [...fieldTypes].find(([field]) => field.position.offset === member.position.offset)?.[1] ?? ANY_TYPE;
-
-    return member.parameters.length === 0 ? createFunction([], fieldType) : createFunction([fieldType], VOID_TYPE);
-}
-
 function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): ClassMethodDeclaration[] {
     const fieldTypes = new Map<ClassFieldDeclaration, Type>();
 
@@ -61,13 +50,42 @@ function registerMembers(context: CheckContext, info: ClassInfo, statement: Clas
         const type = member.kind === 'class-field'
             ? fieldTypes.get(member) ?? ANY_TYPE
             : member.isSynthetic
-              ? generatedMethodType(member, fieldTypes)
-              : buildFunctionType(context, member.parameters, member.returnAnnotation);
+               ? buildFunctionType(context, member.parameters, member.returnAnnotation)
+               : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
-        info.members.set(member.name, { name: member.name, type, isMethod: member.kind === 'class-method', position: member.position });
+        const decorators = member.decorators.map((decorator) => decorator.name);
+        info.members.set(member.name, {
+            name: member.name,
+            type,
+            isMethod: member.kind === 'class-method',
+            position: member.position,
+            readOnly: decorators.includes('ReadOnly'),
+            deprecated: decorators.includes('Deprecated'),
+        });
     }
 
     return generated;
+}
+
+function declareBuilder(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
+    if (!statement.decorators.some((decorator) => decorator.name === 'Builder')) {
+        return;
+    }
+
+    const name = `${statement.name}Builder`;
+    const members = new Map<string, MemberInfo>();
+
+    for (const field of statement.members) {
+        if (field.kind === 'class-field') {
+            const type = info.members.get(field.name)?.type ?? ANY_TYPE;
+            const method = `with${field.name[0]?.toUpperCase()}${field.name.slice(1)}`;
+            members.set(method, { name: method, type: { kind: 'function', parameters: [type], minimumArguments: 1, isVariadic: false, returnType: createNamed(name) }, isMethod: true, position: field.position });
+        }
+    }
+
+    members.set('build', { name: 'build', type: { kind: 'function', parameters: [], minimumArguments: 0, isVariadic: false, returnType: createNamed(statement.name) }, isMethod: true, position: statement.position });
+    context.declarations.declareClass({ name, superClass: null, interfaces: [], members, position: statement.position });
+    context.declareModuleGlobal({ name, type: createNamed(name), isLocal: false, position: statement.position });
 }
 
 function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMethodDeclaration): void {
@@ -86,44 +104,6 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
     context.pushClassMethod({ className: info.name, methodName: member.name });
     checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, createNamed(info.name));
     context.popClassMethod();
-}
-
-function checkContract(context: CheckContext, info: ClassInfo, contract: string, member: MemberInfo): void {
-    const actual = context.declarations.lookupClassMember(info.name, member.name);
-
-    if (actual === null) {
-        const message = `Class "${info.name}" does not implement "${member.name}" required by interface "${contract}".`;
-
-        context.report('check-unimplemented-interface', message, info.position);
-
-        return;
-    }
-
-    if (isAssignable(actual.type, member.type, { allowNil: context.allowNil })) {
-        return;
-    }
-
-    const subject = `Member "${member.name}" of class "${info.name}"`;
-    const message = `${subject} expects "${typeToString(member.type)}" from interface "${contract}" but is "${typeToString(actual.type)}".`;
-
-    context.report('check-unimplemented-interface', message, actual.position);
-}
-
-function checkInterfaces(context: CheckContext, info: ClassInfo): void {
-    for (const name of info.interfaces) {
-        const contract = context.declarations.lookupInterface(name);
-
-        if (contract === null) {
-            context.noteExternalReference(name, info.position);
-            context.report('check-unknown-interface', `Class "${info.name}" implements "${name}", which is not defined.`, info.position);
-
-            continue;
-        }
-
-        for (const member of context.declarations.collectInterfaceContract(contract.name)) {
-            checkContract(context, info, name, member);
-        }
-    }
 }
 
 function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): string | null {
@@ -181,7 +161,9 @@ export function checkClassDeclaration(context: CheckContext, statement: ClassDec
     context.generatedMembers.set(statement, generated);
     context.declarations.declareClass(info);
     context.declareModuleGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: statement.position });
+    declareBuilder(context, info, statement);
     checkInterfaces(context, info);
+    checkOverrides(context, info, statement);
 
     for (const member of statement.members) {
         if (member.kind === 'class-method') {

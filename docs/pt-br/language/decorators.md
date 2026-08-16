@@ -1,7 +1,7 @@
 # Decoradores
 
-`@Getter` e `@Setter` geram acessores tipados no estilo Java, para que uma classe
-mantenha seus campos atrás de métodos sem que você escreva os métodos.
+Decoradores geram APIs tipadas de classe. Eles não recebem argumentos e só podem
+ser usados na classe, campo ou método indicado abaixo.
 
 ```luam
 @Getter
@@ -26,6 +26,25 @@ class Profile {
 
 Um decorador de classe e um de campo se combinam, então o exemplo acima gera um
 getter para cada campo e um setter para `nickname` e `banned`.
+
+## API confirmada
+
+| Decorador | Alvo | Comportamento gerado |
+| --- | --- | --- |
+| `@Getter` | classe, campo | `getField()` ou `isField()` |
+| `@Setter` | classe, campo | `setField(value)` |
+| `@FluentSetter` | campo | `withField(value)` retornando `self` |
+| `@Lazy` | campo | Getter com cache; o campo exige inicializador |
+| `@Observable` | campo | Setter e `onFieldChanged(listener)` |
+| `@ReadOnly` | campo | Rejeita escrita fora dos métodos da própria classe |
+| `@Deprecated` | campo, método | Aviso ao usar o membro |
+| `@Override` | método | Exige assinatura idêntica no método da superclasse |
+| `@ToString` | classe | `toString()` superficial |
+| `@Equals` | classe | `equals(other)` superficial |
+| `@Clone` | classe | `clone()` superficial |
+| `@Serializable` | classe | `toTable()` com valores superficiais dos campos |
+| `@Deserialize` | classe | `fromTable(values)` atribuindo valores superficiais |
+| `@Builder` | classe | `ClassNameBuilder`, `withField(value)` e `build()` |
 
 Um decorador em qualquer outra coisa — um método, um comando, uma função — é
 `check-decorator-target`. Um nome desconhecido é `check-unknown-decorator`, o

@@ -190,6 +190,10 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
     const declared = context.declarations.lookupMember(receiver.name, method);
 
     if (declared?.type.kind === 'function') {
+        if (declared.deprecated === true) {
+            context.warn('check-deprecated-use', `Member "${method}" is deprecated.`, expression.position);
+        }
+
         return checkSignature(context, expression.args, argumentTypes, declared.type, expression.position);
     }
 

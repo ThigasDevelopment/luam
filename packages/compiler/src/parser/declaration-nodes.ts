@@ -22,6 +22,10 @@ export interface ClassMethodDeclaration extends NodeBase {
     returnAnnotation: TypeAnnotation | null;
     body: Statement[];
     decorators: Decorator[];
+    generated?: {
+        kind: 'fluent-setter' | 'to-string' | 'equals' | 'clone' | 'serializable' | 'deserialize' | 'lazy' | 'observable';
+        fields: ClassFieldDeclaration[];
+    };
 }
 
 export type ClassMember = ClassFieldDeclaration | ClassMethodDeclaration;

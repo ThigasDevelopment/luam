@@ -1,7 +1,7 @@
 # Decorators
 
-`@Getter` and `@Setter` generate typed, Java-style accessors so a class can keep
-its fields behind methods without you writing the methods.
+Decorators generate typed class APIs. They take no arguments and apply to a class,
+field, or method only where listed below.
 
 ```luam
 @Getter
@@ -26,6 +26,25 @@ class Profile {
 
 A class decorator and a field decorator combine, so the example above generates
 a getter for every field and a setter for `nickname` and `banned`.
+
+## Confirmed API
+
+| Decorator | Target | Generated behavior |
+| --- | --- | --- |
+| `@Getter` | class, field | `getField()` or `isField()` |
+| `@Setter` | class, field | `setField(value)` |
+| `@FluentSetter` | field | `withField(value)` returning `self` |
+| `@Lazy` | field | Caching getter; the field must have an initializer |
+| `@Observable` | field | Setter plus `onFieldChanged(listener)` |
+| `@ReadOnly` | field | Rejects writes outside methods of its own class |
+| `@Deprecated` | field, method | Warning when the member is used |
+| `@Override` | method | Requires an identical superclass method signature |
+| `@ToString` | class | Shallow `toString()` |
+| `@Equals` | class | Shallow `equals(other)` |
+| `@Clone` | class | Shallow `clone()` |
+| `@Serializable` | class | `toTable()` containing shallow field values |
+| `@Deserialize` | class | `fromTable(values)` assigning shallow field values |
+| `@Builder` | class | `ClassNameBuilder`, `withField(value)`, and `build()` |
 
 A decorator on anything else — a method, a statement, a function — is
 `check-decorator-target`. An unknown name is `check-unknown-decorator`, the same

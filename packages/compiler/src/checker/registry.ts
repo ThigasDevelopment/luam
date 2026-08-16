@@ -10,6 +10,8 @@ export interface MemberInfo {
     position: SourcePosition;
     environment?: ApiEnvironment;
     procedural?: string;
+    readOnly?: boolean;
+    deprecated?: boolean;
 }
 
 export interface ClassInfo {

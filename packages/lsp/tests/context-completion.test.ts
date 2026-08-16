@@ -139,18 +139,39 @@ describe('type completion', () => {
 });
 
 describe('decorator completion', () => {
+    const decorators = [
+        'Getter',
+        'Setter',
+        'FluentSetter',
+        'ToString',
+        'Equals',
+        'Clone',
+        'Serializable',
+        'Deserialize',
+        'Lazy',
+        'Observable',
+        'ReadOnly',
+        'Deprecated',
+        'Override',
+        'Builder',
+    ];
+
     it('offers decorators above a class field', () => {
         const found = labels('class Account {\n    @\n    name: string\n}\n', '    @');
 
-        expect(found).toEqual(['Getter', 'Setter']);
+        expect(found).toEqual(decorators);
     });
 
     it('offers decorators above a class declaration', () => {
-        expect(labels('@\nclass Account {\n}\n', '@')).toEqual(['Getter', 'Setter']);
+        expect(labels('@\nclass Account {\n}\n', '@')).toEqual(decorators);
     });
 
-    it('does not offer decorators outside a class', () => {
-        expect(labels('@\nlocal value = 1\n', '@')).toEqual([]);
+    it('offers decorators while the declaration is incomplete', () => {
+        expect(labels('@', '@')).toEqual(decorators);
+        expect(labels('@Get', '@Get')).toEqual(decorators);
+    });
+
+    it('does not offer decorators after an expression', () => {
         expect(labels('local value = other @\n', 'other @')).toEqual([]);
     });
 });
