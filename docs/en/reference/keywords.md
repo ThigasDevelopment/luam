@@ -96,7 +96,7 @@ Neither is reserved by the lexer, so both stay ordinary names outside a class.
 `nil`, which is `check-invalid-self`. Declaring your own `local self` is legal
 and silences the check.
 
-`super` only exists as `self:super(...)`, the parent implementation of the
+`super` only exists as `super(...)`, the parent implementation of the
 method it appears in. Outside a class method it is `check-invalid-super`, and a
 parent without that method is `check-unknown-super-method`. See
 [Classes](/en/language/classes).

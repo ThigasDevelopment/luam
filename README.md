@@ -160,7 +160,7 @@ configuration. Progress goes to stderr and the report to stdout.
 | Feature | Notes |
 | --- | --- |
 | Type annotations | Optionals, unions, arrays, aliases, generics, `fun(string): void` — all erased |
-| Classes | `extends`, `implements`, `constructor`, `self:super(...)`, `new` |
+| Classes | `extends`, `implements`, `constructor`, `super(...)`, `new` |
 | Decorators | `@Getter` and `@Setter` generate typed accessors |
 | Interfaces | Verified by the checker, never reach the generated Lua |
 | Enums | Zero-based, checked members, erased when unused |

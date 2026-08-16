@@ -6,6 +6,15 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Parent Calls Use `super(...)`
+
+#### Changed
+
+- Parent constructor and overridden method calls now use `super(...)` directly.
+  The former `self:super(...)` syntax reports `check-invalid-super`.
+- Class hover includes inferred constructor return types, and completion offers
+  `super` inside subclass methods.
+
 ### The Administrator Edits `.env`, Not Lua
 
 0.12.0 compiled the declared keys straight into `env.lua` and handed that file to

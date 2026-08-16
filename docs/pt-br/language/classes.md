@@ -58,20 +58,21 @@ class PremiumAccount extends Account {
     tier: number = 1
 
     constructor = function (name: string, tier: number)
-        self:super(name)
+        super(name)
         self.tier = tier
     end
 
     deposit = function (amount: number): void
-        self:super(amount * 2)
+        super(amount * 2)
     end
 }
 ```
 
-- `self:super(...)` no **construtor** chama o construtor da classe pai.
-- `self:super(...)` em um **método** chama o método de mesmo nome na classe pai.
-- `self:super()` fora de uma classe é `check-invalid-super`; nomear um método
+- `super(...)` no **construtor** chama o construtor da classe pai.
+- `super(...)` em um **método** chama o método de mesmo nome na classe pai.
+- `super()` fora de uma classe é `check-invalid-super`; nomear um método
   inexistente na classe pai é `check-unknown-super-method`.
+- `self:super(...)` não é válido; chame `super(...)` diretamente.
 
 ::: warning A ordem de declaração importa
 `extends` e `new` resolvem contra classes declaradas **antes, no mesmo arquivo**.
@@ -134,5 +135,5 @@ separada, liberada por `"oop": true`. Veja [API OOP](/pt-br/mta/oop).
 | --- | --- |
 | `new Missing()` | `check-unknown-class` |
 | `account.deposit(1)` sendo `deposit` um método | `check-unknown-member` |
-| `self:super()` em uma função comum | `check-invalid-super` |
+| `super()` em uma função comum | `check-invalid-super` |
 | duas classes com um mesmo nome em um arquivo | `check-duplicate-class` |

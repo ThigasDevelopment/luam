@@ -58,20 +58,21 @@ class PremiumAccount extends Account {
     tier: number = 1
 
     constructor = function (name: string, tier: number)
-        self:super(name)
+        super(name)
         self.tier = tier
     end
 
     deposit = function (amount: number): void
-        self:super(amount * 2)
+        super(amount * 2)
     end
 }
 ```
 
-- `self:super(...)` in the **constructor** calls the parent constructor.
-- `self:super(...)` in a **method** calls the parent method of the same name.
-- `self:super()` outside a class is `check-invalid-super`; naming a parent method
+- `super(...)` in the **constructor** calls the parent constructor.
+- `super(...)` in a **method** calls the parent method of the same name.
+- `super()` outside a class is `check-invalid-super`; naming a parent method
   that does not exist is `check-unknown-super-method`.
+- `self:super(...)` is not valid; call `super(...)` directly.
 
 ::: warning Declaration order matters
 `extends` and `new` resolve against classes declared **earlier in the same
@@ -134,5 +135,5 @@ gated behind `"oop": true`. See [OOP API](/en/mta/oop).
 | --- | --- |
 | `new Missing()` | `check-unknown-class` |
 | `account.deposit(1)` where `deposit` is a method | `check-unknown-member` |
-| `self:super()` in a plain function | `check-invalid-super` |
+| `super()` in a plain function | `check-invalid-super` |
 | two classes with one name in a file | `check-duplicate-class` |

@@ -97,7 +97,7 @@ writes nothing.
 | `check-invalid-constructor` | A class declares `constructor` as a field instead of a method. |
 | `check-duplicate-enum` | Two enums with the same name in one file. |
 | `check-unknown-enum-member` | The enum has no such member. |
-| `check-invalid-super` | `self:super(...)` outside a class. |
+| `check-invalid-super` | `super(...)` outside a class or the invalid `self:super(...)` syntax. |
 | `check-unknown-super-method` | The parent has no method of that name. |
 | `check-declare-outside-declaration-file` | `declare` outside a `.d.luam` file. |
 | `check-declaration-file-statement` | A `.d.luam` file contains a statement. |

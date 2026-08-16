@@ -30,8 +30,8 @@ luam-docs-typed-class/
 - **`@Getter` na classe, `@Setter` em um campo.** O decorador de classe gera um
   getter para cada campo; o de campo adiciona um setter apenas para `model`. Veja
   [Decoradores](/pt-br/language/decorators).
-- **`self:super(owner, model)`** no construtor chama o construtor da classe pai;
-  **`self:super()`** dentro de `describe` chama o método de mesmo nome na classe
+- **`super(owner, model)`** no construtor chama o construtor da classe pai;
+  **`super()`** dentro de `describe` chama o método de mesmo nome na classe
   pai.
 - **A ordem de declaração importa.** `VehicleSlot` é declarada antes de
   `ReservedSlot`, porque `extends` resolve contra classes declaradas antes no mesmo

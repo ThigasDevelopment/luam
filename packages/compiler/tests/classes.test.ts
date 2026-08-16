@@ -51,8 +51,8 @@ describe('classes', () => {
         expect(emit('class Player {\n    name: string\n}\n')).toBe("class 'Player' {}\n");
     });
 
-    it('emits inheritance as an extends modifier and keeps super calls', () => {
-        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        self:super(name)\n    end\n}\n`;
+    it('emits inheritance as an extends modifier and lowers super calls', () => {
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        super(name)\n    end\n}\n`;
 
         expect(emit(source)).toContain("class 'VIPPlayer' :extends 'Player' {");
         expect(emit(source)).toContain('self:super(name)');
@@ -215,17 +215,23 @@ describe('classes', () => {
     });
 
     it('reports a super call that cannot resolve a parent method', () => {
-        expect(codes('local function helper(): void\n    self:super()\nend\n')).toEqual(['check-invalid-super']);
-        expect(codes('class Player {\n    greet = function (): void\n        self:super()\n    end\n}\n')).toEqual(['check-invalid-super']);
-        expect(codes(`${PLAYER}class VIPPlayer extends Player {\n    greet = function (): void\n        self:super()\n    end\n}\n`)).toEqual([
+        expect(codes('local function helper(): void\n    super()\nend\n')).toEqual(['check-invalid-super']);
+        expect(codes('class Player {\n    greet = function (): void\n        super()\n    end\n}\n')).toEqual(['check-invalid-super']);
+        expect(codes(`${PLAYER}class VIPPlayer extends Player {\n    greet = function (): void\n        super()\n    end\n}\n`)).toEqual([
             'check-unknown-super-method',
         ]);
     });
 
     it('checks super call arguments against the parent method', () => {
-        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        self:super(1)\n    end\n}\n`;
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        super(1)\n    end\n}\n`;
 
         expect(codes(source)).toEqual(['check-type-mismatch']);
+    });
+
+    it('rejects the legacy self super call syntax', () => {
+        const source = `${PLAYER}class VIPPlayer extends Player {\n    constructor = function (name: string)\n        self:super(name)\n    end\n}\n`;
+
+        expect(codes(source)).toEqual(['check-invalid-super']);
     });
 
     it('reports an enum member that is not declared', () => {

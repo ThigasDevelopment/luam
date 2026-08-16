@@ -97,7 +97,7 @@ erro não escreve nada.
 | `check-invalid-constructor` | Uma classe declara `constructor` como campo em vez de método. |
 | `check-duplicate-enum` | Dois enums com o mesmo nome em um arquivo. |
 | `check-unknown-enum-member` | O enum não tem esse membro. |
-| `check-invalid-super` | `self:super(...)` fora de uma classe. |
+| `check-invalid-super` | `super(...)` fora de uma classe ou a sintaxe inválida `self:super(...)`. |
 | `check-unknown-super-method` | A classe pai não tem método com esse nome. |
 | `check-declare-outside-declaration-file` | `declare` fora de um arquivo `.d.luam`. |
 | `check-declaration-file-statement` | Um arquivo `.d.luam` contém um comando. |

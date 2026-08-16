@@ -19,12 +19,12 @@ class PremiumAccount extends Account {
     tier: number = 1
 
     constructor = function (name: string, tier: number)
-        self:super(name)
+        super(name)
         self.tier = tier
     end
 
     deposit = function (amount: number): void
-        self:super(amount * 2)
+        super(amount * 2)
     end
 }
 

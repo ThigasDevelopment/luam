@@ -29,7 +29,7 @@ Toda palavra reservada é completada, cada uma na posição em que é válida:
 | O corpo de uma classe | `constructor`, expandido no formato de método |
 | O cabeçalho de uma classe ou interface | `extends` e `implements` |
 | Uma anotação de tipo | Os tipos primitivos e `fun` |
-| `self:` dentro de um método de uma subclasse | `super` |
+| Dentro de um método de uma subclasse | `super` |
 
 `self`, `super` e `fun` são contextuais, não reservados, então a completação só
 os oferece onde eles significam algo. Veja

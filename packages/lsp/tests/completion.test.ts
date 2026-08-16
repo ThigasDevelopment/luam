@@ -111,26 +111,25 @@ describe('completion', () => {
         expect(found).not.toContain('name');
     });
 
-    it('offers super after self inside a method of a subclass', () => {
+    it('offers super inside a method of a subclass', () => {
         const base = ['class Base {', '    greet = function ()', '    end', '}', ''];
-        const child = ['class Vip extends Base {', '    greet = function ()', '        self:', '    end', '}'];
-        const found = labels(new LanguageService(), SERVER_FILE, [...base, ...child].join('\n'), 'self:');
+        const child = ['class Vip extends Base {', '    greet = function ()', '        sup', '    end', '}'];
+        const found = labels(new LanguageService(), SERVER_FILE, [...base, ...child].join('\n'), 'sup');
 
         expect(found).toContain('super');
-        expect(found).toContain('greet');
     });
 
-    it('hides super after self when the class has no parent', () => {
-        const text = ['class Base {', '    greet = function ()', '        self:', '    end', '}'].join('\n');
-        const found = labels(new LanguageService(), SERVER_FILE, text, 'self:');
+    it('hides super inside a method when the class has no parent', () => {
+        const text = ['class Base {', '    greet = function ()', '        sup', '    end', '}'].join('\n');
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'sup');
 
         expect(found).not.toContain('super');
     });
 
-    it('hides super after an instance that is not self', () => {
+    it('hides super outside a class method', () => {
         const base = ['class Base {', '    greet = function ()', '    end', '}', ''];
-        const child = ['class Vip extends Base {', '}', '', 'local vip = new Vip()', 'vip:'];
-        const found = labels(new LanguageService(), SERVER_FILE, [...base, ...child].join('\n'), 'vip:');
+        const child = ['class Vip extends Base {', '}', '', 'sup'];
+        const found = labels(new LanguageService(), SERVER_FILE, [...base, ...child].join('\n'), 'sup');
 
         expect(found).not.toContain('super');
     });

@@ -107,8 +107,10 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
     return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
 }
 
-function superItems(analysis: DocumentAnalysis, target: ReceiverTarget, context: CompletionContext): CompletionItem[] {
-    if (context.trigger !== ':' || context.segments.length !== 1 || context.segments[0] !== 'self' || target.kind !== 'class') {
+function superItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
+    const target = resolveReceiver(analysis, offset, ['self']);
+
+    if (target?.kind !== 'class') {
         return [];
     }
 
@@ -229,7 +231,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         const target = resolveReceiver(analysis, offset, context.segments);
 
         if (target !== null) {
-            return deduplicate([...memberItems(analysis, target, context.trigger), ...superItems(analysis, target, context)]);
+            return deduplicate(memberItems(analysis, target, context.trigger));
         }
     }
 
@@ -251,6 +253,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...projectItems(analysis, expectation),
         ...plainItems(workspaceItems(analysis, others), expectation),
         ...plainItems(mtaClassItems(analysis), expectation),
+        ...plainItems(superItems(analysis, offset), expectation),
         ...apiItems(analysis, expectation),
         ...plainItems(directives, expectation),
         ...plainItems(constructor, expectation),

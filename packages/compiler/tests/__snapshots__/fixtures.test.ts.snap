@@ -1618,15 +1618,15 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                     "kind": "identifier",
                     "name": "name",
                     "position": {
-                      "column": 20,
+                      "column": 15,
                       "line": 27,
-                      "offset": 499,
+                      "offset": 494,
                     },
                   },
                 ],
                 "callee": {
                   "kind": "identifier",
-                  "name": "self",
+                  "name": "super",
                   "position": {
                     "column": 9,
                     "line": 27,
@@ -1634,11 +1634,11 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                   },
                 },
                 "kind": "call-expression",
-                "method": "super",
+                "method": null,
                 "position": {
-                  "column": 13,
+                  "column": 14,
                   "line": 27,
-                  "offset": 492,
+                  "offset": 493,
                 },
               },
               "kind": "call-statement",
@@ -1654,7 +1654,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 9,
                 "line": 28,
-                "offset": 513,
+                "offset": 508,
               },
               "targets": [
                 {
@@ -1665,13 +1665,13 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                     "position": {
                       "column": 9,
                       "line": 28,
-                      "offset": 513,
+                      "offset": 508,
                     },
                   },
                   "position": {
                     "column": 13,
                     "line": 28,
-                    "offset": 517,
+                    "offset": 512,
                   },
                   "property": "level",
                 },
@@ -1683,7 +1683,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                   "position": {
                     "column": 22,
                     "line": 28,
-                    "offset": 526,
+                    "offset": 521,
                   },
                 },
               ],
@@ -1752,23 +1752,23 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                       "kind": "identifier",
                       "name": "amount",
                       "position": {
-                        "column": 20,
+                        "column": 15,
                         "line": 32,
-                        "offset": 609,
+                        "offset": 599,
                       },
                     },
                     "operator": "/",
                     "position": {
-                      "column": 27,
+                      "column": 22,
                       "line": 32,
-                      "offset": 616,
+                      "offset": 606,
                     },
                     "right": {
                       "kind": "number-literal",
                       "position": {
-                        "column": 29,
+                        "column": 24,
                         "line": 32,
-                        "offset": 618,
+                        "offset": 608,
                       },
                       "raw": "2",
                       "value": 2,
@@ -1777,26 +1777,26 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                 ],
                 "callee": {
                   "kind": "identifier",
-                  "name": "self",
+                  "name": "super",
                   "position": {
                     "column": 9,
                     "line": 32,
-                    "offset": 598,
+                    "offset": 593,
                   },
                 },
                 "kind": "call-expression",
-                "method": "super",
+                "method": null,
                 "position": {
-                  "column": 13,
+                  "column": 14,
                   "line": 32,
-                  "offset": 602,
+                  "offset": 598,
                 },
               },
               "kind": "call-statement",
               "position": {
                 "column": 9,
                 "line": 32,
-                "offset": 598,
+                "offset": 593,
               },
             },
           ],
@@ -1813,7 +1813,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                 "position": {
                   "column": 36,
                   "line": 31,
-                  "offset": 576,
+                  "offset": 571,
                 },
                 "typeArguments": [],
               },
@@ -1822,14 +1822,14 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 28,
                 "line": 31,
-                "offset": 568,
+                "offset": 563,
               },
             },
           ],
           "position": {
             "column": 5,
             "line": 31,
-            "offset": 545,
+            "offset": 540,
           },
           "returnAnnotation": {
             "kind": "type-name",
@@ -1837,7 +1837,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 45,
               "line": 31,
-              "offset": 585,
+              "offset": 580,
             },
             "typeArguments": [],
           },
@@ -1865,7 +1865,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 11,
               "line": 37,
-              "offset": 681,
+              "offset": 671,
             },
             "typeArguments": [],
           },
@@ -1875,14 +1875,14 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 5,
             "line": 37,
-            "offset": 675,
+            "offset": 665,
           },
           "value": {
             "kind": "string-literal",
             "position": {
               "column": 20,
               "line": 37,
-              "offset": 690,
+              "offset": 680,
             },
             "value": "kick",
           },
@@ -1900,13 +1900,13 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                       "position": {
                         "column": 15,
                         "line": 40,
-                        "offset": 758,
+                        "offset": 748,
                       },
                     },
                     "position": {
                       "column": 21,
                       "line": 40,
-                      "offset": 764,
+                      "offset": 754,
                     },
                     "property": "name",
                   },
@@ -1917,7 +1917,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                   "position": {
                     "column": 9,
                     "line": 40,
-                    "offset": 752,
+                    "offset": 742,
                   },
                 },
                 "kind": "call-expression",
@@ -1925,14 +1925,14 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                 "position": {
                   "column": 14,
                   "line": 40,
-                  "offset": 757,
+                  "offset": 747,
                 },
               },
               "kind": "call-statement",
               "position": {
                 "column": 9,
                 "line": 40,
-                "offset": 752,
+                "offset": 742,
               },
             },
           ],
@@ -1949,7 +1949,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                 "position": {
                   "column": 33,
                   "line": 39,
-                  "offset": 730,
+                  "offset": 720,
                 },
                 "typeArguments": [],
               },
@@ -1958,14 +1958,14 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 25,
                 "line": 39,
-                "offset": 722,
+                "offset": 712,
               },
             },
           ],
           "position": {
             "column": 5,
             "line": 39,
-            "offset": 702,
+            "offset": 692,
           },
           "returnAnnotation": {
             "kind": "type-name",
@@ -1973,7 +1973,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 42,
               "line": 39,
-              "offset": 739,
+              "offset": 729,
             },
             "typeArguments": [],
           },
@@ -1983,7 +1983,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
       "position": {
         "column": 1,
         "line": 36,
-        "offset": 632,
+        "offset": 622,
       },
       "superClass": null,
     },
@@ -1995,7 +1995,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 7,
             "line": 44,
-            "offset": 788,
+            "offset": 778,
           },
         },
       ],
@@ -2003,7 +2003,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
       "position": {
         "column": 1,
         "line": 44,
-        "offset": 782,
+        "offset": 772,
       },
       "values": [
         {
@@ -2013,7 +2013,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 27,
                 "line": 44,
-                "offset": 808,
+                "offset": 798,
               },
               "value": "Thigas",
             },
@@ -2022,7 +2022,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 37,
                 "line": 44,
-                "offset": 818,
+                "offset": 808,
               },
               "raw": "2",
               "value": 2,
@@ -2033,7 +2033,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 13,
             "line": 44,
-            "offset": 794,
+            "offset": 784,
           },
         },
       ],
@@ -2046,7 +2046,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "position": {
               "column": 16,
               "line": 46,
-              "offset": 837,
+              "offset": 827,
             },
             "raw": "20",
             "value": 20,
@@ -2058,7 +2058,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 1,
             "line": 46,
-            "offset": 822,
+            "offset": 812,
           },
         },
         "kind": "call-expression",
@@ -2066,14 +2066,14 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "position": {
           "column": 4,
           "line": 46,
-          "offset": 825,
+          "offset": 815,
         },
       },
       "kind": "call-statement",
       "position": {
         "column": 1,
         "line": 46,
-        "offset": 822,
+        "offset": 812,
       },
     },
     {
@@ -2087,13 +2087,13 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 7,
                 "line": 48,
-                "offset": 848,
+                "offset": 838,
               },
             },
             "position": {
               "column": 10,
               "line": 48,
-              "offset": 851,
+              "offset": 841,
             },
             "property": "name",
           },
@@ -2105,13 +2105,13 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
               "position": {
                 "column": 17,
                 "line": 48,
-                "offset": 858,
+                "offset": 848,
               },
             },
             "position": {
               "column": 20,
               "line": 48,
-              "offset": 861,
+              "offset": 851,
             },
             "property": "health",
           },
@@ -2122,7 +2122,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "position": {
             "column": 1,
             "line": 48,
-            "offset": 842,
+            "offset": 832,
           },
         },
         "kind": "call-expression",
@@ -2130,14 +2130,14 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "position": {
           "column": 6,
           "line": 48,
-          "offset": 847,
+          "offset": 837,
         },
       },
       "kind": "call-statement",
       "position": {
         "column": 1,
         "line": 48,
-        "offset": 842,
+        "offset": 832,
       },
     },
   ],
@@ -2284,12 +2284,10 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "punctuation ":" 26:48",
   "identifier "number" 26:50",
   "punctuation ")" 26:56",
-  "identifier "self" 27:9",
-  "punctuation ":" 27:13",
-  "identifier "super" 27:14",
-  "punctuation "(" 27:19",
-  "identifier "name" 27:20",
-  "punctuation ")" 27:24",
+  "identifier "super" 27:9",
+  "punctuation "(" 27:14",
+  "identifier "name" 27:15",
+  "punctuation ")" 27:19",
   "identifier "self" 28:9",
   "punctuation "." 28:13",
   "identifier "level" 28:14",
@@ -2306,14 +2304,12 @@ exports[`fixture classes.luam > locks the token stream 1`] = `
   "punctuation ")" 31:42",
   "punctuation ":" 31:43",
   "identifier "void" 31:45",
-  "identifier "self" 32:9",
-  "punctuation ":" 32:13",
-  "identifier "super" 32:14",
-  "punctuation "(" 32:19",
-  "identifier "amount" 32:20",
-  "operator "/" 32:27",
-  "number "2" 32:29",
-  "punctuation ")" 32:30",
+  "identifier "super" 32:9",
+  "punctuation "(" 32:14",
+  "identifier "amount" 32:15",
+  "operator "/" 32:22",
+  "number "2" 32:24",
+  "punctuation ")" 32:25",
   "keyword "end" 33:5",
   "punctuation "}" 34:1",
   "keyword "class" 36:1",

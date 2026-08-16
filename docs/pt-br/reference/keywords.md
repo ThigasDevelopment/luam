@@ -99,7 +99,7 @@ classe e dentro de uma declaração `function Nome:metodo()`; em qualquer outro
 lugar ele lê um global que é `nil`, o que é `check-invalid-self`. Declarar o seu
 próprio `local self` é válido e desliga a verificação.
 
-`super` só existe como `self:super(...)`, a implementação do método na classe
+`super` só existe como `super(...)`, a implementação do método na classe
 pai. Fora de um método de classe é `check-invalid-super`, e uma classe pai sem
 esse método é `check-unknown-super-method`. Veja
 [Classes](/pt-br/language/classes).

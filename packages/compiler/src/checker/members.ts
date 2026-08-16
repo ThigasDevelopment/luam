@@ -75,6 +75,10 @@ export function resolveNamedMember(context: CheckContext, name: string, expressi
     const member = context.declarations.lookupMember(name, expression.property);
 
     if (member !== null) {
+        if (member.deprecated === true) {
+            context.warn('check-deprecated-use', `Member "${expression.property}" is deprecated.`, expression.position);
+        }
+
         return member.type;
     }
 
@@ -139,7 +143,7 @@ function resolveSuperMethod(context: CheckContext, expression: CallExpression): 
     const frame = context.currentClassMethod();
 
     if (frame === null) {
-        context.report('check-invalid-super', 'A "self:super(...)" call is only valid inside a class method.', expression.position);
+        context.report('check-invalid-super', 'A "super(...)" call is only valid inside a class method.', expression.position);
 
         return null;
     }
@@ -148,7 +152,7 @@ function resolveSuperMethod(context: CheckContext, expression: CallExpression): 
     const parent = info === null ? null : info.superClass;
 
     if (parent === null) {
-        const message = `Class "${frame.className}" does not extend a class, so "self:super(...)" has no parent method.`;
+        const message = `Class "${frame.className}" does not extend a class, so "super(...)" has no parent method.`;
 
         context.report('check-invalid-super', message, expression.position);
 
@@ -158,7 +162,7 @@ function resolveSuperMethod(context: CheckContext, expression: CallExpression): 
     const member = context.declarations.lookupMember(parent, frame.methodName);
 
     if (member === null) {
-        const message = `Class "${parent}" does not define "${frame.methodName}", so "self:super(...)" cannot resolve it.`;
+        const message = `Class "${parent}" does not define "${frame.methodName}", so "super(...)" cannot resolve it.`;
 
         context.report('check-unknown-super-method', message, expression.position);
 

@@ -173,6 +173,10 @@ function checkArguments(context: CheckContext, expression: CallExpression, calle
 }
 
 function isSuperCall(expression: CallExpression): boolean {
+    return expression.method === null && expression.callee.kind === 'identifier' && expression.callee.name === 'super';
+}
+
+function isLegacySuperCall(expression: CallExpression): boolean {
     return expression.method === 'super' && expression.callee.kind === 'identifier' && expression.callee.name === 'self';
 }
 
@@ -203,6 +207,13 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
 }
 
 function checkCall(context: CheckContext, expression: CallExpression): Type {
+    if (isLegacySuperCall(expression)) {
+        checkValueList(context, expression.args);
+        context.report('check-invalid-super', 'Call "super(...)" directly instead of "self:super(...)".', expression.position);
+
+        return context.record(expression, ANY_TYPE);
+    }
+
     if (isSuperCall(expression)) {
         return context.record(expression, checkSuperCall(context, expression));
     }

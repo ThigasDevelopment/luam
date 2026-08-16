@@ -71,6 +71,10 @@ function emitMember(state: EmitState, expression: MemberExpression): string {
 function emitCall(state: EmitState, expression: CallExpression): string {
     const args = expression.args.map((argument) => emitExpression(state, argument));
 
+    if (expression.method === null && expression.callee.kind === 'identifier' && expression.callee.name === 'super') {
+        return `self:super(${args.join(', ')})`;
+    }
+
     if (expression.method !== null) {
         return `${emitExpression(state, expression.callee, UNARY_PRECEDENCE)}:${expression.method}(${args.join(', ')})`;
     }

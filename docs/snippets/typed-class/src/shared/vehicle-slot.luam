@@ -23,12 +23,12 @@ class ReservedSlot extends VehicleSlot {
     reason: string = 'staff'
 
     constructor = function (owner: string, model: number, reason: string)
-        self:super(owner, model)
+        super(owner, model)
         self.reason = reason
     end
 
     describe = function (): string
-        local base: string = self:super()
+        local base: string = super()
 
         return `${base} (${self.reason})`
     end

@@ -65,6 +65,22 @@ describe('hover', () => {
         expect(hoverText(text, 'class Vip', 'Vip')).toContain('class Vip extends Base');
     });
 
+    it('shows the inferred constructor return type in a class', () => {
+        const text = [
+            'class Person {',
+            '    constructor = function (age: number)',
+            '    end',
+            '}',
+            'class Thigas extends Person {',
+            '    constructor = function ()',
+            '        super(1)',
+            '    end',
+            '}',
+        ].join('\n');
+
+        expect(hoverText(text, 'class Thigas', 'Thigas')).toContain('constructor(): void');
+    });
+
     it('shows a class member with its owner', () => {
         const text = 'class Player {\n    name: string\n}\n\nlocal one = new Player()\nlocal value = one.name\n';
 
@@ -132,7 +148,7 @@ describe('hover', () => {
         const contents = annotation?.contents;
         const value = contents !== undefined && typeof contents !== 'string' && !Array.isArray(contents) ? contents.value : '';
 
-        expect(value).toContain('class Core {\n    side: string\n\n    constructor(side: string)\n}');
+        expect(value).toContain('class Core {\n    side: string\n\n    constructor(side: string): void\n}');
         expect(value).toContain('declared in /project/src/shared/core.luam (shared)');
         expect(instantiation).not.toBeNull();
     });

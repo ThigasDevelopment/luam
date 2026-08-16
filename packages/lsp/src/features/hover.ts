@@ -39,7 +39,7 @@ function memberText(member: SymbolDeclaration): string {
         return member.detail.startsWith(FIELD_PREFIX) ? member.detail.slice(FIELD_PREFIX.length) : member.detail;
     }
 
-    return member.name === 'constructor' ? `constructor(${member.parameters.join(', ')})` : member.detail;
+    return member.detail;
 }
 
 function bodyText(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {

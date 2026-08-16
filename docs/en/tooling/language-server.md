@@ -29,7 +29,7 @@ Every reserved word is completed, each in the position where it is legal:
 | A class body | `constructor`, expanded into the method form |
 | A class or interface header | `extends` and `implements` |
 | A type annotation | The primitive types and `fun` |
-| `self:` inside a method of a subclass | `super` |
+| Inside a method of a subclass | `super` |
 
 `self`, `super` and `fun` are contextual rather than reserved, so completion
 offers them only where they mean something. See

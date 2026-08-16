@@ -52,8 +52,8 @@ export function constructorItem(): CompletionItem {
 export function superItem(superClass: string): CompletionItem {
     return {
         label: 'super',
-        kind: CompletionItemKind.Method,
-        detail: `self:super(...) — call the "${superClass}" implementation of this method`,
+        kind: CompletionItemKind.Function,
+        detail: `super(...) — call the "${superClass}" implementation of this method`,
     };
 }
 

@@ -30,8 +30,8 @@ luam-docs-typed-class/
 - **`@Getter` on the class, `@Setter` on one field.** The class decorator
   generates a getter for every field; the field decorator adds a setter for
   `model` only. See [Decorators](/en/language/decorators).
-- **`self:super(owner, model)`** in the constructor calls the parent
-  constructor; **`self:super()`** inside `describe` calls the parent method of
+- **`super(owner, model)`** in the constructor calls the parent constructor;
+  **`super()`** inside `describe` calls the parent method of
   the same name.
 - **Declaration order matters.** `VehicleSlot` is declared before
   `ReservedSlot`, because `extends` resolves against classes declared earlier in

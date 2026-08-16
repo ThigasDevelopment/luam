@@ -9,7 +9,7 @@ which helpers the generated code needs and the CLI copies them.
 
 | Helper | File | Injection | Features |
 | ------ | ---- | --------- | -------- |
-| `class` | `lua/class.lua` | automatic | classes, inheritance, instantiation, `self:super`, enums |
+| `class` | `lua/class.lua` | automatic | classes, inheritance, instantiation, `super`, enums |
 | `math` | `lua/math.lua` | automatic | number extensions Lua 5.1 does not ship (`math.clamp`) |
 | `string` | `lua/string.lua` | automatic | template strings, string extensions (`string.trim`, `string.startsWith`, `string.endsWith`) |
 | `table` | `lua/table.lua` | automatic | table extensions (`table.size`, `table.isEmpty`, `table.keys`, `table.values`, `table.includes`) |
@@ -47,7 +47,7 @@ The helper names mirror the `RuntimeHelper` union the compiler emitter reports.
 
 - `class 'Name' { ... }` registers a class.
 - `class 'Name' :extends 'Parent' { ... }` registers a subclass. A method that
-  overrides a parent method may call `self:super(...)`.
+  overrides a parent method may call `super(...)`.
 - `new 'Name' (...)` builds an instance and calls `constructor`.
 - `enum { 'A', 'B' }` returns a table of zero-based values.
 - `bind(func, self)`, `getClass(name)`, and `getClasses()` are available to

@@ -49,7 +49,7 @@ class VIPPlayer extends Player implements Command {
 | [Funções](/pt-br/language/functions) | Declarações, tipos de função, múltiplos retornos, variádicos. |
 | [Strings de template](/pt-br/language/template-strings) | Interpolação, padrões e a regra de escopo. |
 | [Enums e interfaces](/pt-br/language/enums-and-interfaces) | Enums baseados em zero e contratos só de compilação. |
-| [Classes](/pt-br/language/classes) | Campos, construtores, herança, `self:super`, `new`. |
+| [Classes](/pt-br/language/classes) | Campos, construtores, herança, `super`, `new`. |
 | [Decoradores](/pt-br/language/decorators) | `@Getter` e `@Setter` em um campo ou na classe inteira. |
 | [Extensões de objeto](/pt-br/language/extensions) | `items.count`, `name.trim`, `ratio.clamp(a, b)`. |
 | [Exports](/pt-br/language/exports) | `export function`, e o que chega ao `meta.xml`. |

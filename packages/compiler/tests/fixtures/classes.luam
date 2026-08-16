@@ -24,12 +24,12 @@ class VIPPlayer extends Player {
     level: number = 1
 
     constructor = function (name: string, level: number)
-        self:super(name)
+        super(name)
         self.level = level
     end
 
     takeDamage = function (amount: number): void
-        self:super(amount / 2)
+        super(amount / 2)
     end
 }
 
