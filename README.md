@@ -18,137 +18,69 @@
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
 </p>
 
-**Luam** is a typed language for [Multi Theft Auto](https://multitheftauto.com/).
-You write `.luam` files with type annotations, classes, enums and template
-strings. The compiler checks them and emits readable **Lua 5.1** plus a generated
-`meta.xml` — a resource your server can start as-is.
+Write `.luam` files with types, classes, enums and template strings. The
+compiler checks them and emits readable **Lua 5.1** plus a generated `meta.xml` —
+a resource your MTA server can start as-is.
 
-It is *typed Lua*, not TypeScript. Blocks still end with `end` and inequality is
-still `~=`, while comments use `#` and `#* ... *#` to avoid colliding with `--` decrement.
+It is *typed Lua*, not TypeScript. Blocks still end with `end`, inequality is
+still `~=`, and comments use `#` and `#* ... *#`.
 
 ```lua
-local health: number = 100
+enum Target { LUA_51, MTA }
 
-function heal(player: Player, amount: number): void
-    health += amount
+class Luam {
+    version: string
+    target: Target = Target.LUA_51
+    files: number = 0
 
-    outputChatBox(`${getPlayerName(player)} healed to ${health}`, player)
-end
+    constructor = function (version: string)
+        self.version = version
+    end
+
+    compile = function (source: string): string
+        self.files += 1
+
+        return `Luam ${self.version} compiled ${source} to plain Lua 5.1`
+    end
+}
+
+local luam = new Luam('0.13.0')
+
+outputServerLog(luam:compile('src/server/main.luam'))
 ```
 
 Annotations are erased at build time. `dxDrawText` in a server file, a typo in an
-MTA function name, a `string` passed where a `number` belongs — all build errors,
-before the server ever starts. A build with any error writes nothing.
+MTA function name, a `string` where a `number` belongs — all build errors, before
+the server starts. A build with any error writes nothing.
 
 ---
 
 ## Install
 
-> Full instructions, including `PATH` troubleshooting:
-> **[Installation](https://thigasdevelopment.github.io/luam/en/guide/installation)**
-> · [Instalação](https://thigasdevelopment.github.io/luam/pt-br/guide/installation)
-
-You need [Node.js](https://nodejs.org/) 20 or newer and an
-[MTA:SA](https://multitheftauto.com/) 1.5+ server. No Lua toolchain — the
-compiler emits Lua text, it never runs it.
-
-```bash
-node --version   # must print v20.x or newer
-```
-
-### 1. Install the CLI
+Needs [Node.js](https://nodejs.org/) 20+ and an [MTA:SA](https://multitheftauto.com/)
+1.5+ server. No Lua toolchain.
 
 ```bash
 npm install --global @thigasdevelopment/luam
-```
-
-That gives you one command, `luam`. Check it:
-
-```bash
 luam --version
 ```
 
-| Task | Command |
-| --- | --- |
-| Install | `npm install --global @thigasdevelopment/luam` |
-| Update to the latest | `npm update --global @thigasdevelopment/luam` |
-| Install a specific version | `npm install --global @thigasdevelopment/luam@0.1.1` |
-| Uninstall | `npm uninstall --global @thigasdevelopment/luam` |
-| Run once, without installing | `npx @thigasdevelopment/luam <command>` |
-
-`npx @thigasdevelopment/luam build` works anywhere and caches the download, which is handy in CI or
-on a machine you would rather not install into.
-
-<details>
-<summary><b><code>luam: command not found</code> after installing</b></summary>
-
-npm put the binary in its global bin directory and that directory is not on your
-`PATH`. Find it:
+Then install the VS Code extension — it runs the same checker as the CLI:
 
 ```bash
-npm config get prefix
+luam setup      # detects your editors and asks before installing
+luam doctor     # verifies CLI, editors and extension
 ```
 
-- **Windows** — add that folder itself to your user `PATH`
-  (*Settings → System → About → Advanced system settings → Environment
-  Variables*), then open a **new** terminal.
-- **macOS / Linux** — add `<prefix>/bin` to your `PATH` in `~/.zshrc` or
-  `~/.bashrc`, then run `source ~/.zshrc`.
-
-Nothing to configure if you would rather not: `npx @thigasdevelopment/luam <command>` needs no
-`PATH` entry at all.
-
-</details>
-
-<details>
-<summary><b>Install from source instead</b></summary>
-
-For contributing, or to run a change that is not released yet. Needs
-[pnpm](https://pnpm.io/) 9+.
-
-```bash
-git clone https://github.com/ThigasDevelopment/luam.git
-cd luam
-pnpm install
-pnpm install:cli
-```
-
-`install:cli` bundles the compiler into one self-contained file, writes a
-publishable manifest next to it, and runs `npm install --global` on the result.
-It finishes by running `luam --version` and telling you what to fix if the npm
-bin directory is not on your `PATH`.
-
-</details>
-
-### 2. Install the editor extension
-
-The VS Code extension gives you types, completion and errors while you type —
-from the same checker the CLI runs, so the editor and the build never disagree.
-Let the CLI detect supported editors and ask before changing each one:
-
-```bash
-luam setup
-```
-
-For an unattended development-machine setup, approve every detected editor:
-
-```bash
-luam setup --yes
-```
-
-Run `luam doctor` afterward to check the CLI, detected editors, and extension.
-See [Editor support](#editor-support) for the compatibility matrix and manual installation.
+> [Installation](https://thigasdevelopment.github.io/luam/en/guide/installation)
+> · [Instalação](https://thigasdevelopment.github.io/luam/pt-br/guide/installation)
+> — `PATH` troubleshooting, `npx`, install from source, manual `.vsix`.
 
 ---
 
 ## Quick start
 
-> Step by step, with a checked example:
-> **[Quick start](https://thigasdevelopment.github.io/luam/en/guide/quick-start)**
-> · [Início rápido](https://thigasdevelopment.github.io/luam/pt-br/guide/quick-start)
-
-**1. Scaffold.** `init` writes exactly one file, `.luam.manifest`. No framework, no
-example tree, nothing to delete.
+**1. Scaffold.** `init` writes exactly one file, `.luam.manifest`.
 
 ```bash
 mkdir my-resource && cd my-resource
@@ -156,8 +88,7 @@ luam init
 ```
 
 **2. Write some Luam.** Create the source tree yourself — **the folder decides
-the environment**: `src/server` is server-side, `src/client` is client-side,
-`src/shared` is both.
+the environment**: `src/server`, `src/client`, `src/shared`.
 
 ```
 my-resource/
@@ -167,32 +98,6 @@ my-resource/
     ├── server/main.luam
     └── client/hud.luam
 ```
-
-```lua
--- src/shared/config.luam
-function formatPlayerName(name: string): string
-    return 'Player: ' .. name
-end
-```
-
-```lua
--- src/server/main.luam
-addEventHandler('onPlayerJoin', root, function()
-    outputChatBox(formatPlayerName(getPlayerName(source)), root)
-end)
-```
-
-```lua
--- src/client/hud.luam
-local caption: string = `HUD ${RESOURCE_NAME:demo}`
-
-addEventHandler('onClientRender', root, function()
-    dxDrawText(caption, 10, 10)
-end)
-```
-
-The compiler already knows `formatPlayerName` is shared, so the server file may
-call it — and that `dxDrawText` from `main.luam` would be an error.
 
 **3. Build.**
 
@@ -208,15 +113,11 @@ src/client/hud.luam:4:5 error check-environment-api: API "outputChatBox" is serv
 ```
 
 **4. Run it.** Copy `build/my-resource` into
-`<MTA Server>/mods/deathmatch/resources/`, then in the server console:
-
-```
-refresh
-start my-resource
-```
+`<MTA Server>/mods/deathmatch/resources/`, then `refresh` and
+`start my-resource` in the server console.
 
 **5. Iterate.** Point `.luam.manifest` at your server and let `dev` build, sync,
-restart, and stream resource logs on every save:
+restart and stream logs on every save:
 
 ```luam
 name = 'my-resource'
@@ -226,321 +127,77 @@ serverPath = 'C:/MTA Server'
 ```bash
 luam dev
 ```
+
+> [Quick start](https://thigasdevelopment.github.io/luam/en/guide/quick-start)
+> · [Início rápido](https://thigasdevelopment.github.io/luam/pt-br/guide/quick-start)
 
 ---
 
-## The CLI
+## Commands
 
-> Every command, option and exit code:
-> **[CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli)**
+| Command | What it does |
+| --- | --- |
+| `luam init` | Scaffolds `.luam.manifest` and stops |
+| `luam check` | Compiles and prints diagnostics. Writes nothing — this is the CI command |
+| `luam build` | Writes the bundled resource into `<outDir>/<name>`, plus a source map |
+| `luam dev` | Build, sync, restart and watch, while following the server log |
+| `luam ensure` | Build, sync and restart on every save |
+| `luam trace` | Resolves a production error position back to the authored file |
+| `luam setup` | Installs the editor extension |
+| `luam doctor` | Reports CLI, Node.js, detected editors and extension status |
+
+Exit codes: `0` success, `1` build errors, `2` invalid command line or
+configuration. Progress goes to stderr and the report to stdout.
+
+> [CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli)
 > · [Comandos da CLI](https://thigasdevelopment.github.io/luam/pt-br/tooling/cli)
-
-Project commands read `.luam.manifest` from the current directory or from `--cwd`.
-`setup`, `doctor`, and `init` do not require an existing project.
-
-### `luam init`
-
-Scaffolds `.luam.manifest` and stops. The resource name comes from `--name`, or from
-the directory you are in.
-
-```bash
-luam init --name gamemode-race
-```
-
-An existing `.luam.manifest` is kept and reported — pass `--force` to overwrite it.
-
-### `luam setup`
-
-Detects supported editor commands on `PATH`, asks for consent, and installs the
-Luam extension. It tries the editor's marketplace first and falls back to the
-official `.vsix` from the GitHub release that matches the CLI version.
-
-```bash
-luam setup
-luam setup --yes
-```
-
-The command never installs into an editor silently. In CI or another
-non-interactive terminal, pass `--yes` explicitly.
-
-### `luam doctor`
-
-Reports the running CLI and Node.js versions, every supported editor detected
-on `PATH`, and whether that editor has the Luam extension.
-
-```bash
-luam doctor
-```
-
-### `luam check`
-
-Compiles everything and prints diagnostics. **Writes nothing.** This is the
-command to put in CI and in a pre-commit hook.
-
-```bash
-luam check
-```
-
-```
-src/server/main.luam:11:23 error check-type-mismatch: Variable "total" expects "number" but received "string".
-Build failed: 1 error, 0 warnings in 4 ms.
-```
-
-### `luam build`
-
-Compiles and writes the bundled production resource into `<outDir>/<name>`, plus
-`<outDir>/<name>.luam-map.json` for resolving production error positions. Pass
-`--no-bundle` for tree output or `--no-map` to suppress the map.
-
-```bash
-luam build
-```
-
-```
-Discovery: done in 1 ms.
-Compile: 3 files in 12 ms.
-Assembly: done in 0 ms.
-Manifest: done in 1 ms.
-Write: 7 files in 2 ms.
-Build passed: 3 files, 0 errors, 0 warnings in 16 ms.
-Wrote 7 files to "build/my-resource".
-```
-
-A build that reports any error writes nothing, so a resource that worked is
-never replaced with partial output.
-
-### `luam dev`
-
-Runs the `ensure` build, server sync, restart, and watch loop while following
-`<serverPath>/mods/deathmatch/logs/server.log`. It starts at the end of the file,
-so existing history is not printed.
-
-```bash
-luam dev
-```
-
-Server records attributed to the active resource and relayed client
-`outputDebugString` calls share one stable stream:
-
-```
-[14:22:07][server][info] Resource started
-[14:22:09][client][warn] Missing vehicle model
-```
-
-The client call still reaches the MTA debug console. `dev` adds a validated,
-rate-limited MTA event relay only to the synchronized server resource. `build`
-and `ensure` never include these development helpers. Engine output without a
-resource identity may appear as plain server output; records attributed to
-other resources are ignored.
-
-### `luam ensure`
-
-The loop you leave running while you work. It builds, mirrors the resource into
-your MTA server, restarts it, and repeats all of that on every save.
-
-```bash
-luam ensure
-```
-
-How much it does depends on what `.luam.manifest` gives it:
-
-| Configured | What `ensure` does |
-| --- | --- |
-| nothing | Builds into `<outDir>/<name>` and watches |
-| `serverPath` | Also mirrors the resource into the server. You restart it |
-| `serverPath` + `transport` | Also refreshes and restarts the resource for you |
-
-To get the restart, add an `http` transport pointing at a resource on your server
-that exports `refreshResources` and `restartResource`:
-
-```luam
-name = 'my-resource'
-serverPath = 'C:/MTA Server'
-
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
-```
-
-```bash
-set LUAM_MTA_PASSWORD=...       # Windows
-export LUAM_MTA_PASSWORD=...    # macOS / Linux
-luam ensure
-```
-
-Use `passwordEnv`, which names an environment variable, rather than an inline
-`password` — no log line or diagnostic ever prints the value. MTA's HTTP
-interface has no TLS, so keep `host` on `127.0.0.1` and tunnel over SSH instead
-of exposing the port.
-
-Each save rebuilds only the files whose source changed and writes only the files
-whose content changed. If the build reports an error, nothing is synced and the
-running server keeps the last version that compiled. `Ctrl+C` ends the watch;
-`--no-watch` runs the whole cycle exactly once, which is what an editor task or
-a deploy script wants.
-
-### Options and exit codes
-
-| Option | Meaning |
-| --- | --- |
-| `--cwd <path>` | Project directory holding `.luam.manifest`. Defaults to the current directory |
-| `--manifest <path>` | Load this file instead of `.luam.manifest` |
-| `--name <name>` | Resource name for `init` |
-| `--force` | Let `init` overwrite a file that exists |
-| `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default |
-| `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`; `dev` always uses tree |
-| `--no-map` | Disable source position maps |
-| `--map <path>` | Select the resource map for `luam trace` |
-| `--offline` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same |
-| `--no-color` | Plain output, no colour or emoji. `NO_COLOR` does the same |
-| `-h`, `--help` | Print the usage text |
-| `-v`, `--version` | Print the CLI version |
-
-| Exit code | Meaning |
-| --- | --- |
-| `0` | The command succeeded |
-| `1` | The build reported errors |
-| `2` | The command line or the configuration is invalid |
-
-Progress is painted on stderr and the report goes to stdout, so redirecting
-stdout captures the report alone. Output drops all escape sequences when the
-stream is not a terminal — a CI log stays readable.
-
-### `.luam.manifest`
-
-Only `name` is required.
-
-| Field | Default | Meaning |
-| --- | --- | --- |
-| `name` | required | Names the output folder and the resource `ensure` restarts. MTA reads the resource name from the folder, so it never reaches `meta.xml` |
-| `author`, `version`, `description` | unset | `meta.xml` info attributes |
-| `compilerOptions` | `strict` on, the rest off | How the checker reads the project: `strict`, `oop`, `noUnusedLocals`, `noUnusedParameters`, `warningsAsErrors` |
-| `sources` | `src/<side>/**/*.luam` | Patterns per side. The side that matches a file is its environment, unless a directive overrides it |
-| `assets` | `{ }` | `{ from, to }` mappings. Only what a mapping names is copied and declared `<file>` |
-| `dependencies` | `{ }` | Resources written as `<include resource="..." />` |
-| `engine.minVersion` | `"latest"` | Becomes `min_mta_version`. An explicit version keeps the build network-free |
-| `environment` | `.env`, `.env.local` | Which files declare and override the keys behind `env` and `process.env` |
-| `outDir` | `"build"` | Receives `<outDir>/<name>` |
-| `loadOrder` | `[]` | Source paths pinned ahead of their group in `meta.xml`. An entry matching no file fails the build |
-| `output.bundle` | `true` | Default `build` layout; command flags override it |
-| `output.map` | `true` | Generate source position maps; only `build` writes one to disk |
-| `output.minify` | `true` | Write each generated script on one line during `build`; `dev` and `ensure` never minify |
-| `helpers` | `[]` | Runtime helpers to copy even when no feature requires them |
-| `serverPath` | unset | MTA server root, for `ensure` |
-| `resourcesDir` | `"mods/deathmatch/resources"` | Resource directory relative to `serverPath` |
-| `transport` | `{ "kind": "none" }` | How `ensure` restarts the resource |
-| `development.logs` | disabled, safe limits | Client relay message length and rate limits used by `dev` |
-
-Paths must stay inside their base directory — an absolute path or a `..` segment
-is rejected. A pattern accepts `*`, `**`, and `?` only. `oop`, `sourceDirs`,
-`assetDirs`, and `mta` were removed; each reports `config-removed-field` and
-names its replacement.
-
-Every field, the transport in detail, `.env` handling and declaration files:
-**[.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)**
-and
-[Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)
-· [.luam.manifest](https://thigasdevelopment.github.io/luam/pt-br/tooling/luam-manifest)
-· also in [`packages/cli/README.md`](packages/cli/README.md).
+> — every option, the `ensure` transport, and exit-code details.
 
 ---
 
 ## The language
 
-> Every feature, with emitted Lua and the errors it catches:
-> **[The language](https://thigasdevelopment.github.io/luam/en/language/)**
-> · [A linguagem](https://thigasdevelopment.github.io/luam/pt-br/language/)
-
-```lua
-local name: string = 'Thigas'
-local player: Player? = nil          # optional
-local id: string | number = 1        # union
-local names: string[] = {}           # array
-
-type PlayerId = number               # alias
-
-enum GameState { LOBBY, PLAYING }    # GameState.LOBBY is 0
-
-interface Command {                  # compile-only, never emitted
-    name: string
-    execute(player: Player): void
-}
-
-class VIPPlayer extends Player implements Command {
-    level: number = 1
-
-    constructor = function (name: string, level: number)
-        self:super(name)
-        self.level = level
-    end
-}
-
-local vip = new VIPPlayer('Thigas', 2)
-```
-
 | Feature | Notes |
 | --- | --- |
 | Type annotations | Optionals, unions, arrays, aliases, generics, `fun(string): void` — all erased |
-| Classes | `extends`, `implements`, `constructor`, `self:super(...)`, `new`, checked statically |
-| Decorators | `@Getter` and `@Setter` generate typed Java-style accessors on fields or whole classes |
+| Classes | `extends`, `implements`, `constructor`, `self:super(...)`, `new` |
+| Decorators | `@Getter` and `@Setter` generate typed accessors |
 | Interfaces | Verified by the checker, never reach the generated Lua |
 | Enums | Zero-based, checked members, erased when unused |
 | Template strings | `` `Hi ${name:Guest}` `` — scope-checked, with defaults |
-| Compound assignment | `+=`, `-=`, `*=`, `/=`, `..=` |
-| Increment | `score++` and `score--` as statements, compiled to `score = score + 1` |
-| Comments | `# line` and `#* block *#`; write length without a space as `#items` |
-| Object extensions | `items.count` → `table.size(items)`, `name.trim`, `ratio.clamp(a, b)` |
+| Operators | `+=`, `-=`, `*=`, `/=`, `..=`, and `score++` / `score--` as statements |
+| Comments | `# line` and `#* block *#`; length without a space is `#items` |
+| Object extensions | `items.count`, `name.trim`, `ratio.clamp(a, b)` |
 | Multi-return | `local x, y, z = getElementPosition(el)` — typed from the MTA catalog |
-| `export` | Erased from the Lua, written into `meta.xml` as `<export function="f" http="false" />` |
-| Native libraries | `sleep` plus the `Threads`, `Async` and `Dotenv` classes, injected only when named |
-| Native classes | `local tasks = new Async(100)` — same `new` as a project class |
-| MTA OOP classes | `Player.getRandom()`, `File.exists(path)`, and callable constructors such as `File(path)` |
-| Deployment values | `.env` keys typed and reachable as `env.SERVER_NAME`, server-only |
+| `export` | Erased from the Lua, written into `meta.xml` |
+| Native libraries | `sleep` plus `Threads`, `Async` and `Dotenv`, injected only when named |
+| MTA OOP classes | `Player.getRandom()`, `File.exists(path)`, callable constructors |
+| Deployment values | `.env` keys typed as `env.SERVER_NAME`, server-only |
 | Strictness | `#!strict` (default), `#!nonstrict`, `#!nocheck` per file |
 
 `class`, `constructor`, `declare`, `enum`, `export`, `extends`, `implements`,
-`interface`, `new` and `type` are **reserved**, on top of the 21 Lua 5.1
-keywords. Existing Lua that uses one as an identifier needs a rename — but a
-property name still works (`config.type`), and `type(value)` keeps working
-because `type` stays callable. `fun` is the one term that stays contextual.
-
-Reach for `#!nocheck` when porting existing Lua: rename to `.luam` and the build
-passes while you annotate module by module.
+`interface`, `new` and `type` are **reserved** on top of the Lua 5.1 keywords.
+Property names still work (`config.type`), and `type(value)` keeps working.
+Porting existing Lua? Rename to `.luam`, add `#!nocheck`, and annotate module by
+module.
 
 ### Environments
 
 Every file is `server`, `client` or `shared` — from its folder, or from a `#!`
-directive. That decides which MTA APIs resolve.
+directive. That decides which MTA APIs resolve: `dxDrawText` in a client file is
+fine, `outputChatBox` in the same file is a build error.
 
-```lua
-#!client
+`server` and `client` may use `shared` declarations; `shared` may use only
+`shared`; `server` and `client` never see each other. A name the catalog does
+not know stays `any`, so a missing API never blocks a build.
 
-dxDrawText('hud', 10, 10)   # ok
-outputChatBox('hi', player) # error: server API in a client file
-```
-
-`server` and `client` files may use `shared` declarations; `shared` may use only
-`shared`; `server` and `client` never see each other. Events are scoped the same
-way. A name the catalog does not know stays `any`, so a missing API never blocks
-a build.
-
-The catalog ships **1294 MTA declarations**, **203 events**, **57 element types**
-and the Lua standard library, generated from the MTA wiki — plus the OOP surface
-(**57 classes, 652 methods, 118 static methods, 46 constructors**) behind
-`"oop": true`.
-
-`File(path)` opens an existing file read/write and creates it when missing.
-Use `File.new(path)` only for destructive creation because it truncates an
-existing file. Use `fileOpen(path, true)` when read-only access is required.
+> [The language](https://thigasdevelopment.github.io/luam/en/language/)
+> · [A linguagem](https://thigasdevelopment.github.io/luam/pt-br/language/)
+> — every feature, with the emitted Lua and the errors it catches.
 
 ---
 
-## What you get out
+## Output
 
 ```
 build/
@@ -556,138 +213,62 @@ build/
         └── client.lua
 ```
 
-`build` ships at most one bundle per non-empty environment. `config.lua`, `.env`,
-and assets remain unbundled at their stable paths, and the map remains outside
-the resource. `ensure` defaults to a mirrored tree and `dev` always uses one.
-Use `luam trace src/server.lua:42` with the matching map to recover the authored
-file, line, and symbol. See [output layouts and source maps](https://thigasdevelopment.github.io/luam/en/reference/output-layouts).
+`build` ships at most one bundle per non-empty environment; `config.lua`, `.env`
+and assets stay at their own paths, and the map stays outside the resource.
+`ensure` defaults to a mirrored tree and `dev` always uses one.
 
-`min_mta_version` is resolved from the latest MTA release and cached;
-with no network and no cache it is omitted with a warning, and the build still
-succeeds.
+> [Output layouts and source maps](https://thigasdevelopment.github.io/luam/en/reference/output-layouts)
+
+---
+
+## Configuration
+
+`.luam.manifest` — only `name` is required.
+
+```luam
+name = 'my-resource'
+serverPath = 'C:/MTA Server'
+```
+
+Optional fields cover `meta.xml` info, `compilerOptions`, `sources`, `assets`,
+`dependencies`, `engine.minVersion`, `environment`, `outDir`, `loadOrder`,
+`output`, `helpers`, `resourcesDir`, `transport` and `development.logs`.
+
+> [.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)
+> and [Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)
+> · [.luam.manifest](https://thigasdevelopment.github.io/luam/pt-br/tooling/luam-manifest)
 
 ---
 
 ## Editor support
 
-> Compatibility matrix, manual `.vsix` install, settings:
-> **[Editors](https://thigasdevelopment.github.io/luam/en/tooling/editors)**
+The **Luam** VS Code extension runs a language server built on the same frontend
+as the CLI, so the editor and the build never disagree: syntax highlighting,
+diagnostics on every keystroke, scoped completion, hover types, go to
+definition, find references and rename.
+
+Supported and auto-installed by `luam setup`: VS Code, VS Code Insiders, Cursor,
+VSCodium and Windsurf. The language server itself is editor-agnostic and speaks
+`--stdio` to any LSP client.
+
+> [Editors](https://thigasdevelopment.github.io/luam/en/tooling/editors)
 > · [Editores](https://thigasdevelopment.github.io/luam/pt-br/tooling/editors)
-
-The **Luam** extension for VS Code starts a language server built on the same
-frontend the CLI uses, so the editor and the build never disagree about a file.
-
-| You get | Details |
-| --- | --- |
-| Syntax highlighting | `.luam` files, including type annotations and template strings |
-| Diagnostics | On open and on every keystroke, cleared when you fix the file |
-| Completion | Scope symbols, workspace globals, MTA APIs scoped to the file's environment, keywords |
-| Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members |
-| Hover | Declared or inferred type, function signature, and the environment of an MTA API |
-| Navigation | Go to definition, find references, rename — across files for globals |
-
-Completion is scoped exactly like the checker: `dxDrawText` never appears in a
-server file, `kickPlayer` never appears in a client file.
-
-### Installing it
-
-**Through the CLI (recommended).** The command detects all supported editors
-whose launchers are on `PATH` and asks before installing:
-
-```bash
-luam setup
-```
-
-| Editor | Launcher detected | Automatic installation | Distribution path |
-| --- | --- | --- | --- |
-| Visual Studio Code | `code` | Yes | Marketplace, then release `.vsix` fallback |
-| Visual Studio Code Insiders | `code-insiders` | Yes | Marketplace, then release `.vsix` fallback |
-| Cursor | `cursor` | Yes | Editor marketplace, then release `.vsix` fallback |
-| VSCodium | `codium` | Yes | Open VSX when available, then release `.vsix` fallback |
-| Windsurf | `windsurf` | Yes | Editor marketplace, then release `.vsix` fallback |
-
-Other VS Code-compatible forks can usually install the release `.vsix`
-manually, but `luam setup` does not claim support until their launcher and
-extension APIs are stable. JetBrains IDEs need a separate plugin and are not
-supported by this VS Code extension. Neovim, Zed, and Sublime Text need their
-own LSP adapter or extension and are not currently supported.
-
-**From a release.** Download `luam-<version>.vsix` from the
-[Releases page](https://github.com/ThigasDevelopment/luam/releases), then use
-the launcher for your editor:
-
-```bash
-code --install-extension luam-0.1.1.vsix
-cursor --install-extension luam-0.1.1.vsix
-codium --install-extension luam-0.1.1.vsix
-windsurf --install-extension luam-0.1.1.vsix
-```
-
-In a compatible editor, you can also open **Extensions**, choose **Install from
-VSIX**, and select the downloaded file. Reload the window when prompted.
-
-**From source.** Build the VSIX yourself:
-
-```bash
-git clone https://github.com/ThigasDevelopment/luam.git
-cd luam
-pnpm install
-pnpm --filter luam bundle
-npx --yes @vscode/vsce package --no-dependencies --skip-license --out luam.vsix
-code --install-extension luam.vsix
-```
-
-**To hack on the extension**, skip packaging and launch a development host
-instead — it reloads on rebuild:
-
-```bash
-pnpm --filter luam bundle
-code --extensionDevelopmentPath=packages/vscode
-```
-
-The extension activates when the workspace holds a `.luam.manifest` or any `.luam`
-file, so open your resource folder as the workspace root.
-
-### Commands and settings
-
-| Command | Shortcut | What it does |
-| --- | --- | --- |
-| **Luam: Ensure Resource** | `Ctrl+Alt+E` (`Cmd+Alt+E`) | Runs `luam ensure` in a terminal for the current project |
-| **Luam: Restart Language Server** | — | Restarts the server when it gets confused |
-
-| Setting | Default | Meaning |
-| --- | --- | --- |
-| `luam.cliPath` | `"luam"` | Command used to run the CLI. Point it at a bundle to test an unreleased build |
-| `luam.ensureWatch` | `true` | Pass `--watch` when the ensure command runs |
-| `luam.trace.server` | `"off"` | Trace the LSP traffic. Set to `"verbose"` when reporting a bug |
-
-### Other editors
-
-The language server is editor-agnostic. Bundle it and launch it with `--stdio`
-from any LSP client:
-
-```bash
-pnpm --filter @luam/lsp bundle   # emits packages/lsp/dist/luam-lsp.mjs
-node packages/lsp/dist/luam-lsp.mjs --stdio
-```
+> — compatibility matrix, manual `.vsix` install, commands and settings.
 
 ---
 
 ## Known limitations
 
-> With the workaround for each:
-> **[Limitations](https://thigasdevelopment.github.io/luam/en/reference/limitations)**
-> · [Limitações](https://thigasdevelopment.github.io/luam/pt-br/reference/limitations)
-
 - **No type narrowing.** `if value ~= nil then` does not refine `string?`.
-- **Declaration order matters for classes within a file.** `extends` and `new`
-  resolve against classes declared earlier in the same file.
-- **The MTA catalog can lag a release.** It comes from a pinned snapshot; a newer
-  function stays `any` rather than erroring.
+- **Declaration order matters for classes within a file.**
+- **The MTA catalog can lag a release** — a newer function stays `any`.
 - **No static members, declared metamethods, or generic classes.**
 - **The editor does not re-check an open file when another one changes.**
-  Cross-module violations surface in `luam check`.
 - **An export is named, never verified** against the side that calls it.
+
+> [Limitations](https://thigasdevelopment.github.io/luam/en/reference/limitations)
+> · [Limitações](https://thigasdevelopment.github.io/luam/pt-br/reference/limitations)
+> — with the workaround for each.
 
 ---
 
@@ -698,39 +279,25 @@ The repo is a pnpm workspace: `compiler`, `cli`, `lsp`, `vscode`, `runtime`,
 
 ```bash
 pnpm install
-pnpm typecheck    # strict TypeScript across every package
-pnpm test         # 769 tests
+pnpm typecheck
+pnpm test
 pnpm build
 ```
 
 Branch from `develop`, add a fixture and a snapshot for new language behaviour,
-and run `pnpm typecheck && pnpm test` before opening a pull request. The house
-style is TypeScript only, strict, no `any`, no comments inside code, 4-space
-indentation, single quotes, kebab-case file names, path aliases instead of `../`
-imports, no barrel files, and everything written in English.
+and run `pnpm typecheck && pnpm test` before opening a pull request. House style:
+TypeScript only, strict, no `any`, no comments inside code, 4-space indentation,
+single quotes, kebab-case file names, path aliases instead of `../` imports, no
+barrel files, everything in English.
 
-Each package documents itself: [`cli`](packages/cli/README.md),
-[`lsp`](packages/lsp/README.md), [`mta-types`](packages/mta-types/README.md),
-[`vscode`](packages/vscode/README.md) and
-[`template`](packages/template/README.md). Released milestones and their changes
-are in the [changelog](CHANGELOG.md).
+The manual lives in [`docs/`](docs/) — `pnpm docs:dev` to preview,
+`pnpm docs:verify` before pushing. English is the source locale and pt-BR is
+translated from it; CI fails when a page is missing from one.
 
-### The manual
-
-The user-facing manual lives in [`docs/`](docs/) and is published to
-[thigasdevelopment.github.io/luam](https://thigasdevelopment.github.io/luam/).
-
-```bash
-pnpm docs:dev       # local preview with hot reload
-pnpm docs:verify    # locale parity, snippet checks, and a full build
-```
-
-English is the source locale and pt-BR is translated from it; every page exists in
-both, and CI fails when one is missing. Code samples are real files under
-`docs/snippets/`, verified with `luam check` on every documentation build, and
-rendered into both locales from the same source — so a sample cannot drift. See
-the [documentation changelog](https://thigasdevelopment.github.io/luam/en/changelog)
-for the conventions.
+Per-package docs: [`cli`](packages/cli/README.md), [`lsp`](packages/lsp/README.md),
+[`mta-types`](packages/mta-types/README.md), [`vscode`](packages/vscode/README.md),
+[`template`](packages/template/README.md). Releases are in the
+[changelog](CHANGELOG.md).
 
 ---
 
