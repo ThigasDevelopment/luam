@@ -44,7 +44,7 @@ class Luam {
     end
 }
 
-local luam = new Luam('0.13.0')
+local luam = new Luam('0.14.0')
 
 outputServerLog(luam:compile('src/server/main.luam'))
 ```
