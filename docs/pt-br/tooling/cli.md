@@ -71,7 +71,7 @@ formato exato do resource e as sobrescritas.
 bundles, a árvore espelhada com `--no-bundle`, os helpers de runtime e o
 `config.lua` — é escrito em uma única linha, sem comentários e sem formatação.
 Identificadores nunca são renomeados, então um erro em tempo de execução ainda
-nomeia a função que você escreveu. `meta.xml`, `.env` e os assets são escritos
+nomeia a função que você escreveu. `meta.xml`, `env.lua` e os assets são escritos
 sem alteração. `ensure` e `dev` mantêm a saída legível de sempre.
 
 ```

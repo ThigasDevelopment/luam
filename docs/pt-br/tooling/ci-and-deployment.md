@@ -89,7 +89,7 @@ regras de transporte — veja
 - Nunca versione uma senha. `transport.passwordEnv` nomeia uma variável de
   ambiente, que é o que um cofre de segredos de CI fornece.
 - O `.env` é versionado e declara chaves e padrões seguros; o
-  `<outDir>/<name>/.env` implantado é escrito uma vez, com chaves de aparência
+  `<outDir>/<name>/env.lua` implantado é escrito uma vez, com chaves de aparência
   sensível esvaziadas, e nunca é sobrescrito por um rebuild.
 - A interface HTTP do MTA não tem TLS. Mantenha `host` em `127.0.0.1` e faça um
   túnel por SSH em vez de expor a porta a um runner.

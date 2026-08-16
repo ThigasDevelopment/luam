@@ -5,7 +5,7 @@ import { readHelperSource } from '@cli/build/helper-files';
 import { minifyLuaFiles } from '@cli/build/lua-minifier';
 import { pruneResource } from '@cli/build/resource-prune';
 import type { ProgressReporter } from '@compiler/project/progress';
-import { ENVIRONMENT_FILE, ENVIRONMENT_SCRIPT, type ResourceBuild } from '@compiler/project/resource';
+import { ENVIRONMENT_FILE, type ResourceBuild } from '@compiler/project/resource';
 
 export interface WriteResult {
     written: string[];
@@ -17,6 +17,7 @@ export interface WriteOptions {
     root: string;
     generatedFiles: readonly string[];
     generatedRoots: readonly string[];
+    environmentTemplate: string | null;
     minify?: boolean;
     onProgress?: ProgressReporter;
 }
@@ -77,19 +78,19 @@ function writeIfChanged(absolute: string, content: Buffer): boolean {
     return true;
 }
 
-function writeEnvironmentScript(targetDir: string, script: ResourceBuild['environmentScript']): boolean {
-    if (script === null) {
+function writeEnvironmentFile(targetDir: string, template: string | null): boolean {
+    if (template === null) {
         return false;
     }
 
-    const absolute = resolveInside(targetDir, script.path);
+    const absolute = resolveInside(targetDir, ENVIRONMENT_FILE);
 
     if (existsSync(absolute)) {
         return false;
     }
 
     mkdirSync(dirname(absolute), { recursive: true });
-    writeFileSync(absolute, script.content, 'utf8');
+    writeFileSync(absolute, template, 'utf8');
 
     return true;
 }
@@ -98,7 +99,7 @@ export function writeResource(targetDir: string, build: ResourceBuild, options: 
     const assembled = resourceFiles(build);
     const files = options.minify === true ? minifyLuaFiles(assembled) : assembled;
     const written: string[] = [];
-    const total = files.size + build.assets.length + (build.environmentScript === null ? 0 : 1);
+    const total = files.size + build.assets.length + (options.environmentTemplate === null ? 0 : 1);
     let index = 0;
     let unchanged = 0;
 
@@ -131,15 +132,15 @@ export function writeResource(targetDir: string, build: ResourceBuild, options: 
         advance(asset.path);
     }
 
-    if (build.environmentScript !== null) {
-        if (writeEnvironmentScript(targetDir, build.environmentScript)) {
-            written.push(build.environmentScript.path);
+    if (options.environmentTemplate !== null) {
+        if (writeEnvironmentFile(targetDir, options.environmentTemplate)) {
+            written.push(ENVIRONMENT_FILE);
         }
 
-        advance(build.environmentScript.path);
+        advance(ENVIRONMENT_FILE);
     }
 
-    const keep = new Set([...files.keys(), ...build.assets.map((asset) => asset.path), ENVIRONMENT_FILE, ENVIRONMENT_SCRIPT]);
+    const keep = new Set([...files.keys(), ...build.assets.map((asset) => asset.path), ENVIRONMENT_FILE]);
     const removed = pruneResource(targetDir, keep, { generatedFiles: options.generatedFiles, generatedRoots: options.generatedRoots });
 
     return { written: written.sort((left, right) => left.localeCompare(right)), removed, unchanged };

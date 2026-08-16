@@ -1,7 +1,7 @@
 addEventHandler('onResourceStart', resourceRoot, function()
-    local name: string = process.env.SERVER_NAME
-    local maxPlayers: number = process.env.MAX_PLAYERS
-    local debug: boolean = process.env.DEBUG
+    local name: string = env.SERVER_NAME
+    local maxPlayers: number = env.MAX_PLAYERS
+    local debug: boolean = env.DEBUG
 
     outputServerLog(`${name} accepts ${maxPlayers} players`)
 

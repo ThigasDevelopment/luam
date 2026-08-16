@@ -8,7 +8,7 @@ diferentes**.
 | `config.lua` | O autor do resource | sim | **sim** |
 | `.env` | A implantação | sim | não |
 | `.env.local` | A máquina de um desenvolvedor | não | não |
-| `<outDir>/<name>/.env` | O administrador do servidor | não | não |
+| `<outDir>/<name>/env.lua` | O administrador do servidor | não | não |
 
 ## `config.lua`
 
@@ -55,8 +55,8 @@ Um número sem aspas é `number`, `true` e `false` são `boolean`, e usar aspas 
 
 ## Lendo os valores
 
-Os valores chegam ao Luam por `process.env`, construído no servidor pelo helper de
-runtime `env`:
+Os valores chegam ao Luam por `env` e `process.env`, publicados no servidor pelo
+`env.lua` gerado:
 
 <<< @/snippets/environment-configuration/src/server/startup.luam
 
@@ -78,14 +78,33 @@ Aqui o `.env` é **versionado** e o `.env.local` é ignorado. O `.env` é uma
 declaração de chaves e padrões seguros, não um cofre de segredos.
 :::
 
-## O `.env` implantado
+## O `env.lua` implantado
 
-O primeiro build escreve `<outDir>/<name>/.env` a partir das chaves declaradas,
+O primeiro build escreve `<outDir>/<name>/env.lua` a partir das chaves declaradas,
 esvaziando qualquer chave cujo nome pareça sensível — `password`, `secret`,
-`token`, `key`, `credential`, `dsn` ou `private`.
+`token`, `key`, `credential`, `dsn` ou `private`:
 
-Ele **nunca é sobrescrito depois**, então as edições do administrador sobrevivem a
-todo rebuild. Apague-o para regenerar o esqueleto.
+```lua
+local values = {
+    DEBUG = false,
+    MAX_PLAYERS = 32,
+    SERVER_NAME = 'Luam Docs Server',
+    WEBHOOK_TOKEN = '',
+}
+```
+
+Ele **nunca é sobrescrito depois** e nunca é removido pela limpeza, então as
+edições do administrador sobrevivem a todo rebuild e a todo `ensure`. É isso que
+impede um deploy de substituir a configuração de um servidor em execução pelos
+valores da sua máquina. Apague-o para regenerar o esqueleto.
+
+Os valores são editados no lugar, então seguem a sintaxe Lua: texto fica entre
+aspas, números e booleanos não. Abaixo da tabela o arquivo publica `env` e
+`process.env` por trás de um metatable que levanta erro em chave não declarada e
+recusa atribuição.
+
+O resource não leva um `.env` próprio. O `.env.local` nunca chega ao arquivo
+gerado — os overrides dele valem só para o checker na sua máquina.
 
 ## Escolhendo entre os dois
 
@@ -93,5 +112,5 @@ todo rebuild. Apague-o para regenerar o esqueleto.
 | --- | --- |
 | Ajuste de jogo que um jogador pode ler | `config.lua` |
 | Nome do servidor, um limite, uma flag de recurso | `.env` |
-| Uma senha, um token, uma chave de API | `.env` no servidor, esvaziado no arquivo versionado |
+| Uma senha, um token, uma chave de API | `env.lua` no servidor, esvaziado no `.env` versionado |
 | Diferente por máquina durante o desenvolvimento | `.env.local` |

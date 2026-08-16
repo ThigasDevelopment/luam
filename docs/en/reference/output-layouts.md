@@ -26,7 +26,7 @@ build/
 └── my-resource/
     ├── meta.xml
     ├── config.lua                when authored
-    ├── .env                      when declared; written once
+    ├── env.lua                   when keys are declared; written once
     ├── assets/                   authored paths preserved
     └── src/
         ├── shared.lua            when shared code or helpers exist
@@ -52,12 +52,12 @@ bundles in shared, server, client order:
 <script src="src/client.lua" type="client" cache="false" />
 ```
 
-`config.lua`, `.env`, and assets are never put into a bundle. `config.lua` stays
-at the resource root and remains a shared script. `.env` stays at the root for
-the server-only environment helper and never receives a `<file>` entry. Assets
-keep their authored paths and normal `<file>` entries. See
-[config.lua and .env](/en/mta/configuration) for their ownership and security
-rules.
+`config.lua`, `env.lua`, and assets are never put into a bundle. `config.lua`
+stays at the resource root and remains a shared script. `env.lua` stays at the
+root as a server script, because it is owned by the administrator and written
+once rather than regenerated. Assets keep their authored paths and normal
+`<file>` entries. See [config.lua and .env](/en/mta/configuration) for their
+ownership and security rules.
 
 ## Tree layout
 
@@ -67,31 +67,36 @@ The tree layout keeps each generated module and runtime helper separate:
 my-resource/
 ├── meta.xml
 ├── config.lua
-├── .env
+├── env.lua
 ├── assets/
 ├── lib/
-│   ├── shared/class.lua
-│   └── server/env.lua
+│   ├── class.lua
+│   └── string.lua
 └── src/
     ├── shared/labels.lua
     ├── server/greet.lua
     └── client/hud.lua
 ```
 
-The manifest lists helpers, `config.lua`, pinned `loadOrder` entries, and then
-the source groups. This is the normal `ensure` and fixed `dev` shape because a
-running resource remains easy to inspect. Use `luam build --no-bundle` when a
-local build also needs this shape.
+Runtime helpers sit flat in `lib/`, one file per helper. A helper resolves to a
+single environment per build, so the directory never needs to separate them —
+each `meta.xml` entry carries its own environment.
+
+The manifest lists helpers, `env.lua` and `config.lua`, pinned `loadOrder`
+entries, and then the source groups. This is the normal `ensure` and fixed `dev`
+shape because a running resource remains easy to inspect. Use
+`luam build --no-bundle` when a local build also needs this shape.
 
 Switching layouts removes generated files from the previous layout. Files whose
-bytes did not change are not rewritten, and `.env` is never overwritten.
+bytes did not change are not rewritten, and `env.lua` is never overwritten.
 
 ## Production minification
 
 `luam build` writes every generated `.lua` file as a single line. It applies to
 bundles, to the mirrored tree under `--no-bundle`, to runtime helpers under
-`lib/`, and to `config.lua`. `meta.xml`, `.env`, and copied assets are written
-byte for byte as they were.
+`lib/`, and to `config.lua`. `meta.xml`, `env.lua`, and copied assets are written
+byte for byte as they were — `env.lua` is edited by an administrator, so it stays
+readable.
 
 The transformation lexes Lua 5.1 rather than matching text, so it is safe for
 every construct the emitter can produce:

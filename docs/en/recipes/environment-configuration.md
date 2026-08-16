@@ -101,7 +101,7 @@ unknown to the checker.
 
 ## Security note
 
-The generated `<outDir>/<name>/.env` **blanks** any key whose name looks
+The generated `<outDir>/<name>/env.lua` **blanks** any key whose name looks
 sensitive — `password`, `secret`, `token`, `key`, `credential`, `dsn`, `private`
 — which is why `WEBHOOK_TOKEN` ships empty. The administrator fills it in on the
 server, and no rebuild overwrites that file. Delete it to regenerate the

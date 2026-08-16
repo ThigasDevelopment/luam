@@ -8,7 +8,7 @@ import { findLibraryMember, isLibrary, type LibraryName } from '@mta-types/libra
 import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
-import { descriptorText, namedDescriptorText } from '@lsp/features/api-text';
+import { descriptorShapeText, namedDescriptorText } from '@lsp/features/api-text';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
@@ -87,7 +87,7 @@ function projectHover(analysis: DocumentAnalysis, name: string): Hover | null {
     const origin = target.type.kind === 'record' && target.type.origin !== null ? `"${target.type.origin}"` : 'the project';
     const scope = `declared in ${origin} (${target.environment})`;
 
-    return { contents: { kind: 'markdown', value: `${markdown(descriptorText(name, target.type))}\n\n${scope}` } };
+    return { contents: { kind: 'markdown', value: `${markdown(descriptorShapeText(name, target.type, analysis.env))}\n\n${scope}` } };
 }
 
 function recordMemberHover(analysis: DocumentAnalysis, name: string): Hover | null {

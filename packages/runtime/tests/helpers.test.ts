@@ -12,6 +12,7 @@ import {
     helperForFeature,
     helperForGlobal,
     isRuntimeHelperName,
+    manualHelpers,
     referenceHelpers,
     resolveHelperUrl,
     resolveDevelopmentHelperUrl,
@@ -72,8 +73,9 @@ describe('runtime helpers', () => {
         }
     });
 
-    it('injects a helper from a language feature or a referenced global', () => {
+    it('injects a helper from a language feature, a referenced global, or an opt-in', () => {
         expect(automaticHelpers()).toEqual(['class', 'math', 'string', 'table']);
+        expect(manualHelpers()).toEqual(['env']);
         expect(referenceHelpers()).toEqual(['async', 'threads']);
     });
 
@@ -96,11 +98,11 @@ describe('runtime helpers', () => {
         expect(helperDepth('class')).toBe(0);
     });
 
-    it('ships no helper that reads deployment values, so none is pinned to an environment', () => {
+    it('pins the environment helper to the server so deployment values never reach a client', () => {
         const pinned = Object.values(RUNTIME_HELPERS).filter((helper) => helper.environment !== undefined);
 
-        expect(pinned).toEqual([]);
-        expect(names).not.toContain('env');
+        expect(pinned.map((helper) => helper.name)).toEqual(['env']);
+        expect(RUNTIME_HELPERS.env.requires).toBeUndefined();
         expect(names).not.toContain('dotenv');
     });
 

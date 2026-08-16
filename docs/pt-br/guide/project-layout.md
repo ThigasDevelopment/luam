@@ -46,7 +46,7 @@ build/
 └── my-resource/
     ├── meta.xml
     ├── config.lua
-    ├── .env
+    ├── env.lua
     ├── assets/
     └── src/
         ├── shared.lua
@@ -54,7 +54,7 @@ build/
         └── client.lua
 ```
 
-`build` usa bundles de produção por padrão. `config.lua`, `.env` e assets ficam
+`build` usa bundles de produção por padrão. `config.lua`, `env.lua` e assets ficam
 fora dos bundles, e o mapa fica fora do resource. `ensure` usa uma árvore
 espelhada por padrão e `dev` sempre a usa. Veja
 [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts) para as

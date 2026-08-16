@@ -63,8 +63,8 @@ runtime. Este build empacota, então o helper é embutido no topo de
 `src/server.lua`. Um build em árvore escreve `lib/string.lua` no lugar — nunca
 dentro da sua árvore de código.
 
-Não há `.env` na saída, porque o projeto não tem um `.env` de onde declarar
-chaves. Adicione um e o build escreve uma cópia implantada; veja
+Não há `env.lua` na saída, porque o projeto não tem um `.env` de onde declarar
+chaves. Adicione um e o build compila as chaves dele em `env.lua`; veja
 [Configuração de ambiente](/pt-br/recipes/environment-configuration).
 
 O manifesto gerado:

@@ -27,7 +27,7 @@ build/
 └── my-resource/
     ├── meta.xml
     ├── config.lua                quando escrito pelo autor
-    ├── .env                      quando declarado; escrito uma vez
+    ├── env.lua                   quando há chaves declaradas; escrito uma vez
     ├── assets/                   caminhos originais preservados
     └── src/
         ├── shared.lua            quando há código ou helpers shared
@@ -54,12 +54,12 @@ não vazios na ordem shared, server, client:
 <script src="src/client.lua" type="client" cache="false" />
 ```
 
-`config.lua`, `.env` e assets nunca entram em um bundle. `config.lua` permanece
-na raiz do resource e continua sendo um script shared. `.env` permanece na raiz
-para o helper de ambiente exclusivo do servidor e nunca recebe uma entrada
-`<file>`. Assets mantêm os caminhos originais e suas entradas `<file>` normais.
-Veja [config.lua e .env](/pt-br/mta/configuration) para as regras de propriedade e
-segurança.
+`config.lua`, `env.lua` e assets nunca entram em um bundle. `config.lua` permanece
+na raiz do resource e continua sendo um script shared. `env.lua` permanece na raiz
+como script de servidor, porque pertence ao administrador e é escrito uma vez em
+vez de regerado. Assets mantêm os caminhos originais e suas entradas `<file>`
+normais. Veja [config.lua e .env](/pt-br/mta/configuration) para as regras de
+propriedade e segurança.
 
 ## Estrutura em árvore
 
@@ -69,11 +69,11 @@ A estrutura em árvore mantém cada módulo gerado e helper de runtime separado:
 my-resource/
 ├── meta.xml
 ├── config.lua
-├── .env
+├── env.lua
 ├── assets/
 ├── lib/
-│   ├── shared/class.lua
-│   └── server/env.lua
+│   ├── class.lua
+│   └── string.lua
 └── src/
     ├── shared/labels.lua
     ├── server/greet.lua
@@ -86,14 +86,15 @@ resource em execução permanece fácil de inspecionar. Use
 `luam build --no-bundle` quando um build local também precisar desse formato.
 
 Trocar de estrutura remove arquivos gerados pela estrutura anterior. Arquivos
-cujos bytes não mudaram não são reescritos, e `.env` nunca é sobrescrito.
+cujos bytes não mudaram não são reescritos, e `env.lua` nunca é sobrescrito.
 
 ## Minificação de produção
 
 O `luam build` escreve cada arquivo `.lua` gerado em uma única linha. Isso vale
 para os bundles, para a árvore espelhada com `--no-bundle`, para os helpers de
-runtime em `lib/` e para o `config.lua`. `meta.xml`, `.env` e os assets copiados
-são escritos byte a byte como estavam.
+runtime em `lib/` e para o `config.lua`. `meta.xml`, `env.lua` e os assets copiados
+são escritos byte a byte como estavam — o `env.lua` é editado por um
+administrador, então continua legível.
 
 A transformação analisa tokens de Lua 5.1 em vez de casar texto, então é segura
 para todas as construções que o emissor produz:

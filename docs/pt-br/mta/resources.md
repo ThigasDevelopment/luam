@@ -11,7 +11,7 @@ build/
 └── my-resource/
     ├── meta.xml
     ├── config.lua
-    ├── .env
+    ├── env.lua
     ├── assets/
     └── src/
         ├── shared.lua
@@ -52,7 +52,7 @@ Entradas `<export>` vêm de [funções `export`](/pt-br/language/exports), e ent
 
 Helpers são incluídos **somente quando o código gerado usa o recurso**. A saída em
 bundle os coloca antes dos módulos dentro do bundle do ambiente. A saída em árvore
-os escreve em `lib/<ambiente>/`, fora da árvore de código:
+os escreve direto em `lib/`, fora da árvore de código:
 
 | Helper | Copiado quando |
 | --- | --- |
@@ -99,7 +99,7 @@ binário não é reescrito.
 A limpeza remove o que o build não produz mais: arquivos `.lua`, o `meta.xml` e
 qualquer coisa dentro de um diretório de código configurado, de um diretório de
 assets configurado ou de `lib/`. Um arquivo que o build nunca escreveu é mantido, e
-o `.env` nunca é tocado.
+o `env.lua` nunca é tocado.
 
 **Um build que reporta qualquer erro não escreve nada**, então um resource que
 funcionava nunca é substituído por uma saída parcial.

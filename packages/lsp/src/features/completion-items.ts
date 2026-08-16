@@ -9,7 +9,7 @@ import { memberDocumentation } from '@mta-types/documentation-lookup';
 import { LIBRARY_MEMBERS, type LibraryName } from '@mta-types/library-members';
 import { CompletionItemKind, InsertTextFormat, InsertTextMode, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
-import { descriptorText, namedDescriptorText } from '@lsp/features/api-text';
+import { descriptorShapeText, descriptorText, namedDescriptorText, valueText } from '@lsp/features/api-text';
 import { documentationBody, documentationFor } from '@lsp/features/documentation-text';
 import type { SymbolDeclaration, SymbolKind } from '@lsp/symbols/symbol';
 
@@ -83,17 +83,30 @@ export function apiItem(declaration: ApiDeclaration): CompletionItem {
     return { ...item, documentation: { kind: MarkupKind.Markdown, value: body.join('\n\n') } };
 }
 
+export function projectItem(declaration: ApiDeclaration, values: Readonly<Record<string, string>>): CompletionItem {
+    const origin = declaration.type.kind === 'record' && declaration.type.origin !== null ? `"${declaration.type.origin}"` : 'the project';
+    const shape = descriptorShapeText(declaration.name, declaration.type, values);
+
+    return {
+        label: declaration.name,
+        kind: CompletionItemKind.Variable,
+        detail: `declared in ${origin} (${declaration.environment})`,
+        documentation: { kind: MarkupKind.Markdown, value: ['```luam', shape, '```'].join('\n') },
+    };
+}
+
 function withDocumentation(item: CompletionItem, documentation: ApiDocumentation): CompletionItem {
     const body = documentationBody(documentation);
 
     return body.length === 0 ? item : { ...item, documentation: { kind: MarkupKind.Markdown, value: body.join('\n\n') } };
 }
 
-export function memberItem(name: string, type: Type, isMethod: boolean, owner: string): CompletionItem {
+export function memberItem(name: string, type: Type, isMethod: boolean, owner: string, value?: string): CompletionItem {
+    const assigned = value === undefined ? '' : ` = ${valueText(type.kind, value)}`;
     const item: CompletionItem = {
         label: name,
         kind: isMethod ? CompletionItemKind.Method : CompletionItemKind.Field,
-        detail: `${owner}.${name}: ${typeToString(type)}`,
+        detail: `${owner}.${name}: ${typeToString(type)}${assigned}`,
     };
 
     return withDocumentation(item, memberDocumentation(owner, name));

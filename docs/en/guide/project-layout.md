@@ -46,7 +46,7 @@ build/
 └── my-resource/
     ├── meta.xml
     ├── config.lua
-    ├── .env
+    ├── env.lua
     ├── assets/
     └── src/
         ├── shared.lua
@@ -54,7 +54,7 @@ build/
         └── client.lua
 ```
 
-`build` uses production bundles by default. `config.lua`, `.env`, and assets stay
+`build` uses production bundles by default. `config.lua`, `env.lua`, and assets stay
 outside the bundles, and the map stays outside the resource. `ensure` uses a
 mirrored tree by default and `dev` always uses it. See
 [Output layouts and source maps](/en/reference/output-layouts) for both complete

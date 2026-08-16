@@ -71,7 +71,7 @@ resource shape and overrides.
 bundles, the mirrored tree under `--no-bundle`, runtime helpers, and `config.lua`
 — is written as one line with its comments and formatting removed. Identifiers
 are never renamed, so a runtime error still names the function you wrote.
-`meta.xml`, `.env`, and assets are written untouched. `ensure` and `dev` keep the
+`meta.xml`, `env.lua`, and assets are written untouched. `ensure` and `dev` keep the
 readable output they always had.
 
 ```

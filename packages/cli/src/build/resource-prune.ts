@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, rmdirSync, unlinkSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
-import { ENVIRONMENT_FILE, ENVIRONMENT_SCRIPT } from '@compiler/project/resource';
+import { ENVIRONMENT_FILE } from '@compiler/project/resource';
 
 export interface PruneOptions {
     generatedFiles: readonly string[];
@@ -12,7 +12,7 @@ const GENERATED_MANIFEST = 'meta.xml';
 
 const GENERATED_EXTENSION = '.lua';
 
-const PROTECTED: ReadonlySet<string> = new Set([ENVIRONMENT_FILE, ENVIRONMENT_SCRIPT, '.env.local']);
+const PROTECTED: ReadonlySet<string> = new Set([ENVIRONMENT_FILE, '.env.local']);
 
 function normalize(path: string): string {
     return path.replace(/\\/g, '/');

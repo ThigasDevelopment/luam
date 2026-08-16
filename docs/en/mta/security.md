@@ -49,10 +49,13 @@ The compiler cannot know which of your own values are sensitive.
 ## Secrets in `.env`
 
 `.env` is committed, so it declares keys and safe defaults rather than storing
-secrets. The first build writes `<outDir>/<name>/.env` and **blanks** any key
+secrets. The first build writes `<outDir>/<name>/env.lua` and **blanks** any key
 whose name looks sensitive: `password`, `secret`, `token`, `key`, `credential`,
 `dsn`, `private`. The administrator fills them in on the server, and no rebuild
 overwrites that file.
+
+`.env.local` never reaches the generated file, so a value you set to work locally
+cannot be deployed by accident.
 
 ## The `ensure` transport
 

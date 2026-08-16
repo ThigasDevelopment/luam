@@ -67,7 +67,7 @@ Dependências opcionais não são suportadas. `mta.minVersion` não é aceito.
 
 | Campo | Tipo | Obrigatório | Padrão | Significado |
 | --- | --- | --- | --- | --- |
-| `environment.file` | `string` | não | `'.env'` | Declara as chaves e os tipos por trás de `env` e `process.env`, e o template de implantação. |
+| `environment.file` | `string` | não | `'.env'` | Declara as chaves e os tipos por trás de `env` e `process.env`, e o `env.lua` implantado. |
 | `environment.localFile` | `string` | não | `'.env.local'` | Sobrescreve os valores das chaves que o arquivo base declara. Uma chave só aqui é ignorada. |
 
 Um arquivo configurado que não existe é `config-missing-env-file`. Os padrões são

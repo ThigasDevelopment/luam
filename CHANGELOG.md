@@ -6,6 +6,45 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### The Administrator Edits `.env`, Not Lua
+
+0.12.0 compiled the declared keys straight into `env.lua` and handed that file to
+the server administrator. It removed the runtime parser, but it also handed a Lua
+table to the person least equipped to edit one: an unquoted string is a syntax
+error, the file then fails to load, `env` is never defined, and every read blows
+up far from the mistake. A format that tolerates a typo was traded for one where
+a typo takes the resource down.
+
+The two files now split by who owns them. `.env` is written once and owned by the
+administrator, in the `KEY=value` form they already know. `lib/env.lua` is a
+generated server helper that reads it, and like every other helper it is
+rewritten on each build — so the reader always matches the project while the
+values stay with the server. Editing `.env` and restarting is all a deploy needs,
+and neither `build` nor `ensure` ever overwrites what the administrator set.
+
+`process` is gone with it. It was declared by the checker and published by the
+old runtime; the reader publishes only `env`, so keeping `process` typed would
+have promised a global that no longer exists.
+
+#### Added
+
+- `env.lua`, a generated server helper that reads the deployment file named by
+  `environment.file` and publishes `env`. It is written to `lib/` like any other
+  helper, and the file it reads is substituted at build time.
+
+#### Changed
+
+- The deployment file is `.env` again, written once, never overwritten, never
+  pruned, with sensitive-looking keys blanked for the administrator to fill.
+- `env.lua` is regenerated on every build instead of being written once, so a key
+  added to the project can never leave a stale reader behind on the server.
+
+#### Removed
+
+- `process` and `process.env`. Read `env` instead. A file still naming `process`
+  compiles, because an undeclared global is legal Lua — it simply reads nil at
+  run time.
+
 ### Deployment Values Are Compiled, Not Parsed
 
 A resource carried 178 lines of Lua to read its own `.env` at start. `dotenv.lua`
@@ -191,6 +230,27 @@ per directory.
 - `OOP_MEMBER_ADDITIONS`, the override that declares a member the upstream class
   omits, resolved against the catalog so a wrong procedural name fails the build
   instead of shipping.
+
+### The Editor Suggests the Environment It Typed
+
+`env` was typed from `.env`, completed after a dot, and hovered — but the name
+itself was never suggested. The completion list gathered the MTA catalog and the
+project's own symbols, and the globals the manifest declared were in neither. You
+had to know `env` existed to reach the keys the editor could already describe.
+
+Hover repeated itself as well. A record renders as its own name, and the record
+behind `env` is called `env`, so the hover read `env: env` — true and useless.
+
+#### Added
+
+- `env` is suggested in a server file whenever the project declares keys, and
+  hidden in a client or shared file, matching the rule the checker enforces. The
+  item names the file the keys came from.
+
+#### Changed
+
+- Hovering `env` lists the declared keys, their types, and their configured
+  values instead of repeating the name. Completing a key shows its value too.
 
 ### The Editor Says What It Knows
 

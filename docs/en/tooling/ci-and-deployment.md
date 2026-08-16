@@ -86,7 +86,7 @@ transport rules — see [Security boundaries](/en/mta/security).
 - Never commit a password. `transport.passwordEnv` names an environment variable,
   which is what a CI secret store provides.
 - `.env` is committed and declares keys and safe defaults; the deployed
-  `<outDir>/<name>/.env` is written once, with sensitive-looking keys blanked, and
+  `<outDir>/<name>/env.lua` is written once, with sensitive-looking keys blanked, and
   is never overwritten by a rebuild.
 - MTA's HTTP interface has no TLS. Keep `host` on `127.0.0.1` and tunnel over SSH
   rather than exposing the port to a runner.

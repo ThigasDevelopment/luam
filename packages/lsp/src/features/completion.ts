@@ -3,6 +3,7 @@ import { mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classe
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import { typeToString, type RecordType } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
+import { isAvailableIn } from '@mta-types/api-declaration';
 import { globalsFor } from '@mta-types/catalog';
 import { oopClassesFor } from '@mta-types/oop-surface';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
@@ -33,6 +34,7 @@ import {
     libraryItems,
     memberItem,
     mtaMemberItem,
+    projectItem,
     superItem,
     symbolItem,
 } from '@lsp/features/completion-items';
@@ -60,8 +62,10 @@ function enumItems(analysis: DocumentAnalysis, name: string): CompletionItem[] {
     return enumMemberItems(name, analysis.declarations.lookupEnum(name)?.members ?? []);
 }
 
-function recordItems(record: RecordType): CompletionItem[] {
-    return [...record.members].map(([name, type]) => memberItem(name, type, false, record.name));
+function recordItems(analysis: DocumentAnalysis, record: RecordType): CompletionItem[] {
+    const values: Readonly<Record<string, string>> = record.origin === null ? {} : analysis.env;
+
+    return [...record.members].map(([name, type]) => memberItem(name, type, false, record.name, values[name]));
 }
 
 function tableKeyItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
@@ -97,7 +101,7 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
     }
 
     if (target.kind === 'record') {
-        return recordItems(target.record);
+        return recordItems(analysis, target.record);
     }
 
     return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
@@ -122,6 +126,12 @@ function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: Arg
 
 function apiItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
     return globalsFor(analysis.environment).map((declaration) => withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation));
+}
+
+function projectItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
+    return analysis.project.globals
+        .filter((declaration) => isAvailableIn(declaration.environment, analysis.environment))
+        .map((declaration) => withArgumentRank(projectItem(declaration, analysis.env), descriptorToType(declaration.type), expectation));
 }
 
 function plainItems(items: readonly CompletionItem[], expectation: ArgumentExpectation | null): CompletionItem[] {
@@ -238,6 +248,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     return deduplicate([
         ...plainItems(tableKeyItems(analysis, offset), expectation),
         ...scopeItems(analysis, offset, expectation),
+        ...projectItems(analysis, expectation),
         ...plainItems(workspaceItems(analysis, others), expectation),
         ...plainItems(mtaClassItems(analysis), expectation),
         ...apiItems(analysis, expectation),

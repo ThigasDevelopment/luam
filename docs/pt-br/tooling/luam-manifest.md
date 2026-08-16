@@ -284,7 +284,7 @@ environment = {
 ```
 
 `file` declara as chaves e seus tipos — é contra ele que `env.X` e `process.env.X`
-são tipados, e é dele que o template `.env` de implantação é gerado. `localFile`
+são tipados, e é dele que o `env.lua` implantado é gerado. `localFile`
 sobrescreve os *valores* das chaves que o arquivo base já declara; uma chave só no
 arquivo local é ignorada, então um ajuste local da máquina nunca muda a forma do
 projeto. Os padrões são `.env` e `.env.local`.

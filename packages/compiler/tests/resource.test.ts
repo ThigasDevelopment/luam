@@ -89,20 +89,27 @@ describe('resource assembly', () => {
         ]);
     });
 
-    it('deploys the environment script as a server configuration file, never as a helper', () => {
-        const build = assembleResource(project, { environmentScript: 'local values = {}\n' }).build;
+    it('pins the environment helper to the server regardless of where it is used', () => {
+        const build = assembleResource(project, { helpers: ['env'] }).build;
 
-        expect(build?.environmentScript).toEqual({ path: 'env.lua', source: '.env', environment: 'server', content: 'local values = {}\n', lines: [] });
-        expect(build?.helpers.some((helper) => helper.path === 'env.lua')).toBe(false);
-        expect(build?.manifest).toContain('<script src="env.lua" />');
+        expect(build?.helpers.find((helper) => helper.helper === 'env')).toMatchObject({
+            helper: 'env',
+            file: 'env.lua',
+            path: 'lib/env.lua',
+            environment: 'server',
+        });
     });
 
-    it('loads the environment script after the runtime library and before the sources', () => {
-        const build = assembleResource(project, { environmentScript: 'local values = {}\n' }).build;
-        const sources = (build?.manifest.match(/src="[^"]+"/g) ?? []).map((entry) => entry.slice(5, -1));
+    it('tells the environment helper which file the manifest selected', () => {
+        const build = assembleResource(project, { helpers: ['env'], environmentFile: '.env.development' }).build;
 
-        expect(sources.indexOf('env.lua')).toBeGreaterThan(sources.indexOf('lib/table.lua'));
-        expect(sources.indexOf('env.lua')).toBeLessThan(sources.indexOf('src/shared/**/*.lua'));
+        expect(build?.helpers.find((helper) => helper.helper === 'env')?.replacements).toEqual({ __LUAM_ENV_FILE__: '.env.development' });
+    });
+
+    it('falls back to ".env" when the manifest selects no environment file', () => {
+        const build = assembleResource(project, { helpers: ['env'] }).build;
+
+        expect(build?.helpers.find((helper) => helper.helper === 'env')?.replacements).toEqual({ __LUAM_ENV_FILE__: '.env' });
     });
 
     it('emits shared executable code for both sides', () => {

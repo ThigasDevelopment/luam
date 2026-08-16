@@ -16,60 +16,10 @@ function codes(result: ReturnType<typeof compileProject>): string[] {
     return result.diagnostics.map((entry) => entry.diagnostic.code);
 }
 
-describe('process.env typing', () => {
-    it('types every declared key from the env file', () => {
-        const source = 'local name: string = process.env.SERVER_NAME\nlocal slots: number = process.env.MAX_PLAYERS\n';
-        const result = compile('src/server/main.luam', `${source}local debug: boolean = process.env.DEBUG\n`);
-
-        expect(result.diagnostics).toEqual([]);
-    });
-
-    it('rejects a value used as the wrong type', () => {
-        const result = compile('src/server/main.luam', 'local slots: string = process.env.MAX_PLAYERS\n');
-
-        expect(codes(result)).toEqual(['check-type-mismatch']);
-    });
-
-    it('lists the declared keys when a key is misspelled', () => {
-        const result = compile('src/server/main.luam', 'print(process.env.MAX_PLAYER)\n');
-
-        expect(codes(result)).toEqual(['check-unknown-record-key']);
-        expect(result.diagnostics[0]?.diagnostic.message).toBe(
-            '"MAX_PLAYER" is not a key of "process.env", declared in ".env". Declared keys: "DEBUG", "MAX_PLAYERS", "SERVER_NAME".',
-        );
-    });
-
-    it('rejects a member that is not part of process', () => {
-        const result = compile('src/server/main.luam', 'print(process.argv)\n');
-
-        expect(codes(result)).toEqual(['check-unknown-record-key']);
-    });
-
-    it('keeps deployment values off the client', () => {
-        const result = compile('src/client/hud.luam', 'print(process.env.SERVER_NAME)\n');
-
-        expect(codes(result)).toEqual(['check-environment-api']);
-        expect(result.diagnostics[0]?.diagnostic.message).toBe(
-            '"process" is declared by the project, is server-only, and is not available in a "client" file.',
-        );
-    });
-
-    it('keeps deployment values out of shared files', () => {
-        const result = compile('src/shared/util.luam', 'print(process.env.DEBUG)\n');
-
-        expect(codes(result)).toEqual(['check-environment-api']);
-    });
-
-    it('leaves process undeclared when the project has no env file', () => {
-        const result = compileProject([{ path: 'src/server/main.luam', source: 'print(process.env.ANYTHING)\n' }]);
-
-        expect(result.diagnostics).toEqual([]);
-    });
-
-    it('emits the member access unchanged', () => {
-        const result = compile('src/server/main.luam', 'print(process.env.SERVER_NAME)\n');
-
-        expect(result.modules[0]?.code).toBe('print(process.env.SERVER_NAME)\n');
+describe('process', () => {
+    it('is no longer declared, because the runtime no longer publishes it', () => {
+        expect(declarations.globals.map((global) => global.name)).toEqual(['env']);
+        expect(compile('src/server/main.luam', 'print(process.env.SERVER_NAME)\n').diagnostics).toEqual([]);
     });
 });
 

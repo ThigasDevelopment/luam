@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { writeResource } from '@cli/build/resource-writer';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { runCli } from '@cli/cli/run';
-import { ENVIRONMENT_SCRIPT } from '@compiler/project/resource';
+
 
 import { createMemoryLogger } from './support/memory-logger';
 import { createMockTransport } from './support/mock-transport';
@@ -61,7 +61,7 @@ function walk(root: string, directory = root, found: string[] = []): string[] {
 }
 
 function scripts(root: string, paths: readonly string[]): string[] {
-    return paths.filter((path) => path.endsWith('.lua') && path !== ENVIRONMENT_SCRIPT).map((path) => readFileSync(resolve(root, path), 'utf8'));
+    return paths.filter((path) => path.endsWith('.lua')).map((path) => readFileSync(resolve(root, path), 'utf8'));
 }
 
 async function build(fixture: ProjectFixture): Promise<number> {
@@ -98,7 +98,7 @@ describe('production output', () => {
         }
 
         expect(fixture.read('build/luam-demo/meta.xml')).toContain('\n');
-        expect(fixture.read('build/luam-demo/env.lua')).toContain("\n    TOKEN = '',");
+        expect(fixture.read('build/luam-demo/.env')).toContain('\nTOKEN=');
         expect(fixture.read(`build/luam-demo/${ASSET}`)).toBe('binary-bytes\n');
     });
 
@@ -206,14 +206,14 @@ describe('production output', () => {
             scripts: [{ path: 'src/server.lua', source: 'src/server.luam', environment: 'server', content: 'local s = "open\n', lines: [] }],
             helpers: [],
             configuration: null,
-            environmentScript: null,
+
             assets: [],
             bundles: [],
             layout: 'tree',
             map: null,
         };
 
-        expect(() => writeResource(target, broken, { root: fixture.root, generatedFiles: [], generatedRoots: [], minify: true })).toThrow(
+        expect(() => writeResource(target, broken, { root: fixture.root, generatedFiles: [], generatedRoots: [], environmentTemplate: null, minify: true })).toThrow(
             'is not valid Lua 5.1',
         );
         expect(walk(target)).toEqual(['stale.lua']);

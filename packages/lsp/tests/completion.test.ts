@@ -336,18 +336,8 @@ describe('project environment completion', () => {
         }
     });
 
-    it('offers the declared keys after "process.env." in a server file', () => {
-        const found = labels(environmentService(), SERVER_FILE, 'local value = process.env.\n', 'process.env.');
-
-        expect(found).toEqual(['MAX_PLAYERS', 'SERVER_NAME']);
-    });
-
-    it('offers "env" after "process." in a server file', () => {
-        expect(labels(environmentService(), SERVER_FILE, 'local value = process.\n', 'process.')).toEqual(['env']);
-    });
-
-    it('offers nothing after "process." in a client file', () => {
-        expect(labels(environmentService(), CLIENT_FILE, 'local value = process.\n', 'process.')).toEqual([]);
+    it('offers nothing after "process." now that the runtime no longer publishes it', () => {
+        expect(labels(environmentService(), SERVER_FILE, 'local value = process.\n', 'process.')).toEqual([]);
     });
 
     it('offers the declared keys after "env." in a server file', () => {
@@ -358,13 +348,45 @@ describe('project environment completion', () => {
         expect(labels(environmentService(), CLIENT_FILE, 'local value = env.\n', 'env.')).toEqual([]);
     });
 
-    it('reports the declared type of a key in the completion detail', () => {
+    it('reports the declared type and the configured value in the completion detail', () => {
         const service = environmentService();
+        const text = 'local value = env.\n';
 
-        service.update(SERVER_FILE, 1, 'local value = process.env.\n');
+        service.update(SERVER_FILE, 1, text);
 
-        const items = service.completion(SERVER_FILE, markerAt('local value = process.env.\n', 'process.env.'));
+        const items = service.completion(SERVER_FILE, markerAt(text, 'env.'));
 
-        expect(items.map((item) => item.detail)).toEqual(['process.env.MAX_PLAYERS: number', 'process.env.SERVER_NAME: string']);
+        expect(items.map((item) => item.detail)).toEqual(['env.MAX_PLAYERS: number = 32', "env.SERVER_NAME: string = 'Luam'"]);
+    });
+
+    it('suggests the environment global itself in a server file', () => {
+        expect(labels(environmentService(), SERVER_FILE, 'local value = en\n', 'en')).toContain('env');
+    });
+
+    it('hides the environment global in a client file', () => {
+        expect(labels(environmentService(), CLIENT_FILE, 'local value = en\n', 'en')).not.toContain('env');
+    });
+
+    it('hides the environment globals in a shared file', () => {
+        expect(labels(environmentService(), SHARED_FILE, 'local value = en\n', 'en')).not.toContain('env');
+    });
+
+    it('names the file that declares the keys and lists them on the "env" item', () => {
+        const service = environmentService();
+        const text = 'local value = en\n';
+
+        service.update(SERVER_FILE, 1, text);
+
+        const item = service.completion(SERVER_FILE, markerAt(text, 'en')).find((candidate) => candidate.label === 'env');
+
+        expect(item?.detail).toBe('declared in ".env" (server)');
+        expect(item?.documentation).toEqual({
+            kind: 'markdown',
+            value: ['```luam', 'env: {', '    MAX_PLAYERS: number = 32', "    SERVER_NAME: string = 'Luam'", '}', '```'].join('\n'),
+        });
+    });
+
+    it('offers no environment global when the project declares no keys', () => {
+        expect(labels(new LanguageService(), SERVER_FILE, 'local value = en\n', 'en')).not.toContain('env');
     });
 });

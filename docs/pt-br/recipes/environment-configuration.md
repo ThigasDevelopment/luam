@@ -102,7 +102,7 @@ continua desconhecida para o checker.
 
 ## Nota de segurança
 
-O `<outDir>/<name>/.env` gerado **esvazia** qualquer chave cujo nome pareça
+O `<outDir>/<name>/env.lua` gerado **esvazia** qualquer chave cujo nome pareça
 sensível — `password`, `secret`, `token`, `key`, `credential`, `dsn`, `private` —
 e é por isso que `WEBHOOK_TOKEN` é publicado vazio. O administrador o preenche no
 servidor, e nenhum rebuild sobrescreve aquele arquivo. Apague-o para regenerar o

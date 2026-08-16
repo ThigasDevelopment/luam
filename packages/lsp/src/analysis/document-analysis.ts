@@ -45,6 +45,7 @@ export interface DocumentAnalysis {
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
     directives: SourceDirectives;
     project: ProjectDeclarations;
+    env: Readonly<Record<string, string>>;
     compilerOptions: CompilerOptions;
     index: SymbolIndex;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
@@ -109,6 +110,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
         declaredGlobals: checked.declaredGlobals,
         directives: checked.directives,
         project,
+        env: input.env ?? {},
         compilerOptions,
         index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.declarations, checked.generatedMembers),
         generatedMembers: checked.generatedMembers,
@@ -141,6 +143,7 @@ function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
         declaredGlobals: new Map(),
         directives: EMPTY_DIRECTIVES,
         project: input.project ?? EMPTY_PROJECT_DECLARATIONS,
+        env: input.env ?? {},
         compilerOptions: DEFAULT_COMPILER_OPTIONS,
         index: buildSymbolIndex(input.text, starts, EMPTY_PROGRAM, new Map(), declarations),
         generatedMembers: new Map(),

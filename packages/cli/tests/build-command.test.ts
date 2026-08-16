@@ -196,16 +196,16 @@ describe('build command', () => {
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
 
-        const generated = fixture.read('build/luam-demo/env.lua');
+        const generated = fixture.read('build/luam-demo/.env');
 
-        expect(generated).toContain('MAX_PLAYERS = 32,');
-        expect(generated).toContain("DB_PASSWORD = '',");
+        expect(generated).toContain('MAX_PLAYERS=32');
+        expect(generated).toContain('DB_PASSWORD=');
         expect(generated).not.toContain('changeme');
 
-        fixture.write('build/luam-demo/env.lua', 'local values = {}\n');
+        fixture.write('build/luam-demo/.env', 'MAX_PLAYERS=64\n');
         await runBuildCommand(context);
 
-        expect(fixture.read('build/luam-demo/env.lua')).toBe('local values = {}\n');
+        expect(fixture.read('build/luam-demo/.env')).toBe('MAX_PLAYERS=64\n');
     });
 
     it('keeps a local override out of the generated deployment values', async () => {
@@ -214,43 +214,54 @@ describe('build command', () => {
 
         await runBuildCommand(context);
 
-        expect(fixture.read('build/luam-demo/env.lua')).toContain('MAX_PLAYERS = 32,');
-        expect(fixture.read('build/luam-demo/env.lua')).not.toContain('64');
+        expect(fixture.read('build/luam-demo/.env')).toContain('MAX_PLAYERS=32');
+        expect(fixture.read('build/luam-demo/.env')).not.toContain('64');
     });
 
-    it('declares the env script as a server script and never prunes it', async () => {
+    it('never declares the env file in the manifest and never prunes it', async () => {
         const files = { ...defaultProjectFiles(), '.env': 'MAX_PLAYERS=32\n' };
         const { context, fixture } = harness(files);
 
         await runBuildCommand(context);
         await runBuildCommand(context);
 
-        const manifest = fixture.read('build/luam-demo/meta.xml');
-
-        expect(manifest).toContain('<script src="env.lua" />');
-        expect(manifest).not.toContain('".env"');
-        expect(fixture.exists('build/luam-demo/env.lua')).toBe(true);
+        expect(fixture.read('build/luam-demo/meta.xml')).not.toContain('.env');
+        expect(fixture.exists('build/luam-demo/.env')).toBe(true);
     });
 
-    it('loads the env script before the sources and ships no env helper', async () => {
+    it('ships the env reader as a server helper that names the selected file', async () => {
         const files = { ...defaultProjectFiles(), '.env': 'MAX_PLAYERS=32\n' };
         const { context, fixture } = harness(files);
 
         await runBuildCommand(context);
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
+        const reader = fixture.read('build/luam-demo/lib/env.lua');
 
-        expect(fixture.exists('build/luam-demo/lib/env.lua')).toBe(false);
+        expect(manifest).toContain('<script src="lib/env.lua" />');
         expect(fixture.exists('build/luam-demo/lib/dotenv.lua')).toBe(false);
-        expect(manifest.indexOf('src="env.lua"')).toBeLessThan(manifest.indexOf('src="src/'));
+        expect(reader).toContain("'.env'");
+        expect(reader).not.toContain('__LUAM_ENV_FILE__');
     });
 
-    it('ships no env script when the project declares no keys', async () => {
+    it('points the env reader at the file the manifest selects', async () => {
+        const files = {
+            ...defaultProjectFiles({ environment: { file: '.env.production', localFile: '.env.local' } }),
+            '.env.production': 'MAX_PLAYERS=32\n',
+        };
+        const { context, fixture } = harness(files);
+
+        await runBuildCommand(context);
+
+        expect(fixture.read('build/luam-demo/lib/env.lua')).toContain("'.env.production'");
+    });
+
+    it('ships no env helper when the project declares no keys', async () => {
         const { context, fixture } = harness(defaultProjectFiles());
 
         await runBuildCommand(context);
 
-        expect(fixture.exists('build/luam-demo/env.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/lib/env.lua')).toBe(false);
         expect(fixture.exists('build/luam-demo/.env')).toBe(false);
     });
 
@@ -258,7 +269,7 @@ describe('build command', () => {
         const files = {
             ...defaultProjectFiles(),
             '.env': 'MAX_PLAYERS=32\n',
-            'src/server/main.luam': 'print(process.env.MAX_PLAYER)\n',
+            'src/server/main.luam': 'print(env.MAX_PLAYER)\n',
         };
         const { context, logger } = harness(files);
 

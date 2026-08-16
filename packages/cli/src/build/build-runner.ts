@@ -12,12 +12,13 @@ import type { AssemblyStep } from '@compiler/project/progress';
 import {
     assembleResource,
     materializeBundles,
-    renderEnvironmentScript,
+    renderEnvironmentTemplate,
     type OutputLayout,
     type ResourceBuild,
     type ResourceMap,
     type ResourceOptions,
 } from '@compiler/project/resource';
+import type { RuntimeHelperName } from '@runtime/helpers';
 
 export interface BuildOutcome {
     build: ResourceBuild | null;
@@ -26,6 +27,7 @@ export interface BuildOutcome {
     fileCount: number;
     durationMs: number;
     stats: ProjectStats | null;
+    environmentTemplate: string | null;
     phases: PhaseDuration[];
     sources: ReadonlyMap<string, string>;
     map: ResourceMap | null;
@@ -40,6 +42,16 @@ export interface CompileOptions {
     map?: boolean;
 }
 
+function helperList(config: LuamConfig, inputs: ProjectInputs): RuntimeHelperName[] {
+    if (inputs.declared === null || config.helpers.includes('env')) {
+        return config.helpers;
+    }
+
+    const helpers: RuntimeHelperName[] = [...config.helpers, 'env'];
+
+    return helpers.sort();
+}
+
 function resourceOptions(
     config: LuamConfig,
     inputs: ProjectInputs,
@@ -50,10 +62,10 @@ function resourceOptions(
     const options: ResourceOptions = {
         oop: config.compilerOptions.oop,
         dependencies: config.dependencies,
-        helpers: config.helpers,
+        helpers: helperList(config, inputs),
         assets: inputs.assets,
         configuration: inputs.configuration,
-        environmentScript: inputs.deployed === null ? null : renderEnvironmentScript(inputs.deployed),
+        environmentFile: config.environment.file,
         loadOrder: config.loadOrder,
         minMtaVersion,
         developmentLogs,
@@ -124,6 +136,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
             fileCount: 0,
             durationMs: performance.now() - started,
             stats: null,
+            environmentTemplate: null,
             phases: tracker.durations(),
             sources: new Map(),
             map: null,
@@ -162,6 +175,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
         fileCount: sources.files.length,
         durationMs: performance.now() - started,
         stats: project.stats,
+        environmentTemplate: inputs.deployed === null ? null : renderEnvironmentTemplate(inputs.deployed),
         phases: tracker.durations(),
         sources: diagnosticSources(sources.files, assembly.diagnostics),
         map: build?.map ?? null,

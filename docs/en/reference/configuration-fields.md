@@ -67,7 +67,7 @@ Optional dependencies are not supported. `mta.minVersion` is not accepted.
 
 | Field | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `environment.file` | `string` | no | `'.env'` | Declares the keys and types behind `env` and `process.env`, and the deployment template. |
+| `environment.file` | `string` | no | `'.env'` | Declares the keys and types behind `env` and `process.env`, and the deployed `env.lua`. |
 | `environment.localFile` | `string` | no | `'.env.local'` | Overrides the values of keys the base file declares. A key only here is ignored. |
 
 A configured file that does not exist is `config-missing-env-file`. The defaults

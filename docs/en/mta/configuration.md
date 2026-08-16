@@ -7,7 +7,7 @@ A resource carries two settings files, and they have **different owners**.
 | `config.lua` | The resource author | yes | **yes** |
 | `.env` | The deployment | yes | no |
 | `.env.local` | One developer's machine | no | no |
-| `<outDir>/<name>/.env` | The server administrator | no | no |
+| `<outDir>/<name>/env.lua` | The server administrator | no | no |
 
 ## `config.lua`
 
@@ -54,8 +54,8 @@ forces a `string`.
 
 ## Reading values
 
-Values reach Luam through `process.env`, built on the server by the `env` runtime
-helper:
+Values reach Luam through `env` and `process.env`, published on the server by the
+generated `env.lua`:
 
 <<< @/snippets/environment-configuration/src/server/startup.luam
 
@@ -63,7 +63,9 @@ helper:
 `check-environment-api`. A key `.env` does not declare is
 `check-unknown-record-key`, and the message lists the declared keys.
 
-`.env` never receives a `<file>` entry, so it is never transmitted to a player.
+Nothing is parsed at run time. The compiler reads `.env` during the build and
+writes the keys as a Lua table, so the values a resource ships are fixed when it
+is built and the types the checker knows are the types the resource carries.
 
 ## `.env.local`
 
@@ -76,14 +78,32 @@ Here `.env` is **committed** and `.env.local` is ignored. `.env` is a declaratio
 of keys and safe defaults, not a secret store.
 :::
 
-## The deployed `.env`
+## The deployed `env.lua`
 
-The first build writes `<outDir>/<name>/.env` from the declared keys, blanking any
-key whose name looks sensitive — `password`, `secret`, `token`, `key`,
-`credential`, `dsn`, or `private`.
+The first build writes `<outDir>/<name>/env.lua` from the declared keys, blanking
+any key whose name looks sensitive — `password`, `secret`, `token`, `key`,
+`credential`, `dsn`, or `private`:
 
-It is **never overwritten afterwards**, so an administrator's edits survive every
-rebuild. Delete it to regenerate the skeleton.
+```lua
+local values = {
+    DEBUG = false,
+    MAX_PLAYERS = 32,
+    SERVER_NAME = 'Luam Docs Server',
+    WEBHOOK_TOKEN = '',
+}
+```
+
+It is **never overwritten afterwards** and never pruned, so an administrator's
+edits survive every rebuild and every `ensure`. That is what keeps a deploy from
+replacing a running server's configuration with the values on your machine.
+Delete the file to regenerate the skeleton.
+
+Values are edited in place, so they follow Lua syntax: text stays quoted, numbers
+and booleans do not. Below the table the file publishes `env` and `process.env`
+behind a metatable that raises on an undeclared key and refuses assignment.
+
+The resource ships no `.env` of its own. `.env.local` never reaches the generated
+file — its overrides are for the checker on your machine only.
 
 ## Choosing between the two
 
@@ -91,5 +111,5 @@ rebuild. Delete it to regenerate the skeleton.
 | --- | --- |
 | Gameplay tuning a player may read | `config.lua` |
 | A server name, a limit, a feature flag | `.env` |
-| A password, a token, an API key | `.env` on the server, blanked in the committed file |
+| A password, a token, an API key | `env.lua` on the server, blanked in the committed `.env` |
 | Different per machine while developing | `.env.local` |

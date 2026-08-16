@@ -51,7 +51,7 @@ O compilador não tem como saber quais dos seus valores são sensíveis.
 ## Segredos no `.env`
 
 O `.env` é versionado, então ele declara chaves e padrões seguros em vez de
-guardar segredos. O primeiro build escreve `<outDir>/<name>/.env` e **esvazia**
+guardar segredos. O primeiro build escreve `<outDir>/<name>/env.lua` e **esvazia**
 qualquer chave cujo nome pareça sensível: `password`, `secret`, `token`, `key`,
 `credential`, `dsn`, `private`. O administrador preenche no servidor, e nenhum
 rebuild sobrescreve aquele arquivo.

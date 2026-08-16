@@ -62,8 +62,8 @@ interpolation, so even this one-file resource needs a runtime helper. This build
 bundles, so the helper is inlined at the top of `src/server.lua`. A tree build
 writes it to `lib/string.lua` instead — never into your source tree.
 
-There is no `.env` in the output, because the project has no `.env` to declare
-keys from. Add one and the build writes a deployed copy; see
+There is no `env.lua` in the output, because the project has no `.env` to declare
+keys from. Add one and the build compiles its keys into `env.lua`; see
 [Environment configuration](/en/recipes/environment-configuration).
 
 The generated manifest:

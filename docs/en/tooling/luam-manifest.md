@@ -288,7 +288,7 @@ environment = {
 ```
 
 `file` declares the keys and their types — it is what `env.X` and
-`process.env.X` are typed against, and what the deployment `.env` template is
+`process.env.X` are typed against, and what the deployed `env.lua` is
 rendered from. `localFile` overrides the *values* of keys the base file already
 declares; a key only in the local file is ignored, so a machine-local override
 can never change the project's shape. Both default to `.env` and `.env.local`.

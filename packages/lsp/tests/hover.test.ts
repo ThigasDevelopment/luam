@@ -214,3 +214,54 @@ describe('hover', () => {
         expect(service.hover(SERVER_FILE, { line: 5, character: 0 })).toBeNull();
     });
 });
+
+describe('project environment hover', () => {
+    function environmentHover(text: string, anchor: string, word: string): string {
+        const root = createWorkspace({ '.env': 'SERVER_NAME="Luam"\nMAX_PLAYERS=32\nDEBUG=false\n' });
+        const service = new LanguageService();
+
+        service.loadWorkspace([root]);
+        service.update(SERVER_FILE, 1, text);
+
+        const contents = service.hover(SERVER_FILE, positionOf(text, anchor, word))?.contents;
+
+        removeWorkspace(root);
+
+        if (contents === undefined || typeof contents === 'string' || Array.isArray(contents)) {
+            return '';
+        }
+
+        return contents.value;
+    }
+
+    it('shows the declared keys with their configured values instead of repeating the name', () => {
+        const value = environmentHover('local name = env.SERVER_NAME\n', 'local name', 'env');
+
+        expect(value).toContain('env: {');
+        expect(value).toContain('    DEBUG: boolean = false');
+        expect(value).toContain('    MAX_PLAYERS: number = 32');
+        expect(value).toContain("    SERVER_NAME: string = 'Luam'");
+        expect(value).not.toContain('env: env');
+    });
+
+    it('quotes a value that would break out of its literal', () => {
+        const root = createWorkspace({ '.env': 'MOTD="it\'s here"\n' });
+        const service = new LanguageService();
+        const text = 'local motd = env.MOTD\n';
+
+        service.loadWorkspace([root]);
+        service.update(SERVER_FILE, 1, text);
+
+        const contents = service.hover(SERVER_FILE, positionOf(text, 'local motd', 'env'))?.contents;
+
+        removeWorkspace(root);
+
+        expect(contents === undefined || typeof contents === 'string' || Array.isArray(contents) ? '' : contents.value).toContain(
+            "MOTD: string = 'it\\'s here'",
+        );
+    });
+
+    it('names the file the keys come from and the environment that may read them', () => {
+        expect(environmentHover('local name = env.SERVER_NAME\n', 'local name', 'env')).toContain('declared in ".env" (server)');
+    });
+});

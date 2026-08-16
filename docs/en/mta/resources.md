@@ -11,7 +11,7 @@ build/
 └── my-resource/
     ├── meta.xml
     ├── config.lua
-    ├── .env
+    ├── env.lua
     ├── assets/
     └── src/
         ├── shared.lua
@@ -50,7 +50,7 @@ helpers, `config.lua`, pinned `loadOrder` entries, and source groups instead.
 
 Helpers are included **only when generated code uses the feature**. Bundle output
 places them before modules inside the environment bundle. Tree output writes
-them under `lib/<environment>/`, outside the source tree:
+them flat under `lib/`, outside the source tree:
 
 | Helper | Copied when |
 | --- | --- |
@@ -96,7 +96,7 @@ rewritten.
 
 Pruning removes what the build no longer produces: `.lua` files, `meta.xml`, and
 anything under a configured source directory, a configured asset directory, or
-`lib/`. A file the build never wrote is left in place, and `.env` is never
+`lib/`. A file the build never wrote is left in place, and `env.lua` is never
 touched.
 
 **A build that reports any error writes nothing**, so a previously working
