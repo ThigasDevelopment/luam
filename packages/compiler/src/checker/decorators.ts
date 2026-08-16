@@ -180,7 +180,13 @@ export function expandClassDecorators(
                 const value: Parameter = { name: 'value', annotation: member.annotation, isVararg: false, position: member.position };
                 const listener: Parameter = { name: 'listener', annotation: null, isVararg: false, position: member.position };
                 const kind = decoratorName === 'FluentSetter' ? 'fluent-setter' : decoratorName === 'Lazy' ? 'lazy' : 'observable';
-                generated.push(generatedMethod(member, accessor, decoratorName === 'Lazy' ? [] : [value], decoratorName === 'FluentSetter' ? typeName(statement.name, member) : typeName('void', member), kind, [member]));
+                const returnAnnotation = decoratorName === 'FluentSetter'
+                    ? typeName(statement.name, member)
+                    : decoratorName === 'Lazy'
+                      ? member.annotation
+                      : typeName('void', member);
+
+                generated.push(generatedMethod(member, accessor, decoratorName === 'Lazy' ? [] : [value], returnAnnotation, kind, [member]));
                 if (decoratorName === 'Observable') {
                     const listenerName = `on${member.name[0]?.toUpperCase()}${member.name.slice(1)}Changed`;
                     const listenerConflict = occupied.get(listenerName);

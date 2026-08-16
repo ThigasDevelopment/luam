@@ -6,7 +6,7 @@ import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
 import { buildFunctionType, checkFunctionBody } from './statements';
-import { ANY_TYPE, createNamed, typeToString, type Type } from './types';
+import { ANY_TYPE, createFunction, createNamed, typeToString, VOID_TYPE, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     const valueType = member.value === null ? null : checkExpression(context, member.value);
@@ -34,6 +34,20 @@ function checkFieldName(context: CheckContext, member: ClassFieldDeclaration): v
     context.report('check-invalid-constructor', message, member.position);
 }
 
+function syntheticMethodType(context: CheckContext, member: ClassMethodDeclaration, fieldTypes: ReadonlyMap<ClassFieldDeclaration, Type>): Type {
+    const fieldType = [...fieldTypes].find(([field]) => field.position.offset === member.position.offset)?.[1] ?? ANY_TYPE;
+
+    if (member.generated?.kind === 'lazy') {
+        return createFunction([], fieldType);
+    }
+
+    if (member.generated === undefined) {
+        return member.parameters.length === 0 ? createFunction([], fieldType) : createFunction([fieldType], VOID_TYPE);
+    }
+
+    return buildFunctionType(context, member.parameters, member.returnAnnotation);
+}
+
 function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): ClassMethodDeclaration[] {
     const fieldTypes = new Map<ClassFieldDeclaration, Type>();
 
@@ -50,7 +64,7 @@ function registerMembers(context: CheckContext, info: ClassInfo, statement: Clas
         const type = member.kind === 'class-field'
             ? fieldTypes.get(member) ?? ANY_TYPE
             : member.isSynthetic
-               ? buildFunctionType(context, member.parameters, member.returnAnnotation)
+               ? syntheticMethodType(context, member, fieldTypes)
                : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
         const decorators = member.decorators.map((decorator) => decorator.name);

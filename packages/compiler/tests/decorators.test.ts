@@ -123,7 +123,7 @@ describe('decorators', () => {
     });
 
     it('generates the confirmed class and field decorator APIs', () => {
-        const source = '@ToString\n@Equals\n@Clone\n@Serializable\n@Deserialize\n@Builder\nclass Profile {\n    @FluentSetter\n    name: string = \'Luam\'\n    @Lazy\n    token: string = \'token\'\n    @Observable\n    online: boolean = false\n}\nlocal builder = new ProfileBuilder()\nlocal profile = builder:withName(\'Thigas\'):build()\n';
+        const source = '@ToString\n@Equals\n@Clone\n@Serializable\n@Deserialize\n@Builder\nclass Profile {\n    @FluentSetter\n    name: string = \'Luam\'\n    @Lazy\n    token: string = \'token\'\n    @Observable\n    online: boolean = false\n}\nlocal builder = new ProfileBuilder()\nlocal profile = builder:withName(\'Thigas\'):build()\nlocal token: string = profile:getToken()\n';
         const emitted = code(source);
 
         expect(emitted).toContain('toString = function(self)');
@@ -134,6 +134,12 @@ describe('decorators', () => {
         expect(emitted).toContain('onOnlineChanged = function(self, listener)');
         expect(emitted).toContain("class 'ProfileBuilder'");
         expect(emitted).toContain('withName = function(self, value)');
+    });
+
+    it('preserves an inferred lazy field type', () => {
+        const source = 'class Value {\n    @Lazy\n    active = true\n}\nlocal value = new Value()\nlocal active: boolean = value:isActive()\n';
+
+        expect(codes(source)).toEqual([]);
     });
 
     it('enforces readonly fields, warns on deprecated use, and validates overrides', () => {

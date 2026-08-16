@@ -79,12 +79,120 @@ profile:setNickname('Thigas')                    # string expected
 Passing the wrong type to a generated setter is `check-type-mismatch`, exactly as
 for a hand-written method.
 
+## Reactive fields and fluent configuration
+
+`@FluentSetter` returns the same instance, `@Lazy` computes the field on first
+access, and `@Observable` notifies every registered listener:
+
+```luam
+class Session {
+    @FluentSetter
+    timeout: number = 30
+
+    @Lazy
+    token: string = tostring(getTickCount())
+
+    @Observable
+    connected: boolean = false
+}
+
+local session = new Session()
+session:withTimeout(60):withTimeout(90)
+
+local token: string = session:getToken()
+
+session:onConnectedChanged(function (connected: boolean)
+    print('connected', connected)
+end)
+session:setConnected(true)
+```
+
+The initializer of a `@Lazy` field is not emitted as an initial class value. The
+getter runs it once while the field is `nil` and reuses the result on subsequent
+accesses.
+
+## Object utilities
+
+The class decorators can be combined. They all operate shallowly: a table stored
+in a field remains the same table in the clone and in the serialized table.
+
+```luam
+@ToString
+@Equals
+@Clone
+@Serializable
+@Deserialize
+class Point {
+    x: number = 0
+    y: number = 0
+}
+
+local point = new Point()
+point:fromTable({ x = 10, y = 20 })
+
+local text: string = point:toString()
+local copy: Point = point:clone()
+local same: boolean = point:equals(copy)
+local values: table = point:toTable()
+```
+
+## Typed builder
+
+`@Builder` creates a companion class with one `withField` method per field and a
+`build()` method that returns the original class:
+
+```luam
+@Builder
+class Account {
+    name: string = ''
+    balance: number = 0
+}
+
+local account: Account = new AccountBuilder()
+    :withName('Thigas')
+    :withBalance(100)
+    :build()
+```
+
+## Static validation
+
+`@ReadOnly`, `@Deprecated`, and `@Override` do not need to add behavior to the
+generated Lua. They make the checker validate how code uses the class:
+
+```luam
+class Entity {
+    describe = function (): string
+        return 'entity'
+    end
+}
+
+class Player extends Entity {
+    @ReadOnly
+    id: number = 1
+
+    @Deprecated
+    oldName = function (): string
+        return 'player'
+    end
+
+    @Override
+    describe = function (): string
+        return 'player'
+    end
+}
+```
+
+Using `player:oldName()` produces the `check-deprecated-use` warning. Assigning
+`player.id = 2` outside a `Player` method is `check-readonly-assignment`. An
+`@Override` method missing from the superclass or using a different signature is
+`check-invalid-override`.
+
 ## A complete example
 
 <<< @/snippets/language/src/shared/decorators.luam
 
 ## In the editor
 
-Generated accessors are ordinary members: completion after `:` lists them, hover
-shows their signature, and go-to-definition lands on the field that generated
-them.
+Generated members are ordinary members: completion after `:` lists them, hover
+shows their signature, and go-to-definition lands on the field or class that
+generated them. Typing `@` also suggests every known decorator.

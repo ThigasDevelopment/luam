@@ -1,24 +1,64 @@
-@Getter
-class Profile {
+class Entity {
+    describe = function (): string
+        return 'entity'
+    end
+}
+
+@ToString
+@Equals
+@Clone
+@Serializable
+@Deserialize
+@Builder
+class Profile extends Entity {
+    @Getter
+    id: number = 1
+
     @Setter
     nickname: string = 'Luam'
 
-    @Getter
-    @Setter
-    banned: boolean = false
-
+    @FluentSetter
     level: number = 1
+
+    @Lazy
+    token: string = tostring(getTickCount())
+
+    @Observable
+    online: boolean = false
+
+    @ReadOnly
+    createdAt: number = getTickCount()
+
+    @Deprecated
+    oldName = function (): string
+        return self.nickname
+    end
+
+    @Override
+    describe = function (): string
+        return self.nickname
+    end
 }
 
 function useProfile(): string
     local profile = new Profile()
 
     profile:setNickname('Thigas')
-    profile:setBanned(false)
+    profile:withLevel(10):withLevel(20)
+    profile:onOnlineChanged(function (online: boolean)
+        print('online', online)
+    end)
+    profile:setOnline(true)
 
-    local nickname: string = profile:getNickname()
-    local banned: boolean = profile:isBanned()
-    local level: number = profile:getLevel()
+    local built: Profile = new ProfileBuilder():withNickname('Builder'):withLevel(50):build()
+    local values: table = profile:toTable()
 
-    return nickname .. tostring(banned) .. tostring(level)
+    profile:fromTable(values)
+
+    local id: number = profile:getId()
+    local token: string = profile:getToken()
+    local copy: Profile = profile:clone()
+    local same: boolean = profile:equals(copy)
+
+    return profile:toString() .. built:describe() .. tostring(id) .. token .. tostring(same)
 end
