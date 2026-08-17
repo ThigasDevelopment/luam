@@ -142,6 +142,12 @@ Used by `luam dev` only.
 | `development.logs.rateLimit` | `number` | no | `30` | Records allowed per client per window. |
 | `development.logs.rateWindowMs` | `number` | no | `1000` | Length of that window, in milliseconds. |
 
+## Development server
+
+| Field | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `development.server.executable` | `string?` | no | platform probe | Executable relative to and contained by `serverPath`. Used only by `server` and `dev --start-server`. |
+
 ## Removed fields
 
 A removed name is rejected, never aliased. Each reports `config-removed-field`

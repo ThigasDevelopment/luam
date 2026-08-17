@@ -10,7 +10,7 @@ import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from '
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
-const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'doctor', 'ensure', 'init', 'setup', 'trace'];
+const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'doctor', 'ensure', 'init', 'server', 'setup', 'trace'];
 
 const ACCEPTED: readonly [string, readonly string[]][] = [
     ['build', ['--manifest', '.luam.manifest', '--bundle', '--no-map', '--offline', '--no-color']],
@@ -43,6 +43,7 @@ const REJECTED: readonly [string, readonly string[]][] = [
     ['init', ['--manifest', '.luam.manifest']],
     ['trace', ['--bundle']],
     ['ensure', ['--fast']],
+    ['ensure', ['--start-server']],
     ['build', ['--cwd']],
     ['build', ['--manifest']],
     ['trace', ['--map']],
@@ -97,7 +98,10 @@ describe('command help and version', () => {
         expect(help.build).toContain('--offline');
         expect(help.build).not.toContain('--watch');
         expect(help.dev).toContain('--watch');
+        expect(help.dev).toContain('--start-server');
         expect(help.dev).not.toContain('--bundle');
+        expect(help.server).toContain('--manifest');
+        expect(help.server).not.toContain('--watch');
         expect(help.check).not.toContain('--offline');
         expect(help.doctor).not.toContain('--config');
         expect(help.trace).toContain('--map <path>');

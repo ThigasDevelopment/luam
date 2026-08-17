@@ -6,6 +6,7 @@ export type ManifestRuleKind =
     | 'resource-name'
     | 'dependency-name'
     | 'contained-path'
+    | 'server-contained-path'
     | 'static-path'
     | 'source-pattern'
     | 'engine-version'
@@ -30,6 +31,7 @@ const RULE_TEXT: Readonly<Record<ManifestRuleKind, string>> = {
     'resource-name': 'Letters, digits, dots, dashes, and underscores, starting with a letter or a digit.',
     'dependency-name': 'The name of another MTA resource, which cannot be this resource.',
     'contained-path': 'A relative path that stays inside the project directory.',
+    'server-contained-path': 'A relative path that stays inside the configured serverPath.',
     'static-path': 'A relative path with no wildcards that stays inside the project directory.',
     'source-pattern': 'A relative path or a "*", "**", and "?" pattern that stays inside the project directory.',
     'engine-version': 'A version such as "1.6.0", or "latest" to follow the newest published release.',

@@ -6,6 +6,22 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### CLI-Owned Local MTA Server
+
+#### Added
+
+- `luam server` runs an existing Windows or Linux MTA installation in the
+  foreground, and `luam dev --start-server` waits for it before the first sync.
+- The integrated development flow refreshes and restarts the resource through
+  the owned MTA console, including the first deployment, without HTTP transport.
+- `development.server.executable` selects a contained executable under
+  `serverPath`; platform defaults are probed when it is unset.
+
+#### Security
+
+- Local server launch uses no shell, validates real path containment, and stops
+  only the child owned by the current command.
+
 ### Parent Calls Use `super(...)`
 
 #### Changed

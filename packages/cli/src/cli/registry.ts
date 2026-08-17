@@ -5,6 +5,7 @@ import { registerDoctorCommand } from '@cli/cli/registry/doctor-registration';
 import { registerEnsureCommand } from '@cli/cli/registry/ensure-registration';
 import { registerInitCommand } from '@cli/cli/registry/init-registration';
 import { registerSetupCommand } from '@cli/cli/registry/setup-registration';
+import { registerServerCommand } from '@cli/cli/registry/server-registration';
 import { registerTraceCommand } from '@cli/cli/registry/trace-registration';
 
 import type { CliRuntime } from '@cli/cli/cli-runtime';
@@ -19,6 +20,7 @@ export const COMMAND_REGISTRARS: readonly CommandRegistrar[] = [
     registerDoctorCommand,
     registerEnsureCommand,
     registerInitCommand,
+    registerServerCommand,
     registerSetupCommand,
     registerTraceCommand,
 ];

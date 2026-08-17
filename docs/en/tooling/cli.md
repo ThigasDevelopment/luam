@@ -24,6 +24,7 @@ luam help trace
 | [`build`](#luam-build) | Compiles and writes the resource into `<outDir>/<name>`. |
 | [`ensure`](#luam-ensure) | Builds, syncs into the MTA server, restarts, and watches. |
 | [`dev`](#luam-dev) | The `ensure` loop plus a live server log stream. |
+| [`server`](#luam-server) | Runs an existing local MTA server in the foreground. |
 | [`trace`](#luam-trace) | Resolves generated Lua positions back to Luam source. |
 | [`setup`](#luam-setup) | Detects editors and installs the extension, with consent. |
 | [`doctor`](#luam-doctor) | Reports the CLI, Node.js, editors, and the extension. |
@@ -105,6 +106,7 @@ See [Daily development](/en/guide/daily-development) for the full loop.
 
 ```bash
 luam dev
+luam dev --start-server
 ```
 
 Runs the complete `ensure` workflow and follows
@@ -120,6 +122,29 @@ The development-only log helpers it adds are never written by `build` or
 `ensure`, and are removed by the next normal sync. `dev` always uses the tree
 layout and resolves covered generated positions through its in-memory map, so it
 owns no layout flag: `luam dev --bundle` is a usage error.
+
+`--start-server` starts the local MTA process first and waits for readiness before
+building. After a changed sync, it writes `refresh`, `stop <resource>`, and
+`start <resource>` to the owned console, so this integrated path needs no HTTP
+transport and starts a newly deployed resource. An early or unexpected server
+exit stops the development loop with exit code `1`. Without the flag, `dev`
+never starts or stops an MTA process.
+
+`luam server` and `luam ensure` in separate terminals are separate processes.
+`ensure` cannot write to a console owned by the other invocation, so standalone
+`ensure` still uses the configured transport or only syncs when none is present.
+
+## `luam server`
+
+```bash
+luam server
+```
+
+Runs the existing installation under `serverPath` in the foreground with its
+console attached. Windows probes `MTA Server.exe`; Linux probes `mta-server64`
+then `mta-server`. Set `development.server.executable` for another layout.
+`Ctrl+C` writes MTA's `shutdown` command and uses a bounded kill fallback. The
+command owns and stops only the child it launched.
 
 ## `luam trace`
 

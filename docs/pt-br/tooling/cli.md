@@ -24,6 +24,7 @@ luam help trace
 | [`build`](#luam-build) | Compila e escreve o resource em `<outDir>/<name>`. |
 | [`ensure`](#luam-ensure) | Constrói, sincroniza no servidor MTA, reinicia e observa. |
 | [`dev`](#luam-dev) | O laço do `ensure` mais um fluxo ao vivo do log do servidor. |
+| [`server`](#luam-server) | Roda um servidor MTA local existente em primeiro plano. |
 | [`trace`](#luam-trace) | Resolve posições Lua geradas de volta para o código Luam. |
 | [`setup`](#luam-setup) | Detecta editores e instala a extensão, com consentimento. |
 | [`doctor`](#luam-doctor) | Informa a CLI, o Node.js, os editores e a extensão. |
@@ -107,6 +108,7 @@ completo.
 
 ```bash
 luam dev
+luam dev --start-server
 ```
 
 Roda o fluxo completo do `ensure` e acompanha
@@ -123,6 +125,30 @@ escritos por `build` ou `ensure`, e são removidos pela próxima sincronização
 normal. `dev` sempre usa a estrutura em árvore e resolve posições geradas
 cobertas através do seu mapa em memória, então ele não possui nenhuma flag de
 estrutura: `luam dev --bundle` é um erro de uso.
+
+`--start-server` inicia primeiro o processo MTA local e espera a prontidão antes
+do build. Depois de uma sincronização com mudanças, escreve `refresh`,
+`stop <resource>` e `start <resource>` no console que possui; por isso esse fluxo
+integrado não precisa de transporte HTTP e inicia um resource recém-implantado.
+Uma saída antecipada ou inesperada do servidor encerra o laço de desenvolvimento
+com código `1`. Sem a flag, `dev` nunca inicia nem encerra um processo MTA.
+
+`luam server` e `luam ensure` em terminais separados são processos separados. O
+`ensure` não pode escrever no console possuído pela outra execução, então o
+`ensure` isolado ainda usa o transporte configurado ou apenas sincroniza quando
+ele não existe.
+
+## `luam server`
+
+```bash
+luam server
+```
+
+Roda a instalação existente em `serverPath` em primeiro plano com o console
+conectado. No Windows procura `MTA Server.exe`; no Linux procura `mta-server64` e
+depois `mta-server`. Defina `development.server.executable` para outro layout.
+`Ctrl+C` escreve o comando `shutdown` do MTA e usa um fallback de encerramento
+com tempo limitado. O comando encerra apenas o processo filho que iniciou.
 
 ## `luam trace`
 

@@ -143,6 +143,12 @@ Usados apenas pelo `luam dev`.
 | `development.logs.rateLimit` | `number` | não | `30` | Registros permitidos por cliente por janela. |
 | `development.logs.rateWindowMs` | `number` | não | `1000` | Duração dessa janela, em milissegundos. |
 
+## Servidor de desenvolvimento
+
+| Campo | Tipo | Obrigatório | Padrão | Significado |
+| --- | --- | --- | --- | --- |
+| `development.server.executable` | `string?` | não | busca por plataforma | Executável relativo a `serverPath` e contido nele. Usado apenas por `server` e `dev --start-server`. |
+
 ## Campos removidos
 
 Um nome removido é rejeitado, nunca virado apelido. Cada um reporta

@@ -20,6 +20,7 @@ into an MTA server, and restarting it.
 | `luam build` | Compiles and writes the resource into `<outDir>/<name>`. |
 | `luam dev` | Runs the ensure loop and streams server and relayed client resource logs. |
 | `luam ensure` | Builds, syncs into the MTA server, restarts, and watches sources. |
+| `luam server` | Runs an existing local MTA server in the foreground. |
 | `luam trace` | Resolves generated Lua positions through a resource map without compiling. |
 
 ## Options
@@ -31,6 +32,7 @@ into an MTA server, and restarting it.
 | `--name <name>` | Resource name for `init`. Defaults to the project directory name. |
 | `--force` | Let `init` overwrite files that already exist. |
 | `--watch` / `--no-watch` | Keep `ensure` or `dev` watching, or run it once. Both watch by default. |
+| `--start-server` | Let `dev` start and own the local MTA server process. |
 | `--bundle` / `--no-bundle` | Select bundle or tree output for `build` and `ensure`. `dev` always uses tree. |
 | `--no-map` | Disable source position map generation. |
 | `--map <path>` | Resource map used by `trace`. |
@@ -130,6 +132,9 @@ serverPath = 'C:/MTA Server'
 resourcesDir = 'mods/deathmatch/resources'
 
 development = {
+    server = {
+        executable = 'MTA Server.exe',
+    },
     logs = {
         enabled = false,
         maxMessageLength = 4096,
@@ -168,6 +173,7 @@ transport = {
 | `resourcesDir` | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
 | `transport` | absent | How `ensure` restarts the resource. Omitting the table means `kind = 'none'`; writing it without `kind` is `config-missing-field`. |
 | `development.logs` | disabled, safe limits | Development log capture and client relay limits. `dev` enables capture even when this section is omitted. |
+| `development.server.executable` | unset | Executable relative to `serverPath`; default probing uses `MTA Server.exe` on Windows and `mta-server64`, then `mta-server`, on Linux. |
 
 `outDir`, `resourcesDir`, and every `sources`, `assets`, and `loadOrder` entry
 must stay inside their base directory. An absolute path or a `..` segment is
@@ -457,6 +463,13 @@ colour and emoji off as well; on a terminal the run still advances, in ASCII.
 exactly once, which is what you want from a script or an editor task.
 
 ## Development Logs
+
+`luam server` starts the configured installation in the foreground and attaches
+the terminal. `luam dev --start-server` waits for the server startup marker in
+`server.log`, then uses the owned console to run `refresh`, `stop <resource>`, and
+`start <resource>` after a changed sync. This path needs no HTTP transport.
+`Ctrl+C` sends the MTA `shutdown` command and uses a bounded kill fallback; the
+CLI never stops a process it did not start.
 
 `luam dev` requires `serverPath` and reuses the complete `ensure` workflow. It
 also follows `<serverPath>/mods/deathmatch/logs/server.log` from its current end,

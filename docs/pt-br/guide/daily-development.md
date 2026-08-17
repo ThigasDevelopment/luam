@@ -93,7 +93,14 @@ então o histórico existente não é impresso.
 
 ```bash
 luam dev
+luam dev --start-server
 ```
+
+Use `luam server` em um segundo terminal quando quiser o console interativo do
+MTA, ou `luam dev --start-server` para usar um único comando. A forma integrada
+espera a prontidão do MTA antes de sincronizar, atualiza e inicia ou reinicia o
+resource pelo console possuído e encerra o processo ao receber `Ctrl+C`. Ela não
+precisa de transporte HTTP.
 
 Registros do servidor atribuídos ao resource ativo e chamadas de
 `outputDebugString` do cliente retransmitidas compartilham um único fluxo estável:

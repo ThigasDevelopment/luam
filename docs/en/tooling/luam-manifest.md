@@ -389,6 +389,12 @@ helpers.
 | `rateLimit` | `30` | Records allowed per client per window. |
 | `rateWindowMs` | `1000` | Length of that window. |
 
+## `development.server`
+
+`executable` is an optional path relative to `serverPath`. It must stay inside
+that directory. When omitted, `luam server` and `luam dev --start-server` probe
+`MTA Server.exe` on Windows, or `mta-server64` then `mta-server` on Linux.
+
 ## When the file is wrong
 
 | Problem | Diagnostic |

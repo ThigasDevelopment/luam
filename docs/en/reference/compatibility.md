@@ -46,6 +46,9 @@ another.
 `serverPath` points at the MTA server root on the machine running the CLI, so
 `ensure` needs either a local server or a mounted path.
 
+Owned server startup through `luam server` and `luam dev --start-server` supports
+Windows and Linux. Other CLI commands retain macOS support.
+
 ## Network
 
 A build makes exactly one kind of outbound request: the `min_mta_version` lookup

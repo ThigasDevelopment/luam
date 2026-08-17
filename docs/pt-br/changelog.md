@@ -11,6 +11,10 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
 ### Alterado
 
+- [Comandos da CLI](/pt-br/tooling/cli) documenta `luam server` e
+  `luam dev --start-server`; as páginas do manifesto e de solução de problemas
+  cobrem descoberta do executável, prontidão, encerramento e suporte de sistemas.
+
 - [Palavras-chave](/pt-br/reference/keywords) ganha uma seção sobre `self` e
   `super`, os dois nomes contextuais, e diz que `constructor` é o único nome de
   membro que uma classe precisa declarar como método.

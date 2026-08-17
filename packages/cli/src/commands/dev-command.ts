@@ -6,13 +6,27 @@ import { resolveDevelopmentLogPosition } from '@cli/commands/trace-position';
 import { parseMtaLogLine } from '@cli/logging/mta-log-parser';
 import { resolveServerLogPath, followServerLog } from '@cli/logging/server-log-follower';
 import { reportDevelopmentLog } from '@cli/reporting/development-log-reporter';
+import { startMtaServer } from '@cli/server/mta-server-supervisor';
+import { createServerConsoleTransport } from '@cli/server/server-console-transport';
 import type { ResourceMap } from '@compiler/project/resource';
+
+import type { ProcessService } from '@cli/server/process-service';
+
+export interface DevOptions extends EnsureOptions {
+    startServer?: boolean | undefined;
+    processService?: ProcessService | undefined;
+    env?: NodeJS.ProcessEnv | undefined;
+    platform?: NodeJS.Platform | undefined;
+    readinessTimeoutMs?: number | undefined;
+    shutdownTimeoutMs?: number | undefined;
+    pollIntervalMs?: number | undefined;
+}
 
 export function deployedMapAfterBuild(map: ResourceMap | null, outcome: Pick<BuildOutcome, 'build' | 'map'>): ResourceMap | null {
     return outcome.build === null ? map : outcome.map;
 }
 
-export async function runDevCommand(context: CommandContext, options: EnsureOptions): Promise<number> {
+export async function runDevCommand(context: CommandContext, options: DevOptions): Promise<number> {
     const reporter = commandReporter(context);
     let map: ResourceMap | null = null;
 
@@ -35,9 +49,36 @@ export async function runDevCommand(context: CommandContext, options: EnsureOpti
         { signal: options.signal },
     );
 
+    let supervisor = null;
+    const controller = new AbortController();
+    const abort = (): void => controller.abort();
+
+    options.signal?.addEventListener('abort', abort, { once: true });
+
     try {
-        return await runEnsureCommand(context, {
+        if (options.startServer === true) {
+            if (options.processService === undefined) {
+                throw new Error('The MTA process service is unavailable.');
+            }
+
+            supervisor = startMtaServer({
+                root: context.root,
+                config: context.config,
+                processService: options.processService,
+                env: options.env ?? process.env,
+                signal: controller.signal,
+                platform: options.platform,
+                readinessTimeoutMs: options.readinessTimeoutMs,
+                shutdownTimeoutMs: options.shutdownTimeoutMs,
+                pollIntervalMs: options.pollIntervalMs,
+            });
+            await supervisor.waitUntilReady();
+        }
+
+        const ensure = runEnsureCommand(context, {
             ...options,
+            transport: supervisor === null ? options.transport : createServerConsoleTransport(supervisor),
+            signal: options.startServer === true ? controller.signal : options.signal,
             commandName: 'dev',
             developmentLogs: context.config.development.logs,
             layout: 'tree',
@@ -46,7 +87,32 @@ export async function runDevCommand(context: CommandContext, options: EnsureOpti
                 options.onBuild?.(outcome);
             },
         });
+
+        if (supervisor === null) {
+            return await ensure;
+        }
+
+        const result = await Promise.race([
+            ensure.then((code) => ({ kind: 'ensure' as const, code })),
+            supervisor.waitForExit().then((exit) => ({ kind: 'exit' as const, exit })),
+        ]);
+
+        if (result.kind === 'ensure') {
+            return result.code;
+        }
+
+        controller.abort();
+        await ensure;
+        reporter.error(`Owned MTA server exited unexpectedly with ${result.exit.code === null ? `signal ${result.exit.signal ?? 'unknown'}` : `code ${result.exit.code}`}.`);
+
+        return EXIT_DIAGNOSTICS;
+    } catch (error: unknown) {
+        reporter.error(error instanceof Error ? error.message : String(error));
+
+        return EXIT_DIAGNOSTICS;
     } finally {
+        options.signal?.removeEventListener('abort', abort);
+        await supervisor?.close();
         follower.close();
     }
 }

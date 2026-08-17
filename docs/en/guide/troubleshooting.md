@@ -117,6 +117,13 @@ If the restart is configured and still fails, check that the MTA side resource
 named in `transport.resource` exports both `refreshResources` and
 `restartResource`, and that the ACL grants the configured user HTTP access.
 
+## The local MTA server does not start
+
+The executable error lists every attempted path. Check that `serverPath` points
+at the installation root, or set a contained relative
+`development.server.executable`. A readiness timeout names `server.log`; inspect
+that file for startup errors or a release with a different startup marker.
+
 ## `config-missing-secret`
 
 `passwordEnv` names an environment variable that is not set in the shell running

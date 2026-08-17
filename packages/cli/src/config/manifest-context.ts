@@ -4,7 +4,7 @@ export const DEVELOPMENT_MODE = 'development';
 
 export const PRODUCTION_MODE = 'production';
 
-const DEVELOPMENT_COMMANDS: readonly string[] = ['dev', 'ensure'];
+const DEVELOPMENT_COMMANDS: readonly string[] = ['dev', 'ensure', 'server'];
 
 const PRODUCTION_COMMANDS: readonly string[] = ['build'];
 

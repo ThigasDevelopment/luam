@@ -9,6 +9,7 @@ import { reportManifestDiagnostics } from '@cli/reporting/diagnostic-reporter';
 import { createConsoleLogger } from '@cli/reporting/logger';
 import { detectCapability, PLAIN_CAPABILITY } from '@cli/reporting/output-capability';
 import { createReporter } from '@cli/reporting/reporter';
+import { createProcessService } from '@cli/server/process-service';
 import { createTransport } from '@cli/transport/transport-factory';
 
 import type { CommandContext } from '@cli/commands/command-context';
@@ -20,6 +21,7 @@ import type { InstallationPrompt } from '@cli/editor/installation-prompt';
 import type { Logger } from '@cli/reporting/logger';
 import type { OutputCapability } from '@cli/reporting/output-capability';
 import type { Reporter } from '@cli/reporting/reporter';
+import type { ProcessService } from '@cli/server/process-service';
 import type { MtaTransport } from '@cli/transport/transport';
 
 export interface CliOverrides {
@@ -32,6 +34,7 @@ export interface CliOverrides {
     editorService: EditorService;
     prompt: InstallationPrompt;
     initPrompt: InitPrompt;
+    processService: ProcessService;
 }
 
 export interface CliRuntime {
@@ -118,4 +121,8 @@ export function runtimeEditorService(runtime: CliRuntime): EditorService {
 
 export function runtimeTransport(runtime: CliRuntime, config: LuamConfig): MtaTransport {
     return runtime.overrides.transport ?? createTransport(config.transport);
+}
+
+export function runtimeProcessService(runtime: CliRuntime): ProcessService {
+    return runtime.overrides.processService ?? createProcessService();
 }

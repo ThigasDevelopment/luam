@@ -155,9 +155,11 @@ class RuleWalk {
     }
 
     private path(entry: ManifestField, value: string, path: string, key: string): string {
-        if (entry.rule === 'contained-path') {
+        if (entry.rule === 'contained-path' || entry.rule === 'server-contained-path') {
             if (!isContainedPath(value)) {
-                this.report(ESCAPING_PATH, `"${path}" must stay inside the project directory but received "${value}".`, key);
+                const boundary = entry.rule === 'server-contained-path' ? 'the configured serverPath' : 'the project directory';
+
+                this.report(ESCAPING_PATH, `"${path}" must stay inside ${boundary} but received "${value}".`, key);
             }
 
             return normalizePattern(value);

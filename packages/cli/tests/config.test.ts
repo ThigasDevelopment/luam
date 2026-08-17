@@ -50,6 +50,7 @@ describe('configuration validation', () => {
             transport: { kind: 'none' },
             development: {
                 logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 },
+                server: { executable: null },
             },
         });
     });
@@ -130,13 +131,19 @@ describe('configuration validation', () => {
     it('reads development log capture limits', () => {
         const development = { logs: { enabled: true, maxMessageLength: 512, rateLimit: 10, rateWindowMs: 2000 } };
 
-        expect(manifestConfig({ name: 'demo', development }).development).toEqual(development);
+        expect(manifestConfig({ name: 'demo', development }).development).toEqual({ ...development, server: { executable: null } });
     });
 
     it('rejects invalid and unknown development log fields', () => {
         const source = "name = 'demo'\ndevelopment = { logs = { maxMessageLength = 0, extra = true } }\n";
 
         expect(codes(load(source).diagnostics).sort()).toEqual(['config-invalid-type', 'config-unknown-field']);
+    });
+
+    it('reads and contains the development server executable', () => {
+        expect(manifestConfig({ name: 'demo', development: { server: { executable: 'bin/mta-server' } } }).development.server.executable).toBe('bin/mta-server');
+        expect(codes(load("name = 'demo'\ndevelopment = { server = { executable = '../mta-server' } }\n").diagnostics)).toEqual(['config-escaping-path']);
+        expect(codes(load("name = 'demo'\ndevelopment = { server = { extra = true } }\n").diagnostics)).toEqual(['config-unknown-field']);
     });
 
     it('reports every problem in one pass', () => {

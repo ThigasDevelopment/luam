@@ -145,7 +145,7 @@ describe('manifest evaluation', () => {
         expect(analysis.diagnostics).toEqual([]);
         expect(analysis.value.version).toBe('1.2.3');
         expect(analysis.value.compilerOptions).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false });
-        expect(analysis.value.development).toEqual({ logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 } });
+        expect(analysis.value.development).toEqual({ logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 }, server: {} });
     });
 
     it('reads root and a local table member', () => {

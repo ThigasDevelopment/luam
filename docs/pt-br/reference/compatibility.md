@@ -46,6 +46,9 @@ plataforma funciona em outra.
 `serverPath` aponta para a raiz do servidor MTA na máquina que roda a CLI, então o
 `ensure` precisa de um servidor local ou de um caminho montado.
 
+O início de servidor gerenciado por `luam server` e `luam dev --start-server` tem
+suporte no Windows e Linux. Os outros comandos da CLI mantêm suporte ao macOS.
+
 ## Rede
 
 Um build faz exatamente um tipo de requisição de saída: a consulta de

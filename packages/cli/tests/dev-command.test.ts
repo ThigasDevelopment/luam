@@ -8,10 +8,23 @@ import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import type { ResourceMap } from '@compiler/project/resource';
 
 import { createMemoryLogger } from './support/memory-logger';
+import { FakeProcessService } from './support/fake-process-service';
 import { createMockTransport } from './support/mock-transport';
 import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
+
+async function waitUntil(predicate: () => boolean): Promise<void> {
+    const deadline = Date.now() + 1000;
+
+    while (!predicate()) {
+        if (Date.now() >= deadline) {
+            throw new Error('Timed out waiting for the development command.');
+        }
+
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, 5));
+    }
+}
 
 function context(overrides: Readonly<Record<string, unknown>> = {}): { context: CommandContext; fixture: ProjectFixture } {
     const fixture = createProjectFixture(defaultProjectFiles(overrides));
@@ -74,5 +87,94 @@ describe('development command', () => {
         const map: ResourceMap = { version: 1, resource: 'demo', layout: 'tree', files: [] };
 
         expect(deployedMapAfterBuild(map, { build: null, map: null })).toBe(map);
+    });
+
+    it('waits for an owned server before the first transport call', async () => {
+        const harness = context({ serverPath: 'mta-server' });
+        const transport = createMockTransport();
+        const processService = new FakeProcessService();
+        let input = '';
+
+        harness.fixture.write('mta-server/MTA Server.exe', 'binary');
+        processService.stdin.on('data', (chunk: Buffer) => {
+            input += chunk.toString();
+
+            if (input.includes('shutdown\n')) {
+                processService.exit(0);
+            }
+        });
+
+        const running = runDevCommand(harness.context, {
+            transport,
+            watch: false,
+            signal: null,
+            startServer: true,
+            processService,
+            platform: 'win32',
+            pollIntervalMs: 5,
+            readinessTimeoutMs: 500,
+        });
+
+        expect(transport.calls).toEqual([]);
+
+        harness.fixture.write('mta-server/mods/deathmatch/logs/server.log', 'Server started and is ready to accept connections!\n');
+
+        expect(await running).toBe(EXIT_OK);
+        expect(transport.calls).toEqual([]);
+        expect(input).toBe('refresh\nstop luam-demo\nstart luam-demo\nshutdown\n');
+        expect(processService.calls).toHaveLength(1);
+    });
+
+    it('does not build when the owned server exits during startup', async () => {
+        const harness = context({ serverPath: 'mta-server' });
+        const transport = createMockTransport();
+        const processService = new FakeProcessService();
+
+        harness.fixture.write('mta-server/MTA Server.exe', 'binary');
+
+        const running = runDevCommand(harness.context, {
+            transport,
+            watch: false,
+            signal: null,
+            startServer: true,
+            processService,
+            platform: 'win32',
+        });
+
+        processService.exit(2);
+
+        expect(await running).toBe(EXIT_DIAGNOSTICS);
+        expect(transport.calls).toEqual([]);
+        expect(harness.fixture.exists('mta-server/mods/deathmatch/resources/luam-demo')).toBe(false);
+    });
+
+    it('stops watch mode when the owned server exits unexpectedly', async () => {
+        const harness = context({ serverPath: 'mta-server' });
+        const transport = createMockTransport();
+        const processService = new FakeProcessService();
+        let input = '';
+
+        harness.fixture.write('mta-server/MTA Server.exe', 'binary');
+        processService.stdin.on('data', (chunk: Buffer) => {
+            input += chunk.toString();
+        });
+
+        const running = runDevCommand(harness.context, {
+            transport,
+            watch: true,
+            signal: null,
+            startServer: true,
+            processService,
+            platform: 'win32',
+            pollIntervalMs: 5,
+            readinessTimeoutMs: 500,
+        });
+
+        harness.fixture.write('mta-server/mods/deathmatch/logs/server.log', 'Server started!\n');
+        await waitUntil(() => input.includes('start luam-demo\n'));
+        processService.exit(4);
+
+        expect(await running).toBe(EXIT_DIAGNOSTICS);
+        expect(transport.calls).toEqual([]);
     });
 });

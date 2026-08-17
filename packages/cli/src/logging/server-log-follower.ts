@@ -6,8 +6,8 @@ export interface ServerLogFollower {
 }
 
 export interface ServerLogFollowerOptions {
-    signal?: AbortSignal | null;
-    pollIntervalMs?: number;
+    signal?: AbortSignal | null | undefined;
+    pollIntervalMs?: number | undefined;
 }
 
 const DEFAULT_POLL_INTERVAL_MS = 100;

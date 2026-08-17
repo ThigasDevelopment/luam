@@ -126,6 +126,7 @@ serverPath = 'C:/MTA Server'
 
 ```bash
 luam dev
+luam dev --start-server # also starts and owns the local MTA process
 ```
 
 > [Quick start](https://thigasdevelopment.github.io/luam/en/guide/quick-start)
@@ -142,6 +143,7 @@ luam dev
 | `luam build` | Writes the bundled resource into `<outDir>/<name>`, plus a source map |
 | `luam dev` | Build, sync, restart and watch, while following the server log |
 | `luam ensure` | Build, sync and restart on every save |
+| `luam server` | Run an existing local MTA server in the foreground |
 | `luam trace` | Resolves a production error position back to the authored file |
 | `luam setup` | Installs the editor extension |
 | `luam doctor` | Reports CLI, Node.js, detected editors and extension status |
@@ -232,7 +234,8 @@ serverPath = 'C:/MTA Server'
 
 Optional fields cover `meta.xml` info, `compilerOptions`, `sources`, `assets`,
 `dependencies`, `engine.minVersion`, `environment`, `outDir`, `loadOrder`,
-`output`, `helpers`, `resourcesDir`, `transport` and `development.logs`.
+`output`, `helpers`, `resourcesDir`, `transport`, `development.logs` and
+`development.server.executable`.
 
 > [.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)
 > and [Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)

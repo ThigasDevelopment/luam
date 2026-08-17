@@ -117,6 +117,14 @@ Se o restart está configurado e mesmo assim falha, confira se o resource do lad
 do MTA nomeado em `transport.resource` exporta `refreshResources` e
 `restartResource`, e se a ACL concede acesso HTTP ao usuário configurado.
 
+## O servidor MTA local não inicia
+
+O erro do executável lista todos os caminhos tentados. Confira se `serverPath`
+aponta para a raiz da instalação, ou defina um
+`development.server.executable` relativo e contido nela. Um timeout de prontidão
+nomeia o `server.log`; verifique nele erros de inicialização ou uma versão com um
+marcador de startup diferente.
+
 ## `config-missing-secret`
 
 `passwordEnv` nomeia uma variável de ambiente que não está definida no shell que

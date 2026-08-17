@@ -386,6 +386,13 @@ desenvolvimento.
 | `rateLimit` | `30` | Registros permitidos por cliente por janela. |
 | `rateWindowMs` | `1000` | Duração dessa janela. |
 
+## `development.server`
+
+`executable` é um caminho opcional relativo a `serverPath` e precisa permanecer
+dentro desse diretório. Quando omitido, `luam server` e
+`luam dev --start-server` procuram `MTA Server.exe` no Windows, ou
+`mta-server64` e depois `mta-server` no Linux.
+
 ## Quando o arquivo está errado
 
 | Problema | Diagnóstico |

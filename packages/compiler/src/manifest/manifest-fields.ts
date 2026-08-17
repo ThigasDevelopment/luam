@@ -107,8 +107,16 @@ const LOG_FIELDS: readonly ManifestField[] = [
     field('rateWindowMs', NUMBER_TYPE, 'Length of the rate window in milliseconds.', { defaultValue: 1000, rule: 'positive-integer', owner: 'development' }),
 ];
 
+const DEVELOPMENT_SERVER_FIELDS: readonly ManifestField[] = [
+    field('executable', OPTIONAL_STRING, 'Executable path relative to serverPath used by "luam server" and "luam dev --start-server".', {
+        rule: 'server-contained-path',
+        owner: 'development',
+    }),
+];
+
 const DEVELOPMENT_FIELDS: readonly ManifestField[] = [
     table('logs', 'Log capture used by "luam dev".', LOG_FIELDS, { defaultValue: {}, owner: 'development' }),
+    table('server', 'Local MTA server process settings.', DEVELOPMENT_SERVER_FIELDS, { defaultValue: {}, owner: 'development' }),
 ];
 
 export const MANIFEST_FIELDS: readonly ManifestField[] = [

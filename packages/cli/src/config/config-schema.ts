@@ -26,8 +26,13 @@ export interface DevelopmentLogsConfig {
     rateWindowMs: number;
 }
 
+export interface DevelopmentServerConfig {
+    executable: string | null;
+}
+
 export interface DevelopmentConfig {
     logs: DevelopmentLogsConfig;
+    server: DevelopmentServerConfig;
 }
 
 export interface LuamConfig {

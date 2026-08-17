@@ -91,7 +91,13 @@ so existing history is not printed.
 
 ```bash
 luam dev
+luam dev --start-server
 ```
+
+Use `luam server` in a second terminal when you want the interactive MTA console,
+or `luam dev --start-server` for one command. The integrated form waits for MTA
+readiness before syncing, refreshes and starts or restarts the resource through
+the owned console, and stops its process on `Ctrl+C`. It needs no HTTP transport.
 
 Server records attributed to the active resource and relayed client
 `outputDebugString` calls share one stable stream:

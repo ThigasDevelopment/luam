@@ -27,6 +27,7 @@ const EMPTY: ManifestObject = {};
 
 function readDevelopment(source: ManifestObject | null): DevelopmentConfig {
     const logs = readTable(source ?? EMPTY, 'logs') ?? EMPTY;
+    const server = readTable(source ?? EMPTY, 'server') ?? EMPTY;
 
     return {
         logs: {
@@ -34,6 +35,9 @@ function readDevelopment(source: ManifestObject | null): DevelopmentConfig {
             maxMessageLength: readNumber(logs, 'maxMessageLength') ?? 0,
             rateLimit: readNumber(logs, 'rateLimit') ?? 0,
             rateWindowMs: readNumber(logs, 'rateWindowMs') ?? 0,
+        },
+        server: {
+            executable: readString(server, 'executable'),
         },
     };
 }
