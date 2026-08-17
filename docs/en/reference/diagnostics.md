@@ -101,7 +101,7 @@ writes nothing.
 | `check-unknown-super-method` | The parent has no method of that name. |
 | `check-declare-outside-declaration-file` | `declare` outside a `.d.luam` file. |
 | `check-declaration-file-statement` | A `.d.luam` file contains a statement. |
-| `check-unused-local` | A local is never read, with `compilerOptions.noUnusedLocals` on. |
+| `check-unused-local` | A local is never read, with `compilerOptions.noUnusedLocals` on, or anywhere in the manifest. |
 | `check-unused-parameter` | A parameter is never read, with `compilerOptions.noUnusedParameters` on. |
 
 ## Checker — decorators

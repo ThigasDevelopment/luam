@@ -6,6 +6,7 @@ import { ALLOWED_EXPRESSIONS, INVALID_EXPRESSION, INVALID_TYPE, MISSING_FIELD, U
 import { booleanValue, errorValue, nilValue, numberValue, resolved, stringValue, type Evaluated } from './manifest-evaluated';
 import { elementField, findField, type ManifestField } from './manifest-field';
 import { ENV_MEMBER_TYPE } from './manifest-fields';
+import { ManifestLocals } from './manifest-locals';
 import { closedSetMessage, missingMessage, typeMessage, unknownNameMessage } from './manifest-messages';
 import { applyBinary, applyUnary } from './manifest-operators';
 import { describeReceived, isManifestObject, type ManifestObject, type ManifestValue } from './manifest-value';
@@ -31,7 +32,7 @@ export class ManifestPass {
 
     readonly positions = new Map<string, SourcePosition>();
 
-    private readonly locals = new Map<string, Evaluated>();
+    readonly locals = new ManifestLocals();
 
     private readonly context: ManifestContext;
 
@@ -43,8 +44,8 @@ export class ManifestPass {
         this.diagnostics.push(manifestError(code, message, position));
     }
 
-    declareLocal(name: string, evaluated: Evaluated): void {
-        this.locals.set(name, evaluated);
+    declareLocal(name: string, evaluated: Evaluated, position: SourcePosition): void {
+        this.locals.declare(name, evaluated, position);
     }
 
     expression(node: Expression, target: FieldTarget | null): Evaluated {
@@ -90,9 +91,9 @@ export class ManifestPass {
     }
 
     private identifier(name: string, position: SourcePosition): Evaluated {
-        const local = this.locals.get(name);
+        const local = this.locals.read(name);
 
-        if (local !== undefined) {
+        if (local !== null) {
             return local;
         }
 

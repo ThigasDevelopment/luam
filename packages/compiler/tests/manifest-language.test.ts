@@ -21,9 +21,22 @@ const NAME = "name = 'luam-demo'\n";
 
 describe('manifest subset', () => {
     it('accepts the two statements the dialect allows', () => {
-        const source = ["local password = env.LUAM_PASSWORD", NAME, "outDir = mode == 'production' and 'build' or 'build-dev'"].join('\n');
+        const source = ['local password = env.LUAM_PASSWORD', NAME, "description = password or 'A demo'", "outDir = mode == 'production' and 'build' or 'build-dev'"].join('\n');
 
         expect(codes(source)).toEqual([]);
+    });
+
+    it('reports a local that is never read', () => {
+        const diagnostic = analyze(`local password = env.LUAM_PASSWORD\n${NAME}`).diagnostics[0];
+
+        expect(diagnostic?.code).toBe('check-unused-local');
+        expect(diagnostic?.severity).toBe('warning');
+        expect(diagnostic?.message).toBe('"password" is declared but never read. Read it, remove it, or rename it with a leading "_" to keep it on purpose.');
+        expect(diagnostic?.position.line).toBe(1);
+    });
+
+    it('keeps a local named with a leading underscore', () => {
+        expect(codes(`local _password = env.LUAM_PASSWORD\n${NAME}`)).toEqual([]);
     });
 
     it('rejects a function declaration, a call, an if statement and a return', () => {

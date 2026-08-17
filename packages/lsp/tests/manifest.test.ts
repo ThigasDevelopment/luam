@@ -68,7 +68,7 @@ describe('manifest diagnostics', () => {
     });
 
     it('never reports the environment checks a source file gets', () => {
-        const manifest = openManifest("name = 'demo'\nlocal player = getPlayerFromName('bob')\n");
+        const manifest = openManifest("name = 'demo'\ndescription = getPlayerFromName('bob')\n");
 
         expect(manifest.service.diagnostics(manifest.uri).map((diagnostic) => diagnostic.code)).toEqual(['config-invalid-expression']);
     });

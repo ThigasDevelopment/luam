@@ -100,6 +100,12 @@ manifest. Declare it with "local", or read "mode", "env", or "root".
 Todo diagnóstico de configuração carrega linha e coluna, e um terminal interativo
 sublinha o trecho exatamente como faz com um arquivo de código.
 
+Um `local` que nenhum campo lê é configuração morta, então o manifesto o reporta
+como `check-unused-local` — um aviso, não um erro. Isso não depende de
+`compilerOptions.noUnusedLocals`, que governa os arquivos de código; o manifesto é
+sempre verificado no seu próprio modo estrito. Renomeie o local com `_` inicial
+para mantê-lo de propósito.
+
 Um valor é um literal, uma tabela, ou esses combinados com `and`, `or`, `not`,
 comparação, aritmética e concatenação:
 

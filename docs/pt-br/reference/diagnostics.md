@@ -101,7 +101,7 @@ erro não escreve nada.
 | `check-unknown-super-method` | A classe pai não tem método com esse nome. |
 | `check-declare-outside-declaration-file` | `declare` fora de um arquivo `.d.luam`. |
 | `check-declaration-file-statement` | Um arquivo `.d.luam` contém um comando. |
-| `check-unused-local` | Um local nunca é lido, com `compilerOptions.noUnusedLocals` ligado. |
+| `check-unused-local` | Um local nunca é lido, com `compilerOptions.noUnusedLocals` ligado, ou em qualquer ponto do manifesto. |
 | `check-unused-parameter` | Um parâmetro nunca é lido, com `compilerOptions.noUnusedParameters` ligado. |
 
 ## Checker — decoradores

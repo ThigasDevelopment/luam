@@ -58,7 +58,7 @@ function readLocal(pass: ManifestPass, statement: LocalStatement): void {
     for (const [index, declaration] of statement.declarations.entries()) {
         const value = statement.values[index];
 
-        pass.declareLocal(declaration.name, value === undefined ? nilValue() : pass.evaluate(value, null));
+        pass.declareLocal(declaration.name, value === undefined ? nilValue() : pass.evaluate(value, null), declaration.position);
     }
 }
 
@@ -135,6 +135,7 @@ export function analyzeManifest(source: string, context: ManifestContext): Manif
     }
 
     reportMissing(pass.diagnostics, raw);
+    pass.diagnostics.push(...pass.locals.unused());
 
     const normalized = normalizeManifest(raw, pass.positions);
 

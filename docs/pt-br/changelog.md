@@ -11,6 +11,10 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
 ### Alterado
 
+- [O manifesto](/pt-br/tooling/luam-manifest) explica que um `local` que nenhum
+  campo lê é reportado como `check-unused-local`, e
+  [Diagnósticos](/pt-br/reference/diagnostics) registra que o código também surge
+  no manifesto, independente de `compilerOptions.noUnusedLocals`.
 - [APIs e eventos](/pt-br/mta/apis-and-events) documenta handlers de evento
   tipados, a verificação do payload em cada trigger e o contrato `declare event`
   para eventos personalizados, com os diagnósticos de cada erro.

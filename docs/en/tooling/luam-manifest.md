@@ -101,6 +101,12 @@ manifest. Declare it with "local", or read "mode", "env", or "root".
 Every configuration diagnostic carries a line and a column, and an interactive
 terminal underlines the offending text the same way it does for a source file.
 
+A `local` that no field reads is dead configuration, so the manifest reports it as
+`check-unused-local` — a warning, not an error. This does not depend on
+`compilerOptions.noUnusedLocals`, which governs source files; the manifest is
+always checked in its own strict mode. Rename the local with a leading `_` to keep
+it on purpose.
+
 A value is a literal, a table, or those combined with `and`, `or`, `not`,
 comparison, arithmetic, and concatenation:
 

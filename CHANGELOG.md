@@ -6,6 +6,15 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Dead Configuration Says So
+
+#### Added
+
+- A manifest `local` that no field reads is reported as `check-unused-local`, a
+  warning with a caret under the name. The manifest is always checked in its own
+  strict mode, so this does not depend on `compilerOptions.noUnusedLocals`, and a
+  leading `_` keeps the local on purpose.
+
 ### Typed Events
 
 #### Added

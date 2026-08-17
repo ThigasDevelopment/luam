@@ -10,6 +10,10 @@ When that version changes, the entry below says what moved.
 
 ### Changed
 
+- [The manifest](/en/tooling/luam-manifest) explains that a `local` no field
+  reads is reported as `check-unused-local`, and
+  [Diagnostics](/en/reference/diagnostics) records that the code also fires in
+  the manifest regardless of `compilerOptions.noUnusedLocals`.
 - [APIs and events](/en/mta/apis-and-events) documents typed event handlers,
   payload checking on every trigger, and the `declare event` contract for custom
   events, with the diagnostics each mistake raises.
