@@ -3,6 +3,7 @@ import { findExtension, type ExtensionResult } from '@compiler/extensions/native
 import type { CallExpression, Expression, MemberExpression, TableExpression, TemplateLiteral } from '@compiler/parser/ast';
 
 import type { CheckContext } from './context';
+import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
 import {
     checkNewExpression,
@@ -134,10 +135,11 @@ function countArguments(total: number): string {
 export function checkSignature(
     context: CheckContext,
     args: readonly Expression[],
-    argumentTypes: readonly Type[],
     signature: FunctionType,
     position: SourcePosition,
 ): Type {
+    const argumentTypes = checkValueList(context, args, signature.parameters);
+
     if (argumentTypes.length < signature.minimumArguments) {
         const message = `This call expects at least ${countArguments(signature.minimumArguments)} but received ${argumentTypes.length}.`;
 
@@ -163,13 +165,13 @@ export function checkSignature(
 }
 
 function checkArguments(context: CheckContext, expression: CallExpression, calleeType: Type): Type {
-    const argumentTypes = checkValueList(context, expression.args);
-
     if (calleeType.kind !== 'function') {
+        checkValueList(context, expression.args);
+
         return ANY_TYPE;
     }
 
-    return checkSignature(context, expression.args, argumentTypes, calleeType, expression.position);
+    return checkSignature(context, expression.args, calleeType, expression.position);
 }
 
 function isSuperCall(expression: CallExpression): boolean {
@@ -181,9 +183,9 @@ function isLegacySuperCall(expression: CallExpression): boolean {
 }
 
 function checkMethodCall(context: CheckContext, expression: CallExpression, method: string, receiver: Type): Type {
-    const argumentTypes = checkValueList(context, expression.args);
-
     if (receiver.kind !== 'named') {
+        checkValueList(context, expression.args);
+
         return ANY_TYPE;
     }
 
@@ -194,20 +196,24 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
             context.warn('check-deprecated-use', `Member "${method}" is deprecated.`, expression.position);
         }
 
-        return checkSignature(context, expression.args, argumentTypes, declared.type, expression.position);
+        return checkSignature(context, expression.args, declared.type, expression.position);
     }
 
     if (!isMtaElement(context, receiver.name)) {
+        checkValueList(context, expression.args);
+
         return ANY_TYPE;
     }
 
     const member = resolveMtaMember(context, receiver.name, method, expression.position);
 
     if (member === null || member.type.kind !== 'function') {
+        checkValueList(context, expression.args);
+
         return ANY_TYPE;
     }
 
-    return checkSignature(context, expression.args, argumentTypes, member.type, expression.position);
+    return checkSignature(context, expression.args, member.type, expression.position);
 }
 
 function checkCall(context: CheckContext, expression: CallExpression): Type {
@@ -228,9 +234,14 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
         context.references.add(expression.callee.name);
 
         const constructor = resolveMtaConstructor(context, expression.callee.name, expression.position);
-        const argumentTypes = checkValueList(context, expression.args);
 
-        return context.record(expression, constructor === null ? ANY_TYPE : checkSignature(context, expression.args, argumentTypes, constructor, expression.position));
+        if (constructor === null) {
+            checkValueList(context, expression.args);
+
+            return context.record(expression, ANY_TYPE);
+        }
+
+        return context.record(expression, checkSignature(context, expression.args, constructor, expression.position));
     }
 
     const calleeType = checkExpression(context, expression.callee);
@@ -294,7 +305,7 @@ function checkTemplate(context: CheckContext, expression: TemplateLiteral): Type
     return context.record(expression, STRING_TYPE);
 }
 
-export function checkMultiValueExpression(context: CheckContext, expression: Expression): Type {
+export function checkMultiValueExpression(context: CheckContext, expression: Expression, expected: Type | null = null): Type {
     switch (expression.kind) {
         case 'nil-literal':
             return context.record(expression, NIL_TYPE);
@@ -340,7 +351,7 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'table-expression':
             return checkTable(context, expression);
         case 'function-expression': {
-            const type = buildFunctionType(context, expression.parameters, expression.returnAnnotation);
+            const type = buildFunctionType(context, expression.parameters, expression.returnAnnotation, contextualFunction(expected));
 
             checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, type, null);
 
@@ -355,19 +366,19 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'unary-expression':
             return checkUnary(context, expression.operator, checkExpression(context, expression.operand), expression);
         default:
-            return context.record(expression, checkExpression(context, expression.expression));
+            return context.record(expression, checkExpression(context, expression.expression, expected));
     }
 }
 
-export function checkExpression(context: CheckContext, expression: Expression): Type {
-    return firstValueOf(checkMultiValueExpression(context, expression));
+export function checkExpression(context: CheckContext, expression: Expression, expected: Type | null = null): Type {
+    return firstValueOf(checkMultiValueExpression(context, expression, expected));
 }
 
-export function checkValueList(context: CheckContext, values: readonly Expression[]): Type[] {
+export function checkValueList(context: CheckContext, values: readonly Expression[], expected: readonly Type[] = []): Type[] {
     const types: Type[] = [];
 
     values.forEach((value, index) => {
-        const type = checkMultiValueExpression(context, value);
+        const type = checkMultiValueExpression(context, value, expected[index] ?? null);
 
         if (index === values.length - 1) {
             types.push(...valuesOf(type));

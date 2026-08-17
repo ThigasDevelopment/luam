@@ -28,6 +28,7 @@ export const MTA_AUDIO_CLIENT: ApiCatalog = {
     playSFX3D: fn([STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Element'), 6),
     playSound: fn([STRING, BOOLEAN, BOOLEAN], named('Element'), 1),
     playSound3D: fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Element'), 4),
+    playSoundFrontEnd: fn([NUMBER], BOOLEAN, 1),
     setRadioChannel: fn([NUMBER], BOOLEAN, 1),
     setSoundEffectEnabled: fn([named('Element'), STRING, BOOLEAN], BOOLEAN, 3),
     setSoundEffectParameter: fn([named('Element'), STRING, STRING, ANY], BOOLEAN, 4),

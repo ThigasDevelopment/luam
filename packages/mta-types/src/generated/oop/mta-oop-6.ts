@@ -105,6 +105,6 @@ export const MTA_OOP_6: readonly OopClass[] = [
         oopProperty('valid', 'shared', 'isTimer', BOOLEAN),
     ], [
     ],
-    oopConstructor('shared', fn([ANY, NUMBER, NUMBER], named('Timer'), 3, true), 'setTimer'),
+    oopConstructor('shared', fn([ANY, NUMBER, NUMBER], named('Timer'), 3, true, undefined), 'setTimer'),
     ),
 ];

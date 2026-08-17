@@ -32,7 +32,7 @@ export function localType(analysis: DocumentAnalysis, offset: number, name: stri
 }
 
 function apiType(analysis: DocumentAnalysis, name: string): Type | null {
-    const declaration = findDeclaration(name);
+    const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null || !isAvailableIn(declaration.environment, analysis.environment)) {
         return null;

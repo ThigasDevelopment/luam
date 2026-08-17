@@ -3,6 +3,7 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-ty
 
 export const MTA_VEHICLE_SERVER: ApiCatalog = {
     addVehicleSirens: fn([named('Vehicle'), NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN], BOOLEAN, 3),
+    blowVehicle: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 1),
     getModelHandling: fn([NUMBER], TABLE, 1),
     getVehicleRespawnPosition: fn([named('Element')], tupleOf([NUMBER, NUMBER, NUMBER]), 1),
     getVehicleRespawnRotation: fn([named('Element')], tupleOf([NUMBER, NUMBER, NUMBER]), 1),

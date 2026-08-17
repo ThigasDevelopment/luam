@@ -67,6 +67,13 @@ locals sort first, then functions returning `number`, then the rest. Element
 types respect MTA's hierarchy, so a `Vehicle` ranks first where an `Element` is
 expected.
 
+When the expected parameter is itself a function, an anonymous callback inherits
+its parameter names and types. Completion can insert those names after
+`function (`, and member completion, hover, definition, and references use the
+inherited types inside the body. MTA callback variants follow the current file's
+environment, so `addCommandHandler` offers `player, commandName, ...` on the
+server and `commandName, ...` on the client.
+
 ## Environments
 
 Every document resolves its environment (`server`, `client` or `shared`) from its

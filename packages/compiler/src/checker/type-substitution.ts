@@ -34,7 +34,9 @@ export function substituteType(type: Type, substitutions: ReadonlyMap<string, Ty
         const parameters = type.parameters.map((parameter) => substituteType(parameter, substitutions));
         const returnType = substituteType(type.returnType, substitutions);
 
-        return createFunction(parameters, returnType, type.minimumArguments, type.isVariadic);
+        const variadicType = type.variadicType === undefined ? undefined : substituteType(type.variadicType, substitutions);
+
+        return createFunction(parameters, returnType, type.minimumArguments, type.isVariadic, type.parameterNames, variadicType);
     }
 
     if (type.kind === 'tuple') {

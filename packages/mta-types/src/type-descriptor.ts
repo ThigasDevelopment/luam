@@ -27,6 +27,8 @@ export interface NamedDescriptor {
 export interface FunctionDescriptor {
     kind: 'function';
     parameters: TypeDescriptor[];
+    parameterNames?: string[];
+    variadicType?: TypeDescriptor;
     returnType: TypeDescriptor;
     minimumArguments: number;
     isVariadic: boolean;
@@ -93,6 +95,21 @@ export function tupleOf(elements: TypeDescriptor[]): TypeDescriptor {
     return { kind: 'tuple', elements };
 }
 
-export function fn(parameters: TypeDescriptor[], returnType: TypeDescriptor, minimumArguments?: number, isVariadic = false): TypeDescriptor {
-    return { kind: 'function', parameters, returnType, minimumArguments: minimumArguments ?? parameters.length, isVariadic };
+export function fn(
+    parameters: TypeDescriptor[],
+    returnType: TypeDescriptor,
+    minimumArguments?: number,
+    isVariadic = false,
+    parameterNames?: string[],
+    variadicType?: TypeDescriptor,
+): TypeDescriptor {
+    return {
+        kind: 'function',
+        parameters,
+        ...(parameterNames === undefined ? {} : { parameterNames }),
+        ...(variadicType === undefined ? {} : { variadicType }),
+        returnType,
+        minimumArguments: minimumArguments ?? parameters.length,
+        isVariadic,
+    };
 }

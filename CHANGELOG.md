@@ -6,6 +6,31 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Contextual Callback Types
+
+#### Added
+
+- Function expressions inherit parameter types from their call-site callback
+  contract, including environment-specific MTA callbacks.
+- Completion, hover, navigation, and signature help use contextual callback
+  parameters and can insert generated parameter names into an empty callback.
+
+#### Changed
+
+- The generated MTA catalog retains nested callback signatures and exact
+  server, client, and shared variants from upstream declarations.
+
+### Readable Lua Preserves Authored Formatting
+
+#### Changed
+
+- Readable modules preserve authored whitespace, quotes, semicolons, comments,
+  and multiline layout while Luam-only syntax is erased.
+- Top-level statements requiring lowering use canonical Lua without reformatting
+  neighboring statements, while source maps cover expanding transformations.
+- Production minification removes readable formatting and keeps production bytes
+  compact.
+
 ### CLI-Owned Local MTA Server
 
 #### Added

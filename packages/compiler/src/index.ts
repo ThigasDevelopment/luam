@@ -6,6 +6,7 @@ import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/
 import { hasErrors, sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import { emit } from '@compiler/emitter/emitter';
+import { emitPreservingSource } from '@compiler/emitter/source-preserving';
 import type { RuntimeHelper, SourceLineMapping } from '@compiler/emitter/state';
 import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 import { parse } from '@compiler/parser/parser';
@@ -102,6 +103,16 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
     }
 
     const emitted = emit(parsed.program, checked.types, checked.references, checked.generatedMembers);
+    const preserved = emitPreservingSource(
+        source,
+        parsed.program,
+        parsed.erasures,
+        parsed.comments,
+        checked.types,
+        checked.references,
+        checked.generatedMembers,
+        parsed.statementSpans,
+    );
     const required = new Set<RuntimeHelper>(emitted.requiredHelpers);
 
     for (const name of checked.references) {
@@ -112,5 +123,10 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         }
     }
 
-    return { ...shared, code: emitted.code, requiredHelpers: expandHelpers(required).sort(), lines: emitted.lines };
+    return {
+        ...shared,
+        code: preserved?.code ?? emitted.code,
+        requiredHelpers: expandHelpers(required).sort(),
+        lines: preserved?.lines ?? emitted.lines,
+    };
 }

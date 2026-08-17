@@ -7,6 +7,7 @@ export const MTA_UTILITY_CLIENT: ApiCatalog = {
     getDevelopmentMode: fn([], BOOLEAN, 0),
     getKeyboardLayout: fn([], TABLE, 0),
     getLocalization: fn([], TABLE, 0),
+    getNetworkStats: fn([], TABLE, 0),
     isShowCollisionsEnabled: fn([], BOOLEAN, 0),
     isShowSoundEnabled: fn([], BOOLEAN, 0),
     isTrayNotificationEnabled: fn([], BOOLEAN, 0),

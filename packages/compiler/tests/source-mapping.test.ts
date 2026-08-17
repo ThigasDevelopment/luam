@@ -18,21 +18,10 @@ describe('source line mappings', () => {
         const source = readFileSync(new URL('./fixtures/control-flow.luam', import.meta.url), 'utf8');
         const result = compile(source, { filePath: 'src/server/control-flow.luam' });
 
-        expect(result.lines).toEqual([
-            { generatedLine: 1, sourceLine: 2 },
-            { generatedLine: 2, sourceLine: 4 },
-            { generatedLine: 5, sourceLine: 8 },
-            { generatedLine: 8, sourceLine: 12 },
-            { generatedLine: 11, sourceLine: 16 },
-            { generatedLine: 14, sourceLine: 20 },
-            { generatedLine: 17, sourceLine: 24 },
-            { generatedLine: 19, sourceLine: 27 },
-            { generatedLine: 21, sourceLine: 30 },
-            { generatedLine: 28, sourceLine: 38 },
-        ]);
+        expect(result.lines).toEqual([{ generatedLine: 2, sourceLine: 2 }]);
     });
 
-    it('keeps emitted Lua unchanged while recording sparse source segments', () => {
+    it('preserves authored line gaps while recording sparse source segments', () => {
         const source = `local value = 1
 
 function greet(): void
@@ -44,13 +33,28 @@ print('done')
 `;
         const result = compile(source, { filePath: 'src/server/main.luam' });
 
-        expect(result.code).toBe("local value = 1\nfunction greet()\n    print(value)\nend\nprint('done')\n");
+        expect(result.code).toBe("local value = 1\n\nfunction greet()\n\n    print(value)\nend\n\nprint('done')\n");
         expect(result.lines).toEqual([
             { generatedLine: 1, sourceLine: 1 },
-            { generatedLine: 2, sourceLine: 3 },
-            { generatedLine: 3, sourceLine: 5, symbol: 'greet' },
-            { generatedLine: 5, sourceLine: 8 },
+            { generatedLine: 5, sourceLine: 5, symbol: 'greet' },
+            { generatedLine: 8, sourceLine: 8 },
         ]);
+    });
+
+    it('keeps a runtime statement on its authored line after type erasure', () => {
+        const source = "local LUAM_EXAMPLE: string = 'Ola Mundo!'\n\nprint(LUAM_EXAMPLE)\n";
+        const result = compile(source, { filePath: 'src/server/main.luam' });
+
+        expect(result.code).toBe("local LUAM_EXAMPLE = 'Ola Mundo!'\n\nprint(LUAM_EXAMPLE)\n");
+        expect(result.lines).toEqual([{ generatedLine: 1, sourceLine: 1 }]);
+    });
+
+    it('preserves CRLF gaps and the vertical span of collapsed expressions', () => {
+        const crlf = compile("local value: string = 'a'\r\n\r\nprint(value)\r\n", { filePath: 'src/server/crlf.luam' });
+        const multiline = compile("local value = table.concat(\n    { 'a' },\n    ','\n)\nprint(value)\n", { filePath: 'src/server/call.luam' });
+
+        expect(crlf.code).toBe("local value = 'a'\r\n\r\nprint(value)\r\n");
+        expect(multiline.code).toBe("local value = table.concat(\n    { 'a' },\n    ','\n)\nprint(value)\n");
     });
 
     it('records class methods and generated accessors with their enclosing symbols', () => {
@@ -65,8 +69,18 @@ print('done')
 `;
         const result = compile(source, { filePath: 'src/shared/shop.luam' });
 
-        expect(result.lines).toContainEqual({ generatedLine: 3, sourceLine: 5, symbol: 'Shop:buy' });
+        expect(result.lines).toContainEqual({ generatedLine: 5, sourceLine: 5, symbol: 'Shop:buy' });
         expect(result.lines.some((line) => line.sourceLine === 3 && line.symbol === 'Shop:getName')).toBe(true);
+    });
+
+    it('shifts preserved mappings after an expanding canonical region', () => {
+        const source = "print ('before')\nclass Box { constructor = function () end }\nfunction after (): void\n    print ('after')\nend\n";
+        const result = compile(source, { filePath: 'src/shared/hybrid.luam' });
+
+        expect(result.code).toContain("print ('before')\nclass 'Box' {");
+        expect(result.code).toContain("function after ()\n    print ('after')\nend\n");
+        expect(result.lines).toContainEqual({ generatedLine: 6, sourceLine: 3 });
+        expect(result.lines).toContainEqual({ generatedLine: 7, sourceLine: 4, symbol: 'after' });
     });
 
     it('returns cached mappings with the cached module and invalidates them with code', () => {
@@ -94,7 +108,7 @@ print('done')
             return;
         }
 
-        expect(resolveResourcePosition(map, 'src/server/main.lua', 1)).toEqual({
+        expect(resolveResourcePosition(map, 'src/server/main.lua', 3)).toEqual({
             status: 'resolved',
             position: { file: 'src/server/main.luam', line: 3 },
         });

@@ -7,4 +7,6 @@ src/server/hud.luam:13:5 error check-environment-api: API "dxDrawText" is client
 src/server/hud.luam:16:16 error check-environment-event: Event "onClientRender" is client-only and cannot be used in a "server" file.
 src/server/hud.luam:18:16 error check-environment-event: Event "onClientResourceStop" is client-only and cannot be used in a "server" file.
 src/server/hud.luam:19:23 error check-environment-event: Event "onClientRender" is client-only and cannot be used in a "server" file.
-Check failed: 6 errors, 0 warnings in 13 ms.
+src/server/hud.luam:22:8 error check-argument-count: This call expects at least 4 arguments but received 3.
+src/server/hud.luam:22:23 error check-type-mismatch: Argument 3 expects "string" but received "fun(): void".
+Check failed: 8 errors, 0 warnings in 13 ms.

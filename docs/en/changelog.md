@@ -10,6 +10,13 @@ When that version changes, the entry below says what moved.
 
 ### Changed
 
+- [Language server](/en/tooling/language-server) uses expected callback types for
+  parameter completion, member completion, hover, navigation, and signature
+  help, including environment-specific MTA callbacks.
+- [Output layouts](/en/reference/output-layouts) explains how readable Lua keeps
+  authored statement lines for direct MTA debugging while source maps cover
+  expanding transforms and production minification removes the padding.
+
 - [CLI commands](/en/tooling/cli) documents `luam server` and
   `luam dev --start-server`; the manifest and troubleshooting pages cover
   executable discovery, readiness, shutdown, and platform support.

@@ -1,7 +1,7 @@
 import { createDiagnostic, type Diagnostic } from '@compiler/diagnostics/diagnostic';
 
 import { isIdentifierPart, isIdentifierStart, isLineBreak, isWhitespace } from './char';
-import { isCommentStart, scanComment } from './comment-scanner';
+import { isCommentStart, scanComment, type Comment } from './comment-scanner';
 import { Cursor } from './cursor';
 import { isDecrementOperator } from './decrement';
 import { longBracketLevel } from './long-bracket';
@@ -13,6 +13,8 @@ export interface LexResult {
     tokens: Token[];
     diagnostics: Diagnostic[];
     directives: string[];
+    hasComments: boolean;
+    comments: Comment[];
 }
 
 function scanIdentifier(cursor: Cursor): string {
@@ -152,6 +154,8 @@ export function scan(source: string): LexResult {
     const tokens: Token[] = [];
     const diagnostics: Diagnostic[] = [];
     const directives: string[] = [];
+    let hasComments = false;
+    const comments: Comment[] = [];
 
     while (!cursor.isEof()) {
         if (isWhitespace(cursor.peek())) {
@@ -162,6 +166,9 @@ export function scan(source: string): LexResult {
 
         if (isCommentStart(cursor) && !isDecrementOperator(cursor, tokens)) {
             const comment = scanComment(cursor, diagnostics);
+
+            hasComments = true;
+            comments.push(comment);
 
             if (comment.isDirective) {
                 directives.push(comment.text.slice(1));
@@ -183,5 +190,5 @@ export function scan(source: string): LexResult {
 
     tokens.push(createToken('eof', '', cursor.position(), cursor.position()));
 
-    return { tokens, diagnostics, directives };
+    return { tokens, diagnostics, directives, hasComments, comments };
 }

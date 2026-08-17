@@ -3,6 +3,7 @@ import { BOOLEAN, fn, named, NUMBER, STRING, tupleOf } from '@mta-types/type-des
 
 export const MTA_PED_CLIENT: ApiCatalog = {
     canPedBeKnockedOffBike: fn([named('Ped')], BOOLEAN, 1),
+    createPed: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('Ped'), 4),
     getPedAnalogControlState: fn([named('Ped'), STRING, BOOLEAN], NUMBER, 2),
     getPedAnimation: fn([named('Ped')], tupleOf([STRING, STRING]), 1),
     getPedBonePosition: fn([named('Ped'), NUMBER], tupleOf([NUMBER, NUMBER, NUMBER]), 2),

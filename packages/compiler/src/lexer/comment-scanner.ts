@@ -1,14 +1,17 @@
-import { createDiagnostic, type Diagnostic } from '@compiler/diagnostics/diagnostic';
+import { createDiagnostic, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 
 import { isLineBreak, isWhitespace } from './char';
 import type { Cursor } from './cursor';
 
 export interface Comment {
+    kind: 'line' | 'block';
     text: string;
     isDirective: boolean;
+    position: SourcePosition;
+    end: SourcePosition;
 }
 
-function scanLineComment(cursor: Cursor): Comment {
+function scanLineComment(cursor: Cursor, position: SourcePosition): Comment {
     const start = cursor.offset();
 
     while (!cursor.isEof() && !isLineBreak(cursor.peek())) {
@@ -17,7 +20,7 @@ function scanLineComment(cursor: Cursor): Comment {
 
     const text = cursor.slice(start, cursor.offset());
 
-    return { text: text.trim(), isDirective: text.startsWith('!') };
+    return { kind: 'line', text: text.trim(), isDirective: text.startsWith('!'), position, end: cursor.position() };
 }
 
 export function isCommentStart(cursor: Cursor): boolean {
@@ -32,7 +35,7 @@ export function scanComment(cursor: Cursor, diagnostics: Diagnostic[]): Comment 
     if (!cursor.matches('#*')) {
         cursor.advance();
 
-        return scanLineComment(cursor);
+        return scanLineComment(cursor, position);
     }
 
     cursor.advance(2);
@@ -50,5 +53,5 @@ export function scanComment(cursor: Cursor, diagnostics: Diagnostic[]): Comment 
         cursor.advance(2);
     }
 
-    return { text, isDirective: false };
+    return { kind: 'block', text, isDirective: false, position, end: cursor.position() };
 }

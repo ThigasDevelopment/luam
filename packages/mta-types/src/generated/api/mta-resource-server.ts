@@ -1,10 +1,15 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_RESOURCE_SERVER: ApiCatalog = {
     addResourceConfig: fn([STRING, STRING], named('XmlNode'), 1),
     addResourceMap: fn([STRING, NUMBER], named('XmlNode'), 1),
-    callRemote: fn([STRING, STRING, ANY, ANY, ANY, ANY, ANY], BOOLEAN, 4, true),
+    callRemote: fn(
+        [STRING, STRING, ANY, unionOf([NUMBER, fn([], ANY, 0, true, [], ANY)]), ANY, ANY, unionOf([fn([], ANY, 0, true, [], ANY), ANY])],
+        BOOLEAN,
+        4,
+        true,
+    ),
     copyResource: fn([named('Resource'), STRING, STRING], named('Resource'), 2),
     createResource: fn([STRING, STRING], named('Resource'), 1),
     deleteResource: fn([STRING], BOOLEAN, 1),

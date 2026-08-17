@@ -72,6 +72,18 @@ describe('ensure runner', () => {
         expect(result.outcome.map?.layout).toBe('tree');
     });
 
+    it('keeps authored statement lines in the synchronized Lua', async () => {
+        const files = syncedProject();
+
+        files['src/server/main.luam'] = "local LUAM_EXAMPLE: string = 'Ola Mundo!'\n\nprint(LUAM_EXAMPLE)\n";
+
+        const { context, fixture, transport } = harness(files);
+
+        await createEnsureRunner(context, transport).run();
+
+        expect(fixture.read(`${SERVER_RESOURCE}/src/server/main.lua`)).toBe("local LUAM_EXAMPLE = 'Ola Mundo!'\n\nprint(LUAM_EXAMPLE)\n");
+    });
+
     it('skips the sync and the restart when the build fails', async () => {
         const { context, fixture, transport, logger } = harness({ ...syncedProject(), 'src/server/main.luam': BROKEN_SERVER });
         const result = await createEnsureRunner(context, transport).run();

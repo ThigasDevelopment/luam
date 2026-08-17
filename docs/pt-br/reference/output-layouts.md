@@ -85,6 +85,16 @@ os grupos de código. Este é o formato normal do `ensure` e fixo do `dev`, pois
 resource em execução permanece fácil de inspecionar. Use
 `luam build --no-bundle` quando um build local também precisar desse formato.
 
+O Lua legível gerado preserva o texto escrito onde ele já é Lua válido depois da
+remoção da sintaxe exclusiva do Luam. Anotações de tipo e declarações usadas
+apenas na compilação são apagadas, comentários Luam viram comentários Lua, e os
+demais espaços, aspas, pontos e vírgulas e layouts multilinha permanecem como
+foram escritos. Um statement de nível superior com uma construção que exige
+transformação, como classe, template, extension ou atribuição composta, é
+substituído por Lua canônico sem reformatar os statements vizinhos. O mapa de
+código considera regiões que expandem ou contraem. A minificação de produção
+remove toda formatação legível.
+
 Trocar de estrutura remove arquivos gerados pela estrutura anterior. Arquivos
 cujos bytes não mudaram não são reescritos, e `env.lua` nunca é sobrescrito.
 

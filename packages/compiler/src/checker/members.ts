@@ -112,17 +112,17 @@ export function nativeConstructor(context: CheckContext, name: string): Function
 }
 
 export function checkNewExpression(context: CheckContext, expression: NewExpression): Type {
-    const argumentTypes = expression.args.map((argument) => checkExpression(context, argument));
-
     if (context.declarations.lookupClass(expression.className) === null) {
         const constructor = nativeConstructor(context, expression.className);
 
         if (constructor !== null) {
             context.references.add(expression.className);
-            checkSignature(context, expression.args, argumentTypes, constructor, expression.position);
+            checkSignature(context, expression.args, constructor, expression.position);
 
             return constructor.returnType;
         }
+
+        expression.args.forEach((argument) => checkExpression(context, argument));
 
         context.noteExternalReference(expression.className, expression.position);
         context.report('check-unknown-class', `Class "${expression.className}" is not defined.`, expression.position);
@@ -133,7 +133,9 @@ export function checkNewExpression(context: CheckContext, expression: NewExpress
     const constructor = context.declarations.lookupMember(expression.className, 'constructor');
 
     if (constructor !== null && constructor.type.kind === 'function') {
-        checkSignature(context, expression.args, argumentTypes, constructor.type, expression.position);
+        checkSignature(context, expression.args, constructor.type, expression.position);
+    } else {
+        expression.args.forEach((argument) => checkExpression(context, argument));
     }
 
     return createNamed(expression.className);
@@ -173,12 +175,13 @@ function resolveSuperMethod(context: CheckContext, expression: CallExpression): 
 }
 
 export function checkSuperCall(context: CheckContext, expression: CallExpression): Type {
-    const argumentTypes = expression.args.map((argument) => checkExpression(context, argument));
     const method = resolveSuperMethod(context, expression);
 
     if (method === null || method.kind !== 'function') {
+        expression.args.forEach((argument) => checkExpression(context, argument));
+
         return ANY_TYPE;
     }
 
-    return checkSignature(context, expression.args, argumentTypes, method, expression.position);
+    return checkSignature(context, expression.args, method, expression.position);
 }

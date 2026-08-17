@@ -137,7 +137,7 @@ function projectTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget
 }
 
 function catalogTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget | null {
-    const declaration = findDeclaration(name);
+    const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null || !isAvailableIn(declaration.environment, analysis.environment)) {
         return null;

@@ -3,6 +3,7 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-ty
 
 export const MTA_VEHICLE_CLIENT: ApiCatalog = {
     areVehicleLightsOn: fn([named('Vehicle')], BOOLEAN, 1),
+    blowVehicle: fn([named('Vehicle')], BOOLEAN, 1),
     getHeliBladeCollisionsEnabled: fn([named('Vehicle')], BOOLEAN, 1),
     getHelicopterRotorSpeed: fn([named('Vehicle')], NUMBER, 1),
     getVehicleAdjustableProperty: fn([named('Vehicle')], NUMBER, 1),

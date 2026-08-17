@@ -2,6 +2,7 @@ import type { ApiCatalog } from '@mta-types/api-declaration';
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE } from '@mta-types/type-descriptor';
 
 export const MTA_PLAYER_SERVER: ApiCatalog = {
+    forcePlayerMap: fn([named('Player'), BOOLEAN], BOOLEAN, 2),
     getAlivePlayers: fn([], TABLE, 0),
     getDeadPlayers: fn([], TABLE, 0),
     getPlayerACInfo: fn([named('Element')], TABLE, 1),
@@ -10,16 +11,22 @@ export const MTA_PLAYER_SERVER: ApiCatalog = {
     getPlayerCount: fn([], NUMBER, 0),
     getPlayerIdleTime: fn([named('Player')], NUMBER, 1),
     getPlayerIP: fn([named('Player')], STRING, 1),
+    getPlayerMoney: fn([named('Player')], NUMBER, 1),
     getPlayerScriptDebugLevel: fn([named('Player')], NUMBER, 1),
     getPlayerSerial: fn([named('Player')], STRING, 1),
     getPlayerVersion: fn([named('Player')], STRING, 1),
+    getPlayerWantedLevel: fn([named('Player')], NUMBER, 1),
     getRandomPlayer: fn([], named('Player'), 0),
+    givePlayerMoney: fn([named('Player'), NUMBER], BOOLEAN, 2),
+    isPlayerMapForced: fn([named('Player')], BOOLEAN, 1),
     isPlayerMuted: fn([named('Player')], BOOLEAN, 1),
     redirectPlayer: fn([named('Player'), STRING, NUMBER, STRING], BOOLEAN, 3),
     resendPlayerACInfo: fn([named('Player')], BOOLEAN, 1),
     resendPlayerModInfo: fn([named('Player')], BOOLEAN, 1),
     setPlayerAnnounceValue: fn([named('Element'), STRING, STRING], BOOLEAN, 3),
     setPlayerBlurLevel: fn([named('Player'), NUMBER], BOOLEAN, 2),
+    setPlayerHudComponentVisible: fn([named('Player'), STRING, BOOLEAN], BOOLEAN, 3),
+    setPlayerMoney: fn([named('Player'), NUMBER, BOOLEAN], BOOLEAN, 2),
     setPlayerMuted: fn([named('Player'), BOOLEAN], BOOLEAN, 2),
     setPlayerName: fn([named('Player'), STRING], BOOLEAN, 2),
     setPlayerScriptDebugLevel: fn([named('Player'), NUMBER], BOOLEAN, 2),
@@ -27,5 +34,6 @@ export const MTA_PLAYER_SERVER: ApiCatalog = {
     setPlayerVoiceIgnoreFrom: fn([named('Element'), ANY], BOOLEAN, 2),
     setPlayerWantedLevel: fn([named('Player'), NUMBER], BOOLEAN, 2),
     spawnPlayer: fn([named('Player'), NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, named('Team')], BOOLEAN, 4),
+    takePlayerMoney: fn([named('Player'), NUMBER], BOOLEAN, 2),
     takePlayerScreenShot: fn([named('Player'), NUMBER, NUMBER, STRING, NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
 };

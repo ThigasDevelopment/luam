@@ -17,32 +17,42 @@ export function emissionMarker(index: number): string {
     return `${MARKER_START}${index}${MARKER_END}`;
 }
 
-export function finalizeEmission(code: string, markers: readonly EmissionMarker[]): { code: string; lines: SourceLineMapping[] } {
+export function finalizeEmission(code: string, markers: readonly EmissionMarker[], sourceLineOffset = 0): { code: string; lines: SourceLineMapping[] } {
     const lines = code.split('\n');
+    const output: string[] = [];
     const mappings: SourceLineMapping[] = [];
     let previous: SourceLineMapping | null = null;
 
-    for (let index = 0; index < lines.length; index += 1) {
+    for (const line of lines) {
         const pattern = /\u0000luam:(\d+)\u0000/;
-        const match = pattern.exec(lines[index] ?? '');
+        const match = pattern.exec(line);
 
         if (match === null) {
+            output.push(line);
+
             continue;
         }
 
         const marker = markers[Number(match[1])];
-
-        lines[index] = (lines[index] ?? '').replace(pattern, '');
+        const emitted = line.replace(pattern, '');
 
         if (marker === undefined) {
+            output.push(emitted);
+
             continue;
         }
 
-        const mapping: SourceLineMapping = { generatedLine: index + 1, sourceLine: marker.sourceLine };
+        while (output.length + 1 < marker.sourceLine - sourceLineOffset) {
+            output.push('');
+        }
+
+        const mapping: SourceLineMapping = { generatedLine: output.length + 1, sourceLine: marker.sourceLine };
 
         if (marker.symbol !== undefined) {
             mapping.symbol = marker.symbol;
         }
+
+        output.push(emitted);
 
         const sameSegment =
             previous !== null &&
@@ -55,5 +65,5 @@ export function finalizeEmission(code: string, markers: readonly EmissionMarker[
         }
     }
 
-    return { code: lines.join('\n'), lines: mappings };
+    return { code: output.join('\n'), lines: mappings };
 }

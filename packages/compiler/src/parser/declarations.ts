@@ -238,6 +238,7 @@ function parseInterfaceMember(stream: TokenStream): InterfaceMember {
 }
 
 function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
+    const checkpoint = stream.checkpoint();
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
     const superInterfaces: string[] = [];
@@ -269,7 +270,11 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
 
     stream.expect('punctuation', '}');
 
-    return { kind: 'interface-declaration', name, superInterfaces, members, position };
+    const declaration: InterfaceDeclaration = { kind: 'interface-declaration', name, superInterfaces, members, position };
+
+    stream.eraseFrom(checkpoint);
+
+    return declaration;
 }
 
 function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {

@@ -16,5 +16,5 @@ export const MTA_FILE_SHARED: ApiCatalog = {
     fileRead: fn([named('File'), NUMBER], STRING, 2),
     fileRename: fn([STRING, STRING], BOOLEAN, 2),
     fileSetPos: fn([named('File'), NUMBER], NUMBER, 2),
-    fileWrite: fn([named('File'), STRING, STRING, STRING], NUMBER, 2, true),
+    fileWrite: fn([named('File'), STRING, STRING, STRING], NUMBER, 2, true, undefined),
 };

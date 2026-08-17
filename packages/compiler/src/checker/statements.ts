@@ -42,9 +42,16 @@ function minimumArguments(context: CheckContext, parameters: readonly Parameter[
     return index === -1 ? parameters.length : index;
 }
 
-export function buildFunctionType(context: CheckContext, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): FunctionType {
+export function buildFunctionType(
+    context: CheckContext,
+    parameters: readonly Parameter[],
+    returnAnnotation: TypeAnnotation | null,
+    contextual: FunctionType | null = null,
+): FunctionType {
     const isVariadic = parameters.some((parameter) => parameter.isVararg);
-    const types = parameters.filter((parameter) => !parameter.isVararg).map((parameter) => context.resolveAnnotation(parameter.annotation));
+    const types = parameters
+        .filter((parameter) => !parameter.isVararg)
+        .map((parameter, index) => parameter.annotation === null ? (contextual?.parameters[index] ?? ANY_TYPE) : context.resolveAnnotation(parameter.annotation));
 
     return createFunction(types, context.resolveAnnotation(returnAnnotation), minimumArguments(context, parameters), isVariadic);
 }
@@ -64,10 +71,16 @@ export function checkFunctionBody(
         context.binder.declare({ name: 'self', type: selfType, isLocal: true, position: ORIGIN });
     }
 
+    let parameterIndex = 0;
+
     for (const parameter of parameters) {
-        const type = parameter.isVararg ? ANY_TYPE : context.resolveAnnotation(parameter.annotation);
+        const type = parameter.isVararg ? ANY_TYPE : (signature.parameters[parameterIndex] ?? ANY_TYPE);
 
         context.binder.declare({ name: parameter.name, type, isLocal: true, position: parameter.position, origin: 'parameter' });
+
+        if (!parameter.isVararg) {
+            parameterIndex += 1;
+        }
     }
 
     checkStatements(context, body);

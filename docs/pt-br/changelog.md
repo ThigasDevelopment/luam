@@ -11,6 +11,13 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
 ### Alterado
 
+- [Servidor de linguagem](/pt-br/tooling/language-server) usa os tipos esperados
+  de callbacks para completar parâmetros e membros, hover, navegação e ajuda de
+  assinatura, inclusive em callbacks MTA específicos de cada ambiente.
+- [Layouts de saída](/pt-br/reference/output-layouts) explica como o Lua legível
+  mantém as linhas dos statements para debug direto no MTA, enquanto mapas
+  cobrem transformações expansivas e a minificação remove o preenchimento.
+
 - [Comandos da CLI](/pt-br/tooling/cli) documenta `luam server` e
   `luam dev --start-server`; as páginas do manifesto e de solução de problemas
   cobrem descoberta do executável, prontidão, encerramento e suporte de sistemas.

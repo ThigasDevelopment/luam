@@ -18,15 +18,15 @@ export const MTA_DRAWING_CLIENT: ApiCatalog = {
     dxDrawLine: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], BOOLEAN, 5),
     dxDrawLine3D: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], BOOLEAN, 6),
     dxDrawMaterialLine3D: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, ANY, ANY, NUMBER, ANY, ANY, NUMBER, NUMBER, ANY], BOOLEAN, 8),
-    dxDrawMaterialPrimitive: fn([ANY, ANY, BOOLEAN, TABLE, TABLE], BOOLEAN, 4, true),
-    dxDrawMaterialPrimitive3D: fn([ANY, ANY, BOOLEAN, TABLE, TABLE], BOOLEAN, 4, true),
+    dxDrawMaterialPrimitive: fn([ANY, ANY, BOOLEAN, TABLE, TABLE], BOOLEAN, 4, true, undefined),
+    dxDrawMaterialPrimitive3D: fn([ANY, ANY, BOOLEAN, TABLE, TABLE], BOOLEAN, 4, true, undefined),
     dxDrawMaterialSectionLine3D: fn(
         [NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, ANY, ANY, NUMBER, ANY, ANY, NUMBER, NUMBER, ANY],
         BOOLEAN,
         12,
     ),
-    dxDrawPrimitive: fn([STRING, BOOLEAN, TABLE, TABLE], BOOLEAN, 3, true),
-    dxDrawPrimitive3D: fn([STRING, BOOLEAN, TABLE, TABLE, TABLE, TABLE], BOOLEAN, 5, true),
+    dxDrawPrimitive: fn([STRING, BOOLEAN, TABLE, TABLE], BOOLEAN, 3, true, undefined),
+    dxDrawPrimitive3D: fn([STRING, BOOLEAN, TABLE, TABLE, TABLE, TABLE], BOOLEAN, 5, true, undefined),
     dxDrawRectangle: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, BOOLEAN], BOOLEAN, 4),
     dxDrawText: fn(
         [

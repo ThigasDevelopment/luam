@@ -51,8 +51,28 @@ function readDirectory(directory: string, label: string): UpstreamFile[] {
     }));
 }
 
+function readTree(directory: string): UpstreamFile[] {
+    const files: UpstreamFile[] = [];
+
+    for (const entry of readdirSync(directory, { recursive: true, withFileTypes: true })) {
+        if (!entry.isFile() || !entry.name.endsWith('.d.ts')) {
+            continue;
+        }
+
+        const path = join(entry.parentPath, entry.name);
+
+        files.push({ category: basename(entry.name, '.d.ts'), path, contents: readFileSync(path, 'utf8') });
+    }
+
+    return files.sort((left, right) => left.path.localeCompare(right.path, 'en'));
+}
+
 export function functionFiles(side: 'server' | 'client'): UpstreamFile[] {
     return readDirectory(join(upstreamRoot(), side, 'function'), `${side} function`);
+}
+
+export function typeFiles(side: 'server' | 'client'): UpstreamFile[] {
+    return [...readTree(join(upstreamRoot(), 'shared')), ...readTree(join(upstreamRoot(), side))];
 }
 
 export function variableFile(side: 'server' | 'client'): UpstreamFile {
@@ -82,17 +102,5 @@ export function classFiles(side: 'server' | 'client'): UpstreamFile[] {
         throw new GeneratorError(directory, `the upstream ${side} class directory is missing`);
     }
 
-    const files: UpstreamFile[] = [];
-
-    for (const entry of readdirSync(directory, { recursive: true, withFileTypes: true })) {
-        if (!entry.isFile() || !entry.name.endsWith('.d.ts')) {
-            continue;
-        }
-
-        const path = join(entry.parentPath, entry.name);
-
-        files.push({ category: basename(entry.name, '.d.ts'), path, contents: readFileSync(path, 'utf8') });
-    }
-
-    return files.sort((left, right) => left.path.localeCompare(right.path));
+    return readTree(directory);
 }

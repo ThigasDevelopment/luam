@@ -1,6 +1,7 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
 
 import { MTA_AUDIO_CLIENT } from './mta-audio-client';
+import { MTA_BLIP_CLIENT } from './mta-blip-client';
 import { MTA_BROWSER_CLIENT } from './mta-browser-client';
 import { MTA_CAMERA_CLIENT } from './mta-camera-client';
 import { MTA_CURSOR_CLIENT } from './mta-cursor-client';
@@ -9,6 +10,7 @@ import { MTA_EFFECTS_CLIENT } from './mta-effects-client';
 import { MTA_ELEMENT_CLIENT } from './mta-element-client';
 import { MTA_ENGINE_CLIENT } from './mta-engine-client';
 import { MTA_EVENT_CLIENT } from './mta-event-client';
+import { MTA_EXPLOSION_CLIENT } from './mta-explosion-client';
 import { MTA_FIRE_CLIENT } from './mta-fire-client';
 import { MTA_GUI_CLIENT } from './mta-gui-client';
 import { MTA_INPUT_CLIENT } from './mta-input-client';
@@ -17,6 +19,7 @@ import { MTA_MARKER_CLIENT } from './mta-marker-client';
 import { MTA_OBJECT_CLIENT } from './mta-object-client';
 import { MTA_OUTPUT_CLIENT } from './mta-output-client';
 import { MTA_PED_CLIENT } from './mta-ped-client';
+import { MTA_PICKUP_CLIENT } from './mta-pickup-client';
 import { MTA_PLAYER_CLIENT } from './mta-player-client';
 import { MTA_PROJECTILE_CLIENT } from './mta-projectile-client';
 import { MTA_RESOURCE_CLIENT } from './mta-resource-client';
@@ -32,6 +35,7 @@ import { MTA_WORLD_CLIENT } from './mta-world-client';
 
 export const MTA_CLIENT_GLOBALS: ApiCatalog = {
     ...MTA_AUDIO_CLIENT,
+    ...MTA_BLIP_CLIENT,
     ...MTA_BROWSER_CLIENT,
     ...MTA_CAMERA_CLIENT,
     ...MTA_CURSOR_CLIENT,
@@ -40,6 +44,7 @@ export const MTA_CLIENT_GLOBALS: ApiCatalog = {
     ...MTA_ELEMENT_CLIENT,
     ...MTA_ENGINE_CLIENT,
     ...MTA_EVENT_CLIENT,
+    ...MTA_EXPLOSION_CLIENT,
     ...MTA_FIRE_CLIENT,
     ...MTA_GUI_CLIENT,
     ...MTA_INPUT_CLIENT,
@@ -48,6 +53,7 @@ export const MTA_CLIENT_GLOBALS: ApiCatalog = {
     ...MTA_OBJECT_CLIENT,
     ...MTA_OUTPUT_CLIENT,
     ...MTA_PED_CLIENT,
+    ...MTA_PICKUP_CLIENT,
     ...MTA_PLAYER_CLIENT,
     ...MTA_PROJECTILE_CLIENT,
     ...MTA_RESOURCE_CLIENT,

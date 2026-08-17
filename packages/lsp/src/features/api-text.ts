@@ -22,7 +22,7 @@ export function typeDescriptorText(descriptor: TypeDescriptor): string {
         const parameters = descriptor.parameters.map(typeDescriptorText);
 
         if (descriptor.isVariadic) {
-            parameters.push('...');
+            parameters.push(descriptor.variadicType === undefined ? '...' : `...: ${typeDescriptorText(descriptor.variadicType)}`);
         }
 
         return `function(${parameters.join(', ')}): ${typeDescriptorText(descriptor.returnType)}`;
@@ -43,7 +43,7 @@ export function descriptorText(name: string, descriptor: TypeDescriptor): string
     });
 
     if (descriptor.isVariadic) {
-        parameters.push('...');
+        parameters.push(descriptor.variadicType === undefined ? '...' : `...: ${typeDescriptorText(descriptor.variadicType)}`);
     }
 
     return `function ${name}(${parameters.join(', ')}): ${typeDescriptorText(descriptor.returnType)}`;

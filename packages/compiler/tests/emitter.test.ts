@@ -17,16 +17,16 @@ function helpers(source: string): string[] {
 
 describe('emitter', () => {
     it('erases type annotations', () => {
-        expect(emit("local name: string = 'Thigas'")).toBe("local name = 'Thigas'\n");
+        expect(emit("local name: string = 'Thigas'")).toBe("local name = 'Thigas'");
     });
 
     it('erases function type annotations', () => {
-        expect(emit('local callback: fun(string): void = print')).toBe('local callback = print\n');
+        expect(emit('local callback: fun(string): void = print')).toBe('local callback = print');
         expect(emit('function make(): fun(string): void\n    return print\nend\n')).toBe('function make()\n    return print\nend\n');
     });
 
     it('erases type aliases', () => {
-        expect(emit('type PlayerId = number\nlocal id: PlayerId = 7\n')).toBe('local id = 7\n');
+        expect(emit('type PlayerId = number\nlocal id: PlayerId = 7\n')).toBe('\nlocal id = 7\n');
     });
 
     it('lowers increment and decrement statements', () => {
@@ -142,15 +142,15 @@ describe('emitter', () => {
     });
 
     it('preserves operator precedence and explicit grouping', () => {
-        expect(emit('local a = 1 + 2 * 3')).toBe('local a = 1 + 2 * 3\n');
-        expect(emit('local a = (1 + 2) * 3')).toBe('local a = (1 + 2) * 3\n');
-        expect(emit('local a = 2 ^ 3 ^ 2')).toBe('local a = 2 ^ 3 ^ 2\n');
-        expect(emit('local a = not true')).toBe('local a = not true\n');
+        expect(emit('local a = 1 + 2 * 3')).toBe('local a = 1 + 2 * 3');
+        expect(emit('local a = (1 + 2) * 3')).toBe('local a = (1 + 2) * 3');
+        expect(emit('local a = 2 ^ 3 ^ 2')).toBe('local a = 2 ^ 3 ^ 2');
+        expect(emit('local a = not true')).toBe('local a = not true');
     });
 
     it('escapes special characters in emitted strings', () => {
-        expect(emit("local text = 'line\\nbreak'")).toBe("local text = 'line\\nbreak'\n");
-        expect(emit('local text = "it\'s"')).toBe("local text = 'it\\'s'\n");
+        expect(emit("local text = 'line\\nbreak'")).toBe("local text = 'line\\nbreak'");
+        expect(emit('local text = "it\'s"')).toBe('local text = "it\'s"');
     });
 
     it('escapes control characters that would truncate the emitted literal', () => {
@@ -163,18 +163,104 @@ describe('emitter', () => {
     });
 
     it('emits table constructors with positional, named, and computed fields', () => {
-        expect(emit("local map = { 1, name = 'x', [2] = 'y' }")).toBe("local map = { 1, name = 'x', [2] = 'y' }\n");
-        expect(emit('local empty = {}')).toBe('local empty = {}\n');
+        expect(emit("local map = { 1, name = 'x', [2] = 'y' }")).toBe("local map = { 1, name = 'x', [2] = 'y' }");
+        expect(emit('local empty = {}')).toBe('local empty = {}');
+    });
+
+    it('preserves source formatting while erasing typed callback syntax', () => {
+        const source = [
+            "print ('LOADED');",
+            '',
+            'local function example (message: string): boolean',
+            '\treturn outputDebugString (message);',
+            'end',
+            '',
+            "addCommandHandler ('luam-command',",
+            '\tfunction (player: Player, command: string, ...: string): void',
+            "\t\tlocal message: string = table.concat ({ ... }, ' ');",
+            '\t\texample (message);',
+            '\tend',
+            ');',
+        ].join('\n');
+        const expected = [
+            "print ('LOADED');",
+            '',
+            'local function example (message)',
+            '\treturn outputDebugString (message);',
+            'end',
+            '',
+            "addCommandHandler ('luam-command',",
+            '\tfunction (player, command, ...)',
+            "\t\tlocal message = table.concat ({ ... }, ' ');",
+            '\t\texample (message);',
+            '\tend',
+            ');',
+        ].join('\n');
+
+        expect(emit(source)).toBe(expected);
+    });
+
+    it('canonically lowers only the class in an otherwise preserved module', () => {
+        const source = [
+            "print ('LOADED');",
+            '',
+            'local function example (message: string): boolean',
+            '\treturn outputDebugString (message);',
+            'end',
+            '',
+            "addCommandHandler ('luam-command',",
+            '\tfunction (player: Player, command: string, ...: string): void',
+            "\t\tlocal message: string = table.concat ({ ... }, ' ');",
+            '\t\texample (message);',
+            '\tend',
+            ');',
+            '',
+            'class Thigas {',
+            '\tconstructor = function ()',
+            '\t\t',
+            '\tend',
+            '}',
+            '',
+        ].join('\n');
+        const expected = [
+            "print ('LOADED');",
+            '',
+            'local function example (message)',
+            '\treturn outputDebugString (message);',
+            'end',
+            '',
+            "addCommandHandler ('luam-command',",
+            '\tfunction (player, command, ...)',
+            "\t\tlocal message = table.concat ({ ... }, ' ');",
+            '\t\texample (message);',
+            '\tend',
+            ');',
+            '',
+            "class 'Thigas' {",
+            '    constructor = function(self)',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+
+        expect(emit(source)).toBe(expected);
+    });
+
+    it('preserves comments while erasing compile-only declarations', () => {
+        const source = "# heading\ntype Name = string\ninterface Entry { name: Name }\n#* block ]] text *#\nlocal name: Name = 'Luam'\n";
+        const expected = "-- heading\n\n\n--[=[ block ]] text ]=]\nlocal name = 'Luam'\n";
+
+        expect(emit(source)).toBe(expected);
     });
 
     it('emits nested function bodies with increasing indentation', () => {
         const source = 'local function outer(): void\n    local inner = function()\n        print(1)\n    end\n\n    inner()\nend\n';
 
-        expect(emit(source)).toBe('local function outer()\n    local inner = function()\n        print(1)\n    end\n    inner()\nend\n');
+        expect(emit(source)).toBe('local function outer()\n    local inner = function()\n        print(1)\n    end\n\n    inner()\nend\n');
     });
 
-    it('emits nothing for an empty program', () => {
+    it('preserves a comment-only program as valid Lua', () => {
         expect(emit('')).toBe('');
-        expect(emit('# only a comment\n')).toBe('');
+        expect(emit('# only a comment\n')).toBe('-- only a comment\n');
     });
 });

@@ -55,6 +55,7 @@ function parseReturnStatement(stream: TokenStream): Statement {
 }
 
 function parseTypeAlias(stream: TokenStream): TypeAliasStatement {
+    const checkpoint = stream.checkpoint();
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
     const typeParameters: string[] = [];
@@ -69,7 +70,11 @@ function parseTypeAlias(stream: TokenStream): TypeAliasStatement {
 
     stream.expect('operator', '=');
 
-    return { kind: 'type-alias-statement', name, typeParameters, annotation: parseTypeAnnotation(stream), position };
+    const statement: TypeAliasStatement = { kind: 'type-alias-statement', name, typeParameters, annotation: parseTypeAnnotation(stream), position };
+
+    stream.eraseFrom(checkpoint);
+
+    return statement;
 }
 
 function isTypeAlias(stream: TokenStream): boolean {
@@ -81,12 +86,17 @@ function isTypeAlias(stream: TokenStream): boolean {
 }
 
 function parseDeclareStatement(stream: TokenStream): DeclareStatement {
+    const checkpoint = stream.checkpoint();
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
 
     stream.expect('punctuation', ':');
 
-    return { kind: 'declare-statement', name, annotation: parseTypeAnnotation(stream), position };
+    const statement: DeclareStatement = { kind: 'declare-statement', name, annotation: parseTypeAnnotation(stream), position };
+
+    stream.eraseFrom(checkpoint);
+
+    return statement;
 }
 
 function isDeclareStatement(stream: TokenStream): boolean {

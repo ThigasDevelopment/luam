@@ -15,6 +15,7 @@ export const MTA_WEAPON_CLIENT: ApiCatalog = {
     setWeaponClipAmmo: fn([named('Weapon'), NUMBER], BOOLEAN, 2),
     setWeaponFiringRate: fn([named('Weapon'), NUMBER], BOOLEAN, 2),
     setWeaponFlags: fn([named('Weapon'), STRING, BOOLEAN], BOOLEAN, 3),
+    setWeaponProperty: fn([named('Weapon'), STRING, ANY], BOOLEAN, 3),
     setWeaponState: fn([named('Weapon'), STRING], BOOLEAN, 2),
     setWeaponTarget: fn([named('Weapon'), named('Element'), NUMBER], BOOLEAN, 2),
 };

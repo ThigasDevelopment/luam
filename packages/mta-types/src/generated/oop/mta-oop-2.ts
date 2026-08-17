@@ -2,6 +2,19 @@ import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from 
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_2: readonly OopClass[] = [
+    oopClass('DxShader', null, [
+    ], [
+    ],
+    oopConstructor('client', fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], named('DxShader'), 1), 'dxCreateShader'),
+    ),
+    oopClass('DxTexture', null, [
+        oopMethod('getPixels', 'client', 'dxGetTexturePixels', fn([ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], STRING, 1)),
+        oopMethod('setEdge', 'client', 'dxSetTextureEdge', fn([STRING, NUMBER], BOOLEAN, 1)),
+        oopMethod('setPixels', 'client', 'dxSetTexturePixels', fn([ANY, ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], BOOLEAN, 2)),
+    ], [
+    ],
+    oopConstructor('client', fn([STRING, STRING, BOOLEAN, STRING], named('DxTexture'), 1), 'dxCreateTexture'),
+    ),
     oopClass('Effect', 'Element', [
         oopProperty('density', 'client', 'getEffectDensity', NUMBER),
         oopMethod('getDensity', 'client', 'getEffectDensity', fn([], NUMBER, 0)),
@@ -208,28 +221,5 @@ export const MTA_OOP_2: readonly OopClass[] = [
     ], [
     ],
     oopConstructor('client', fn([STRING, BOOLEAN], named('EngineTXD'), 1), 'engineLoadTXD'),
-    ),
-    oopClass('File', null, [
-        oopMethod('close', 'shared', 'fileClose', fn([], BOOLEAN, 0)),
-        oopProperty('eof', 'shared', 'fileIsEOF', BOOLEAN),
-        oopMethod('flush', 'shared', 'fileFlush', fn([], BOOLEAN, 0)),
-        oopMethod('getPath', 'shared', 'fileGetPath', fn([], STRING, 0)),
-        oopMethod('getPos', 'shared', 'fileGetPos', fn([], NUMBER, 0)),
-        oopMethod('getSize', 'shared', 'fileGetSize', fn([], NUMBER, 0)),
-        oopMethod('isEOF', 'shared', 'fileIsEOF', fn([], BOOLEAN, 0)),
-        oopProperty('path', 'shared', 'fileGetPath', STRING),
-        oopProperty('pos', 'shared', 'fileGetPos', NUMBER),
-        oopMethod('read', 'shared', 'fileRead', fn([NUMBER], STRING, 1)),
-        oopMethod('setPos', 'shared', 'fileSetPos', fn([NUMBER], NUMBER, 1)),
-        oopProperty('size', 'shared', 'fileGetSize', NUMBER),
-        oopMethod('write', 'shared', 'fileWrite', fn([STRING, STRING, STRING], NUMBER, 1, true)),
-    ], [
-        oopMethod('copy', 'shared', 'fileCopy', fn([STRING, STRING, BOOLEAN], BOOLEAN, 2)),
-        oopMethod('delete', 'shared', 'fileDelete', fn([STRING], BOOLEAN, 1)),
-        oopMethod('exists', 'shared', 'fileExists', fn([STRING], BOOLEAN, 1)),
-        oopMethod('new', 'shared', 'fileCreate', fn([STRING], named('File'), 1)),
-        oopMethod('rename', 'shared', 'fileRename', fn([STRING, STRING], BOOLEAN, 2)),
-    ],
-    oopConstructor('shared', fn([STRING], named('File'), 1), 'fileOpen'),
     ),
 ];

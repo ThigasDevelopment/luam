@@ -39,8 +39,8 @@ function typeParameters(type: Type, names: readonly string[] = []): { parameters
     return { parameters, returnText: typeToString(type.returnType) };
 }
 
-function fromApi(name: string): SignatureSource | null {
-    const declaration = findDeclaration(name);
+function fromApi(analysis: DocumentAnalysis, name: string): SignatureSource | null {
+    const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null || declaration.type.kind !== 'function') {
         return null;
@@ -271,7 +271,7 @@ export function resolveSignature(
     }
 
     if (segments.length === 1) {
-        return localSignature(analysis, offset, first) ?? (analysis.compilerOptions.oop ? fromMtaConstructor(analysis, first) : null) ?? fromApi(first);
+        return localSignature(analysis, offset, first) ?? (analysis.compilerOptions.oop ? fromMtaConstructor(analysis, first) : null) ?? fromApi(analysis, first);
     }
 
     return memberSignature(analysis, offset, segments, trigger === ':');

@@ -62,7 +62,16 @@ export function descriptorToType(descriptor: TypeDescriptor): Type {
     if (descriptor.kind === 'function') {
         const parameters = descriptor.parameters.map(descriptorToType);
 
-        return createFunction(parameters, descriptorToType(descriptor.returnType), descriptor.minimumArguments, descriptor.isVariadic);
+        const variadicType = descriptor.variadicType === undefined ? undefined : descriptorToType(descriptor.variadicType);
+
+        return createFunction(
+            parameters,
+            descriptorToType(descriptor.returnType),
+            descriptor.minimumArguments,
+            descriptor.isVariadic,
+            descriptor.parameterNames,
+            variadicType,
+        );
     }
 
     return PRIMITIVES[descriptor.kind] ?? ANY_TYPE;

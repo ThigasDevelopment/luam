@@ -218,7 +218,7 @@ describe('checker', () => {
 
         expect(result.mode).toBe('nocheck');
         expect(result.diagnostics).toEqual([]);
-        expect(result.code).toBe("local total = 'text'\n");
+        expect(result.code).toBe("\nlocal total = 'text'\n");
     });
 
     it('allows nil in nonstrict mode where strict rejects it', () => {
@@ -243,10 +243,10 @@ describe('checker', () => {
     it('loses an extension rewrite when nonstrict widens the receiver', () => {
         const source = 'local items = {}\nprint(items.count)\n';
 
-        expect(compile(`#!strict\n${source}`).code).toBe('local items = {}\nprint(table.size(items))\n');
-        expect(compile(`#!nocheck\n${source}`).code).toBe('local items = {}\nprint(table.size(items))\n');
-        expect(compile(`#!nonstrict\n${source}`).code).toBe('local items = {}\nprint(items.count)\n');
-        expect(compile('#!nonstrict\nlocal items: any[] = {}\nprint(items.count)\n').code).toBe('local items = {}\nprint(table.size(items))\n');
+        expect(compile(`#!strict\n${source}`).code).toBe('\nlocal items = {}\nprint(table.size(items))\n');
+        expect(compile(`#!nocheck\n${source}`).code).toBe('\nlocal items = {}\nprint(table.size(items))\n');
+        expect(compile(`#!nonstrict\n${source}`).code).toBe('\nlocal items = {}\nprint(items.count)\n');
+        expect(compile('#!nonstrict\nlocal items: any[] = {}\nprint(items.count)\n').code).toBe('\nlocal items = {}\nprint(table.size(items))\n');
     });
 
     it('never lets nocheck silence a syntax error', () => {

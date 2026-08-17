@@ -11,6 +11,8 @@ export interface NormalizedCatalog {
     shared: readonly CatalogEntry[];
     server: readonly CatalogEntry[];
     client: readonly CatalogEntry[];
+    serverVariants: readonly CatalogEntry[];
+    clientVariants: readonly CatalogEntry[];
     reserved: readonly string[];
 }
 
@@ -30,6 +32,12 @@ export function mergeDescriptor(left: TypeDescriptor, right: TypeDescriptor): Ty
             kind: 'tuple',
             elements: left.elements.map((element, index) => mergeDescriptor(element, right.elements[index] ?? ANY)),
         };
+    }
+
+    if (left.kind === 'function' || right.kind === 'function') {
+        if (left.kind !== 'function' || right.kind !== 'function') {
+            return { kind: 'union', options: [left, right] };
+        }
     }
 
     if (left.kind !== 'function' || right.kind !== 'function') {
@@ -105,6 +113,8 @@ export function normalize(server: readonly ParsedDeclaration[], client: readonly
     const clientByName = collapse(client);
     const buckets: Record<ApiEnvironment, CatalogEntry[]> = { shared: [], server: [], client: [] };
     const reserved: string[] = [];
+    const serverVariants: CatalogEntry[] = [];
+    const clientVariants: CatalogEntry[] = [];
     const seen = new Set<string>();
 
     for (const name of [...serverByName.keys(), ...clientByName.keys()]) {
@@ -135,12 +145,24 @@ export function normalize(server: readonly ParsedDeclaration[], client: readonly
         const entry = applyOverride({ name, category: source.category, environment, type, documentation });
 
         buckets[entry.environment].push(entry);
+
+        if (isShared && fromServer !== undefined && fromClient !== undefined) {
+            const serverVariant = applyOverride({ ...fromServer, environment: 'server' });
+            const clientVariant = applyOverride({ ...fromClient, environment: 'client' });
+
+            if (JSON.stringify(serverVariant.type) !== JSON.stringify(clientVariant.type)) {
+                serverVariants.push({ ...serverVariant, environment: 'server' });
+                clientVariants.push({ ...clientVariant, environment: 'client' });
+            }
+        }
     }
 
     return {
         shared: buckets.shared.sort(byName),
         server: buckets.server.sort(byName),
         client: buckets.client.sort(byName),
+        serverVariants: serverVariants.sort(byName),
+        clientVariants: clientVariants.sort(byName),
         reserved: reserved.sort(),
     };
 }

@@ -6,13 +6,14 @@ import { pathToUri } from '@lsp/workspace/document-uri';
 import { markerAt } from './support/service-fixture';
 
 const SERVER_FILE = pathToUri('/project/src/server/main.luam');
+const CLIENT_FILE = pathToUri('/project/src/client/main.luam');
 
-function helpFor(text: string, marker: string): ReturnType<LanguageService['signatureHelp']> {
+function helpFor(text: string, marker: string, uri = SERVER_FILE): ReturnType<LanguageService['signatureHelp']> {
     const service = new LanguageService();
 
-    service.update(SERVER_FILE, 1, text);
+    service.update(uri, 1, text);
 
-    return service.signatureHelp(SERVER_FILE, markerAt(text, marker));
+    return service.signatureHelp(uri, markerAt(text, marker));
 }
 
 describe('signature help', () => {
@@ -22,6 +23,14 @@ describe('signature help', () => {
         expect(help?.signatures[0]?.label).toContain('outputChatBox(text: string');
         expect(help?.signatures[0]?.label).toContain('colorCoded?');
         expect(help?.activeParameter).toBe(0);
+    });
+
+    it('uses environment-exact shared MTA signatures', () => {
+        const server = helpFor('addCommandHandler(\n', 'addCommandHandler(')?.signatures[0]?.label;
+        const client = helpFor('addCommandHandler(\n', 'addCommandHandler(', CLIENT_FILE)?.signatures[0]?.label;
+
+        expect(server).toContain('handlerFunction: function(Player, string');
+        expect(client).toContain('handlerFunction: function(string');
     });
 
     it('follows the cursor to the argument being typed', () => {

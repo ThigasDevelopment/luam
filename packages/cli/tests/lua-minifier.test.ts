@@ -98,6 +98,13 @@ describe('lua minifier', () => {
         expect(minifyLua(MULTILINE_LITERAL, 'fixture.lua')).toBe('local long=[[keeps\n   its   spacing\n]]');
     });
 
+    it('removes readable source-line padding without changing tokens', () => {
+        const padded = "local LUAM_EXAMPLE = 'Ola Mundo!'\n\nprint(LUAM_EXAMPLE)\n";
+        const compact = "local LUAM_EXAMPLE = 'Ola Mundo!'\nprint(LUAM_EXAMPLE)\n";
+
+        expect(minifyLua(padded, 'fixture.lua')).toBe(minifyLua(compact, 'fixture.lua'));
+    });
+
     it('minifies only the Lua files in a resource file set', () => {
         const files = new Map([
             ['meta.xml', '<meta>\n    <info />\n</meta>\n'],

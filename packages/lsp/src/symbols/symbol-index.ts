@@ -9,10 +9,13 @@ import { collectFunctionScope, collectStatements } from './statement-collector';
 import { endOffset, matchesReferenceKind, type SymbolDeclaration, type SymbolReference } from './symbol';
 
 function walkFunction(state: CollectorState, block: BlockContext, expression: FunctionExpression): void {
+    const type = state.types.get(expression);
+
     collectFunctionScope(state, block, {
         start: expression.position.offset,
         end: block.end,
         parameters: expression.parameters,
+        ...(type?.kind === 'function' ? { type } : {}),
         body: expression.body,
         selfType: null,
         container: block.container,

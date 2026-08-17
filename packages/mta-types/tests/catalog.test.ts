@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { isAvailableIn } from '@mta-types/api-declaration';
 import { allDeclarations, declarationEnvironment, findDeclaration, globalsFor, isApiAvailable } from '@mta-types/catalog';
+import { CATALOG_OVERRIDES } from '@mta-types/catalog-overrides';
 import { elementAncestors, isElementType } from '@mta-types/element-hierarchy';
 import { ELEMENT_TYPES } from '@mta-types/generated/element-types';
 import { eventEnvironment } from '@mta-types/event-lookup';
@@ -154,13 +155,7 @@ describe('catalog signatures', () => {
     });
 
     it('types addEventHandler from the override', () => {
-        expect(findDeclaration('addEventHandler')?.type).toEqual({
-            kind: 'function',
-            parameters: [{ kind: 'string' }, { kind: 'named', name: 'Element' }, { kind: 'any' }, { kind: 'boolean' }, { kind: 'string' }],
-            returnType: { kind: 'boolean' },
-            minimumArguments: 3,
-            isVariadic: false,
-        });
+        expect(findDeclaration('addEventHandler')?.type).toEqual(CATALOG_OVERRIDES.addEventHandler?.type);
     });
 
     it('types a multi-return function as a tuple', () => {

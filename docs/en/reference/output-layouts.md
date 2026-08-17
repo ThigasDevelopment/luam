@@ -87,6 +87,15 @@ entries, and then the source groups. This is the normal `ensure` and fixed `dev`
 shape because a running resource remains easy to inspect. Use
 `luam build --no-bundle` when a local build also needs this shape.
 
+Readable generated Lua preserves authored text wherever it is already valid Lua
+after Luam-only syntax is removed. Type annotations and compile-only declarations
+are erased, Luam comments become Lua comments, and the remaining whitespace,
+quotes, semicolons, and multiline layout stay as written. A top-level statement
+that contains a construct requiring lowering, such as a class, template,
+extension, or compound assignment, is replaced with canonical Lua without
+reformatting neighboring statements. The source map accounts for regions that
+expand or contract. Production minification removes all readable formatting.
+
 Switching layouts removes generated files from the previous layout. Files whose
 bytes did not change are not rewritten, and `env.lua` is never overwritten.
 

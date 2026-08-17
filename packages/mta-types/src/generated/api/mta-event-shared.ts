@@ -3,13 +3,13 @@ import { ANY, BOOLEAN, fn, named, STRING, TABLE } from '@mta-types/type-descript
 
 export const MTA_EVENT_SHARED: ApiCatalog = {
     addEvent: fn([STRING, BOOLEAN], BOOLEAN, 1),
-    addEventHandler: fn([STRING, named('Element'), ANY, BOOLEAN, STRING], BOOLEAN, 3),
+    addEventHandler: fn([STRING, named('Element'), fn([], ANY, 0, true, undefined), BOOLEAN, STRING], BOOLEAN, 3),
     cancelEvent: fn([ANY, ANY], BOOLEAN, 0),
     cancelLatentEvent: fn([ANY, ANY], BOOLEAN, 1),
     getEventHandlers: fn([STRING, named('Element')], TABLE, 2),
     getLatentEventHandles: fn([ANY], TABLE, 0),
     getLatentEventStatus: fn([ANY, ANY], TABLE, 1),
-    removeEventHandler: fn([STRING, named('Element'), ANY], BOOLEAN, 3),
-    triggerEvent: fn([STRING, named('Element')], BOOLEAN, 2, true),
+    removeEventHandler: fn([STRING, named('Element'), fn([], ANY, 0, true, undefined)], BOOLEAN, 3),
+    triggerEvent: fn([STRING, named('Element')], BOOLEAN, 2, true, undefined),
     wasEventCancelled: fn([], BOOLEAN, 0),
 };

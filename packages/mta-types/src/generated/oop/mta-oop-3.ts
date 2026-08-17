@@ -2,6 +2,29 @@ import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from 
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_3: readonly OopClass[] = [
+    oopClass('File', null, [
+        oopMethod('close', 'shared', 'fileClose', fn([], BOOLEAN, 0)),
+        oopProperty('eof', 'shared', 'fileIsEOF', BOOLEAN),
+        oopMethod('flush', 'shared', 'fileFlush', fn([], BOOLEAN, 0)),
+        oopMethod('getPath', 'shared', 'fileGetPath', fn([], STRING, 0)),
+        oopMethod('getPos', 'shared', 'fileGetPos', fn([], NUMBER, 0)),
+        oopMethod('getSize', 'shared', 'fileGetSize', fn([], NUMBER, 0)),
+        oopMethod('isEOF', 'shared', 'fileIsEOF', fn([], BOOLEAN, 0)),
+        oopProperty('path', 'shared', 'fileGetPath', STRING),
+        oopProperty('pos', 'shared', 'fileGetPos', NUMBER),
+        oopMethod('read', 'shared', 'fileRead', fn([NUMBER], STRING, 1)),
+        oopMethod('setPos', 'shared', 'fileSetPos', fn([NUMBER], NUMBER, 1)),
+        oopProperty('size', 'shared', 'fileGetSize', NUMBER),
+        oopMethod('write', 'shared', 'fileWrite', fn([STRING, STRING, STRING], NUMBER, 1, true, undefined)),
+    ], [
+        oopMethod('copy', 'shared', 'fileCopy', fn([STRING, STRING, BOOLEAN], BOOLEAN, 2)),
+        oopMethod('delete', 'shared', 'fileDelete', fn([STRING], BOOLEAN, 1)),
+        oopMethod('exists', 'shared', 'fileExists', fn([STRING], BOOLEAN, 1)),
+        oopMethod('new', 'shared', 'fileCreate', fn([STRING], named('File'), 1)),
+        oopMethod('rename', 'shared', 'fileRename', fn([STRING, STRING], BOOLEAN, 2)),
+    ],
+    oopConstructor('shared', fn([STRING], named('File'), 1), 'fileOpen'),
+    ),
     oopClass('GuiBrowser', 'GuiElement', [
         oopProperty('browser', 'client', 'guiGetBrowser', named('Browser')),
         oopMethod('getBrowser', 'client', 'guiGetBrowser', fn([], named('Browser'), 0)),
@@ -115,7 +138,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
     ),
     oopClass('GuiGridList', 'GuiElement', [
         oopMethod('addColumn', 'client', 'guiGridListAddColumn', fn([STRING, NUMBER], NUMBER, 2)),
-        oopMethod('addRow', 'client', 'guiGridListAddRow', fn([ANY, ANY], NUMBER, 0, true)),
+        oopMethod('addRow', 'client', 'guiGridListAddRow', fn([ANY, ANY], NUMBER, 0, true, undefined)),
         oopMethod('autoSizeColumn', 'client', 'guiGridListAutoSizeColumn', fn([NUMBER], BOOLEAN, 1)),
         oopMethod('clear', 'client', 'guiGridListClear', fn([], BOOLEAN, 0)),
         oopProperty('columnCount', 'client', 'guiGridListGetColumnCount', NUMBER),
@@ -212,19 +235,5 @@ export const MTA_OOP_3: readonly OopClass[] = [
     ], [
     ],
     oopConstructor('client', fn([STRING, named('Element')], named('GuiTab'), 2), 'guiCreateTab'),
-    ),
-    oopClass('GuiTabPanel', 'GuiElement', [
-        oopMethod('getSelectedTab', 'client', 'guiGetSelectedTab', fn([], named('Element'), 0)),
-        oopProperty('selectedTab', 'client', 'guiGetSelectedTab', named('Element')),
-    ], [
-    ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, named('Element')], named('GuiTabPanel'), 5), 'guiCreateTabPanel'),
-    ),
-    oopClass('GuiWindow', 'GuiElement', [
-        oopMethod('setMovable', 'client', 'guiWindowSetMovable', fn([BOOLEAN], BOOLEAN, 1)),
-        oopMethod('setSizable', 'client', 'guiWindowSetSizable', fn([BOOLEAN], BOOLEAN, 1)),
-    ], [
-    ],
-    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN], named('GuiWindow'), 6), 'guiCreateWindow'),
     ),
 ];

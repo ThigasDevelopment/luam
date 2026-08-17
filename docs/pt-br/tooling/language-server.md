@@ -67,6 +67,13 @@ numéricos vêm primeiro, depois funções que retornam `number`, depois o resto
 tipos de elemento respeitam a hierarquia do MTA, então um `Vehicle` vem primeiro
 onde se espera um `Element`.
 
+Quando o parâmetro esperado também é uma função, um callback anônimo herda os
+nomes e tipos dos seus parâmetros. A completação pode inserir esses nomes depois
+de `function (`, e completação de membros, hover, definição e referências usam os
+tipos herdados dentro do corpo. As variantes de callbacks MTA seguem o ambiente
+do arquivo atual, então `addCommandHandler` oferece `player, commandName, ...` no
+servidor e `commandName, ...` no cliente.
+
 ## Ambientes
 
 Todo documento resolve o seu ambiente (`server`, `client` ou `shared`) a partir do

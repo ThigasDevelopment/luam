@@ -1,12 +1,12 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { BOOLEAN, fn, named, NUMBER } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER } from '@mta-types/type-descriptor';
 
 export const MTA_PICKUP_SHARED: ApiCatalog = {
-    createPickup: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('Pickup'), 5),
-    getPickupAmmo: fn([named('Pickup')], NUMBER, 1),
-    getPickupAmount: fn([named('Pickup')], NUMBER, 1),
-    getPickupType: fn([named('Pickup')], NUMBER, 1),
-    getPickupWeapon: fn([named('Pickup')], NUMBER, 1),
-    setPickupType: fn([named('Pickup'), NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
-    usePickup: fn([named('Pickup'), named('Player')], BOOLEAN, 2),
+    createPickup: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], ANY, 5),
+    getPickupAmmo: fn([ANY], NUMBER, 1),
+    getPickupAmount: fn([ANY], NUMBER, 1),
+    getPickupType: fn([ANY], NUMBER, 1),
+    getPickupWeapon: fn([ANY], NUMBER, 1),
+    setPickupType: fn([ANY, NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
+    usePickup: fn([ANY, named('Player')], BOOLEAN, 2),
 };

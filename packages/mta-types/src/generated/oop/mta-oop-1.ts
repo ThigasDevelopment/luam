@@ -1,5 +1,5 @@
 import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from '@mta-types/oop-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_1: readonly OopClass[] = [
     oopClass('Account', null, [
@@ -112,7 +112,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopMethod('executeJavascript', 'client', 'executeBrowserJavascript', fn([STRING], BOOLEAN, 1)),
         oopMethod('focus', 'client', 'focusBrowser', fn([], BOOLEAN, 0)),
         oopMethod('getProperty', 'client', 'getBrowserProperty', fn([STRING], BOOLEAN, 1)),
-        oopMethod('getSource', 'client', 'getBrowserSource', fn([ANY], BOOLEAN, 1)),
+        oopMethod('getSource', 'client', 'getBrowserSource', fn([fn([], ANY, 0, true, [], ANY)], BOOLEAN, 1)),
         oopMethod('getTitle', 'client', 'getBrowserTitle', fn([], STRING, 0)),
         oopMethod('getURL', 'client', 'getBrowserURL', fn([], STRING, 0)),
         oopMethod('injectMouseDown', 'client', 'injectBrowserMouseDown', fn([STRING], BOOLEAN, 1)),
@@ -125,7 +125,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
         oopProperty('loading', 'client', 'isBrowserLoading', BOOLEAN),
         oopMethod('loadURL', 'client', 'loadBrowserURL', fn([STRING, STRING, BOOLEAN], BOOLEAN, 1)),
         oopProperty('renderingPaused', 'client', 'isBrowserRenderingPaused', BOOLEAN),
-        oopMethod('setAjaxHandler', 'client', 'setBrowserAjaxHandler', fn([STRING, ANY], BOOLEAN, 1)),
+        oopMethod('setAjaxHandler', 'client', 'setBrowserAjaxHandler', fn([STRING, fn([], ANY, 0, true, [], ANY)], BOOLEAN, 1)),
         oopMethod('setProperty', 'client', 'setBrowserProperty', fn([STRING, STRING], BOOLEAN, 2)),
         oopMethod('setRenderingPaused', 'client', 'setBrowserRenderingPaused', fn([BOOLEAN], BOOLEAN, 1)),
         oopMethod('setVolume', 'client', 'setBrowserVolume', fn([NUMBER], BOOLEAN, 1)),
@@ -135,7 +135,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ], [
         oopMethod('getSettings', 'client', 'getBrowserSettings', fn([], TABLE, 0)),
         oopMethod('isDomainBlocked', 'client', 'isBrowserDomainBlocked', fn([STRING, BOOLEAN], BOOLEAN, 1)),
-        oopMethod('requestDomains', 'client', 'requestBrowserDomains', fn([TABLE, BOOLEAN, ANY], BOOLEAN, 1)),
+        oopMethod('requestDomains', 'client', 'requestBrowserDomains', fn([TABLE, BOOLEAN, fn([], ANY, 0, true, [], ANY)], BOOLEAN, 1)),
     ],
     oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Browser'), 3), 'createBrowser'),
     ),
@@ -202,9 +202,22 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ),
     oopClass('Connection', null, [
         oopMethod('destroy', 'shared', 'destroyElement', fn([], BOOLEAN, 0)),
-        oopMethod('exec', 'server', 'dbExec', fn([STRING, ANY], BOOLEAN, 1, true)),
-        oopMethod('prepareString', 'server', 'dbPrepareString', fn([STRING, ANY], STRING, 1, true)),
-        oopMethod('query', 'server', 'dbQuery', fn([ANY, ANY, ANY, ANY, ANY], ANY, 2, true)),
+        oopMethod('exec', 'server', 'dbExec', fn([STRING, ANY], BOOLEAN, 1, true, undefined)),
+        oopMethod('prepareString', 'server', 'dbPrepareString', fn([STRING, ANY], STRING, 1, true, undefined)),
+        oopMethod('query', 'server', 'dbQuery',
+            fn(
+                [
+                unionOf([named('Element'), fn([], ANY, 0, true, [], ANY)]),
+                ANY,
+                ANY,
+                ANY,
+                ANY,
+                ],
+                fn([], ANY, 0, true, [], ANY),
+                2,
+                true,
+            ),
+        ),
     ], [
     ],
     oopConstructor('server', fn([STRING, STRING, STRING, STRING, STRING], named('Connection'), 2), 'dbConnect'),
@@ -227,18 +240,5 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ], [
     ],
     oopConstructor('client', fn([NUMBER, NUMBER], named('DxScreenSource'), 2), 'dxCreateScreenSource'),
-    ),
-    oopClass('DxShader', null, [
-    ], [
-    ],
-    oopConstructor('client', fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], named('DxShader'), 1), 'dxCreateShader'),
-    ),
-    oopClass('DxTexture', null, [
-        oopMethod('getPixels', 'client', 'dxGetTexturePixels', fn([ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], STRING, 1)),
-        oopMethod('setEdge', 'client', 'dxSetTextureEdge', fn([STRING, NUMBER], BOOLEAN, 1)),
-        oopMethod('setPixels', 'client', 'dxSetTexturePixels', fn([ANY, ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], BOOLEAN, 2)),
-    ], [
-    ],
-    oopConstructor('client', fn([STRING, STRING, BOOLEAN, STRING], named('DxTexture'), 1), 'dxCreateTexture'),
     ),
 ];

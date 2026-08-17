@@ -21,14 +21,18 @@ export function isDirectiveStart(stream: TokenStream): boolean {
 }
 
 export function parseDirective(stream: TokenStream): Statement {
+    const checkpoint = stream.checkpoint();
     const token = stream.next();
     const isHttpExport = stream.match('identifier', 'http');
 
     if (!stream.match('keyword', 'local')) {
+        stream.eraseToCurrent(checkpoint);
+
         return parseFunctionDeclaration(stream, false, true, isHttpExport);
     }
 
     stream.report('parse-export-local', EXPORT_LOCAL_MESSAGE, token.position);
+    stream.eraseToCurrent(checkpoint);
 
     return parseFunctionDeclaration(stream, true);
 }

@@ -74,7 +74,7 @@ export const MTA_OOP_5: readonly OopClass[] = [
         oopMethod('takeMoney', 'server', 'takePlayerMoney', fn([NUMBER], BOOLEAN, 1)),
         oopMethod('takeScreenShot', 'server', 'takePlayerScreenShot', fn([NUMBER, NUMBER, STRING, NUMBER, NUMBER, NUMBER], BOOLEAN, 2)),
         oopProperty('team', 'shared', 'getPlayerTeam', named('Team')),
-        oopMethod('triggerEvent', 'server', 'triggerClientEvent', fn([ANY, ANY, ANY], BOOLEAN, 2, true)),
+        oopMethod('triggerEvent', 'server', 'triggerClientEvent', fn([ANY, ANY, ANY], BOOLEAN, 2, true, undefined)),
         oopProperty('version', 'server', 'getPlayerVersion', STRING),
         oopProperty('wantedLevel', 'server', 'getPlayerWantedLevel', NUMBER),
     ], [
@@ -155,7 +155,7 @@ export const MTA_OOP_5: readonly OopClass[] = [
     oopClass('Resource', null, [
         oopProperty('aclRequests', 'server', 'getResourceACLRequests', TABLE),
         oopProperty('archived', 'server', 'isResourceArchived', BOOLEAN),
-        oopMethod('call', 'shared', 'call', fn([STRING], ANY, 1, true)),
+        oopMethod('call', 'shared', 'call', fn([STRING], ANY, 1, true, undefined)),
         oopMethod('copy', 'server', 'copyResource', fn([STRING, STRING], named('Resource'), 1)),
         oopProperty('dynamicElementRoot', 'shared', 'getResourceDynamicElementRoot', named('Element')),
         oopProperty('exportedFunctions', 'shared', 'getResourceExportedFunctions', TABLE),

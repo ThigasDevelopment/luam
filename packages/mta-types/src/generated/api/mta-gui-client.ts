@@ -61,7 +61,7 @@ export const MTA_GUI_CLIENT: ApiCatalog = {
     guiGetText: fn([named('Element')], STRING, 1),
     guiGetVisible: fn([named('Element')], BOOLEAN, 1),
     guiGridListAddColumn: fn([named('Element'), STRING, NUMBER], NUMBER, 3),
-    guiGridListAddRow: fn([named('Element'), ANY, ANY], NUMBER, 1, true),
+    guiGridListAddRow: fn([named('Element'), ANY, ANY], NUMBER, 1, true, undefined),
     guiGridListAutoSizeColumn: fn([named('Element'), NUMBER], BOOLEAN, 2),
     guiGridListClear: fn([named('Element')], BOOLEAN, 1),
     guiGridListGetColumnCount: fn([named('Element')], NUMBER, 1),

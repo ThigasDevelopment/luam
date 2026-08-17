@@ -202,11 +202,12 @@ export function emit(
     types: Map<Expression, Type>,
     references: ReadonlySet<string>,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
+    sourceLineOffset = 0,
 ): EmitResult {
     const state = createEmitState(types, references, generatedMembers);
     const lines = emitBlock(state, program.body);
     const markedCode = lines.length === 0 ? '' : `${lines.join('\n')}\n`;
-    const finalized = finalizeEmission(markedCode, state.markers);
+    const finalized = finalizeEmission(markedCode, state.markers, sourceLineOffset);
 
     return { code: finalized.code, requiredHelpers: [...state.helpers].sort(), lines: finalized.lines };
 }

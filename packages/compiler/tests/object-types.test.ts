@@ -50,7 +50,7 @@ describe('object types', () => {
     });
 
     it('erases the annotation from the generated Lua', () => {
-        expect(emit(`${ARGS}\nlocal function take(args: { name: string }): void\nend\n`)).toBe('local function take(args)\nend\n');
+        expect(emit(`${ARGS}\nlocal function take(args: { name: string }): void\nend\n`)).toBe('\n\nlocal function take(args)\nend\n');
     });
 
     it('names an unknown key after the alias that declared it', () => {

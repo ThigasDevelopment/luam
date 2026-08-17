@@ -84,7 +84,7 @@ describe('continue', () => {
     it('keeps the output unchanged when a loop has no continue', () => {
         const source = 'for i = 1, 3 do\n    if i == 2 then break end\n    print(i)\nend\n';
 
-        expect(emit(source)).toBe('for i = 1, 3 do\n    if i == 2 then\n        break\n    end\n    print(i)\nend\n');
+        expect(emit(source)).toBe(source);
     });
 
     it('reports a continue outside a loop', () => {

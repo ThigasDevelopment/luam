@@ -141,7 +141,7 @@ describe('mta oop emitter', () => {
         const source = `${PLAYER}local name = player:getName()\nplayer:setNametagText(name)\n`;
         const emitted = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: true }) }).code;
 
-        expect(emitted).toBe("local player = getPlayerFromName('bob')\nlocal name = player:getName()\nplayer:setNametagText(name)\n");
+        expect(emitted).toBe('local player = getPlayerFromName("bob")\nlocal name = player:getName()\nplayer:setNametagText(name)\n');
     });
 
     it('emits the same Lua whether or not the flag is on', () => {
@@ -176,7 +176,7 @@ describe('mta oop class values', () => {
         const result = compile(source, { filePath: SERVER_FILE, compilerOptions: compilerOptions({ oop: true }) });
 
         expect(result.diagnostics).toEqual([]);
-        expect(result.code).toBe("local file = File('data.txt')\nfile:close()\n");
+        expect(result.code).toBe('local file = File("data.txt")\nfile:close()\n');
     });
 
     it('checks callable constructor arguments and environments', () => {

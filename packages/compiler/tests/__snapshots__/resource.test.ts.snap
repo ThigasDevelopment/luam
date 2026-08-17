@@ -19,30 +19,45 @@ exports[`resource assembly > generates a manifest that matches the authored stan
 exports[`resource assembly > locks the generated resource output 1`] = `
 [
   "src/shared/config.lua
+
+
 RESOURCE_NAME = 'luam-demo'
+
 GameState = enum { 'LOBBY', 'PLAYING' }
+
+
+
+
 local state = GameState.LOBBY
+
 function formatPlayerName(name)
     return 'Player: ' .. name
 end
+
 function countEntries(entries)
     return table.size(entries)
 end
 ",
   "src/server/main.lua
 local joined = 0
+
 class 'Session' {
     name = '',
+
     constructor = function(self, name)
         self.name = name
     end
 }
+
 function announceJoin(player)
     joined = joined + 1
+
     local session = new 'Session' (getPlayerName(player))
+
     outputChatBox(formatPlayerName(session.name), root)
     outputChatBox(RESOURCE_NAME, root)
 end
+
 addEventHandler('onPlayerJoin', root, function()
     announceJoin(source)
 end)
@@ -50,6 +65,7 @@ end)
   "src/client/hud.lua
 local title = 'Luam'
 local caption = string.template('HUD \${title}', { title = title })
+
 addEventHandler('onClientRender', root, function()
     dxDrawText(caption, 10, 10)
 end)

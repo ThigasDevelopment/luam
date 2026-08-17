@@ -36,8 +36,13 @@ export function printDescriptor(descriptor: TypeDescriptor): string {
     if (descriptor.kind === 'function') {
         const parameters = `[${descriptor.parameters.map(printDescriptor).join(', ')}]`;
         const head = `fn(${parameters}, ${printDescriptor(descriptor.returnType)}, ${descriptor.minimumArguments}`;
+        const names = descriptor.parameterNames === undefined ? 'undefined' : `[${descriptor.parameterNames.map((name) => `'${name}'`).join(', ')}]`;
 
-        return descriptor.isVariadic ? `${head}, true)` : `${head})`;
+        if (descriptor.variadicType !== undefined) {
+            return `${head}, ${descriptor.isVariadic}, ${names}, ${printDescriptor(descriptor.variadicType)})`;
+        }
+
+        return descriptor.isVariadic || descriptor.parameterNames !== undefined ? `${head}, ${descriptor.isVariadic}, ${names})` : `${head})`;
     }
 
     return PRIMITIVES[descriptor.kind] ?? 'ANY';

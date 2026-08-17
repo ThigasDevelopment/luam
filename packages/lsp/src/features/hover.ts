@@ -195,7 +195,7 @@ function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
         return library;
     }
 
-    const declaration = findDeclaration(name);
+    const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null) {
         return mtaMemberHover(analysis, name, offset) ?? projectHover(analysis, name) ?? recordMemberHover(analysis, name);

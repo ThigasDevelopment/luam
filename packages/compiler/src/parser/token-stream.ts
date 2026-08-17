@@ -1,6 +1,8 @@
 import { createDiagnostic, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { isLuamKeyword, type Token, type TokenKind } from '@compiler/lexer/token';
 
+import type { SourceSpan } from './source-metadata';
+
 export class ParserError extends Error {
     readonly diagnostic: Diagnostic;
 
@@ -18,6 +20,8 @@ export class TokenStream {
     private readonly tokens: readonly Token[];
 
     private index = 0;
+
+    private readonly erased: SourceSpan[] = [];
 
     constructor(tokens: readonly Token[]) {
         this.tokens = tokens;
@@ -45,6 +49,44 @@ export class TokenStream {
         }
 
         return token;
+    }
+
+    checkpoint(): number {
+        return this.index;
+    }
+
+    eraseFrom(checkpoint: number): void {
+        const first = this.tokens[checkpoint];
+        const last = this.tokens[this.index - 1];
+
+        if (first !== undefined && last !== undefined && first.kind !== 'eof') {
+            this.erased.push({ start: first.position.offset, end: last.end.offset });
+        }
+    }
+
+    eraseToCurrent(checkpoint: number): void {
+        const first = this.tokens[checkpoint];
+
+        if (first !== undefined && first.kind !== 'eof') {
+            this.erased.push({ start: first.position.offset, end: this.current().position.offset });
+        }
+    }
+
+    erasures(): SourceSpan[] {
+        return [...this.erased];
+    }
+
+    sourceSpanFrom(checkpoint: number): SourceSpan | null {
+        const first = this.tokens[checkpoint];
+        let lastIndex = this.index - 1;
+
+        while (lastIndex >= checkpoint && this.tokens[lastIndex]?.kind === 'punctuation' && this.tokens[lastIndex]?.value === ';') {
+            lastIndex -= 1;
+        }
+
+        const last = this.tokens[lastIndex];
+
+        return first === undefined || last === undefined || first.kind === 'eof' ? null : { start: first.position.offset, end: last.end.offset };
     }
 
     check(kind: TokenKind, value?: string): boolean {

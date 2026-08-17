@@ -10,6 +10,7 @@ import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { callbackParameterItems } from '@lsp/features/callback-parameter-completion';
 import { classBodyNeedsConstructor } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
 import { directiveItems, isDirectivePosition } from '@lsp/features/directive-completion';
@@ -216,6 +217,12 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
 
     if (analysis.text[offset - 1] === '@') {
         return [];
+    }
+
+    const callbackParameters = callbackParameterItems(analysis, offset, lexical);
+
+    if (callbackParameters !== null) {
+        return callbackParameters;
     }
 
     const header = classHeaderPosition(analysis.text, offset);

@@ -7,6 +7,7 @@ export const MTA_PROJECTILE_CLIENT: ApiCatalog = {
         named('Projectile'),
         2,
     ),
+    detonateSatchels: fn([], BOOLEAN, 0),
     getProjectileCounter: fn([named('Projectile')], NUMBER, 1),
     getProjectileCreator: fn([named('Projectile')], named('Element'), 1),
     getProjectileForce: fn([named('Projectile')], NUMBER, 1),

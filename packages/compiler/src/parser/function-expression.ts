@@ -9,9 +9,15 @@ function parseParameter(stream: TokenStream): Parameter {
     if (token.kind === 'operator' && token.value === '...') {
         stream.next();
 
+        const checkpoint = stream.checkpoint();
         const name = stream.check('identifier') ? stream.next().value : '';
+        const annotation = parseOptionalAnnotation(stream);
 
-        return { name, annotation: parseOptionalAnnotation(stream), isVararg: true, position: token.position };
+        if (name.length > 0) {
+            stream.eraseFrom(checkpoint);
+        }
+
+        return { name, annotation, isVararg: true, position: token.position };
     }
 
     const name = stream.expect('identifier').value;

@@ -1,11 +1,19 @@
 import ts from 'typescript';
 
-import { ANY, arrayOf, BOOLEAN, named, NUMBER, STRING, TABLE, tupleOf, type TypeDescriptor, VOID } from '#mta-types/type-descriptor';
+import { ANY, arrayOf, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf, type TypeDescriptor, VOID } from '#mta-types/type-descriptor';
+
+export interface TypeAliasDefinition {
+    typeParameters: readonly ts.TypeParameterDeclaration[];
+    type: ts.TypeNode;
+}
 
 export interface MapContext {
     elementTypes: ReadonlySet<string>;
     aliases: Readonly<Record<string, string>>;
     typeParameters: ReadonlySet<string>;
+    typeAliases?: ReadonlyMap<string, TypeAliasDefinition>;
+    typeArguments?: ReadonlyMap<string, TypeDescriptor>;
+    resolvingAliases?: ReadonlySet<string>;
 }
 
 const TABLE_REFERENCES: ReadonlySet<string> = new Set(['LuaTable', 'LuaMap', 'LuaSet', 'Table', 'Matrix', 'Vector2', 'Vector3', 'Vector4']);
@@ -60,6 +68,31 @@ function mapMultiReturn(node: ts.TypeReferenceNode, context: MapContext): TypeDe
     return tupleOf(argument.elements.map((element) => mapTypeNode(element, context)));
 }
 
+function mapAlias(name: string, node: ts.TypeReferenceNode, context: MapContext): TypeDescriptor | undefined {
+    const alias = context.typeAliases?.get(name);
+
+    if (alias === undefined || context.resolvingAliases?.has(name)) {
+        return undefined;
+    }
+
+    const typeParameters = new Set(context.typeParameters);
+    const typeArguments = new Map(context.typeArguments);
+
+    alias.typeParameters.forEach((parameter, index) => {
+        const argument = node.typeArguments?.[index] ?? parameter.default ?? parameter.constraint;
+
+        typeParameters.add(parameter.name.text);
+        typeArguments.set(parameter.name.text, mapTypeNode(argument, { ...context, typeParameters, typeArguments }));
+    });
+
+    return mapTypeNode(alias.type, {
+        ...context,
+        typeParameters,
+        typeArguments,
+        resolvingAliases: new Set([...(context.resolvingAliases ?? []), name]),
+    });
+}
+
 function mapReference(node: ts.TypeReferenceNode, context: MapContext): TypeDescriptor {
     const name = referenceName(node);
     const resolved = context.aliases[name] ?? name;
@@ -79,7 +112,13 @@ function mapReference(node: ts.TypeReferenceNode, context: MapContext): TypeDesc
     }
 
     if (context.typeParameters.has(name)) {
-        return ANY;
+        return context.typeArguments?.get(name) ?? ANY;
+    }
+
+    const alias = mapAlias(name, node, context);
+
+    if (alias !== undefined) {
+        return alias;
     }
 
     if (context.elementTypes.has(resolved)) {
@@ -87,6 +126,43 @@ function mapReference(node: ts.TypeReferenceNode, context: MapContext): TypeDesc
     }
 
     return ANY;
+}
+
+function functionContext(node: ts.SignatureDeclarationBase, context: MapContext): MapContext {
+    if (node.typeParameters === undefined || node.typeParameters.length === 0) {
+        return context;
+    }
+
+    const typeParameters = new Set(context.typeParameters);
+    const typeArguments = new Map(context.typeArguments);
+
+    for (const parameter of node.typeParameters) {
+        typeParameters.add(parameter.name.text);
+        typeArguments.set(parameter.name.text, mapTypeNode(parameter.constraint ?? parameter.default, { ...context, typeParameters, typeArguments }));
+    }
+
+    return { ...context, typeParameters, typeArguments };
+}
+
+function mapFunction(node: ts.FunctionTypeNode, context: MapContext): TypeDescriptor {
+    const local = functionContext(node, context);
+    const runtimeParameters = node.parameters.filter((parameter) => !ts.isIdentifier(parameter.name) || parameter.name.text !== 'this');
+    const positional = runtimeParameters.filter((parameter) => parameter.dotDotDotToken === undefined);
+    const variadic = runtimeParameters.find((parameter) => parameter.dotDotDotToken !== undefined);
+    const parameters = positional.map((parameter) => mapTypeNode(parameter.type, local));
+    const parameterNames = positional.map((parameter, index) => ts.isIdentifier(parameter.name) ? parameter.name.text : `argument${index + 1}`);
+    const minimumArguments = positional.filter((parameter) => parameter.questionToken === undefined).length;
+    const mappedVariadic = mapTypeNode(variadic?.type, local);
+    const variadicType = mappedVariadic.kind === 'array' ? mappedVariadic.element : mappedVariadic;
+
+    return fn(
+        parameters,
+        mapTypeNode(node.type, local),
+        minimumArguments,
+        variadic !== undefined,
+        parameterNames,
+        variadic === undefined ? undefined : variadicType,
+    );
 }
 
 function mapUnion(node: ts.UnionTypeNode, context: MapContext): TypeDescriptor {
@@ -129,6 +205,10 @@ export function mapTypeNode(node: ts.TypeNode | undefined, context: MapContext):
 
     if (ts.isUnionTypeNode(node)) {
         return mapUnion(node, context);
+    }
+
+    if (ts.isFunctionTypeNode(node)) {
+        return mapFunction(node, context);
     }
 
     if (ts.isTypeReferenceNode(node)) {

@@ -4,7 +4,7 @@ import { fn, type TypeDescriptor } from '#mta-types/type-descriptor';
 
 import { functionDocumentation, variableDocumentation } from './documentation-parser.ts';
 import { GeneratorError, type ParsedDeclaration } from './generator-model.ts';
-import { type MapContext, mapTypeNode } from './type-mapper.ts';
+import { type MapContext, mapTypeNode, type TypeAliasDefinition } from './type-mapper.ts';
 import type { UpstreamFile } from './upstream-source.ts';
 
 export interface ParsedClass {
@@ -17,13 +17,19 @@ function sourceFileOf(file: UpstreamFile): ts.SourceFile {
 }
 
 function contextFor(context: MapContext, node: ts.FunctionDeclaration): MapContext {
-    const names = (node.typeParameters ?? []).map((parameter) => parameter.name.text);
-
-    if (names.length === 0) {
+    if (node.typeParameters === undefined || node.typeParameters.length === 0) {
         return context;
     }
 
-    return { ...context, typeParameters: new Set([...context.typeParameters, ...names]) };
+    const typeParameters = new Set(context.typeParameters);
+    const typeArguments = new Map(context.typeArguments);
+
+    for (const parameter of node.typeParameters) {
+        typeParameters.add(parameter.name.text);
+        typeArguments.set(parameter.name.text, mapTypeNode(parameter.constraint ?? parameter.default, { ...context, typeParameters, typeArguments }));
+    }
+
+    return { ...context, typeParameters, typeArguments };
 }
 
 function signatureOf(node: ts.FunctionDeclaration, context: MapContext): TypeDescriptor {
@@ -70,6 +76,22 @@ export function parseFunctions(file: UpstreamFile, context: MapContext, multiRet
     }
 
     return declarations;
+}
+
+export function parseTypeAliases(files: readonly UpstreamFile[]): ReadonlyMap<string, TypeAliasDefinition> {
+    const aliases = new Map<string, TypeAliasDefinition>();
+
+    for (const file of files) {
+        for (const statement of sourceFileOf(file).statements) {
+            if (!ts.isTypeAliasDeclaration(statement)) {
+                continue;
+            }
+
+            aliases.set(statement.name.text, { typeParameters: statement.typeParameters ?? [], type: statement.type });
+        }
+    }
+
+    return aliases;
 }
 
 export function parseVariables(file: UpstreamFile, context: MapContext): ParsedDeclaration[] {

@@ -2,6 +2,20 @@ import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from 
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_4: readonly OopClass[] = [
+    oopClass('GuiTabPanel', 'GuiElement', [
+        oopMethod('getSelectedTab', 'client', 'guiGetSelectedTab', fn([], named('Element'), 0)),
+        oopProperty('selectedTab', 'client', 'guiGetSelectedTab', named('Element')),
+    ], [
+    ],
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, named('Element')], named('GuiTabPanel'), 5), 'guiCreateTabPanel'),
+    ),
+    oopClass('GuiWindow', 'GuiElement', [
+        oopMethod('setMovable', 'client', 'guiWindowSetMovable', fn([BOOLEAN], BOOLEAN, 1)),
+        oopMethod('setSizable', 'client', 'guiWindowSetSizable', fn([BOOLEAN], BOOLEAN, 1)),
+    ], [
+    ],
+    oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN], named('GuiWindow'), 6), 'guiCreateWindow'),
+    ),
     oopClass('Light', null, [
         oopProperty('color', 'client', 'getLightColor', tupleOf([NUMBER, NUMBER, NUMBER])),
         oopProperty('direction', 'client', 'getLightDirection', tupleOf([NUMBER, NUMBER, NUMBER])),

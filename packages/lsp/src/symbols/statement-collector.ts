@@ -1,4 +1,4 @@
-import { createNamed, renameRecord, typeToString, widenInferred } from '@compiler/checker/types';
+import { ANY_TYPE, createNamed, renameRecord, typeToString, widenInferred, type FunctionType } from '@compiler/checker/types';
 import type {
     AssignmentStatement,
     DeclareStatement,
@@ -36,6 +36,7 @@ export interface FunctionScopeInput {
     start: number;
     end: number;
     parameters: readonly Parameter[];
+    type?: FunctionType;
     body: readonly Statement[];
     selfType: string | null;
     container: string | null;
@@ -59,14 +60,21 @@ export function collectFunctionScope(state: CollectorState, block: BlockContext,
         declareSymbol(state, scopeId, { name: 'self', kind: 'parameter', position, detail, type: createNamed(input.selfType) });
     }
 
+    let parameterIndex = 0;
+
     for (const parameter of input.parameters) {
         collectAnnotation(state, inner, parameter.annotation);
 
         if (parameter.name.length > 0) {
-            const detail = variableText('parameter', parameter.name, parameter.annotation, null);
-            const type = annotationType(parameter.annotation);
+            const inferred = parameter.isVararg ? ANY_TYPE : (input.type?.parameters[parameterIndex] ?? ANY_TYPE);
+            const type = parameter.annotation === null ? inferred : annotationType(parameter.annotation);
+            const detail = variableText('parameter', parameter.name, parameter.annotation, typeToString(type));
 
             declareSymbol(state, scopeId, { name: parameter.name, kind: 'parameter', position: parameter.position, detail, type });
+        }
+
+        if (!parameter.isVararg) {
+            parameterIndex += 1;
         }
     }
 

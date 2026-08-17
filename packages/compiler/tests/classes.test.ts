@@ -25,7 +25,7 @@ function helpers(source: string): string[] {
 describe('classes', () => {
     it('emits fields with defaults and methods as a class runtime call', () => {
         expect(emit(PLAYER)).toBe(
-            "class 'Player' {\n    health = 100,\n    constructor = function(self, name)\n        self.name = name\n    end\n}\n",
+            "class 'Player' {\n    health = 100,\n\n    constructor = function(self, name)\n        self.name = name\n    end\n}\n",
         );
     });
 
@@ -69,9 +69,9 @@ describe('classes', () => {
 
     it('emits an enum that is used and erases one that is not', () => {
         expect(emit('enum State {\n    LOBBY,\n    PLAYING,\n}\nprint(State.LOBBY)\n')).toBe(
-            "State = enum { 'LOBBY', 'PLAYING' }\nprint(State.LOBBY)\n",
+            "State = enum { 'LOBBY', 'PLAYING' }\n\n\n\nprint(State.LOBBY)\n",
         );
-        expect(emit('enum State {\n    LOBBY,\n}\nprint(1)\n')).toBe('print(1)\n');
+        expect(emit('enum State {\n    LOBBY,\n}\nprint(1)\n')).toBe('\n\n\nprint(1)\n');
     });
 
     it('requires the class helper only for emitted OOP and enum features', () => {

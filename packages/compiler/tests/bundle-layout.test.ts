@@ -49,7 +49,7 @@ describe('bundle resource layout', () => {
         const materialized = materializeBundles('demo', build.bundles, () => '_class = {}\n');
         const script = materialized.scripts[0];
 
-        expect(script?.content).toBe('_class = {}\nprint(1)\n');
+        expect(script?.content).toBe('_class = {}\n\nprint(1)\n');
         expect(materialized.map.files[0]?.segments).toEqual([
             {
                 kind: 'helper',
@@ -62,18 +62,18 @@ describe('bundle resource layout', () => {
             {
                 kind: 'module',
                 generatedStartLine: 2,
-                generatedEndLine: 2,
+                generatedEndLine: 3,
                 contentStartLine: 2,
                 source: 'src/shared/main.luam',
-                lines: [{ generatedLine: 1, sourceLine: 2 }],
+                lines: [{ generatedLine: 2, sourceLine: 2 }],
             },
         ]);
-        expect(resolveResourcePosition(materialized.map, 'src/shared.lua', 2)).toEqual({
+        expect(resolveResourcePosition(materialized.map, 'src/shared.lua', 3)).toEqual({
             status: 'resolved',
             position: { file: 'src/shared/main.luam', line: 2 },
         });
         expect(resolveResourcePosition(materialized.map, 'src/shared.lua', 1)).toEqual({ status: 'uncovered' });
-        expect(resolveResourcePosition(materialized.map, 'src/shared.lua', 3)).toEqual({ status: 'uncovered' });
+        expect(resolveResourcePosition(materialized.map, 'src/shared.lua', 4)).toEqual({ status: 'uncovered' });
     });
 
     it('concatenates modules into one chunk scope without function frames', () => {

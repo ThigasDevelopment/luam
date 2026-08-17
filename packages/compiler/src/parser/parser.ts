@@ -1,8 +1,10 @@
 import { createPosition, sortDiagnostics, type Diagnostic } from '@compiler/diagnostics/diagnostic';
 import { scan } from '@compiler/lexer/lexer';
+import type { Comment } from '@compiler/lexer/comment-scanner';
 import type { Token } from '@compiler/lexer/token';
 
 import type { Program, Statement } from './ast';
+import type { SourceSpan } from './source-metadata';
 import { parseStatement } from './statement';
 import { ParserError, TokenStream } from './token-stream';
 
@@ -11,6 +13,10 @@ export interface ParseResult {
     tokens: Token[];
     diagnostics: Diagnostic[];
     directives: string[];
+    erasures: SourceSpan[];
+    hasComments: boolean;
+    comments: Comment[];
+    statementSpans: ReadonlyMap<Statement, SourceSpan>;
 }
 
 function synchronize(stream: TokenStream): void {
@@ -23,7 +29,7 @@ function synchronize(stream: TokenStream): void {
     }
 }
 
-function parseProgram(stream: TokenStream, diagnostics: Diagnostic[]): Program {
+function parseProgram(stream: TokenStream, diagnostics: Diagnostic[], statementSpans: Map<Statement, SourceSpan>): Program {
     const body: Statement[] = [];
 
     while (!stream.isEof()) {
@@ -32,7 +38,15 @@ function parseProgram(stream: TokenStream, diagnostics: Diagnostic[]): Program {
         }
 
         try {
-            body.push(parseStatement(stream));
+            const checkpoint = stream.checkpoint();
+            const statement = parseStatement(stream);
+            const span = stream.sourceSpanFrom(checkpoint);
+
+            body.push(statement);
+
+            if (span !== null) {
+                statementSpans.set(statement, span);
+            }
         } catch (error) {
             if (!(error instanceof ParserError)) {
                 throw error;
@@ -50,12 +64,17 @@ export function parse(source: string): ParseResult {
     const lexed = scan(source);
     const diagnostics: Diagnostic[] = [...lexed.diagnostics];
     const stream = new TokenStream(lexed.tokens);
-    const program = parseProgram(stream, diagnostics);
+    const statementSpans = new Map<Statement, SourceSpan>();
+    const program = parseProgram(stream, diagnostics, statementSpans);
 
     return {
         program,
         tokens: lexed.tokens,
         diagnostics: sortDiagnostics([...diagnostics, ...stream.diagnostics]),
         directives: lexed.directives,
+        erasures: stream.erasures(),
+        hasComments: lexed.hasComments,
+        comments: lexed.comments,
+        statementSpans,
     };
 }

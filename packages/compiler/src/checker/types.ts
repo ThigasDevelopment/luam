@@ -52,6 +52,8 @@ export interface NamedType {
 export interface FunctionType {
     kind: 'function';
     parameters: Type[];
+    parameterNames?: string[];
+    variadicType?: Type;
     minimumArguments: number;
     isVariadic: boolean;
     returnType: Type;
@@ -174,8 +176,23 @@ export function widenInferred(type: Type): Type {
     return type.members.size === 0 ? TABLE_TYPE : createRecord(type.name, type.members, type.origin);
 }
 
-export function createFunction(parameters: Type[], returnType: Type, minimumArguments?: number, isVariadic = false): FunctionType {
-    return { kind: 'function', parameters, returnType, minimumArguments: minimumArguments ?? parameters.length, isVariadic };
+export function createFunction(
+    parameters: Type[],
+    returnType: Type,
+    minimumArguments?: number,
+    isVariadic = false,
+    parameterNames?: string[],
+    variadicType?: Type,
+): FunctionType {
+    return {
+        kind: 'function',
+        parameters,
+        ...(parameterNames === undefined ? {} : { parameterNames }),
+        ...(variadicType === undefined ? {} : { variadicType }),
+        returnType,
+        minimumArguments: minimumArguments ?? parameters.length,
+        isVariadic,
+    };
 }
 
 export function createTuple(elements: Type[]): Type {
@@ -285,7 +302,7 @@ export function typeToString(type: Type): string {
         const parameters = type.parameters.map(typeToString);
 
         if (type.isVariadic) {
-            parameters.push('...');
+            parameters.push(type.variadicType === undefined ? '...' : `...: ${typeToString(type.variadicType)}`);
         }
 
         return `fun(${parameters.join(', ')}): ${typeToString(type.returnType)}`;

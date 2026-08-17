@@ -5,7 +5,7 @@ export const MTA_COLLISION_SHARED: ApiCatalog = {
     addColPolygonPoint: fn([named('ColShape'), NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
     createColCircle: fn([NUMBER, NUMBER, NUMBER], named('ColShape'), 3),
     createColCuboid: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 6),
-    createColPolygon: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 8, true),
+    createColPolygon: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 8, true, undefined),
     createColRectangle: fn([NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 4),
     createColSphere: fn([NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 4),
     createColTube: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('ColShape'), 5),
