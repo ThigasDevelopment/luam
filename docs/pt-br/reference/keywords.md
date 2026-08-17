@@ -71,9 +71,12 @@ local exported: number = 1
 print(exported)
 ```
 
-`fun` é o único termo que continua contextual: nomeia um tipo de função apenas em
-posição de tipo, então uma variável chamada `fun` ainda compila. Veja
-[Funções](/pt-br/language/functions).
+Dois termos continuam contextuais. `fun` nomeia um tipo de função apenas em
+posição de tipo, então uma variável chamada `fun` ainda compila — veja
+[Funções](/pt-br/language/functions). `event` só é lido como palavra-chave
+logo depois de `declare`, em `declare event 'nome'(...)`, então `local event = 1`
+continua sendo um local comum — veja
+[APIs e eventos](/pt-br/mta/apis-and-events).
 
 ## Nomes de propriedade são exceção
 

@@ -1,3 +1,4 @@
+import type { EventInfo } from '@compiler/checker/registry';
 import type { Diagnostic, SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { RuntimeHelper } from '@compiler/emitter/state';
 import type { SourceLineMapping } from '@compiler/emitter/source-map';
@@ -23,6 +24,7 @@ export interface CompiledModule {
     diagnostics: Diagnostic[];
     lines: SourceLineMapping[];
     topLevelReturn: SourcePosition | null;
+    events: readonly EventInfo[];
 }
 
 export interface FileDiagnostic {
@@ -41,6 +43,7 @@ export interface ProjectResult {
     diagnostics: FileDiagnostic[];
     hasErrors: boolean;
     stats: ProjectStats;
+    events: readonly EventInfo[];
 }
 
 export function sortFileDiagnostics(diagnostics: readonly FileDiagnostic[]): FileDiagnostic[] {

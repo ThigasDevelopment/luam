@@ -1,0 +1,234 @@
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+
+import type { FunctionDescriptor } from '@mta-types/type-descriptor';
+
+export const MTA_EVENT_SIGNATURES_CLIENT_2: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientCursorMove: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        7,
+        false,
+        [
+            'cursorX',
+            'cursorY',
+            'absoluteX',
+            'absoluteY',
+            'worldX',
+            'worldY',
+            'worldZ',
+        ],
+    ),
+    onClientDebugMessage: fn(
+        [
+            STRING,
+            NUMBER,
+            STRING,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        7,
+        false,
+        [
+            'message',
+            'level',
+            'file',
+            'line',
+            'r',
+            'g',
+            'b',
+        ],
+    ),
+    onClientDoubleClick: fn(
+        [
+            STRING,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            named('Element'),
+        ],
+        VOID,
+        7,
+        false,
+        [
+            'button',
+            'absoluteX',
+            'absoluteY',
+            'worldX',
+            'worldY',
+            'worldZ',
+            'clickedWorld',
+        ],
+    ),
+    onClientElementColShapeHit: fn(
+        [
+            named('ColShape'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theShape',
+            'matchingDimension',
+        ],
+    ),
+    onClientElementColShapeLeave: fn(
+        [
+            named('ColShape'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theShape',
+            'matchingDimension',
+        ],
+    ),
+    onClientElementDataChange: fn(
+        [
+            STRING,
+            ANY,
+            ANY,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'theKey',
+            'oldValue',
+            'newValue',
+        ],
+    ),
+    onClientElementDestroy: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onClientElementDimensionChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldDimension',
+            'newDimension',
+        ],
+    ),
+    onClientElementInteriorChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldInterior',
+            'newInterior',
+        ],
+    ),
+    onClientElementModelChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldModel',
+            'newModel',
+        ],
+    ),
+    onClientElementStreamIn: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onClientElementStreamOut: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onClientExplosion: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'x',
+            'y',
+            'z',
+            'theType',
+        ],
+    ),
+    onClientFileDownloadComplete: fn(
+        [
+            STRING,
+            BOOLEAN,
+            named('Resource'),
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'fileName',
+            'success',
+            'requestResource',
+        ],
+    ),
+    onClientGUIAccepted: fn(
+        [
+            named('Element'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'editBox',
+        ],
+    ),
+    onClientGUIBlur: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+};

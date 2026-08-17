@@ -208,6 +208,25 @@ export function scanContext(text: string, offset: number): SourceContext {
     };
 }
 
+export function frameArguments(text: string, open: number, offset: number): string[] {
+    const state: ScanState = { mode: 'code', quote: '', level: 0, stringStart: -1, frames: [{ open, argument: 0, isCall: true }] };
+    const boundaries: number[] = [];
+
+    let index = open + 1;
+
+    while (index < offset && state.frames.length > 0) {
+        if (state.mode === 'code' && text[index] === ',' && state.frames.length === 1) {
+            boundaries.push(index);
+        }
+
+        index = advance(text, state, index);
+    }
+
+    const starts = [open + 1, ...boundaries.map((boundary) => boundary + 1)];
+
+    return starts.map((start, position) => text.slice(start, boundaries[position] ?? offset).trim());
+}
+
 export function calleeSegments(text: string, open: number): { segments: string[]; trigger: '.' | ':' | null } {
     const segments: string[] = [];
 

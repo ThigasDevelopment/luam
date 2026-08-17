@@ -11,6 +11,7 @@ import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { descriptorShapeText, namedDescriptorText } from '@lsp/features/api-text';
 import { contextualHover } from '@lsp/features/contextual-hover';
 import { declarationDocumentation } from '@lsp/features/declaration-documentation';
+import { eventHover } from '@lsp/features/event-hover';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
@@ -286,6 +287,12 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
 
     if (contextual !== null) {
         return contextual;
+    }
+
+    const event = eventHover(analysis, others, offset);
+
+    if (event !== null) {
+        return event;
     }
 
     const decorator = decoratorHover(analysis, offset);

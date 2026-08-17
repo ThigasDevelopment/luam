@@ -6,6 +6,28 @@ by milestone rather than by released version. Format follows
 
 ## Unreleased
 
+### Typed Events
+
+#### Added
+
+- `declare event 'name'(...)` declares the contract of a custom MTA event. It is
+  erased from the output, takes its environment from the file path, and reaches
+  every module of the project.
+- The generated catalog carries the handler signature of all 203 built-in
+  events, per environment.
+- `addEventHandler` and `removeEventHandler` type their callback from the event
+  name, and `triggerEvent`, `triggerServerEvent`, `triggerClientEvent` and the
+  latent variants check their payload against the signature of the side they
+  reach. An unresolved name keeps the permissive MTA signature.
+- Completion inside an event-name string lists the contracts, the names created
+  with `addEvent`, and the catalog events of the targeted side; hover shows the
+  contract and its origin; signature help names the handler and payload
+  arguments; the outline lists declared events.
+
+#### Changed
+
+- `event` is contextual after `declare` only, so `local event` still compiles.
+
 ### Contextual Callback Types
 
 #### Added

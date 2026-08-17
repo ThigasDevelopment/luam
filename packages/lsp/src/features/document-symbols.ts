@@ -16,6 +16,7 @@ const SYMBOL_KINDS: Readonly<Record<LuamSymbolKind, SymbolKind>> = {
     field: SymbolKind.Field,
     method: SymbolKind.Method,
     'enum-member': SymbolKind.EnumMember,
+    event: SymbolKind.Event,
 };
 
 function documentSymbol(declaration: SymbolDeclaration, children?: DocumentSymbol[]): DocumentSymbol {

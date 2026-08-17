@@ -46,6 +46,7 @@ const STATEMENT_NAMES: Readonly<Record<string, string>> = {
     'generic-for-statement': 'a loop',
     'type-alias-statement': 'a type alias',
     'declare-statement': 'a declaration',
+    'event-declaration': 'an event declaration',
     'class-declaration': 'a class declaration',
     'interface-declaration': 'an interface declaration',
     'enum-declaration': 'an enum declaration',

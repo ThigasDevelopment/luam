@@ -124,6 +124,16 @@ writes nothing.
 | `check-native-constructor` | Wrong arguments to a native constructor. |
 | `check-native-class-inheritance` | A project class tried to extend a native class. |
 
+## Checker — event contracts
+
+| Code | Meaning |
+| --- | --- |
+| `check-duplicate-event` | Two `declare event` declarations for one name. |
+| `check-invalid-event-name` | `declare event ''`, with an empty name. |
+| `check-duplicate-event-parameter` | Two parameters of one event share a name. |
+| `check-invalid-event-parameter` | The variadic parameter of an event is not last. |
+| `check-event-return-type` | An event declared a return type other than `void`. |
+
 ## Checker — templates and exports
 
 | Code | Meaning |

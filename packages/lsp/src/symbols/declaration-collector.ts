@@ -4,6 +4,7 @@ import type {
     ClassMember,
     DeclarationStatement,
     EnumDeclaration,
+    EventDeclaration,
     InterfaceDeclaration,
     InterfaceMember,
 } from '@compiler/parser/declaration-nodes';
@@ -180,6 +181,20 @@ function collectEnum(state: CollectorState, statement: EnumDeclaration): void {
             container: statement.name,
         });
     });
+}
+
+export function collectEvent(state: CollectorState, block: BlockContext, statement: EventDeclaration): void {
+    const position = locatePosition(state, statement.position.offset, statement.name) ?? statement.position;
+
+    for (const parameter of statement.parameters) {
+        collectAnnotation(state, block, parameter.annotation);
+    }
+
+    collectAnnotation(state, block, statement.returnAnnotation);
+
+    const detail = `event '${statement.name}'(${statement.parameters.map(parameterText).join(', ')})`;
+
+    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'event', position, detail });
 }
 
 export function collectDeclaration(state: CollectorState, block: BlockContext, statement: DeclarationStatement): void {

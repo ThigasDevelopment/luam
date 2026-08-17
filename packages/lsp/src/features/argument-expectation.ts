@@ -10,6 +10,7 @@ import type { CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { resolveReceiver, type ReceiverTarget } from '@lsp/features/completion-context';
+import { eventArgumentExpectation } from '@lsp/features/event-signature';
 import { calleeSegments, type CallFrame } from '@lsp/features/source-context';
 import { matchesReferenceKind, type SymbolDeclaration } from '@lsp/symbols/symbol';
 
@@ -90,6 +91,12 @@ function calleeType(analysis: DocumentAnalysis, offset: number, segments: readon
 export function expectedArgument(analysis: DocumentAnalysis, offset: number, frame: CallFrame | null): ArgumentExpectation | null {
     if (frame === null || !frame.isCall) {
         return null;
+    }
+
+    const event = eventArgumentExpectation(analysis, offset, frame);
+
+    if (event !== null && event.kind !== 'any' && event.kind !== 'unknown') {
+        return { analysis, type: event };
     }
 
     const { segments } = calleeSegments(analysis.text, frame.open);

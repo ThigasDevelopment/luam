@@ -1,5 +1,5 @@
 import type { AmbientDeclarations } from '@compiler/checker/ambient';
-import type { ClassInfo, EnumInfo, GlobalInfo, InterfaceInfo, MemberInfo } from '@compiler/checker/registry';
+import type { ClassInfo, EnumInfo, EventInfo, GlobalInfo, InterfaceInfo, MemberInfo } from '@compiler/checker/registry';
 import { typeToString } from '@compiler/checker/types';
 
 const OFFSET_BASIS_LOW = 0x811c9dc5;
@@ -60,11 +60,18 @@ function globalText(info: GlobalInfo): string {
     return `declare ${info.name}:${typeToString(info.type)}`;
 }
 
+function eventText(info: EventInfo): string {
+    const parameters = info.parameters.map((parameter) => `${parameter.isVariadic ? '...' : ''}${parameter.name}:${typeToString(parameter.type)}`).join(',');
+
+    return `event ${info.environment} ${info.name}(${parameters})`;
+}
+
 export function fingerprintDeclarations(declarations: AmbientDeclarations): string {
     const classes = declarations.classes.map(classText);
     const interfaces = declarations.interfaces.map(interfaceText);
     const enums = declarations.enums.map(enumText);
     const globals = declarations.globals.map(globalText);
+    const events = declarations.events.map(eventText);
 
-    return hashString([...classes, ...interfaces, ...enums, ...globals].sort(compareText).join(';'));
+    return hashString([...classes, ...interfaces, ...enums, ...globals, ...events].sort(compareText).join(';'));
 }

@@ -12,6 +12,7 @@ import type {
     Statement,
     TypeAliasStatement,
 } from '@compiler/parser/ast';
+import type { EventDeclaration } from '@compiler/parser/declaration-nodes';
 
 import { positionAt } from '@lsp/support/source-text';
 import { annotationType, signatureType } from '@lsp/symbols/annotation-type';
@@ -26,7 +27,7 @@ import {
     type BlockContext,
     type CollectorState,
 } from './collector-state';
-import { collectDeclaration } from './declaration-collector';
+import { collectDeclaration, collectEvent } from './declaration-collector';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
 import { annotationText, assignedText, parameterText, signatureText, variableText } from './signature-text';
@@ -277,6 +278,8 @@ function collectStatement(state: CollectorState, block: BlockContext, statement:
         collectTypeAlias(state, block, statement);
     } else if (statement.kind === 'declare-statement') {
         collectDeclare(state, block, statement);
+    } else if (statement.kind === 'event-declaration') {
+        collectEvent(state, block, statement);
     } else if (statement.kind !== 'break-statement' && statement.kind !== 'continue-statement') {
         collectDeclaration(state, block, statement);
     }

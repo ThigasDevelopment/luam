@@ -75,6 +75,14 @@ export class Binder {
         return this.builtins.get(name) ?? null;
     }
 
+    isBuiltinReference(name: string): boolean {
+        if (!this.builtins.has(name)) {
+            return false;
+        }
+
+        return this.scopes.every((scope) => !scope.has(name));
+    }
+
     isDeclaredInCurrentScope(name: string): boolean {
         return this.scopes[this.scopes.length - 1]?.has(name) ?? false;
     }

@@ -10,6 +10,16 @@ When that version changes, the entry below says what moved.
 
 ### Changed
 
+- [APIs and events](/en/mta/apis-and-events) documents typed event handlers,
+  payload checking on every trigger, and the `declare event` contract for custom
+  events, with the diagnostics each mistake raises.
+- [Declaration files](/en/language/declaration-files) covers `declare event`, and
+  [Keywords](/en/reference/keywords) records `event` as the second contextual
+  term next to `fun`.
+- [Language server](/en/tooling/language-server) and
+  [Editors](/en/tooling/editors) describe event-name completion, hover, and
+  signature help.
+- [Diagnostics](/en/reference/diagnostics) lists the event contract codes.
 - [Language server](/en/tooling/language-server) uses expected callback types for
   parameter completion, member completion, hover, navigation, and signature
   help, including environment-specific MTA callbacks.

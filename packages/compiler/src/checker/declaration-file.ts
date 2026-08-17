@@ -8,6 +8,7 @@ const ALLOWED: ReadonlySet<string> = new Set([
     'enum-declaration',
     'type-alias-statement',
     'declare-statement',
+    'event-declaration',
     'function-declaration',
 ]);
 

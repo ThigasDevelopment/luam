@@ -1,13 +1,14 @@
-import type { ClassInfo, DeclarationRegistry, EnumInfo, GlobalInfo, InterfaceInfo } from './registry';
+import type { ClassInfo, DeclarationRegistry, EnumInfo, EventInfo, GlobalInfo, InterfaceInfo } from './registry';
 
 export interface AmbientDeclarations {
     classes: readonly ClassInfo[];
     interfaces: readonly InterfaceInfo[];
     enums: readonly EnumInfo[];
     globals: readonly GlobalInfo[];
+    events: readonly EventInfo[];
 }
 
-export const EMPTY_AMBIENT: AmbientDeclarations = { classes: [], interfaces: [], enums: [], globals: [] };
+export const EMPTY_AMBIENT: AmbientDeclarations = { classes: [], interfaces: [], enums: [], globals: [], events: [] };
 
 export function ambientFromRegistry(registry: DeclarationRegistry): AmbientDeclarations {
     return {
@@ -15,6 +16,7 @@ export function ambientFromRegistry(registry: DeclarationRegistry): AmbientDecla
         interfaces: registry.allInterfaces(),
         enums: registry.allEnums(),
         globals: registry.allGlobals(),
+        events: registry.allEvents(),
     };
 }
 
@@ -36,6 +38,7 @@ export function ownDeclarations(registry: DeclarationRegistry, ambient: AmbientD
         interfaces: withoutNames(all.interfaces, ambient.interfaces),
         enums: withoutNames(all.enums, ambient.enums),
         globals: withoutNames(all.globals, ambient.globals),
+        events: withoutNames(all.events, ambient.events),
     };
 }
 
@@ -57,5 +60,6 @@ export function mergeAmbient(sources: readonly AmbientDeclarations[]): AmbientDe
         interfaces: mergeByName(sources.map((source) => source.interfaces)),
         enums: mergeByName(sources.map((source) => source.enums)),
         globals: mergeByName(sources.map((source) => source.globals)),
+        events: mergeByName(sources.map((source) => source.events)),
     };
 }

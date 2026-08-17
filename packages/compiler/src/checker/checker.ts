@@ -10,7 +10,7 @@ import { checkDeclarationFile } from './declaration-file';
 import type { StrictMode } from './directives';
 import { checkJumps } from './jumps';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
-import type { DeclarationRegistry } from './registry';
+import type { DeclarationRegistry, EventInfo } from './registry';
 import { checkStatements } from './statements';
 import { reportUnknownTypes } from './type-names';
 import type { Type } from './types';
@@ -28,6 +28,7 @@ export interface CheckResult {
     mode: StrictMode;
     environment: Environment;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
+    events: readonly EventInfo[];
 }
 
 function externalReferences(context: CheckContext): Map<string, SourcePosition> {
@@ -77,5 +78,6 @@ export function check(program: Program, mode: StrictMode, environment: Environme
         mode,
         environment,
         generatedMembers: context.generatedMembers,
+        events: context.declarations.allEvents(),
     };
 }

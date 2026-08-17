@@ -1,0 +1,235 @@
+import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, VOID } from '@mta-types/type-descriptor';
+
+import type { FunctionDescriptor } from '@mta-types/type-descriptor';
+
+export const MTA_EVENT_SIGNATURES_CLIENT_1: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientBrowserCreated: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onClientBrowserCursorChange: fn(
+        [
+            NUMBER,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'cursorId',
+        ],
+    ),
+    onClientBrowserDocumentReady: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'url',
+        ],
+    ),
+    onClientBrowserInputFocusChanged: fn(
+        [
+            BOOLEAN,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'gainedFocus',
+        ],
+    ),
+    onClientBrowserLoadingFailed: fn(
+        [
+            STRING,
+            NUMBER,
+            STRING,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'url',
+            'errorCode',
+            'errorDescription',
+        ],
+    ),
+    onClientBrowserLoadingStart: fn(
+        [
+            STRING,
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'URL',
+            'isMain',
+        ],
+    ),
+    onClientBrowserNavigate: fn(
+        [
+            STRING,
+            BOOLEAN,
+            BOOLEAN,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'targetURL',
+            'isBlocked',
+            'isMainFrame',
+        ],
+    ),
+    onClientBrowserPopup: fn(
+        [
+            STRING,
+            STRING,
+            BOOLEAN,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'targetURL',
+            'openerURL',
+            'isPopup',
+        ],
+    ),
+    onClientBrowserResourceBlocked: fn(
+        [
+            STRING,
+            STRING,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'url',
+            'domain',
+            'reason',
+        ],
+    ),
+    onClientBrowserTooltip: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'text',
+        ],
+    ),
+    onClientBrowserWhitelistChange: fn(
+        [
+            TABLE,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'changedDomains',
+        ],
+    ),
+    onClientCharacter: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'character',
+        ],
+    ),
+    onClientChatMessage: fn(
+        [
+            STRING,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        5,
+        false,
+        [
+            'text',
+            'r',
+            'g',
+            'b',
+            'messageType',
+        ],
+    ),
+    onClientClick: fn(
+        [
+            STRING,
+            STRING,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            named('Element'),
+        ],
+        VOID,
+        8,
+        false,
+        [
+            'button',
+            'state',
+            'absoluteX',
+            'absoluteY',
+            'worldX',
+            'worldY',
+            'worldZ',
+            'clickedWorld',
+        ],
+    ),
+    onClientColShapeHit: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theElement',
+            'matchingDimension',
+        ],
+    ),
+    onClientColShapeLeave: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theElement',
+            'matchingDimension',
+        ],
+    ),
+    onClientConsole: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'text',
+        ],
+    ),
+};

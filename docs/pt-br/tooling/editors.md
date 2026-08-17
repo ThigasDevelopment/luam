@@ -14,7 +14,8 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Diretivas | Depois de `#!`, completa as diretivas de ambiente e de rigor, cada uma com o que faz. |
 | Cabeçalho de classe | Depois de `class Nome `, completa `extends` e `implements`, e então as classes ou interfaces declaradas que podem vir a seguir. |
 | Ordenação de argumentos | Dentro de uma chamada, candidatos do tipo esperado do parâmetro vêm primeiro, depois funções que o retornam. |
-| Hover | Tipo declarado ou inferido, assinatura da função e o ambiente de uma API do MTA. |
+| Eventos | Dentro das aspas, completa os eventos alcançáveis da chamada; o handler e o payload de um evento conhecido carregam os parâmetros tipados. |
+| Hover | Tipo declarado ou inferido, assinatura da função, o ambiente de uma API do MTA e o contrato de um evento. |
 | Navegação | Ir para definição, encontrar referências e renomear — entre arquivos para globais. |
 
 A completação tem exatamente o mesmo escopo do checker: `dxDrawText` nunca aparece

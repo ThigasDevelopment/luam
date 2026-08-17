@@ -5,6 +5,7 @@ import type { CallExpression, Expression, MemberExpression, TableExpression, Tem
 import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
+import { specializeEventCall } from './event-calls';
 import {
     checkNewExpression,
     checkSuperCall,
@@ -161,6 +162,17 @@ export function checkSignature(
         }
     });
 
+    if (signature.isVariadic && signature.variadicType !== undefined) {
+        for (let index = signature.parameters.length; index < argumentTypes.length; index += 1) {
+            const argumentType = argumentTypes[index];
+            const argument = args[Math.min(index, args.length - 1)];
+
+            if (argumentType !== undefined && argument !== undefined) {
+                context.expectAssignable(argumentType, signature.variadicType, argument.position, `Argument ${index + 1}`);
+            }
+        }
+    }
+
     return signature.returnType;
 }
 
@@ -228,8 +240,6 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
         return context.record(expression, checkSuperCall(context, expression));
     }
 
-    checkEventUsage(context, expression);
-
     if (expression.method === null && expression.callee.kind === 'identifier' && isMtaClassReference(context, expression.callee.name)) {
         context.references.add(expression.callee.name);
 
@@ -248,6 +258,14 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
 
     if (expression.method !== null) {
         return context.record(expression, checkMethodCall(context, expression, expression.method, calleeType));
+    }
+
+    if (expression.callee.kind === 'identifier' && context.binder.isBuiltinReference(expression.callee.name)) {
+        checkEventUsage(context, expression);
+
+        const specialized = specializeEventCall(context, expression, calleeType);
+
+        return context.record(expression, checkArguments(context, expression, specialized ?? calleeType));
     }
 
     return context.record(expression, checkArguments(context, expression, calleeType));

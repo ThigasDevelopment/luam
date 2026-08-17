@@ -1,6 +1,6 @@
 import type { ApiEnvironment } from '#mta-types/api-declaration';
 import type { ApiDocumentation } from '#mta-types/api-documentation';
-import type { TypeDescriptor } from '#mta-types/type-descriptor';
+import type { FunctionDescriptor, TypeDescriptor } from '#mta-types/type-descriptor';
 
 export interface ParsedDeclaration {
     name: string;
@@ -22,9 +22,14 @@ export interface ElementTypeEntry {
     parent: string | null;
 }
 
+export interface ParsedEventHandler {
+    name: string;
+    type: FunctionDescriptor;
+}
+
 export interface UpstreamCatalog {
     declarations: readonly ParsedDeclaration[];
-    events: readonly string[];
+    events: readonly ParsedEventHandler[];
 }
 
 export interface GeneratedFile {

@@ -122,7 +122,7 @@ function superItems(analysis: DocumentAnalysis, offset: number): CompletionItem[
 function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: ArgumentExpectation | null): CompletionItem[] {
     return analysis.index
         .visibleAt(offset)
-        .filter((declaration) => !MEMBER_KINDS.has(declaration.kind))
+        .filter((declaration) => !MEMBER_KINDS.has(declaration.kind) && declaration.kind !== 'event')
         .map((declaration) => withArgumentRank(symbolItem(declaration), declaration.type, expectation));
 }
 
@@ -184,7 +184,7 @@ function stringItems(analysis: DocumentAnalysis, offset: number, others: readonl
     const frame = context.frame;
 
     if (frame !== null && frame.isCall && isEventArgument(analysis.text, frame)) {
-        return eventItems(analysis, others);
+        return eventItems(analysis, others, frame);
     }
 
     const expected = expectedStringType(analysis, context.stringStart) ?? expectedArgument(analysis, offset, frame)?.type ?? null;

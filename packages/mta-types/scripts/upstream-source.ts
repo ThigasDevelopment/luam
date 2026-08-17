@@ -85,14 +85,8 @@ export function variableFile(side: 'server' | 'client'): UpstreamFile {
     return { category: 'variable', path, contents: readFileSync(path, 'utf8') };
 }
 
-export function eventFile(side: 'server' | 'client'): UpstreamFile {
-    const path = join(upstreamRoot(), side, 'event', 'all_event_names.d.ts');
-
-    if (!existsSync(path)) {
-        throw new GeneratorError(path, `the upstream ${side} event catalog is missing`);
-    }
-
-    return { category: 'event', path, contents: readFileSync(path, 'utf8') };
+export function eventFiles(side: 'server' | 'client'): UpstreamFile[] {
+    return readDirectory(join(upstreamRoot(), side, 'event'), `${side} event`);
 }
 
 export function classFiles(side: 'server' | 'client'): UpstreamFile[] {

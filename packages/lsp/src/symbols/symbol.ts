@@ -12,7 +12,8 @@ export type SymbolKind =
     | 'type-alias'
     | 'field'
     | 'method'
-    | 'enum-member';
+    | 'enum-member'
+    | 'event';
 
 export type ReferenceKind = 'value' | 'type' | 'member';
 

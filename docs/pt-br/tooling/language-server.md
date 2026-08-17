@@ -74,6 +74,21 @@ tipos herdados dentro do corpo. As variantes de callbacks MTA seguem o ambiente
 do arquivo atual, então `addCommandHandler` oferece `player, commandName, ...` no
 servidor e `commandName, ...` no cliente.
 
+## Eventos
+
+O nome do evento é resolvido a partir do literal de string na chamada, então o
+handler de `addEventHandler('onPlayerQuit', root, function (` completa como
+`quitType: string, reason: string, responsibleElement: Element`, e a ajuda de
+assinatura nomeia os argumentos do payload de `triggerEvent` e das suas variantes
+de cliente e servidor. O hover sobre o nome mostra o contrato e de onde ele vem.
+
+Dentro das aspas, a completação lista os eventos alcançáveis daquela chamada:
+primeiro os contratos declarados com
+[`declare event`](/pt-br/mta/apis-and-events), com os seus parâmetros, depois os
+nomes criados com `addEvent`, depois o catálogo. Um trigger entre ambientes lista
+os eventos do lado que ele alcança, então `triggerClientEvent(root, '` oferece
+eventos de cliente a partir de um arquivo servidor.
+
 ## Ambientes
 
 Todo documento resolve o seu ambiente (`server`, `client` ou `shared`) a partir do

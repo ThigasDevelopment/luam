@@ -3,9 +3,10 @@ import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { DeclareStatement, Expression, Statement, TypeAliasStatement, VariableDeclarator } from './ast';
 import { parseDoStatement, parseForStatement, parseIfStatement, parseRepeatStatement, parseWhileStatement } from './control-flow';
 import { isDeclarationStart, parseDeclaration, parseDecorators } from './declarations';
+import type { EventDeclaration } from './declaration-nodes';
 import { isDirectiveStart, parseDirective } from './directives';
 import { parseExpression, parseSuffixed } from './expression';
-import { parseFunctionDeclaration } from './function-expression';
+import { parseFunctionDeclaration, parseParameters } from './function-expression';
 import { ASSIGNMENT_OPERATORS, INCREMENT_OPERATORS } from './precedence';
 import { BRACE_TERMINATORS, recoverInBlock } from './recovery';
 import { ParserError, type TokenStream } from './token-stream';
@@ -101,6 +102,30 @@ function parseDeclareStatement(stream: TokenStream): DeclareStatement {
 
 function isDeclareStatement(stream: TokenStream): boolean {
     return stream.check('keyword', 'declare') && stream.checkAhead(1, 'identifier') && stream.checkAhead(2, 'punctuation', ':');
+}
+
+function isEventDeclaration(stream: TokenStream): boolean {
+    return (
+        stream.check('keyword', 'declare') &&
+        stream.checkAhead(1, 'identifier', 'event') &&
+        !stream.checkAhead(2, 'punctuation', ':')
+    );
+}
+
+function parseEventDeclaration(stream: TokenStream): EventDeclaration {
+    const checkpoint = stream.checkpoint();
+    const position = stream.next().position;
+
+    stream.expect('identifier', 'event');
+
+    const name = stream.expect('string').value;
+    const parameters = parseParameters(stream);
+    const returnAnnotation = parseOptionalAnnotation(stream);
+    const declaration: EventDeclaration = { kind: 'event-declaration', name, parameters, returnAnnotation, position };
+
+    stream.eraseFrom(checkpoint);
+
+    return declaration;
 }
 
 function isIncrementTarget(target: Expression | undefined): boolean {
@@ -214,6 +239,10 @@ export function parseStatement(stream: TokenStream): Statement {
 
     if (isTypeAlias(stream)) {
         return parseTypeAlias(stream);
+    }
+
+    if (isEventDeclaration(stream)) {
+        return parseEventDeclaration(stream);
     }
 
     if (isDeclareStatement(stream)) {

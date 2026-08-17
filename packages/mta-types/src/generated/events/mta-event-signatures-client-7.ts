@@ -1,0 +1,230 @@
+import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+
+import type { FunctionDescriptor } from '@mta-types/type-descriptor';
+
+export const MTA_EVENT_SIGNATURES_CLIENT_7: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientSoundStarted: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'reason',
+        ],
+    ),
+    onClientSoundStopped: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'reason',
+        ],
+    ),
+    onClientSoundStream: fn(
+        [
+            BOOLEAN,
+            NUMBER,
+            STRING,
+            STRING,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'success',
+            'length',
+            'streamName',
+            'errorMessage',
+        ],
+    ),
+    onClientTrailerAttach: fn(
+        [
+            named('Vehicle'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'towedBy',
+        ],
+    ),
+    onClientTrailerDetach: fn(
+        [
+            named('Vehicle'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'towedBy',
+        ],
+    ),
+    onClientTransferBoxProgressChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'downloadedSizeTotal',
+            'downloadTotalBytes',
+        ],
+    ),
+    onClientTransferBoxVisibilityChange: fn(
+        [
+            BOOLEAN,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'isVisible',
+        ],
+    ),
+    onClientVehicleCollision: fn(
+        [
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        11,
+        false,
+        [
+            'theHitElement',
+            'damageImpulseMag',
+            'bodypart',
+            'collisionX',
+            'collisionY',
+            'collisionZ',
+            'normalX',
+            'normalY',
+            'normalZ',
+            'hitElementForce',
+            'model',
+        ],
+    ),
+    onClientVehicleDamage: fn(
+        [
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        7,
+        false,
+        [
+            'theAttacker',
+            'theWeapon',
+            'loss',
+            'damagePosX',
+            'damagePosY',
+            'damagePosZ',
+            'tireID',
+        ],
+    ),
+    onClientVehicleEnter: fn(
+        [
+            named('Ped'),
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'thePed',
+            'seat',
+        ],
+    ),
+    onClientVehicleExit: fn(
+        [
+            named('Ped'),
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'thePed',
+            'seat',
+        ],
+    ),
+    onClientVehicleExplode: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onClientVehicleNitroStateChange: fn(
+        [
+            BOOLEAN,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'state',
+        ],
+    ),
+    onClientVehicleRespawn: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onClientVehicleStartEnter: fn(
+        [
+            named('Ped'),
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'thePed',
+            'seat',
+            'door',
+        ],
+    ),
+    onClientVehicleStartExit: fn(
+        [
+            named('Ped'),
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'thePed',
+            'seat',
+            'door',
+        ],
+    ),
+};

@@ -102,7 +102,7 @@ export function fn(
     isVariadic = false,
     parameterNames?: string[],
     variadicType?: TypeDescriptor,
-): TypeDescriptor {
+): FunctionDescriptor {
     return {
         kind: 'function',
         parameters,

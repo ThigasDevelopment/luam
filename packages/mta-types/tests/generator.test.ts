@@ -5,7 +5,9 @@ import { describe, expect, it } from 'vitest';
 
 import { generate } from '@generator/catalog-generator';
 import { emitCatalog } from '@generator/catalog-emitter';
-import { parseClasses, parseEvents, parseFunctions, parseVariables } from '@generator/declaration-parser';
+import { parseClasses, parseFunctions, parseVariables } from '@generator/declaration-parser';
+import { parseEvents } from '@generator/event-parser';
+import { emitEventSignatures } from '@generator/event-signature-emitter';
 import { GeneratorError } from '@generator/generator-model';
 import { normalize } from '@generator/catalog-normalizer';
 import type { MapContext } from '@generator/type-mapper';
@@ -108,11 +110,51 @@ describe('generator input validation', () => {
     it('rejects an event catalog with a non string member', () => {
         const source = 'export const enum EventNames {\n    OnBroken = 1,\n}\n';
 
-        expect(() => parseEvents(upstreamFile(source))).toThrow(GeneratorError);
+        expect(() => parseEvents([upstreamFile(source)], context)).toThrow(GeneratorError);
     });
 
     it('rejects an event catalog that declares nothing', () => {
-        expect(() => parseEvents(upstreamFile('export const value: number;\n'))).toThrow(GeneratorError);
+        expect(() => parseEvents([upstreamFile('export const value: number;\n')], context)).toThrow(GeneratorError);
+    });
+
+    it('joins onPlayerQuit to its runtime name and callback signature', () => {
+        const source = [
+            "export const enum EventNames { OnPlayerQuit = 'onPlayerQuit' }",
+            'export interface OnPlayerQuit extends GenericEventHandler {',
+            '    name: EventNames.OnPlayerQuit;',
+            '    function: (this: void, quitType: string, reason: string, responsibleElement: Element) => void;',
+            '}',
+        ].join('\n');
+        const [event] = parseEvents([upstreamFile(source)], context);
+
+        expect(event).toEqual({
+            name: 'onPlayerQuit',
+            type: {
+                kind: 'function',
+                parameters: [{ kind: 'string' }, { kind: 'string' }, { kind: 'named', name: 'Element' }],
+                parameterNames: ['quitType', 'reason', 'responsibleElement'],
+                returnType: { kind: 'void' },
+                minimumArguments: 3,
+                isVariadic: false,
+            },
+        });
+    });
+
+    it('emits an optional client damage callback with its lower minimum', () => {
+        const source = [
+            "export const enum EventNames { OnClientPlayerDamage = 'onClientPlayerDamage' }",
+            'export interface OnClientPlayerDamage extends GenericEventHandler {',
+            '    name: EventNames.OnClientPlayerDamage;',
+            '    function: (this: void, attacker: Element, damage_causing: number, bodypart: number, loss?: number) => void;',
+            '}',
+        ].join('\n');
+        const events = parseEvents([upstreamFile(source)], context);
+        const generated = emitEventSignatures([], events).map((file) => file.contents).join('\n');
+
+        expect(events[0]?.type.minimumArguments).toBe(3);
+        expect(events[0]?.type.parameterNames).toEqual(['attacker', 'damage_causing', 'bodypart', 'loss']);
+        expect(generated).toContain('onClientPlayerDamage: fn(');
+        expect(generated).toContain("            'loss',");
     });
 
     it('rejects a variable declared with a binding pattern', () => {

@@ -124,6 +124,16 @@ erro não escreve nada.
 | `check-native-constructor` | Argumentos errados para um construtor nativo. |
 | `check-native-class-inheritance` | Uma classe de projeto tentou estender uma classe nativa. |
 
+## Checker — contratos de evento
+
+| Código | Significado |
+| --- | --- |
+| `check-duplicate-event` | Duas declarações `declare event` para um nome. |
+| `check-invalid-event-name` | `declare event ''`, com nome vazio. |
+| `check-duplicate-event-parameter` | Dois parâmetros de um evento com o mesmo nome. |
+| `check-invalid-event-parameter` | O parâmetro variádico do evento não é o último. |
+| `check-event-return-type` | Um evento declarou um retorno diferente de `void`. |
+
 ## Checker — templates e exports
 
 | Código | Significado |

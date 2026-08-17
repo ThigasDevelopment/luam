@@ -1,7 +1,7 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { TemplateSegment } from '@compiler/lexer/token';
 
-import type { ClassDeclaration, EnumDeclaration, InterfaceDeclaration, NewExpression } from './declaration-nodes';
+import type { ClassDeclaration, EnumDeclaration, EventDeclaration, InterfaceDeclaration, NewExpression } from './declaration-nodes';
 
 export interface NodeBase {
     position: SourcePosition;
@@ -317,6 +317,7 @@ export type Statement =
     | GenericForStatement
     | TypeAliasStatement
     | DeclareStatement
+    | EventDeclaration
     | ClassDeclaration
     | InterfaceDeclaration
     | EnumDeclaration;

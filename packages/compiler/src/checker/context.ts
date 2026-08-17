@@ -399,6 +399,10 @@ export class CheckContext {
         for (const info of ambient.globals) {
             this.binder.declareGlobal({ name: info.name, type: info.type, isLocal: false, position: info.position });
         }
+
+        for (const info of ambient.events) {
+            this.declarations.declareEvent(info);
+        }
     }
 
     private resolveMapAnnotation(typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {

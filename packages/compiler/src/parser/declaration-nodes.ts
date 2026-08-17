@@ -71,6 +71,13 @@ export interface EnumDeclaration extends NodeBase {
     members: EnumMember[];
 }
 
+export interface EventDeclaration extends NodeBase {
+    kind: 'event-declaration';
+    name: string;
+    parameters: Parameter[];
+    returnAnnotation: TypeAnnotation | null;
+}
+
 export interface NewExpression extends NodeBase {
     kind: 'new-expression';
     className: string;

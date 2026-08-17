@@ -1,5 +1,8 @@
-import type { ApiEnvironment } from './api-declaration';
 import { MTA_EVENTS } from '@mta-types/generated/mta-events';
+import { MTA_EVENT_SIGNATURES } from '@mta-types/generated/events/mta-event-signatures';
+
+import type { ApiEnvironment } from './api-declaration';
+import type { FunctionDescriptor } from './type-descriptor';
 
 const SERVER: ReadonlySet<string> = new Set(MTA_EVENTS.server);
 const CLIENT: ReadonlySet<string> = new Set(MTA_EVENTS.client);
@@ -27,4 +30,8 @@ export function eventEnvironment(name: string): ApiEnvironment | null {
     }
 
     return null;
+}
+
+export function eventHandler(name: string, environment: ApiEnvironment): FunctionDescriptor | null {
+    return MTA_EVENT_SIGNATURES[environment][name] ?? null;
 }

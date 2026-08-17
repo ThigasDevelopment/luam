@@ -1,4 +1,5 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
+import type { Environment } from '@compiler/environment/environment';
 import type { ApiEnvironment } from '@mta-types/api-declaration';
 
 import type { Type } from './types';
@@ -41,6 +42,20 @@ export interface GlobalInfo {
     position: SourcePosition;
 }
 
+export interface EventParameterInfo {
+    name: string;
+    type: Type;
+    isVariadic: boolean;
+    position: SourcePosition;
+}
+
+export interface EventInfo {
+    name: string;
+    parameters: readonly EventParameterInfo[];
+    environment: Environment;
+    position: SourcePosition;
+}
+
 export class DeclarationRegistry {
     private readonly classes = new Map<string, ClassInfo>();
 
@@ -50,12 +65,26 @@ export class DeclarationRegistry {
 
     private readonly globals = new Map<string, GlobalInfo>();
 
+    private readonly events = new Map<string, EventInfo>();
+
     declareGlobal(info: GlobalInfo): void {
         this.globals.set(info.name, info);
     }
 
     allGlobals(): GlobalInfo[] {
         return [...this.globals.values()];
+    }
+
+    declareEvent(info: EventInfo): void {
+        this.events.set(info.name, info);
+    }
+
+    lookupEvent(name: string): EventInfo | null {
+        return this.events.get(name) ?? null;
+    }
+
+    allEvents(): EventInfo[] {
+        return [...this.events.values()];
     }
 
     declareClass(info: ClassInfo): void {

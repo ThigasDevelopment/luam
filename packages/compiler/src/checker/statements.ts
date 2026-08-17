@@ -15,6 +15,7 @@ import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration 
 import type { CheckContext } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor } from './control-flow';
 import { checkExpression, checkValueList } from './expressions';
+import { checkEventDeclaration } from './events';
 import { guardFacts } from './narrowing';
 import {
     ANY_TYPE,
@@ -326,6 +327,8 @@ function checkStatement(context: CheckContext, statement: Statement): void {
         }
         case 'declare-statement':
             return checkDeclareStatement(context, statement);
+        case 'event-declaration':
+            return checkEventDeclaration(context, statement);
         case 'class-declaration':
             return checkClassDeclaration(context, statement);
         case 'interface-declaration':

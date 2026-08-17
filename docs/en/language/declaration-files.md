@@ -24,6 +24,19 @@ declare legacyVersion: string
 Where a declaration and real source name the same global, the declaration wins
 and the source is checked against it.
 
+## `declare event`
+
+`declare event 'name'(...)` gives a custom MTA event a typed contract, and every
+handler and trigger of that name is checked against it:
+
+```luam
+declare event 'onMatchStart'(player: Player, round: number, ...tags: string)
+```
+
+Unlike `declare NAME: Type`, it is valid in ordinary source too, because it emits
+nothing either way. A `.d.luam` file is still the natural home for the contracts
+of a resource. See [APIs and events](/en/mta/apis-and-events).
+
 ## Declarations only
 
 A declaration file holds declarations. A call, an assignment, or a loop is

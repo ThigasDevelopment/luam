@@ -25,6 +25,7 @@ const ITEM_KINDS: Readonly<Record<SymbolKind, CompletionItemKind>> = {
     field: CompletionItemKind.Field,
     method: CompletionItemKind.Method,
     'enum-member': CompletionItemKind.EnumMember,
+    event: CompletionItemKind.Event,
 };
 
 const CONTEXTUAL_KEYWORDS: ReadonlySet<string> = new Set(['constructor', 'export', 'extends', 'implements']);

@@ -120,30 +120,6 @@ export function parseVariables(file: UpstreamFile, context: MapContext): ParsedD
     return declarations;
 }
 
-export function parseEvents(file: UpstreamFile): string[] {
-    const events: string[] = [];
-
-    for (const statement of sourceFileOf(file).statements) {
-        if (!ts.isEnumDeclaration(statement)) {
-            continue;
-        }
-
-        for (const member of statement.members) {
-            if (member.initializer === undefined || !ts.isStringLiteral(member.initializer)) {
-                throw new GeneratorError(file.path, 'an event member carries no string value');
-            }
-
-            events.push(member.initializer.text);
-        }
-    }
-
-    if (events.length === 0) {
-        throw new GeneratorError(file.path, 'the event catalog declares no events');
-    }
-
-    return events;
-}
-
 export function parseClasses(file: UpstreamFile): ParsedClass[] {
     const classes: ParsedClass[] = [];
 

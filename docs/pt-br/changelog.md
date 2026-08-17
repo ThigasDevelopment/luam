@@ -11,6 +11,17 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 
 ### Alterado
 
+- [APIs e eventos](/pt-br/mta/apis-and-events) documenta handlers de evento
+  tipados, a verificação do payload em cada trigger e o contrato `declare event`
+  para eventos personalizados, com os diagnósticos de cada erro.
+- [Arquivos de declaração](/pt-br/language/declaration-files) cobre
+  `declare event`, e [Palavras-chave](/pt-br/reference/keywords) registra `event`
+  como o segundo termo contextual ao lado de `fun`.
+- [Servidor de linguagem](/pt-br/tooling/language-server) e
+  [Editores](/pt-br/tooling/editors) descrevem completação, hover e ajuda de
+  assinatura para nomes de evento.
+- [Diagnósticos](/pt-br/reference/diagnostics) lista os códigos de contrato de
+  evento.
 - [Servidor de linguagem](/pt-br/tooling/language-server) usa os tipos esperados
   de callbacks para completar parâmetros e membros, hover, navegação e ajuda de
   assinatura, inclusive em callbacks MTA específicos de cada ambiente.

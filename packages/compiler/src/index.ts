@@ -3,6 +3,7 @@ import type { SourceDirectives } from '@compiler/checker/build-directives';
 import { check } from '@compiler/checker/checker';
 import { resolveStrictMode, type StrictMode } from '@compiler/checker/directives';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
+import type { EventInfo } from '@compiler/checker/registry';
 import { hasErrors, sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import { emit } from '@compiler/emitter/emitter';
@@ -14,6 +15,8 @@ import { isDeclarationPath } from '@compiler/project/source-kind';
 import { expandHelpers, helperForGlobal } from '@runtime/helpers';
 
 import type { Statement } from '@compiler/parser/ast';
+
+export type { EventInfo, EventParameterInfo } from '@compiler/checker/registry';
 
 export interface CompileOptions {
     filePath?: string;
@@ -36,6 +39,7 @@ export interface CompileResult {
     directives: SourceDirectives;
     lines: SourceLineMapping[];
     topLevelReturn: SourcePosition | null;
+    events: readonly EventInfo[];
 }
 
 function findTopLevelReturn(statements: readonly Statement[]): SourcePosition | null {
@@ -96,6 +100,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         externalReferences: checked.externalReferences,
         directives: checked.directives,
         topLevelReturn: findTopLevelReturn(parsed.program.body),
+        events: checked.events,
     };
 
     if (hasErrors(diagnostics) || options.emitCode === false || isDeclarationFile) {

@@ -1,0 +1,225 @@
+import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+
+import type { FunctionDescriptor } from '@mta-types/type-descriptor';
+
+export const MTA_EVENT_SIGNATURES_SERVER_4: Readonly<Record<string, FunctionDescriptor>> = {
+    onPlayerScreenShot: fn(
+        [
+            named('Resource'),
+            STRING,
+            STRING,
+            NUMBER,
+            STRING,
+        ],
+        VOID,
+        5,
+        false,
+        [
+            'theResource',
+            'status',
+            'imageData',
+            'timestamp',
+            'tag',
+        ],
+    ),
+    onPlayerSpawn: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            named('Team'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        8,
+        false,
+        [
+            'posX',
+            'posY',
+            'posZ',
+            'spawnRotation',
+            'theTeam',
+            'theSkin',
+            'theInterior',
+            'theDimension',
+        ],
+    ),
+    onPlayerStealthKill: fn(
+        [
+            named('Element'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'targetPlayer',
+        ],
+    ),
+    onPlayerTarget: fn(
+        [
+            named('Element'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'targettedElement',
+        ],
+    ),
+    onPlayerUnmute: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPlayerVehicleEnter: fn(
+        [
+            named('Vehicle'),
+            NUMBER,
+            named('Ped'),
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'theVehicle',
+            'seat',
+            'jacked',
+        ],
+    ),
+    onPlayerVehicleExit: fn(
+        [
+            named('Vehicle'),
+            NUMBER,
+            named('Ped'),
+            BOOLEAN,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'theVehicle',
+            'seat',
+            'jacker',
+            'forcedByScript',
+        ],
+    ),
+    onPlayerVoiceStart: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPlayerVoiceStop: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPlayerWasted: fn(
+        [
+            NUMBER,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            BOOLEAN,
+        ],
+        VOID,
+        5,
+        false,
+        [
+            'totalAmmo',
+            'killer',
+            'killerWeapon',
+            'bodypart',
+            'stealth',
+        ],
+    ),
+    onPlayerWeaponFire: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        8,
+        false,
+        [
+            'weapon',
+            'endX',
+            'endY',
+            'endZ',
+            'hitElement',
+            'startX',
+            'startY',
+            'startZ',
+        ],
+    ),
+    onPlayerWeaponSwitch: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'previousWeaponID',
+            'currentWeaponID',
+        ],
+    ),
+    onResourceLoadStateChange: fn(
+        [
+            named('Resource'),
+            STRING,
+            STRING,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'changedResource',
+            'oldState',
+            'newState',
+        ],
+    ),
+    onResourcePreStart: fn(
+        [
+            named('Resource'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'startingResource',
+        ],
+    ),
+    onResourceStart: fn(
+        [
+            named('Resource'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'startedResource',
+        ],
+    ),
+};

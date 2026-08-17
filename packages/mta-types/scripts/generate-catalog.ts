@@ -6,7 +6,7 @@ import { generate } from './catalog-generator.ts';
 import { upstreamVersion, UPSTREAM_PACKAGE } from './upstream-source.ts';
 
 const packageRoot = fileURLToPath(new URL('..', import.meta.url));
-const generatedDirs = ['src/generated', 'src/generated/api', 'src/generated/docs', 'src/generated/oop'];
+const generatedDirs = ['src/generated', 'src/generated/api', 'src/generated/docs', 'src/generated/events', 'src/generated/oop'];
 
 const result = generate();
 const oop = result.oop;

@@ -14,7 +14,8 @@ uses, so the editor and the build never disagree about a file.
 | Directives | After `#!`, completes the environment and strictness directives, each with what it does. |
 | Class headers | After `class Name `, completes `extends` and `implements`, then the declared classes or interfaces that can follow. |
 | Argument ranking | Inside a call, candidates matching the expected parameter type sort first, then functions returning it. |
-| Hover | Declared or inferred type, function signature, and the environment of an MTA API. |
+| Events | Inside the quotes, completes the events reachable from the call; the handler and the payload of a known event carry its typed parameters. |
+| Hover | Declared or inferred type, function signature, the environment of an MTA API, and the contract of an event. |
 | Navigation | Go to definition, find references, and rename — across files for globals. |
 
 Completion is scoped exactly like the checker: `dxDrawText` never appears in a

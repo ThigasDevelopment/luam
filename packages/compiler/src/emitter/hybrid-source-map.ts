@@ -29,6 +29,7 @@ function collectAnchors(statements: readonly Statement[], symbol: string | undef
             lowered.has(statement) ||
             statement.kind === 'type-alias-statement' ||
             statement.kind === 'declare-statement' ||
+            statement.kind === 'event-declaration' ||
             statement.kind === 'interface-declaration'
         ) {
             continue;

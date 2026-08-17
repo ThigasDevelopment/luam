@@ -90,6 +90,7 @@ function canPreserveStatement(statement: Statement, types: Map<Expression, Type>
             return statement.iterators.every((iterator) => canPreserveExpression(iterator, types)) && canPreserveStatements(statement.body, types);
         case 'type-alias-statement':
         case 'declare-statement':
+        case 'event-declaration':
         case 'interface-declaration':
             return true;
         default:

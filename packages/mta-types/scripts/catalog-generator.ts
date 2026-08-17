@@ -3,14 +3,16 @@ import { CALLBACK_TYPE_GAPS, CATALOG_OVERRIDES, ELEMENT_TYPE_ALIASES } from '#mt
 import { emitCatalog } from './catalog-emitter.ts';
 import { emitElementTypes, emitEvents, resolveElementTypes } from './catalog-data-emitter.ts';
 import { normalize, type NormalizedCatalog } from './catalog-normalizer.ts';
-import { parseClasses, parseEvents, parseFunctions, parseTypeAliases, parseVariables } from './declaration-parser.ts';
+import { parseClasses, parseFunctions, parseTypeAliases, parseVariables } from './declaration-parser.ts';
 import { emitDocumentation } from './documentation-emitter.ts';
+import { parseEvents } from './event-parser.ts';
+import { emitEventSignatures } from './event-signature-emitter.ts';
 import { GeneratorError, type CatalogEntry, type GeneratedFile, type ParsedDeclaration } from './generator-model.ts';
 import { emitOopSurface } from './oop-emitter.ts';
 import { parseOopClasses } from './oop-parser.ts';
 import { buildOopSurface, type OopSurfaceResult } from './oop-surface-builder.ts';
 import type { MapContext } from './type-mapper.ts';
-import { classFiles, eventFile, functionFiles, typeFiles, variableFile } from './upstream-source.ts';
+import { classFiles, eventFiles, functionFiles, typeFiles, variableFile } from './upstream-source.ts';
 
 const MINIMUM_DECLARATIONS = 800;
 
@@ -115,8 +117,8 @@ export function generate(): GenerationResult {
 
     const catalog = normalize(server, client);
     auditCallbacks(server, client, catalog);
-    const serverEvents = parseEvents(eventFile('server'));
-    const clientEvents = parseEvents(eventFile('client'));
+    const serverEvents = parseEvents(eventFiles('server'), serverContext);
+    const clientEvents = parseEvents(eventFiles('client'), clientContext);
     const oop = buildOopSurface(
         [
             ...serverClasses.flatMap((file) => parseOopClasses(file, serverContext, 'server')),
@@ -137,7 +139,8 @@ export function generate(): GenerationResult {
         ...emitCatalog('client', sortedEntries([...catalog.client, ...catalog.clientVariants])),
         ...emitDocumentation(documented),
         ...emitOopSurface(oop.classes),
-        emitEvents(serverEvents, clientEvents),
+        emitEvents(serverEvents.map((event) => event.name), clientEvents.map((event) => event.name)),
+        ...emitEventSignatures(serverEvents, clientEvents),
         emitElementTypes(elementTypes),
     ];
 

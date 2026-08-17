@@ -74,6 +74,20 @@ inherited types inside the body. MTA callback variants follow the current file's
 environment, so `addCommandHandler` offers `player, commandName, ...` on the
 server and `commandName, ...` on the client.
 
+## Events
+
+An event name is resolved from the string literal in the call, so the handler of
+`addEventHandler('onPlayerQuit', root, function (` completes as
+`quitType: string, reason: string, responsibleElement: Element`, and signature
+help names the payload arguments of `triggerEvent` and its client and server
+variants. Hovering the name shows the contract and where it comes from.
+
+Inside the quotes, completion lists the events reachable from that call: the
+contracts declared with [`declare event`](/en/mta/apis-and-events) first, with
+their parameters, then the names created with `addEvent`, then the catalog. A
+cross-environment trigger lists the events of the side it targets, so
+`triggerClientEvent(root, '` offers client events from a server file.
+
 ## Environments
 
 Every document resolves its environment (`server`, `client` or `shared`) from its

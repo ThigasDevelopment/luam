@@ -24,6 +24,20 @@ arquivo `.d.luam`; usá-lo em código comum é
 Onde uma declaração e o código real nomeiam o mesmo global, a declaração vence e o
 código é verificado contra ela.
 
+## `declare event`
+
+`declare event 'nome'(...)` dá um contrato tipado a um evento personalizado do
+MTA, e todo handler e todo trigger desse nome é verificado contra ele:
+
+```luam
+declare event 'onMatchStart'(player: Player, round: number, ...tags: string)
+```
+
+Diferente de `declare NOME: Tipo`, ele também é válido em código comum, porque
+não emite nada de qualquer forma. Um arquivo `.d.luam` continua sendo a casa
+natural dos contratos de um resource. Veja
+[APIs e eventos](/pt-br/mta/apis-and-events).
+
 ## Somente declarações
 
 Um arquivo de declaração contém declarações. Uma chamada, uma atribuição ou um

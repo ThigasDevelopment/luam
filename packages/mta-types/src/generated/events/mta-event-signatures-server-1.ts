@@ -1,0 +1,231 @@
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+
+import type { FunctionDescriptor } from '@mta-types/type-descriptor';
+
+export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDescriptor>> = {
+    onAccountDataChange: fn(
+        [
+            named('Account'),
+            STRING,
+            STRING,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'theAccount',
+            'theKey',
+            'theValue',
+        ],
+    ),
+    onBan: fn(
+        [
+            named('Ban'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'theBan',
+        ],
+    ),
+    onChatMessage: fn(
+        [
+            STRING,
+            ANY,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theMessage',
+            'theElement',
+        ],
+    ),
+    onColShapeHit: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'hitElement',
+            'matchingDimension',
+        ],
+    ),
+    onColShapeLeave: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'leaveElement',
+            'matchingDimension',
+        ],
+    ),
+    onConsole: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'theMessage',
+        ],
+    ),
+    onDebugMessage: fn(
+        [
+            STRING,
+            NUMBER,
+            STRING,
+            NUMBER,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'message',
+            'level',
+            'file',
+            'line',
+        ],
+    ),
+    onElementClicked: fn(
+        [
+            STRING,
+            STRING,
+            named('Player'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        6,
+        false,
+        [
+            'mouseButton',
+            'buttonState',
+            'playerWhoClicked',
+            'clickPosX',
+            'clickPosY',
+            'clickPosZ',
+        ],
+    ),
+    onElementColShapeHit: fn(
+        [
+            named('ColShape'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theColShape',
+            'matchingDimension',
+        ],
+    ),
+    onElementColShapeLeave: fn(
+        [
+            named('ColShape'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theColShape',
+            'matchingDimension',
+        ],
+    ),
+    onElementDataChange: fn(
+        [
+            STRING,
+            ANY,
+            ANY,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'theKey',
+            'oldValue',
+            'newValue',
+        ],
+    ),
+    onElementDestroy: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onElementDimensionChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldDimension',
+            'newDimension',
+        ],
+    ),
+    onElementInteriorChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldInterior',
+            'newInterior',
+        ],
+    ),
+    onElementModelChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldModel',
+            'newModel',
+        ],
+    ),
+    onElementStartSync: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'newSyncer',
+        ],
+    ),
+    onElementStopSync: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'oldSyncer',
+        ],
+    ),
+};

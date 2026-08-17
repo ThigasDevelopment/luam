@@ -74,9 +74,9 @@ function ambientKeys(collected: readonly DeclarationEntry[], project: ProjectDec
 }
 
 function declaresNothing(declarations: AmbientDeclarations): boolean {
-    const { classes, interfaces, enums, globals } = declarations;
+    const { classes, interfaces, enums, globals, events } = declarations;
 
-    return classes.length === 0 && interfaces.length === 0 && enums.length === 0 && globals.length === 0;
+    return classes.length === 0 && interfaces.length === 0 && enums.length === 0 && globals.length === 0 && events.length === 0;
 }
 
 function createAmbientResolver(collected: readonly DeclarationEntry[]): AmbientResolver {
@@ -122,6 +122,7 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
         diagnostics: result.diagnostics,
         lines: result.lines,
         topLevelReturn: result.topLevelReturn,
+        events: result.events,
     };
 }
 
@@ -225,6 +226,7 @@ export function createProjectCache(): ProjectCache {
                 diagnostics,
                 hasErrors: diagnostics.some((entry) => entry.diagnostic.severity === 'error'),
                 stats: { files: files.length, declarationsReused: declarationsReused.count, modulesReused: modulesReused.count },
+                events: collected.flatMap((entry) => entry.declarations.events),
             };
         },
         clear: (): void => {

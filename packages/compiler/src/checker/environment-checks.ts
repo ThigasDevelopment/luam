@@ -55,9 +55,10 @@ export function checkEventUsage(context: CheckContext, expression: CallExpressio
     }
 
     const name = eventName(expression);
+    const custom = name === null ? null : context.declarations.lookupEvent(name);
     const declared = name === null ? null : eventEnvironment(name);
 
-    if (name === null || declared === null || declared === context.environment) {
+    if (name === null || custom?.environment === 'shared' || custom?.environment === context.environment || declared === null || declared === context.environment) {
         return;
     }
 

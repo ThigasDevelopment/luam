@@ -1,0 +1,232 @@
+import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, VOID } from '@mta-types/type-descriptor';
+
+import type { FunctionDescriptor } from '@mta-types/type-descriptor';
+
+export const MTA_EVENT_SIGNATURES_SERVER_2: Readonly<Record<string, FunctionDescriptor>> = {
+    onMarkerHit: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'hitElement',
+            'matchingDimension',
+        ],
+    ),
+    onMarkerLeave: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'leftElement',
+            'matchingDimension',
+        ],
+    ),
+    onPedDamage: fn(
+        [
+            NUMBER,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'loss',
+        ],
+    ),
+    onPedVehicleEnter: fn(
+        [
+            named('Vehicle'),
+            NUMBER,
+            named('Ped'),
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'theVehicle',
+            'seat',
+            'jacked',
+        ],
+    ),
+    onPedVehicleExit: fn(
+        [
+            named('Vehicle'),
+            NUMBER,
+            named('Ped'),
+            BOOLEAN,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'theVehicle',
+            'seat',
+            'jacker',
+            'forcedByScript',
+        ],
+    ),
+    onPedWasted: fn(
+        [
+            NUMBER,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            BOOLEAN,
+        ],
+        VOID,
+        5,
+        false,
+        [
+            'totalAmmo',
+            'killer',
+            'killerWeapon',
+            'bodypart',
+            'stealth',
+        ],
+    ),
+    onPedWeaponSwitch: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'previousWeaponID',
+            'currentWeaponID',
+        ],
+    ),
+    onPickupHit: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'thePlayer',
+        ],
+    ),
+    onPickupLeave: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'thePlayer',
+        ],
+    ),
+    onPickupSpawn: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPickupUse: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'playerWhoUsed',
+        ],
+    ),
+    onPlayerACInfo: fn(
+        [
+            TABLE,
+            NUMBER,
+            STRING,
+            STRING,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'detectedACList',
+            'd3d9Size',
+            'd3d9MD5',
+            'd3d9SHA256',
+        ],
+    ),
+    onPlayerBan: fn(
+        [
+            named('Ban'),
+            named('Player'),
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'banPointer',
+            'responsibleElement',
+        ],
+    ),
+    onPlayerChangeNick: fn(
+        [
+            STRING,
+            STRING,
+            BOOLEAN,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'oldNick',
+            'newNick',
+            'changedByUser',
+        ],
+    ),
+    onPlayerChat: fn(
+        [
+            STRING,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'message',
+            'messageType',
+        ],
+    ),
+    onPlayerClick: fn(
+        [
+            STRING,
+            STRING,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        8,
+        false,
+        [
+            'mouseButton',
+            'buttonState',
+            'clickedElement',
+            'worldPosX',
+            'worldPosY',
+            'worldPosZ',
+            'screenPosX',
+            'screenPosY',
+        ],
+    ),
+};
