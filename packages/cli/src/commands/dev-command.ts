@@ -7,7 +7,7 @@ import { parseMtaLogLine } from '@cli/logging/mta-log-parser';
 import { resolveServerLogPath, followServerLog } from '@cli/logging/server-log-follower';
 import { reportDevelopmentLog } from '@cli/reporting/development-log-reporter';
 import { startMtaServer } from '@cli/server/mta-server-supervisor';
-import { createServerConsoleTransport } from '@cli/server/server-console-transport';
+import { createServerConsole } from '@cli/server/server-console';
 import type { ResourceMap } from '@compiler/project/resource';
 
 import type { ProcessService } from '@cli/server/process-service';
@@ -77,7 +77,7 @@ export async function runDevCommand(context: CommandContext, options: DevOptions
 
         const ensure = runEnsureCommand(context, {
             ...options,
-            transport: supervisor === null ? options.transport : createServerConsoleTransport(supervisor),
+            serverConsole: supervisor === null ? null : createServerConsole(supervisor),
             signal: options.startServer === true ? controller.signal : options.signal,
             commandName: 'dev',
             developmentLogs: context.config.development.logs,

@@ -153,7 +153,7 @@ configuration. Progress goes to stderr and the report to stdout.
 
 > [CLI commands](https://thigasdevelopment.github.io/luam/en/tooling/cli)
 > · [Comandos da CLI](https://thigasdevelopment.github.io/luam/pt-br/tooling/cli)
-> — every option, the `ensure` transport, and exit-code details.
+> — every option and exit-code details.
 
 ---
 
@@ -234,7 +234,7 @@ serverPath = 'C:/MTA Server'
 
 Optional fields cover `meta.xml` info, `compilerOptions`, `sources`, `assets`,
 `dependencies`, `engine.minVersion`, `environment`, `outDir`, `loadOrder`,
-`output`, `helpers`, `resourcesDir`, `transport`, `development.logs` and
+`output`, `helpers`, `resourcesDir`, `development.logs` and
 `development.server.executable`.
 
 > [.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)

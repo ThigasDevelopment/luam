@@ -15,8 +15,6 @@ import {
 
 export const HELPER_NAMES: readonly string[] = Object.keys(RUNTIME_HELPERS).sort();
 
-export const TRANSPORT_KINDS: readonly string[] = ['none', 'http'];
-
 export const MANIFEST_MODES: readonly string[] = ['development', 'production'];
 
 const OPTIONAL_STRING = createOptional(STRING_TYPE);
@@ -24,8 +22,6 @@ const OPTIONAL_STRING = createOptional(STRING_TYPE);
 const STRING_LIST = createArray(STRING_TYPE);
 
 const HELPER_LIST = createArray(createUnion(HELPER_NAMES.map((name) => createStringLiteral(name))));
-
-const TRANSPORT_KIND = createUnion(TRANSPORT_KINDS.map((kind) => createStringLiteral(kind)));
 
 const COMPILER_OPTION_FIELDS: readonly ManifestField[] = [
     field('strict', BOOLEAN_TYPE, 'Checks the project under the strict rules unless a file directive says otherwise.', {
@@ -81,23 +77,6 @@ const OUTPUT_FIELDS: readonly ManifestField[] = [
     field('bundle', BOOLEAN_TYPE, 'Writes one Lua file per side instead of mirroring the source tree.', { defaultValue: DEFAULT_OUTPUT.bundle, owner: 'output' }),
     field('map', BOOLEAN_TYPE, 'Writes a resource map that traces generated lines back to their source.', { defaultValue: DEFAULT_OUTPUT.map, owner: 'output' }),
     field('minify', BOOLEAN_TYPE, 'Shrinks the generated Lua before it is written.', { defaultValue: DEFAULT_OUTPUT.minify, owner: 'output' }),
-];
-
-const TRANSPORT_FIELDS: readonly ManifestField[] = [
-    field('kind', TRANSPORT_KIND, 'Selects how "luam ensure" reaches the running server.', {
-        required: true,
-        values: TRANSPORT_KINDS,
-        valueCode: 'config-invalid-transport',
-        owner: 'deployment',
-    }),
-    field('host', STRING_TYPE, 'Host the MTA HTTP interface listens on.', { defaultValue: '127.0.0.1', owner: 'deployment' }),
-    field('port', NUMBER_TYPE, 'Port the MTA HTTP interface listens on.', { defaultValue: 22005, rule: 'positive-integer', owner: 'deployment' }),
-    field('resource', STRING_TYPE, 'Resource that exposes the refresh and restart functions.', { owner: 'deployment' }),
-    field('username', STRING_TYPE, 'Account used to call the MTA HTTP interface.', { owner: 'deployment' }),
-    field('password', STRING_TYPE, 'Password stored in plain text. Prefer "passwordEnv".', { owner: 'deployment' }),
-    field('passwordEnv', STRING_TYPE, 'Environment variable holding the password.', { owner: 'deployment' }),
-    field('refreshFunction', STRING_TYPE, 'Exported function that refreshes the resource list.', { defaultValue: 'refreshResources', owner: 'deployment' }),
-    field('restartFunction', STRING_TYPE, 'Exported function that restarts a resource.', { defaultValue: 'restartResource', owner: 'deployment' }),
 ];
 
 const LOG_FIELDS: readonly ManifestField[] = [
@@ -164,7 +143,6 @@ export const MANIFEST_FIELDS: readonly ManifestField[] = [
         owner: 'deployment',
     }),
     table('output', 'Switches for the generated output.', OUTPUT_FIELDS, { defaultValue: {}, owner: 'output' }),
-    table('transport', 'How "luam ensure" reaches the running server.', TRANSPORT_FIELDS, { owner: 'deployment' }),
     table('development', 'Behaviour that only applies while developing.', DEVELOPMENT_FIELDS, { defaultValue: {}, owner: 'development' }),
 ];
 
@@ -177,6 +155,7 @@ export const REMOVED_FIELDS: Readonly<Record<string, string>> = {
     sourceDirs: 'Replace it with "sources = { server = { ... }, client = { ... }, shared = { ... } }", listing paths or patterns per side.',
     assetDirs: 'Replace it with "assets = { { from = \'assets/**/*\', to = \'assets\' } }", naming a destination for each entry.',
     mta: 'Replace it with "engine = { minVersion = \'1.6.0\' }".',
+    transport: 'Remove it. "luam ensure" only syncs files, and "luam dev --start-server" restarts the server it owns.',
 };
 
 export function findManifestField(path: readonly string[]): ManifestField | null {

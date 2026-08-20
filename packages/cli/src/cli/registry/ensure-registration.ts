@@ -1,4 +1,4 @@
-import { createProjectContext, runtimeTransport } from '@cli/cli/cli-runtime';
+import { createProjectContext } from '@cli/cli/cli-runtime';
 import { addLayoutOptions, addProjectOptions, addWatchOptions, noMapOption, offlineOption } from '@cli/cli/shared-options';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 
@@ -28,7 +28,6 @@ export function registerEnsureCommand(program: Command, runtime: CliRuntime): vo
         }
 
         runtime.exitCode = await runEnsureCommand(project.context, {
-            transport: runtimeTransport(runtime, project.context.config),
             watch: options.watch ?? true,
             signal: runtime.overrides.signal ?? null,
             layout: options.bundle === true ? 'bundle' : 'tree',

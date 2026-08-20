@@ -142,20 +142,11 @@ development = {
         rateWindowMs = 1000,
     },
 }
-
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
 ```
 
 | Field | Default | Meaning |
 | ----- | ------- | ------- |
-| `name` | required | Resource name. Names the output folder and the resource `ensure` restarts. It never reaches `meta.xml` — MTA reads the name from the folder. |
+| `name` | required | Resource name. Names the output folder and the resource `ensure` syncs. It never reaches `meta.xml` — MTA reads the name from the folder. |
 | `author`, `version`, `description` | unset | Optional `meta.xml` info attributes. |
 | `compilerOptions` | see below | How the checker reads the project: `strict`, `oop`, `noUnusedLocals`, `noUnusedParameters`, `warningsAsErrors`. |
 | `sources` | `src/<side>/**/*.luam` | Patterns per side. The matched side is the file's environment unless a directive overrides it. |
@@ -171,7 +162,6 @@ transport = {
 | `helpers` | `{ }` | Runtime helpers to copy even when no language feature requires them. |
 | `serverPath` | unset | MTA server root. `ensure` syncs the resource there. |
 | `resourcesDir` | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
-| `transport` | absent | How `ensure` restarts the resource. Omitting the table means `kind = 'none'`; writing it without `kind` is `config-missing-field`. |
 | `development.logs` | disabled, safe limits | Development log capture and client relay limits. `dev` enables capture even when this section is omitted. |
 | `development.server.executable` | unset | Executable relative to `serverPath`; default probing uses `MTA Server.exe` on Windows and `mta-server64`, then `mta-server`, on Linux. |
 
@@ -206,34 +196,6 @@ helper is harmless and listing an unknown name is an error.
 bundle output includes them in environment bundles. A server-only helper is
 never downloaded by a client. A `.luam.manifest` that still names `helperDir` fails with
 `config-unknown-field`; delete the line.
-
-## Transport
-
-`ensure` restarts the resource through a transport. `none` skips the restart and
-only syncs files. `http` calls the MTA HTTP interface:
-
-```
-POST http://<host>:<port>/<resource>/call/<function>
-```
-
-The call carries HTTP basic authentication and a JSON array of arguments.
-`refreshFunction` (default `refreshResources`) is called first, then
-`restartFunction` (default `restartResource`) with the resource name. Both must
-be exported by the `resource` named in the configuration.
-
-Prefer `passwordEnv`, which names an environment variable, over `password`. A
-plaintext `password` is accepted but reports a warning, and no diagnostic or log
-line ever prints the password.
-
-`resource`, `refreshFunction`, `restartFunction`, and `host` become part of that
-URL, so they are validated before any request is sent. A value containing `/`,
-`?`, `#`, or `..` is `config-invalid-url-segment` and the configuration fails to
-load.
-
-MTA's HTTP interface offers no TLS, so basic authentication travels in the
-clear. A `host` that is not a loopback address reports
-`config-remote-plaintext-transport`, a warning. Tunnel the port over SSH and
-point `host` at `127.0.0.1` instead of exposing the interface.
 
 ## Build Output
 
@@ -361,39 +323,29 @@ same global, the declaration wins and the source is checked against it.
 ## The `ensure` Development Loop
 
 `ensure` is the loop you leave running while you work. One command builds the
-resource directly into the MTA server, restarts it, and then repeats that on
-every save. It never writes to `<outDir>/<name>`.
+resource directly into the MTA server and then repeats that on every save. It
+never writes to `<outDir>/<name>`.
 
 ### Setting it up
 
 ```luam
 name = 'gamemode-race'
 serverPath = 'C:/MTA Server'
-
-transport = {
-    kind = 'http',
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
 ```
 
 ```
-set LUAM_MTA_PASSWORD=...
 luam ensure
 ```
 
-`serverPath` is required by `ensure`. The transport remains optional:
+`serverPath` is required by `ensure`:
 
 | Configured | What `ensure` does |
 | --- | --- |
 | No `serverPath` | Reports a diagnostic without building or watching. |
-| `serverPath` only | Writes the resource into the server. Restart it yourself. |
-| `serverPath` and transport | Also calls `refreshResources` and `restartResource` over the transport. |
+| `serverPath` | Writes the resource into the server. Restart it yourself. |
 
-The MTA side needs a resource — `luam-sync` above — that exports the two
-functions and grants HTTP access to the configured user. Any resource works as
-long as `resource`, `username`, and the password match the server's ACL.
+`luam dev --start-server` is the form that also restarts: it owns the MTA
+process and writes `refresh`, `stop <name>`, and `start <name>` to its console.
 
 ### What happens on each save
 
@@ -403,7 +355,8 @@ long as `resource`, `username`, and the password match the server's ACL.
    previous resource stays on the server.
 3. Write `<serverPath>/<resourcesDir>/<name>`, skipping identical files and
    deleting generated files the project no longer produces.
-4. Restart the resource, but only if the sync actually changed a file.
+4. Restart the resource — only under `dev --start-server`, and only if the sync
+   actually changed a file.
 
 `ensure` never creates, updates, prunes, or deletes `<outDir>/<name>`. Use
 `luam build` when you need a local generated resource.
@@ -422,8 +375,6 @@ Manifest: done in 0 ms.
 Build passed: 42 files, 41 reused, 0 errors, 0 warnings in 3 ms.
 Sync: 18 files in 1 ms.
 Synced 1 file to "C:/MTA Server/mods/deathmatch/resources/gamemode-race" (0 removed).
-Restart: done in 24 ms.
-Restarted "gamemode-race" through the "http" transport.
 ```
 
 `reused` is the incremental cache at work: 41 of 42 files came back from cache
@@ -467,8 +418,8 @@ exactly once, which is what you want from a script or an editor task.
 `luam server` starts the configured installation in the foreground and attaches
 the terminal. `luam dev --start-server` waits for the server startup marker in
 `server.log`, then uses the owned console to run `refresh`, `stop <resource>`, and
-`start <resource>` after a changed sync. This path needs no HTTP transport.
-`Ctrl+C` sends the MTA `shutdown` command and uses a bounded kill fallback; the
+`start <resource>` after a changed sync. It is the only path that restarts a
+resource for you. `Ctrl+C` sends the MTA `shutdown` command and uses a bounded kill fallback; the
 CLI never stops a process it did not start.
 
 `luam dev` requires `serverPath` and reuses the complete `ensure` workflow. It

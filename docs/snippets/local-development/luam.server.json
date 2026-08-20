@@ -2,14 +2,6 @@
     "name": "luam-docs-local-development",
     "serverPath": "C:/MTA Server",
     "resourcesDir": "mods/deathmatch/resources",
-    "transport": {
-        "kind": "http",
-        "host": "127.0.0.1",
-        "port": 22005,
-        "resource": "luam-sync",
-        "username": "luam",
-        "passwordEnv": "LUAM_MTA_PASSWORD"
-    },
     "development": {
         "logs": {
             "enabled": true,

@@ -3,13 +3,13 @@ import { createEnsureRunner, type EnsureRunner } from '@cli/commands/ensure-runn
 import type { DevelopmentLogsConfig } from '@cli/config/config-schema';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
-import type { MtaTransport } from '@cli/transport/transport';
+import type { ServerConsole } from '@cli/server/server-console';
 import { watchedRoots, watchSources } from '@cli/watch/source-watcher';
 import type { BuildOutcome } from '@cli/build/build-runner';
 import type { OutputLayout } from '@compiler/project/resource';
 
 export interface EnsureOptions {
-    transport: MtaTransport;
+    serverConsole?: ServerConsole | null;
     watch: boolean;
     signal: AbortSignal | null;
     developmentLogs?: DevelopmentLogsConfig | null;
@@ -86,7 +86,8 @@ export async function runEnsureCommand(context: CommandContext, options: EnsureO
         return EXIT_DIAGNOSTICS;
     }
 
-    const runner = createEnsureRunner(context, options.transport, {
+    const runner = createEnsureRunner(context, {
+        serverConsole: options.serverConsole ?? null,
         developmentLogs: options.developmentLogs ?? null,
         layout: options.layout ?? 'tree',
         map: options.map ?? context.config.output.map,

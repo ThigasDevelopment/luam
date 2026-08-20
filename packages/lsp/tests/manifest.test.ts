@@ -81,7 +81,7 @@ describe('manifest completion', () => {
 
         expect(found).toContain('outDir');
         expect(found).toContain('sources');
-        expect(found).toContain('transport');
+        expect(found).toContain('development');
     });
 
     it('leaves out a field that is already assigned', () => {
@@ -91,25 +91,24 @@ describe('manifest completion', () => {
     });
 
     it('offers the members of a nested table', () => {
-        const manifest = openManifest("name = 'demo'\ntransport = {\n    \n}\n");
-        const found = labels(manifest, 'transport = {\n    ');
+        const manifest = openManifest("name = 'demo'\ndevelopment = {\n    \n}\n");
+        const found = labels(manifest, 'development = {\n    ');
 
-        expect(found).toContain('kind');
-        expect(found).toContain('host');
-        expect(found).toContain('passwordEnv');
+        expect(found).toContain('logs');
+        expect(found).toContain('server');
         expect(found).not.toContain('outDir');
     });
 
     it('offers the closed set of a field value', () => {
-        const manifest = openManifest("name = 'demo'\ntransport = {\n    kind = \n}\n");
+        const manifest = openManifest("name = 'demo'\nhelpers = \n");
 
-        expect(labels(manifest, 'kind = ')).toContain("'http'");
+        expect(labels(manifest, 'helpers = ')).toContain("'class'");
     });
 
     it('offers the closed set inside an open string', () => {
-        const manifest = openManifest("name = 'demo'\ntransport = {\n    kind = ''\n}\n");
+        const manifest = openManifest("name = 'demo'\nhelpers = ''\n");
 
-        expect(labels(manifest, "kind = '")).toEqual(['none', 'http']);
+        expect(labels(manifest, "helpers = '")).toEqual(['async', 'class', 'env', 'math', 'string', 'table', 'threads']);
     });
 
     it('offers the build modes when comparing against mode', () => {
@@ -126,7 +125,7 @@ describe('manifest completion', () => {
     });
 
     it('offers the keys declared in the environment file', () => {
-        const manifest = openManifest("name = 'demo'\ntransport = {\n    password = env.\n}\n", { '.env': 'MTA_PASSWORD=secret\n' });
+        const manifest = openManifest("name = 'demo'\nserverPath = env.\n", { '.env': 'MTA_PASSWORD=secret\n' });
 
         expect(labels(manifest, 'env.')).toEqual(['MTA_PASSWORD']);
     });
@@ -154,13 +153,13 @@ describe('manifest hover', () => {
     });
 
     it('describes a nested field by its full path', () => {
-        const manifest = openManifest("name = 'demo'\ntransport = {\n    port = 22005,\n}\n");
+        const manifest = openManifest("name = 'demo'\ndevelopment = {\n    logs = { rateLimit = 30 },\n}\n");
 
-        expect(hoverText(manifest, '{\n', 'port')).toContain('transport.port: number');
+        expect(hoverText(manifest, '{ ', 'rateLimit')).toContain('development.logs.rateLimit: number');
     });
 
     it('describes an environment key as an optional string', () => {
-        const manifest = openManifest("name = 'demo'\ntransport = {\n    password = env.MTA_PASSWORD,\n}\n");
+        const manifest = openManifest("name = 'demo'\nserverPath = env.MTA_PASSWORD\n");
 
         expect(hoverText(manifest, 'env.', 'MTA_PASSWORD')).toContain('env.MTA_PASSWORD: string?');
     });

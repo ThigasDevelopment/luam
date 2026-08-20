@@ -8,7 +8,7 @@ import { resolveServerTarget } from '@cli/commands/resource-targets';
 import { pluralize } from '@cli/reporting/plural';
 import { createProgressRenderer, type ProgressRenderer } from '@cli/reporting/progress-renderer';
 import type { Reporter } from '@cli/reporting/reporter';
-import type { MtaTransport } from '@cli/transport/transport';
+import type { ServerConsole } from '@cli/server/server-console';
 import { createProjectCache, type ProjectCache } from '@compiler/project/project-cache';
 import type { OutputLayout } from '@compiler/project/resource';
 
@@ -25,6 +25,7 @@ export interface EnsureRunner {
 }
 
 export interface EnsureRunnerOptions {
+    serverConsole?: ServerConsole | null;
     developmentLogs?: CommandContext['config']['development']['logs'] | null;
     layout?: OutputLayout;
     map?: boolean;
@@ -41,12 +42,12 @@ function hasChanges(result: WriteResult): boolean {
     return result.written.length > 0 || result.removed.length > 0;
 }
 
-async function restartResource(scope: RunScope, transport: MtaTransport): Promise<boolean> {
+function restartResource(scope: RunScope, serverConsole: ServerConsole): boolean {
     const { reporter, tracker, renderer } = scope;
 
     tracker.begin('restart');
 
-    const refreshed = await transport.refresh();
+    const refreshed = serverConsole.refresh();
 
     if (!refreshed.ok) {
         tracker.end('failed');
@@ -56,7 +57,7 @@ async function restartResource(scope: RunScope, transport: MtaTransport): Promis
         return false;
     }
 
-    const restarted = await transport.restart(scope.context.config.name);
+    const restarted = serverConsole.restart(scope.context.config.name);
 
     tracker.end(restarted.ok ? 'done' : 'failed');
     renderer.clear();
@@ -67,7 +68,7 @@ async function restartResource(scope: RunScope, transport: MtaTransport): Promis
         return false;
     }
 
-    reporter.success(`Restarted "${scope.context.config.name}" through the "${transport.kind}" transport.`);
+    reporter.success(`Restarted "${scope.context.config.name}" through the owned server console.`);
 
     return true;
 }
@@ -76,7 +77,7 @@ function failed(outcome: BuildOutcome): EnsureResult {
     return { ok: false, outcome, sync: null, restarted: false };
 }
 
-async function runOnce(scope: RunScope, transport: MtaTransport, target: string, cache: ProjectCache, options: EnsureRunnerOptions): Promise<EnsureResult> {
+async function runOnce(scope: RunScope, target: string, cache: ProjectCache, options: EnsureRunnerOptions): Promise<EnsureResult> {
     const { context, reporter, renderer, tracker } = scope;
 
     tracker.begin('version');
@@ -116,14 +117,16 @@ async function runOnce(scope: RunScope, transport: MtaTransport, target: string,
     renderer.clear();
     reporter.info(`Synced ${pluralize(sync.written.length, 'file')} to "${target}" (${sync.removed.length} removed).`);
 
-    if (transport.kind === 'none' || !hasChanges(sync)) {
+    const serverConsole = options.serverConsole ?? null;
+
+    if (serverConsole === null || !hasChanges(sync)) {
         return { ok: true, outcome, sync, restarted: false };
     }
 
-    return { ok: true, outcome, sync, restarted: await restartResource(scope, transport) };
+    return { ok: true, outcome, sync, restarted: restartResource(scope, serverConsole) };
 }
 
-export function createEnsureRunner(context: CommandContext, transport: MtaTransport, options: EnsureRunnerOptions = {}): EnsureRunner {
+export function createEnsureRunner(context: CommandContext, options: EnsureRunnerOptions = {}): EnsureRunner {
     const target = resolveServerTarget(context.root, context.config);
 
     if (target === null) {
@@ -139,7 +142,7 @@ export function createEnsureRunner(context: CommandContext, transport: MtaTransp
             const renderer = createProgressRenderer(reporter);
             const tracker = createPhaseTracker(renderer.listen);
             const scope: RunScope = { context, reporter, renderer, tracker };
-            const result = await runOnce(scope, transport, target, cache, options);
+            const result = await runOnce(scope, target, cache, options);
 
             renderer.clear();
             reportPhaseTimings(reporter, tracker.durations(), totalDuration(tracker.durations()));

@@ -16,7 +16,7 @@ import { createOutputStyle } from '@cli/reporting/output-style';
 import { createProgressRenderer } from '@cli/reporting/progress-renderer';
 
 import { createMemoryReporter, createTtyReporter, type MemoryReporter } from './support/memory-logger';
-import { createMockTransport } from './support/mock-transport';
+import { createMockServerConsole } from './support/mock-server-console';
 import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
 const ESC = String.fromCharCode(27);
@@ -231,14 +231,14 @@ describe('check output', () => {
 describe('watch output', () => {
     it('separates and timestamps each rebuild', async () => {
         const { context, fixture, target } = harness(defaultProjectFiles({ serverPath: 'mta-server' }));
-        const transport = createMockTransport();
+        const serverConsole = createMockServerConsole();
         const controller = new AbortController();
-        const command = runEnsureCommand(context, { transport, watch: true, signal: controller.signal });
+        const command = runEnsureCommand(context, { serverConsole, watch: true, signal: controller.signal });
 
-        await waitFor(() => transport.calls.length === 2);
+        await waitFor(() => serverConsole.calls.length === 2);
         fixture.write('src/client/hud.luam', clientSource('Luam watched'));
 
-        await waitFor(() => transport.calls.length === 4);
+        await waitFor(() => serverConsole.calls.length === 4);
         controller.abort();
 
         expect(await command).toBe(EXIT_OK);

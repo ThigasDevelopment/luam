@@ -69,7 +69,7 @@ describe('manifest subset', () => {
     });
 
     it('rejects an assignment to a member', () => {
-        expect(codes(`${NAME}transport.kind = 'none'`)).toEqual(['config-invalid-statement']);
+        expect(codes(`${NAME}output.bundle = true`)).toEqual(['config-invalid-statement']);
     });
 });
 
@@ -97,21 +97,16 @@ describe('manifest checking', () => {
         expect(diagnostics[0]?.position.line).toBe(1);
     });
 
-    it('checks nested output, transport and development tables', () => {
+    it('checks nested output and development tables', () => {
         expect(codes(`${NAME}output = { bundle = 'yes' }`)).toEqual(['config-invalid-type']);
         expect(messages(`${NAME}output = { bundle = 'yes' }`)[0]).toBe('"output.bundle" must be a boolean but received a string.');
         expect(codes(`${NAME}development = { logs = { enabled = 1 } }`)).toEqual(['config-invalid-type']);
-        expect(codes(`${NAME}transport = { kind = 'none', retries = 3 }`)).toEqual(['config-unknown-field']);
+        expect(codes(`${NAME}development = { logs = { enabled = true, retries = 3 } }`)).toEqual(['config-unknown-field']);
     });
 
-    it('requires a kind once a transport table exists', () => {
-        expect(codes(`${NAME}transport = { }`)).toEqual(['config-missing-field']);
-        expect(codes(`${NAME}transport = { kind = 'none' }`)).toEqual([]);
-    });
-
-    it('rejects a transport kind outside the closed set', () => {
-        expect(codes(`${NAME}transport = { kind = 'rcon' }`)).toEqual(['config-invalid-transport']);
-        expect(messages(`${NAME}transport = { kind = 'rcon' }`)[0]).toBe('"transport.kind" must be "none" or "http" but received "rcon".');
+    it('requires every field a nested table declares as required', () => {
+        expect(codes(`${NAME}assets = { { to = 'assets' } }`)).toEqual(['config-missing-field']);
+        expect(codes(`${NAME}assets = { { from = 'assets/**/*', to = 'assets' } }`)).toEqual([]);
     });
 
     it('rejects a helper the runtime does not ship', () => {
@@ -126,7 +121,7 @@ describe('manifest checking', () => {
     });
 
     it('rejects arithmetic on an environment value', () => {
-        expect(codes(`${NAME}transport = { kind = 'none' }\nversion = env.PORT + 1`)).toEqual(['config-invalid-type']);
+        expect(codes(`${NAME}version = env.PORT + 1`)).toEqual(['config-invalid-type']);
     });
 
     it('closes the global scope', () => {
@@ -144,11 +139,11 @@ describe('manifest evaluation', () => {
     });
 
     it('follows lua truthiness', () => {
-        const source = `${NAME}transport = { kind = password and 'http' or 'none' }`;
+        const source = `${NAME}outDir = password and 'build-secret' or 'build'`;
         const withLocal = `local password = env.LUAM_PASSWORD\n${source}`;
 
-        expect(analyze(withLocal, { env: {} }).raw.transport).toEqual({ kind: 'none' });
-        expect(analyze(withLocal, { env: { LUAM_PASSWORD: 'secret' } }).raw.transport).toEqual({ kind: 'http' });
+        expect(analyze(withLocal, { env: {} }).raw.outDir).toBe('build');
+        expect(analyze(withLocal, { env: { LUAM_PASSWORD: 'secret' } }).raw.outDir).toBe('build-secret');
     });
 
     it('evaluates arithmetic, concatenation and comparison', () => {

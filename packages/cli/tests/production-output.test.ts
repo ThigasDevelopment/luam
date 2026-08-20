@@ -9,7 +9,6 @@ import { runCli } from '@cli/cli/run';
 
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createMockTransport } from './support/mock-transport';
 import { parsesAsLua51, tokenTexts } from './support/lua-check';
 import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
@@ -69,7 +68,7 @@ async function build(fixture: ProjectFixture): Promise<number> {
 }
 
 async function ensure(fixture: ProjectFixture): Promise<number> {
-    return runCli(['ensure', '--no-watch', '--cwd', fixture.root], { logger: createMemoryLogger(), env: OFFLINE, transport: createMockTransport() });
+    return runCli(['ensure', '--no-watch', '--cwd', fixture.root], { logger: createMemoryLogger(), env: OFFLINE });
 }
 
 afterEach(() => {

@@ -15,8 +15,7 @@ import type { ManifestObject } from '@compiler/manifest/manifest-value';
 import { isRuntimeHelperName, type RuntimeHelperName } from '@runtime/helpers';
 
 import type { LuamConfig, DevelopmentConfig } from '@cli/config/config-schema';
-import { validateTransport } from '@cli/config/transport-validation';
-import { ValidationContext, type Environment } from '@cli/config/validation-context';
+import { ValidationContext } from '@cli/config/validation-context';
 
 export interface ValidatedConfig {
     config: LuamConfig | null;
@@ -54,8 +53,8 @@ function checkDependencies(name: string, dependencies: readonly string[], contex
     }
 }
 
-export function validateConfig(value: ManifestObject, positions: PositionLookup, env: Environment): ValidatedConfig {
-    const context = new ValidationContext(positions, env);
+export function validateConfig(value: ManifestObject, positions: PositionLookup): ValidatedConfig {
+    const context = new ValidationContext(positions);
     const name = readString(value, 'name') ?? '';
     const dependencies = readDependencies(value);
     const config: LuamConfig = {
@@ -75,7 +74,6 @@ export function validateConfig(value: ManifestObject, positions: PositionLookup,
         serverPath: readString(value, 'serverPath'),
         resourcesDir: readString(value, 'resourcesDir') ?? '',
         output: readOutputSettings(value),
-        transport: validateTransport(readTable(value, 'transport'), context),
         development: readDevelopment(readTable(value, 'development')),
     };
 

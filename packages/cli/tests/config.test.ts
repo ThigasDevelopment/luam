@@ -47,7 +47,6 @@ describe('configuration validation', () => {
             serverPath: null,
             resourcesDir: 'mods/deathmatch/resources',
             output: { bundle: true, map: true, minify: true },
-            transport: { kind: 'none' },
             development: {
                 logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 },
                 server: { executable: null },
@@ -66,7 +65,7 @@ describe('configuration validation', () => {
     it('rejects fields with the wrong type', () => {
         expect(codes(load("name = 'demo'\nsources = { server = 'src' }\n").diagnostics)).toEqual(['config-invalid-type']);
         expect(codes(load("name = 'demo'\noutDir = 5\n").diagnostics)).toEqual(['config-invalid-type']);
-        expect(codes(load("name = 'demo'\ntransport = 'http'\n").diagnostics)).toEqual(['config-invalid-type']);
+        expect(codes(load("name = 'demo'\noutput = 'bundle'\n").diagnostics)).toEqual(['config-invalid-type']);
     });
 
     it('rejects an unknown field', () => {
@@ -113,11 +112,11 @@ describe('configuration validation', () => {
     it('qualifies a nested field with its scope when the type is wrong', () => {
         const output = load("name = 'demo'\noutput = { bundle = 'yes' }\n").diagnostics;
         const logs = load("name = 'demo'\ndevelopment = { logs = { enabled = 'yes' } }\n").diagnostics;
-        const transport = load("name = 'demo'\ntransport = { kind = 5 }\n").diagnostics;
+        const engine = load("name = 'demo'\nengine = { minVersion = 5 }\n").diagnostics;
 
         expect(output[0]?.message).toBe('"output.bundle" must be a boolean but received a string.');
         expect(logs[0]?.message).toBe('"development.logs.enabled" must be a boolean but received a string.');
-        expect(transport[0]?.message).toBe('"transport.kind" must be one of "none", "http" but received a number.');
+        expect(engine[0]?.message).toBe('"engine.minVersion" must be a string but received a number.');
     });
 
     it('rejects a helper the runtime does not ship', () => {
@@ -158,83 +157,6 @@ describe('configuration validation', () => {
 
         expect(loaded.diagnostics[0]?.position.line).toBe(3);
         expect(loaded.diagnostics[0]?.position.column).toBe(10);
-    });
-});
-
-describe('transport configuration', () => {
-    const HTTP = { kind: 'http', resource: 'luam-sync', username: 'admin', passwordEnv: 'LUAM_PASSWORD' };
-
-    it('reads an http transport with defaults', () => {
-        expect(manifestConfig({ name: 'demo', transport: HTTP }, { LUAM_PASSWORD: 'secret' }).transport).toEqual({
-            kind: 'http',
-            host: '127.0.0.1',
-            port: 22005,
-            resource: 'luam-sync',
-            username: 'admin',
-            password: 'secret',
-            refreshFunction: 'refreshResources',
-            restartFunction: 'restartResource',
-        });
-    });
-
-    it('requires the environment variable named by passwordEnv', () => {
-        expect(codes(load(manifestSource({ name: 'demo', transport: HTTP })).diagnostics)).toEqual(['config-missing-secret']);
-    });
-
-    it('warns when a password is stored in plain text', () => {
-        const source = manifestSource({ name: 'demo', transport: { kind: 'http', resource: 'luam-sync', username: 'admin', password: 'secret' } });
-        const loaded = load(source);
-
-        expect(codes(loaded.diagnostics)).toEqual(['config-plaintext-password']);
-        expect(loaded.diagnostics[0]?.severity).toBe('warning');
-        expect(loaded.config?.transport).toMatchObject({ kind: 'http', password: 'secret' });
-    });
-
-    it('requires the http credentials', () => {
-        const loaded = load(manifestSource({ name: 'demo', transport: { kind: 'http' } }));
-
-        expect(codes(loaded.diagnostics)).toEqual(['config-missing-field', 'config-missing-field', 'config-missing-field']);
-    });
-
-    it('rejects an unknown transport kind', () => {
-        expect(codes(load(manifestSource({ name: 'demo', transport: { kind: 'rcon' } })).diagnostics)).toEqual(['config-invalid-transport']);
-    });
-
-    it('rejects an unknown transport field', () => {
-        expect(codes(load(manifestSource({ name: 'demo', transport: { kind: 'none', retries: 3 } })).diagnostics)).toEqual(['config-unknown-field']);
-    });
-
-    it('rejects a transport field that would change the request path', () => {
-        const env = { LUAM_PASSWORD: 'secret' };
-        const base = { kind: 'http', username: 'admin', passwordEnv: 'LUAM_PASSWORD' };
-        const escaping = manifestSource({ name: 'demo', transport: { ...base, resource: '../admin' } });
-        const restart = manifestSource({ name: 'demo', transport: { ...base, resource: 'sync', restartFunction: 'a/b' } });
-        const host = manifestSource({ name: 'demo', transport: { ...base, resource: 'sync', host: 'host/../x' } });
-
-        expect(codes(load(escaping, env).diagnostics)).toEqual(['config-invalid-url-segment']);
-        expect(codes(load(restart, env).diagnostics)).toEqual(['config-invalid-url-segment']);
-        expect(codes(load(host, env).diagnostics)).toEqual(['config-invalid-url-segment']);
-    });
-
-    it('produces no configuration when a url segment is rejected', () => {
-        const source = manifestSource({ name: 'demo', transport: { ...HTTP, resource: 'a?b' } });
-
-        expect(load(source, { LUAM_PASSWORD: 'secret' }).config).toBeNull();
-    });
-
-    it('warns when the password would cross the network without tls', () => {
-        const source = manifestSource({ name: 'demo', transport: { ...HTTP, host: 'mta.example.com', passwordEnv: 'PW' } });
-        const loaded = load(source, { PW: 'secret' });
-
-        expect(codes(loaded.diagnostics)).toEqual(['config-remote-plaintext-transport']);
-        expect(loaded.diagnostics[0]?.severity).toBe('warning');
-        expect(loaded.config?.transport).toMatchObject({ kind: 'http', host: 'mta.example.com' });
-    });
-
-    it('stays quiet for a loopback host', () => {
-        const source = manifestSource({ name: 'demo', transport: { ...HTTP, host: 'localhost', passwordEnv: 'PW' } });
-
-        expect(codes(load(source, { PW: 'secret' }).diagnostics)).toEqual([]);
     });
 });
 
@@ -299,20 +221,10 @@ describe('manifest loading', () => {
         expect(loaded.diagnostics.map((diagnostic) => diagnostic.message).join('\n')).not.toContain('super-secret');
     });
 
-    it('resolves the transport password through the environment it was given', () => {
-        const source = [
-            'local password = env.LUAM_PASSWORD',
-            "name = 'luam-demo'",
-            'transport = {',
-            "    kind = password and 'http' or 'none',",
-            "    resource = 'luam-sync',",
-            "    username = 'admin',",
-            "    passwordEnv = 'LUAM_PASSWORD',",
-            '}',
-            '',
-        ].join('\n');
+    it('resolves a field through the environment it was given', () => {
+        const source = ['local root = env.LUAM_SERVER', "name = 'luam-demo'", "serverPath = root or 'mta-server'", ''].join('\n');
 
-        expect(load(source, {}).config?.transport).toEqual({ kind: 'none' });
-        expect(load(source, { LUAM_PASSWORD: 'secret' }).config?.transport).toMatchObject({ kind: 'http', password: 'secret' });
+        expect(load(source, {}).config?.serverPath).toBe('mta-server');
+        expect(load(source, { LUAM_SERVER: 'C:/mta' }).config?.serverPath).toBe('C:/mta');
     });
 });

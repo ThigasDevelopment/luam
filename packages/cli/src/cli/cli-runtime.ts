@@ -10,11 +10,9 @@ import { createConsoleLogger } from '@cli/reporting/logger';
 import { detectCapability, PLAIN_CAPABILITY } from '@cli/reporting/output-capability';
 import { createReporter } from '@cli/reporting/reporter';
 import { createProcessService } from '@cli/server/process-service';
-import { createTransport } from '@cli/transport/transport-factory';
 
 import type { CommandContext } from '@cli/commands/command-context';
 import type { InitPrompt } from '@cli/commands/init-prompt';
-import type { LuamConfig } from '@cli/config/config-schema';
 import type { Environment } from '@cli/config/validation-context';
 import type { EditorService } from '@cli/editor/editor-service';
 import type { InstallationPrompt } from '@cli/editor/installation-prompt';
@@ -22,14 +20,12 @@ import type { Logger } from '@cli/reporting/logger';
 import type { OutputCapability } from '@cli/reporting/output-capability';
 import type { Reporter } from '@cli/reporting/reporter';
 import type { ProcessService } from '@cli/server/process-service';
-import type { MtaTransport } from '@cli/transport/transport';
 
 export interface CliOverrides {
     logger: Logger;
     capability: OutputCapability;
     cwd: string;
     env: Environment;
-    transport: MtaTransport | null;
     signal: AbortSignal | null;
     editorService: EditorService;
     prompt: InstallationPrompt;
@@ -117,10 +113,6 @@ export function createProjectContext(runtime: CliRuntime, command: string, optio
 
 export function runtimeEditorService(runtime: CliRuntime): EditorService {
     return runtime.overrides.editorService ?? createEditorService();
-}
-
-export function runtimeTransport(runtime: CliRuntime, config: LuamConfig): MtaTransport {
-    return runtime.overrides.transport ?? createTransport(config.transport);
 }
 
 export function runtimeProcessService(runtime: CliRuntime): ProcessService {

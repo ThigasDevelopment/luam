@@ -5,7 +5,6 @@ import { runCli } from '@cli/cli/run';
 import { VERSION } from '@cli/cli/version';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createMockTransport } from './support/mock-transport';
 import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
@@ -134,7 +133,6 @@ describe('command option matrix', () => {
             const code = await runCli(argv, {
                 logger,
                 env: OFFLINE,
-                transport: createMockTransport(),
                 signal: AbortSignal.abort(),
                 editorService: STUB_EDITORS,
                 initPrompt: async (defaults) => defaults,

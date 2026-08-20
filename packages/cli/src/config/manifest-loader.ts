@@ -76,7 +76,7 @@ export function loadManifest(root: string, options: ManifestOptions = {}): Loade
 
     const env = options.env ?? {};
     const analysis = analyzeManifest(source, { mode: options.mode ?? DEFAULT_MODE, root, env: manifestEnvironment(env) });
-    const validated = validateConfig(analysis.value, analysis.positions, env);
+    const validated = validateConfig(analysis.value, analysis.positions);
     const diagnostics = sortDiagnostics([...analysis.diagnostics, ...validated.diagnostics]);
 
     return { path, source, config: hasErrors(diagnostics) ? null : validated.config, diagnostics };

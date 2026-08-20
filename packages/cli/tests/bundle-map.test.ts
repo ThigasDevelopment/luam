@@ -6,7 +6,6 @@ import { runCli } from '@cli/cli/run';
 import { EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createMockTransport } from './support/mock-transport';
 import { createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
@@ -172,15 +171,14 @@ describe('bundle and map output', () => {
     it('keeps ensure tree by default and allows an explicit bundle override', async () => {
         const fixture = project({ bundle: true, map: true }, 'mta-server');
         const logger = createMemoryLogger();
-        const transport = createMockTransport();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
-        await runCli(['ensure', '--no-watch'], { cwd: fixture.root, env: OFFLINE, logger, transport });
+        await runCli(['ensure', '--no-watch'], { cwd: fixture.root, env: OFFLINE, logger });
 
         expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
         expect(fixture.exists(`${resource}/src/server.lua`)).toBe(false);
 
-        await runCli(['ensure', '--no-watch', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger, transport });
+        await runCli(['ensure', '--no-watch', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger });
 
         expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(false);
         expect(fixture.exists(`${resource}/src/server.lua`)).toBe(true);
@@ -189,10 +187,9 @@ describe('bundle and map output', () => {
     it('keeps dev tree even when bundle output is configured', async () => {
         const fixture = project({ bundle: true, map: true }, 'mta-server');
         const logger = createMemoryLogger();
-        const transport = createMockTransport();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
-        await runCli(['dev', '--no-watch'], { cwd: fixture.root, env: OFFLINE, logger, transport });
+        await runCli(['dev', '--no-watch'], { cwd: fixture.root, env: OFFLINE, logger });
 
         expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
         expect(fixture.exists(`${resource}/src/server.lua`)).toBe(false);
@@ -201,10 +198,8 @@ describe('bundle and map output', () => {
     it('rejects a layout flag on dev instead of ignoring it', async () => {
         const fixture = project({ bundle: true, map: true }, 'mta-server');
         const logger = createMemoryLogger();
-        const transport = createMockTransport();
 
-        expect(await runCli(['dev', '--no-watch', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger, transport })).toBe(EXIT_USAGE);
+        expect(await runCli(['dev', '--no-watch', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger })).toBe(EXIT_USAGE);
         expect(logger.errors.join('\n')).toContain("unknown option '--bundle'");
-        expect(transport.calls).toEqual([]);
     });
 });

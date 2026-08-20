@@ -42,6 +42,6 @@ describe('template catalog', () => {
         expect(source).toContain("client = { 'src/client/**/*.luam' },");
         expect(source).toContain("shared = { 'src/shared/**/*.luam' },");
         expect(source).toContain("{ from = 'assets/**/*', to = 'assets' },");
-        expect(source).toContain("    kind = 'none',");
+        expect(source).not.toContain('transport');
     });
 });

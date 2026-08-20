@@ -9,7 +9,6 @@ import type { ResourceMap } from '@compiler/project/resource';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { FakeProcessService } from './support/fake-process-service';
-import { createMockTransport } from './support/mock-transport';
 import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
@@ -48,20 +47,17 @@ afterEach(() => {
 describe('development command', () => {
     it('requires serverPath before writing or following logs', async () => {
         const harness = context();
-        const transport = createMockTransport();
 
-        expect(await runDevCommand(harness.context, { transport, watch: false, signal: null })).toBe(EXIT_DIAGNOSTICS);
+        expect(await runDevCommand(harness.context, { watch: false, signal: null })).toBe(EXIT_DIAGNOSTICS);
         expect(harness.fixture.exists('mta-server')).toBe(false);
-        expect(transport.calls).toEqual([]);
     });
 
     it('writes configured development helpers only to the server resource', async () => {
         const development = { logs: { maxMessageLength: 300, rateLimit: 4, rateWindowMs: 500 } };
         const harness = context({ serverPath: 'mta-server', development });
-        const transport = createMockTransport();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
-        expect(await runDevCommand(harness.context, { transport, watch: false, signal: null })).toBe(EXIT_OK);
+        expect(await runDevCommand(harness.context, { watch: false, signal: null })).toBe(EXIT_OK);
         expect(harness.fixture.read(`${resource}/lib/development-logs-client.lua`)).toContain('local luamMaximumMessageLength = 300');
         expect(harness.fixture.read(`${resource}/lib/development-logs-server.lua`)).toContain('local luamRateLimit = 4');
         expect(harness.fixture.read(`${resource}/meta.xml`).indexOf('development-logs-server.lua')).toBeLessThan(
@@ -72,11 +68,10 @@ describe('development command', () => {
 
     it('keeps normal ensure output free of development helpers and prunes prior helpers', async () => {
         const harness = context({ serverPath: 'mta-server' });
-        const transport = createMockTransport();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
-        await runDevCommand(harness.context, { transport, watch: false, signal: null });
-        await runEnsureCommand(harness.context, { transport, watch: false, signal: null });
+        await runDevCommand(harness.context, { watch: false, signal: null });
+        await runEnsureCommand(harness.context, { watch: false, signal: null });
 
         expect(harness.fixture.exists(`${resource}/lib/development-logs-client.lua`)).toBe(false);
         expect(harness.fixture.exists(`${resource}/lib/development-logs-server.lua`)).toBe(false);
@@ -89,9 +84,8 @@ describe('development command', () => {
         expect(deployedMapAfterBuild(map, { build: null, map: null })).toBe(map);
     });
 
-    it('waits for an owned server before the first transport call', async () => {
+    it('waits for an owned server before the first console command', async () => {
         const harness = context({ serverPath: 'mta-server' });
-        const transport = createMockTransport();
         const processService = new FakeProcessService();
         let input = '';
 
@@ -105,7 +99,6 @@ describe('development command', () => {
         });
 
         const running = runDevCommand(harness.context, {
-            transport,
             watch: false,
             signal: null,
             startServer: true,
@@ -115,25 +108,21 @@ describe('development command', () => {
             readinessTimeoutMs: 500,
         });
 
-        expect(transport.calls).toEqual([]);
 
         harness.fixture.write('mta-server/mods/deathmatch/logs/server.log', 'Server started and is ready to accept connections!\n');
 
         expect(await running).toBe(EXIT_OK);
-        expect(transport.calls).toEqual([]);
         expect(input).toBe('refresh\nstop luam-demo\nstart luam-demo\nshutdown\n');
         expect(processService.calls).toHaveLength(1);
     });
 
     it('does not build when the owned server exits during startup', async () => {
         const harness = context({ serverPath: 'mta-server' });
-        const transport = createMockTransport();
         const processService = new FakeProcessService();
 
         harness.fixture.write('mta-server/MTA Server.exe', 'binary');
 
         const running = runDevCommand(harness.context, {
-            transport,
             watch: false,
             signal: null,
             startServer: true,
@@ -144,13 +133,11 @@ describe('development command', () => {
         processService.exit(2);
 
         expect(await running).toBe(EXIT_DIAGNOSTICS);
-        expect(transport.calls).toEqual([]);
         expect(harness.fixture.exists('mta-server/mods/deathmatch/resources/luam-demo')).toBe(false);
     });
 
     it('stops watch mode when the owned server exits unexpectedly', async () => {
         const harness = context({ serverPath: 'mta-server' });
-        const transport = createMockTransport();
         const processService = new FakeProcessService();
         let input = '';
 
@@ -160,7 +147,6 @@ describe('development command', () => {
         });
 
         const running = runDevCommand(harness.context, {
-            transport,
             watch: true,
             signal: null,
             startServer: true,
@@ -175,6 +161,5 @@ describe('development command', () => {
         processService.exit(4);
 
         expect(await running).toBe(EXIT_DIAGNOSTICS);
-        expect(transport.calls).toEqual([]);
     });
 });

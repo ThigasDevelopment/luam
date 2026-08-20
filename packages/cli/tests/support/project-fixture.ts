@@ -100,7 +100,7 @@ export function manifestSource(config: Readonly<Record<string, unknown>>): strin
 
 export function manifestConfig(config: Readonly<Record<string, unknown>>, env: Readonly<Record<string, string>> = {}): LuamConfig {
     const analysis = analyzeManifest(manifestSource(config), { mode: 'check', root: '/project', env });
-    const validated = validateConfig(analysis.value, analysis.positions, env);
+    const validated = validateConfig(analysis.value, analysis.positions);
 
     if (validated.config === null) {
         throw new Error(`The fixture manifest is invalid: ${[...analysis.diagnostics, ...validated.diagnostics].map((entry) => entry.message).join(' ')}`);

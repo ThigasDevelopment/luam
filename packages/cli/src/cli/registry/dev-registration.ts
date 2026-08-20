@@ -1,4 +1,4 @@
-import { createProjectContext, runtimeProcessService, runtimeTransport } from '@cli/cli/cli-runtime';
+import { createProjectContext, runtimeProcessService } from '@cli/cli/cli-runtime';
 import { addProjectOptions, addWatchOptions, noMapOption, offlineOption } from '@cli/cli/shared-options';
 import { runDevCommand } from '@cli/commands/dev-command';
 
@@ -31,7 +31,6 @@ export function registerDevCommand(program: Command, runtime: CliRuntime): void 
         }
 
         runtime.exitCode = await runDevCommand(project.context, {
-            transport: runtimeTransport(runtime, project.context.config),
             watch: options.watch ?? true,
             signal: runtime.overrides.signal ?? null,
             layout: 'tree',
