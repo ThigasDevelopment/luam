@@ -1,10 +1,104 @@
 # Changelog
 
-Notable changes per milestone. Nothing is published yet, so entries are grouped
-by milestone rather than by released version. Format follows
+Notable changes to Luam, newest first. Every heading below a released
+version names the change set that shipped with it, and the date matches the
+tag for that release. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+Manual changes live in the documentation changelog, in
+[English](docs/en/changelog.md) and
+[Portuguese (Brazil)](docs/pt-br/changelog.md).
+
+Releases before `0.2.0` were never published, so the work of milestones 1 to
+13 is listed under `0.2.0`, the first release on npm.
+
 ## Unreleased
+
+### The Wrong Form Is Now An Error
+
+#### Added
+
+- `check-extension-form` reports an object extension written in the other form.
+  A property extension that is called, such as `count.abs()`, compiled to
+  `math.abs(count)()` and failed at runtime on a call to a number. A call
+  extension that is only read, such as `count.clamp`, compiled to an index that
+  never runs. Both are rejected before anything is emitted.
+- `check-not-callable` reports a call on a value the checker knows is not a
+  function, such as `count()` on a number or `label()` on a string.
+
+#### Fixed
+
+- A statement the compiler has to lower kept the semicolon that closed it in the
+  authored file. It used to be left behind, alone on the line after the lowered
+  statement.
+
+### A Shared Enum Reaches The Generated Lua
+
+#### Fixed
+
+- An enum declared in one file and read from another was erased. The build
+  decided erasure from the declaring file alone, so the generated Lua held no
+  table and the resource failed at runtime. Erasure now reads the whole
+  resource: an enum any file reads is emitted, and only an enum nothing reads
+  is erased.
+- A declaration erased at the end of a file left its blank lines behind. The
+  generated Lua now ends at the last line that carries code. The blank slots
+  that keep line numbers aligned are still written everywhere else.
+
+### No Transport To Configure
+
+#### Removed
+
+- **Breaking.** The `transport` manifest table, the `http` transport, and every
+  field, diagnostic, and environment variable that served them. A manifest that
+  still writes `transport` reports `config-removed-field` and names what replaced
+  it. The removed codes are `config-invalid-transport`,
+  `config-invalid-url-segment`, `config-missing-secret`,
+  `config-plaintext-password` and `config-remote-plaintext-transport`.
+- The CLI no longer opens a connection to an MTA server, so the only outbound
+  request a build can make is the `min_mta_version` lookup.
+
+#### Changed
+
+- `luam ensure` builds and syncs the resource, and stops there. Loading the sync
+  is `refresh` and `restart <name>` in the server console.
+- `luam dev --start-server` is the one path that restarts a resource for you. It
+  owns the MTA process and writes those commands to the console it started, which
+  is what it already did.
+- `luam init` scaffolds a manifest without a `transport` block.
+
+### One Version, Checked Before It Ships
+
+#### Added
+
+- `pnpm release:prepare <version>` bumps every workspace package and promotes the
+  `Unreleased` section of all three changelogs into a `## X.Y.Z - YYYY-MM-DD`
+  heading. It refuses a malformed version, a version at or below the committed
+  one, a version that already has a heading, and an empty `Unreleased` section in
+  any locale, and it writes nothing when any of those fail.
+- `pnpm docs:versions [tag]` fails when a workspace package, a changelog heading,
+  a locale pair, or a supplied tag disagrees with `packages/cli/package.json`.
+- `pnpm docs:obsolete` fails when current documentation, snippets, or maintained
+  examples still show a removed form. A removed form is allowed only under a
+  release heading no newer than the version that removed it, or through an
+  exact-line exemption that records its replacement and reason.
+- `pnpm release:notes` prints the GitHub release body, with anchors into both
+  manual changelogs and this file.
+- `pnpm docs:verify` runs the version and obsolete-content checks, and the
+  documentation workflow now also triggers on package manifests, changelogs,
+  release tooling, examples, and the workspace files.
+
+#### Changed
+
+- Every section of this file now sits under the release that shipped it. The
+  header no longer claims that nothing is published.
+- Both manual changelogs use the same dated release headings, so a locale cannot
+  document a release the other one is missing.
+- Version-specific install and extension examples in the manual are written as
+  `%LUAM_VERSION%` and rendered from `packages/cli/package.json` at build time.
+- The release workflow verifies the tag against the committed version and no
+  longer stamps versions in the runner. It packages only what the tagged commit
+  already declares, and it runs the full documentation verification first.
 
 ### Dead Configuration Says So
 
@@ -14,6 +108,8 @@ by milestone rather than by released version. Format follows
   warning with a caret under the name. The manifest is always checked in its own
   strict mode, so this does not depend on `compilerOptions.noUnusedLocals`, and a
   leading `_` keeps the local on purpose.
+
+## 0.15.6 - 2026-08-17
 
 ### Typed Events
 
@@ -36,6 +132,8 @@ by milestone rather than by released version. Format follows
 #### Changed
 
 - `event` is contextual after `declare` only, so `local event` still compiles.
+
+## 0.15.5 - 2026-08-16
 
 ### Contextual Callback Types
 
@@ -62,6 +160,8 @@ by milestone rather than by released version. Format follows
 - Production minification removes readable formatting and keeps production bytes
   compact.
 
+## 0.15.4 - 2026-08-16
+
 ### CLI-Owned Local MTA Server
 
 #### Added
@@ -78,6 +178,8 @@ by milestone rather than by released version. Format follows
 - Local server launch uses no shell, validates real path containment, and stops
   only the child owned by the current command.
 
+## 0.14.0 - 2026-08-15
+
 ### Parent Calls Use `super(...)`
 
 #### Changed
@@ -86,6 +188,8 @@ by milestone rather than by released version. Format follows
   The former `self:super(...)` syntax reports `check-invalid-super`.
 - Class hover includes inferred constructor return types, and completion offers
   `super` inside subclass methods.
+
+## 0.13.0 - 2026-08-15
 
 ### The Administrator Edits `.env`, Not Lua
 
@@ -125,6 +229,29 @@ have promised a global that no longer exists.
 - `process` and `process.env`. Read `env` instead. A file still naming `process`
   compiles, because an undeclared global is legal Lua — it simply reads nil at
   run time.
+
+### The Editor Suggests the Environment It Typed
+
+`env` was typed from `.env`, completed after a dot, and hovered — but the name
+itself was never suggested. The completion list gathered the MTA catalog and the
+project's own symbols, and the globals the manifest declared were in neither. You
+had to know `env` existed to reach the keys the editor could already describe.
+
+Hover repeated itself as well. A record renders as its own name, and the record
+behind `env` is called `env`, so the hover read `env: env` — true and useless.
+
+#### Added
+
+- `env` is suggested in a server file whenever the project declares keys, and
+  hidden in a client or shared file, matching the rule the checker enforces. The
+  item names the file the keys came from.
+
+#### Changed
+
+- Hovering `env` lists the declared keys, their types, and their configured
+  values instead of repeating the name. Completing a key shows its value too.
+
+## 0.12.0 - 2026-08-15
 
 ### Deployment Values Are Compiled, Not Parsed
 
@@ -184,6 +311,8 @@ two files with one name never existed.
 - Runtime helpers are written flat to `lib/`. Each `meta.xml` entry still carries
   its helper's environment, and load order is unchanged — a helper still loads
   after everything it requires.
+
+## 0.11.1 - 2026-08-15
 
 ### A Contract Comes From the Interface That Names It
 
@@ -279,6 +408,8 @@ exchange the contents of a built resource are what the manifest says they are.
   `config-missing-source`, and `config-escaping-path` — the manifest is where the
   mistake is, so that is where it is reported.
 
+## 0.10.6 - 2026-08-14
+
 ### Directives Complete
 
 `#` opens a comment, so the completion pass stopped at `#!` and offered nothing.
@@ -291,6 +422,8 @@ without help.
   `nonstrict`, and `nocheck`, each with what it does. It fires while the name is
   being typed, with or without a space after the marker, and on any line — not
   just the first. `#items` and an ordinary `# comment` are left alone.
+
+## 0.10.5 - 2026-08-14
 
 ### A Nested Project Is Still a Project
 
@@ -312,26 +445,7 @@ per directory.
   omits, resolved against the catalog so a wrong procedural name fails the build
   instead of shipping.
 
-### The Editor Suggests the Environment It Typed
-
-`env` was typed from `.env`, completed after a dot, and hovered — but the name
-itself was never suggested. The completion list gathered the MTA catalog and the
-project's own symbols, and the globals the manifest declared were in neither. You
-had to know `env` existed to reach the keys the editor could already describe.
-
-Hover repeated itself as well. A record renders as its own name, and the record
-behind `env` is called `env`, so the hover read `env: env` — true and useless.
-
-#### Added
-
-- `env` is suggested in a server file whenever the project declares keys, and
-  hidden in a client or shared file, matching the rule the checker enforces. The
-  item names the file the keys came from.
-
-#### Changed
-
-- Hovering `env` lists the declared keys, their types, and their configured
-  values instead of repeating the name. Completing a key shows its value too.
+## 0.10.4 - 2026-08-14
 
 ### The Editor Says What It Knows
 
@@ -359,6 +473,8 @@ never rendered.
 - The multi-line branch of the OOP constructor emitter dropped the type
   descriptor entirely. It was unreachable until the procedural name made a
   constructor line long enough to take it.
+
+## 0.10.2 - 2026-08-14
 
 ### A Table Literal Carries Its Shape
 
@@ -396,6 +512,8 @@ rather than the one that is unexpected.
 - `{}` is unchanged in every container position: it still fits an array, a map,
   and `table`, and an unannotated `local items = {}` still widens to `table` so
   the object extensions keep working. Only a shape that requires a key rejects it.
+
+## 0.10.1 - 2026-08-14
 
 ### Literals Are Types, and the Editor Knows the Shape
 
@@ -442,6 +560,8 @@ instead of the keys it expects.
   generated constructor, so `Object` reported `MTASAObject`, a name nothing
   declares.
 
+## 0.10.0 - 2026-08-14
+
 ### Shapes That Combine and Unions That Narrow
 
 `type SQLite = Base & { kind: 'sqlite' }` did not lex — `&` was not a character
@@ -482,6 +602,8 @@ union, the shape the pattern exists for, compiled without a single check.
   annotate a checked value as `any`. Narrowing had already shipped, and the same
   page documented it a few sections later.
 
+## 0.8.0 - 2026-08-12
+
 ### Every Reserved Word Completes
 
 Completion offered the 32 reserved words at a statement, `constructor` in a
@@ -502,6 +624,8 @@ value, so `new` called it.
   parameter both still resolve.
 - `check-invalid-constructor`, reported on a class member named `constructor`
   that is declared as a field instead of as a method.
+
+## 0.7.0 - 2026-08-12
 
 ### One Class Method Form
 
@@ -554,6 +678,8 @@ manual does not describe, and a project could carry both.
   same name worked. The hover now names the declaration and the file it comes
   from, and respects the environment rules, so a server file does not see a class
   declared under `src/client`.
+
+## 0.6.0 - 2026-08-12
 
 ### The `.luam.manifest` Dialect
 
@@ -666,6 +792,8 @@ every option on every command and silently ignored the ones that did not apply.
   instead of succeeding, and `--version` is a root option. Exit codes `0`, `1`,
   and `2` keep their meanings. See the migration table in the CLI reference.
 
+## 0.3.0 - 2026-08-11
+
 ### Object Types
 
 An argument bag is the most common shape in an MTA resource, and the only way to
@@ -717,6 +845,8 @@ down with it, so the editor lost the parameters and locals it needed to answer.
   keys. A class or interface of the same name still wins, and a self-referencing
   alias stops instead of recursing.
 
+## 0.2.1 - 2026-08-11
+
 ### Editor Detection on Windows
 
 Editor launchers ship as `.cmd` scripts on Windows, and a direct process spawn
@@ -729,6 +859,8 @@ all on a machine with Visual Studio Code installed.
   resolved against `PATH` and `PATHEXT` before it runs, and a `.cmd` or `.bat`
   launcher is executed through `COMSPEC` as a single quoted command line, so a
   launcher installed under a path with spaces is invoked as one argument.
+
+## 0.2.0 - 2026-08-11
 
 ### The `continue` Statement
 
@@ -1394,7 +1526,7 @@ resource layout.
 - The scaffolded `.gitignore` excludes `.env`, `.env.*`, and `*.log`, and
   re-includes `.env.example`.
 
-## Milestone 6 — Framework Template and Scaffolding
+### Milestone 6 — Framework Template and Scaffolding
 
 - `luam init` scaffolds a project: `luam.json`, `README.md`, `.gitignore`, the
   framework under `src/shared/framework`, and one example listener and command
@@ -1408,20 +1540,20 @@ resource layout.
   extend a framework base class declared in another file.
 - `luam.json` gained a `helpers` field for manually injected runtime helpers.
 
-## Milestone 5 — LSP and Editor
+### Milestone 5 — LSP and Editor
 
 - A language server on the compiler's own frontend: diagnostics, completion
   scoped to the file's environment, hover, definition, references, and rename.
 - A VS Code extension that starts the server and ships the TextMate grammar.
 
-## Milestone 4 — CLI
+### Milestone 4 — CLI
 
 - `luam build`, `luam check`, and `luam ensure` with a watch loop.
 - `luam.json` configuration with validation, MTA server sync, and an `http`
   transport that refreshes and restarts the resource.
 - The CLI ships as an esbuild bundle.
 
-## Milestone 3 — Environments and Resource Assembly
+### Milestone 3 — Environments and Resource Assembly
 
 - Every file resolves to `server`, `client`, or `shared` from its path or a
   `#!` directive, and MTA API availability is scoped to it.
@@ -1430,13 +1562,13 @@ resource layout.
 - Resource assembly maps sources to Lua outputs, orders runtime helpers first,
   and generates `meta.xml`.
 
-## Milestone 2 — Classes, Enums, and the Runtime
+### Milestone 2 — Classes, Enums, and the Runtime
 
 - `class`, `extends`, `implements`, `new`, `self:super`, and `enum`.
 - `@luam/runtime` ships the Lua 5.1 helpers and the catalog that maps each
   language feature to the helper it requires.
 
-## Milestone 1 — Compiler Pipeline
+### Milestone 1 — Compiler Pipeline
 
 - Lexer, parser, binder, type checker, and Lua 5.1 emitter.
 - Type annotations, `type` aliases, compound assignment, template strings, and

@@ -1,7 +1,8 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
-import { findExtension, type ExtensionResult } from '@compiler/extensions/native-extensions';
+import type { ExtensionResult } from '@compiler/extensions/native-extensions';
 import type { CallExpression, Expression, MemberExpression, TableExpression, TemplateLiteral } from '@compiler/parser/ast';
 
+import { extensionFor, reportExtensionForm, reportNotCallable } from './callable';
 import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
@@ -53,20 +54,6 @@ const EXTENSION_RESULTS: Readonly<Record<ExtensionResult, Type>> = {
     string: STRING_TYPE,
     table: TABLE_TYPE,
 };
-
-function extensionType(receiver: Type, property: string): Type | null {
-    const literal = receiver.kind === 'string-literal' ? 'string' : receiver.kind === 'number-literal' ? 'number' : null;
-    const kind = literal ?? (receiver.kind === 'string' || receiver.kind === 'number' ? receiver.kind : null);
-    const target = kind ?? (isTableLike(receiver) ? 'table' : null);
-
-    if (target === null) {
-        return null;
-    }
-
-    const extension = findExtension(target, property);
-
-    return extension === null ? null : EXTENSION_RESULTS[extension.result];
-}
 
 function isNativeConstruction(context: CheckContext, expression: MemberExpression): boolean {
     const object = expression.object;
@@ -124,9 +111,13 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
         return context.record(expression, named);
     }
 
-    const extension = extensionType(objectType, expression.property);
+    const extension = extensionFor(objectType, expression.property);
 
-    return context.record(expression, extension ?? ANY_TYPE);
+    if (extension !== null) {
+        reportExtensionForm(context, expression, extension);
+    }
+
+    return context.record(expression, extension === null ? ANY_TYPE : EXTENSION_RESULTS[extension.result]);
 }
 
 function countArguments(total: number): string {
@@ -179,6 +170,7 @@ export function checkSignature(
 function checkArguments(context: CheckContext, expression: CallExpression, calleeType: Type): Type {
     if (calleeType.kind !== 'function') {
         checkValueList(context, expression.args);
+        reportNotCallable(context, expression, calleeType);
 
         return ANY_TYPE;
     }
@@ -252,6 +244,10 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
         }
 
         return context.record(expression, checkSignature(context, expression.args, constructor, expression.position));
+    }
+
+    if (expression.method === null) {
+        context.calledMembers.add(expression.callee);
     }
 
     const calleeType = checkExpression(context, expression.callee);

@@ -78,13 +78,7 @@ export class TokenStream {
 
     sourceSpanFrom(checkpoint: number): SourceSpan | null {
         const first = this.tokens[checkpoint];
-        let lastIndex = this.index - 1;
-
-        while (lastIndex >= checkpoint && this.tokens[lastIndex]?.kind === 'punctuation' && this.tokens[lastIndex]?.value === ';') {
-            lastIndex -= 1;
-        }
-
-        const last = this.tokens[lastIndex];
+        const last = this.tokens[this.index - 1];
 
         return first === undefined || last === undefined || first.kind === 'eof' ? null : { start: first.position.offset, end: last.end.offset };
     }

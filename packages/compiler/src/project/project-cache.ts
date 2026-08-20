@@ -16,6 +16,7 @@ interface DeclarationEntry {
     hash: string;
     environment: Environment;
     declarations: AmbientDeclarations;
+    externalReferences: readonly string[];
     fingerprint: string;
 }
 
@@ -49,6 +50,7 @@ interface ModuleContext {
     keys: AmbientKeys;
     resolve: AmbientResolver;
     project: ProjectDeclarations;
+    projectReferences: ReadonlySet<string>;
     compilerOptions: CompilerOptions;
 }
 
@@ -60,9 +62,19 @@ function optionsKey(options: CompilerOptions): string {
     return `${options.strict ? 'strict' : ''}|${options.oop ? 'oop' : ''}|${options.noUnusedLocals ? 'nul' : ''}|${options.noUnusedParameters ? 'nup' : ''}`;
 }
 
-function ambientKeys(collected: readonly DeclarationEntry[], project: ProjectDeclarations, options: CompilerOptions): AmbientKeys {
+function sharedEnums(collected: readonly DeclarationEntry[]): ReadonlySet<string> {
+    const declared = new Set(collected.flatMap((entry) => entry.declarations.enums.map((enumeration) => enumeration.name)));
+
+    if (declared.size === 0) {
+        return declared;
+    }
+
+    return new Set(collected.flatMap((entry) => entry.externalReferences.filter((name) => declared.has(name))));
+}
+
+function ambientKeys(collected: readonly DeclarationEntry[], project: ProjectDeclarations, references: ReadonlySet<string>, options: CompilerOptions): AmbientKeys {
     const keys: Partial<Record<Environment, string>> = {};
-    const projectKey = `${optionsKey(options)}|${JSON.stringify(project.globals)}`;
+    const projectKey = `${optionsKey(options)}|${JSON.stringify(project.globals)}|${[...references].sort().join(',')}`;
 
     for (const environment of ALL_ENVIRONMENTS) {
         const visible = collected.filter((entry) => canReference(environment, entry.environment));
@@ -107,6 +119,7 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
         ...(file.environment === undefined ? {} : { environment: file.environment }),
         ambient,
         project: context.project,
+        projectReferences: context.projectReferences,
         compilerOptions: context.compilerOptions,
     });
 
@@ -165,6 +178,7 @@ export function createProjectCache(): ProjectCache {
             hash,
             environment: result.environment,
             declarations: result.declarations,
+            externalReferences: [...result.externalReferences.keys()],
             fingerprint: fingerprintDeclarations(result.declarations),
         };
 
@@ -199,10 +213,12 @@ export function createProjectCache(): ProjectCache {
             const compilerOptions = options.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
             const pairs = files.map((file) => ({ file, entry: declarationsFor(file, compilerOptions, declarationsReused) }));
             const collected = pairs.map((pair) => pair.entry);
+            const projectReferences = sharedEnums(collected);
             const context = {
-                keys: ambientKeys(collected, project, compilerOptions),
+                keys: ambientKeys(collected, project, projectReferences, compilerOptions),
                 resolve: createAmbientResolver(collected),
                 project,
+                projectReferences,
                 compilerOptions,
             };
             const modules = pairs.map((pair, index) => {

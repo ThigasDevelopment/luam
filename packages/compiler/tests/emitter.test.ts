@@ -246,6 +246,11 @@ describe('emitter', () => {
         expect(emit(source)).toBe(expected);
     });
 
+    it('keeps the semicolon that closes a statement it lowers', () => {
+        expect(emit('local ratio: number = 4\nratio = ratio.abs;\nprint(ratio)\n')).toBe('local ratio = 4\nratio = math.abs(ratio);\nprint(ratio)\n');
+        expect(emit('local ratio: number = 4;ratio = ratio.abs;print(ratio)\n')).toBe('local ratio = 4;ratio = math.abs(ratio);print(ratio)\n');
+    });
+
     it('preserves comments while erasing compile-only declarations', () => {
         const source = "# heading\ntype Name = string\ninterface Entry { name: Name }\n#* block ]] text *#\nlocal name: Name = 'Luam'\n";
         const expected = "-- heading\n\n\n--[=[ block ]] text ]=]\nlocal name = 'Luam'\n";

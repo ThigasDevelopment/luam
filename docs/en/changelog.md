@@ -4,16 +4,40 @@ Changes to this manual. Compiler and CLI changes live in the repository's
 [CHANGELOG](https://github.com/ThigasDevelopment/luam/blob/main/CHANGELOG.md).
 
 The banner at the top of every page names the Luam version the manual documents.
-When that version changes, the entry below says what moved.
+Every heading below is a released version and the date it shipped, newest first.
+`Unreleased` holds the manual changes that land after the current release.
 
 ## Unreleased
 
+### Removed
+
+- The `transport` reference and every page that described configuring one. The
+  field no longer exists: `ensure` syncs files, and `dev --start-server` restarts
+  the resource through the console it owns.
+
 ### Changed
 
+- [Object extensions](/en/language/extensions) names `check-extension-form` as
+  the error for using the wrong form, and
+  [Diagnostics](/en/reference/diagnostics) lists it next to `check-not-callable`.
+- [Enums and interfaces](/en/language/enums-and-interfaces) states that erasure
+  looks at the whole resource, so an enum declared in a shared file and read
+  from a server or client file is kept.
 - [The manifest](/en/tooling/luam-manifest) explains that a `local` no field
   reads is reported as `check-unused-local`, and
   [Diagnostics](/en/reference/diagnostics) records that the code also fires in
   the manifest regardless of `compilerOptions.noUnusedLocals`.
+- This changelog now uses dated release headings. Every entry written since the
+  first published manual moved under the version that shipped it, and
+  `Unreleased` holds only the work that follows the current release.
+- [Installation](/en/guide/installation) and [Editors](/en/tooling/editors) no
+  longer name a version by hand. The pinned install command and the `.vsix` file
+  name are rendered from the version the banner shows, so they cannot go stale.
+
+## 0.15.6 - 2026-08-17
+
+### Changed
+
 - [APIs and events](/en/mta/apis-and-events) documents typed event handlers,
   payload checking on every trigger, and the `declare event` contract for custom
   events, with the diagnostics each mistake raises.
@@ -24,6 +48,11 @@ When that version changes, the entry below says what moved.
   [Editors](/en/tooling/editors) describe event-name completion, hover, and
   signature help.
 - [Diagnostics](/en/reference/diagnostics) lists the event contract codes.
+
+## 0.15.5 - 2026-08-16
+
+### Changed
+
 - [Language server](/en/tooling/language-server) uses expected callback types for
   parameter completion, member completion, hover, navigation, and signature
   help, including environment-specific MTA callbacks.
@@ -31,9 +60,17 @@ When that version changes, the entry below says what moved.
   authored statement lines for direct MTA debugging while source maps cover
   expanding transforms and production minification removes the padding.
 
+## 0.15.4 - 2026-08-16
+
+### Changed
+
 - [CLI commands](/en/tooling/cli) documents `luam server` and
   `luam dev --start-server`; the manifest and troubleshooting pages cover
   executable discovery, readiness, shutdown, and platform support.
+
+## 0.8.0 - 2026-08-12
+
+### Changed
 
 - [Keywords](/en/reference/keywords) gains a section on `self` and `super`, the
   two contextual names, and states that `constructor` is the one member name a
@@ -42,6 +79,11 @@ When that version changes, the entry below says what moved.
   completes, including `fun` in a type annotation and `super` after `self:`.
 - [Diagnostics](/en/reference/diagnostics) lists `check-invalid-self` and
   `check-invalid-constructor`.
+
+## 0.7.0 - 2026-08-12
+
+### Changed
+
 - [Output layouts](/en/reference/output-layouts) drops the `do ... end` blocks
   from the bundle description. A bundle is now the plain concatenation of its
   helpers and modules, so the page states what the shared chunk scope means for
@@ -49,6 +91,11 @@ When that version changes, the entry below says what moved.
 - [Diagnostics](/en/reference/diagnostics) lists `parse-class-method-form`, the
   error raised when a class member is written as `name(...) { ... }` instead of
   `name = function (...) ... end`.
+
+## 0.6.0 - 2026-08-12
+
+### Changed
+
 - `luam.json` became [`.luam.manifest`](/en/tooling/luam-manifest), a restricted
   Luam dialect the compiler parses, checks, and evaluates. The page is rebuilt
   around the two statements it allows, the expression language, the injected
@@ -64,7 +111,7 @@ When that version changes, the entry below says what moved.
 - [Project layout](/en/guide/project-layout) no longer describes a settings
   snapshot. The editor reads the manifest itself, so `oop` takes effect on save.
 
-## Documents Luam 0.1.1
+## 0.1.1 - 2026-08-11
 
 The first published manual.
 

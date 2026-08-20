@@ -199,6 +199,10 @@ function canonicalEdits(
         if (canonical.length === 0) {
             canonical = authored.replace(/[^\r\n]/g, '');
         } else {
+            if (authored.endsWith(';')) {
+                canonical += ';';
+            }
+
             const missingLines = authored.split('\n').length - canonical.split('\n').length;
 
             if (missingLines > 0 && index < program.body.length - 1) {
@@ -211,6 +215,18 @@ function canonicalEdits(
     }
 
     return { edits, lowered };
+}
+
+function withoutTrailingBlankLines(code: string): string {
+    const body = code.replace(/\s+$/, '');
+
+    if (body === '') {
+        return '';
+    }
+
+    const [ending] = /\r?\n$/.exec(code) ?? [''];
+
+    return `${body}${ending}`;
 }
 
 export function emitPreservingSource(
@@ -235,7 +251,7 @@ export function emitPreservingSource(
         return null;
     }
 
-    const code = applySourceEdits(source, edits);
+    const code = withoutTrailingBlankLines(applySourceEdits(source, edits));
 
-    return { code: code.trim() === '' ? '' : code, lines: hybridSourceMappings(source, program, edits, canonical.lowered) };
+    return { code, lines: hybridSourceMappings(source, program, edits, canonical.lowered) };
 }

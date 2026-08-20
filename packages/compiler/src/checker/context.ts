@@ -103,6 +103,8 @@ export class CheckContext {
 
     readonly unknownTypes = new Map<string, SourcePosition>();
 
+    readonly calledMembers = new Set<Expression>();
+
     private readonly typeParameters = new Set<string>();
 
     readonly generatedMembers = new Map<ClassDeclaration, ClassMethodDeclaration[]>();

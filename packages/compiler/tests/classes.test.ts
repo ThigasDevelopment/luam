@@ -74,6 +74,11 @@ describe('classes', () => {
         expect(emit('enum State {\n    LOBBY,\n}\nprint(1)\n')).toBe('\n\n\nprint(1)\n');
     });
 
+    it('leaves no blank lines behind a declaration erased at the end of the file', () => {
+        expect(emit('print(1)\n\nenum State {\n    LOBBY,\n}\n')).toBe('print(1)\n');
+        expect(emit(`print(1)\n\n${COMMAND}`)).toBe('print(1)\n');
+    });
+
     it('requires the class helper only for emitted OOP and enum features', () => {
         expect(helpers(PLAYER)).toEqual(['class']);
         expect(helpers(`${PLAYER}local player = new Player('Thigas')\n`)).toEqual(['class']);

@@ -5,16 +5,43 @@ Mudanças neste manual. Mudanças no compilador e na CLI ficam no
 repositório.
 
 O aviso no topo de cada página nomeia a versão do Luam que o manual documenta.
-Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
+Cada título abaixo é uma versão lançada e a data em que ela saiu, da mais nova
+para a mais antiga. `Não lançado` guarda as mudanças do manual que chegam depois
+da versão atual.
 
 ## Não lançado
 
+### Removido
+
+- A referência de `transport` e todas as páginas que descreviam configurar um. O
+  campo não existe mais: o `ensure` sincroniza arquivos, e o
+  `dev --start-server` reinicia o resource pelo console que ele possui.
+
 ### Alterado
 
+- [Extensões de objeto](/pt-br/language/extensions) nomeia `check-extension-form`
+  como o erro de usar a forma errada, e
+  [Diagnósticos](/pt-br/reference/diagnostics) o lista ao lado de
+  `check-not-callable`.
+- [Enums e interfaces](/pt-br/language/enums-and-interfaces) informa que o
+  apagamento olha o recurso inteiro, então um enum declarado em um arquivo
+  shared e lido de um arquivo server ou client é mantido.
 - [O manifesto](/pt-br/tooling/luam-manifest) explica que um `local` que nenhum
   campo lê é reportado como `check-unused-local`, e
   [Diagnósticos](/pt-br/reference/diagnostics) registra que o código também surge
   no manifesto, independente de `compilerOptions.noUnusedLocals`.
+- Este changelog passa a usar títulos de versão com data. Toda entrada escrita
+  desde o primeiro manual publicado foi para baixo da versão que a lançou, e
+  `Não lançado` guarda apenas o trabalho posterior à versão atual.
+- [Instalação](/pt-br/guide/installation) e [Editores](/pt-br/tooling/editors)
+  não nomeiam mais uma versão à mão. O comando de instalação fixada e o nome do
+  arquivo `.vsix` são gerados a partir da versão que o aviso mostra, então não
+  ficam desatualizados.
+
+## 0.15.6 - 2026-08-17
+
+### Alterado
+
 - [APIs e eventos](/pt-br/mta/apis-and-events) documenta handlers de evento
   tipados, a verificação do payload em cada trigger e o contrato `declare event`
   para eventos personalizados, com os diagnósticos de cada erro.
@@ -26,6 +53,11 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
   assinatura para nomes de evento.
 - [Diagnósticos](/pt-br/reference/diagnostics) lista os códigos de contrato de
   evento.
+
+## 0.15.5 - 2026-08-16
+
+### Alterado
+
 - [Servidor de linguagem](/pt-br/tooling/language-server) usa os tipos esperados
   de callbacks para completar parâmetros e membros, hover, navegação e ajuda de
   assinatura, inclusive em callbacks MTA específicos de cada ambiente.
@@ -33,9 +65,17 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
   mantém as linhas dos statements para debug direto no MTA, enquanto mapas
   cobrem transformações expansivas e a minificação remove o preenchimento.
 
+## 0.15.4 - 2026-08-16
+
+### Alterado
+
 - [Comandos da CLI](/pt-br/tooling/cli) documenta `luam server` e
   `luam dev --start-server`; as páginas do manifesto e de solução de problemas
   cobrem descoberta do executável, prontidão, encerramento e suporte de sistemas.
+
+## 0.8.0 - 2026-08-12
+
+### Alterado
 
 - [Palavras-chave](/pt-br/reference/keywords) ganha uma seção sobre `self` e
   `super`, os dois nomes contextuais, e diz que `constructor` é o único nome de
@@ -45,6 +85,11 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
   depois de `self:`.
 - [Diagnósticos](/pt-br/reference/diagnostics) lista o `check-invalid-self` e o
   `check-invalid-constructor`.
+
+## 0.7.0 - 2026-08-12
+
+### Alterado
+
 - [Layouts de saída](/pt-br/reference/output-layouts) deixa de descrever os
   blocos `do ... end` do bundle. Um bundle agora é a concatenação pura dos seus
   helpers e módulos, então a página diz o que o escopo de chunk compartilhado
@@ -53,6 +98,11 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
 - [Diagnósticos](/pt-br/reference/diagnostics) lista o `parse-class-method-form`,
   o erro levantado quando um membro de classe é escrito como `name(...) { ... }`
   em vez de `name = function (...) ... end`.
+
+## 0.6.0 - 2026-08-12
+
+### Alterado
+
 - O `luam.json` virou o [`.luam.manifest`](/pt-br/tooling/luam-manifest), um
   dialeto restrito do Luam que o compilador analisa, verifica e avalia. A página
   foi reescrita em torno das duas instruções permitidas, da linguagem de
@@ -69,7 +119,7 @@ Quando essa versão muda, a entrada abaixo diz o que mudou de lugar.
   snapshot de configuração. O editor lê o próprio manifesto, então `oop` passa a
   valer ao salvar.
 
-## Documenta o Luam 0.1.1
+## 0.1.1 - 2026-08-11
 
 O primeiro manual publicado.
 

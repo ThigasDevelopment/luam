@@ -24,6 +24,7 @@ export interface CompileOptions {
     ambient?: AmbientDeclarations;
     project?: ProjectDeclarations;
     compilerOptions?: CompilerOptions;
+    projectReferences?: ReadonlySet<string>;
     emitCode?: boolean;
 }
 
@@ -75,6 +76,14 @@ function findTopLevelReturn(statements: readonly Statement[]): SourcePosition | 
     return null;
 }
 
+function reachedNames(own: ReadonlySet<string>, elsewhere: ReadonlySet<string> | undefined): ReadonlySet<string> {
+    if (elsewhere === undefined || elsewhere.size === 0) {
+        return own;
+    }
+
+    return new Set([...own, ...elsewhere]);
+}
+
 export function compile(source: string, options: CompileOptions = {}): CompileResult {
     const settings = options.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
     const parsed = parse(source);
@@ -107,14 +116,15 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         return { ...shared, code: null, requiredHelpers: [], lines: [] };
     }
 
-    const emitted = emit(parsed.program, checked.types, checked.references, checked.generatedMembers);
+    const references = reachedNames(checked.references, options.projectReferences);
+    const emitted = emit(parsed.program, checked.types, references, checked.generatedMembers);
     const preserved = emitPreservingSource(
         source,
         parsed.program,
         parsed.erasures,
         parsed.comments,
         checked.types,
-        checked.references,
+        references,
         checked.generatedMembers,
         parsed.statementSpans,
     );

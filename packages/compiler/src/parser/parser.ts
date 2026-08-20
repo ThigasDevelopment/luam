@@ -40,6 +40,9 @@ function parseProgram(stream: TokenStream, diagnostics: Diagnostic[], statementS
         try {
             const checkpoint = stream.checkpoint();
             const statement = parseStatement(stream);
+
+            stream.match('punctuation', ';');
+
             const span = stream.sourceSpanFrom(checkpoint);
 
             body.push(statement);
