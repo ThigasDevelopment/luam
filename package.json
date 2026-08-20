@@ -12,12 +12,20 @@
         "docs:parity": "node docs/scripts/check-parity.ts",
         "docs:outputs": "node docs/scripts/check-outputs.ts",
         "docs:capture": "node docs/scripts/check-outputs.ts --write",
-        "docs:verify": "pnpm docs:parity && pnpm docs:snippets && pnpm docs:outputs && pnpm docs:build",
+        "docs:verify": "pnpm docs:parity && pnpm docs:versions && pnpm docs:obsolete && pnpm docs:playground && pnpm docs:examples && pnpm docs:snippets && pnpm docs:outputs && pnpm docs:build && pnpm docs:layout",
+        "docs:versions": "node tools/release/scripts/check-versions.ts",
+        "docs:obsolete": "node tools/release/scripts/check-obsolete.ts",
+        "release:notes": "node tools/release/scripts/release-notes.ts",
+        "release:prepare": "node tools/release/scripts/release-prepare.ts",
         "install:cli": "pnpm --filter @luam/cli install-cli",
         "test": "pnpm -r test",
-        "typecheck": "pnpm -r typecheck"
+        "typecheck": "pnpm -r typecheck",
+        "docs:examples": "node docs/scripts/check-examples.ts",
+        "docs:layout": "node docs/scripts/check-layout.ts",
+        "docs:playground": "node docs/scripts/check-playground.ts"
     },
     "devDependencies": {
+        "esbuild": "^0.21.5",
         "typescript": "^5.6.3",
         "vitepress": "^1.6.4",
         "vitest": "^2.1.4"

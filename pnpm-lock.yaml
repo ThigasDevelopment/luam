@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      esbuild:
+        specifier: ^0.21.5
+        version: 0.21.5
       typescript:
         specifier: ^5.6.3
         version: 5.9.3
@@ -150,6 +153,18 @@ importers:
       esbuild:
         specifier: ^0.21.5
         version: 0.21.5
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@22.20.1)
+
+  tools/release:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.20.1
       typescript:
         specifier: ^5.6.3
         version: 5.9.3

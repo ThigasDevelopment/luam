@@ -5,13 +5,25 @@ on:
         branches: [main]
         paths:
             - 'docs/**'
-            - 'packages/cli/package.json'
+            - 'examples/**'
+            - 'tools/release/**'
+            - 'packages/*/package.json'
+            - 'CHANGELOG.md'
+            - 'README.md'
+            - 'package.json'
+            - 'pnpm-workspace.yaml'
             - '.github/workflows/docs.yml'
     pull_request:
         branches: [main, develop]
         paths:
             - 'docs/**'
-            - 'packages/cli/package.json'
+            - 'examples/**'
+            - 'tools/release/**'
+            - 'packages/*/package.json'
+            - 'CHANGELOG.md'
+            - 'README.md'
+            - 'package.json'
+            - 'pnpm-workspace.yaml'
             - '.github/workflows/docs.yml'
     workflow_dispatch:
 
@@ -32,6 +44,21 @@ jobs:
 
             - name: Locale parity
               run: pnpm docs:parity
+
+            - name: Version contract
+              run: pnpm docs:versions
+
+            - name: Obsolete content
+              run: pnpm docs:obsolete
+
+            - name: Release tooling
+              run: pnpm --filter @luam/release test
+
+            - name: Playground contract and browser bundle
+              run: pnpm docs:playground
+
+            - name: Documented examples
+              run: pnpm docs:examples
 
             - name: Bundle the CLI
               run: pnpm --filter @luam/cli bundle

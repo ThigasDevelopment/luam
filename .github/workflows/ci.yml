@@ -48,6 +48,9 @@ jobs:
             - name: LSP and VS Code extension
               run: pnpm --filter @luam/lsp --filter luam test
 
+            - name: Release tooling
+              run: pnpm --filter @luam/release test
+
     build:
         name: Build
         needs: test

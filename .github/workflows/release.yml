@@ -24,8 +24,18 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/setup
+
+            - name: Version contract
+              run: pnpm docs:versions "${{ inputs.version || github.ref_name }}"
+
             - run: pnpm -r typecheck
             - run: pnpm -r test
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Verify the manual
+              run: pnpm docs:verify
 
     package:
         name: Package
@@ -39,12 +49,10 @@ jobs:
 
             - name: Resolve the version
               id: version
-              run: echo "value=${{ inputs.version || github.ref_name }}" | sed 's/=v/=/' >> "$GITHUB_OUTPUT"
+              run: node -p "'value=' + require('./packages/cli/package.json').version" >> "$GITHUB_OUTPUT"
 
-            - name: Stamp the CLI version
-              run: |
-                  cd packages/cli
-                  npm version "${{ steps.version.outputs.value }}" --no-git-tag-version --allow-same-version
+            - name: Version contract
+              run: pnpm docs:versions "${{ inputs.version || github.ref_name }}"
 
             - name: Bundle the CLI
               run: pnpm --filter @luam/cli bundle
@@ -61,8 +69,14 @@ jobs:
             - name: Package the extension
               run: |
                   cd packages/vscode
-                  npm version "${{ steps.version.outputs.value }}" --no-git-tag-version --allow-same-version
                   npx --yes @vscode/vsce package --no-dependencies --skip-license --out "$GITHUB_WORKSPACE/artifacts/luam-${{ steps.version.outputs.value }}.vsix"
+
+            - name: Verify the packaged versions
+              env:
+                  EXPECTED: ${{ steps.version.outputs.value }}
+              run: |
+                  node -e "const v = require('./packages/cli/dist/package.json').version; if (v !== process.env.EXPECTED) { console.error('The bundled CLI is ' + v + ', not ' + process.env.EXPECTED + '.'); process.exit(1); }"
+                  test -f "$GITHUB_WORKSPACE/artifacts/luam-$EXPECTED.vsix"
 
             - uses: actions/upload-artifact@v4
               with:
@@ -84,11 +98,6 @@ jobs:
             - uses: ./.github/actions/setup
               with:
                   registry-url: https://registry.npmjs.org
-
-            - name: Stamp the CLI version
-              run: |
-                  cd packages/cli
-                  npm version "${{ needs.package.outputs.version }}" --no-git-tag-version --allow-same-version
 
             - name: Bundle the CLI
               run: pnpm --filter @luam/cli bundle
@@ -129,10 +138,16 @@ jobs:
         permissions:
             contents: write
         steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup
+
             - uses: actions/download-artifact@v4
               with:
                   name: luam-${{ needs.package.outputs.version }}
                   path: artifacts
+
+            - name: Render the release notes
+              run: pnpm --silent release:notes > "$RUNNER_TEMP/notes.md"
 
             - name: Create the release
               env:
@@ -140,6 +155,6 @@ jobs:
               run: |
                   gh release create "${{ github.ref_name }}" artifacts/* \
                       --repo "${{ github.repository }}" \
-                      --notes "Manual: [English](https://thigasdevelopment.github.io/luam/en/) · [Português (Brasil)](https://thigasdevelopment.github.io/luam/pt-br/) — see the [documentation changelog](https://thigasdevelopment.github.io/luam/en/changelog)." \
+                      --notes-file "$RUNNER_TEMP/notes.md" \
                       --generate-notes \
                       --verify-tag
