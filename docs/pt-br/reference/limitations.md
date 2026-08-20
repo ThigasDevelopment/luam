@@ -14,7 +14,7 @@ como você testa:
 
 Copie o campo para um local antes:
 
-```luam
+```luam static
 local connection = self.connection
 
 if connection ~= nil then

@@ -5,8 +5,8 @@ deixa rodando enquanto trabalha.
 
 ## `luam ensure`
 
-Um comando constrói o resource, espelha-o para dentro do seu servidor MTA,
-reinicia-o e repete tudo isso a cada gravação.
+Um comando constrói o resource, espelha-o para dentro do seu servidor MTA e
+repete as duas coisas a cada gravação.
 
 ```bash
 luam ensure
@@ -18,29 +18,17 @@ Quanto ele faz depende do que o `.luam.manifest` fornece:
 | --- | --- |
 | nada | Reporta um diagnóstico. `serverPath` é obrigatório. |
 | `serverPath` | Escreve o resource dentro do servidor. Você reinicia. |
-| `serverPath` + `transport` | Também atualiza e reinicia o resource para você. |
 
 O `ensure` nunca escreve em `<outDir>/<name>`. Use `luam build` quando quiser uma
 cópia local do resource gerado.
 
 ### Conseguindo o restart
 
-Adicione um transporte `http` apontando para um resource no seu servidor que
-exporte `refreshResources` e `restartResource`:
-
-<<< @/snippets/local-development/luam.server.json
-
-```bash
-set LUAM_MTA_PASSWORD=...       # Windows
-export LUAM_MTA_PASSWORD=...    # macOS e Linux
-luam ensure
-```
-
-Use `passwordEnv`, que nomeia uma variável de ambiente, em vez de um `password`
-embutido: nenhuma linha de log e nenhum diagnóstico jamais imprime o valor. A
-interface HTTP do MTA não tem TLS, então mantenha `host` em `127.0.0.1` e faça um
-túnel por SSH em vez de expor a porta. Veja
-[Fronteiras de segurança](/pt-br/mta/security).
+O `ensure` escreve arquivos e para por aí. Para que o restart aconteça sozinho,
+rode `luam dev --start-server`: a CLI passa a ser dona do processo do MTA e
+escreve `refresh`, `stop <name>` e `start <name>` no console dele depois de uma
+sincronização que mudou algo. Fora disso, digite esses comandos você mesmo no
+console do servidor.
 
 ### O que acontece a cada gravação
 
@@ -51,7 +39,8 @@ túnel por SSH em vez de expor a porta. Veja
    sincronização, sem restart, e o resource anterior continua no servidor.
 3. **Sincronizar.** Escreve `<serverPath>/<resourcesDir>/<name>`, pulando arquivos
    idênticos e apagando arquivos gerados que o projeto não produz mais.
-4. **Reiniciar** — mas só quando a sincronização realmente mudou algum arquivo.
+4. **Reiniciar** — só com `dev --start-server`, e só quando a sincronização
+   realmente mudou algum arquivo.
 
 ### Lendo a saída
 
@@ -69,8 +58,6 @@ Manifest: done in 0 ms.
 Build passed: 42 files, 41 reused, 0 errors, 0 warnings in 3 ms.
 Sync: 18 files in 1 ms.
 Synced 1 file to "C:/MTA Server/mods/deathmatch/resources/gamemode-race" (0 removed).
-Restart: done in 24 ms.
-Restarted "gamemode-race" through the "http" transport.
 ```
 
 `reused` é o cache incremental em ação: 41 de 42 arquivos vieram do cache e só o
@@ -99,8 +86,7 @@ luam dev --start-server
 Use `luam server` em um segundo terminal quando quiser o console interativo do
 MTA, ou `luam dev --start-server` para usar um único comando. A forma integrada
 espera a prontidão do MTA antes de sincronizar, atualiza e inicia ou reinicia o
-resource pelo console possuído e encerra o processo ao receber `Ctrl+C`. Ela não
-precisa de transporte HTTP.
+resource pelo console possuído e encerra o processo ao receber `Ctrl+C`.
 
 Registros do servidor atribuídos ao resource ativo e chamadas de
 `outputDebugString` do cliente retransmitidas compartilham um único fluxo estável:

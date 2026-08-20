@@ -2,10 +2,34 @@ import type { DefaultTheme } from 'vitepress';
 
 import { pagePath, SECTIONS, type LocaleId } from './structure';
 
+export interface PlaygroundStrings {
+    environmentLabel: string;
+    oopLabel: string;
+    sourceLabel: string;
+    outputTab: string;
+    diagnosticsTab: string;
+    copy: string;
+    copied: string;
+    reset: string;
+    compiling: string;
+    clean: string;
+    blocked: string;
+    privacy: string;
+    scriptRequired: string;
+    lspHint: string;
+    tryIt: string;
+    openInPlayground: string;
+    expectedError: string;
+    share: string;
+    outline: string;
+    shortcuts: string;
+}
+
 export interface LocaleStrings {
     label: string;
     lang: string;
     description: string;
+    playground: PlaygroundStrings;
     sectionTitles: Record<string, string>;
     pageTitles: Record<string, string>;
     editLinkText: string;
@@ -63,11 +87,13 @@ export function localeSidebar(locale: LocaleId, strings: LocaleStrings): Default
 }
 
 export function localeNav(locale: LocaleId, strings: LocaleStrings): DefaultTheme.NavItem[] {
-    return SECTIONS.map((section) => ({
+    const sections = SECTIONS.map((section) => ({
         text: strings.sectionTitles[section.id] ?? section.id,
         link: `${localeRoot(locale)}${pagePath(section.id, 'index')}`,
         activeMatch: `${localeRoot(locale)}${section.id}/`,
     }));
+
+    return [...sections, { text: 'Playground', link: `${localeRoot(locale)}playground`, activeMatch: `${localeRoot(locale)}playground` }];
 }
 
 export function localeSearchOptions(strings: LocaleStrings): Record<string, unknown> {
@@ -122,6 +148,7 @@ export function localeThemeConfig(locale: LocaleId, strings: LocaleStrings, vers
             bannerText: strings.versionBanner,
             bannerLink: `${localeRoot(locale)}changelog`,
             bannerLinkText: strings.versionBannerLink,
+            playground: strings.playground,
         },
     } as DefaultTheme.Config;
 }

@@ -1,0 +1,741 @@
+.luam-playground {
+    margin: 26px 0 10px;
+}
+
+.luam-playground-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.luam-pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid var(--luam-line);
+    border-radius: var(--luam-radius-lg);
+    background-color: var(--luam-paper-2);
+    overflow: hidden;
+}
+
+.luam-pane > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 38px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--luam-line);
+    background-color: var(--luam-paper-3);
+}
+
+.luam-pane-file {
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    color: var(--luam-ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.luam-pane-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.luam-pane-actions select,
+.luam-pane-actions button {
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    color: var(--luam-ink-2);
+    background-color: transparent;
+    transition: color 0.16s, border-color 0.16s;
+}
+
+.luam-pane-actions select:hover,
+.luam-pane-actions button:hover {
+    color: var(--luam-ink);
+    border-color: var(--luam-line-strong);
+}
+
+.luam-pane-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    color: var(--luam-ink-2);
+}
+
+.luam-pane-toggle input {
+    width: 12px;
+    height: 12px;
+    accent-color: var(--luam-brand);
+}
+
+.luam-code {
+    display: flex;
+    background-color: inherit;
+    flex: 1;
+    min-height: 356px;
+    max-height: 356px;
+    overflow: auto;
+    font-family: var(--luam-mono);
+    font-size: 12.75px;
+    line-height: 1.7;
+    tab-size: 4;
+}
+
+.luam-code-gutter {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    background-color: inherit;
+    padding: 14px 14px 14px 14px;
+    text-align: right;
+    color: color-mix(in srgb, var(--luam-ink-3) 62%, transparent);
+    user-select: none;
+}
+
+.luam-code-gutter span {
+    padding-left: 6px;
+    font-variant-numeric: tabular-nums;
+}
+
+.luam-code-gutter span.has-error {
+    color: var(--luam-danger);
+    font-weight: 600;
+}
+
+.luam-code-body {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 14px 16px 14px 0;
+}
+
+.luam-code-body pre,
+.luam-code-body textarea {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    line-height: inherit;
+    tab-size: inherit;
+    white-space: pre;
+    overflow-wrap: normal;
+    background: transparent;
+}
+
+.luam-code-body pre {
+    color: var(--luam-ink);
+}
+
+.luam-code-body textarea {
+    position: absolute;
+    top: 14px;
+    left: 0;
+    display: block;
+    min-width: calc(100% - 16px);
+    height: 100%;
+    resize: none;
+    overflow: hidden;
+    color: transparent;
+    caret-color: var(--luam-brand);
+    -webkit-text-fill-color: transparent;
+}
+
+.luam-code-body textarea::selection {
+    background-color: color-mix(in srgb, var(--luam-brand) 26%, transparent);
+}
+
+.tk-keyword {
+    color: #9333ea;
+}
+
+.tk-string {
+    color: #b45309;
+}
+
+.tk-interp {
+    color: #0369a1;
+}
+
+.tk-comment {
+    color: var(--luam-ink-3);
+    font-style: italic;
+}
+
+.tk-number {
+    color: #0e7490;
+}
+
+.tk-call {
+    color: #1d4ed8;
+}
+
+.tk-builtin {
+    color: #be185d;
+}
+
+.dark .tk-keyword {
+    color: #c792ea;
+}
+
+.dark .tk-string {
+    color: #ecc48d;
+}
+
+.dark .tk-interp {
+    color: #7dd3fc;
+}
+
+.dark .tk-number {
+    color: #5eead4;
+}
+
+.dark .tk-call {
+    color: #82aaff;
+}
+
+.dark .tk-builtin {
+    color: #f78fb3;
+}
+
+.luam-report {
+    flex: 1;
+    min-height: 356px;
+    max-height: 356px;
+    overflow: auto;
+    padding: 14px 16px;
+}
+
+.luam-report ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.luam-report li {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 2px 8px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--luam-line);
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    align-items: baseline;
+}
+
+.luam-report li:first-child {
+    padding-top: 0;
+}
+
+.luam-report li:last-child {
+    border-bottom: 0;
+}
+
+.luam-report li p {
+    grid-column: 1 / -1;
+    margin: 2px 0 0;
+    font-family: var(--luam-sans);
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--luam-ink-2);
+}
+
+.luam-report-where {
+    color: var(--luam-ink-3);
+    font-variant-numeric: tabular-nums;
+}
+
+.luam-report-severity {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--luam-ink-3);
+}
+
+.luam-report li.is-error .luam-report-severity {
+    color: var(--luam-danger);
+}
+
+.luam-report-code {
+    color: var(--luam-brand);
+}
+
+.luam-report-note {
+    margin: 0;
+    max-width: 52ch;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--luam-ink-3);
+}
+
+.luam-playground-ok {
+    color: var(--luam-brand);
+}
+
+.luam-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .luam-playground-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .luam-code,
+    .luam-report {
+        min-height: 260px;
+        max-height: 300px;
+    }
+}
+
+.luam-suggest {
+    position: absolute;
+    z-index: 20;
+    margin: 0;
+    padding: 4px;
+    min-width: 240px;
+    max-width: 420px;
+    max-height: 230px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--luam-line-strong);
+    border-radius: var(--luam-radius);
+    background-color: var(--luam-paper);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+}
+
+.luam-suggest li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.luam-suggest li.is-chosen {
+    background-color: var(--vp-c-brand-soft);
+}
+
+.luam-suggest-kind {
+    flex-shrink: 0;
+    width: 62px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--luam-ink-3);
+}
+
+.luam-suggest-label {
+    color: var(--luam-ink);
+}
+
+.luam-suggest-detail {
+    margin-left: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    color: var(--luam-ink-3);
+}
+
+.luam-hover {
+    position: absolute;
+    z-index: 19;
+    transform: translateY(-100%);
+    max-width: 460px;
+    padding: 8px 11px;
+    border: 1px solid var(--luam-line-strong);
+    border-radius: var(--luam-radius);
+    background-color: var(--luam-paper);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    font-family: var(--luam-sans);
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--luam-ink-2);
+    white-space: pre-wrap;
+    pointer-events: none;
+}
+
+.luam-example {
+    margin: 20px 0;
+    border: 1px solid var(--luam-line);
+    border-radius: var(--luam-radius-lg);
+    overflow: hidden;
+}
+
+.luam-example-static div[class*='language-'] {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+}
+
+.luam-example-live .luam-code {
+    min-height: 0;
+    max-height: none;
+    background-color: var(--luam-paper-2);
+}
+
+.luam-example-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 6px 14px;
+    border-top: 1px solid var(--luam-line);
+    background-color: var(--luam-paper-3);
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+}
+
+.luam-example-env {
+    color: var(--luam-ink-3);
+}
+
+.luam-example-flag {
+    color: var(--luam-warn);
+}
+
+.luam-example-spacer {
+    flex: 1;
+}
+
+.luam-example-bar button,
+.luam-example-bar a {
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--luam-ink-2);
+    background: transparent;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.luam-example-bar button:hover,
+.luam-example-bar a:hover {
+    color: var(--luam-ink);
+    border-color: var(--luam-line-strong);
+}
+
+.luam-example-result {
+    border-top: 1px solid var(--luam-line);
+    padding: 12px 14px;
+    background-color: var(--luam-paper-2);
+}
+
+.luam-example-diagnostics {
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+}
+
+.luam-example-diagnostics li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.luam-example-diagnostics li span:last-child {
+    font-family: var(--luam-sans);
+    font-size: 13px;
+    color: var(--luam-ink-2);
+}
+
+.luam-example-output summary {
+    cursor: pointer;
+    font-family: var(--luam-mono);
+    font-size: var(--luam-eyebrow);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--luam-ink-3);
+}
+
+.luam-example-output .luam-code {
+    min-height: 0;
+    max-height: 320px;
+    margin-top: 8px;
+}
+
+.luam-outline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--luam-line);
+    background-color: var(--luam-paper-2);
+}
+
+.luam-outline button {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    border: 0;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    color: var(--luam-ink-2);
+    background: transparent;
+}
+
+.luam-outline button:hover {
+    color: var(--luam-ink);
+    background-color: var(--luam-paper-3);
+}
+
+.luam-outline-kind {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--luam-ink-3);
+}
+
+.luam-mark {
+    position: absolute;
+    z-index: 1;
+    border-radius: 2px;
+    background-color: color-mix(in srgb, var(--luam-brand) 22%, transparent);
+    pointer-events: none;
+}
+
+.luam-signature {
+    position: absolute;
+    z-index: 18;
+    max-width: 520px;
+    padding: 5px 10px;
+    border: 1px solid var(--luam-line-strong);
+    border-radius: var(--luam-radius);
+    background-color: var(--luam-paper);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+    color: var(--luam-ink-2);
+    white-space: pre-wrap;
+    pointer-events: none;
+}
+
+.luam-rename {
+    position: absolute;
+    z-index: 21;
+}
+
+.luam-rename input {
+    width: 200px;
+    padding: 3px 8px;
+    border: 1px solid var(--luam-brand);
+    border-radius: 5px;
+    font-family: var(--luam-mono);
+    font-size: 12.5px;
+    color: var(--luam-ink);
+    background-color: var(--luam-paper);
+}
+
+.luam-pane-busy {
+    font-family: var(--luam-mono);
+    font-size: 11px;
+    color: var(--luam-ink-3);
+}
+
+.luam-divider {
+    flex: 0 0 5px;
+    cursor: col-resize;
+    border-top: 1px solid var(--luam-line);
+    border-bottom: 1px solid var(--luam-line);
+    background-color: var(--luam-line);
+    transition: background-color 0.16s;
+}
+
+.luam-divider:hover {
+    background-color: var(--luam-brand);
+}
+
+.luam-squiggle {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    border-bottom: 2px dotted var(--luam-danger);
+}
+
+.luam-squiggle.is-warning {
+    border-bottom-color: var(--luam-warn);
+}
+
+@media (max-width: 900px) {
+    .luam-playground.is-full .luam-playground-grid {
+        flex-direction: column;
+    }
+
+    .luam-playground.is-full .luam-pane {
+        flex-basis: auto !important;
+    }
+
+    .luam-divider {
+        display: none;
+    }
+}
+
+html.luam-fullscreen {
+    scrollbar-gutter: auto;
+    overflow: hidden;
+}
+
+html.luam-fullscreen body {
+    width: 100%;
+    overflow: hidden;
+}
+
+.luam-app {
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-color: var(--luam-paper);
+}
+
+.luam-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    padding: 0 12px;
+    height: 42px;
+    border-bottom: 1px solid var(--luam-line);
+    background-color: var(--luam-paper-3);
+    font-family: var(--luam-mono);
+    font-size: 11.5px;
+}
+
+.luam-toolbar-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-right: 6px;
+    padding-right: 12px;
+    border-right: 1px solid var(--luam-line-strong);
+    font-weight: 600;
+    color: var(--luam-ink);
+    text-decoration: none;
+}
+
+.luam-toolbar-home img {
+    display: block;
+}
+
+.luam-toolbar select,
+.luam-toolbar button {
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--luam-ink-2);
+    background-color: transparent;
+}
+
+.luam-toolbar select {
+    border-color: var(--luam-line-strong);
+    color: var(--luam-ink);
+}
+
+.luam-toolbar button:hover,
+.luam-toolbar-home:hover {
+    color: var(--luam-ink);
+    border-color: var(--luam-line-strong);
+}
+
+.luam-toolbar-spacer {
+    flex: 1;
+}
+
+.luam-app .luam-playground-grid {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 0;
+    align-items: stretch;
+}
+
+.luam-app .luam-pane {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: var(--luam-paper);
+}
+
+.luam-app .luam-code,
+.luam-app .luam-report {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+}
+
+.luam-statusbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+    height: 30px;
+    padding: 0 12px;
+    border-top: 1px solid var(--luam-line);
+    background-color: var(--luam-paper-3);
+    font-family: var(--luam-mono);
+    font-size: 11px;
+    color: var(--luam-ink-3);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.luam-statusbar > span:first-child {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.luam-statusbar > span:last-child {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+    .luam-app .luam-playground-grid {
+        flex-direction: column;
+    }
+
+    .luam-app .luam-pane {
+        flex: 1 1 50% !important;
+    }
+
+    .luam-divider {
+        display: none;
+    }
+}

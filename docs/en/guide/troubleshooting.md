@@ -53,7 +53,7 @@ check-environment-api: API "dxDrawText" is client-only and is not available in a
 The file's environment comes from its folder. Move the file under `src/client`,
 or override the environment for that one file:
 
-```luam
+```luam env=client
 #!client
 ```
 
@@ -109,13 +109,10 @@ See [Template strings](/en/language/template-strings).
 
 ## `ensure` builds but never restarts
 
-`ensure` restarts only through a transport. With `serverPath` alone it mirrors the
-files and stops — restart the resource yourself. Add a `transport` block to get
-the refresh and restart. See [Daily development](/en/guide/daily-development).
-
-If the restart is configured and still fails, check that the MTA side resource
-named in `transport.resource` exports both `refreshResources` and
-`restartResource`, and that the ACL grants the configured user HTTP access.
+That is what it does: `ensure` mirrors the files into the server and stops. Type
+`refresh` and `restart <name>` in the server console, or run
+`luam dev --start-server`, which owns the MTA process and writes those commands
+for you. See [Daily development](/en/guide/daily-development).
 
 ## The local MTA server does not start
 
@@ -123,15 +120,6 @@ The executable error lists every attempted path. Check that `serverPath` points
 at the installation root, or set a contained relative
 `development.server.executable`. A readiness timeout names `server.log`; inspect
 that file for startup errors or a release with a different startup marker.
-
-## `config-missing-secret`
-
-`passwordEnv` names an environment variable that is not set in the shell running
-the CLI. Export it before starting the loop:
-
-```bash
-export LUAM_MTA_PASSWORD=...
-```
 
 ## `min_mta_version` is missing with a warning
 

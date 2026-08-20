@@ -28,7 +28,7 @@ luam --version
 | --- | --- |
 | Install | `npm install --global @thigasdevelopment/luam` |
 | Update to the latest | `npm update --global @thigasdevelopment/luam` |
-| Install a specific version | `npm install --global @thigasdevelopment/luam@0.1.1` |
+| Install a specific version | `npm install --global @thigasdevelopment/luam@%LUAM_VERSION%` |
 | Uninstall | `npm uninstall --global @thigasdevelopment/luam` |
 | Run once, without installing | `npx @thigasdevelopment/luam <command>` |
 

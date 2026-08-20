@@ -72,27 +72,26 @@ oferecer — rsync, SFTP, um script de deploy — e então `refresh` e
 `restart <name>` no console do servidor.
 
 **Rodar o laço uma vez.** Em uma máquina que alcança o servidor diretamente,
-`ensure --no-watch` executa o ciclo inteiro exatamente uma vez: construir,
-sincronizar, reiniciar.
+`ensure --no-watch` executa build e sincronização exatamente uma vez.
 
 ```bash
-export LUAM_MTA_PASSWORD=...
 npx --yes @thigasdevelopment/luam ensure --no-watch
 ```
 
-Essa é a forma "script de deploy" do laço de desenvolvimento, e usa as mesmas
-regras de transporte — veja
-[Fronteiras de segurança](/pt-br/mta/security).
+Essa é a forma "script de deploy" do laço de desenvolvimento. Carregar os arquivos
+sincronizados é um passo à parte: `refresh` e `restart <name>` no console do
+servidor — veja [Fronteiras de segurança](/pt-br/mta/security).
 
 ## Segredos
 
-- Nunca versione uma senha. `transport.passwordEnv` nomeia uma variável de
-  ambiente, que é o que um cofre de segredos de CI fornece.
+- Nunca versione uma senha. Leia uma de `env` no manifesto, que é o que um cofre
+  de segredos de CI fornece.
 - O `.env` é versionado e declara chaves e padrões seguros; o
   `<outDir>/<name>/env.lua` implantado é escrito uma vez, com chaves de aparência
   sensível esvaziadas, e nunca é sobrescrito por um rebuild.
-- A interface HTTP do MTA não tem TLS. Mantenha `host` em `127.0.0.1` e faça um
-  túnel por SSH em vez de expor a porta a um runner.
+- A CLI nunca abre conexão com um servidor em execução. Um runner que precise
+  alcançar um precisa da sua própria etapa de transferência — SSH ou SFTP — fora
+  do Luam.
 
 ## Um hook de pre-commit
 

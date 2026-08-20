@@ -5,68 +5,74 @@ titleTemplate: Lua tipado para Multi Theft Auto
 hero:
     name: Luam
     text: Lua tipado para Multi Theft Auto
-    tagline: Escreva .luam com tipos, classes e strings de template. Publique Lua 5.1 puro e um meta.xml gerado que o seu servidor inicia como está.
-    image:
-        src: /luam-mark.svg
-        alt: Luam
+    tagline: Escreva .luam com tipos e classes. Publique Lua 5.1 puro e um meta.xml gerado que o seu servidor inicia como está.
     actions:
         - theme: brand
           text: Início rápido
           link: /pt-br/guide/quick-start
         - theme: alt
-          text: Instalação
+          text: Instalar a CLI
           link: /pt-br/guide/installation
-        - theme: alt
-          text: Referência da linguagem
-          link: /pt-br/reference/keywords
-features:
-    - title: Erros antes de o servidor iniciar
-      details: Uma API só de servidor em um arquivo de cliente, um erro de digitação no nome de uma função do MTA, uma string onde cabia um número — tudo vira erro de build. Um build com qualquer erro não escreve nada.
-      link: /pt-br/mta/environments
-      linkText: Ambientes
-    - title: Lua tipado, não TypeScript
-      details: Blocos continuam terminando com end e a desigualdade continua sendo ~=. Anotações, classes, enums e interfaces são apagadas no build.
-      link: /pt-br/language/
-      linkText: A linguagem
-    - title: Um resource pronto para iniciar
-      details: Builds de produção emitem um bundle Lua legível por ambiente não vazio e um mapa separado para resolver erros do MTA.
-      link: /pt-br/reference/output-layouts
-      linkText: Estruturas de saída
-    - title: O editor nunca discorda
-      details: O servidor de linguagem roda o mesmo verificador que a CLI roda, então completação, hover e diagnósticos batem exatamente com o build.
-      link: /pt-br/tooling/editors
-      linkText: Editores
 ---
 
-## O que é o Luam
+## Experimente
 
-Luam é uma linguagem tipada para o [Multi Theft Auto](https://multitheftauto.com/).
-Você escreve arquivos `.luam`, o compilador os verifica e emite **Lua 5.1**
-legível mais um `meta.xml` gerado — um resource (recurso do MTA) que o seu
-servidor inicia sem nenhum passo adicional.
+Nada para instalar. O compilador e o servidor de linguagem rodam no seu
+navegador: completação, hover, ir para a definição, renomear e diagnósticos, do
+mesmo código que o seu editor roda.
 
-```luam
-local health: number = 100
+<div class="luam-cta">
+<a href="/pt-br/playground">Abrir o playground</a>
+<span>ou <a href="/pt-br/guide/installation">instale a CLI</a> para construir um resource de verdade.</span>
+</div>
 
-function heal(player: Player, amount: number): void
-    health += amount
+## O que o compilador se recusa a publicar
 
-    outputChatBox(`${getPlayerName(player)} healed`, player)
-end
-```
+<div class="luam-split">
+<div>
 
-É *Lua tipado*, não TypeScript. Comentários usam `#` e `#* ... *#` para nunca
-colidirem com o operador de decremento `--`, e toda anotação de tipo desaparece
-do Lua gerado.
+### Lado errado
 
-## Por onde começar
+`dxDrawText` em um arquivo de servidor é erro, não surpresa em tempo de execução.
+Cada arquivo resolve para `server`, `client` ou `shared`, e o catálogo do MTA é
+limitado a ele.
 
-| Você quer | Leia |
-| --- | --- |
-| Instalar as ferramentas | [Instalação](/pt-br/guide/installation) |
-| Construir o primeiro resource | [Início rápido](/pt-br/guide/quick-start) |
-| Entender o sistema de tipos | [Tipos](/pt-br/language/types) |
-| Saber qual API do MTA um arquivo pode chamar | [Ambientes](/pt-br/mta/environments) |
-| Configurar um projeto | [.luam.manifest](/pt-br/tooling/luam-manifest) |
-| Copiar um exemplo que funciona | [Receitas](/pt-br/recipes/) |
-| Consultar uma palavra-chave ou um diagnóstico | [Referência](/pt-br/reference/) |
+</div>
+<div>
+
+### Nome errado
+
+Um erro de digitação em uma função do MTA é conferido contra o catálogo fixado,
+então falha no `luam check` em vez de retornar `nil` às três da manhã.
+
+</div>
+<div>
+
+### Tipo errado
+
+Uma `string` onde cabia um `number`, um campo que não existe na classe, um nome
+escrito errado dentro de `` `${...}` `` — tudo vira erro de build.
+
+</div>
+</div>
+
+Um build com qualquer erro não escreve absolutamente nada, então um resource
+quebrado nunca chega ao diretório do servidor.
+
+## Continua sendo Lua
+
+Blocos fecham com `end`. A desigualdade é `~=`. Comentários usam `#` para nunca
+colidirem com o operador de decremento `--`. Anotações, classes, enums e
+interfaces são apagadas no build, e o que chega ao seu resource é Lua 5.1
+legível, que você depura direto no servidor.
+
+## Por onde seguir
+
+<ul class="luam-next">
+<li><a href="/pt-br/guide/installation"><strong>Instalação</strong><span>Instale a CLI e a extensão do editor.</span></a></li>
+<li><a href="/pt-br/guide/quick-start"><strong>Início rápido</strong><span>Construa e rode o seu primeiro resource.</span></a></li>
+<li><a href="/pt-br/language/types"><strong>Tipos</strong><span>O sistema de tipos, de ponta a ponta.</span></a></li>
+<li><a href="/pt-br/mta/environments"><strong>Ambientes</strong><span>Qual API do MTA cada arquivo pode chamar.</span></a></li>
+<li><a href="/pt-br/recipes/"><strong>Receitas</strong><span>Projetos completos, verificados a cada build.</span></a></li>
+<li><a href="/pt-br/reference/"><strong>Referência</strong><span>Palavras-chave, diagnósticos, campos de configuração.</span></a></li>
+</ul>

@@ -1,0 +1,120 @@
+:root {
+    --luam-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', 'JetBrains Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+    --luam-sans: 'Inter var', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+
+    --luam-ink: #101418;
+    --luam-ink-2: #48525d;
+    --luam-ink-3: #78828e;
+    --luam-paper: #ffffff;
+    --luam-paper-2: #f7f8fa;
+    --luam-paper-3: #eef0f4;
+    --luam-line: #e2e6ec;
+    --luam-line-strong: #cdd4dd;
+
+    --luam-brand: #0b6e82;
+    --luam-brand-strong: #08505f;
+    --luam-violet: #6d3ff0;
+    --luam-danger: #c0392f;
+    --luam-warn: #9a6206;
+
+    --luam-eyebrow: 11px;
+    --luam-measure: 74ch;
+    --luam-radius: 8px;
+    --luam-radius-lg: 12px;
+
+    --vp-font-family-base: var(--luam-sans);
+    --vp-font-family-mono: var(--luam-mono);
+
+    --vp-c-bg: var(--luam-paper);
+    --vp-c-bg-alt: var(--luam-paper-2);
+    --vp-c-bg-soft: var(--luam-paper-2);
+    --vp-c-bg-elv: var(--luam-paper);
+    --vp-c-divider: var(--luam-line);
+    --vp-c-border: var(--luam-line-strong);
+    --vp-c-gutter: var(--luam-line);
+
+    --vp-c-text-1: var(--luam-ink);
+    --vp-c-text-2: var(--luam-ink-2);
+    --vp-c-text-3: var(--luam-ink-3);
+
+    --vp-c-brand-1: var(--luam-brand);
+    --vp-c-brand-2: var(--luam-brand-strong);
+    --vp-c-brand-3: var(--luam-brand-strong);
+    --vp-c-brand-soft: rgba(11, 110, 130, 0.1);
+
+    --vp-c-danger-1: var(--luam-danger);
+    --vp-c-warning-1: var(--luam-warn);
+
+    --vp-code-font-size: 0.86em;
+    --vp-code-line-height: 1.7;
+    --vp-layout-max-width: 1440px;
+    --vp-sidebar-width: 258px;
+    --vp-nav-height: 56px;
+
+    --luam-banner-height: 32px;
+    --vp-layout-top-height: var(--luam-banner-height);
+    --vp-home-hero-name-color: var(--luam-ink);
+}
+
+.dark {
+    --luam-ink: #e8eef5;
+    --luam-ink-2: #97a3b2;
+    --luam-ink-3: #6b7684;
+    --luam-paper: #0c1014;
+    --luam-paper-2: #12171d;
+    --luam-paper-3: #171d25;
+    --luam-line: #1f262e;
+    --luam-line-strong: #2c353f;
+
+    --luam-brand: #34c9e0;
+    --luam-brand-strong: #6fdcee;
+    --luam-violet: #a78bfa;
+    --luam-danger: #f87171;
+    --luam-warn: #e0a44a;
+
+    --vp-c-brand-soft: rgba(52, 201, 224, 0.14);
+}
+
+html {
+    scrollbar-gutter: stable;
+    scrollbar-color: color-mix(in srgb, var(--luam-ink-3) 52%, transparent) transparent;
+}
+
+* {
+    scrollbar-width: thin;
+}
+
+body {
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--luam-brand);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+::selection {
+    background-color: var(--vp-c-brand-soft);
+}
+
+.luam-eyebrow {
+    font-family: var(--luam-mono);
+    font-size: var(--luam-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--luam-ink-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

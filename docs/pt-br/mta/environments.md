@@ -17,7 +17,7 @@ são visíveis e onde o arquivo compilado é declarado no `meta.xml`.
 | `src/client/**` | `client` |
 | `src/shared/**` | `shared` |
 
-```luam
+```luam env=client
 #!client
 
 dxDrawText('hud', 10, 10)
@@ -37,13 +37,13 @@ usual.
 `server` e `client` nunca enxergam um ao outro. `shared` é o mais restrito dos
 três, porque o seu código precisa ser válido dos dois lados.
 
-```luam
+```luam env=client
 # src/server/admin.luam
 outputChatBox('hi', player)   # ok, outputChatBox é shared
 dxDrawText('hud', 10, 10)     # check-environment-api
 ```
 
-```luam
+```luam env=server
 # src/shared/util.luam
 outputDebugString('hello')    # ok, outputDebugString é shared
 kickPlayer(player)            # check-environment-api: kickPlayer é exclusivo do servidor
@@ -68,7 +68,7 @@ precisam:
 `onPlayerJoin` é um evento de servidor e `onClientRender` é de cliente. Tratar um
 evento do lado errado é `check-environment-event`:
 
-```luam
+```luam env=client
 # src/server/main.luam
 addEventHandler('onClientRender', root, draw)   # check-environment-event
 ```

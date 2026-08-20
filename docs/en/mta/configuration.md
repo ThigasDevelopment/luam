@@ -27,7 +27,7 @@ Anything a player may see belongs here. Nothing secret does.
 Because the compiler never parses it, give it a
 [declaration file](/en/language/declaration-files) to get types:
 
-```luam
+```luam decl
 interface ConfigShape {
     greeting: string
     limit: number

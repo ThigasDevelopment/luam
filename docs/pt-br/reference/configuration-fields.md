@@ -109,29 +109,6 @@ projeto com `.env` recebe um `env.lua` gerado no lugar.
 | `serverPath` | `string?` | não | não definido | Raiz do servidor MTA. Exigido por `ensure` e `dev`. |
 | `resourcesDir` | `string` | não | `'mods/deathmatch/resources'` | Diretório de resources relativo a `serverPath`. |
 
-## Transporte
-
-A tabela `transport` inteira é opcional; omiti-la equivale a `kind = 'none'`.
-Escrever a tabela sem `kind` é `config-missing-field`.
-
-| Campo | Tipo | Obrigatório | Padrão | Significado |
-| --- | --- | --- | --- | --- |
-| `transport.kind` | `'none' \| 'http'` | sim | — | `none` sincroniza sem reiniciar. |
-| `transport.host` | `string` | não | `'127.0.0.1'` | Um host que não é loopback reporta `config-remote-plaintext-transport`. |
-| `transport.port` | `number` | não | `22005` | Porta da interface HTTP do MTA. |
-| `transport.resource` | `string` | para `http` | — | Resource que exporta as funções de refresh e restart. |
-| `transport.username` | `string` | para `http` | — | Usuário da autenticação básica HTTP. |
-| `transport.passwordEnv` | `string` | não | — | Nomeia uma variável de ambiente com a senha. Não definida em tempo de execução é `config-missing-secret`. |
-| `transport.password` | `string` | não | — | Senha embutida. Aceita, mas reporta `config-plaintext-password`. |
-| `transport.refreshFunction` | `string` | não | `'refreshResources'` | Chamada primeiro. |
-| `transport.restartFunction` | `string` | não | `'restartResource'` | Chamada com o nome do resource. |
-
-`host`, `resource`, `refreshFunction` e `restartFunction` viram parte da URL da
-requisição e são validados antes de qualquer envio. Um valor com `/`, `?`, `#` ou
-`..` é `config-invalid-url-segment`.
-
-Um `kind` que não é `'none'` nem `'http'` é `config-invalid-transport`.
-
 ## Logs de desenvolvimento
 
 Usados apenas pelo `luam dev`.
@@ -160,6 +137,7 @@ Um nome removido é rejeitado, nunca virado apelido. Cada um reporta
 | `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |
+| `transport` | Nada. `ensure` sincroniza arquivos, e `dev --start-server` reinicia o servidor que ele mesmo iniciou. |
 | `helperDir` | Nada. Helpers da árvore usam `lib/<ambiente>`; helpers em bundle ficam dentro dos bundles de ambiente. Reporta `config-unknown-field`. |
 
 Hooks, plugins, expressões regulares e dependências opcionais não são suportados e
@@ -171,4 +149,3 @@ não têm substituto.
 | --- | --- |
 | `LUAM_OFFLINE` | Pula a consulta de `min_mta_version`, como `--offline`. |
 | `NO_COLOR` | Desliga cor e emoji, como `--no-color`. |
-| o nome em `transport.passwordEnv` | Fornece a senha do transporte. |

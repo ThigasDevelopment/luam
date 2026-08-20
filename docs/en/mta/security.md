@@ -57,31 +57,15 @@ overwrites that file.
 `.env.local` never reaches the generated file, so a value you set to work locally
 cannot be deployed by accident.
 
-## The `ensure` transport
+## Reaching a running server
 
-`ensure` restarts a resource over MTA's HTTP interface, which has **no TLS**.
-Basic authentication therefore travels in the clear.
+The CLI never opens a connection to an MTA server. `ensure` writes files into
+`serverPath`, and `dev --start-server` drives the console of the process it
+started itself — there is no HTTP interface to configure, no credential to store,
+and nothing to keep off a shared network.
 
-```luam
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
-```
-
-- Use `passwordEnv`, which names an environment variable. An inline `password`
-  is accepted but reports `config-plaintext-password`. No log line or diagnostic
-  ever prints the value either way.
-- Keep `host` on a loopback address and tunnel the port over SSH. A non-loopback
-  host reports `config-remote-plaintext-transport`.
-- `resource`, `refreshFunction`, `restartFunction` and `host` become part of the
-  request URL, so they are validated before any request is sent. A value
-  containing `/`, `?`, `#` or `..` is `config-invalid-url-segment` and the
-  configuration fails to load.
+A server the CLI does not own is refreshed by hand, in its console, so no
+password ever enters the manifest.
 
 ## Network access
 

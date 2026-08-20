@@ -43,7 +43,7 @@ declarado não é verificada contra nenhum.
 
 Um `?` no tipo do parâmetro permite omitir o argumento:
 
-```luam
+```luam static
 function formatLabel(name: string, tag?: string): string
 ```
 

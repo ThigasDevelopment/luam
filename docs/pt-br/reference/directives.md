@@ -3,7 +3,7 @@
 Uma diretiva é uma linha `#!` no topo de um arquivo, antes do primeiro comando.
 Ela configura **apenas aquele arquivo**.
 
-```luam
+```luam env=client
 #!client
 #!nonstrict
 ```
@@ -22,7 +22,7 @@ primeiro comando não é uma diretiva.
 Uma diretiva **sobrepõe a pasta**, e é isso que permite a um arquivo viver fora de
 `src/server`, `src/client` ou `src/shared`:
 
-```luam
+```luam env=client
 #!client
 
 dxDrawText('hud', 10, 10)

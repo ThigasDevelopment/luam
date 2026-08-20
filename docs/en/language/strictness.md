@@ -27,7 +27,7 @@ module is normal and expected — it is how a project migrates a file at a time.
 The directive must appear before the first statement. Environment directives
 (`#!server`, `#!client`, `#!shared`) may sit beside it, in any order:
 
-```luam
+```luam env=client
 #!client
 #!nonstrict
 ```

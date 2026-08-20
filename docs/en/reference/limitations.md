@@ -13,7 +13,7 @@ block it guards. A field keeps its declared type, however you test it:
 
 Copy the field into a local first:
 
-```luam
+```luam static
 local connection = self.connection
 
 if connection ~= nil then

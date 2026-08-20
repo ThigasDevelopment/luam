@@ -95,8 +95,10 @@ luam ensure
 luam ensure --no-watch
 ```
 
-Constrói, espelha o resource no seu servidor MTA, reinicia e repete a cada
-gravação. Exige `serverPath`; o restart também exige um `transport`. O `ensure`
+Constrói, espelha o resource no seu servidor MTA e repete a cada gravação. Exige
+`serverPath`. Ele sincroniza arquivos e nunca reinicia o resource — use
+`luam dev --start-server`, ou `refresh` no console do servidor, para carregar a
+sincronização. O `ensure`
 nunca escreve em `<outDir>/<name>` e usa a estrutura em árvore por padrão,
 independentemente de `output.bundle`. Passe `--bundle` para uma sincronização em
 bundle.
@@ -128,15 +130,14 @@ estrutura: `luam dev --bundle` é um erro de uso.
 
 `--start-server` inicia primeiro o processo MTA local e espera a prontidão antes
 do build. Depois de uma sincronização com mudanças, escreve `refresh`,
-`stop <resource>` e `start <resource>` no console que possui; por isso esse fluxo
-integrado não precisa de transporte HTTP e inicia um resource recém-implantado.
+`stop <resource>` e `start <resource>` no console que possui, então também
+inicia um resource recém-implantado.
 Uma saída antecipada ou inesperada do servidor encerra o laço de desenvolvimento
 com código `1`. Sem a flag, `dev` nunca inicia nem encerra um processo MTA.
 
 `luam server` e `luam ensure` em terminais separados são processos separados. O
 `ensure` não pode escrever no console possuído pela outra execução, então o
-`ensure` isolado ainda usa o transporte configurado ou apenas sincroniza quando
-ele não existe.
+`ensure` isolado apenas sincroniza arquivos.
 
 ## `luam server`
 

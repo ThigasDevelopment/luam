@@ -3,7 +3,7 @@
 A directive is a `#!` line at the top of a file, before the first statement. It
 configures **that file only**.
 
-```luam
+```luam env=client
 #!client
 #!nonstrict
 ```
@@ -22,7 +22,7 @@ statement is not a directive.
 A directive **overrides the folder**, which is what lets a file live outside
 `src/server`, `src/client` or `src/shared`:
 
-```luam
+```luam env=client
 #!client
 
 dxDrawText('hud', 10, 10)

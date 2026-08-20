@@ -66,6 +66,8 @@ erro não escreve nada.
 | `check-argument-count` | error | Argumentos de menos ou de mais. |
 | `check-invalid-operand` | error | Um operador não pode ser aplicado a esse tipo. |
 | `check-unknown-member` | error | O membro não existe no receptor. |
+| `check-not-callable` | error | Uma chamada em um valor que não é função. |
+| `check-extension-form` | error | Uma extensão de objeto usada na outra forma: uma extensão de propriedade chamada, ou uma extensão de chamada apenas lida. |
 | `check-unknown-record-key` | error | A chave não é declarada pelo tipo de objeto. Também usado por `process.env`. |
 | `check-unknown-union-key` | error | A chave falta em pelo menos um membro da união. |
 | `check-invalid-intersection` | error | Uma parte da interseção não é um tipo objeto, uma interface ou uma classe. |
@@ -173,7 +175,7 @@ erro não escreve nada.
 | `config-unreadable-manifest` | O arquivo não pôde ser lido. |
 | `config-invalid-statement` | Uma instrução que o dialeto do manifesto não permite. Apenas declarações `local` e atribuições a campos de configuração. |
 | `config-invalid-expression` | Um valor que a linguagem de expressões do manifesto não permite — uma chamada, uma função, um índice por algo que não seja um nome. |
-| `config-missing-field` | Um campo obrigatório — `name`, ou `transport.kind` quando `transport` é escrito — está ausente. |
+| `config-missing-field` | Um campo obrigatório — `name`, ou `from` dentro de uma entrada de `assets` — está ausente. |
 | `config-invalid-name` | `name` não é um nome válido de resource do MTA. |
 | `config-invalid-type` | Um campo tem o tipo errado. |
 | `config-unknown-field` | Um nome não é um campo de configuração. Inclui o removido `helperDir`. |
@@ -189,8 +191,3 @@ erro não escreve nada.
 | `config-invalid-engine-version` | `engine.minVersion` não é `'latest'` nem uma versão. |
 | `config-missing-env-file` | Um arquivo configurado em `environment` não existe. |
 | `config-unknown-helper` | `helpers` nomeia um helper inexistente. |
-| `config-invalid-transport` | O bloco de transporte tem formato inválido. |
-| `config-invalid-url-segment` | Um valor de transporte contém `/`, `?`, `#` ou `..`. |
-| `config-missing-secret` | `passwordEnv` nomeia uma variável de ambiente não definida. |
-| `config-plaintext-password` | Um `password` embutido foi usado. Prefira `passwordEnv`. |
-| `config-remote-plaintext-transport` | `host` não é loopback, e a interface não tem TLS. |

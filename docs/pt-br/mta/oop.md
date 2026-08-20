@@ -35,7 +35,7 @@ o que o checker aceita e o que o manifesto declara, nada mais.
 | Métodos estáticos | 118 |
 | Construtores | 46 |
 
-```luam
+```luam env=server oop
 function describePlayer(player: Player): string
     local name: string = player:getName()
     local money: number = player:getMoney()
@@ -50,7 +50,7 @@ membros herdados.
 
 ## Métodos estáticos e construtores
 
-```luam
+```luam env=server oop
 local player = Player.getRandom()
 local exists: boolean = File.exists('data.json')
 local handle = File('data.json')

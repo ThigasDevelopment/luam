@@ -62,7 +62,7 @@ O `meta.xml` começa com a flag de OOP:
 
 A mesma flag tipa membros estáticos e classes chamáveis:
 
-```luam
+```luam env=server oop
 local player = Player.getRandom()
 local exists: boolean = File.exists('data.json')
 local handle = File('data.json')

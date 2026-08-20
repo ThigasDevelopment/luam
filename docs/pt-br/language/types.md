@@ -134,7 +134,7 @@ Quando todos os membros são tipos objeto, interfaces ou classes, a leitura de u
 chave é checada. Uma chave que todos os membros declaram devolve a união dos seus
 tipos; uma chave que só alguns declaram é `check-unknown-union-key`:
 
-```luam
+```luam expect-error
 type Circle = {
     kind: 'circle',
     radius: number
@@ -211,7 +211,7 @@ Uma união cujos membros compartilham uma chave tipada como literal estreita por
 essa chave. Comparar a chave com um literal mantém apenas os membros
 que podem casar:
 
-```luam
+```luam expect-error
 type SQLite = Base & {
     kind: 'sqlite',
     sender: string
@@ -238,7 +238,7 @@ Dentro do primeiro bloco `config` é `MySQL`, então `host` e `port` resolvem e
 `sender` é `check-unknown-record-key`. O `else` recebe o membro restante. `~=`
 estreita para o outro lado, o que faz a forma com saída antecipada funcionar:
 
-```luam
+```luam static
 function connect(config: Config): void
     if config.kind ~= 'mysql' then
         return

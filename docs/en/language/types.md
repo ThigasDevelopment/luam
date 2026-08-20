@@ -133,7 +133,7 @@ When every member is an object type, an interface, or a class, reading a key is
 checked. A key that all members declare gives the union of its types; a key that
 only some declare is `check-unknown-union-key`:
 
-```luam
+```luam expect-error
 type Circle = {
     kind: 'circle',
     radius: number
@@ -207,7 +207,7 @@ generated Lua is the same table it would have been.
 A union whose members share a key typed as a literal narrows on that key.
 Comparing it against a literal keeps only the members that can match:
 
-```luam
+```luam expect-error
 type SQLite = Base & {
     kind: 'sqlite',
     sender: string
@@ -234,7 +234,7 @@ Inside the first branch `config` is `MySQL`, so `host` and `port` resolve and
 `sender` is `check-unknown-record-key`. The `else` branch gets the remaining
 member. `~=` narrows the other way, which makes the early-return form work too:
 
-```luam
+```luam static
 function connect(config: Config): void
     if config.kind ~= 'mysql' then
         return

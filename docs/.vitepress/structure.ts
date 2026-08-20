@@ -59,7 +59,7 @@ export const SECTIONS: readonly Section[] = [
     },
 ];
 
-export const ROOT_PAGES: readonly string[] = ['index', 'changelog'];
+export const ROOT_PAGES: readonly string[] = ['index', 'changelog', 'playground'];
 
 export function pageId(section: string, page: string): string {
     return page === 'index' ? section : `${section}/${page}`;

@@ -5,7 +5,7 @@ a vendored library, a snippet copied from another resource. It is type checked,
 contributes **nothing** to the generated resource, and takes its environment from
 its path like any other source file.
 
-```luam
+```luam decl
 interface ConfigShape {
     greeting: string
     limit: number
@@ -42,7 +42,7 @@ of a resource. See [APIs and events](/en/mta/apis-and-events).
 A declaration file holds declarations. A call, an assignment, or a loop is
 `check-declaration-file-statement`:
 
-```luam
+```luam expect-error
 declare Config: ConfigShape
 
 outputDebugString('hello')   # check-declaration-file-statement
@@ -77,7 +77,7 @@ Config = {
 }
 ```
 
-```luam
+```luam decl
 interface ConfigShape {
     greeting: string
     limit: number

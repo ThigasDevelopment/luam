@@ -54,7 +54,7 @@ depende da ACL `resource.<nome>.http` e da autenticação configurada no servido
 | Dois arquivos não podem exportar o mesmo nome. | `project-duplicate-export` |
 | `export` não pode ser aplicado a uma `local function`. | `parse-export-local` |
 
-```luam
+```luam static
 export function api.getScore(): number   # check-export-member
 ```
 

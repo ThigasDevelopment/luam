@@ -42,7 +42,7 @@ declared return type is not checked against one.
 
 A `?` on the parameter type allows the argument to be omitted:
 
-```luam
+```luam static
 function formatLabel(name: string, tag?: string): string
 ```
 

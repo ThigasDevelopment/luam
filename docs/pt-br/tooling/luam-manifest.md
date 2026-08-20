@@ -58,15 +58,6 @@ development = {
         rateWindowMs = 1000,
     },
 }
-
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
 ```
 
 `--manifest <path>` carrega outro arquivo, que é como um projeto mantém um manifesto
@@ -111,16 +102,12 @@ comparação, aritmética e concatenação:
 
 ```luam
 outDir = mode == 'production' and 'build' or 'build-dev'
-port = 22000 + 5
-transport = {
-    kind = env.LUAM_MTA_PASSWORD and 'http' or 'none',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
+serverPath = env.LUAM_MTA_SERVER or 'C:/MTA Server'
 ```
 
 Vale a veracidade do Lua, então `a and b or c` se lê como um condicional e o
-verificador o tipa com precisão: o ramo acima é `'http' | 'none'`, que é o que
-`transport.kind` aceita.
+verificador o tipa com precisão: o ramo acima é uma `string`, que é o que
+`serverPath` aceita.
 
 ### Por que não há chamadas
 
@@ -147,11 +134,9 @@ Os membros de `env` são strings opcionais, então uma variável ausente é `nil
 não um erro. Comparar ou dar um padrão é a forma de usar uma:
 
 ```luam
-local password = env.LUAM_MTA_PASSWORD
+local root = env.LUAM_MTA_SERVER
 
-transport = {
-    kind = password and 'http' or 'none',
-}
+serverPath = root or 'C:/MTA Server'
 ```
 
 Nada mais está em escopo. Não há `print`, `os` nem `require` — um nome que o
@@ -162,9 +147,9 @@ digitação em um campo é apontado no campo em vez de ignorado em silêncio.
 
 Para o servidor de linguagem, o manifesto é um documento comum. Os diagnósticos
 aparecem enquanto você digita, o autocompletar oferece os campos válidos no cursor
-— com tipo, se são obrigatórios e o padrão — e os conjuntos fechados
-(`transport.kind`, `helpers` e os valores de `mode`) completam dentro das aspas. O
-hover nomeia o caminho completo do campo e seu tipo.
+— com tipo, se são obrigatórios e o padrão — e os conjuntos fechados (`helpers` e
+os valores de `mode`) completam dentro das aspas. O hover nomeia o caminho
+completo do campo e seu tipo.
 
 Como o servidor lê o arquivo diretamente, mudar `compilerOptions.oop` passa a
 valer ao salvar. Não há snapshot para atualizar nem execução da CLI para esperar;
@@ -186,7 +171,7 @@ dois lugares.
 | `engine` | A versão do MTA que o resource exige. |
 | `environment` | Quais arquivos `.env` alimentam `env` e `process.env`. |
 | saída | `outDir`, `loadOrder`, `output`, `helpers`. |
-| implantação | `serverPath`, `resourcesDir`, `transport`, `development`. |
+| implantação | `serverPath`, `resourcesDir`, `development`. |
 
 Uma tabela campo a campo completa, incluindo cada regra de validação, está em
 [Campos de configuração](/pt-br/reference/configuration-fields).
@@ -346,40 +331,6 @@ Nomeia helpers de runtime que o compilador não injetaria por conta própria.
 a saída em bundle os inclui nos bundles de ambiente. Um `.luam.manifest` que ainda
 nomeia `helperDir` falha com `config-unknown-field` — apague a linha.
 
-## `transport`
-
-```luam
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-    refreshFunction = 'refreshResources',
-    restartFunction = 'restartResource',
-}
-```
-
-`kind` é o único membro que a tabela precisa carregar — `transport = { }` é
-`config-missing-field`, então um bloco pela metade nunca cai em um padrão
-silencioso.
-
-`none` pula o restart e apenas sincroniza arquivos. `http` chama a interface HTTP
-do MTA:
-
-```
-POST http://<host>:<port>/<resource>/call/<function>
-```
-
-A chamada leva autenticação básica HTTP e um array JSON de argumentos.
-`refreshFunction` roda primeiro, depois `restartFunction` com o nome do resource.
-Os dois precisam ser exportados pelo `resource` nomeado na configuração, e a ACL
-precisa conceder acesso HTTP ao usuário configurado.
-
-Prefira `passwordEnv` a um `password` embutido. Veja
-[Fronteiras de segurança](/pt-br/mta/security).
-
 ## `development.logs`
 
 Usado apenas pelo `luam dev`. `build` e `ensure` nunca escrevem os helpers de
@@ -408,14 +359,13 @@ dentro desse diretório. Quando omitido, `luam server` e
 | O arquivo não pôde ser lido | `config-unreadable-manifest` |
 | Uma instrução que o dialeto não permite | `config-invalid-statement` |
 | Um valor que a linguagem de expressões não permite | `config-invalid-expression` |
-| `name`, ou `transport.kind`, ausente | `config-missing-field` |
+| `name`, ou `from` dentro de uma entrada de `assets`, ausente | `config-missing-field` |
 | `name` não é um nome de resource válido | `config-invalid-name` |
 | Um campo tem o tipo errado | `config-invalid-type` |
 | Um nome não é um campo de configuração | `config-unknown-field` |
 | Um campo que não existe mais | `config-removed-field` |
 | Um caminho escapa da sua base | `config-escaping-path` |
 | Um padrão que a gramática de glob não permite | `config-invalid-pattern` |
-| `passwordEnv` nomeia uma variável não definida | `config-missing-secret` |
 
 Todos os códigos estão em [Diagnósticos](/pt-br/reference/diagnostics).
 
@@ -432,5 +382,6 @@ diz:
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |
 | `helperDir` | Nada. Os helpers vão para `lib/<ambiente>` ou para dentro dos bundles. |
+| `transport` | Nada. `ensure` sincroniza arquivos; `dev --start-server` reinicia o servidor que ele mesmo iniciou. |
 
 Cada um reporta `config-removed-field` e nomeia seu substituto na mensagem.

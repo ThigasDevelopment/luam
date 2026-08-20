@@ -58,15 +58,6 @@ development = {
         rateWindowMs = 1000,
     },
 }
-
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
 ```
 
 `--manifest <path>` loads a different file, which is how a project keeps a separate
@@ -112,16 +103,12 @@ comparison, arithmetic, and concatenation:
 
 ```luam
 outDir = mode == 'production' and 'build' or 'build-dev'
-port = 22000 + 5
-transport = {
-    kind = env.LUAM_MTA_PASSWORD and 'http' or 'none',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
+serverPath = env.LUAM_MTA_SERVER or 'C:/MTA Server'
 ```
 
 Lua truthiness applies, so `a and b or c` reads as a conditional and the checker
-types it precisely: the branch above is `'http' | 'none'`, which is what
-`transport.kind` accepts.
+types it precisely: the branch above is a `string`, which is what `serverPath`
+accepts.
 
 ### Why there are no calls
 
@@ -148,11 +135,9 @@ Three names are in scope besides the configuration fields:
 error. Comparing or defaulting is the way to use one:
 
 ```luam
-local password = env.LUAM_MTA_PASSWORD
+local root = env.LUAM_MTA_SERVER
 
-transport = {
-    kind = password and 'http' or 'none',
-}
+serverPath = root or 'C:/MTA Server'
 ```
 
 Nothing else is in scope. There is no `print`, no `os`, no `require` — a name the
@@ -163,8 +148,8 @@ field name is caught at the field rather than silently ignored.
 
 The manifest is an ordinary document to the language server. Diagnostics appear
 as you type, completion offers the fields valid at the cursor — with their type,
-whether they are required, and their default — and the closed sets (`transport.kind`,
-`helpers`, and the `mode` values) complete inside the quotes. Hover names the
+whether they are required, and their default — and the closed sets (`helpers`
+and the `mode` values) complete inside the quotes. Hover names the
 field's full path and type.
 
 Because the server reads the file directly, flipping `compilerOptions.oop` takes
@@ -186,7 +171,7 @@ single implemented consumer, so a field never means two things in two places.
 | `engine` | The MTA version the resource requires. |
 | `environment` | Which `.env` files supply `env` and `process.env`. |
 | output | `outDir`, `loadOrder`, `output`, `helpers`. |
-| deployment | `serverPath`, `resourcesDir`, `transport`, `development`. |
+| deployment | `serverPath`, `resourcesDir`, `development`. |
 
 A complete field-by-field table, including every validation rule, is in
 [Configuration fields](/en/reference/configuration-fields).
@@ -349,40 +334,6 @@ Names runtime helpers the compiler would not inject on its own.
 bundle output includes them in its environment bundles. A `.luam.manifest` that
 still names `helperDir` fails with `config-unknown-field` — delete the line.
 
-## `transport`
-
-```luam
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-    refreshFunction = 'refreshResources',
-    restartFunction = 'restartResource',
-}
-```
-
-`kind` is the one member the table must carry — `transport = { }` is
-`config-missing-field`, so a half-written block never falls back to a silent
-default.
-
-`none` skips the restart and only syncs files. `http` calls the MTA HTTP
-interface:
-
-```
-POST http://<host>:<port>/<resource>/call/<function>
-```
-
-The call carries HTTP basic authentication and a JSON array of arguments.
-`refreshFunction` runs first, then `restartFunction` with the resource name. Both
-must be exported by the `resource` named in the configuration, and the ACL must
-grant the configured user HTTP access.
-
-Prefer `passwordEnv` over an inline `password`. See
-[Security boundaries](/en/mta/security).
-
 ## `development.logs`
 
 Used by `luam dev` only. `build` and `ensure` never write the development
@@ -410,14 +361,13 @@ that directory. When omitted, `luam server` and `luam dev --start-server` probe
 | The file could not be read | `config-unreadable-manifest` |
 | A statement the dialect does not allow | `config-invalid-statement` |
 | A value the expression language does not allow | `config-invalid-expression` |
-| `name`, or `transport.kind`, is missing | `config-missing-field` |
+| `name`, or `from` inside an `assets` entry, is missing | `config-missing-field` |
 | `name` is not a valid resource name | `config-invalid-name` |
 | A field has the wrong type | `config-invalid-type` |
 | A name is not a configuration field | `config-unknown-field` |
 | A field that no longer exists | `config-removed-field` |
 | A path escapes its base | `config-escaping-path` |
 | A pattern the glob grammar does not allow | `config-invalid-pattern` |
-| `passwordEnv` names an unset variable | `config-missing-secret` |
 
 Every code is listed in [Diagnostics](/en/reference/diagnostics).
 
@@ -433,5 +383,6 @@ instead of building something different from what it says:
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |
 | `helperDir` | Nothing. Helpers go to `lib/<environment>` or into the bundles. |
+| `transport` | Nothing. `ensure` syncs files; `dev --start-server` restarts the server it owns. |
 
 Each one reports `config-removed-field` and names its replacement in the message.

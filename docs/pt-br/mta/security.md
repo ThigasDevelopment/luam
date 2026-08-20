@@ -56,30 +56,15 @@ qualquer chave cujo nome pareça sensível: `password`, `secret`, `token`, `key`
 `credential`, `dsn`, `private`. O administrador preenche no servidor, e nenhum
 rebuild sobrescreve aquele arquivo.
 
-## O transporte do `ensure`
+## Alcançando um servidor em execução
 
-O `ensure` reinicia um resource pela interface HTTP do MTA, que **não tem TLS**. A
-autenticação básica, portanto, trafega em claro.
+A CLI nunca abre conexão com um servidor MTA. O `ensure` escreve arquivos dentro
+de `serverPath`, e o `dev --start-server` conversa com o console do processo que
+ele mesmo iniciou — não há interface HTTP para configurar, credencial para
+guardar nem nada para manter fora de uma rede compartilhada.
 
-```luam
-transport = {
-    kind = 'http',
-    host = '127.0.0.1',
-    port = 22005,
-    resource = 'luam-sync',
-    username = 'luam',
-    passwordEnv = 'LUAM_MTA_PASSWORD',
-}
-```
-
-- Use `passwordEnv`, que nomeia uma variável de ambiente. Um `password` embutido é
-  aceito, mas reporta `config-plaintext-password`. Nenhuma linha de log ou
-  diagnóstico imprime o valor de qualquer forma.
-- Mantenha `host` em um endereço de loopback e faça um túnel da porta por SSH. Um
-  host que não é loopback reporta `config-remote-plaintext-transport`.
-- `resource`, `refreshFunction`, `restartFunction` e `host` viram parte da URL da
-  requisição, então são validados antes de qualquer envio. Um valor com `/`, `?`,
-  `#` ou `..` é `config-invalid-url-segment` e a configuração não carrega.
+Um servidor que a CLI não possui é atualizado à mão, no console dele, então
+nenhuma senha entra no manifesto.
 
 ## Acesso à rede
 

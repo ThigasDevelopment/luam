@@ -16,7 +16,7 @@ file is declared in `meta.xml`.
 | `src/client/**` | `client` |
 | `src/shared/**` | `shared` |
 
-```luam
+```luam env=client
 #!client
 
 dxDrawText('hud', 10, 10)
@@ -36,13 +36,13 @@ the usual tree.
 `server` and `client` never see each other. `shared` is the strictest of the
 three, because its code has to be valid on both sides.
 
-```luam
+```luam env=client
 # src/server/admin.luam
 outputChatBox('hi', player)   # ok, outputChatBox is shared
 dxDrawText('hud', 10, 10)     # check-environment-api
 ```
 
-```luam
+```luam env=server
 # src/shared/util.luam
 outputDebugString('hello')    # ok, outputDebugString is shared
 kickPlayer(player)            # check-environment-api: kickPlayer is server-only
@@ -66,7 +66,7 @@ This is why a shared helper is the right home for anything both sides need:
 `onPlayerJoin` is a server event and `onClientRender` is a client one. Handling an
 event from the wrong side is `check-environment-event`:
 
-```luam
+```luam env=client
 # src/server/main.luam
 addEventHandler('onClientRender', root, draw)   # check-environment-event
 ```

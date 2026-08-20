@@ -5,68 +5,73 @@ titleTemplate: Typed Lua for Multi Theft Auto
 hero:
     name: Luam
     text: Typed Lua for Multi Theft Auto
-    tagline: Write .luam with types, classes and template strings. Ship plain Lua 5.1 and a generated meta.xml your server can start as-is.
-    image:
-        src: /luam-mark.svg
-        alt: Luam
+    tagline: Write .luam with types and classes. Ship plain Lua 5.1 and a generated meta.xml your server starts as-is.
     actions:
         - theme: brand
           text: Quick start
           link: /en/guide/quick-start
         - theme: alt
-          text: Install
+          text: Install the CLI
           link: /en/guide/installation
-        - theme: alt
-          text: Language reference
-          link: /en/reference/keywords
-features:
-    - title: Errors before the server starts
-      details: A server-only API in a client file, a typo in an MTA function name, a string where a number belongs — all build errors. A build with any error writes nothing.
-      link: /en/mta/environments
-      linkText: Environments
-    - title: Typed Lua, not TypeScript
-      details: Blocks still end with end, inequality is still ~=. Annotations, classes, enums and interfaces are erased at build time.
-      link: /en/language/
-      linkText: The language
-    - title: One resource, ready to start
-      details: Production builds emit one readable Lua bundle per non-empty environment and a separate source map for resolving MTA errors.
-      link: /en/reference/output-layouts
-      linkText: Output layouts
-    - title: The editor never disagrees
-      details: The language server runs the same checker the CLI runs, so completion, hover and diagnostics match the build exactly.
-      link: /en/tooling/editors
-      linkText: Editors
 ---
 
-## What Luam is
+## Try it
 
-Luam is a typed language for [Multi Theft Auto](https://multitheftauto.com/). You
-write `.luam` files, the compiler checks them, and it emits readable **Lua 5.1**
-plus a generated `meta.xml` — an MTA resource your server can start without any
-further step.
+Nothing to install. The compiler and the language server both run in your
+browser: completion, hover, go-to-definition, rename and diagnostics, from the
+same code your editor runs.
 
-```luam
-local health: number = 100
+<div class="luam-cta">
+<a href="/en/playground">Open the playground</a>
+<span>or <a href="/en/guide/installation">install the CLI</a> to build a real resource.</span>
+</div>
 
-function heal(player: Player, amount: number): void
-    health += amount
+## What the compiler refuses to ship
 
-    outputChatBox(`${getPlayerName(player)} healed`, player)
-end
-```
+<div class="luam-split">
+<div>
 
-It is *typed Lua*, not TypeScript. Comments use `#` and `#* ... *#` so they never
-collide with the `--` decrement operator, and every type annotation disappears
-from the generated Lua.
+### Wrong side
 
-## Where to start
+`dxDrawText` in a server file is an error, not a runtime surprise. Every file
+resolves to `server`, `client` or `shared`, and the MTA catalog is scoped to it.
 
-| You want to | Read |
-| --- | --- |
-| Install the toolchain | [Installation](/en/guide/installation) |
-| Build your first resource | [Quick start](/en/guide/quick-start) |
-| Understand the type system | [Types](/en/language/types) |
-| Know which MTA API a file may call | [Environments](/en/mta/environments) |
-| Configure a project | [.luam.manifest](/en/tooling/luam-manifest) |
-| Copy a working example | [Recipes](/en/recipes/) |
-| Look up a keyword or a diagnostic | [Reference](/en/reference/) |
+</div>
+<div>
+
+### Wrong name
+
+A typo in an MTA function is checked against the pinned catalog, so it fails at
+`luam check` instead of returning `nil` at three in the morning.
+
+</div>
+<div>
+
+### Wrong type
+
+A `string` where a `number` belongs, a field that does not exist on a class, a
+name misspelled inside `` `${...}` `` — all build errors.
+
+</div>
+</div>
+
+A build with any error writes nothing at all, so a broken resource never reaches
+the server directory.
+
+## Still Lua
+
+Blocks close with `end`. Inequality is `~=`. Comments use `#` so they never
+collide with the `--` decrement operator. Annotations, classes, enums and
+interfaces are erased at build time, and what lands in your resource is readable
+Lua 5.1 you can debug directly on the server.
+
+## Where to go next
+
+<ul class="luam-next">
+<li><a href="/en/guide/installation"><strong>Installation</strong><span>Install the CLI and the editor extension.</span></a></li>
+<li><a href="/en/guide/quick-start"><strong>Quick start</strong><span>Build and run your first resource.</span></a></li>
+<li><a href="/en/language/types"><strong>Types</strong><span>The type system, end to end.</span></a></li>
+<li><a href="/en/mta/environments"><strong>Environments</strong><span>Which MTA API each file may call.</span></a></li>
+<li><a href="/en/recipes/"><strong>Recipes</strong><span>Complete projects, verified on every build.</span></a></li>
+<li><a href="/en/reference/"><strong>Reference</strong><span>Keywords, diagnostics, configuration fields.</span></a></li>
+</ul>

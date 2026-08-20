@@ -61,7 +61,7 @@ luam build
 
 The same flag types static members and callable classes:
 
-```luam
+```luam env=server oop
 local player = Player.getRandom()
 local exists: boolean = File.exists('data.json')
 local handle = File('data.json')

@@ -2,7 +2,12 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { LOCALES, pageFiles } from '../.vitepress/structure.ts';
+import type { LocaleStrings } from '../.vitepress/locale-theme.ts';
+import { en } from '../.vitepress/locales/en.ts';
+import { ptBR } from '../.vitepress/locales/pt-br.ts';
+import { LOCALES, SECTIONS, pageFiles } from '../.vitepress/structure.ts';
+
+const STRINGS: Readonly<Record<string, LocaleStrings>> = { en, 'pt-br': ptBR };
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const docsRoot = resolve(scriptDir, '..');
@@ -81,6 +86,30 @@ for (const id of allowlist) {
 
     if (locale === undefined || !LOCALES.includes(locale as (typeof LOCALES)[number])) {
         errors.push(`"${id}" in docs/translation-allowlist.json does not start with a known locale.`);
+    }
+}
+
+for (const locale of LOCALES) {
+    const strings = STRINGS[locale];
+
+    if (strings === undefined) {
+        errors.push(`"${locale}" has no strings module. Add one next to docs/.vitepress/locales.`);
+
+        continue;
+    }
+
+    for (const section of SECTIONS) {
+        if (strings.sectionTitles[section.id] === undefined) {
+            errors.push(`"${locale}" has no sidebar title for the "${section.id}" section, so the sidebar would show the raw id.`);
+        }
+
+        for (const page of section.pages) {
+            const id = `${section.id}/${page}`;
+
+            if (strings.pageTitles[id] === undefined) {
+                errors.push(`"${locale}" has no sidebar title for "${id}", so the sidebar would show the raw slug.`);
+            }
+        }
     }
 }
 

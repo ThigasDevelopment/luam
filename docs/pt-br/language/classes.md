@@ -27,7 +27,7 @@ class Account {
 
 Um campo é um nome, um tipo e um valor padrão opcional:
 
-```luam
+```luam static
 name: string          # sem padrão; defina no construtor
 balance: number = 0   # padrão aplicado a toda instância
 ```
@@ -39,7 +39,7 @@ simplesmente começa como `nil`.
 
 `new` chama o construtor:
 
-```luam
+```luam expect-error
 local account = new Account('Thigas')
 
 account:deposit(50)
@@ -53,7 +53,7 @@ que não é classe é `check-unknown-class`.
 
 ## Herança
 
-```luam
+```luam expect-error
 class PremiumAccount extends Account {
     tier: number = 1
 
@@ -83,7 +83,7 @@ Declare a classe pai antes das filhas.
 
 `implements` pede ao checker que verifique se cada membro de uma interface existe:
 
-```luam
+```luam static
 class Round implements Describable {
     label: string = 'round'
 

@@ -71,25 +71,25 @@ Two shapes work well.
 server console.
 
 **Run the loop once.** On a machine that can reach the server directly,
-`ensure --no-watch` performs the whole cycle exactly once: build, sync, restart.
+`ensure --no-watch` performs build and sync exactly once.
 
 ```bash
-export LUAM_MTA_PASSWORD=...
 npx --yes @thigasdevelopment/luam ensure --no-watch
 ```
 
-That is the deploy-script form of the development loop, and it uses the same
-transport rules — see [Security boundaries](/en/mta/security).
+That is the deploy-script form of the development loop. Loading the synced files
+is a separate step: `refresh` and `restart <name>` in the server console — see
+[Security boundaries](/en/mta/security).
 
 ## Secrets
 
-- Never commit a password. `transport.passwordEnv` names an environment variable,
-  which is what a CI secret store provides.
+- Never commit a password. Read one from `env` in the manifest, which is what a
+  CI secret store provides.
 - `.env` is committed and declares keys and safe defaults; the deployed
   `<outDir>/<name>/env.lua` is written once, with sensitive-looking keys blanked, and
   is never overwritten by a rebuild.
-- MTA's HTTP interface has no TLS. Keep `host` on `127.0.0.1` and tunnel over SSH
-  rather than exposing the port to a runner.
+- The CLI never opens a connection to a running server. A runner that has to
+  reach one needs its own transfer step — SSH or SFTP — outside Luam.
 
 ## A pre-commit hook
 

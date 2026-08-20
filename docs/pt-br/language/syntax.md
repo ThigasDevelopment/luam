@@ -174,7 +174,7 @@ Valem três regras, cada uma com seu diagnóstico:
   do `until` lê, porque o envelope deixaria esse local fora de escopo. Declare o
   local acima do laço, ou use `while`.
 
-```luam
+```luam expect-error
 repeat
     local found: boolean = search()
 

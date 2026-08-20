@@ -5,7 +5,7 @@ Um arquivo `.d.luam` descreve tipos para Lua que o compilador não controla:
 Ele é verificado, **não contribui com nada** para o resource gerado e recebe o
 ambiente do seu caminho como qualquer outro arquivo de código.
 
-```luam
+```luam decl
 interface ConfigShape {
     greeting: string
     limit: number
@@ -43,7 +43,7 @@ natural dos contratos de um resource. Veja
 Um arquivo de declaração contém declarações. Uma chamada, uma atribuição ou um
 laço é `check-declaration-file-statement`:
 
-```luam
+```luam expect-error
 declare Config: ConfigShape
 
 outputDebugString('hello')   # check-declaration-file-statement
@@ -78,7 +78,7 @@ Config = {
 }
 ```
 
-```luam
+```luam decl
 interface ConfigShape {
     greeting: string
     limit: number

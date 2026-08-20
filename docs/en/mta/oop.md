@@ -35,7 +35,7 @@ what the checker accepts and what the manifest declares, nothing else.
 | Static methods | 118 |
 | Constructors | 46 |
 
-```luam
+```luam env=server oop
 function describePlayer(player: Player): string
     local name: string = player:getName()
     local money: number = player:getMoney()
@@ -49,7 +49,7 @@ available on a `Vehicle`, and completion after `:` lists inherited members too.
 
 ## Static methods and constructors
 
-```luam
+```luam env=server oop
 local player = Player.getRandom()
 local exists: boolean = File.exists('data.json')
 local handle = File('data.json')

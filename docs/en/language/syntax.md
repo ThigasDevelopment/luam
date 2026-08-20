@@ -172,7 +172,7 @@ Three rules apply, and each has its own diagnostic:
   reads, because the wrapper would put that local out of scope. Declare the local
   above the loop, or use `while`.
 
-```luam
+```luam expect-error
 repeat
     local found: boolean = search()
 

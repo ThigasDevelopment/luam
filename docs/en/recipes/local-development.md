@@ -1,15 +1,14 @@
 # Local development
 
-The loop you leave running: build, sync into the server, restart, stream the log,
-repeat on every save.
+The loop you leave running: build, sync into the server, stream the log, repeat
+on every save.
 
 ## Prerequisites
 
 - The `luam` CLI ([Installation](/en/guide/installation)).
-- An MTA server on the same machine, or reachable over a tunnel.
-- For the automatic restart: a resource on that server exporting
-  `refreshResources` and `restartResource`, and an ACL entry granting the
-  configured user HTTP access.
+- An MTA server on the same machine.
+- For the automatic restart: `luam dev --start-server`, so the CLI owns the
+  server process and can write to its console.
 
 ## File tree
 
@@ -29,23 +28,16 @@ luam-docs-local-development/
 
 ## Wiring the server
 
-Add `serverPath` and a transport. This is the manifest the loop actually uses:
+Add `serverPath`. This is the manifest the loop actually uses:
 
 <<< @/snippets/local-development/luam.server.json
-
-```bash
-set LUAM_MTA_PASSWORD=...       # Windows
-export LUAM_MTA_PASSWORD=...    # macOS and Linux
-```
-
-`passwordEnv` names an environment variable rather than storing the password, and
-no log line or diagnostic ever prints its value.
 
 ## Commands
 
 ```bash
-luam ensure     # build, sync, restart, watch
-luam dev        # the same loop, plus a live server log stream
+luam ensure            # build, sync, watch
+luam dev               # the same loop, plus a live server log stream
+luam dev --start-server # also owns the server and restarts the resource
 ```
 
 ## Expected result
@@ -59,8 +51,6 @@ Compile: 42 files in 2 ms.
 Build passed: 42 files, 41 reused, 0 errors, 0 warnings in 3 ms.
 Sync: 18 files in 1 ms.
 Synced 1 file to "C:/MTA Server/mods/deathmatch/resources/luam-docs-local-development" (0 removed).
-Restart: done in 24 ms.
-Restarted "luam-docs-local-development" through the "http" transport.
 ```
 
 `reused` is the incremental cache: only the file you saved was recompiled.
@@ -84,10 +74,9 @@ Skipping sync and restart because the build reported errors.
 Nothing is synced and nothing is restarted, so the running game keeps the last
 version that compiled.
 
-## Without a transport
+## Loading the sync
 
-With `serverPath` alone, `ensure` mirrors the files and stops. Restart the
-resource yourself:
+`ensure` mirrors the files and stops. Restart the resource yourself:
 
 ```
 refresh
@@ -115,7 +104,6 @@ resource with `luam build`.
 
 ## Security note
 
-MTA's HTTP interface has no TLS, so basic authentication travels in the clear.
-Keep `host` on `127.0.0.1` and tunnel the port over SSH rather than exposing it. A
-non-loopback host reports `config-remote-plaintext-transport`. See
-[Security boundaries](/en/mta/security).
+The CLI never opens a connection to a running server: `ensure` only writes files
+into `serverPath`, and `dev --start-server` writes to a console it owns. No
+credential belongs in the manifest. See [Security boundaries](/en/mta/security).

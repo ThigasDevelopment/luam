@@ -1,0 +1,195 @@
+.VPNav {
+    backdrop-filter: saturate(160%) blur(12px);
+}
+
+.VPNavBar:not(.has-sidebar):not(.top) {
+    background-color: color-mix(in srgb, var(--luam-paper) 84%, transparent);
+}
+
+.VPNavBar .divider {
+    display: none;
+}
+
+.VPNavBar:not(.top) {
+    border-bottom: 1px solid var(--luam-line);
+}
+
+.VPNavBarTitle .title {
+    font-weight: 650;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    border-bottom: 0;
+}
+
+.VPNavBarTitle .logo {
+    height: 22px;
+    margin-right: 8px;
+}
+
+.VPNavBarMenuLink {
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+}
+
+.VPNavBarMenuLink.active {
+    color: var(--luam-brand);
+}
+
+.VPSidebar {
+    padding-top: 18px;
+    border-right: 1px solid var(--luam-line);
+    background-color: var(--luam-paper);
+}
+
+.VPSidebarItem.level-0 {
+    padding-bottom: 18px;
+}
+
+.VPSidebarItem.level-0 > .item > .text {
+    font-family: var(--luam-mono);
+    font-size: var(--luam-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--luam-ink-3);
+}
+
+.VPSidebarItem.level-1 .link .text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    padding: 3px 0;
+    color: var(--luam-ink-2);
+}
+
+.VPSidebarItem.level-1 .link:hover .text {
+    color: var(--luam-ink);
+}
+
+.VPSidebarItem.level-1.is-active .link .text {
+    font-weight: 600;
+    color: var(--luam-brand);
+}
+
+.VPSidebarItem.level-1 .items {
+    border-left: 1px solid var(--luam-line);
+    padding-left: 14px;
+    margin-left: 1px;
+}
+
+.VPDocOutlineItem .outline-link {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 3px 0;
+}
+
+.VPDocAsideOutline .outline-title {
+    font-family: var(--luam-mono);
+    font-size: var(--luam-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--luam-ink-3);
+}
+
+.VPDocFooter .edit-link-button {
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.VPDocFooter .pager-link {
+    border: 1px solid var(--luam-line);
+    border-radius: var(--luam-radius);
+    background-color: transparent;
+    transition: border-color 0.18s;
+}
+
+.VPDocFooter .pager-link:hover {
+    border-color: var(--luam-line-strong);
+}
+
+.VPDocFooter .pager-link .desc {
+    font-family: var(--luam-mono);
+    font-size: var(--luam-eyebrow);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--luam-ink-3);
+}
+
+.VPDocFooter .pager-link .title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--luam-ink);
+}
+
+.VPFooter {
+    border-top: 1px solid var(--luam-line);
+    background-color: transparent;
+    padding: 26px 24px;
+}
+
+.VPFooter .message,
+.VPFooter .copyright {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--luam-ink-3);
+}
+
+.DocSearch-Button {
+    border: 1px solid var(--luam-line);
+    border-radius: var(--luam-radius);
+    background-color: var(--luam-paper-2);
+}
+
+.DocSearch-Button:hover {
+    border-color: var(--luam-line-strong);
+    box-shadow: none;
+}
+
+.DocSearch-Button-Keys {
+    font-family: var(--luam-mono);
+}
+
+.luam-version-banner {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: var(--vp-z-index-layout-top);
+    box-sizing: border-box;
+    min-height: var(--luam-banner-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 5px 24px;
+    background-color: var(--luam-paper-2);
+    border-bottom: 1px solid var(--luam-line);
+    text-align: center;
+    font-family: var(--luam-mono);
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--luam-ink-2);
+}
+
+.luam-version-banner p {
+    margin: 0;
+}
+
+.luam-version-banner a {
+    margin-left: 10px;
+    font-weight: 500;
+    color: var(--luam-violet);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--luam-violet) 40%, transparent);
+}
+
+.luam-version-banner a:hover {
+    border-bottom-color: var(--luam-violet);
+}
+
+@media (max-width: 640px) {
+    .luam-version-banner {
+        font-size: 11px;
+    }
+}

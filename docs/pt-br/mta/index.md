@@ -38,7 +38,7 @@ bloqueia um build.
 Todo arquivo é `server`, `client` ou `shared`, e isso decide quais APIs e eventos
 resolvem:
 
-```luam
+```luam static
 #!client
 
 dxDrawText('hud', 10, 10)     # ok

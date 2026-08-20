@@ -5,7 +5,7 @@ still `~=`, and tables are still tables. What the language adds is checked at
 build time and then erased, so the Lua you ship is the Lua you would have
 written.
 
-```luam
+```luam static
 local name: string = 'Thigas'
 local target?: Player = nil
 local key: string | number = 1

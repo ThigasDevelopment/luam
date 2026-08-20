@@ -108,29 +108,6 @@ gets a generated `env.lua` instead.
 | `serverPath` | `string?` | no | unset | MTA server root. Required by `ensure` and `dev`. |
 | `resourcesDir` | `string` | no | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
 
-## Transport
-
-The whole `transport` table is optional; omitting it is the same as `kind = 'none'`.
-Writing the table without `kind` is `config-missing-field`.
-
-| Field | Type | Required | Default | Meaning |
-| --- | --- | --- | --- | --- |
-| `transport.kind` | `'none' \| 'http'` | yes | — | `none` syncs without restarting. |
-| `transport.host` | `string` | no | `'127.0.0.1'` | A non-loopback host reports `config-remote-plaintext-transport`. |
-| `transport.port` | `number` | no | `22005` | MTA HTTP interface port. |
-| `transport.resource` | `string` | for `http` | — | Resource exporting the refresh and restart functions. |
-| `transport.username` | `string` | for `http` | — | HTTP basic authentication user. |
-| `transport.passwordEnv` | `string` | no | — | Names an environment variable holding the password. Unset at run time is `config-missing-secret`. |
-| `transport.password` | `string` | no | — | Inline password. Accepted, but reports `config-plaintext-password`. |
-| `transport.refreshFunction` | `string` | no | `'refreshResources'` | Called first. |
-| `transport.restartFunction` | `string` | no | `'restartResource'` | Called with the resource name. |
-
-`host`, `resource`, `refreshFunction` and `restartFunction` become part of the
-request URL and are validated before any request is sent. A value containing `/`,
-`?`, `#` or `..` is `config-invalid-url-segment`.
-
-A `kind` that is neither `'none'` nor `'http'` is `config-invalid-transport`.
-
 ## Development logs
 
 Used by `luam dev` only.
@@ -159,6 +136,7 @@ and names its replacement.
 | `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |
+| `transport` | Nothing. `ensure` syncs files, and `dev --start-server` restarts the server it owns. |
 | `helperDir` | Nothing. Tree helpers use `lib/<environment>`; bundled helpers live inside environment bundles. Reports `config-unknown-field`. |
 
 Hooks, plugins, regular expressions, and optional dependencies are not supported
@@ -170,4 +148,3 @@ and have no replacement.
 | --- | --- |
 | `LUAM_OFFLINE` | Skips the `min_mta_version` lookup, like `--offline`. |
 | `NO_COLOR` | Turns colour and emoji off, like `--no-color`. |
-| the name in `transport.passwordEnv` | Supplies the transport password. |

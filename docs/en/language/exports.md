@@ -55,7 +55,7 @@ configuration.
 | Two files may not export the same name. | `project-duplicate-export` |
 | `export` may not be applied to a `local function`. | `parse-export-local` |
 
-```luam
+```luam static
 export function api.getScore(): number   # check-export-member
 ```
 

@@ -2,7 +2,7 @@
 
 Uma string de template é delimitada por crases e interpola valores com `${...}`.
 
-```luam
+```luam expect-error
 local greeting: string = `Welcome to ${serverName}!`
 ```
 
@@ -13,7 +13,7 @@ então o Lua gerado continua legível e compatível com o MTA.
 
 `${name:fallback}` usa o padrão quando o valor é `nil`:
 
-```luam
+```luam expect-error
 local caption: string = `HUD ${title:untitled}`
 ```
 
@@ -23,7 +23,7 @@ O padrão é texto literal até a chave de fechamento. Ele não é uma expressã
 
 Uma interpolação pode percorrer uma tabela:
 
-```luam
+```luam expect-error
 local line: string = `Player ${session.player}`
 ```
 
@@ -54,7 +54,7 @@ de um `nil` no chat.
 
 ## Lua emitido
 
-```luam
+```luam expect-error
 local greeting: string = `Welcome to ${serverName}!`
 ```
 

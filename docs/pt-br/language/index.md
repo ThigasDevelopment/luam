@@ -5,7 +5,7 @@ desigualdade continua sendo `~=` e tabelas continuam sendo tabelas. O que a
 linguagem adiciona é verificado no build e depois apagado, então o Lua que você
 publica é o Lua que você teria escrito.
 
-```luam
+```luam static
 local name: string = 'Thigas'
 local target?: Player = nil
 local key: string | number = 1

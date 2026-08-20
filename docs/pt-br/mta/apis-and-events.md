@@ -59,7 +59,7 @@ highlight(vehicle)   # um Vehicle é um Element
 `source` dentro de um handler não tem tipo por si só, então anote-o quando quiser
 a API do elemento:
 
-```luam
+```luam env=server
 addEventHandler('onPlayerJoin', root, function()
     local player: Player = source
 
@@ -71,7 +71,7 @@ end)
 
 Um nome de evento é verificado contra o catálogo e contra o ambiente do arquivo:
 
-```luam
+```luam expect-error
 # src/server/join.luam
 addEventHandler('onPlayerJoin', root, function() end)      # ok
 addEventHandler('onClientRender', root, function() end)    # check-environment-event
@@ -90,7 +90,7 @@ com `addEvent` continuam funcionando.
 Todo evento do catálogo carrega a assinatura do seu handler, então um callback
 escrito para um nome conhecido recebe os parâmetros tipados sem anotação:
 
-```luam
+```luam env=server
 addEventHandler('onPlayerQuit', root, function(quitType, reason, responsibleElement)
     # quitType: string, reason: string, responsibleElement: Element
     outputChatBox(quitType .. ': ' .. reason, responsibleElement)
@@ -103,7 +103,7 @@ próprios parâmetros.
 
 O payload de um trigger é verificado contra a mesma assinatura:
 
-```luam
+```luam expect-error
 triggerEvent('onPlayerQuit', root, 'Quit', 'Timed out.', root)   # ok
 triggerEvent('onPlayerQuit', root, 1, 'Timed out.', root)        # check-type-mismatch
 triggerEvent('onPlayerQuit', root, 'Quit')                       # check-argument-count

@@ -66,6 +66,8 @@ writes nothing.
 | `check-argument-count` | error | Too few or too many arguments. |
 | `check-invalid-operand` | error | An operator cannot be applied to that type. |
 | `check-unknown-member` | error | The member does not exist on the receiver. |
+| `check-not-callable` | error | A call on a value that is not a function. |
+| `check-extension-form` | error | An object extension used in the other form: a property extension called, or a call extension only read. |
 | `check-unknown-record-key` | error | The key is not declared by the object type. Also used by `process.env`. |
 | `check-unknown-union-key` | error | The key is missing from at least one member of the union. |
 | `check-invalid-intersection` | error | A part of an intersection is not an object type, an interface, or a class. |
@@ -173,7 +175,7 @@ writes nothing.
 | `config-unreadable-manifest` | The file could not be read. |
 | `config-invalid-statement` | A statement the manifest dialect does not allow. Only `local` declarations and assignments to configuration fields. |
 | `config-invalid-expression` | A value the manifest expression language does not allow — a call, a function, an index by anything but a name. |
-| `config-missing-field` | A required field — `name`, or `transport.kind` once `transport` is written — is absent. |
+| `config-missing-field` | A required field — `name`, or `from` inside an `assets` entry — is absent. |
 | `config-invalid-name` | `name` is not a valid MTA resource name. |
 | `config-invalid-type` | A field has the wrong type. |
 | `config-unknown-field` | A name is not a configuration field. Includes the removed `helperDir`. |
@@ -189,8 +191,3 @@ writes nothing.
 | `config-invalid-engine-version` | `engine.minVersion` is neither `'latest'` nor a version. |
 | `config-missing-env-file` | A configured `environment` file does not exist. |
 | `config-unknown-helper` | `helpers` names a helper that does not exist. |
-| `config-invalid-transport` | The transport block has an invalid shape. |
-| `config-invalid-url-segment` | A transport value contains `/`, `?`, `#` or `..`. |
-| `config-missing-secret` | `passwordEnv` names an environment variable that is not set. |
-| `config-plaintext-password` | An inline `password` was used. Prefer `passwordEnv`. |
-| `config-remote-plaintext-transport` | `host` is not a loopback address, and the interface has no TLS. |

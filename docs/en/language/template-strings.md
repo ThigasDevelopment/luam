@@ -3,7 +3,7 @@
 A template string is delimited by backticks and interpolates values with
 `${...}`.
 
-```luam
+```luam expect-error
 local greeting: string = `Welcome to ${serverName}!`
 ```
 
@@ -14,7 +14,7 @@ generated Lua stays readable and MTA-compatible.
 
 `${name:fallback}` uses the fallback when the value is `nil`:
 
-```luam
+```luam expect-error
 local caption: string = `HUD ${title:untitled}`
 ```
 
@@ -24,7 +24,7 @@ The fallback is literal text up to the closing brace. It is not an expression.
 
 An interpolation may walk a table:
 
-```luam
+```luam expect-error
 local line: string = `Player ${session.player}`
 ```
 
@@ -55,7 +55,7 @@ a `nil` in the chat box.
 
 ## Emitted Lua
 
-```luam
+```luam expect-error
 local greeting: string = `Welcome to ${serverName}!`
 ```
 

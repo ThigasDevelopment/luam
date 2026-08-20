@@ -52,7 +52,7 @@ check-environment-api: API "dxDrawText" is client-only and is not available in a
 O ambiente do arquivo vem da pasta. Mova o arquivo para `src/client`, ou sobreponha
 o ambiente daquele arquivo:
 
-```luam
+```luam env=client
 #!client
 ```
 
@@ -108,14 +108,10 @@ Veja [Strings de template](/pt-br/language/template-strings).
 
 ## O `ensure` constrói mas nunca reinicia
 
-O `ensure` só reinicia através de um transporte. Com apenas `serverPath` ele
-espelha os arquivos e para — reinicie o resource você mesmo. Adicione um bloco
-`transport` para obter o refresh e o restart. Veja
-[Desenvolvimento diário](/pt-br/guide/daily-development).
-
-Se o restart está configurado e mesmo assim falha, confira se o resource do lado
-do MTA nomeado em `transport.resource` exporta `refreshResources` e
-`restartResource`, e se a ACL concede acesso HTTP ao usuário configurado.
+É isso que ele faz: o `ensure` espelha os arquivos no servidor e para. Digite
+`refresh` e `restart <name>` no console do servidor, ou rode
+`luam dev --start-server`, que passa a ser dono do processo do MTA e escreve esses
+comandos por você. Veja [Desenvolvimento diário](/pt-br/guide/daily-development).
 
 ## O servidor MTA local não inicia
 
@@ -124,15 +120,6 @@ aponta para a raiz da instalação, ou defina um
 `development.server.executable` relativo e contido nela. Um timeout de prontidão
 nomeia o `server.log`; verifique nele erros de inicialização ou uma versão com um
 marcador de startup diferente.
-
-## `config-missing-secret`
-
-`passwordEnv` nomeia uma variável de ambiente que não está definida no shell que
-roda a CLI. Exporte-a antes de iniciar o laço:
-
-```bash
-export LUAM_MTA_PASSWORD=...
-```
 
 ## `min_mta_version` some com um warning
 

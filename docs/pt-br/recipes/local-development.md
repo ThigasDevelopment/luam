@@ -1,15 +1,14 @@
 # Desenvolvimento local
 
-O laço que você deixa rodando: construir, sincronizar no servidor, reiniciar,
-acompanhar o log, repetir a cada gravação.
+O laço que você deixa rodando: construir, sincronizar no servidor, acompanhar o
+log, repetir a cada gravação.
 
 ## Pré-requisitos
 
 - A CLI `luam` ([Instalação](/pt-br/guide/installation)).
-- Um servidor MTA na mesma máquina, ou alcançável por um túnel.
-- Para o restart automático: um resource nesse servidor exportando
-  `refreshResources` e `restartResource`, e uma entrada de ACL concedendo acesso
-  HTTP ao usuário configurado.
+- Um servidor MTA na mesma máquina.
+- Para o restart automático: `luam dev --start-server`, para que a CLI seja dona
+  do processo do servidor e possa escrever no console dele.
 
 ## Árvore de arquivos
 
@@ -29,24 +28,16 @@ luam-docs-local-development/
 
 ## Ligando ao servidor
 
-Adicione `serverPath` e um transporte. Este é o manifesto que o laço realmente
-usa:
+Adicione `serverPath`. Este é o manifesto que o laço realmente usa:
 
 <<< @/snippets/local-development/luam.server.json
-
-```bash
-set LUAM_MTA_PASSWORD=...       # Windows
-export LUAM_MTA_PASSWORD=...    # macOS e Linux
-```
-
-`passwordEnv` nomeia uma variável de ambiente em vez de guardar a senha, e nenhuma
-linha de log ou diagnóstico imprime o valor.
 
 ## Comandos
 
 ```bash
-luam ensure     # construir, sincronizar, reiniciar, observar
-luam dev        # o mesmo laço, mais um fluxo ao vivo do log do servidor
+luam ensure            # construir, sincronizar, observar
+luam dev               # o mesmo laço, mais um fluxo ao vivo do log do servidor
+luam dev --start-server # também é dono do servidor e reinicia o resource
 ```
 
 ## Resultado esperado
@@ -60,8 +51,6 @@ Compile: 42 files in 2 ms.
 Build passed: 42 files, 41 reused, 0 errors, 0 warnings in 3 ms.
 Sync: 18 files in 1 ms.
 Synced 1 file to "C:/MTA Server/mods/deathmatch/resources/luam-docs-local-development" (0 removed).
-Restart: done in 24 ms.
-Restarted "luam-docs-local-development" through the "http" transport.
 ```
 
 `reused` é o cache incremental: apenas o arquivo que você salvou foi recompilado.
@@ -85,10 +74,9 @@ Skipping sync and restart because the build reported errors.
 Nada é sincronizado e nada é reiniciado, então o jogo em execução mantém a última
 versão que compilou.
 
-## Sem transporte
+## Carregando a sincronização
 
-Com apenas `serverPath`, o `ensure` espelha os arquivos e para. Reinicie o resource
-você mesmo:
+O `ensure` espelha os arquivos e para. Reinicie o resource você mesmo:
 
 ```
 refresh
@@ -116,7 +104,7 @@ de publicar, ou gere um resource novo com `luam build`.
 
 ## Nota de segurança
 
-A interface HTTP do MTA não tem TLS, então a autenticação básica trafega em claro.
-Mantenha `host` em `127.0.0.1` e faça um túnel da porta por SSH em vez de expô-la.
-Um host que não é loopback reporta `config-remote-plaintext-transport`. Veja
+A CLI nunca abre conexão com um servidor em execução: o `ensure` só escreve
+arquivos dentro de `serverPath`, e o `dev --start-server` escreve em um console
+que ele possui. Nenhuma credencial pertence ao manifesto. Veja
 [Fronteiras de segurança](/pt-br/mta/security).

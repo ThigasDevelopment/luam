@@ -36,7 +36,7 @@ from the MTA wiki, so it can lag a release: a name the catalog does not know sta
 Every file is `server`, `client` or `shared`, and that decides which APIs and
 events resolve:
 
-```luam
+```luam static
 #!client
 
 dxDrawText('hud', 10, 10)     # ok

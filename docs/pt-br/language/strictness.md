@@ -28,7 +28,7 @@ cada vez.
 A diretiva precisa aparecer antes do primeiro comando. Diretivas de ambiente
 (`#!server`, `#!client`, `#!shared`) podem ficar ao lado, em qualquer ordem:
 
-```luam
+```luam env=client
 #!client
 #!nonstrict
 ```

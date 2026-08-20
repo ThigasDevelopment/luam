@@ -90,6 +90,6 @@ serverPath = 'C:/MTA Server'
 luam ensure
 ```
 
-Com um transporte configurado, o `ensure` também reinicia o resource para você, e
-`luam dev` acrescenta um fluxo ao vivo do log do servidor. Veja
+O `ensure` sincroniza arquivos; `luam dev` acrescenta um fluxo ao vivo do log do
+servidor, e `luam dev --start-server` também reinicia o resource para você. Veja
 [Desenvolvimento diário](/pt-br/guide/daily-development).

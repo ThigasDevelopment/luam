@@ -27,7 +27,7 @@ class Account {
 
 A field is a name, a type, and an optional default:
 
-```luam
+```luam static
 name: string          # no default; set it in the constructor
 balance: number = 0   # default applied to every instance
 ```
@@ -39,7 +39,7 @@ declared — it simply starts as `nil`.
 
 `new` calls the constructor:
 
-```luam
+```luam expect-error
 local account = new Account('Thigas')
 
 account:deposit(50)
@@ -53,7 +53,7 @@ is `check-unknown-class`.
 
 ## Inheritance
 
-```luam
+```luam expect-error
 class PremiumAccount extends Account {
     tier: number = 1
 
@@ -83,7 +83,7 @@ file**. Declare a parent before its children.
 
 `implements` asks the checker to verify every member of an interface exists:
 
-```luam
+```luam static
 class Round implements Describable {
     label: string = 'round'
 

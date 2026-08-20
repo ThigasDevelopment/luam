@@ -95,8 +95,9 @@ luam ensure
 luam ensure --no-watch
 ```
 
-Builds, mirrors the resource into your MTA server, restarts it, and repeats on
-every save. Requires `serverPath`; the restart also requires a `transport`.
+Builds, mirrors the resource into your MTA server, and repeats on every save.
+Requires `serverPath`. It syncs files and never restarts the resource — use
+`luam dev --start-server`, or `refresh` in the server console, to load the sync.
 `ensure` never writes to `<outDir>/<name>` and uses the tree layout by default,
 regardless of `output.bundle`. Pass `--bundle` for a bundled sync.
 
@@ -125,14 +126,14 @@ owns no layout flag: `luam dev --bundle` is a usage error.
 
 `--start-server` starts the local MTA process first and waits for readiness before
 building. After a changed sync, it writes `refresh`, `stop <resource>`, and
-`start <resource>` to the owned console, so this integrated path needs no HTTP
-transport and starts a newly deployed resource. An early or unexpected server
+`start <resource>` to the owned console, so it also starts a newly deployed
+resource. An early or unexpected server
 exit stops the development loop with exit code `1`. Without the flag, `dev`
 never starts or stops an MTA process.
 
 `luam server` and `luam ensure` in separate terminals are separate processes.
 `ensure` cannot write to a console owned by the other invocation, so standalone
-`ensure` still uses the configured transport or only syncs when none is present.
+`ensure` only syncs files.
 
 ## `luam server`
 

@@ -46,8 +46,9 @@ local safe: number = ratio.clamp(0, 1) # math.clamp(ratio, 0, 1)
 
 A **property** extension takes no arguments and is written without parentheses:
 `items.count`, not `items.count()`. A **call** extension takes arguments:
-`items.includes('a')`. Using the wrong form is a member error, because the other
-form does not exist.
+`items.includes('a')`. Using the wrong form is `check-extension-form`, because
+the other form does not exist: calling a property extension would call its
+result, and reading a call extension would never run it.
 
 ## Runtime helpers
 

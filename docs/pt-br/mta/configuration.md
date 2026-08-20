@@ -28,7 +28,7 @@ Tudo que um jogador pode ver pertence aqui. Nada secreto pertence.
 Como o compilador nunca o analisa, dê a ele um
 [arquivo de declaração](/pt-br/language/declaration-files) para obter tipos:
 
-```luam
+```luam decl
 interface ConfigShape {
     greeting: string
     limit: number

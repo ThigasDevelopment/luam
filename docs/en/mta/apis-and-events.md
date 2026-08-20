@@ -59,7 +59,7 @@ highlight(vehicle)   # a Vehicle is an Element
 `source` inside a handler is untyped by itself, so annotate it when you want the
 element's API:
 
-```luam
+```luam env=server
 addEventHandler('onPlayerJoin', root, function()
     local player: Player = source
 
@@ -71,7 +71,7 @@ end)
 
 An event name is checked against the catalog and against the file's environment:
 
-```luam
+```luam expect-error
 # src/server/join.luam
 addEventHandler('onPlayerJoin', root, function() end)      # ok
 addEventHandler('onClientRender', root, function() end)    # check-environment-event
@@ -90,7 +90,7 @@ An event the catalog does not know is not an error — custom events created wit
 Every event in the catalog carries the signature of its handler, so a callback
 written against a known name gets its parameters typed with no annotation:
 
-```luam
+```luam env=server
 addEventHandler('onPlayerQuit', root, function(quitType, reason, responsibleElement)
     # quitType: string, reason: string, responsibleElement: Element
     outputChatBox(quitType .. ': ' .. reason, responsibleElement)
@@ -102,7 +102,7 @@ a client file and `onPlayerQuit` in a server file each get their own parameters.
 
 The payload of a trigger is checked against the same signature:
 
-```luam
+```luam expect-error
 triggerEvent('onPlayerQuit', root, 'Quit', 'Timed out.', root)   # ok
 triggerEvent('onPlayerQuit', root, 1, 'Timed out.', root)        # check-type-mismatch
 triggerEvent('onPlayerQuit', root, 'Quit')                       # check-argument-count

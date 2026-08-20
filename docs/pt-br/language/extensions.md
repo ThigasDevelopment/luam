@@ -46,8 +46,9 @@ local safe: number = ratio.clamp(0, 1) # math.clamp(ratio, 0, 1)
 
 Uma extensão de **propriedade** não recebe argumentos e é escrita sem parênteses:
 `items.count`, não `items.count()`. Uma extensão de **chamada** recebe
-argumentos: `items.includes('a')`. Usar a forma errada é um erro de membro, porque
-a outra forma não existe.
+argumentos: `items.includes('a')`. Usar a forma errada é `check-extension-form`,
+porque a outra forma não existe: chamar uma extensão de propriedade chamaria o
+resultado dela, e ler uma extensão de chamada nunca a executaria.
 
 ## Helpers de runtime
 

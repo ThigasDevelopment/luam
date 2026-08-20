@@ -50,10 +50,10 @@ Baixe `luam-<version>.vsix` da
 [página de Releases](https://github.com/ThigasDevelopment/luam/releases) e então:
 
 ```bash
-code --install-extension luam-0.1.1.vsix
-cursor --install-extension luam-0.1.1.vsix
-codium --install-extension luam-0.1.1.vsix
-windsurf --install-extension luam-0.1.1.vsix
+code --install-extension luam-%LUAM_VERSION%.vsix
+cursor --install-extension luam-%LUAM_VERSION%.vsix
+codium --install-extension luam-%LUAM_VERSION%.vsix
+windsurf --install-extension luam-%LUAM_VERSION%.vsix
 ```
 
 Em um editor compatível você também pode abrir **Extensions**, escolher **Install

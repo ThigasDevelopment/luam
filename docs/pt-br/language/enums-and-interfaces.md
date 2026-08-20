@@ -17,7 +17,9 @@ enum MatchState {
 - Uma vírgula final é permitida.
 - Os membros são verificados. `MatchState.PAUSED` é `check-unknown-enum-member`, e
   a mensagem lista os membros existentes.
-- Um enum nunca usado é **apagado**, então um enum sem uso não custa nada.
+- Um enum que nenhum arquivo do recurso lê é **apagado**, então um enum sem uso
+  não custa nada. Um enum declarado em um arquivo shared e lido de um arquivo
+  server ou client é mantido, porque o build olha o recurso inteiro.
 
 ```luam
 local state: number = MatchState.PLAYING
@@ -47,7 +49,7 @@ interface Describable {
 Uma interface pode declarar campos e métodos. Uma classe declara que a satisfaz
 com `implements`:
 
-```luam
+```luam expect-error
 class Round implements Describable {
     label: string = 'round'
 
@@ -85,7 +87,7 @@ mesma duas vezes é `check-duplicate-interface`.
 
 Uma interface também é utilizável como tipo:
 
-```luam
+```luam static
 local target: Describable = new Round()
 ```
 
