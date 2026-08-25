@@ -87,6 +87,8 @@ writes nothing.
 | --- | --- |
 | `check-unknown-class` | `new` or `extends` names a class that is not declared. |
 | `check-duplicate-class` | Two classes with the same name in one file. |
+| `check-class-cycle` | A class extends itself, directly or through its parents. |
+| `check-class-before-declaration` | A top-level effect instantiates a class declared further down the file. |
 | `check-unknown-interface` | `implements` or interface `extends` names an interface that is not declared. |
 | `check-duplicate-interface` | Two interfaces with the same name in one file. |
 | `check-duplicate-interface-parent` | An interface extends the same parent more than once. |

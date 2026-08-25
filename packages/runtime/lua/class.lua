@@ -24,21 +24,69 @@ local function bindSuper(value, inherited)
     end
 end
 
+local function bindLateSuper(definition, key, value)
+    return function(self, ...)
+        local inherited = definition.__super and definition.__super[key]
+
+        if type(inherited) ~= 'function' then
+            return value(self, ...)
+        end
+
+        return bindSuper(value, inherited)(self, ...)
+    end
+end
+
+local function declare(name)
+    local existing = classes[name]
+
+    if existing then
+        return existing
+    end
+
+    local definition = { __name = name, __pending = true }
+
+    classes[name] = definition
+
+    return definition
+end
+
+local function pendingAncestor(definition)
+    local current = definition.__super
+
+    while current do
+        if current.__pending then
+            return current.__name
+        end
+
+        current = current.__super
+    end
+
+    return nil
+end
+
 local function create(name, struct, options)
-    if classes[name] then
+    local definition = classes[name]
+
+    if definition and not definition.__pending then
         error('Class ' .. tostring(name) .. ' already exists.')
     end
 
-    local definition = {
-        __name = name,
-        __super = options.super,
-        __metamethods = options.metamethods,
-    }
+    definition = definition or { __name = name }
+
+    definition.__pending = nil
+    definition.__super = options.super
+    definition.__metamethods = options.metamethods
+
+    local pending = definition.__super and definition.__super.__pending
 
     for key, value in pairs(struct) do
         local inherited = definition.__super and definition.__super[key]
 
-        if type(value) == 'function' and type(inherited) == 'function' then
+        if type(value) ~= 'function' then
+            definition[key] = value
+        elseif pending then
+            definition[key] = bindLateSuper(definition, key, value)
+        elseif type(inherited) == 'function' then
             definition[key] = bindSuper(value, inherited)
         else
             definition[key] = value
@@ -59,11 +107,7 @@ function class(name)
 
     local modifiers = {
         extends = function(self, super)
-            options.super = classes[super]
-
-            if not options.super then
-                error('Class ' .. tostring(name) .. ' extends ' .. tostring(super) .. ', which is not defined.')
-            end
+            options.super = declare(super)
 
             return self
         end,
@@ -131,13 +175,19 @@ end
 function new(name)
     local definition = classes[name]
 
-    if not definition then
+    if not definition or definition.__pending then
         error('Class ' .. tostring(name) .. ' is not defined.')
     end
 
     local constructor = constructors[definition]
 
     if not constructor then
+        local missing = pendingAncestor(definition)
+
+        if missing then
+            error('Class ' .. tostring(name) .. ' extends ' .. tostring(missing) .. ', which is not defined.')
+        end
+
         constructor = createConstructor(definition)
         constructors[definition] = constructor
     end
@@ -170,9 +220,23 @@ function enum(names)
 end
 
 function getClasses()
-    return classes
+    local defined = {}
+
+    for name, definition in pairs(classes) do
+        if not definition.__pending then
+            defined[name] = definition
+        end
+    end
+
+    return defined
 end
 
 function getClass(name)
-    return classes[name]
+    local definition = classes[name]
+
+    if not definition or definition.__pending then
+        return nil
+    end
+
+    return definition
 end
