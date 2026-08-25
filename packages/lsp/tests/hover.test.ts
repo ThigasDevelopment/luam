@@ -257,6 +257,21 @@ describe('hover', () => {
         expect(hoverText(source, 'local marker: ', 'Marker')).toContain('class Marker {}');
     });
 
+    it('lists the members of an enum with the value each one carries', () => {
+        const source = 'enum MatchState {\n    LOBBY,\n    PLAYING,\n    FINISHED,\n}\n\nlocal state: number = MatchState.LOBBY\n';
+        const shape = 'enum MatchState {\n    LOBBY = 0\n    PLAYING = 1\n    FINISHED = 2\n}';
+
+        expect(hoverText(source, 'enum ', 'MatchState')).toContain(shape);
+        expect(hoverText(source, 'local state: number = ', 'MatchState')).toContain(shape);
+        expect(hoverText(source, 'MatchState.', 'LOBBY')).toContain('MatchState.LOBBY = 0');
+    });
+
+    it('shows an empty body for an enum without members', () => {
+        const source = 'enum Empty {\n}\n\nlocal value: number = 0\n';
+
+        expect(hoverText(source, 'enum ', 'Empty')).toContain('enum Empty {}');
+    });
+
     it('names the origin relative to the workspace root', () => {
         const root = createWorkspace({
             'src/shared/core.luam': 'class Core {\n}\n',

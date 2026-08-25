@@ -20,6 +20,8 @@ enum MatchState {
 - An enum no file in the resource reads is **erased**, so an unused enum costs
   nothing. An enum declared in a shared file and read from a server or client
   file is kept, because the build looks at the whole resource.
+- Hovering the enum lists every member with the number it carries, so you never
+  have to count the lines to know what `FINISHED` is.
 
 ### What reachability sees, and what it does not
 

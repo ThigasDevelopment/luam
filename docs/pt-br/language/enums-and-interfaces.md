@@ -20,6 +20,8 @@ enum MatchState {
 - Um enum que nenhum arquivo do recurso lê é **apagado**, então um enum sem uso
   não custa nada. Um enum declarado em um arquivo shared e lido de um arquivo
   server ou client é mantido, porque o build olha o recurso inteiro.
+- O hover do enum lista cada membro com o número que ele carrega, então você
+  nunca precisa contar as linhas para saber quanto vale `FINISHED`.
 
 ### O que o alcance enxerga, e o que não enxerga
 
