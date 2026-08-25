@@ -9,6 +9,11 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Changed
+
+- [Enums and interfaces](/en/language/enums-and-interfaces) states that an
+  optional interface member is optional for the class implementing it.
+
 ## 0.16.0 - 2026-08-25
 
 ### Removed

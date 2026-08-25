@@ -128,6 +128,13 @@ describe('classes', () => {
         ]);
     });
 
+    it('accepts a class that omits an optional interface member', () => {
+        expect(codes('interface IExample {\n    name?: string,\n}\n\nclass Example implements IExample {\n}\n')).toEqual([]);
+        expect(codes('interface IExample {\n    name?: string,\n}\n\nclass Example implements IExample {\n    name: number = 1\n}\n')).toEqual([
+            'check-unimplemented-interface',
+        ]);
+    });
+
     it('accepts a class that satisfies its interface', () => {
         expect(codes(`${COMMAND}class KickCommand implements Command {\n    name: string = 'kick'\n\n    execute = function (): void\n    end\n}\n`)).toEqual(
             [],

@@ -11,6 +11,11 @@ da versão atual.
 
 ## Não lançado
 
+### Alterado
+
+- [Enums e interfaces](/pt-br/language/enums-and-interfaces) informa que um
+  membro opcional de interface é opcional para a classe que a implementa.
+
 ## 0.16.0 - 2026-08-25
 
 ### Removido

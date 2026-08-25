@@ -110,6 +110,8 @@ Compatible inherited declarations are merged. Incompatible declarations report
 also rejected.
 
 A missing member is `check-unimplemented-interface`, and the message names it.
+An optional member, written `name?: Type`, is not required: a class may omit it,
+but a member it does declare still has to match the declared type.
 Referring to an interface that does not exist in `implements` or `extends` is `check-unknown-interface`;
 declaring the same one twice is `check-duplicate-interface`.
 

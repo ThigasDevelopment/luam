@@ -113,6 +113,8 @@ Declarações herdadas compatíveis são combinadas. Declarações incompatívei
 são rejeitados.
 
 Um membro faltando é `check-unimplemented-interface`, e a mensagem o nomeia.
+Um membro opcional, escrito `name?: Tipo`, não é obrigatório: a classe pode
+omiti-lo, mas um membro que ela declare ainda precisa corresponder ao tipo declarado.
 Referir-se a uma interface inexistente em `implements` ou `extends` é `check-unknown-interface`; declarar a
 mesma duas vezes é `check-duplicate-interface`.
 

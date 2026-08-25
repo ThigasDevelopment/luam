@@ -8,6 +8,10 @@ function checkContract(context: CheckContext, info: ClassInfo, contract: string,
     const actual = context.declarations.lookupClassMember(info.name, member.name);
 
     if (actual === null) {
+        if (member.type.kind === 'optional') {
+            return;
+        }
+
         context.report('check-unimplemented-interface', `Class "${info.name}" does not implement "${member.name}" required by interface "${contract}".`, info.position);
 
         return;

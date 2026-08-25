@@ -14,6 +14,12 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Fixed
+
+- An optional interface member is optional for the class that implements it. A
+  class omitting `name?: string` no longer reports
+  `check-unimplemented-interface`; declaring it with the wrong type still does.
+
 ## 0.16.0 - 2026-08-25
 
 ### The Generated Lua Is The File You Wrote
