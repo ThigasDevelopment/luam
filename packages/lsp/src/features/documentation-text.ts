@@ -1,5 +1,5 @@
 import type { ApiDeclaration } from '@mta-types/api-declaration';
-import { hasDocumentation, type ApiDocumentation } from '@mta-types/api-documentation';
+import { hasDocumentation, type ApiDocumentation, type ParameterDocumentation } from '@mta-types/api-documentation';
 import { apiDocumentation, memberDocumentation } from '@mta-types/documentation-lookup';
 
 import { namedDescriptorText } from '@lsp/features/api-text';
@@ -10,7 +10,7 @@ export function documentationFor(name: string): ApiDocumentation {
     return apiDocumentation(name);
 }
 
-export function parameterList(documentation: ApiDocumentation): string[] {
+export function parameterList(documentation: { parameters: readonly ParameterDocumentation[] }): string[] {
     return documentation.parameters
         .filter((parameter) => parameter.summary.length > 0)
         .map((parameter) => `- \`${parameter.name}\` — ${parameter.summary}`);

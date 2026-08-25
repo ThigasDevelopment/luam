@@ -42,7 +42,7 @@ export function summaryLines(result: GenerationResult): string[] {
         `files: ${result.files.length}`,
         `shared: ${result.catalog.shared.length}, server: ${result.catalog.server.length}, client: ${result.catalog.client.length}`,
         `documented: ${result.documented}`,
-        `events: ${result.events.server} server, ${result.events.client} client`,
+        `events: ${result.events.server} server, ${result.events.client} client, ${result.events.documented} documented`,
         `element types: ${result.elementTypes}`,
         `oop: ${oop.classes.length} classes, ${oop.methods} methods, ${oop.staticMethods} static methods, ${oop.constructors} constructors, ${oop.properties} properties`,
         `oop members without a procedural function: ${oop.skippedMethods.length} methods, ${oop.skippedProperties.length} properties`,

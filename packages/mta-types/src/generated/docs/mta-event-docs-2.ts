@@ -1,0 +1,243 @@
+import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
+
+export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
+    onClientDoubleClick: {
+        summary: 'This event triggers whenever the user double-clicks his mouse.  This is linked to the GTA world, as appose to GUI for which onClientGUIDoubleClick is to be used.  This event allows detection of click positions of the 3D world.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'This refers the button used to click on the mouse, can be *left*, *right*, or *middle*.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'This refers to the 2D *x coordinate* the user clicked on his screen, and is an *absolute* position in pixels.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'This refers to the 2D *y coordinate* the user clicked on his screen, and is an *absolute* position in pixels.' },
+            { name: 'worldX', isOptional: false, isVariadic: false, summary: 'This represents the 3D *x coordinate* the player clicked on the screen, and is relative to the GTA world.' },
+            { name: 'worldY', isOptional: false, isVariadic: false, summary: 'This represents the 3D *y coordinate* the player clicked on the screen, and is relative to the GTA world.' },
+            { name: 'worldZ', isOptional: false, isVariadic: false, summary: 'This represents the 3D *z coordinate* the player clicked on the screen, and is relative to the GTA world.' },
+            { name: 'clickedWorld', isOptional: false, isVariadic: false, summary: 'This represents any physical entity elements that were clicked. If the player clicked on no MTA element, it\'s set to false.' },
+        ],
+        source: 'The source of this event is the client\'s root element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientDoubleClick',
+    },
+    onClientElementColShapeHit: {
+        summary: 'This event is triggered when an element (like a player or vehicle) enters a collision shape.',
+        parameters: [
+            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'the colshape that the element entered.' },
+            { name: 'matchingDimension', isOptional: false, isVariadic: false, summary: '*true* if the element is in the same dimension as the colshape, *false* otherwise.' },
+        ],
+        source: 'The source of this event is the element that entered the colshape.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementColShapeHit',
+    },
+    onClientElementColShapeLeave: {
+        summary: 'This event is triggered when an element (like a player or vehicle) leaves a collision shape.',
+        parameters: [
+            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'the colshape that the element left.' },
+            { name: 'matchingDimension', isOptional: false, isVariadic: false, summary: '*true* if the element is in the same dimension as the colshape, *false* otherwise.' },
+        ],
+        source: 'The source of this event is the element that left the colshape.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementColShapeLeave',
+    },
+    onClientElementDataChange: {
+        summary: 'This event is triggered *after* an element\'s data entry is changed. Such changes can be made on the client or the server using setElementData.',
+        parameters: [
+            { name: 'theKey', isOptional: false, isVariadic: false, summary: 'The name of the element data entry that has changed.' },
+            { name: 'oldValue', isOptional: false, isVariadic: false, summary: 'The old value of this entry before it changed. See element data for a list of possible datatypes.' },
+            { name: 'newValue', isOptional: false, isVariadic: false, summary: 'the new value of this entry after it changed. This will be equivalent to getElementData(source, theKey).' },
+        ],
+        source: 'The source of this event is the element whose element data changed.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementDataChange',
+    },
+    onClientElementDestroy: {
+        summary: 'This event is triggered when an element gets destroyed by destroyElement or when the creator resource is stopping. It is also triggered when a children element of this element is destroyed. It is not triggered on a player when they quit.',
+        parameters: [],
+        source: 'The source of this event is the element that is being destroyed.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementDestroy',
+    },
+    onClientElementDimensionChange: {
+        summary: '',
+        parameters: [
+            { name: 'oldDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element was in before.' },
+            { name: 'newDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element is in now.' },
+        ],
+        source: 'The source of this event is the element that changed its dimension.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementDimensionChange',
+    },
+    onClientElementInteriorChange: {
+        summary: '',
+        parameters: [
+            { name: 'oldInterior', isOptional: false, isVariadic: false, summary: 'An int representing the interior the element was in before.' },
+            { name: 'newInterior', isOptional: false, isVariadic: false, summary: 'An int representing the interior the element is in now.' },
+        ],
+        source: 'The source of this event is the element that changed its interior.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementInteriorChange',
+    },
+    onClientElementModelChange: {
+        summary: 'This event is triggered when the model of an element is changed using setElementModel.',
+        parameters: [
+            { name: 'oldModel', isOptional: false, isVariadic: false, summary: 'an int representing the model of the element before the change occurred.' },
+            { name: 'newModel', isOptional: false, isVariadic: false, summary: 'an int representing the new model of the element.' },
+        ],
+        source: 'The source of this event is the element that changed its model.',
+        cancel: 'This event doesn\'t support cancellation. Use setElementModel with the old value to reverse.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementModelChange',
+    },
+    onClientElementStreamIn: {
+        summary: 'This event is triggered whenever a physical element is streamed in. This is triggered for all elements that are streamable, such as players, peds, vehicles, objects and markers. When this event is triggered, that element is guaranteed to be physically created as a GTA object.\n\nBe aware that this event triggers for local player (as itself being the element that got streamed in) when said local player spawns, as this is the creation of entity local ped.',
+        parameters: [],
+        source: 'The source of this event is the element that streamed in.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementStreamIn',
+    },
+    onClientElementStreamOut: {
+        summary: 'This event is triggered whenever a physical element is streamed out. This is triggered for all elements that are streamable, such as players, peds, vehicles, objects and markers when the local player is leaving the element. When this event is triggered, that element is no longer physical and is now virtualized by MTA.',
+        parameters: [],
+        source: 'The source of this event is the element that streamed out.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementStreamOut',
+    },
+    onClientExplosion: {
+        summary: 'This event is triggered every time an explosion is created on the current **clients scene** (inside the streamer).',
+        parameters: [
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'X coordinate of where the explosion was created' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'Y coordinate of where the explosion was created' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'Z coordinate of where the explosion was created' },
+            { name: 'theType', isOptional: false, isVariadic: false, summary: 'the type of explosion created, see: Explosion types' },
+        ],
+        source: 'The source of this event is the player who created the explosion. If the explosion is from a vehicle the source is the player who syncs the vehicle.',
+        cancel: 'If this event is canceled, the explosion will not occur.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientExplosion',
+    },
+    onClientFileDownloadComplete: {
+        summary: 'This event is triggered when a file has been downloaded after downloadFile has been successfully called.',
+        parameters: [
+            { name: 'fileName', isOptional: false, isVariadic: false, summary: 'the file downloaded.' },
+            { name: 'success', isOptional: false, isVariadic: false, summary: 'whether successful or not.' },
+            { name: 'requestResource', isOptional: false, isVariadic: false, summary: 'the resource that called downloadFile.' },
+        ],
+        source: 'The source of this event is the root element of the resource that downloaded file.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientFileDownloadComplete',
+    },
+    onClientGUIAccepted: {
+        summary: 'This event is triggered when enter is pressed on an editbox.',
+        parameters: [
+            { name: 'editBox', isOptional: false, isVariadic: false, summary: 'the editbox which had focus.' },
+        ],
+        source: 'The source of this event is the editbox which enter was pressed on.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIAccepted',
+    },
+    onClientGUIBlur: {
+        summary: 'This event is triggered each time a GUI element looses input focus (mainly useful for windows, editboxes and memos but triggered for all GUI elements nevertheless).',
+        parameters: [],
+        source: 'The source of this event is the GUI element which just lost input focus.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIBlur',
+    },
+    onClientGUIChanged: {
+        summary: 'This event is fired when a memo or an editbox has changed (either by the user or by guiSetText).',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The GUI element which was changed.' },
+        ],
+        source: 'The source of this event is the element which was changed.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIChanged',
+    },
+    onClientGUIClick: {
+        summary: 'This event happens when any gui-element clicked.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the button which will be clicked, it can be *left*, *right*, *middle*.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'the state of the mouse button, will be *down* if the mouse button was pushed, or *up* if it was released.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
+        ],
+        source: 'The source of this event is the GUI element that was clicked.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIClick',
+    },
+    onClientGUIComboBoxAccepted: {
+        summary: 'This event is called when a combobox gets accepted.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the combobox that got accepted.' },
+        ],
+        source: 'The source of this event is the GUI combo box that was accepted.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIComboBoxAccepted',
+    },
+    onClientGUIDoubleClick: {
+        summary: 'This event is fired when the user double clicks a GUI element. Doesn\'t work with buttons.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the mouse button that the GUI element was double clicked with.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'the state of the mouse button. Can be *down* or *up*. **Please note currently only the up state is supported.**' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
+        ],
+        source: 'The source of this event is the GUI element that was double clicked.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIDoubleClick',
+    },
+    onClientGUIFocus: {
+        summary: 'This event is triggered each time a GUI element gains input focus (mainly useful for windows, editboxes and memos but triggered for all GUI elements nevertheless).',
+        parameters: [],
+        source: 'The source of this event is the GUI element which just gained input focus.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIFocus',
+    },
+    onClientGUIMouseDown: {
+        summary: 'This event is fired when the user clicks certain mouse button on a GUI element.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the mouse button that the GUI element was clicked with, can be *left*, *right*, or *middle*.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
+        ],
+        source: 'The source of this event is the GUI element that was clicked.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseDown',
+    },
+    onClientGUIMouseUp: {
+        summary: 'This event is fired when the user releases his mouse button when on top of a GUI element.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the mouse button that was released on a GUI element, can be *left*, *right*, or *middle*.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
+        ],
+        source: 'The source of this event is the GUI element on top of which the mouse button was released.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseUp',
+    },
+    onClientGUIMove: {
+        summary: 'This event is triggered each time the user moves a GUI element.',
+        parameters: [],
+        source: 'The source of this event is the GUI element which was moved.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMove',
+    },
+    onClientGUIScroll: {
+        summary: 'This event is fired when a GUI scrollbar is scrolled.',
+        parameters: [
+            { name: 'scrolled', isOptional: false, isVariadic: false, summary: 'the scrollbar element that was scrolled.' },
+        ],
+        source: 'The source of this event is the scrollbar element that got scrolled.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIScroll',
+    },
+    onClientGUISize: {
+        summary: 'This event is triggered when the local client resizes a GUI element.',
+        parameters: [],
+        source: 'The source of this event is the GUI element that was resized.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUISize',
+    },
+    onClientGUITabSwitched: {
+        summary: 'This event is triggered each time the user switch from GUI tab.\n\nWhen adding the event handler on the tab panel, propagate must be true.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the tab which was selected.' },
+        ],
+        source: 'The source of this event is the tab.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUITabSwitched',
+    },
+};

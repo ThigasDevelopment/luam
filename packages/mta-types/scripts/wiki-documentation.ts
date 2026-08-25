@@ -60,7 +60,14 @@ export function stripTemplates(text: string): string {
     return output;
 }
 
-function sections(text: string): ReadonlyMap<string, string[]> {
+export function pageIntro(text: string): string {
+    const heading = HEADING.exec(text);
+    const opening = stripTemplates(text.slice(0, heading?.index ?? text.length)).replace(MEDIA_LINK, '');
+
+    return cleanMarkup(opening).replace(/^__[A-Z]+__\s*/gm, '').trim();
+}
+
+export function sections(text: string): ReadonlyMap<string, string[]> {
     const found = new Map<string, string[]>();
     const headings: { title: string; start: number; end: number }[] = [];
 
@@ -84,7 +91,7 @@ function sections(text: string): ReadonlyMap<string, string[]> {
     return found;
 }
 
-function bulletSummaries(body: string): ReadonlyMap<string, string> {
+export function bulletSummaries(body: string): ReadonlyMap<string, string> {
     const summaries = new Map<string, string>();
 
     BULLET.lastIndex = 0;
@@ -97,9 +104,7 @@ function bulletSummaries(body: string): ReadonlyMap<string, string> {
 }
 
 export function wikiDocumentation(title: string, text: string, parameters: readonly WikiParameter[], isVariadic: boolean): ApiDocumentation {
-    const heading = HEADING.exec(text);
-    const opening = stripTemplates(text.slice(0, heading?.index ?? text.length)).replace(MEDIA_LINK, '');
-    const intro = cleanMarkup(opening).replace(/^__[A-Z]+__\s*/gm, '');
+    const intro = pageIntro(text);
     const found = sections(text);
     const argumentBody = [...found].filter(([heading]) => heading.includes('argument')).flatMap(([, bodies]) => bodies).join('\n');
     const summaries = bulletSummaries(argumentBody);
@@ -111,7 +116,7 @@ export function wikiDocumentation(title: string, text: string, parameters: reado
     }));
 
     return {
-        summary: intro.trim(),
+        summary: intro,
         parameters: isVariadic ? [...documented, { name: 'arguments', isOptional: true, isVariadic: true, summary: '' }] : documented,
         returns: singleLine(stripTemplates((found.get('returns') ?? []).join(' '))),
         wiki: `${WIKI_SITE}/wiki/${title}`,

@@ -5,6 +5,8 @@ import { diffCatalogs, fingerprint, readIndex, type CatalogDiff, type CatalogInd
 import { emitElementTypes, emitEvents } from './catalog-data-emitter.ts';
 import { normalize, type NormalizedCatalog } from './catalog-normalizer.ts';
 import { emitDocumentation } from './documentation-emitter.ts';
+import { emitEventDocumentation, type EventDocumentationEntry } from './event-documentation-emitter.ts';
+import { wikiEventDocumentation } from './event-documentation-parser.ts';
 import { parseEvents } from './event-parser.ts';
 import { emitEventSignatures } from './event-signature-emitter.ts';
 import { GeneratorError, type CatalogEntry, type GeneratedFile, type ParsedDeclaration } from './generator-model.ts';
@@ -25,7 +27,7 @@ export interface GenerationResult {
     oop: OopSurfaceResult;
     multiReturns: readonly string[];
     elementTypes: number;
-    events: { server: number; client: number };
+    events: { server: number; client: number; documented: number };
     documented: number;
     source: WikiCatalogSource;
     index: CatalogIndex;
@@ -112,6 +114,10 @@ export function generate(): GenerationResult {
     auditCallbacks(server, client, catalog);
     const serverEvents = parseEvents(eventFiles('server'), serverContext);
     const clientEvents = parseEvents(eventFiles('client'), clientContext);
+    const eventNames = new Set([...serverEvents, ...clientEvents].map((event) => event.name));
+    const eventDocumentation: EventDocumentationEntry[] = source.eventPages
+        .filter((page) => eventNames.has(page.name))
+        .map((page) => ({ name: page.name, documentation: wikiEventDocumentation(page.title, page.text) }));
     const oop = buildOopSurface(
         [
             ...upstream.classes.server.flatMap((file) => parseOopClasses(file, serverContext, 'server')),
@@ -131,6 +137,7 @@ export function generate(): GenerationResult {
         ...emitCatalog('server', sortedEntries([...catalog.server, ...catalog.serverVariants])),
         ...emitCatalog('client', sortedEntries([...catalog.client, ...catalog.clientVariants])),
         ...emitDocumentation(documented),
+        ...emitEventDocumentation(eventDocumentation),
         ...emitOopSurface(oop.classes),
         emitEvents(serverEvents.map((event) => event.name), clientEvents.map((event) => event.name)),
         ...emitEventSignatures(serverEvents, clientEvents),
@@ -148,7 +155,7 @@ export function generate(): GenerationResult {
         diff: diffCatalogs(readIndex(), index),
         multiReturns: source.multiReturns,
         elementTypes: elementTypes.length,
-        events: { server: serverEvents.length, client: clientEvents.length },
+        events: { server: serverEvents.length, client: clientEvents.length, documented: eventDocumentation.length },
         documented: documented.filter((entry) => entry.documentation.summary.length > 0).length,
     };
 }

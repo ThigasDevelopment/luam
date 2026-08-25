@@ -6,7 +6,7 @@ import { applyTiebreaker } from './upstream-tiebreaker.ts';
 import { parseWikiCatalog, type UnparsedPage, type WikiSurface } from './wiki-declaration-parser.ts';
 import { applyEnumerations } from './wiki-enumeration-apply.ts';
 import { enumerationValues, pageEnumerations } from './wiki-enumeration-values.ts';
-import { latestRevisionAt, readSnapshot, templateText } from './wiki-snapshot.ts';
+import { latestRevisionAt, readSnapshot, templateText, type WikiSnapshotPage } from './wiki-snapshot.ts';
 
 export const RETAINED_UPSTREAM: Readonly<Record<string, string>> = {
     base64Decode: 'documented outside the curated lists, still accepted by MTA',
@@ -33,6 +33,7 @@ export interface WikiCatalogSource {
     server: readonly ParsedDeclaration[];
     client: readonly ParsedDeclaration[];
     surfaces: readonly WikiSurface[];
+    eventPages: readonly WikiSnapshotPage[];
     unparsed: readonly UnparsedPage[];
     multiReturns: readonly string[];
     tiebreakers: readonly string[];
@@ -82,6 +83,7 @@ export function wikiCatalogSource(
         server: [...server.declarations, ...retainedServer],
         client: [...client.declarations, ...retainedClient],
         surfaces: parsed.surfaces,
+        eventPages: snapshot.events,
         unparsed: parsed.unparsed,
         multiReturns: parsed.multiReturns,
         tiebreakers: [...new Set([...server.resolved, ...client.resolved])].sort(),

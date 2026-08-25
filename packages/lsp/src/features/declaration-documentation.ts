@@ -41,13 +41,9 @@ function skipDecorators(text: string, from: number): number {
     return end;
 }
 
-export function declarationDocumentation(text: string, declaration: SymbolDeclaration): string {
-    if (declaration.isSynthetic || !startsItsOwnLine(text, declaration)) {
-        return '';
-    }
-
+export function documentationAbove(text: string, offset: number): string {
     const lines: string[] = [];
-    let end = skipDecorators(text, text.lastIndexOf('\n', declaration.position.offset - 1) + 1);
+    let end = skipDecorators(text, text.lastIndexOf('\n', offset - 1) + 1);
 
     while (end > 0) {
         const line = previousLine(text, end);
@@ -67,4 +63,12 @@ export function declarationDocumentation(text: string, declaration: SymbolDeclar
     }
 
     return lines.join('\n').trim();
+}
+
+export function declarationDocumentation(text: string, declaration: SymbolDeclaration): string {
+    if (declaration.isSynthetic || !startsItsOwnLine(text, declaration)) {
+        return '';
+    }
+
+    return documentationAbove(text, declaration.position.offset);
 }
