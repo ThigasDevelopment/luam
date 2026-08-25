@@ -88,6 +88,7 @@ async function runOnce(scope: RunScope, target: string, cache: ProjectCache, opt
         tracker,
         minMtaVersion: version.version,
         developmentLogs: options.developmentLogs ?? null,
+        development: true,
         layout: options.layout ?? 'tree',
         map: options.map ?? context.config.output.map,
     });

@@ -26,6 +26,7 @@ export interface CompileOptions {
     compilerOptions?: CompilerOptions;
     projectReferences?: ReadonlySet<string>;
     emitCode?: boolean;
+    development?: boolean;
 }
 
 export interface CompileResult {
@@ -118,16 +119,17 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
 
     const references = reachedNames(checked.references, options.projectReferences);
     const emitted = emit(parsed.program, checked.types, references, checked.generatedMembers);
-    const preserved = emitPreservingSource(
+    const preserved = emitPreservingSource({
         source,
-        parsed.program,
-        parsed.erasures,
-        parsed.comments,
-        checked.types,
+        program: parsed.program,
+        erasures: parsed.erasures,
+        comments: parsed.comments,
+        spans: parsed.spans,
+        types: checked.types,
         references,
-        checked.generatedMembers,
-        parsed.statementSpans,
-    );
+        generatedMembers: checked.generatedMembers,
+        development: options.development === true,
+    });
     const required = new Set<RuntimeHelper>(emitted.requiredHelpers);
 
     for (const name of checked.references) {

@@ -38,6 +38,7 @@ export interface CompileOptions {
     tracker?: PhaseTracker;
     minMtaVersion?: string | null;
     developmentLogs?: LuamConfig['development']['logs'] | null;
+    development?: boolean;
     layout?: OutputLayout;
     map?: boolean;
 }
@@ -149,6 +150,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
     const project = cache.compile(sources.files, {
         project: declarations,
         compilerOptions: config.compilerOptions,
+        development: options.development === true,
         onProgress: (event) => tracker.advance(event.item, event.index, event.total),
     });
 

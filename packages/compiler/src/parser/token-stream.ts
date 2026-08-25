@@ -1,7 +1,7 @@
 import { createDiagnostic, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { isLuamKeyword, type Token, type TokenKind } from '@compiler/lexer/token';
 
-import type { SourceSpan } from './source-metadata';
+import type { ErasureKind, ErasureSpan, SourceSpan, SpannedNode } from './source-metadata';
 
 export class ParserError extends Error {
     readonly diagnostic: Diagnostic;
@@ -21,7 +21,9 @@ export class TokenStream {
 
     private index = 0;
 
-    private readonly erased: SourceSpan[] = [];
+    private readonly erased: ErasureSpan[] = [];
+
+    private readonly spans = new Map<SpannedNode, SourceSpan>();
 
     constructor(tokens: readonly Token[]) {
         this.tokens = tokens;
@@ -55,12 +57,12 @@ export class TokenStream {
         return this.index;
     }
 
-    eraseFrom(checkpoint: number): void {
+    eraseFrom(checkpoint: number, kind: ErasureKind = 'annotation'): void {
         const first = this.tokens[checkpoint];
         const last = this.tokens[this.index - 1];
 
         if (first !== undefined && last !== undefined && first.kind !== 'eof') {
-            this.erased.push({ start: first.position.offset, end: last.end.offset });
+            this.erased.push({ start: first.position.offset, end: last.end.offset, kind });
         }
     }
 
@@ -68,12 +70,32 @@ export class TokenStream {
         const first = this.tokens[checkpoint];
 
         if (first !== undefined && first.kind !== 'eof') {
-            this.erased.push({ start: first.position.offset, end: this.current().position.offset });
+            this.erased.push({ start: first.position.offset, end: this.current().position.offset, kind: 'annotation' });
         }
     }
 
-    erasures(): SourceSpan[] {
+    extendDeclarationErasure(end: number): void {
+        const last = this.erased[this.erased.length - 1];
+
+        if (last !== undefined && last.kind === 'declaration' && last.end <= end) {
+            last.end = end;
+        }
+    }
+
+    erasures(): ErasureSpan[] {
         return [...this.erased];
+    }
+
+    recordSpan(node: SpannedNode, checkpoint: number): void {
+        const span = this.sourceSpanFrom(checkpoint);
+
+        if (span !== null) {
+            this.spans.set(node, span);
+        }
+    }
+
+    nodeSpans(): ReadonlyMap<SpannedNode, SourceSpan> {
+        return this.spans;
     }
 
     sourceSpanFrom(checkpoint: number): SourceSpan | null {

@@ -1,0 +1,151 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`development output > locks the release output of 'class' 1`] = `
+"class 'Example' {
+    label = 'a',
+
+    greet = function(self, value)
+        print(value)
+    end
+}
+"
+`;
+
+exports[`development output > locks the release output of 'compound assignment' 1`] = `
+"local total = 0
+
+total = total + 1
+
+print(total)
+"
+`;
+
+exports[`development output > locks the release output of 'continue with break' 1`] = `
+"for index = 1, 10 do
+    local __luam_break = false repeat if index == 3 then
+        break
+    end
+    if index == 8 then
+        __luam_break = true break
+    end until true if __luam_break then break end
+end
+"
+`;
+
+exports[`development output > locks the release output of 'continue' 1`] = `
+"for index = 1, 10 do
+    repeat if index == 3 then
+        break
+    end
+    print(index) until true
+end
+"
+`;
+
+exports[`development output > locks the release output of 'declare' 1`] = `
+"
+
+print(1)
+"
+`;
+
+exports[`development output > locks the release output of 'enum' 1`] = `
+"GameState = enum { 'LOBBY', 'RUNNING' }
+
+
+
+
+print(GameState.LOBBY)
+"
+`;
+
+exports[`development output > locks the release output of 'interface' 1`] = `
+"
+
+
+
+print(1)
+"
+`;
+
+exports[`development output > locks the release output of 'native extension' 1`] = `
+"local label = ' a '
+
+print(string.trim(label))
+"
+`;
+
+exports[`development output > locks the release output of 'nested in a call' 1`] = `
+"addEventHandler('onThing', root, function ()
+    local total = 0
+
+    total = total + 1
+
+    print(total)
+end)
+"
+`;
+
+exports[`development output > locks the release output of 'nested in a loop' 1`] = `
+"local total = 0
+
+for index = 1, 3 do
+    total = total + index
+
+    print(total)
+end
+"
+`;
+
+exports[`development output > locks the release output of 'new' 1`] = `
+"class 'Point' {
+    x = 0
+}
+
+local value = new 'Point' ()
+
+print(value)
+"
+`;
+
+exports[`development output > locks the release output of 'single line class' 1`] = `
+"class 'Tiny' {
+    label = 'a'
+}
+
+print(1)
+"
+`;
+
+exports[`development output > locks the release output of 'single line enum' 1`] = `
+"Colors = enum { 'RED', 'GREEN' }
+
+print(Colors.RED)
+"
+`;
+
+exports[`development output > locks the release output of 'single line loop' 1`] = `
+"for index = 1, 3 do
+    repeat if index == 2 then
+        break
+    end
+    print(index) until true
+end
+"
+`;
+
+exports[`development output > locks the release output of 'template literal' 1`] = `
+"local name = 'a'
+
+print('hi {name}')
+"
+`;
+
+exports[`development output > locks the release output of 'type alias' 1`] = `
+"
+
+local function example (name)
+
+end
+"
+`;

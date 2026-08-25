@@ -30,9 +30,11 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
 
     const version = await commandVersion(context);
     const layout = options.layout ?? (context.config.output.bundle ? 'bundle' : 'tree');
+    const minify = options.minify ?? context.config.output.minify;
     const outcome = runCompile(context.root, context.config, {
         tracker,
         minMtaVersion: version.version,
+        development: !minify,
         layout,
         map: options.map ?? context.config.output.map,
     });
@@ -54,7 +56,6 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
 
     tracker.begin('write');
 
-    const minify = options.minify ?? context.config.output.minify;
     const writeOptions = productionWriteOptions(context.root, context.config, outcome.environmentTemplate, tracker, minify);
     let result: WriteResult;
 

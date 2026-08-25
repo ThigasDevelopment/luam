@@ -203,7 +203,11 @@ function parseClassDeclaration(stream: TokenStream, decorators: Decorator[]): Cl
         }
 
         try {
-            declaration.members.push(parseClassMember(stream));
+            const checkpoint = stream.checkpoint();
+            const member = parseClassMember(stream);
+
+            declaration.members.push(member);
+            stream.recordSpan(member, checkpoint);
         } catch (error) {
             if (!(error instanceof ParserError)) {
                 throw error;
@@ -272,7 +276,7 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
 
     const declaration: InterfaceDeclaration = { kind: 'interface-declaration', name, superInterfaces, members, position };
 
-    stream.eraseFrom(checkpoint);
+    stream.eraseFrom(checkpoint, 'declaration');
 
     return declaration;
 }

@@ -1,143 +1,148 @@
-import { resolveCallExtension, resolvePropertyExtension } from './extensions';
-import { emit } from './emitter';
 import { hybridSourceMappings, type HybridSourceEdit } from './hybrid-source-map';
+import { containsJump } from './loops';
+import { loopBody, nestedBlocks } from './preserve-blocks';
+import { canonicalEdit } from './preserve-canonical';
+import { blankSpan, commentReplacement, longComment } from './preserve-comments';
+import { classEdits, enumEdits } from './preserve-declarations';
+import { isPreservableStatement } from './preserve-guards';
+import type { PreserveInput } from './preserve-input';
+import { loopEdits } from './preserve-loops';
 
-import type { Type } from '@compiler/checker/types';
 import type { SourceLineMapping } from '@compiler/emitter/source-map';
-import type { Comment } from '@compiler/lexer/comment-scanner';
-import type { Expression, Program, Statement } from '@compiler/parser/ast';
-import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
-import type { SourceSpan } from '@compiler/parser/source-metadata';
+import type { Statement } from '@compiler/parser/ast';
+import type { ErasureSpan } from '@compiler/parser/source-metadata';
 
-function canPreserveExpression(expression: Expression, types: Map<Expression, Type>): boolean {
-    switch (expression.kind) {
-        case 'template-literal':
-        case 'new-expression':
-            return false;
-        case 'member-expression':
-            return resolvePropertyExtension(types.get(expression.object) ?? null, expression.property) === null && canPreserveExpression(expression.object, types);
-        case 'index-expression':
-            return canPreserveExpression(expression.object, types) && canPreserveExpression(expression.index, types);
-        case 'call-expression':
-            if (expression.method === null && expression.callee.kind === 'identifier' && expression.callee.name === 'super') {
-                return false;
-            }
+interface Collector {
+    input: PreserveInput;
+    edits: HybridSourceEdit[];
+    lowered: Set<Statement>;
+    failed: boolean;
+}
 
-            if (
-                expression.callee.kind === 'member-expression' &&
-                resolveCallExtension(types.get(expression.callee.object) ?? null, expression.callee.property) !== null
-            ) {
-                return false;
-            }
+interface Surgery {
+    edits: HybridSourceEdit[];
+    wrapsBody: boolean;
+}
 
-            return canPreserveExpression(expression.callee, types) && expression.args.every((argument) => canPreserveExpression(argument, types));
-        case 'function-expression':
-            return canPreserveStatements(expression.body, types);
-        case 'table-expression':
-            return expression.fields.every(
-                (field) => (field.key === null || canPreserveExpression(field.key, types)) && canPreserveExpression(field.value, types),
-            );
-        case 'binary-expression':
-            return canPreserveExpression(expression.left, types) && canPreserveExpression(expression.right, types);
-        case 'unary-expression':
-            return canPreserveExpression(expression.operand, types);
-        case 'group-expression':
-            return canPreserveExpression(expression.expression, types);
-        default:
-            return true;
+function surgery(collector: Collector, statement: Statement): Surgery | null {
+    const { input } = collector;
+    const span = input.spans.get(statement);
+
+    if (!input.development || span === undefined) {
+        return null;
+    }
+
+    if (statement.kind === 'enum-declaration') {
+        const edits = input.references.has(statement.name) ? enumEdits(input.source, statement) : null;
+
+        return edits === null ? null : { edits, wrapsBody: false };
+    }
+
+    if (statement.kind === 'class-declaration') {
+        const generated = input.generatedMembers.get(statement)?.length ?? 0;
+        const edits = classEdits(input.source, statement, generated, input.types, { span, members: input.spans });
+
+        return edits === null ? null : { edits, wrapsBody: false };
+    }
+
+    if (loopBody(statement) === null || !isPreservableStatement(statement, input.types)) {
+        return null;
+    }
+
+    const edits = loopEdits(input, statement);
+
+    return edits === null ? null : { edits, wrapsBody: true };
+}
+
+function keepsScaffolding(statement: Statement): boolean {
+    const body = loopBody(statement);
+
+    return body === null || !containsJump(body, 'continue-statement');
+}
+
+function descend(collector: Collector, statement: Statement, blockWrap: boolean, bodyWrap: boolean): void {
+    for (const block of nestedBlocks(statement)) {
+        walk(collector, block, blockWrap);
+    }
+
+    const body = loopBody(statement);
+
+    if (body !== null) {
+        walk(collector, body, bodyWrap);
     }
 }
 
-function canPreserveStatement(statement: Statement, types: Map<Expression, Type>): boolean {
-    switch (statement.kind) {
-        case 'local-statement':
-            return statement.values.every((value) => canPreserveExpression(value, types));
-        case 'assignment-statement':
-            return (
-                statement.operator === '=' &&
-                statement.targets.every((target) => canPreserveExpression(target, types)) &&
-                statement.values.every((value) => canPreserveExpression(value, types))
-            );
-        case 'call-statement':
-            return canPreserveExpression(statement.expression, types);
-        case 'function-declaration':
-            return canPreserveStatements(statement.body, types);
-        case 'return-statement':
-            return statement.values.every((value) => canPreserveExpression(value, types));
-        case 'break-statement':
-            return true;
-        case 'continue-statement':
-            return false;
-        case 'do-statement':
-            return canPreserveStatements(statement.body, types);
-        case 'while-statement':
-            return canPreserveExpression(statement.condition, types) && canPreserveStatements(statement.body, types);
-        case 'repeat-statement':
-            return canPreserveStatements(statement.body, types) && canPreserveExpression(statement.condition, types);
-        case 'if-statement':
-            return (
-                statement.clauses.every((clause) => canPreserveExpression(clause.condition, types) && canPreserveStatements(clause.body, types)) &&
-                (statement.alternate === null || canPreserveStatements(statement.alternate, types))
-            );
-        case 'numeric-for-statement':
-            return (
-                canPreserveExpression(statement.start, types) &&
-                canPreserveExpression(statement.limit, types) &&
-                (statement.step === null || canPreserveExpression(statement.step, types)) &&
-                canPreserveStatements(statement.body, types)
-            );
-        case 'generic-for-statement':
-            return statement.iterators.every((iterator) => canPreserveExpression(iterator, types)) && canPreserveStatements(statement.body, types);
-        case 'type-alias-statement':
-        case 'declare-statement':
-        case 'event-declaration':
-        case 'interface-declaration':
-            return true;
-        default:
-            return false;
+function visit(collector: Collector, statement: Statement, wrapped: boolean): void {
+    if (wrapped && (statement.kind === 'continue-statement' || statement.kind === 'break-statement')) {
+        return;
+    }
+
+    const surgical = surgery(collector, statement);
+
+    if (surgical !== null) {
+        collector.edits.push(...surgical.edits);
+        descend(collector, statement, false, surgical.wrapsBody);
+
+        return;
+    }
+
+    if (isPreservableStatement(statement, collector.input.types) && keepsScaffolding(statement)) {
+        const inherited = statement.kind === 'do-statement' || statement.kind === 'if-statement' ? wrapped : false;
+
+        descend(collector, statement, inherited, false);
+
+        return;
+    }
+
+    const span = collector.input.spans.get(statement);
+    const edit = span === undefined ? null : canonicalEdit(collector.input, statement, span);
+
+    if (edit === null) {
+        collector.failed = true;
+
+        return;
+    }
+
+    collector.edits.push(edit);
+    collector.lowered.add(statement);
+}
+
+function walk(collector: Collector, statements: readonly Statement[], wrapped: boolean): void {
+    for (const statement of statements) {
+        if (collector.failed) {
+            return;
+        }
+
+        visit(collector, statement, wrapped);
     }
 }
 
-function canPreserveStatements(statements: readonly Statement[], types: Map<Expression, Type>): boolean {
-    return statements.every((statement) => canPreserveStatement(statement, types));
+function erasureReplacement(input: PreserveInput, span: ErasureSpan): string {
+    const text = input.source.slice(span.start, span.end);
+
+    return input.development && span.kind === 'declaration' ? longComment(text) : blankSpan(text);
 }
 
-function commentReplacement(source: string, comment: Comment): string {
-    const raw = source.slice(comment.position.offset, comment.end.offset);
-
-    if (comment.isDirective) {
-        return raw.replace(/[^\r\n]/g, '');
+function byPosition(left: HybridSourceEdit, right: HybridSourceEdit): number {
+    if (left.start !== right.start) {
+        return left.start - right.start;
     }
 
-    if (comment.kind === 'line') {
-        return `--${raw.slice(1)}`;
-    }
+    const empty = Number(left.end === left.start) - Number(right.end === right.start);
 
-    const body = raw.slice(2, raw.endsWith('*#') ? -2 : undefined);
-    let equals = '';
-
-    while (body.includes(`]${equals}]`)) {
-        equals += '=';
-    }
-
-    return `--[${equals}[${body}]${equals}]`;
+    return empty !== 0 ? -empty : right.end - left.end;
 }
 
-function sourceEdits(
-    source: string,
-    erasures: readonly SourceSpan[],
-    comments: readonly Comment[],
-    loweredEdits: readonly HybridSourceEdit[],
-): HybridSourceEdit[] | null {
+function sourceEdits(input: PreserveInput, lowered: readonly HybridSourceEdit[]): HybridSourceEdit[] | null {
     const edits: HybridSourceEdit[] = [
-        ...erasures.map((span) => ({ ...span, replacement: source.slice(span.start, span.end).replace(/[^\r\n]/g, '') })),
-        ...comments.map((comment) => ({
+        ...input.erasures.map((span) => ({ start: span.start, end: span.end, replacement: erasureReplacement(input, span) })),
+        ...input.comments.map((comment) => ({
             start: comment.position.offset,
             end: comment.end.offset,
-            replacement: commentReplacement(source, comment),
+            replacement: commentReplacement(input.source, comment),
         })),
-        ...loweredEdits,
-    ].sort((left, right) => left.start - right.start || right.end - left.end);
+        ...lowered,
+    ].sort(byPosition);
     const normalized: HybridSourceEdit[] = [];
 
     for (const edit of edits) {
@@ -170,53 +175,6 @@ function applySourceEdits(source: string, edits: readonly HybridSourceEdit[]): s
     return output + source.slice(offset);
 }
 
-function canonicalEdits(
-    source: string,
-    program: Program,
-    types: Map<Expression, Type>,
-    references: ReadonlySet<string>,
-    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>,
-    statementSpans: ReadonlyMap<Statement, SourceSpan>,
-): { edits: HybridSourceEdit[]; lowered: ReadonlySet<Statement> } | null {
-    const edits: HybridSourceEdit[] = [];
-    const lowered = new Set<Statement>();
-
-    for (const [index, statement] of program.body.entries()) {
-        if (canPreserveStatement(statement, types)) {
-            continue;
-        }
-
-        const span = statementSpans.get(statement);
-
-        if (span === undefined) {
-            return null;
-        }
-
-        const emitted = emit({ ...program, body: [statement] }, types, references, generatedMembers, statement.position.line - 1);
-        const authored = source.slice(span.start, span.end);
-        let canonical = span.end < source.length && emitted.code.endsWith('\n') ? emitted.code.slice(0, -1) : emitted.code;
-
-        if (canonical.length === 0) {
-            canonical = authored.replace(/[^\r\n]/g, '');
-        } else {
-            if (authored.endsWith(';')) {
-                canonical += ';';
-            }
-
-            const missingLines = authored.split('\n').length - canonical.split('\n').length;
-
-            if (missingLines > 0 && index < program.body.length - 1) {
-                canonical += '\n'.repeat(missingLines);
-            }
-        }
-
-        edits.push({ ...span, replacement: canonical, lines: emitted.lines });
-        lowered.add(statement);
-    }
-
-    return { edits, lowered };
-}
-
 function withoutTrailingBlankLines(code: string): string {
     const body = code.replace(/\s+$/, '');
 
@@ -229,29 +187,22 @@ function withoutTrailingBlankLines(code: string): string {
     return `${body}${ending}`;
 }
 
-export function emitPreservingSource(
-    source: string,
-    program: Program,
-    erasures: readonly SourceSpan[],
-    comments: readonly Comment[],
-    types: Map<Expression, Type>,
-    references: ReadonlySet<string>,
-    generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>,
-    statementSpans: ReadonlyMap<Statement, SourceSpan>,
-): { code: string; lines: SourceLineMapping[] } | null {
-    const canonical = canonicalEdits(source, program, types, references, generatedMembers, statementSpans);
+export function emitPreservingSource(input: PreserveInput): { code: string; lines: SourceLineMapping[] } | null {
+    const collector: Collector = { input, edits: [], lowered: new Set<Statement>(), failed: false };
 
-    if (canonical === null) {
+    walk(collector, input.program.body, false);
+
+    if (collector.failed) {
         return null;
     }
 
-    const edits = sourceEdits(source, erasures, comments, canonical.edits);
+    const edits = sourceEdits(input, collector.edits);
 
     if (edits === null) {
         return null;
     }
 
-    const code = withoutTrailingBlankLines(applySourceEdits(source, edits));
+    const code = withoutTrailingBlankLines(applySourceEdits(input.source, edits));
 
-    return { code, lines: hybridSourceMappings(source, program, edits, canonical.lowered) };
+    return { code, lines: hybridSourceMappings(input.source, input.program, edits, collector.lowered) };
 }

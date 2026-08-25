@@ -4,7 +4,8 @@ import type { Comment } from '@compiler/lexer/comment-scanner';
 import type { Token } from '@compiler/lexer/token';
 
 import type { Program, Statement } from './ast';
-import type { SourceSpan } from './source-metadata';
+import { absorbDeclarationTerminator } from './erased-declarations';
+import type { ErasureSpan, SourceSpan, SpannedNode } from './source-metadata';
 import { parseStatement } from './statement';
 import { ParserError, TokenStream } from './token-stream';
 
@@ -13,10 +14,10 @@ export interface ParseResult {
     tokens: Token[];
     diagnostics: Diagnostic[];
     directives: string[];
-    erasures: SourceSpan[];
+    erasures: ErasureSpan[];
     hasComments: boolean;
     comments: Comment[];
-    statementSpans: ReadonlyMap<Statement, SourceSpan>;
+    spans: ReadonlyMap<SpannedNode, SourceSpan>;
 }
 
 function synchronize(stream: TokenStream): void {
@@ -29,7 +30,7 @@ function synchronize(stream: TokenStream): void {
     }
 }
 
-function parseProgram(stream: TokenStream, diagnostics: Diagnostic[], statementSpans: Map<Statement, SourceSpan>): Program {
+function parseProgram(stream: TokenStream, diagnostics: Diagnostic[]): Program {
     const body: Statement[] = [];
 
     while (!stream.isEof()) {
@@ -41,15 +42,10 @@ function parseProgram(stream: TokenStream, diagnostics: Diagnostic[], statementS
             const checkpoint = stream.checkpoint();
             const statement = parseStatement(stream);
 
-            stream.match('punctuation', ';');
-
-            const span = stream.sourceSpanFrom(checkpoint);
-
+            absorbDeclarationTerminator(stream, statement);
             body.push(statement);
-
-            if (span !== null) {
-                statementSpans.set(statement, span);
-            }
+            stream.recordSpan(statement, checkpoint);
+            stream.match('punctuation', ';');
         } catch (error) {
             if (!(error instanceof ParserError)) {
                 throw error;
@@ -67,8 +63,7 @@ export function parse(source: string): ParseResult {
     const lexed = scan(source);
     const diagnostics: Diagnostic[] = [...lexed.diagnostics];
     const stream = new TokenStream(lexed.tokens);
-    const statementSpans = new Map<Statement, SourceSpan>();
-    const program = parseProgram(stream, diagnostics, statementSpans);
+    const program = parseProgram(stream, diagnostics);
 
     return {
         program,
@@ -78,6 +73,6 @@ export function parse(source: string): ParseResult {
         erasures: stream.erasures(),
         hasComments: lexed.hasComments,
         comments: lexed.comments,
-        statementSpans,
+        spans: stream.nodeSpans(),
     };
 }

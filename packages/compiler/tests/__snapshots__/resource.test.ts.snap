@@ -19,7 +19,7 @@ exports[`resource assembly > generates a manifest that matches the authored stan
 exports[`resource assembly > locks the generated resource output 1`] = `
 [
   "src/shared/config.lua
-
+--!shared
 
 RESOURCE_NAME = 'luam-demo'
 

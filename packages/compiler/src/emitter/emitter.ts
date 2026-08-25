@@ -1,6 +1,6 @@
 import { emitClassDeclaration, emitEnumDeclaration } from './classes';
 import { emitExpression, emitFunctionBody } from './expressions';
-import { CONTINUE_JUMP, emitBreak, emitLoopBody } from './loops';
+import { CONTINUE_JUMP, emitBreak, emitLoop } from './loops';
 import { finalizeEmission, type SourceLineMapping } from './source-map';
 import { createEmitState, indentLine, markSource, withSymbol, type EmitState, type RuntimeHelper } from './state';
 
@@ -124,7 +124,7 @@ function emitNumericFor(state: EmitState, statement: NumericForStatement): strin
 
     const header = `for ${statement.variable.name} = ${bounds.join(', ')} do`;
 
-    return [header, ...emitLoopBody(state, statement.body), indentLine(state, 'end')].join('\n');
+    return emitLoop(state, header, statement.body, 'end');
 }
 
 function emitGenericFor(state: EmitState, statement: GenericForStatement): string {
@@ -132,7 +132,7 @@ function emitGenericFor(state: EmitState, statement: GenericForStatement): strin
     const iterators = statement.iterators.map((iterator) => emitExpression(state, iterator)).join(', ');
     const header = `for ${names} in ${iterators} do`;
 
-    return [header, ...emitLoopBody(state, statement.body), indentLine(state, 'end')].join('\n');
+    return emitLoop(state, header, statement.body, 'end');
 }
 
 function emitStatement(state: EmitState, statement: Statement): string | null {
@@ -157,17 +157,9 @@ function emitStatement(state: EmitState, statement: Statement): string | null {
         case 'do-statement':
             return ['do', ...emitNested(state, statement.body), indentLine(state, 'end')].join('\n');
         case 'while-statement':
-            return [
-                `while ${emitExpression(state, statement.condition)} do`,
-                ...emitLoopBody(state, statement.body),
-                indentLine(state, 'end'),
-            ].join('\n');
+            return emitLoop(state, `while ${emitExpression(state, statement.condition)} do`, statement.body, 'end');
         case 'repeat-statement':
-            return [
-                'repeat',
-                ...emitLoopBody(state, statement.body),
-                indentLine(state, `until ${emitExpression(state, statement.condition)}`),
-            ].join('\n');
+            return emitLoop(state, 'repeat', statement.body, `until ${emitExpression(state, statement.condition)}`);
         case 'if-statement':
             return emitIf(state, statement);
         case 'numeric-for-statement':

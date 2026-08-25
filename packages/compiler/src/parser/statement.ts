@@ -5,6 +5,7 @@ import type { DeclareStatement, Expression, Statement, TypeAliasStatement, Varia
 import { parseDoStatement, parseForStatement, parseIfStatement, parseRepeatStatement, parseWhileStatement } from './control-flow';
 import { isDeclarationStart, parseDeclaration, parseDecorators } from './declarations';
 import type { EventDeclaration } from './declaration-nodes';
+import { absorbDeclarationTerminator } from './erased-declarations';
 import { isDirectiveStart, parseDirective } from './directives';
 import { parseExpression, parseSuffixed } from './expression';
 import { parseFunctionDeclaration, parseParameters } from './function-expression';
@@ -74,7 +75,7 @@ function parseTypeAlias(stream: TokenStream): TypeAliasStatement {
 
     const statement: TypeAliasStatement = { kind: 'type-alias-statement', name, typeParameters, annotation: parseTypeAnnotation(stream), position };
 
-    stream.eraseFrom(checkpoint);
+    stream.eraseFrom(checkpoint, 'declaration');
 
     return statement;
 }
@@ -96,7 +97,7 @@ function parseDeclareStatement(stream: TokenStream): DeclareStatement {
 
     const statement: DeclareStatement = { kind: 'declare-statement', name, annotation: parseTypeAnnotation(stream), position };
 
-    stream.eraseFrom(checkpoint);
+    stream.eraseFrom(checkpoint, 'declaration');
 
     return statement;
 }
@@ -124,7 +125,7 @@ function parseEventDeclaration(stream: TokenStream): EventDeclaration {
     const returnAnnotation = parseOptionalAnnotation(stream);
     const declaration: EventDeclaration = { kind: 'event-declaration', name, parameters, returnAnnotation, position };
 
-    stream.eraseFrom(checkpoint);
+    stream.eraseFrom(checkpoint, 'declaration');
 
     return declaration;
 }
@@ -322,13 +323,17 @@ export function parseBraceBlock(stream: TokenStream): Statement[] {
             continue;
         }
 
+        const checkpoint = stream.checkpoint();
         const statement = parseBlockStatement(stream);
 
         if (statement === null) {
             continue;
         }
 
+        absorbDeclarationTerminator(stream, statement);
         body.push(statement);
+        stream.recordSpan(statement, checkpoint);
+        stream.match('punctuation', ';');
 
         if (statement.kind === 'return-statement') {
             break;
@@ -354,6 +359,7 @@ export function parseBlock(stream: TokenStream, terminators: readonly string[]):
         }
 
         const offset = stream.current().position.offset;
+        const checkpoint = stream.checkpoint();
         const statement = parseBlockStatement(stream, stop);
 
         if (statement === null) {
@@ -364,7 +370,10 @@ export function parseBlock(stream: TokenStream, terminators: readonly string[]):
             continue;
         }
 
+        absorbDeclarationTerminator(stream, statement);
         body.push(statement);
+        stream.recordSpan(statement, checkpoint);
+        stream.match('punctuation', ';');
 
         if (statement.kind === 'return-statement') {
             return body;

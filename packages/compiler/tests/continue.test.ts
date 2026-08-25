@@ -10,6 +10,14 @@ function emit(source: string): string {
     return result.code ?? '';
 }
 
+function develop(source: string): string {
+    const result = compile(source, { development: true });
+
+    expect(result.diagnostics).toEqual([]);
+
+    return result.code ?? '';
+}
+
 function codes(source: string): string[] {
     return compile(source).diagnostics.map((diagnostic) => diagnostic.code);
 }
@@ -19,30 +27,30 @@ function messages(source: string): string[] {
 }
 
 describe('continue', () => {
-    it('wraps a numeric for body in "repeat until true"', () => {
+    it('wraps the numeric for body without touching the loop header or closing line', () => {
         const source = 'for i = 1, 10 do\n    if i == 3 then continue end\n    print(i)\nend\n';
-        const expected = 'for i = 1, 10 do\n    repeat\n        if i == 3 then\n            break\n        end\n        print(i)\n    until true\nend\n';
+        const expected = 'for i = 1, 10 do\n    repeat if i == 3 then\n        break\n    end\n    print(i) until true\nend\n';
 
         expect(emit(source)).toBe(expected);
     });
 
-    it('wraps a generic for body', () => {
+    it('wraps the generic for body', () => {
         const source = 'for key, value in pairs(source) do\n    if key == 1 then continue end\nend\n';
-        const expected = 'for key, value in pairs(source) do\n    repeat\n        if key == 1 then\n            break\n        end\n    until true\nend\n';
+        const expected = 'for key, value in pairs(source) do\n    repeat if key == 1 then\n        break\n    end until true\nend\n';
 
         expect(emit(source)).toBe(expected);
     });
 
-    it('wraps a while body', () => {
+    it('wraps the while body', () => {
         const source = 'local i: number = 0\nwhile i < 10 do\n    i++\n    if i == 3 then continue end\nend\n';
-        const expected = 'local i = 0\nwhile i < 10 do\n    repeat\n        i = i + 1\n        if i == 3 then\n            break\n        end\n    until true\nend\n';
+        const expected = 'local i = 0\nwhile i < 10 do\n    repeat i = i + 1\n    if i == 3 then\n        break\n    end until true\nend\n';
 
         expect(emit(source)).toBe(expected);
     });
 
-    it('wraps a repeat body when the condition does not read a body local', () => {
+    it('wraps the repeat body when the condition does not read a body local', () => {
         const source = 'local i: number = 0\nrepeat\n    i++\n    if i == 3 then continue end\nuntil i > 5\n';
-        const expected = 'local i = 0\nrepeat\n    repeat\n        i = i + 1\n        if i == 3 then\n            break\n        end\n    until true\nuntil i > 5\n';
+        const expected = 'local i = 0\nrepeat\n    repeat i = i + 1\n    if i == 3 then\n        break\n    end until true\nuntil i > 5\n';
 
         expect(emit(source)).toBe(expected);
     });
@@ -51,22 +59,44 @@ describe('continue', () => {
         const source = 'for i = 1, 10 do\n    if i == 3 then continue end\n    if i == 8 then break end\nend\n';
         const expected = [
             'for i = 1, 10 do',
-            '    local __luam_break = false',
-            '    repeat',
-            '        if i == 3 then',
-            '            break',
-            '        end',
-            '        if i == 8 then',
-            '            __luam_break = true',
-            '            break',
-            '        end',
-            '    until true',
-            '    if __luam_break then break end',
+            '    local __luam_break = false repeat if i == 3 then',
+            '        break',
+            '    end',
+            '    if i == 8 then',
+            '        __luam_break = true break',
+            '    end until true if __luam_break then break end',
             'end',
             '',
         ].join('\n');
 
         expect(emit(source)).toBe(expected);
+    });
+
+    it('keeps a development build of a continue loop on its authored lines', () => {
+        const source = 'for i = 1, 10 do\n    if i == 3 then continue end\n    print(i)\nend\n';
+        const expected = 'for i = 1, 10 do\n    repeat if i == 3 then break end\n    print(i) until true\nend\n';
+
+        expect(develop(source)).toBe(expected);
+    });
+
+    it('keeps a development build of a continue and break loop on its authored lines', () => {
+        const source = 'for i = 1, 10 do\n    if i == 3 then continue end\n    if i == 8 then break end\nend\n';
+        const expected = [
+            'for i = 1, 10 do',
+            '    local __luam_break = false repeat if i == 3 then break end',
+            '    if i == 8 then __luam_break = true break end until true if __luam_break then break end',
+            'end',
+            '',
+        ].join('\n');
+
+        expect(develop(source)).toBe(expected);
+    });
+
+    it('leaves the loop header and closing line byte-identical to the source', () => {
+        const source = 'for i = 1, 3 do\n    if (i == 2) then continue end\nend\n';
+        const expected = 'for i = 1, 3 do\n    repeat if (i == 2) then break end until true\nend\n';
+
+        expect(develop(source)).toBe(expected);
     });
 
     it('raises the flag from a break nested in a do block', () => {
