@@ -42,5 +42,7 @@ export function readExcerpt(source: string | undefined, position: SourcePosition
 }
 
 export function caretRow(excerpt: SourceExcerpt): string {
-    return `${' '.repeat(excerpt.caretColumn - 1)}${'^'.repeat(excerpt.caretWidth)}`;
+    const prefix = excerpt.text.slice(0, excerpt.caretColumn - 1).replace(/[^\t]/g, ' ');
+
+    return `${prefix}${'^'.repeat(excerpt.caretWidth)}`;
 }

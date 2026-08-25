@@ -1,4 +1,5 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
+import type { Token } from '@compiler/lexer/token';
 
 import type { DeclareStatement, Expression, Statement, TypeAliasStatement, VariableDeclarator } from './ast';
 import { parseDoStatement, parseForStatement, parseIfStatement, parseRepeatStatement, parseWhileStatement } from './control-flow';
@@ -145,8 +146,31 @@ function parseIncrement(stream: TokenStream, targets: readonly Expression[], pos
     return { kind: 'assignment-statement', operator, targets: [target], values: [], position };
 }
 
+function pathOf(expression: Expression): string | null {
+    if (expression.kind === 'identifier') {
+        return expression.name;
+    }
+
+    if (expression.kind !== 'member-expression') {
+        return null;
+    }
+
+    const object = pathOf(expression.object);
+
+    return object === null ? null : `${object}.${expression.property}`;
+}
+
+function invalidStatement(stream: TokenStream, target: Expression | undefined, start: Token): ParserError {
+    const path = target === undefined ? null : pathOf(target);
+    const subject = path === null ? 'A value on its own' : `"${path}"`;
+    const message = `${subject} is not a statement. Assign it with "=", pass it to a call, or remove the line.`;
+
+    return stream.errorAt(message, 'parse-invalid-statement', start.position, start.end);
+}
+
 function parseExpressionStatement(stream: TokenStream): Statement {
-    const position = stream.current().position;
+    const start = stream.current();
+    const position = start.position;
     const targets: Expression[] = [parseSuffixed(stream)];
 
     while (stream.match('punctuation', ',')) {
@@ -171,7 +195,7 @@ function parseExpressionStatement(stream: TokenStream): Statement {
         return { kind: 'call-statement', expression: first, position };
     }
 
-    throw stream.error('Expected a call or an assignment statement.', 'parse-invalid-statement');
+    throw invalidStatement(stream, first, start);
 }
 
 function parseKeywordStatement(stream: TokenStream, value: string): Statement | null {

@@ -280,6 +280,15 @@ describe('parser', () => {
         expect(codes('local a = 1\na + 1\n')).toEqual(['parse-invalid-statement']);
     });
 
+    it('names the value it was given and points at where it starts', () => {
+        const diagnostic = parse('local count: number = 1\ncount.abs;\n').diagnostics[0];
+
+        expect(diagnostic?.code).toBe('parse-invalid-statement');
+        expect(diagnostic?.message).toBe('"count.abs" is not a statement. Assign it with "=", pass it to a call, or remove the line.');
+        expect(diagnostic?.position.line).toBe(2);
+        expect(diagnostic?.position.column).toBe(1);
+    });
+
     it('recovers after a syntax error and keeps parsing', () => {
         const result = parse('local a = 1\na + 1\nlocal b = 2\n');
 

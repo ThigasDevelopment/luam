@@ -141,6 +141,10 @@ export class TokenStream {
         return new ParserError(createDiagnostic('parser', code, message, token.position, 'error', token.end));
     }
 
+    errorAt(message: string, code: string, position: SourcePosition, end: SourcePosition): ParserError {
+        return new ParserError(createDiagnostic('parser', code, message, position, 'error', end));
+    }
+
     report(code: string, message: string, position: SourcePosition): void {
         this.diagnostics.push(createDiagnostic('parser', code, message, position));
     }

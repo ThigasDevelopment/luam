@@ -14,6 +14,19 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### A Caret That Lands On The Problem
+
+#### Fixed
+
+- The caret under a diagnostic ignored tabs. It padded with spaces while the
+  terminal drew each tab several columns wide, so on a tab-indented file it
+  pointed to the left of the code it meant. It now copies the indentation of the
+  line it underlines.
+- `parse-invalid-statement` pointed at the token after the offending expression,
+  usually the semicolon, and said only what it expected. It now points at where
+  the expression starts and names it: `"count.abs" is not a statement. Assign it
+  with "=", pass it to a call, or remove the line.`
+
 ### The Wrong Form Is Now An Error
 
 #### Added

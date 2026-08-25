@@ -43,6 +43,13 @@ describe('source excerpt', () => {
         expect(excerpt === null ? '' : caretRow(excerpt)).toBe(`${' '.repeat(12)}^`);
     });
 
+    it('indents the caret with the tabs the line uses', () => {
+        const tabbed = ['local total: number = 1', '\t\ttotal.abs;', ''].join('\n');
+        const excerpt = readExcerpt(tabbed, createPosition(2, 3, 26));
+
+        expect(excerpt === null ? '' : caretRow(excerpt)).toBe('\t\t^^^^^');
+    });
+
     it('survives a position at the start of the file', () => {
         const excerpt = readExcerpt(SOURCE, createPosition(1, 1, 0));
 
