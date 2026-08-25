@@ -16,7 +16,7 @@ uses, so the editor and the build never disagree about a file.
 | Argument ranking | Inside a call, candidates matching the expected parameter type sort first, then functions returning it. |
 | Events | Inside the quotes, completes the events reachable from the call; the handler and the payload of a known event carry its typed parameters. |
 | Hover | Declared or inferred type, function signature, the environment of an MTA API, and the contract of an event. |
-| Documentation hover | The `#` comment lines directly above a declaration — function, method, class, interface, enum, field, or local — appear under its signature, at the declaration and at every use. |
+| Documentation hover | The `#` comment lines directly above any declaration — function, method, class, interface, enum, type alias, declared event, field, local or global — appear under its signature, at the declaration and at every use. Decorators between the comment and the declaration do not break the pair. |
 | Keyword hover | `self` carries the class it is bound to and the shape of that class; `super(...)` carries how the parent implementation is selected. |
 | Decorator hover | The exact members the decorator generates at that site, where it may sit, and the diagnostics it can raise. |
 | Navigation | Go to definition, find references, and rename — across files for globals. |

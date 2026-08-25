@@ -75,4 +75,22 @@ describe('hover documentation', () => {
 
         expect(hoverText(text, 'for index', 'index')).not.toContain('Counts up.');
     });
+
+    it('shows a comment immediately before a type alias', () => {
+        const text = '# The identifier of a round.\ntype RoundId = number\n';
+
+        expect(hoverText(text, 'type RoundId', 'RoundId')).toContain('The identifier of a round.');
+    });
+
+    it('shows a comment immediately before a declared event', () => {
+        const text = "# Fires when a match starts.\ndeclare event 'onMatchStart'(round: number)\n";
+
+        expect(hoverText(text, "'onMatchStart'", 'onMatchStart')).toContain('Fires when a match starts.');
+    });
+
+    it('reads across the decorators of a member', () => {
+        const text = 'class Counter {\n    # How many bumps happened.\n    @readonly\n    total: number = 0\n}\n';
+
+        expect(hoverText(text, 'total: number', 'total')).toContain('How many bumps happened.');
+    });
 });
