@@ -24,7 +24,7 @@ function flag(source: ManifestObject, name: string, fallback: boolean): boolean 
 }
 
 export function readCompilerOptions(value: ManifestObject): CompilerOptions {
-    const source = readTable(value, 'compilerOptions') ?? EMPTY;
+    const source = readTable(value, 'compiler') ?? EMPTY;
 
     return {
         strict: flag(source, 'strict', DEFAULT_COMPILER_OPTIONS.strict),

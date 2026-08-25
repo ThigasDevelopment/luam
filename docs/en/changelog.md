@@ -11,6 +11,14 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ### Changed
 
+- [The manifest](/en/tooling/luam-manifest) and
+  [Configuration fields](/en/reference/configuration-fields) rename the
+  `compilerOptions` table to `compiler`, with the same members and defaults, and
+  list `compilerOptions` among the removed fields that report
+  `config-removed-field`. [OOP API](/en/mta/oop),
+  [Project layout](/en/guide/project-layout),
+  [Troubleshooting](/en/guide/troubleshooting) and
+  [Diagnostics](/en/reference/diagnostics) use the new name throughout.
 - [Classes](/en/language/classes) documents declaration order as two rules
   instead of one warning: a class is a type everywhere in its file, and a value
   from the line its declaration runs. `extends` may name a parent written

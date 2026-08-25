@@ -69,10 +69,10 @@ para `any` em vez de falhar, então uma declaração faltando nunca bloqueia um 
 ## `player:getName()` é rejeitado
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compilerOptions = { oop = true }" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Defina `compilerOptions = { oop = true }` no `.luam.manifest`. Isso também escreve `<oop>true</oop>` no
+Defina `compiler = { oop = true }` no `.luam.manifest`. Isso também escreve `<oop>true</oop>` no
 `meta.xml`, que é o que faz a forma de objeto existir em tempo de execução. Veja
 [API OOP](/pt-br/mta/oop).
 

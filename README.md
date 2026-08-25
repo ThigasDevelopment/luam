@@ -232,7 +232,7 @@ name = 'my-resource'
 serverPath = 'C:/MTA Server'
 ```
 
-Optional fields cover `meta.xml` info, `compilerOptions`, `sources`, `assets`,
+Optional fields cover `meta.xml` info, `compiler`, `sources`, `assets`,
 `dependencies`, `engine.minVersion`, `environment`, `outDir`, `loadOrder`,
 `output`, `helpers`, `resourcesDir`, `development.logs` and
 `development.server.executable`.

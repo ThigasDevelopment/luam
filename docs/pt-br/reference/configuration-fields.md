@@ -19,11 +19,11 @@ Para a versão narrada, veja [.luam.manifest](/pt-br/tooling/luam-manifest).
 
 | Campo | Tipo | Obrigatório | Padrão | Significado |
 | --- | --- | --- | --- | --- |
-| `compilerOptions.strict` | `boolean` | não | `true` | Modo estrito de todo o projeto. Uma diretiva `#!strict` ou `#!nonstrict` ainda vence para o arquivo que a carrega. |
-| `compilerOptions.oop` | `boolean` | não | `false` | Liga a API OOP do MTA e escreve `<oop>true</oop>`. Veja [API OOP](/pt-br/mta/oop). |
-| `compilerOptions.noUnusedLocals` | `boolean` | não | `false` | Reporta um local que nunca é lido como `check-unused-local`. |
-| `compilerOptions.noUnusedParameters` | `boolean` | não | `false` | Reporta um parâmetro que nunca é lido como `check-unused-parameter`. |
-| `compilerOptions.warningsAsErrors` | `boolean` | não | `false` | Promove todo aviso a erro. |
+| `compiler.strict` | `boolean` | não | `true` | Modo estrito de todo o projeto. Uma diretiva `#!strict` ou `#!nonstrict` ainda vence para o arquivo que a carrega. |
+| `compiler.oop` | `boolean` | não | `false` | Liga a API OOP do MTA e escreve `<oop>true</oop>`. Veja [API OOP](/pt-br/mta/oop). |
+| `compiler.noUnusedLocals` | `boolean` | não | `false` | Reporta um local que nunca é lido como `check-unused-local`. |
+| `compiler.noUnusedParameters` | `boolean` | não | `false` | Reporta um parâmetro que nunca é lido como `check-unused-parameter`. |
+| `compiler.warningsAsErrors` | `boolean` | não | `false` | Promove todo aviso a erro. |
 
 Um vínculo cujo nome começa com `_` nunca é reportado como não usado.
 
@@ -133,7 +133,8 @@ Um nome removido é rejeitado, nunca virado apelido. Cada um reporta
 
 | Campo | Substituto |
 | --- | --- |
-| `oop` | `compilerOptions = { oop = true }` |
+| `oop` | `compiler = { oop = true }` |
+| `compilerOptions` | `compiler = { ... }` |
 | `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |

@@ -8,7 +8,7 @@ author = 'Thigas'
 version = '1.0.0'
 description = 'A demo resource'
 
-compilerOptions = {
+compiler = {
     strict = true,
     oop = false,
     noUnusedLocals = false,
@@ -94,7 +94,7 @@ terminal underlines the offending text the same way it does for a source file.
 
 A `local` that no field reads is dead configuration, so the manifest reports it as
 `check-unused-local` — a warning, not an error. This does not depend on
-`compilerOptions.noUnusedLocals`, which governs source files; the manifest is
+`compiler.noUnusedLocals`, which governs source files; the manifest is
 always checked in its own strict mode. Rename the local with a leading `_` to keep
 it on purpose.
 
@@ -152,7 +152,7 @@ whether they are required, and their default — and the closed sets (`helpers`
 and the `mode` values) complete inside the quotes. Hover names the
 field's full path and type.
 
-Because the server reads the file directly, flipping `compilerOptions.oop` takes
+Because the server reads the file directly, flipping `compiler.oop` takes
 effect on save. There is no snapshot to refresh and no CLI run to wait for;
 `.luam/settings.json` no longer exists.
 
@@ -164,7 +164,7 @@ single implemented consumer, so a field never means two things in two places.
 | Domain | Owns |
 | --- | --- |
 | identity | `name`, `author`, `version`, `description` |
-| `compilerOptions` | How the checker reads the project. |
+| `compiler` | How the checker reads the project. |
 | `sources` | Which files belong to the project and to which environment. |
 | `assets` | Which files are copied into the resource and where they land. |
 | `dependencies` | Resources this one requires at run time. |
@@ -176,7 +176,7 @@ single implemented consumer, so a field never means two things in two places.
 A complete field-by-field table, including every validation rule, is in
 [Configuration fields](/en/reference/configuration-fields).
 
-## `compilerOptions`
+## `compiler`
 
 | Key | Default | Meaning |
 | --- | --- | --- |
@@ -378,7 +378,8 @@ instead of building something different from what it says:
 
 | Removed | Replacement |
 | --- | --- |
-| `oop` | `compilerOptions = { oop = true }` |
+| `oop` | `compiler = { oop = true }` |
+| `compilerOptions` | `compiler = { ... }` |
 | `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |

@@ -34,6 +34,13 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ### Changed
 
+- The manifest table that holds `strict`, `oop`, `noUnusedLocals`,
+  `noUnusedParameters` and `warningsAsErrors` is now named `compiler` instead of
+  `compilerOptions`. The members and their defaults are unchanged. The old name
+  is not aliased: `compilerOptions` reports `config-removed-field` and names
+  `compiler` as its replacement, so a stale manifest fails loudly instead of
+  building with the defaults. Rename the table to migrate.
+
 - Hovering `self` or a decorator now answers what it is, not just what it is
   named. `self` was one line, `self: Round`, next to a `super(...)` hover that
   explains itself in full; it now carries the class it is bound to and that

@@ -22,20 +22,20 @@ function codes(source: string): string[] {
     return analyzeManifest(`${NAME}${source}`, { mode: 'production', root: '/project', env: {} }).diagnostics.map((diagnostic) => diagnostic.code);
 }
 
-describe('compilerOptions', () => {
+describe('compiler', () => {
     it('defaults to strict with every other option off', () => {
         expect(readCompilerOptions(value(''))).toEqual(DEFAULT_COMPILER_OPTIONS);
     });
 
     it('reads each option independently', () => {
-        const options = readCompilerOptions(value('compilerOptions = { strict = false, noUnusedLocals = true, warningsAsErrors = true }\n'));
+        const options = readCompilerOptions(value('compiler = { strict = false, noUnusedLocals = true, warningsAsErrors = true }\n'));
 
         expect(options).toEqual({ strict: false, oop: false, noUnusedLocals: true, noUnusedParameters: false, warningsAsErrors: true });
     });
 
     it('rejects an unknown option and a wrongly typed one', () => {
-        expect(codes('compilerOptions = { target = 54 }\n')).toEqual(['config-unknown-field']);
-        expect(codes("compilerOptions = { strict = 'yes' }\n")).toEqual(['config-invalid-type']);
+        expect(codes('compiler = { target = 54 }\n')).toEqual(['config-unknown-field']);
+        expect(codes("compiler = { strict = 'yes' }\n")).toEqual(['config-invalid-type']);
     });
 });
 
@@ -135,7 +135,8 @@ describe('output', () => {
 
 describe('removed fields', () => {
     it.each([
-        ['oop = true\n', 'compilerOptions'],
+        ['oop = true\n', 'compiler'],
+        ['compilerOptions = { oop = true }\n', 'compiler'],
         ["sourceDirs = { 'src' }\n", 'sources'],
         ["assetDirs = { 'assets' }\n", 'assets'],
         ["mta = { minVersion = '1.6' }\n", 'engine'],

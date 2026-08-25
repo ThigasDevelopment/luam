@@ -12,7 +12,7 @@ A Luam annotation is read by the checker and disappears from the generated Lua. 
 - **Erase by default and generate validators only where the author marks a trust boundary.** Keeps the default and the cost model intact, puts the guard exactly where untrusted data enters, and leaves the marking visible in the source. This is the direction of the runtime boundary validation task.
 
 **Decision:**
-Type annotations are a compile-time contract and are erased from the generated Lua. The compiler emits no implicit runtime type check anywhere, and neither the strictness modes nor `compilerOptions` change that. Validating data that crosses a trust boundary — a client-triggered event, a command argument, an exported function called by another resource, a value read from `config.lua` — is the author's responsibility, and the security chapter of the manual is where that duty is documented.
+Type annotations are a compile-time contract and are erased from the generated Lua. The compiler emits no implicit runtime type check anywhere, and neither the strictness modes nor `compiler` change that. Validating data that crosses a trust boundary — a client-triggered event, a command argument, an exported function called by another resource, a value read from `config.lua` — is the author's responsibility, and the security chapter of the manual is where that duty is documented.
 
 A future opt-in validator may generate checks, subject to two constraints that this decision fixes: it is off unless the source marks the boundary, and it never changes what an unmarked function emits. Turning implicit validation on globally is not a future option.
 

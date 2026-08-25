@@ -82,8 +82,8 @@ describe('configuration validation', () => {
     });
 
     it('reads the oop flag', () => {
-        expect(manifestConfig({ name: 'demo', compilerOptions: { oop: true } }).compilerOptions.oop).toBe(true);
-        expect(manifestConfig({ name: 'demo', compilerOptions: { oop: false } }).compilerOptions.oop).toBe(false);
+        expect(manifestConfig({ name: 'demo', compiler: { oop: true } }).compilerOptions.oop).toBe(true);
+        expect(manifestConfig({ name: 'demo', compiler: { oop: false } }).compilerOptions.oop).toBe(false);
     });
 
     it('reads output switches and rejects invalid output fields', () => {
@@ -95,11 +95,11 @@ describe('configuration validation', () => {
     });
 
     it('rejects an oop flag that is not a boolean', () => {
-        const loaded = load("name = 'demo'\ncompilerOptions = { oop = 'true' }\n");
+        const loaded = load("name = 'demo'\ncompiler = { oop = 'true' }\n");
 
         expect(loaded.config).toBeNull();
         expect(codes(loaded.diagnostics)).toEqual(['config-invalid-type']);
-        expect(loaded.diagnostics[0]?.message).toBe('"compilerOptions.oop" must be a boolean but received a string.');
+        expect(loaded.diagnostics[0]?.message).toBe('"compiler.oop" must be a boolean but received a string.');
     });
 
     it('rejects a removed field and names its replacement', () => {

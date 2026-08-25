@@ -105,8 +105,8 @@ writes nothing.
 | `check-unknown-super-method` | The parent has no method of that name. |
 | `check-declare-outside-declaration-file` | `declare` outside a `.d.luam` file. |
 | `check-declaration-file-statement` | A `.d.luam` file contains a statement. |
-| `check-unused-local` | A local is never read, with `compilerOptions.noUnusedLocals` on, or anywhere in the manifest. |
-| `check-unused-parameter` | A parameter is never read, with `compilerOptions.noUnusedParameters` on. |
+| `check-unused-local` | A local is never read, with `compiler.noUnusedLocals` on, or anywhere in the manifest. |
+| `check-unused-parameter` | A parameter is never read, with `compiler.noUnusedParameters` on. |
 
 ## Checker — decorators
 
@@ -127,7 +127,7 @@ writes nothing.
 | --- | --- |
 | `check-environment-api` | The API belongs to another environment. |
 | `check-environment-event` | The event belongs to another environment. |
-| `check-oop-disabled` | An OOP call with `compilerOptions.oop` off. |
+| `check-oop-disabled` | An OOP call with `compiler.oop` off. |
 | `check-not-callable-class` | A class used as a constructor that MTA does not make callable. |
 | `check-native-constructor` | Wrong arguments to a native constructor. |
 | `check-native-class-inheritance` | A project class tried to extend a native class. |

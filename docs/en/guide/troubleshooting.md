@@ -70,10 +70,10 @@ completion and argument checking for that call.
 ## `player:getName()` is rejected
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compilerOptions = { oop = true }" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Set `compilerOptions = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
+Set `compiler = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
 `meta.xml`, which is what makes the object form exist at runtime. See
 [OOP API](/en/mta/oop).
 

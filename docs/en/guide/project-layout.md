@@ -78,7 +78,7 @@ a later build with no network still succeeds. That is the only thing the CLI
 writes outside `outDir`, and it is generated — ignore `.luam/` in version control.
 
 There is no settings snapshot. The language server reads `.luam.manifest`
-directly, so a change to `compilerOptions` takes effect as soon as the file is
+directly, so a change to `compiler` takes effect as soon as the file is
 saved.
 
 ## Configuring the layout

@@ -105,8 +105,8 @@ erro não escreve nada.
 | `check-unknown-super-method` | A classe pai não tem método com esse nome. |
 | `check-declare-outside-declaration-file` | `declare` fora de um arquivo `.d.luam`. |
 | `check-declaration-file-statement` | Um arquivo `.d.luam` contém um comando. |
-| `check-unused-local` | Um local nunca é lido, com `compilerOptions.noUnusedLocals` ligado, ou em qualquer ponto do manifesto. |
-| `check-unused-parameter` | Um parâmetro nunca é lido, com `compilerOptions.noUnusedParameters` ligado. |
+| `check-unused-local` | Um local nunca é lido, com `compiler.noUnusedLocals` ligado, ou em qualquer ponto do manifesto. |
+| `check-unused-parameter` | Um parâmetro nunca é lido, com `compiler.noUnusedParameters` ligado. |
 
 ## Checker — decoradores
 
@@ -127,7 +127,7 @@ erro não escreve nada.
 | --- | --- |
 | `check-environment-api` | A API pertence a outro ambiente. |
 | `check-environment-event` | O evento pertence a outro ambiente. |
-| `check-oop-disabled` | Uma chamada OOP com `compilerOptions.oop` desligado. |
+| `check-oop-disabled` | Uma chamada OOP com `compiler.oop` desligado. |
 | `check-not-callable-class` | Uma classe usada como construtor que o MTA não torna chamável. |
 | `check-native-constructor` | Argumentos errados para um construtor nativo. |
 | `check-native-class-inheritance` | Uma classe de projeto tentou estender uma classe nativa. |

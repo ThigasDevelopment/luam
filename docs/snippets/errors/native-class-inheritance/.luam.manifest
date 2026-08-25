@@ -1,2 +1,2 @@
 name = 'luam-docs-error-native-class-inheritance'
-compilerOptions = { oop = true }
+compiler = { oop = true }

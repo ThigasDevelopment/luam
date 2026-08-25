@@ -48,7 +48,7 @@ describe('domain completion', () => {
         const manifest = openManifest("name = 'demo'\n\n");
         const found = labels(manifest, "name = 'demo'\n");
 
-        expect(found).toContain('compilerOptions');
+        expect(found).toContain('compiler');
         expect(found).toContain('sources');
         expect(found).toContain('assets');
         expect(found).toContain('dependencies');
@@ -56,9 +56,9 @@ describe('domain completion', () => {
         expect(found).toContain('environment');
     });
 
-    it('offers the members of compilerOptions and nothing from another domain', () => {
-        const manifest = openManifest("name = 'demo'\ncompilerOptions = {\n    \n}\n");
-        const found = labels(manifest, 'compilerOptions = {\n    ');
+    it('offers the members of compiler and nothing from another domain', () => {
+        const manifest = openManifest("name = 'demo'\ncompiler = {\n    \n}\n");
+        const found = labels(manifest, 'compiler = {\n    ');
 
         expect(found).toContain('strict');
         expect(found).toContain('oop');
@@ -94,7 +94,7 @@ describe('domain completion', () => {
     });
 
     it('offers booleans for a nested boolean option', () => {
-        const manifest = openManifest("name = 'demo'\ncompilerOptions = {\n    strict = \n}\n");
+        const manifest = openManifest("name = 'demo'\ncompiler = {\n    strict = \n}\n");
 
         expect(labels(manifest, 'strict = ')).toEqual(['true', 'false']);
     });
@@ -108,9 +108,9 @@ describe('domain completion', () => {
 
 describe('domain hover', () => {
     it('names the full path of a nested option', () => {
-        const manifest = openManifest("name = 'demo'\ncompilerOptions = { oop = true }\n");
+        const manifest = openManifest("name = 'demo'\ncompiler = { oop = true }\n");
 
-        expect(hoverText(manifest, 'compilerOptions = { ', 'oop')).toContain('compilerOptions.oop');
+        expect(hoverText(manifest, 'compiler = { ', 'oop')).toContain('compiler.oop');
     });
 
     it('names the full path of a source side', () => {
@@ -135,7 +135,7 @@ describe('domain diagnostics in the editor', () => {
     it('accepts the full contract without a diagnostic', () => {
         const text = [
             "name = 'demo'",
-            'compilerOptions = { strict = true, oop = false }',
+            'compiler = { strict = true, oop = false }',
             "sources = { server = { 'src/server/**/*.luam' } }",
             "assets = { { from = 'assets/**/*', to = 'assets' } }",
             "dependencies = { 'scoreboard' }",
@@ -164,7 +164,7 @@ describe('project settings drive analysis', () => {
 
         expect(manifest.service.diagnostics(source)).toEqual([]);
 
-        manifest.service.update(manifest.uri, 2, "name = 'demo'\ncompilerOptions = { noUnusedLocals = true }\n");
+        manifest.service.update(manifest.uri, 2, "name = 'demo'\ncompiler = { noUnusedLocals = true }\n");
 
         expect(manifest.service.diagnostics(source).map((diagnostic) => diagnostic.code)).toEqual(['check-unused-local']);
     });

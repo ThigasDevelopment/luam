@@ -13,6 +13,14 @@ da versão atual.
 
 ### Alterado
 
+- [O manifesto](/pt-br/tooling/luam-manifest) e
+  [Campos de configuração](/pt-br/reference/configuration-fields) renomeiam a
+  tabela `compilerOptions` para `compiler`, com os mesmos membros e padrões, e
+  listam `compilerOptions` entre os campos removidos que reportam
+  `config-removed-field`. [API OOP](/pt-br/mta/oop),
+  [Layout do projeto](/pt-br/guide/project-layout),
+  [Solução de problemas](/pt-br/guide/troubleshooting) e
+  [Diagnósticos](/pt-br/reference/diagnostics) usam o novo nome em todo lugar.
 - [Classes](/pt-br/language/classes) documenta a ordem de declaração como duas
   regras em vez de um aviso: uma classe é um tipo em todo o arquivo e um valor a
   partir da linha em que a declaração roda. O `extends` pode nomear uma pai
