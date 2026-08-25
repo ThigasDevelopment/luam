@@ -16,6 +16,7 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Ordenação de argumentos | Dentro de uma chamada, candidatos do tipo esperado do parâmetro vêm primeiro, depois funções que o retornam. |
 | Eventos | Dentro das aspas, completa os eventos alcançáveis da chamada; o handler e o payload de um evento conhecido carregam os parâmetros tipados. |
 | Hover | Tipo declarado ou inferido, assinatura da função, o ambiente de uma API do MTA e o contrato de um evento. |
+| Hover de documentação | As linhas de comentário `#` logo acima de uma declaração — função, método, classe, interface, enum, campo ou local — aparecem sob a assinatura dela, na declaração e em cada uso. |
 | Hover de palavra-chave | `self` carrega a classe a que está vinculado e a forma dessa classe; `super(...)` carrega como a implementação do pai é escolhida. |
 | Hover de decorator | Os membros exatos que o decorator gera naquele ponto, onde ele pode ficar e os diagnósticos que pode emitir. |
 | Navegação | Ir para definição, encontrar referências e renomear — entre arquivos para globais. |

@@ -39,4 +39,40 @@ describe('hover documentation', () => {
 
         expect(hoverText(text, 'function ', 'greet')).not.toContain('Unrelated');
     });
+
+    it('shows a comment immediately before a class field', () => {
+        const text = 'class Counter {\n    # How many bumps happened.\n    total: number = 0\n}\n';
+
+        expect(hoverText(text, 'total: number', 'total')).toContain('How many bumps happened.');
+    });
+
+    it('shows a comment immediately before a local', () => {
+        const text = '# The current round.\nlocal round = 1\n';
+
+        expect(hoverText(text, 'local round', 'round')).toContain('The current round.');
+    });
+
+    it('shows a comment immediately before a class', () => {
+        const text = '# Counts things.\nclass Counter {\n}\n';
+
+        expect(hoverText(text, 'class Counter', 'Counter')).toContain('Counts things.');
+    });
+
+    it('shows a comment immediately before an enum member', () => {
+        const text = 'enum Colour {\n    # The warm one.\n    RED,\n}\n';
+
+        expect(hoverText(text, 'RED,', 'RED')).toContain('The warm one.');
+    });
+
+    it('does not attach the comment of a function to its parameters', () => {
+        const text = '# Greets a person.\nfunction greet(name: string): string\n    return name\nend\n';
+
+        expect(hoverText(text, 'greet(name', 'name')).not.toContain('Greets a person.');
+    });
+
+    it('does not attach the comment of a loop to its variable', () => {
+        const text = '# Counts up.\nfor index = 1, 10 do\nend\n';
+
+        expect(hoverText(text, 'for index', 'index')).not.toContain('Counts up.');
+    });
 });

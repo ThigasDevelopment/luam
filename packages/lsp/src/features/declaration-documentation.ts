@@ -1,5 +1,7 @@
 import type { SymbolDeclaration } from '@lsp/symbols/symbol';
 
+const DECLARATION_PREFIX = /^\s*(?!for\b)(?:[A-Za-z_]\w*\s+)*$/;
+
 function previousLine(text: string, end: number): { start: number; value: string } | null {
     if (end === 0) {
         return null;
@@ -13,8 +15,14 @@ function previousLine(text: string, end: number): { start: number; value: string
     return { start, value: text.slice(start, contentEnd) };
 }
 
+function startsItsOwnLine(text: string, declaration: SymbolDeclaration): boolean {
+    const lineStart = text.lastIndexOf('\n', declaration.position.offset - 1) + 1;
+
+    return DECLARATION_PREFIX.test(text.slice(lineStart, declaration.position.offset));
+}
+
 export function declarationDocumentation(text: string, declaration: SymbolDeclaration): string {
-    if ((declaration.kind !== 'function' && declaration.kind !== 'method') || declaration.isSynthetic) {
+    if (declaration.isSynthetic || !startsItsOwnLine(text, declaration)) {
         return '';
     }
 
