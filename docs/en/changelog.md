@@ -12,7 +12,7 @@ Every heading below is a released version and the date it shipped, newest first.
 ### Changed
 
 - [APIs and events](/en/mta/apis-and-events) and the
-  [MTA overview](/en/mta) report the catalog's new size: 1413 API declarations
+  [MTA overview](/en/mta/) report the catalog's new size: 1413 API declarations
   and 58 element types, generated from a committed MTA wiki snapshot covering
   MTA 1.7.0.
 - [Enums and interfaces](/en/language/enums-and-interfaces) states that an
