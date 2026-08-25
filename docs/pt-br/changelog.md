@@ -11,6 +11,34 @@ da versão atual.
 
 ## Não lançado
 
+### Alterado
+
+- [Classes](/pt-br/language/classes) documenta a ordem de declaração como duas
+  regras em vez de um aviso: uma classe é um tipo em todo o arquivo e um valor a
+  partir da linha em que a declaração roda. O `extends` pode nomear uma pai
+  escrita mais abaixo; um `new` de topo de uma classe declarada abaixo é
+  `check-class-before-declaration`.
+
+- [Limitações](/pt-br/reference/limitations) rotula cada entrada como planejado,
+  decisão de projeto, restrição da fonte ou restrição da plataforma, diz o que
+  nunca volta — `__index`, `__newindex` e `__call`, verificações implícitas em
+  execução, um build que lê o `config.lua` — e nomeia a versão que descreve.
+
+### Corrigido
+
+- [Solução de problemas](/pt-br/guide/troubleshooting) dizia que o Luam não faz
+  estreitamento. Uma guarda estreita um nome, um `or` descarta o nil do lado
+  esquerdo, e quem mantém o tipo declarado é um **campo**. A página mostra os
+  dois casos agora.
+- [Editores](/pt-br/tooling/editors) e
+  [Solução de problemas](/pt-br/guide/troubleshooting) diziam que o servidor
+  nunca reverifica um arquivo aberto quando outro muda, e mandavam reiniciá-lo
+  para enxergar arquivos. Ele reanalisa quando uma declaração muda, varre o
+  workspace e observa `**/*.luam`, `.luam.manifest` e `.env*`.
+- As receitas de [comando de servidor](/pt-br/recipes/server-command) e de
+  [função exportada](/pt-br/recipes/exported-function) anotavam um local como
+  `any` por causa de uma limitação que não existe. Os dois locais são `number`.
+
 ## 0.17.0 - 2026-08-25
 
 ### Alterado

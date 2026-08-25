@@ -82,7 +82,8 @@ code --extensionDevelopmentPath=packages/vscode
 
 A extensão ativa quando o workspace contém um `.luam.manifest` ou qualquer arquivo
 `.luam`, então **abra a pasta do seu resource como raiz do workspace**. Ela observa
-`**/*.luam`, então arquivos alterados fora do editor também chegam ao servidor.
+`**/*.luam`, `.luam.manifest` e `.env*`, então arquivos alterados fora do editor
+também chegam ao servidor.
 
 ## Comandos
 
@@ -99,8 +100,19 @@ A extensão ativa quando o workspace contém um `.luam.manifest` ou qualquer arq
 | `luam.ensureWatch` | `true` | Passa `--watch` quando o comando ensure roda. |
 | `luam.trace.server` | `"off"` | Registra o tráfego LSP. Use `"verbose"` ao relatar um bug. |
 
-## Uma limitação conhecida
+## O que uma mudança reverifica
 
-O servidor não reverifica um arquivo já aberto quando **outro** arquivo muda,
-então uma violação entre módulos pode aparecer só no `luam check`. Rode
-**Luam: Restart Language Server** para forçar uma nova varredura.
+Editar um arquivo republica diagnóstico daquele arquivo. Os outros só são
+reanalisados quando a edição muda o que o arquivo **declara** — uma classe, uma
+interface, um enum ou um global, incluindo o tipo de qualquer membro. Uma edição
+de corpo custa um arquivo; uma edição de declaração custa todo arquivo que
+enxerga aquela declaração.
+
+Essa última parte é mais larga do que precisa ser: uma mudança de declaração
+reverifica os arquivos que a enxergam, não os que a usam. Estreitar isso é
+[planejado](/pt-br/reference/limitations).
+
+Nada disso espera um arquivo ser aberto. O servidor varre o workspace ao iniciar
+e a extensão observa os padrões de arquivo acima, então um arquivo criado, movido
+ou apagado fora do editor chega até ele sem reinício. **Luam: Restart Language
+Server** é a saída se o servidor e o projeto ainda discordarem.

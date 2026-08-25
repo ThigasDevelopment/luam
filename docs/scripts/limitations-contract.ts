@@ -1,0 +1,78 @@
+import type { LocaleId } from '../.vitepress/structure.ts';
+
+export type LimitationLabel = 'planned' | 'design-boundary' | 'upstream-constraint' | 'platform-constraint';
+
+export interface Limitation {
+    id: string;
+    label: LimitationLabel;
+    owners: string[];
+    decision: string | null;
+}
+
+export interface StaleClaim {
+    id: string;
+    pattern: RegExp;
+    correction: string;
+}
+
+export const LIMITATIONS_PAGE = 'reference/limitations.md';
+
+export const LIMITATIONS: readonly Limitation[] = [
+    { id: 'field-narrowing', label: 'planned', owners: ['26.4'], decision: null },
+    { id: 'class-runtime-visibility', label: 'platform-constraint', owners: [], decision: 'docs/adr/006-two-phase-class-declaration.md' },
+    { id: 'class-members', label: 'planned', owners: ['26.6', '26.7', '26.10'], decision: null },
+    { id: 'catalog-lag', label: 'upstream-constraint', owners: [], decision: '.github/workflows/catalog-refresh.yml' },
+    { id: 'unverified-exports', label: 'planned', owners: ['26.8'], decision: null },
+    { id: 'declaration-recheck', label: 'planned', owners: ['26.3'], decision: null },
+    { id: 'opaque-configuration', label: 'design-boundary', owners: [], decision: 'docs/adr/004-opaque-native-configuration.md' },
+    { id: 'source-faithful-output', label: 'design-boundary', owners: [], decision: 'docs/en/reference/output-layouts.md' },
+    { id: 'erased-annotations', label: 'design-boundary', owners: [], decision: 'docs/adr/003-erased-type-annotations.md' },
+    { id: 'file-environment', label: 'platform-constraint', owners: [], decision: 'docs/adr/005-file-level-environments.md' },
+    { id: 'development-log-scope', label: 'planned', owners: ['26.12'], decision: null },
+];
+
+export const LABEL_TEXT: Readonly<Record<LocaleId, Readonly<Record<LimitationLabel, string>>>> = {
+    en: {
+        planned: 'Planned',
+        'design-boundary': 'Design boundary',
+        'upstream-constraint': 'Upstream constraint',
+        'platform-constraint': 'Platform constraint',
+    },
+    'pt-br': {
+        planned: 'Planejado',
+        'design-boundary': 'Decisão de projeto',
+        'upstream-constraint': 'Restrição da fonte',
+        'platform-constraint': 'Restrição da plataforma',
+    },
+};
+
+export const CLAIM_ROOTS: readonly string[] = ['README.md', 'docs/en', 'docs/pt-br', 'examples'];
+
+export const CLAIM_EXCLUDED: readonly string[] = ['docs/en/changelog.md', 'docs/pt-br/changelog.md'];
+
+export const STALE_CLAIMS: readonly StaleClaim[] = [
+    {
+        id: 'absent-narrowing',
+        pattern: /\b(does no (type )?narrowing|no type narrowing|não faz estreitamento)\b/i,
+        correction: 'A guard narrows a name. Say that fields are what keep their declared type.',
+    },
+    {
+        id: 'absent-cross-file-recheck',
+        pattern: /\b(does not re-?check an (already )?open file|não reverifica um arquivo já aberto)\b/i,
+        correction: 'The server re-analyzes other files when a declaration changes. Describe the granularity instead.',
+    },
+    {
+        id: 'restart-to-rescan',
+        pattern: /\b(to force a rescan|para forçar uma nova varredura)\b/i,
+        correction: 'The workspace scan and the file watchers already find unopened files. Restarting is a last resort, not the way in.',
+    },
+    {
+        id: 'unscanned-files-invisible',
+        pattern: /\b(invisible until it is saved or opened|invisível até ser salvo ou aberto)\b/i,
+        correction: 'The server scans the workspace on start and watches the source, manifest and environment patterns.',
+    },
+];
+
+export function labelOf(locale: LocaleId, label: LimitationLabel): string {
+    return LABEL_TEXT[locale][label];
+}

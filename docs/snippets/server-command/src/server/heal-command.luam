@@ -1,7 +1,7 @@
 local MAX_HEALTH: number = 100
 
 local function heal(player: Player, command: string, amount?: string): void
-    local requested: any = tonumber(amount) or MAX_HEALTH
+    local requested: number = tonumber(amount) or MAX_HEALTH
     local current: number = getElementHealth(player)
     local target: number = current + requested
     local healed: number = target.clamp(0, MAX_HEALTH)

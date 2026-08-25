@@ -45,6 +45,9 @@ jobs:
             - name: Locale parity
               run: pnpm docs:parity
 
+            - name: Limitation contract
+              run: pnpm docs:limitations
+
             - name: Version contract
               run: pnpm docs:versions
 

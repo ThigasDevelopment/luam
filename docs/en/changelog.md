@@ -9,6 +9,32 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Changed
+
+- [Classes](/en/language/classes) documents declaration order as two rules
+  instead of one warning: a class is a type everywhere in its file, and a value
+  from the line its declaration runs. `extends` may name a parent written
+  further down; a top-level `new` of a class declared below is
+  `check-class-before-declaration`.
+
+- [Limitations](/en/reference/limitations) labels every entry planned, design
+  boundary, upstream constraint or platform constraint, states which ones are
+  never coming back — `__index`, `__newindex` and `__call`, implicit runtime
+  checks, a build that reads `config.lua` — and names the release it describes.
+
+### Fixed
+
+- [Troubleshooting](/en/guide/troubleshooting) said Luam does no narrowing. A
+  guard narrows a name, an `or` drops the nil on its left, and it is a **field**
+  that keeps its declared type. The page now shows both.
+- [Editors](/en/tooling/editors) and [Troubleshooting](/en/guide/troubleshooting)
+  said the server never re-checks an open file when another one changes, and told
+  you to restart it to pick up files. It re-analyzes on a declaration change, and
+  it scans the workspace and watches `**/*.luam`, `.luam.manifest` and `.env*`.
+- The [server command](/en/recipes/server-command) and
+  [exported function](/en/recipes/exported-function) recipes annotated a local
+  `any` for a limitation that does not exist. Both locals are `number`.
+
 ## 0.17.0 - 2026-08-25
 
 ### Changed

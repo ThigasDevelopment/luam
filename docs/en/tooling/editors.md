@@ -82,7 +82,8 @@ code --extensionDevelopmentPath=packages/vscode
 
 The extension activates when the workspace holds a `.luam.manifest` or any `.luam`
 file, so **open your resource folder as the workspace root**. It watches
-`**/*.luam`, so files changed outside the editor still reach the server.
+`**/*.luam`, `.luam.manifest` and `.env*`, so files changed outside the editor
+still reach the server.
 
 ## Commands
 
@@ -99,8 +100,18 @@ file, so **open your resource folder as the workspace root**. It watches
 | `luam.ensureWatch` | `true` | Pass `--watch` when the ensure command runs. |
 | `luam.trace.server` | `"off"` | Trace LSP traffic. Set to `"verbose"` when reporting a bug. |
 
-## A known limitation
+## What a change re-checks
 
-The server does not re-check an already open file when a **different** file
-changes, so a cross-module violation can surface only in `luam check`. Run
-**Luam: Restart Language Server** to force a rescan.
+Editing a file republishes diagnostics for that file. The other files are
+re-analyzed only when the edit changes what the file **declares** — a class, an
+interface, an enum, or a global, including the type of any member. A body edit
+costs one file; a declaration edit costs every file that can see it.
+
+That last part is wider than it needs to be: a declaration change re-checks the
+files it is visible to rather than the files that use it. Narrowing it is
+[planned](/en/reference/limitations).
+
+Nothing here waits for a file to be opened. The server scans the workspace when
+it starts and the extension watches the file patterns above, so a file created,
+moved or deleted outside the editor reaches it without a restart. **Luam: Restart
+Language Server** is the way out if the server and the project still disagree.
