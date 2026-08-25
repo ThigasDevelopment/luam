@@ -140,6 +140,7 @@ export function emitEnumDeclaration(state: EmitState, statement: EnumDeclaration
     requireHelper(state, 'class');
 
     const names = statement.members.map((member) => emitString(member.name));
+    const target = statement.isLocal ? `local ${statement.name}` : statement.name;
 
-    return names.length === 0 ? `${statement.name} = enum {}` : `${statement.name} = enum { ${names.join(', ')} }`;
+    return names.length === 0 ? `${target} = enum {}` : `${target} = enum { ${names.join(', ')} }`;
 }

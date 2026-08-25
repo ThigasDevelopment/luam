@@ -68,6 +68,16 @@ print(1)
 "
 `;
 
+exports[`development output > locks the release output of 'local enum' 1`] = `
+"local Weather = enum { 'CLEAR', 'RAIN' }
+
+
+
+
+print(Weather.RAIN)
+"
+`;
+
 exports[`development output > locks the release output of 'native extension' 1`] = `
 "local label = ' a '
 

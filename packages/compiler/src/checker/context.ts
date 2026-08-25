@@ -129,6 +129,8 @@ export class CheckContext {
 
     private readonly ambientInterfaces = new Set<string>();
 
+    private readonly ambientEnums = new Set<string>();
+
     constructor(
         mode: StrictMode,
         environment: Environment,
@@ -227,6 +229,10 @@ export class CheckContext {
 
     isAmbientInterface(name: string): boolean {
         return this.ambientInterfaces.has(name);
+    }
+
+    isAmbientEnum(name: string): boolean {
+        return this.ambientEnums.has(name);
     }
 
     noteExternalReference(name: string, position: SourcePosition): void {
@@ -433,6 +439,7 @@ export class CheckContext {
         }
 
         for (const info of ambient.enums) {
+            this.ambientEnums.add(info.name);
             this.declarations.declareEnum(info);
             this.binder.declareGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: info.position });
         }

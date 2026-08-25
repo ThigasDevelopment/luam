@@ -281,7 +281,7 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
     return declaration;
 }
 
-function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {
+export function parseEnumDeclaration(stream: TokenStream, isLocal = false): EnumDeclaration {
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
     const members: EnumMember[] = [];
@@ -300,7 +300,7 @@ function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {
 
     stream.expect('punctuation', '}');
 
-    return { kind: 'enum-declaration', name, members, position };
+    return { kind: 'enum-declaration', name, isLocal, members, position };
 }
 
 export function parseDeclaration(stream: TokenStream): DeclarationStatement {

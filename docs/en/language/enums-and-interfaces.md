@@ -39,6 +39,29 @@ A surviving enum is a **global**, not a local, so declaration order across files
 matters at load time. Put it in a shared file and pin that file with `loadOrder`
 when a server or client file reads it while loading.
 
+### Local enums
+
+`local` scopes an enum to the file that declares it, the same way it scopes a
+`local function`:
+
+```luam
+local enum Weather {
+    CLEAR,
+    RAIN,
+}
+```
+
+- The generated Lua declares a local: `local Weather = enum { 'CLEAR', 'RAIN' }`.
+- No other file sees it — not the checker, not the runtime. The build never
+  treats it as a resource declaration, so editing it re-analyzes no other file.
+- Reachability shrinks to the declaring file: a local enum no line of its own
+  file reads is erased, even when another file mentions the same name.
+- A local enum may reuse a name a global enum takes elsewhere; inside its file
+  the local wins, exactly as a `local` variable shadows a global.
+- Because the name is a local, `noUnusedLocals` reports an unread local enum as
+  `check-unused-local`; a global enum is erased silently instead.
+- There is no global to race at load time, so `loadOrder` never matters for it.
+
 Member names stay quoted in the generated Lua:
 
 ```lua

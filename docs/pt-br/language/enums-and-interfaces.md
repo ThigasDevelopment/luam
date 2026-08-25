@@ -40,6 +40,33 @@ entre arquivos importa no carregamento. Coloque-o em um arquivo shared e fixe
 esse arquivo com `loadOrder` quando um arquivo server ou client o ler durante a
 carga.
 
+### Enums locais
+
+`local` restringe um enum ao arquivo que o declara, do mesmo jeito que restringe
+uma `local function`:
+
+```luam
+local enum Weather {
+    CLEAR,
+    RAIN,
+}
+```
+
+- O Lua gerado declara um local: `local Weather = enum { 'CLEAR', 'RAIN' }`.
+- Nenhum outro arquivo o enxerga — nem o checker, nem o runtime. O build nunca o
+  trata como declaração do recurso, então editá-lo não re-analisa nenhum outro
+  arquivo.
+- O alcance encolhe para o arquivo que declara: um enum local que nenhuma linha
+  do próprio arquivo lê é apagado, mesmo que outro arquivo mencione o mesmo
+  nome.
+- Um enum local pode reutilizar um nome que um enum global ocupa em outro
+  arquivo; dentro do seu arquivo o local vence, exatamente como uma variável
+  `local` esconde um global.
+- Como o nome é um local, `noUnusedLocals` reporta um enum local nunca lido como
+  `check-unused-local`; um enum global é apagado em silêncio.
+- Não há global para disputar no carregamento, então `loadOrder` nunca importa
+  para ele.
+
 Os nomes dos membros continuam entre aspas no Lua gerado:
 
 ```lua

@@ -170,7 +170,7 @@ function collectInterface(state: CollectorState, block: BlockContext, statement:
 function collectEnum(state: CollectorState, statement: EnumDeclaration): void {
     const position = namePosition(state, statement);
 
-    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'enum', position, detail: `enum ${statement.name}` });
+    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'enum', position, detail: `${statement.isLocal ? 'local ' : ''}enum ${statement.name}` });
 
     statement.members.forEach((member, index) => {
         declareSymbol(state, ROOT_SCOPE, {

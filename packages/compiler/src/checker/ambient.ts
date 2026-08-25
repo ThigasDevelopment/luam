@@ -14,7 +14,7 @@ export function ambientFromRegistry(registry: DeclarationRegistry): AmbientDecla
     return {
         classes: registry.allClasses(),
         interfaces: registry.allInterfaces(),
-        enums: registry.allEnums(),
+        enums: registry.allEnums().filter((info) => info.isLocal !== true),
         globals: registry.allGlobals(),
         events: registry.allEvents(),
     };

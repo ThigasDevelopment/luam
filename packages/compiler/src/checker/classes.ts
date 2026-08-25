@@ -271,7 +271,10 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
 }
 
 export function checkEnumDeclaration(context: CheckContext, statement: EnumDeclaration): void {
-    if (context.declarations.lookupEnum(statement.name) !== null) {
+    const existing = context.declarations.lookupEnum(statement.name);
+    const shadowsAmbient = statement.isLocal && existing?.isLocal !== true && context.isAmbientEnum(statement.name);
+
+    if (existing !== null && !shadowsAmbient) {
         context.report('check-duplicate-enum', `Enum "${statement.name}" is already defined.`, statement.position);
 
         return;
@@ -279,6 +282,11 @@ export function checkEnumDeclaration(context: CheckContext, statement: EnumDecla
 
     const members = statement.members.map((member) => member.name);
 
-    context.declarations.declareEnum({ name: statement.name, members, position: statement.position });
-    context.declareModuleGlobal({ name: statement.name, type: createNamed(statement.name), isLocal: false, position: statement.position });
+    context.declarations.declareEnum({ name: statement.name, members, isLocal: statement.isLocal, position: statement.position });
+
+    if (statement.isLocal) {
+        context.binder.declare({ name: statement.name, type: createNamed(statement.name), isLocal: true, position: statement.position, origin: 'local' });
+    } else {
+        context.declareModuleGlobal({ name: statement.name, type: createNamed(statement.name), isLocal: false, position: statement.position });
+    }
 }

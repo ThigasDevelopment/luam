@@ -81,6 +81,8 @@ describe('grammar', () => {
         expect(matchesAny('declaration', 'class VIPPlayer extends Player {')).toBe(true);
         expect(matchesAny('declaration', 'interface Command {')).toBe(true);
         expect(matchesAny('declaration', 'enum GameState {')).toBe(true);
+        expect(matchesAny('declaration', 'local enum GameState {')).toBe(true);
+        expect(matchesAny('enumBody', 'local enum GameState {')).toBe(true);
         expect(matchesAny('declaration', 'local vip = new VIPPlayer(')).toBe(true);
         expect(matchesAny('declaration', 'type PlayerId = number')).toBe(true);
     });

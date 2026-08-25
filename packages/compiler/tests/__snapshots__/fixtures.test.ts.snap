@@ -4140,6 +4140,7 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
 {
   "body": [
     {
+      "isLocal": false,
       "kind": "enum-declaration",
       "members": [
         {
@@ -4175,6 +4176,7 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
       },
     },
     {
+      "isLocal": false,
       "kind": "enum-declaration",
       "members": [
         {
@@ -4194,6 +4196,34 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
       },
     },
     {
+      "isLocal": true,
+      "kind": "enum-declaration",
+      "members": [
+        {
+          "name": "CLEAR",
+          "position": {
+            "column": 5,
+            "line": 12,
+            "offset": 113,
+          },
+        },
+        {
+          "name": "RAIN",
+          "position": {
+            "column": 5,
+            "line": 13,
+            "offset": 124,
+          },
+        },
+      ],
+      "name": "Weather",
+      "position": {
+        "column": 7,
+        "line": 11,
+        "offset": 94,
+      },
+    },
+    {
       "declarations": [
         {
           "annotation": {
@@ -4201,24 +4231,24 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
             "name": "number",
             "position": {
               "column": 14,
-              "line": 11,
-              "offset": 101,
+              "line": 16,
+              "offset": 146,
             },
             "typeArguments": [],
           },
           "name": "state",
           "position": {
             "column": 7,
-            "line": 11,
-            "offset": 94,
+            "line": 16,
+            "offset": 139,
           },
         },
       ],
       "kind": "local-statement",
       "position": {
         "column": 1,
-        "line": 11,
-        "offset": 88,
+        "line": 16,
+        "offset": 133,
       },
       "values": [
         {
@@ -4228,16 +4258,64 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
             "name": "GameState",
             "position": {
               "column": 23,
-              "line": 11,
-              "offset": 110,
+              "line": 16,
+              "offset": 155,
             },
           },
           "position": {
             "column": 32,
-            "line": 11,
-            "offset": 119,
+            "line": 16,
+            "offset": 164,
           },
           "property": "PLAYING",
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "number",
+            "position": {
+              "column": 12,
+              "line": 17,
+              "offset": 184,
+            },
+            "typeArguments": [],
+          },
+          "name": "sky",
+          "position": {
+            "column": 7,
+            "line": 17,
+            "offset": 179,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 17,
+        "offset": 173,
+      },
+      "values": [
+        {
+          "kind": "member-expression",
+          "object": {
+            "kind": "identifier",
+            "name": "Weather",
+            "position": {
+              "column": 21,
+              "line": 17,
+              "offset": 193,
+            },
+          },
+          "position": {
+            "column": 28,
+            "line": 17,
+            "offset": 200,
+          },
+          "property": "RAIN",
         },
       ],
     },
@@ -4253,8 +4331,8 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
                     "kind": "string-literal",
                     "position": {
                       "column": 11,
-                      "line": 14,
-                      "offset": 172,
+                      "line": 20,
+                      "offset": 250,
                     },
                     "value": "waiting for players",
                   },
@@ -4264,23 +4342,23 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
                   "name": "print",
                   "position": {
                     "column": 5,
-                    "line": 14,
-                    "offset": 166,
+                    "line": 20,
+                    "offset": 244,
                   },
                 },
                 "kind": "call-expression",
                 "method": null,
                 "position": {
                   "column": 10,
-                  "line": 14,
-                  "offset": 171,
+                  "line": 20,
+                  "offset": 249,
                 },
               },
               "kind": "call-statement",
               "position": {
                 "column": 5,
-                "line": 14,
-                "offset": 166,
+                "line": 20,
+                "offset": 244,
               },
             },
           ],
@@ -4291,15 +4369,15 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
               "name": "state",
               "position": {
                 "column": 4,
-                "line": 13,
-                "offset": 132,
+                "line": 19,
+                "offset": 210,
               },
             },
             "operator": "==",
             "position": {
               "column": 10,
-              "line": 13,
-              "offset": 138,
+              "line": 19,
+              "offset": 216,
             },
             "right": {
               "kind": "member-expression",
@@ -4308,30 +4386,30 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
                 "name": "GameState",
                 "position": {
                   "column": 13,
-                  "line": 13,
-                  "offset": 141,
+                  "line": 19,
+                  "offset": 219,
                 },
               },
               "position": {
                 "column": 22,
-                "line": 13,
-                "offset": 150,
+                "line": 19,
+                "offset": 228,
               },
               "property": "LOBBY",
             },
           },
           "position": {
             "column": 1,
-            "line": 13,
-            "offset": 129,
+            "line": 19,
+            "offset": 207,
           },
         },
       ],
       "kind": "if-statement",
       "position": {
         "column": 1,
-        "line": 13,
-        "offset": 129,
+        "line": 19,
+        "offset": 207,
       },
     },
   ],
@@ -4355,7 +4433,13 @@ exports[`fixture enums.luam > locks the generated Lua 5.1 output 1`] = `
 
 
 
+local Weather = enum { 'CLEAR', 'RAIN' }
+
+
+
+
 local state = GameState.PLAYING
+local sky = Weather.RAIN
 
 if state == GameState.LOBBY then
     print('waiting for players')
@@ -4388,25 +4472,42 @@ exports[`fixture enums.luam > locks the token stream 1`] = `
   "punctuation "," 8:9",
   "punctuation "}" 9:1",
   "keyword "local" 11:1",
-  "identifier "state" 11:7",
-  "punctuation ":" 11:12",
-  "identifier "number" 11:14",
-  "operator "=" 11:21",
-  "identifier "GameState" 11:23",
-  "punctuation "." 11:32",
-  "identifier "PLAYING" 11:33",
-  "keyword "if" 13:1",
-  "identifier "state" 13:4",
-  "operator "==" 13:10",
-  "identifier "GameState" 13:13",
-  "punctuation "." 13:22",
-  "identifier "LOBBY" 13:23",
-  "keyword "then" 13:29",
-  "identifier "print" 14:5",
-  "punctuation "(" 14:10",
-  "string "waiting for players" 14:11",
-  "punctuation ")" 14:32",
-  "keyword "end" 15:1",
+  "keyword "enum" 11:7",
+  "identifier "Weather" 11:12",
+  "punctuation "{" 11:20",
+  "identifier "CLEAR" 12:5",
+  "punctuation "," 12:10",
+  "identifier "RAIN" 13:5",
+  "punctuation "," 13:9",
+  "punctuation "}" 14:1",
+  "keyword "local" 16:1",
+  "identifier "state" 16:7",
+  "punctuation ":" 16:12",
+  "identifier "number" 16:14",
+  "operator "=" 16:21",
+  "identifier "GameState" 16:23",
+  "punctuation "." 16:32",
+  "identifier "PLAYING" 16:33",
+  "keyword "local" 17:1",
+  "identifier "sky" 17:7",
+  "punctuation ":" 17:10",
+  "identifier "number" 17:12",
+  "operator "=" 17:19",
+  "identifier "Weather" 17:21",
+  "punctuation "." 17:28",
+  "identifier "RAIN" 17:29",
+  "keyword "if" 19:1",
+  "identifier "state" 19:4",
+  "operator "==" 19:10",
+  "identifier "GameState" 19:13",
+  "punctuation "." 19:22",
+  "identifier "LOBBY" 19:23",
+  "keyword "then" 19:29",
+  "identifier "print" 20:5",
+  "punctuation "(" 20:10",
+  "string "waiting for players" 20:11",
+  "punctuation ")" 20:32",
+  "keyword "end" 21:1",
 ]
 `;
 

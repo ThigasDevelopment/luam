@@ -68,6 +68,7 @@ export interface EnumMember extends NodeBase {
 export interface EnumDeclaration extends NodeBase {
     kind: 'enum-declaration';
     name: string;
+    isLocal: boolean;
     members: EnumMember[];
 }
 

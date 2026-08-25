@@ -22,6 +22,7 @@ const FIXTURES: readonly Fixture[] = [
         lowered: [1, 4],
     },
     { name: 'enum', source: 'enum GameState {\n    LOBBY,\n    RUNNING\n}\n\nprint(GameState.LOBBY)\n', lowered: [1, 2, 3] },
+    { name: 'local enum', source: 'local enum Weather {\n    CLEAR,\n    RAIN\n}\n\nprint(Weather.RAIN)\n', lowered: [1, 2, 3] },
     { name: 'compound assignment', source: 'local total: number = 0\n\ntotal += 1\n\nprint(total)\n', lowered: [1, 3] },
     { name: 'native extension', source: "local label: string = ' a '\n\nprint(label.trim)\n", lowered: [1, 3] },
     { name: 'new', source: 'class Point {\n    x = 0\n}\n\nlocal value = new Point ()\n\nprint(value)\n', lowered: [1, 5] },

@@ -8,7 +8,13 @@ enum UnusedState {
     NONE,
 }
 
+local enum Weather {
+    CLEAR,
+    RAIN,
+}
+
 local state: number = GameState.PLAYING
+local sky: number = Weather.RAIN
 
 if state == GameState.LOBBY then
     print('waiting for players')
