@@ -1,7 +1,9 @@
 import { join } from 'node:path';
 
 import { workspace, type ExtensionContext } from 'vscode';
-import { LanguageClient, TransportKind, type LanguageClientOptions, type ServerOptions } from 'vscode-languageclient/node';
+import { LanguageClient, TransportKind, type LanguageClientOptions, type Middleware, type ServerOptions } from 'vscode-languageclient/node';
+
+import { readSettings } from '@vscode-extension/config/settings';
 
 export const CLIENT_ID = 'luam';
 
@@ -30,8 +32,17 @@ export function createServerOptions(modulePath: string): ServerOptions {
     };
 }
 
+function semanticTokensMiddleware(): Middleware {
+    return {
+        provideDocumentSemanticTokens: (document, token, next) => (readSettings().semanticHighlighting ? next(document, token) : undefined),
+        provideDocumentRangeSemanticTokens: (document, range, token, next) =>
+            readSettings().semanticHighlighting ? next(document, range, token) : undefined,
+    };
+}
+
 export function createClientOptions(): LanguageClientOptions {
     return {
+        middleware: semanticTokensMiddleware(),
         documentSelector: [
             { scheme: 'file', language: LANGUAGE_ID },
             { scheme: 'file', language: MANIFEST_LANGUAGE_ID },

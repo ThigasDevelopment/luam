@@ -6,6 +6,7 @@
         "paths": {
             "@vscode-extension/*": ["src/*"],
             "@lsp/*": ["../lsp/src/*"],
+            "@theme/*": ["../theme/src/*"],
             "@compiler/*": ["../compiler/src/*"],
             "@mta-types/*": ["../mta-types/src/*"]
         }

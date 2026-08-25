@@ -130,3 +130,32 @@ describe('manifest language configuration', () => {
         expect(new RegExp(`^(?:${configuration.wordPattern})$`).test('$name')).toBe(false);
     });
 });
+
+describe('manifest theme scopes', () => {
+    it('leaves an environment named key on the ordinary key scope', () => {
+        const field = rulePatterns('field')[0];
+
+        expect(field?.captures?.['1']?.name).toBe('support.type.property-name.luam-manifest');
+
+        for (const key of ['server', 'client', 'shared']) {
+            expect(new RegExp(field?.match ?? '').test(`${key} = { }`), key).toBe(true);
+        }
+
+        expect(grammar.repository['environmentField'], 'the grammar cannot prove a key belongs to sources').toBeUndefined();
+    });
+
+    it('scopes the same punctuation the luam grammar dims', () => {
+        const names = rulePatterns('punctuation').map((rule) => rule.name);
+
+        expect(names).toContain('punctuation.section.braces.begin.luam-manifest');
+        expect(names).toContain('punctuation.separator.comma.luam-manifest');
+        expect(names).toContain('punctuation.accessor.luam-manifest');
+    });
+
+    it('reaches the punctuation rule and no environment rule', () => {
+        const order = grammar.patterns.map((pattern) => pattern.include);
+
+        expect(order).not.toContain('#environmentField');
+        expect(order).toContain('#punctuation');
+    });
+});

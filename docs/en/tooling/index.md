@@ -8,6 +8,7 @@ that configures a project, and the editor support that runs the same checker.
 | [CLI commands](/en/tooling/cli) | `init`, `check`, `build`, `ensure`, `dev`, `setup`, `doctor`, all options and exit codes. |
 | [.luam.manifest](/en/tooling/luam-manifest) | Every configuration field, with defaults and validation rules. |
 | [Editors](/en/tooling/editors) | The VS Code extension, supported forks, commands and settings. |
+| [The Luam theme](/en/tooling/theme) | The colour contract, every element it paints, and how to install it per editor. |
 | [Language server](/en/tooling/language-server) | Running the editor-agnostic LSP from any client. |
 | [CI and deployment](/en/tooling/ci-and-deployment) | Checking in a pipeline and shipping a resource. |
 
@@ -21,6 +22,7 @@ that configures a project, and the editor support that runs the same checker.
 | `luam` (VS Code) | The extension: grammar, client, commands. |
 | `@luam/mta-types` | The generated MTA catalog. |
 | `@luam/runtime` | The Lua runtime helpers a build may copy. |
+| `@luam/theme` | The role table every editor theme is generated from. |
 | `@luam/template` | The starter `.luam.manifest` that `luam init` writes. |
 
 The editor and the build share the compiler frontend, which is why they never

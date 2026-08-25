@@ -8,6 +8,8 @@ uses, so the editor and the build never disagree about a file.
 | Feature | Details |
 | --- | --- |
 | Syntax highlighting | `.luam` files, including type annotations, `#!` directives and template strings. |
+| Semantic highlighting | An MTA native, a Lua library call, a method and one of your own functions each read differently, and a native carries the environment it belongs to. |
+| Themes | `Luam Dark` and `Luam Light`, generated from one role table shared with the Zed, Neovim and TextMate exports. |
 | Diagnostics | On open and on every keystroke, cleared when you fix the file. |
 | Completion | Scope symbols, workspace globals, MTA APIs scoped to the file's environment, keywords. |
 | Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members. |
@@ -101,7 +103,39 @@ still reach the server.
 | --- | --- | --- |
 | `luam.cliPath` | `"luam"` | Command used to run the CLI. Point it at a bundle to test an unreleased build. |
 | `luam.ensureWatch` | `true` | Pass `--watch` when the ensure command runs. |
+| `luam.semanticHighlighting` | `true` | Colour Luam with the semantic tokens the server serves. Turn it off to keep only the grammar layer. |
 | `luam.trace.server` | `"off"` | Trace LSP traffic. Set to `"verbose"` when reporting a bug. |
+
+## Colours
+
+The extension ships `Luam Dark` and `Luam Light`, generated from one role
+table so every editor reads Luam the same way. Installing the extension does
+not change your colours — pick the theme from **File → Preferences → Theme →
+Color Theme**. The rule the theme teaches, and every element it paints, is on
+[The Luam theme](/en/tooling/theme).
+
+| Editor | How to install the theme | What it colours |
+| --- | --- | --- |
+| VS Code and its forks | Included with the extension; pick it in the theme picker. | Everything: the grammar layer and the semantic layer. |
+| Zed | Copy `packages/theme/dist-themes/luam-zed.json` into `~/.config/zed/themes/`. | The base layer; register the language server first. |
+| Neovim | Copy `packages/theme/dist-themes/luam.lua` onto your runtime path and call `require('luam').setup()`. | Everything the server reports, including the environment of a native. |
+| Sublime Text and TextMate | Install `packages/theme/dist-themes/luam-dark.tmTheme` or `luam-light.tmTheme` alongside the `.tmLanguage.json` grammars. | The grammar layer only. |
+
+The TextMate format has no semantic tokens, so in that family an MTA native and
+one of your own functions share a colour, as do a parameter and a local. That is
+the limit of the format, not a defect in the theme.
+
+Zed and Neovim both need the language server configured before any of this
+applies — see [Language server](/en/tooling/language-server).
+
+### JetBrains
+
+There is no Luam colour scheme for the JetBrains IDEs. Their scheme format is
+`.icls`, their highlighting comes from a language plugin rather than from a
+grammar, and the community IDEs do not map LSP semantic tokens onto a colour
+scheme without one. Shipping an `.icls` that coloured nothing Luam-specific
+would be a worse promise than shipping nothing. The question reopens if a Luam
+plugin is ever built.
 
 ## What a change re-checks
 

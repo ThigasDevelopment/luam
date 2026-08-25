@@ -142,7 +142,7 @@ describe('grammar', () => {
 
         expect(matchesAny('method', 'return self:query(str)')).toBe(true);
         expect(matchesAny('method', "self:log('ready')")).toBe(true);
-        expect(rule?.captures?.['2']?.name).toBe('support.function.any-method.luam');
+        expect(rule?.captures?.['2']?.name).toBe('entity.name.function.method.luam');
         expect(matchesAny('method', 'local player: Player = nil')).toBe(false);
         expect(matchesAny('method', 'local run: fun(id: number): void = nil')).toBe(false);
     });
@@ -157,7 +157,7 @@ describe('grammar', () => {
     });
 
     it('keeps the type keyword for type aliases only', () => {
-        const rule = rulePatterns('keyword').find((pattern) => pattern.name === 'storage.type.luam');
+        const rule = rulePatterns('keyword').find((pattern) => pattern.name === 'storage.type.alias.luam');
 
         expect(new RegExp(rule?.match ?? '').test('type PlayerId = number')).toBe(true);
         expect(new RegExp(rule?.match ?? '').test('local kind = type(1)')).toBe(false);
@@ -167,10 +167,10 @@ describe('grammar', () => {
         const local = rulePatterns('keyword').find((pattern) => pattern.name === 'keyword.local.luam');
 
         expect(new RegExp(local?.match ?? '').test('local health = 100')).toBe(true);
-        expect(rulePatterns('call')[0]?.captures?.['1']?.name).toBe('support.function.any-method.luam');
+        expect(rulePatterns('call')[0]?.captures?.['1']?.name).toBe('entity.name.function.call.luam');
         expect(rulePatterns('attribute')[0]?.name).toBe('entity.other.attribute.luam');
         expect(matchesAny('attribute', 'self.side = side')).toBe(true);
-        const assigned = new RegExp(rulePatterns('function')[1]?.match ?? '');
+        const assigned = new RegExp(rulePatterns('function')[2]?.match ?? '');
 
         expect(assigned.test('insert = function (data: table)')).toBe(true);
         expect(assigned.test('constructor = function (side: string)')).toBe(false);
@@ -185,11 +185,11 @@ describe('grammar', () => {
     });
 
     it('gives the vararg its own scope ahead of concatenation', () => {
-        const [vararg] = rulePatterns('constant');
+        const [vararg] = rulePatterns('vararg');
 
         expect(vararg?.name).toBe('variable.language.vararg.luam');
         expect(new RegExp(vararg?.match ?? '').test('function take(...)')).toBe(true);
-        expect(matchesAny('constant', 'local rest = ...')).toBe(true);
+        expect(matchesAny('vararg', 'local rest = ...')).toBe(true);
     });
 
     it('highlights an intersection in an annotation', () => {

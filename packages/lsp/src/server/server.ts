@@ -4,7 +4,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { FileChangeType, TextDocuments, type Connection, type FileEvent, type InitializeParams, type InitializeResult } from 'vscode-languageserver';
 
 import { LanguageService } from '@lsp/server/language-service';
-import { SERVER_CAPABILITIES } from '@lsp/server/capabilities';
+import { capabilitiesFor } from '@lsp/server/capabilities';
 import { uriToPath } from '@lsp/workspace/document-uri';
 
 function workspaceRoots(params: InitializeParams): string[] {
@@ -77,6 +77,11 @@ function registerWorkspace(connection: Connection, documents: TextDocuments<Text
     });
 }
 
+function registerSemanticTokens(connection: Connection, service: LanguageService): void {
+    connection.languages.semanticTokens.on((params) => service.semanticTokens(params.textDocument.uri));
+    connection.languages.semanticTokens.onRange((params) => service.semanticTokens(params.textDocument.uri, params.range));
+}
+
 function registerFeatures(connection: Connection, service: LanguageService): void {
     connection.onCompletion((params) => service.completion(params.textDocument.uri, params.position));
     connection.onSignatureHelp((params) => service.signatureHelp(params.textDocument.uri, params.position));
@@ -95,12 +100,13 @@ export function startServer(connection: Connection): LanguageService {
         service.loadWorkspace(workspaceRoots(params));
         service.useSnippets(params.capabilities.textDocument?.completion?.completionItem?.snippetSupport === true);
 
-        return { capabilities: SERVER_CAPABILITIES };
+        return { capabilities: capabilitiesFor(params.capabilities.textDocument?.semanticTokens !== undefined) };
     });
 
     registerDocuments(connection, documents, service);
     registerWorkspace(connection, documents, service);
     registerFeatures(connection, service);
+    registerSemanticTokens(connection, service);
 
     documents.listen(connection);
     connection.listen();

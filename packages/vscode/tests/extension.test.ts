@@ -130,14 +130,14 @@ describe('ensure command', () => {
     });
 
     it('builds a single run command line when watch is off', () => {
-        expect(ensureCommandLine({ cliPath: 'pnpm luam', ensureWatch: false })).toBe('pnpm luam ensure');
+        expect(ensureCommandLine({ cliPath: 'pnpm luam', ensureWatch: false, semanticHighlighting: true })).toBe('pnpm luam ensure');
     });
 
     it('reads the configured cli path', () => {
         state.settings.set('luam.cliPath', 'node ./bin/luam.mjs');
         state.settings.set('luam.ensureWatch', false);
 
-        expect(readSettings()).toEqual({ cliPath: 'node ./bin/luam.mjs', ensureWatch: false });
+        expect(readSettings()).toEqual({ cliPath: 'node ./bin/luam.mjs', ensureWatch: false, semanticHighlighting: true });
     });
 
     it('runs the cli in a dedicated terminal', () => {

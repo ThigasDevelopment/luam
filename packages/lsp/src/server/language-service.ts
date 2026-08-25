@@ -1,5 +1,16 @@
 import type { Environment } from '@compiler/environment/environment';
-import type { CompletionItem, Diagnostic, DocumentSymbol, Hover, Location, Position, SignatureHelp, WorkspaceEdit } from 'vscode-languageserver';
+import type {
+    CompletionItem,
+    Diagnostic,
+    DocumentSymbol,
+    Hover,
+    Location,
+    Position,
+    Range,
+    SemanticTokens,
+    SignatureHelp,
+    WorkspaceEdit,
+} from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { completionAt } from '@lsp/features/completion';
@@ -7,6 +18,7 @@ import { collectDiagnostics } from '@lsp/features/diagnostics';
 import { documentSymbols } from '@lsp/features/document-symbols';
 import { hoverAt } from '@lsp/features/hover';
 import { definitionAt, referencesAt, renameAt } from '@lsp/features/navigation';
+import { semanticTokens } from '@lsp/features/semantic-tokens';
 import { signatureHelpAt } from '@lsp/features/signature-help';
 import { offsetAt } from '@lsp/support/source-text';
 import { WorkspaceIndex } from '@lsp/workspace/workspace-index';
@@ -52,6 +64,12 @@ export class LanguageService {
         const analysis = this.workspace.get(uri);
 
         return analysis === null ? [] : collectDiagnostics(analysis);
+    }
+
+    semanticTokens(uri: string, range: Range | null = null): SemanticTokens {
+        const analysis = this.workspace.get(uri);
+
+        return analysis === null ? { data: [] } : semanticTokens(analysis, range);
     }
 
     documentSymbols(uri: string): DocumentSymbol[] {
