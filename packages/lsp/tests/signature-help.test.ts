@@ -65,6 +65,13 @@ describe('signature help', () => {
         expect(help?.signatures[0]?.label).toBe('Player.setName(value: string): void');
     });
 
+    it('spells a multi-return out instead of naming the tuple kind', () => {
+        const position = helpFor('getElementPosition(\n', 'getElementPosition(')?.signatures[0]?.label;
+
+        expect(position).toBe('getElementPosition(theElement: Element): (number, number, number)');
+        expect(position).not.toContain('tuple');
+    });
+
     it('offers nothing outside a call and nothing inside a comment', () => {
         expect(helpFor('local value = 1\n', 'local value')).toBeNull();
         expect(helpFor('# outputChatBox(\n', 'outputChatBox(')).toBeNull();

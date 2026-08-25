@@ -18,6 +18,14 @@ export function typeDescriptorText(descriptor: TypeDescriptor): string {
         return descriptor.name;
     }
 
+    if (descriptor.kind === 'literal') {
+        return `'${descriptor.value}'`;
+    }
+
+    if (descriptor.kind === 'tuple') {
+        return `(${descriptor.elements.map(typeDescriptorText).join(', ')})`;
+    }
+
     if (descriptor.kind === 'function') {
         const parameters = descriptor.parameters.map(typeDescriptorText);
 
