@@ -79,6 +79,16 @@ the editor.
 It is copied verbatim, so the compiler knows nothing about its contents. Describe
 it with a [declaration file](/en/language/declaration-files) to get types.
 
+## Generated Lua is the source, not a rewrite
+
+A readable build keeps one line of Lua for every line of Luam, and copies through
+everything Lua 5.1 already accepts. What it does not do is restore what it
+erased: an `interface` becomes a comment, not a runtime table. Read
+[the development output contract](/en/reference/output-layouts#the-development-output-contract)
+for what is rewritten, and
+[Resolving an MTA runtime position](/en/guide/troubleshooting#resolving-an-mta-runtime-position)
+for turning a generated position back into an authored one.
+
 ## Type annotations are erased
 
 They are a **compile-time contract**, not a runtime guard. A handler for an event

@@ -80,6 +80,16 @@ Ele é copiado como está, então o compilador não sabe nada sobre o seu conte�
 Descreva-o com um
 [arquivo de declaração](/pt-br/language/declaration-files) para obter tipos.
 
+## O Lua gerado é o código, não uma reescrita
+
+Um build legível mantém uma linha de Lua para cada linha de Luam e copia tudo que
+o Lua 5.1 já aceita. O que ele não faz é restaurar o que apagou: uma `interface`
+vira um comentário, não uma tabela de execução. Leia
+[o contrato da saída de desenvolvimento](/pt-br/reference/output-layouts#o-contrato-da-saida-de-desenvolvimento)
+para o que é reescrito, e
+[Resolvendo uma posição de execução do MTA](/pt-br/guide/troubleshooting#resolvendo-uma-posicao-de-execucao-do-mta)
+para transformar uma posição gerada de volta em uma posição escrita.
+
 ## Anotações de tipo são apagadas
 
 Elas são um **contrato de compilação**, não uma guarda de execução. Um handler de

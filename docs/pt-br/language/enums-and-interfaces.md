@@ -21,6 +21,37 @@ enum MatchState {
   não custa nada. Um enum declarado em um arquivo shared e lido de um arquivo
   server ou client é mantido, porque o build olha o recurso inteiro.
 
+### O que o alcance enxerga, e o que não enxerga
+
+O apagamento é **silencioso**. Nenhum diagnóstico o informa e nenhuma opção do
+compilador pede um, porque um enum declara um global de módulo e o relato de
+declarações sem uso cobre apenas locais e parâmetros.
+
+O alcance é casado por **nome de identificador** entre as fontes do recurso. Um
+enum alcançado apenas de forma dinâmica, por `_G['MatchState']` ou a partir de um
+`config.lua` escrito à mão, ou ainda de outro recurso, não é visto pelo build e
+desaparece. Leia-o ao menos uma vez de uma fonte compilada quando algo fora do
+build depender dele.
+
+Um enum que sobrevive é um **global**, não um local, então a ordem de declaração
+entre arquivos importa no carregamento. Coloque-o em um arquivo shared e fixe
+esse arquivo com `loadOrder` quando um arquivo server ou client o ler durante a
+carga.
+
+Os nomes dos membros continuam entre aspas no Lua gerado:
+
+```lua
+MatchState = enum { 'LOBBY', 'PLAYING', 'FINISHED' }
+```
+
+O helper de execução usa cada elemento como chave de tabela. Um `LOBBY` sem aspas
+seria um global não declarado avaliado como `nil`, o que deixa a tabela vazia e
+produz um enum sem membros que falha em silêncio a cada leitura.
+
+Um [build de desenvolvimento](/pt-br/reference/output-layouts#o-contrato-da-saida-de-desenvolvimento)
+mantém o enum nas linhas em que você o escreveu; um build minificado o coloca em
+uma só.
+
 ```luam
 local state: number = MatchState.PLAYING
 

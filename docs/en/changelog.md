@@ -15,8 +15,25 @@ Every heading below is a released version and the date it shipped, newest first.
   field no longer exists: `ensure` syncs files, and `dev --start-server` restarts
   the resource through the console it owns.
 
+### Added
+
+- [Output layouts and source maps](/en/reference/output-layouts) documents the
+  development output contract: which commands write readable Lua, what is
+  rewritten, what is copied through byte for byte, and what the contract does not
+  promise. It carries a worked example of a `continue` loop and of an erased
+  declaration.
+
 ### Changed
 
+- [Enums and interfaces](/en/language/enums-and-interfaces) records what enum
+  reachability sees and what it does not: erasure is silent, reachability is
+  matched by identifier name so a dynamic or cross-resource read is invisible to
+  the build, a surviving enum is a global so declaration order matters at load
+  time, and member names stay quoted because the runtime helper uses each element
+  as a table key.
+- [Limitations](/en/reference/limitations) states that generated Lua is the
+  source rather than a rewrite, and links to the output contract and to resolving
+  an MTA runtime position.
 - [Object extensions](/en/language/extensions) names `check-extension-form` as
   the error for using the wrong form, and
   [Diagnostics](/en/reference/diagnostics) lists it next to `check-not-callable`.

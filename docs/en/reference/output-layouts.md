@@ -87,17 +87,105 @@ entries, and then the source groups. This is the normal `ensure` and fixed `dev`
 shape because a running resource remains easy to inspect. Use
 `luam build --no-bundle` when a local build also needs this shape.
 
-Readable generated Lua preserves authored text wherever it is already valid Lua
-after Luam-only syntax is removed. Type annotations and compile-only declarations
-are erased, Luam comments become Lua comments, and the remaining whitespace,
-quotes, semicolons, and multiline layout stay as written. A top-level statement
-that contains a construct requiring lowering, such as a class, template,
-extension, or compound assignment, is replaced with canonical Lua without
-reformatting neighboring statements. The source map accounts for regions that
-expand or contract. Production minification removes all readable formatting.
-
 Switching layouts removes generated files from the previous layout. Files whose
 bytes did not change are not rewritten, and `env.lua` is never overwritten.
+
+## The development output contract
+
+Every command that writes readable Lua emits the source file with the Luam-only
+constructs removed or lowered, and nothing else changed. There is no manifest
+field for it: turning minification off is what asks for readable output.
+
+| Command | Readable output |
+| --- | --- |
+| `luam dev` | Always. It never minifies. |
+| `luam ensure` | Always. It never minifies. |
+| `luam build` | When `output.minify` is `false`, or with `--no-minify`. |
+
+The contract has one measurable shape: **one line of Lua for every line of
+Luam**. A rewritten construct occupies the lines the construct it replaces
+occupied, so a position MTA reports against the generated file names the same
+line in the source.
+
+What is rewritten:
+
+| Written | Generated |
+| --- | --- |
+| A type annotation or a return type | Erased, so the signature reads as plain Lua |
+| `interface`, `type`, `declare`, `declare event` | A Lua block comment over the same lines, trailing semicolon included |
+| `enum Name { A, B }` | `Name = enum { 'A', 'B' }` on the lines it was written on |
+| `class Name extends Base` | `class 'Name' :extends 'Base'`, with the implicit `self` parameter and the member separators added in place |
+| `implements` | Erased, because it is a compile-time contract |
+| A compound assignment, `new`, a template string, a native extension | Canonical Lua for that statement alone, not for the statement enclosing it |
+| `continue` | `break` inside a `repeat ... until true` whose keywords ride the first and last lines of the loop body |
+| A Luam comment | The equivalent Lua comment |
+| A build directive such as `#!client` | `--!client`, a comment on the same line, because it steers the compiler and not the runtime |
+
+Everything else is copied through byte for byte: indentation, blank lines, the
+space before a parenthesis, the quotes, and the semicolons you wrote.
+
+```luam
+type CustomType = string;
+
+class Example {
+    label = 'a';
+
+    greet = function (value: CustomType): void
+        print(value)
+    end
+}
+```
+
+```lua
+--[[type CustomType = string;]]
+
+class 'Example' {
+    label = 'a';
+
+    greet = function (self, value)
+        print(value)
+    end
+}
+```
+
+A `continue` is the one construct that needs scaffolding rather than a
+substitution. The scaffolding is placed on the body's own lines, so `for ... do`
+and its `end` stay byte-identical to what you wrote:
+
+```luam
+for index = 1, 10 do
+    if (index == 2) then
+        continue;
+    end
+
+    print (index);
+end
+```
+
+```lua
+for index = 1, 10 do
+    repeat if (index == 2) then
+        break;
+    end
+
+    print (index); until true
+end
+```
+
+### What the contract does not promise
+
+- A comment is not a runtime construct. An erased declaration stays erased: the
+  comment shows the contract, it does not restore it.
+- A loop containing a `continue` carries its scaffolding on the first and last
+  lines of its body, which makes those two lines denser than what you wrote.
+  That is the accepted cost of adding no line, and it is why the loop's own
+  header and `end` survive untouched.
+- The canonical emitter remains the fallback whenever a construct has no
+  surgical form — a decorated class, a class with generated members, a builder.
+  When such a construct cannot fit the lines it was written on, the whole file
+  falls back to canonical emission rather than shifting every line below it.
+- A minified `luam build` ships the release form instead: no authored
+  whitespace, and no comment carrying source text.
 
 ## Production minification
 

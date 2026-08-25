@@ -21,6 +21,35 @@ enum MatchState {
   nothing. An enum declared in a shared file and read from a server or client
   file is kept, because the build looks at the whole resource.
 
+### What reachability sees, and what it does not
+
+Erasure is **silent**. No diagnostic reports it and no compiler option asks for
+one, because an enum declares a module global and unused reporting covers locals
+and parameters only.
+
+Reachability is matched by **identifier name** across the resource sources. An
+enum reached only dynamically, through `_G['MatchState']` or from a hand-written
+`config.lua`, or from another resource entirely, is not seen by the build and
+disappears. Read it once from a compiled source when something outside the build
+depends on it.
+
+A surviving enum is a **global**, not a local, so declaration order across files
+matters at load time. Put it in a shared file and pin that file with `loadOrder`
+when a server or client file reads it while loading.
+
+Member names stay quoted in the generated Lua:
+
+```lua
+MatchState = enum { 'LOBBY', 'PLAYING', 'FINISHED' }
+```
+
+The runtime helper uses each element as a table key. An unquoted `LOBBY` would be
+an undeclared global evaluating to `nil`, which makes the table empty and
+produces an enum with no members that fails silently at every read.
+
+A [development build](/en/reference/output-layouts#the-development-output-contract)
+keeps the enum on the lines you wrote it on; a minified build puts it on one.
+
 ```luam
 local state: number = MatchState.PLAYING
 

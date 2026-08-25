@@ -14,6 +14,44 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### The Generated Lua Is The File You Wrote
+
+#### Added
+
+- A readable build now emits one line of Lua for every line of Luam, and copies
+  through everything Lua 5.1 already accepts: indentation, blank lines, the space
+  before a parenthesis, the quotes, and the semicolons you wrote. `luam dev` and
+  `luam ensure` are always in this form, and `luam build` uses it whenever
+  `output.minify` is `false`. There is no manifest field for it, because turning
+  minification off is already the request for output meant to be read.
+- A declaration with no runtime form stays visible instead of leaving a gap. An
+  `interface`, `type`, `declare`, or `declare event` becomes a Lua block comment
+  over the lines it occupied, its trailing semicolon inside the comment. An
+  inline type annotation stays erased, so a generated signature reads as plain
+  Lua.
+- A build directive is a comment now, not a blank line. `#!client` reads
+  `--!client` in the generated Lua, so the environment of a file is legible in
+  the file itself and not only in `meta.xml`.
+- An `enum` and a `class` keep the shape they were written in. A multi-line enum
+  stays multi-line over its own lines with its members quoted, and a class keeps
+  its body spacing and the semicolons written inside it while still receiving the
+  quoted name, the implicit `self` parameter, and the member separators.
+
+#### Fixed
+
+- An erased declaration written with a trailing semicolon emitted a bare `;`.
+  Lua 5.1 has no empty statement, so `interface I { name: string };` produced a
+  file the runtime refused to load. The semicolon is now absorbed into the
+  erasure, in every build.
+- Lowering a `continue` no longer adds a line. The `repeat ... until true`
+  scaffolding rides the first and last lines of the loop body, and the sentinel
+  that carries an author's `break` past the wrapper shares a line with it, so
+  `for ... do` and its `end` are copied through untouched.
+- A single lowered statement no longer reformats everything around it. Canonical
+  replacement narrowed from the enclosing top-level statement to the statement
+  that actually needs lowering, so one compound assignment inside a handler
+  changes its own line and leaves the handler's layout alone.
+
 ### A Caret That Lands On The Problem
 
 #### Fixed

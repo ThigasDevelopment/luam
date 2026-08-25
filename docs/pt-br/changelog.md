@@ -17,8 +17,26 @@ da versão atual.
   campo não existe mais: o `ensure` sincroniza arquivos, e o
   `dev --start-server` reinicia o resource pelo console que ele possui.
 
+### Adicionado
+
+- [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts)
+  documenta o contrato da saída de desenvolvimento: quais comandos escrevem Lua
+  legível, o que é reescrito, o que é copiado byte a byte e o que o contrato não
+  promete. Traz um exemplo trabalhado de um laço com `continue` e de uma
+  declaração apagada.
+
 ### Alterado
 
+- [Enums e interfaces](/pt-br/language/enums-and-interfaces) registra o que o
+  alcance de um enum enxerga e o que não enxerga: o apagamento é silencioso, o
+  alcance é casado por nome de identificador, então uma leitura dinâmica ou de
+  outro recurso é invisível ao build, um enum que sobrevive é um global e por
+  isso a ordem de declaração importa no carregamento, e os nomes dos membros
+  continuam entre aspas porque o helper de execução usa cada elemento como chave
+  de tabela.
+- [Limitações](/pt-br/reference/limitations) informa que o Lua gerado é o código,
+  não uma reescrita, e aponta para o contrato de saída e para a resolução de uma
+  posição de execução do MTA.
 - [Extensões de objeto](/pt-br/language/extensions) nomeia `check-extension-form`
   como o erro de usar a forma errada, e
   [Diagnósticos](/pt-br/reference/diagnostics) o lista ao lado de

@@ -85,18 +85,106 @@ os grupos de código. Este é o formato normal do `ensure` e fixo do `dev`, pois
 resource em execução permanece fácil de inspecionar. Use
 `luam build --no-bundle` quando um build local também precisar desse formato.
 
-O Lua legível gerado preserva o texto escrito onde ele já é Lua válido depois da
-remoção da sintaxe exclusiva do Luam. Anotações de tipo e declarações usadas
-apenas na compilação são apagadas, comentários Luam viram comentários Lua, e os
-demais espaços, aspas, pontos e vírgulas e layouts multilinha permanecem como
-foram escritos. Um statement de nível superior com uma construção que exige
-transformação, como classe, template, extension ou atribuição composta, é
-substituído por Lua canônico sem reformatar os statements vizinhos. O mapa de
-código considera regiões que expandem ou contraem. A minificação de produção
-remove toda formatação legível.
-
 Trocar de estrutura remove arquivos gerados pela estrutura anterior. Arquivos
 cujos bytes não mudaram não são reescritos, e `env.lua` nunca é sobrescrito.
+
+## O contrato da saída de desenvolvimento
+
+Todo comando que escreve Lua legível emite o arquivo de código com as construções
+exclusivas do Luam removidas ou transformadas, e nada mais alterado. Não existe
+campo no manifesto para isso: desligar a minificação é o que pede saída legível.
+
+| Comando | Saída legível |
+| --- | --- |
+| `luam dev` | Sempre. Ele nunca minifica. |
+| `luam ensure` | Sempre. Ele nunca minifica. |
+| `luam build` | Quando `output.minify` é `false`, ou com `--no-minify`. |
+
+O contrato tem uma forma mensurável: **uma linha de Lua para cada linha de
+Luam**. Uma construção reescrita ocupa as linhas que a construção substituída
+ocupava, então uma posição que o MTA informa sobre o arquivo gerado nomeia a
+mesma linha no código.
+
+O que é reescrito:
+
+| Escrito | Gerado |
+| --- | --- |
+| Uma anotação de tipo ou tipo de retorno | Apagada, para a assinatura ler como Lua puro |
+| `interface`, `type`, `declare`, `declare event` | Um comentário de bloco Lua sobre as mesmas linhas, ponto e vírgula final incluído |
+| `enum Name { A, B }` | `Name = enum { 'A', 'B' }` nas linhas em que foi escrito |
+| `class Name extends Base` | `class 'Name' :extends 'Base'`, com o parâmetro `self` implícito e os separadores de membro acrescentados no lugar |
+| `implements` | Apagado, porque é um contrato de compilação |
+| Uma atribuição composta, `new`, um template, uma extension nativa | Lua canônico apenas para aquele statement, não para o statement que o contém |
+| `continue` | `break` dentro de um `repeat ... until true` cujas palavras-chave viajam na primeira e na última linha do corpo do laço |
+| Um comentário Luam | O comentário Lua equivalente |
+| Uma diretiva de build como `#!client` | `--!client`, um comentário na mesma linha, porque ela orienta o compilador e não a execução |
+
+Todo o resto é copiado byte a byte: indentação, linhas em branco, o espaço antes
+de um parêntese, as aspas e os pontos e vírgulas que você escreveu.
+
+```luam
+type CustomType = string;
+
+class Example {
+    label = 'a';
+
+    greet = function (value: CustomType): void
+        print(value)
+    end
+}
+```
+
+```lua
+--[[type CustomType = string;]]
+
+class 'Example' {
+    label = 'a';
+
+    greet = function (self, value)
+        print(value)
+    end
+}
+```
+
+O `continue` é a única construção que precisa de andaime em vez de substituição.
+O andaime é colocado nas linhas do próprio corpo, então o `for ... do` e o seu
+`end` permanecem idênticos byte a byte ao que você escreveu:
+
+```luam
+for index = 1, 10 do
+    if (index == 2) then
+        continue;
+    end
+
+    print (index);
+end
+```
+
+```lua
+for index = 1, 10 do
+    repeat if (index == 2) then
+        break;
+    end
+
+    print (index); until true
+end
+```
+
+### O que o contrato não promete
+
+- Um comentário não é uma construção de execução. Uma declaração apagada continua
+  apagada: o comentário mostra o contrato, não o restaura.
+- Um laço com um `continue` carrega o andaime na primeira e na última linha do
+  seu corpo, o que deixa essas duas linhas mais densas do que o escrito. Esse é
+  o custo aceito para não acrescentar linha, e é o que faz a abertura e o `end`
+  do laço sobreviverem intactos.
+- O emissor canônico continua sendo o recurso final sempre que uma construção não
+  tem forma cirúrgica — uma classe decorada, uma classe com membros gerados, um
+  builder. Quando essa construção não cabe nas linhas em que foi escrita, o
+  arquivo inteiro recorre à emissão canônica em vez de deslocar cada linha
+  abaixo dela.
+- Um `luam build` minificado entrega a forma de produção: nenhum espaço escrito e
+  nenhum comentário carregando texto do código.
 
 ## Minificação de produção
 
