@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.16.0 - 2026-08-25
+
 ### The Generated Lua Is The File You Wrote
 
 #### Added

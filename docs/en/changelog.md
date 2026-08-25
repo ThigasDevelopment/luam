@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.16.0 - 2026-08-25
+
 ### Removed
 
 - The `transport` reference and every page that described configuring one. The

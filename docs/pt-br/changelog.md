@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.16.0 - 2026-08-25
+
 ### Removido
 
 - A referência de `transport` e todas as páginas que descreviam configurar um. O
