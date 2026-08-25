@@ -20,7 +20,6 @@ import { MTA_PLAYER_SHARED } from './mta-player-shared';
 import { MTA_PROJECTILE_SHARED } from './mta-projectile-shared';
 import { MTA_RADAR_SHARED } from './mta-radar-shared';
 import { MTA_RESOURCE_SHARED } from './mta-resource-shared';
-import { MTA_SERVER_SHARED } from './mta-server-shared';
 import { MTA_TEAM_SHARED } from './mta-team-shared';
 import { MTA_UTILITY_SHARED } from './mta-utility-shared';
 import { MTA_VARIABLE_SHARED } from './mta-variable-shared';
@@ -51,7 +50,6 @@ export const MTA_SHARED_GLOBALS: ApiCatalog = {
     ...MTA_PROJECTILE_SHARED,
     ...MTA_RADAR_SHARED,
     ...MTA_RESOURCE_SHARED,
-    ...MTA_SERVER_SHARED,
     ...MTA_TEAM_SHARED,
     ...MTA_UTILITY_SHARED,
     ...MTA_VARIABLE_SHARED,

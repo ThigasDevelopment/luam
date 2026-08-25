@@ -1,244 +1,236 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_29: ApiDocumentationCatalog = {
-    guiScrollPaneSetVerticalScrollPosition: {
-        summary: 'This function is used to set the position of a vertical scroll pane as a percentage.',
+    guiGetSize: {
+        summary: 'This function gets the size of a GUI element.',
         parameters: [
-            { name: 'verticalScrollPane', isOptional: false, isVariadic: false, summary: ': The scroll pane you want to change the position of' },
-            { name: 'position', isOptional: false, isVariadic: false, summary: ': a float ranging from 0 - 100' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The GUI element to get size of.' },
+            { name: 'relative', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the size should be relative to the element\'s parent width, or an absolute size in pixels.' },
         ],
-        returns: 'returns true if the position was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneSetVerticalScrollPosition',
+        returns: 'Returns the GUI element size *x* and *y* if the function has been successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetSize',
     },
-    guiSetAlpha: {
-        summary: 'This changes the alpha level (the visibleness/transparency) of a GUI element',
+    guiGetText: {
+        summary: 'This function is used to get the text of GUI elements like edit boxes, labels, buttons etc.',
         parameters: [
-            { name: 'guielement', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'alpha', isOptional: false, isVariadic: false, summary: 'The visibility/transparency of the GUI element. Ranges from 0 (fully transparent) to 1 (fully opaque). Default value is 0.80.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'element you wish to get text of.' },
         ],
-        returns: 'returns true if the gui elements alpha was successfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetAlpha',
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns a string containing the requested element\'s text, or false if the gui element passed to the function is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetText',
     },
-    guiSetEnabled: {
-        summary: 'This function enables/disables a GUI element. A disabled GUI element cant be used, gets a\ngray aspect and doesnt receive any events.',
+    guiGetVisible: {
+        summary: 'This function determines if a GUI element is visible.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to enable or disable' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'the new state' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element to be checked' },
         ],
-        returns: 'if the function succeeds it returns true, if it fails it returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetEnabled',
+        returns: 'Returns *true* if the element is visible, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetVisible',
     },
-    guiSetFont: {
-        summary: 'This function sets the font of a GUI_widgets|GUI element to be used when drawing text.',
+    guiGridListAddColumn: {
+        summary: 'This function is used to create columns in grid lists.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The GUI element you wish to change the font of' },
-            { name: 'font', isOptional: false, isVariadic: false, summary: 'Either a custom GUI font element or the name of a built-in GUI font. See Standard GUI Font Names' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a column to' },
+            { name: 'title', isOptional: false, isVariadic: false, summary: 'Title of the column' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'Column width, relative to the grid list width' },
         ],
-        returns: 'returns true if the font has been successfully set on the gui element, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetFont',
+        returns: 'Returns the column id if it was created, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListAddColumn',
     },
-    guiSetInputEnabled: {
-        summary: 'This function enables or disables input focus for the GUI.  This means that any keybinds\nor MTA binds are overidden so that text can be input into an editbox, for example.  In\nother words, keys such as t and y which activate the chatbox are disabled.\nguiSetInputMode can be used as an extended version of guiSetInputEnabled since it\nprovides the same functionality with one added feature.',
+    guiGridListAddRow: {
+        summary: 'Adds a row to a grid list, and optionally add simple text items with your rows.  Use guiGridListSetItemText to add row headers.',
         parameters: [
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'true if input should go to GUI, false if it should go to the game.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a row to' },
+            { name: 'itemText1', isOptional: true, isVariadic: false, summary: 'The text for the first column item in the row. Either a string or a number can be passed (use numbers for sorting purposes).' },
+            { name: 'itemText2', isOptional: true, isVariadic: false, summary: 'The text for the second column item in the row. Either a string or a number can be passed (use numbers for sorting purposes).' },
+            { name: 'arguments', isOptional: true, isVariadic: true, summary: '' },
         ],
-        returns: 'returns true if input mode could be changed, false if invalid parameters are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetInputEnabled',
+        returns: 'Returns the row id if it has been created, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListAddRow',
     },
-    guiSetInputMode: {
-        summary: 'This function controls the input mode to define whether or not (and when) keybinds or MTA\nbinds are overridden (disabled) so that text can be input into an editbox, for example.\nThe binds can be either:\n* never disabled (hence using a key such as t in an editbox will still activate the\nchatbox)\n* always disabled (hence using a key such as t in an editbox will not activate the\nchatbox)\n* only disabled when actually editing an editbox or a memo (binds are always enabled\nexcept when an editbox or memo has input focus)',
+    guiGridListAutoSizeColumn: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis allows you to automatically size a column to display everything in it correctly, with the most minimal width.',
         parameters: [
-            { name: 'mode', isOptional: false, isVariadic: false, summary: 'a string representing the desired input mode. Accepted values are: allow_binds binds are enabled, hence using a key such as t in an editbox will still activate the chatbox (default) no_binds binds are disabled, hence using a key such as t in an editbox will not activate the chatbox no_binds_when_editing binds are always enabled except when an editable editbox or memo has input focus' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list element where the column is located.' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'The ID of the column you want to be auto-sized.' },
         ],
-        returns: 'returns true if input mode could be changed, false if invalid parameters are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetInputMode',
+        returns: 'Returns *true* if the column was auto-sized, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListAutoSizeColumn',
     },
-    guiSetPosition: {
-        summary: 'This function sets the position of a GUI element.',
+    guiGridListClear: {
+        summary: 'This function clears all the data from a grid list.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The GUI element to change position for' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'Position over the X axis' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'Position over the Y axis' },
-            { name: 'relative', isOptional: false, isVariadic: false, summary: 'Bool that indicates if the x/y positions are relative to the elements parent element.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list element to be cleared' },
         ],
-        returns: 'returns true if the position has been successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetPosition',
+        returns: 'Returns *true* if the grid list element is valid and has been cleared successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListClear',
     },
-    guiSetProperty: {
-        summary: 'This function sets the value of a specific CEGUI property of a GUI element. For a list of\nproperties and their meaning, see the\nhttp://static.cegui.org.uk/static/WindowsLookProperties.html CEGUI properties page.',
+    guiGridListGetColumnCount: {
+        summary: 'This allows you to get the count of existing columns in a gridlist.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to get a property of.' },
-            { name: 'property', isOptional: false, isVariadic: false, summary: 'the name of of property you want the value of.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'the new value for the property.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a column to' },
         ],
-        returns: 'if the function succeeds it returns true, if it fails it returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetProperty',
+        returns: 'Returns an integer with the amount of columns in the gridlist, false otherwise. ```lua -- create the grid list local list = guiCreateGridList(0.80, 0.40, 0.15, 0.35, true) -- add three columns to the grid list guiGridListAddColumn(list, "Column 1", 0.33) guiGridListAddColumn(list, "Column 2", 0.33) guiGridListAddColumn(list, "Column 3", 0.33) -- display the number of columns in the grid list in the debug or server console (/debugscript 3) print("Number of columns: " .. guiGridListGetColumnCount(list)) ```',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetColumnCount',
     },
-    guiSetSelectedTab: {
-        summary: 'This function is used to change the currently selected Element/GUI/Tab|tab in a\nElement/GUI/Tab panel|tab panel.',
+    guiGridListGetColumnTitle: {
+        summary: 'This function is used to get the column title of a gridlist column.',
         parameters: [
-            { name: 'tabPanel', isOptional: false, isVariadic: false, summary: 'The Element/GUI/Tab panel|tab panel which current tab you want to change.' },
-            { name: 'theTab', isOptional: false, isVariadic: false, summary: 'The Element/GUI/Tab|tab which will be the new active tab.' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The grid list you want to get the column title from' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID' },
         ],
-        returns: 'returns true if the selected tab was changed to a new one successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetSelectedTab',
+        returns: 'Returns a string containing the column title, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetColumnTitle',
     },
-    guiSetSize: {
-        summary: 'This function sets the dimensions (size) of a GUI element. It refers to the bounding box\nsize for GUI elements. It does not make GUI elements smaller or larger in appearance.',
+    guiGridListGetColumnWidth: {
+        summary: 'This allows you to get the width of an existing column in a gridlist.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element whose visibility is to be changed' },
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'The desired width setting for the gui element' },
-            { name: 'height', isOptional: false, isVariadic: false, summary: 'The desired height setting for the gui element' },
-            { name: 'relative', isOptional: false, isVariadic: false, summary: 'This is whether sizes and positioning are relative. If this is true, then all x,y,width,height floats must be between 0 and 1, representing sizes relative to the parent.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a column to' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID of the Get size' },
+            { name: 'relative', isOptional: false, isVariadic: false, summary: 'A boolean defining whether **width** measurements will be relative to the Gridlist size, or absolute pixels.' },
         ],
-        returns: 'returns true if the gui elements size was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetSize',
+        returns: 'Returns the width of the gridlist column, *false* if bad arguments were given.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetColumnWidth',
     },
-    guiSetText: {
-        summary: 'This function sets the text of a GUI element.',
+    guiGridListGetHorizontalScrollPosition: {
+        summary: 'This function is used to get the horizontal scroll position from a grid list',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The GUI element you wish to change the text of' },
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'The new text' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The grid list you want to get the horizontal scroll position from' },
         ],
-        returns: 'returns true if text has been successfully set on the gui element, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetText',
+        returns: 'Returns a integer between 0 and 100 indicating the horizontal scroll position, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetHorizontalScrollPosition',
     },
-    guiSetVisible: {
-        summary: 'This function changes the visibility state of a GUI element.',
+    guiGridListGetItemColor: {
+        summary: 'This function gets the color of a gridlist item.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element whose visibility is to be changed' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'the new visibility state' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list element' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'Row ID' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID' },
         ],
-        returns: 'returns true if the elements visibility could be changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetVisible',
+        returns: 'Returns four *int* values, representing the amount of red, green, blue and alpha if successful. *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetItemColor',
     },
-    guiStaticImageGetNativeSize: {
-        summary: 'This function gets the native size of image. That means the original size in pixels of\nthe image file.',
+    guiGridListGetItemData: {
+        summary: 'With this function you can retrieve the string data associated with an item in a grid list. This is not the text that is displayed on the item, but an internal string that you can use to hold extra information about the item.\n\n**Note:** This function will only work **after** you set the item\'s text using guiGridListSetItemText!',
         parameters: [
-            { name: 'theImage', isOptional: false, isVariadic: false, summary: 'The static image element to get the original size of.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'the grid list containing the item you\'re interested in' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'the row index of the item' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'the column index of the item' },
         ],
-        returns: 'returns two integers where first is the width and second the height of the image in pixels, false if the image element was invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiStaticImageGetNativeSize',
+        returns: 'Returns the item data of the specified item if succesful, *false* if one of the arguments was invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetItemData',
     },
-    guiStaticImageLoadImage: {
-        summary: 'This function allows you to change the image in GUI static image element to another one.\nTip: If you set other images as children you will have to use\nsetElementCallPropagationEnabled to only affect the parent image.',
+    guiGridListGetItemText: {
+        summary: 'This function retrieves the text from a specific grid list item.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The static image element to be changed.' },
-            { name: 'filename', isOptional: false, isVariadic: false, summary: 'A string specifying the filepath of the image file being loaded in current resource.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'the gridlist containing the item you\'re interested in' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'row id of the item (first is 0)' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'column id of the item (first is 0)' },
         ],
-        returns: 'returns true if the the image in the static image element was successfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiStaticImageLoadImage',
+        returns: 'Returns the text of the item if the arguments are right, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetItemText',
     },
-    guiWindowIsMovable: {
-        summary: '',
+    guiGridListGetRowCount: {
+        summary: 'This function returns the number of rows in a grid list.',
         parameters: [
-            { name: 'guiWindow', isOptional: false, isVariadic: false, summary: 'the window to check the movable flag of' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list to get the number of rows from.' },
         ],
-        returns: 'returns true if the window is movable, false if not, nil if an invalid window was provided.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowIsMovable',
+        returns: 'Returns the number of rows if the function is successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetRowCount',
     },
-    guiWindowIsSizable: {
-        summary: '',
+    guiGridListGetSelectedCount: {
+        summary: 'This function returns the amount of options selected in the specified grid list.',
         parameters: [
-            { name: 'guiWindow', isOptional: false, isVariadic: false, summary: 'the window to check the sizable flag of' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list which amount of selected items you want to retrieve.' },
         ],
-        returns: 'returns true if the window is sizable, false if not, nil if an invalid window was provided.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowIsSizable',
+        returns: 'Returns an integer representing the amount of selected options if everything was successful or *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetSelectedCount',
     },
-    guiWindowSetMovable: {
-        summary: 'This function allows you to specify whether or not a user can move a GUI window.',
+    guiGridListGetSelectedItem: {
+        summary: 'This function returns the row and column indexes of the selected item in a grid list. First selected row and column is (0, 0).',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The window to be changed.' },
-            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether the window is movable or not.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'the grid list you want to know the selected row index of' },
         ],
-        returns: 'returns true if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowSetMovable',
+        returns: 'Returns the row and column indexes of the selected item if the specified grid list is valid and has a selected item, (-1, -1) if no item is selected, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetSelectedItem',
     },
-    guiWindowSetSizable: {
-        summary: 'This function enables or disables user resizing of a GUI window.',
+    guiGridListGetSelectedItems: {
+        summary: 'This function returns the items selected in the specified grid list.\n\nNote that for some reason the column ID is 1 lower than it should be, for example 0 is returned but if you try and get the text for column 0 there is nothing, but column 1 has what you clicked on.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The window to be changed.' },
-            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether user resizing is to be enabled or disabled.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list which selected items you want to retrieve.' },
         ],
-        returns: 'returns true if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowSetSizable',
+        returns: 'Returns a table over the selected items in the grid list in this format: ```lua table = { [1] = { ["column"], -- has the first selected item\'s column ID ["row"] -- has the first selected item\'s row ID }, [2] = { ["column"],-- has the second selected item\'s column ID ["row"] -- has the second selected item\'s row ID }, ... } ``` if everything was successful or *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetSelectedItems',
     },
-    hasElementData: {
-        summary: 'This function checks if an element has element data available under a certain key.',
+    guiGridListGetSelectionMode: {
+        summary: 'This function retrieves the current selection mode of a gui gridlist.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'This is the element with data you want to check.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the element data entry you want to check for. (Maximum 31 characters.)' },
-            { name: 'inherit', isOptional: true, isVariadic: false, summary: '- toggles whether or not the function should go up the hierarchy to find the requested key in case the specified element doesnt have it.' },
+            { name: 'gridlist', isOptional: false, isVariadic: false, summary: 'The gridlist you want to get the selection mode of.' },
         ],
-        returns: 'this function returns true if the element contains element data for key, or false if the element doesnt exist or there is no data associated with the key.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/HasElementData',
+        returns: 'Returns the ID of the current gridlist\'s selection mode.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetSelectionMode',
     },
-    hasElementDataSubscriber: {
-        summary: 'This function is used together with setElementData in subscribe mode.',
+    guiGridListGetVerticalScrollPosition: {
+        summary: 'This function is used to get the vertical scroll position from a grid list',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to check whether the player is subscribed to.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key you wish to check whether the player is subscribed to.' },
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish to check.' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The grid list you want to get the vertical scroll position from' },
         ],
-        returns: 'returns true if the player is subscribed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/HasElementDataSubscriber',
+        returns: 'Returns a integer between 0 and 100 indicating the vertical scroll position, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListGetVerticalScrollPosition',
     },
-    hash: {
-        summary: 'This function returns a hash of the specified string in the specified algorithm.',
+    guiGridListInsertRowAfter: {
+        summary: 'This allows you to insert a new row after a specified row, and simultaneously set text. Good for inserting new rows in the middle of existing rows. To insert at the top use -1 as row index.',
         parameters: [
-            { name: 'algorithm', isOptional: false, isVariadic: false, summary: ': A string which must be one of these: md5, sha1, sha224, sha256, sha384, sha512, hmac' },
-            { name: 'dataToHash', isOptional: false, isVariadic: false, summary: ': A string of the data to hash.' },
-            { name: 'options', isOptional: true, isVariadic: false, summary: ': A table with options and other necessary data for the algorithm, as detailed below.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a row to' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'Row ID of the row you want to insert the **new row** after.' },
         ],
-        returns: 'returns the hash of the data, false if an invalid argument was used.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Hash',
+        returns: 'Returns *row id* if the row was successfully added, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListInsertRowAfter',
     },
-    hasObjectPermissionTo: {
-        summary: 'This function returns whether or not the given object has access to perform the given\naction.\nScripts frequently wish to limit access to features to particular users. The naïve way to\ndo this would be to check if the player who is attempting to perform an action is in a\nparticular group (usually the Admin group). The main issue with doing this is that the\nAdmin group is not guaranteed to exist. It also doesnt give the server admin any\nflexibility. He might want to allow his moderators access to the function youre limiting\naccess to, or he may want it disabled entirely.\nThis is where using the ACL properly comes in, and luckily this is very easy. It all\ncomes down to using this function. This, somewhat confusingly named function lets you\ncheck if an ACL object (a player or a resource) has a particular ACL right. In this case,\nwe just care about players.\nSo, first of all, think of a name for your right. Lets say we want a private area only\ncertain people can go in, well call our right accessPrivateArea. Then, all you need to do\nis add one if statement to your code:\n```lua\nif hasObjectPermissionTo ( player,\nresource.YourResourceName.accessPrivateArea, false ) then\n-- Whatever you want to happen if theyre allowed in\nelse\n-- Whatever you want to happen if they arent\nend\n```\nNotice that weve named the right using resource.YourResourceName.accessPrivateArea - this\nis just for neatness, so that the admin knows what resource the right belongs to. Its\nstrongly advised you follow this convention. The false argument specifies the\ndefaultPermission, false indicating that if the user hasnt had the right allowed or\ndissallowed (i.e. the admin hasnt added it to the config), that it should default to\nbeing not allowed.\nThe only downside of using this method is that the admin has to modify his config. The\nupsides are that the admin has much more control and your script will work for any\nserver, however the admin has configured it.',
+    guiGridListIsSortingEnabled: {
+        summary: 'This function checks whether the gridlist sorting is enabled or disabled.',
         parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'The object to test if has permission to. This can be a client element (ie. a player), a resource or a string in the form user. or resource..' },
-            { name: 'theAction', isOptional: false, isVariadic: false, summary: 'The action to test if the given object has access to. Ie. function.kickPlayer.' },
-            { name: 'defaultPermission', isOptional: true, isVariadic: false, summary: 'The default permission if none is specified in either of the groups the given object is a member of. If this is left to true, the given object will have permissions to perform the action unless the opposite is explicitly specified in the ACL. If false, the action will be denied by default unless explicitly approved by the Access Control List.' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The GUI gridlist you wish to check if sorting is enabled or not.' },
         ],
-        returns: 'returns true if the given object has permission to perform the given action, false otherwise. returns nil if the function failed because of bad arguments.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/HasObjectPermissionTo',
+        returns: 'Returns *true* if sorting is enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListIsSortingEnabled',
     },
-    injectBrowserMouseDown: {
-        summary: 'This function injects a mouse click (state: down).',
+    guiGridListRemoveColumn: {
+        summary: 'This allows you to delete columns that exist in grid lists.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser' },
-            { name: 'mouseButton', isOptional: false, isVariadic: false, summary: 'The mouse button (Possible values: left, middle, right)' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to remove a column from' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID' },
         ],
-        returns: 'returns true if the click was successfully injected, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseDown',
+        returns: 'Returns *true* if the grid list column was successfully removed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListRemoveColumn',
     },
-    injectBrowserMouseMove: {
-        summary: 'This function injects a mouse movement.',
+    guiGridListRemoveRow: {
+        summary: 'This allows you to delete rows that exist in grid lists.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser which will retrieve the mouse movement' },
-            { name: 'posX', isOptional: false, isVariadic: false, summary: 'Absolute X screen coordinate' },
-            { name: 'posY', isOptional: false, isVariadic: false, summary: 'Absolute Y screen coordinate' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to remove a row from' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'The row ID which you want to remove' },
         ],
-        returns: 'returns true if the movement was injected successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseMove',
+        returns: 'Returns *true* if the grid list row was successfully removed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListRemoveRow',
     },
-    injectBrowserMouseUp: {
-        summary: 'This function injects a mouse click (state: up).',
+    guiGridListSetColumnTitle: {
+        summary: 'This function is used to change the column title of a gridlist column.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser' },
-            { name: 'mouseButton', isOptional: false, isVariadic: false, summary: 'The mouse button (Possible values: left, middle, right)' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The grid list you want to change the column title from' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID' },
+            { name: 'title', isOptional: false, isVariadic: false, summary: 'The title of the column' },
         ],
-        returns: 'returns true if the click was successfully injected, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseUp',
+        returns: 'Returns *true* if the new title was set, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetColumnTitle',
     },
-    injectBrowserMouseWheel: {
-        summary: 'This function injects mouse wheel events.',
+    guiGridListSetColumnWidth: {
+        summary: 'This allows you to set the width of an existing column in a gridlist.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser' },
-            { name: 'verticalScroll', isOptional: false, isVariadic: false, summary: ': Amount of units you want the browser to scroll along the Y-axe.' },
-            { name: 'horizontalScroll', isOptional: false, isVariadic: false, summary: ': Amount of units you want the browser to scroll along the X-axe.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a column to' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID of the size you want to change' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'A float or integer of the width of the column depending on the **relative** argument.' },
+            { name: 'relative', isOptional: false, isVariadic: false, summary: 'A boolean defining whether **width** measurements will be relative to the Gridlist size, or absolute pixels.' },
         ],
-        returns: 'returns true if the mouse action was successfully injected, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseWheel',
+        returns: 'Returns *true* if the gridlist column width was successfully set, *false* if bad arguments were given.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetColumnWidth',
     },
 };

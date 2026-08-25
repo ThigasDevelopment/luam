@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, literal, named, NUMBER, STRING, TABLE, tupleOf, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_AUDIO_CLIENT: ApiCatalog = {
     getRadioChannel: fn([], NUMBER, 0),
@@ -7,7 +7,24 @@ export const MTA_AUDIO_CLIENT: ApiCatalog = {
     getSFXStatus: fn([STRING], BOOLEAN, 1),
     getSoundBPM: fn([named('Element')], NUMBER, 1),
     getSoundBufferLength: fn([named('Element')], NUMBER, 1),
-    getSoundEffectParameters: fn([named('Element'), STRING], TABLE, 2),
+    getSoundEffectParameters: fn(
+        [
+            named('Element'),
+            unionOf([
+                literal('gargle'),
+                literal('compressor'),
+                literal('echo'),
+                literal('i3dl2reverb'),
+                literal('distortion'),
+                literal('chorus'),
+                literal('parameq'),
+                literal('reverb'),
+                literal('flanger'),
+            ]),
+        ],
+        TABLE,
+        2,
+    ),
     getSoundEffects: fn([named('Element')], TABLE, 1),
     getSoundFFTData: fn([named('Element'), NUMBER, NUMBER], TABLE, 2),
     getSoundLength: fn([named('Element')], NUMBER, 1),
@@ -27,11 +44,48 @@ export const MTA_AUDIO_CLIENT: ApiCatalog = {
     playSFX: fn([STRING, NUMBER, NUMBER, BOOLEAN], named('Element'), 3),
     playSFX3D: fn([STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Element'), 6),
     playSound: fn([STRING, BOOLEAN, BOOLEAN], named('Element'), 1),
-    playSound3D: fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Element'), 4),
+    playSound3D: fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Element'), 4),
     playSoundFrontEnd: fn([NUMBER], BOOLEAN, 1),
     setRadioChannel: fn([NUMBER], BOOLEAN, 1),
-    setSoundEffectEnabled: fn([named('Element'), STRING, BOOLEAN], BOOLEAN, 3),
-    setSoundEffectParameter: fn([named('Element'), STRING, STRING, ANY], BOOLEAN, 4),
+    setSoundEffectEnabled: fn(
+        [
+            named('Element'),
+            unionOf([
+                literal('gargle'),
+                literal('compressor'),
+                literal('echo'),
+                literal('i3dl2reverb'),
+                literal('distortion'),
+                literal('chorus'),
+                literal('parameq'),
+                literal('reverb'),
+                literal('flanger'),
+            ]),
+            BOOLEAN,
+        ],
+        BOOLEAN,
+        3,
+    ),
+    setSoundEffectParameter: fn(
+        [
+            named('Element'),
+            unionOf([
+                literal('gargle'),
+                literal('compressor'),
+                literal('echo'),
+                literal('i3dl2reverb'),
+                literal('distortion'),
+                literal('chorus'),
+                literal('parameq'),
+                literal('reverb'),
+                literal('flanger'),
+            ]),
+            STRING,
+            ANY,
+        ],
+        BOOLEAN,
+        4,
+    ),
     setSoundLooped: fn([named('Element'), BOOLEAN], BOOLEAN, 2),
     setSoundMaxDistance: fn([named('Element'), NUMBER], BOOLEAN, 2),
     setSoundMinDistance: fn([named('Element'), NUMBER], BOOLEAN, 2),

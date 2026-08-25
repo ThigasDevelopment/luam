@@ -1,238 +1,244 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_24: ApiDocumentationCatalog = {
-    getWeaponFlags: {
-        summary: 'This function gets the flags of a Element/Weapon|custom weapon.',
+    getVehicleCompatibleUpgrades: {
+        summary: 'This function returns a table of all the compatible upgrades (or all for a specified slot, optionally) for a specified vehicle.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the weapon to get the flag of.' },
-            { name: 'theFlag', isOptional: false, isVariadic: false, summary: 'the weapon flag to get: disable_model : makes the weapon and muzzle effect invisible or not. flags : returns the flags used to get where the gun shoots at. These flags are (by order): checkBuildings : allows the shoot to be blocked by GTAs internally placed buildings, i.e. the world map. checkCarTires : allows the shoot to be blocked by vehicle tires. checkDummies : allows the shoot to be blocked by GTAs internal dummies. These are not used in the current MTA version so this argument can be set to false. checkObjects : allows the shoot to be blocked by object|objects. checkPeds : allows the shoot to be blocked by ped|peds and player|players. checkVehicles : allows the shoot to be blocked by vehicle|vehicles. checkSeeThroughStuff : allows the shoot to be blocked by translucent game objects, e.g. glass. checkShootThroughStuff : allows the shoot to be blocked by things that can be shot through. instant_reload : if enabled, the weapon reloads instantly rather than waiting the reload time until shooting again. shoot_if_out_of_range : if enabled, the weapon still fires its target beyond the weapon range distance. shoot_if_blocked : if enabled, the weapon still fires its target even if its blocked by something.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you wish to retrieve the list of compatible upgrades of.' },
+            { name: 'slot', isOptional: true, isVariadic: false, summary: 'the upgrade slot number for which you\'re getting the list (from 0 to 16). Compatible upgrades for all slots are listed if this is not specified.' },
         ],
-        returns: 'returns the true or false on success (flags flag returns 8 values) if the flag is enabled or not. returns false if the weapon element isnt valid or an error occured.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponFlags',
+        returns: 'Returns a *table* with all the compatible upgrades, or *false* if invalid arguments are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleCompatibleUpgrades',
     },
-    getWeaponIDFromName: {
-        summary: 'This function will obtain the ID of a particular weapon from its name.',
+    getVehicleComponentPosition: {
+        summary: 'This function gets the component position of a vehicle. The vehicle must be streamed in.',
         parameters: [
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'A string containing the name of the weapon. Names can be: (Case is ignored)' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get component position of.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the returned position is relative to. It can be one of the following values:' },
         ],
-        returns: 'returns an int if the name matches that of a weapon, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponIDFromName',
+        returns: 'Returns three *floats* indicating the position of the component, *x*, *y* and *z* respectively.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleComponentPosition',
     },
-    getWeaponNameFromID: {
-        summary: 'This function allows you to retrieve the name of a weapon from an ID.',
+    getVehicleComponentRotation: {
+        summary: 'This function gets the component rotation of a vehicle.',
         parameters: [
-            { name: 'id', isOptional: false, isVariadic: false, summary: 'The ID you wish to retrieve the name of' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get component rotation of.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the returned rotation is relative to. It can be one of the following values:' },
         ],
-        returns: 'returns a string of the name of the weapon or death type, false otherwise. names will be like these: (ignoring case)',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponNameFromID',
+        returns: 'Returns three *floats* indicating the rotation of the component, *x*, *y* and *z* respectively.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleComponentRotation',
     },
-    getWeaponOwner: {
-        summary: 'This function gets the owner of a Element/Weapon|custom weapon. Weapon ownership system\nwas, however, disabled, so this function always returns false. Please refer to\nsetWeaponOwner for details.',
+    getVehicleComponents: {
+        summary: 'This function gets a table of the components currently on a vehicle.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to get the owner of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get the components of.' },
         ],
-        returns: 'this function was intended to return the player which owns the element/weapon|custom weapon, and false if an error occured. however, at the moment it always returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponOwner',
+        returns: 'Returns a *table* containing the name of the component as the key and visibility flag of that component as the value',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleComponents',
     },
-    getWeaponProperty: {
-        summary: 'This function gets a weapon property of the specified Element/Weapon|custom weapon\n(clientside only) or specified Weapons|player-held weapon (both client and server).',
+    getVehicleComponentScale: {
+        summary: 'This function gets the component scale of a vehicle.',
         parameters: [
-            { name: 'weaponID', isOptional: false, isVariadic: false, summary: 'or weaponName The ID or name of the weapon you want to get info of. Names can be:' },
-            { name: 'weaponSkill', isOptional: false, isVariadic: false, summary: 'Either: pro, std or poor' },
-            { name: 'property', isOptional: false, isVariadic: false, summary: 'The property you want to get the value of: The following properties are get only:' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get component scale of.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the returned scale is relative to. It can be one of the following values:' },
         ],
-        returns: 'on success: int: the weapon property on failure: bool: false if the passed arguments were invalid',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponProperty',
+        returns: 'Returns three *floats* indicating the scale of the component, *x*, *y* and *z* respectively.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleComponentScale',
     },
-    getWeaponState: {
-        summary: 'This function gets the state of a Element/Weapon|custom weapon.',
+    getVehicleComponentVisible: {
+        summary: 'This function get component visibility for vehicle.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the Element/Weapon|weapon to get the state of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get component visibility of.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
         ],
-        returns: '* a string if the element/weapon|weapon is valid, indicating the weapon state, which can be: ** reloading: the weapon is reloading. ** firing: the weapon is constantly shooting (unless any shooting blocking flags are set) according to its assigned firing rate. ** ready: the weapon is idle. * false if an error occured or the element/weapon|weapon is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponState',
+        returns: 'Returns a *bool* indicating the visible state of the component.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleComponentVisible',
     },
-    getWeaponTarget: {
-        summary: 'This functions gets the target of a Element/Weapon|custom weapon.',
+    getVehicleController: {
+        summary: 'This function is used to get the player in control of the specified vehicle which includes somebody who is trying to enter the drivers seat.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to get the target of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you want to get the \'controller\' of.' },
         ],
-        returns: '* returns the target of the element/weapon|custom weapon, which can be: **nil if the weapon is in rotation based targeting. **3 float|floats if the weapon is firing at a fixed point. **an element if the weapon is firing an entity. * returns false if the weapon element is not valid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponTarget',
+        returns: 'Returns a player object, if there isn\'t a driver, it will search the \'trailer chain\' for the front driver, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleController',
     },
-    getWeather: {
-        summary: 'This function returns the current Weather ID.',
-        parameters: [],
-        returns: 'returns two integers indicating the weather type that is currently active. the first integer says what weather is currently considered to be active. the second integer is the weather id that is being blended into if any, otherwise it is nil.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeather',
-    },
-    getWindVelocity: {
-        summary: 'This function gets the wind velocity in San Andreas.',
-        parameters: [],
-        returns: '*velocityx: the velocity on the x-coordinate or false if the wind velocity is default. *velocityy: the velocity on the y-coordinate or nil if the wind velocity is default. *velocityz: the velocity on the z-coordinate or nil if the wind velocity is default.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWindVelocity',
-    },
-    getWorldFromScreenPosition: {
-        summary: 'This function allows you to retrieve the world position corresponding to a 2D position on\nthe screen, at a certain depth.\nIf you want to detect what element is at a particular point on the screen, use\nprocessLineOfSight between the camera position and the position returned from this\nfunction when passed a high depth value (100 or so, depending how far away you want to\ndetect elements at).\nAs expected, setting 0 as the distance will cause the point retrived to be within the\ncamera itself. That means that drawing any 3D thing in that point would result in it not\nbeing visible. Depending on the camera near clip distance, however, the minimum distance\nto be able to view it can vary.',
+    getVehicleCurrentGear: {
+        summary: 'Gets the specified vehicle\'s current gear.',
         parameters: [
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'A float value indicating the x position on the screen, in pixels.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'A float value indicating the y position on the screen, in pixels.' },
-            { name: 'depth', isOptional: false, isVariadic: false, summary: 'A float value indicating the distance from the camera of the point whose coordinates we are retrieving, in units.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle to get the gear of' },
         ],
-        returns: 'returns three x, y, z floats indicating the world position if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWorldFromScreenPosition',
+        returns: 'Returns the gear if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleCurrentGear',
     },
-    getZoneName: {
-        summary: 'This function allows you to retrieve the zone name of a certain location.',
+    getVehicleDoorOpenRatio: {
+        summary: 'This function tells you how open a door is (the \'open ratio\'). Doors include boots/trunks and bonnets on vehicles that have them.',
         parameters: [
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'The X axis position' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'The Y axis position' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'The Z axis position' },
-            { name: 'citiesonly', isOptional: true, isVariadic: false, summary: ': An optional argument to choose if you want to return one of the following city names: ** Tierra Robada ** Bone County ** Las Venturas ** San Fierro ** Red County ** Whetstone ** Flint County ** Los Santos' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the door open ratio of.' },
+            { name: 'door', isOptional: false, isVariadic: false, summary: 'A whole number, 0 (hood), 1 (trunk), 2 (front left), 3 (front right), 4 (rear left), 5 (rear right)' },
         ],
-        returns: 'returns the string of the zone name.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetZoneName',
+        returns: 'Returns a number between 0 and 1 that indicates how open the door is. 0 is closed, and 1 is fully open. Returns *false* if invalid arguments are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleDoorOpenRatio',
     },
-    givePedWeapon: {
-        summary: 'This function gives the specified weapon to the specified ped. This function cant be used\non players, use giveWeapon for that.\nThis function is mainly useful for client side created peds however you can use it on a\nserver side ped, though note that the weapon wouldnt be synced between clients unless\nyour script gives the weapon to the ped on every client.\nThere is an optional argument to specify ammunition and whether to set as the current\nweapon. If you dont specify an ammo value it will give 30 ammo by default and for a melee\nweapon you can specify just 1 or above.\n*When setting ammo for Weapon|weapons in slot 0,1,10,11 or 12 the maximum ammo is 1\n*When setting ammo for Weapon|weapons in slot 3,4,5 the ammo is added\n*When setting ammo for Weapon|weapons in slot 2,6,7,8,9 and the slot weapon is changing,\nthe ammo is replaced',
+    getVehicleDoorState: {
+        summary: 'This function returns the current state of the specifed door on the vehicle.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'A ped element.' },
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a Weapon ID. Click Weapon|here for a list of possible weapon IDs.' },
-            { name: 'ammo', isOptional: true, isVariadic: false, summary: 'A whole number integer serving as the ammo amount for the given weapon. For weapons that do not require ammo, such as melee, this should be at least 1.' },
-            { name: 'setAsCurrent', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether or not the weapon will be set as the peds currently selected weapon.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you want to get the door status of.' },
+            { name: 'door', isOptional: false, isVariadic: false, summary: 'a whole number representing which door to get the status of. Valid values are:' },
         ],
-        returns: 'returns true if weapon was successfully given to the ped, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GivePedWeapon',
+        returns: 'If successful, one of the following integers will be returned: * **0:** Shut, intact (also returned if the door does not exist) * **1:** Ajar, intact * **2:** Shut, damaged * **3:** Ajar, damaged * **4:** Missing',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleDoorState',
     },
-    givePlayerMoney: {
-        summary: 'This function adds money to a players current money amount.  To set absolute values,\nsetPlayerMoney can be used.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player you are giving the money to.' },
-            { name: 'amount', isOptional: false, isVariadic: false, summary: 'a positive integer number specifying the amount of money to give to the player.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GivePlayerMoney',
-    },
-    giveWeapon: {
-        summary: 'giveWeapon gives a specified weapon to a certain player or ped. There is an optional\nargument to specify ammunition. For example, a melee weapon doesnt need an ammo argument.\n*When setting ammo for Weapon|weapons in slot 0,1,10,11 or 12, the ammo max is 1\n*When setting ammo for Weapon|weapons in slot 3,4,5, the ammo is added\n*When setting ammo for Weapon|weapons in slot 2,6,7,8,9 and the slot weapon is changing,\nthe ammo is replaced',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player or ped object referencing the specified player (or ped)' },
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a Weapon ID.' },
-            { name: 'ammo', isOptional: true, isVariadic: false, summary: 'A whole number integer serving as the ammo amount for the given weapon. For weapons that do not require ammo, such as melee, this should be at least 1.' },
-            { name: 'setAsCurrent', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether or not the weapon will be set as the players current.' },
-        ],
-        returns: 'returns true if weapon was successfully acquired, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GiveWeapon',
-    },
-    guiBlur: {
+    getVehicleDummyPosition: {
         summary: '',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to defocus' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you want to get the dummy positions from.' },
+            { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to get.' },
         ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiBlur',
+        returns: 'Returns 3 floats indicating the position X, Y and Z of the vehicle\'s dummy. It returns *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleDummyPosition',
     },
-    guiBringToFront: {
-        summary: 'This function brings a GUI element on top of others.',
+    getVehicleEngineState: {
+        summary: 'This function returns a vehicle\'s engine state (on or off).',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to move to the front.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you wish to get the engine state of.' },
         ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiBringToFront',
+        returns: 'Returns **true** if the vehicle\'s engine is started, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleEngineState',
     },
-    guiCheckBoxGetSelected: {
-        summary: 'This function gets a checkboxs selection state.',
+    getVehicleEntryPoints: {
+        summary: 'This function returns a table containing the positions to 4 possible entry points to a vehicle. This function can be used alongside setPedEnterVehicle to make a ped enter a specific seat by first moving the ped to a entry point retrieved through **getVehicleEntryPoints** and then using setPedEnterVehicle to make them enter.',
         parameters: [
-            { name: 'theCheckbox', isOptional: false, isVariadic: false, summary: 'The checkbox you wish to retrieve the selection state of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: '' },
         ],
-        returns: 'returns true if the checkbox is selected, false if it is not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCheckBoxGetSelected',
+        returns: 'If the vehicle has entry points, it returns a table containing the positions of the 4 possible entry points to the vehicle, otherwise it returns *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleEntryPoints',
     },
-    guiCheckBoxSetSelected: {
-        summary: 'This function selects (ticks) or unselects a checkbox.',
+    getVehicleGravity: {
+        summary: 'Retrieves the current gravity vector of a vehicle. This is the direction in which the vehicle falls, also the cameras of any passengers will be rotated to match it.',
         parameters: [
-            { name: 'theCheckbox', isOptional: false, isVariadic: false, summary: 'The GUI element in which you wish to change the selection state of' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'The state of the checkbox, where true indicates selected, and false indicates unselected.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle to retrieve the gravity vector of.' },
         ],
-        returns: 'returns true if the checkboxs selection state was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCheckBoxSetSelected',
+        returns: 'Returns the x, y and z components of the gravity vector if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleGravity',
     },
-    guiComboBoxAddItem: {
-        summary: 'Adds an item to a combobox.',
+    getVehicleHandling: {
+        summary: 'This function returns a table of the current vehicle handling data.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox you want to add a row to' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The text that the item will contain.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you wish to get the handling data of.' },
+            { name: 'property', isOptional: true, isVariadic: false, summary: 'the property you want to get.' },
         ],
-        returns: 'returns the item id if it has been created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxAddItem',
+        returns: 'Returns a *table* containing all the handling data, *false* otherwise. If a property is specified, it returns the value of the specific property. Here\'s a list of valid table properties and what they return:',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleHandling',
     },
-    guiComboBoxClear: {
-        summary: 'This function removes all the items from a combobox.',
+    getVehicleHeadLightColor: {
+        summary: 'This function will get the headlight color of a vehicle.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox element to be cleared' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to set the headlight color of.' },
         ],
-        returns: 'returns true if the combobox element is valid and has been cleared successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxClear',
+        returns: 'Returns three *integers* for the red, green and blue of the headlight color for the specified vehicle, *false* if an invalid vehicle was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleHeadLightColor',
     },
-    guiComboBoxGetItemCount: {
+    getVehicleIdleRespawnDelay: {
         summary: '',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combo box to get the number of items from.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get the idle delay of.' },
         ],
-        returns: 'returns the number of items if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxGetItemCount',
+        returns: 'Returns the delay in milliseconds.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleIdleRespawnDelay',
     },
-    guiComboBoxGetItemText: {
-        summary: 'This function retrieves the text from a specific combobox item.',
+    getVehicleLandingGearDown: {
+        summary: 'This function is used to check whether a vehicle\'s landing gear is down or not. Only planes can be used with this function.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox containing the item youre interested in' },
-            { name: 'itemId', isOptional: false, isVariadic: false, summary: 'The index of the item' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle of which you wish to check the landing gear state.' },
         ],
-        returns: 'returns the text of the item if the arguments are right, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxGetItemText',
+        returns: 'Returns *true* if landing gear is down, *false* if the landing gear is up. Returns *nil* if the vehicle has no landing gear, or is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleLandingGearDown',
     },
-    guiComboBoxGetSelected: {
-        summary: 'This function returns the index of the selected combobox item.',
+    getVehicleLightState: {
+        summary: 'This function returns the current state of the specified light on the vehicle.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'the combobox you want to know the selected item index of' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle that you wish to know the light state of.' },
+            { name: 'light', isOptional: false, isVariadic: false, summary: 'A whole number determining the individual light:' },
         ],
-        returns: 'returns the index of the selected item if the specified combobox is valid and has a selected item, -1 if no item is selected, nil otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxGetSelected',
+        returns: 'Returns 0 (working) or 1 (broken)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleLightState',
     },
-    guiComboBoxIsOpen: {
+    getVehicleMaxPassengers: {
+        summary: 'This function returns the maximum number of passengers that a specified vehicle can hold. Only passenger seats are counted, the driver seat is excluded.',
+        parameters: [
+            { name: 'modelID', isOptional: false, isVariadic: false, summary: 'the model id that you wish to know the maximum capacity of.' },
+        ],
+        returns: 'Returns an int indicating the maximum number of passengers that can enter a vehicle. Returns **false** if vehicle (or its ID) is a trailer <!-- -->',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleMaxPassengers',
+    },
+    getVehicleModelDummyDefaultPosition: {
         summary: '',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combo box to get the state.' },
+            { name: 'modelId', isOptional: false, isVariadic: false, summary: 'The model ID which you want to apply the change to.' },
+            { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to get.' },
         ],
-        returns: 'returns true if combobox is opened, false if combobox is closed, nil otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxIsOpen',
+        returns: 'Returns 3 floats indicating the default position X, Y and Z of the given dummy. It returns *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleModelDummyDefaultPosition',
     },
-    guiComboBoxRemoveItem: {
-        summary: 'This function removes an item from a combobox.',
+    getVehicleModelDummyPosition: {
+        summary: 'This function gets position of the dummies contained in a vehicle model.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox containing the item youre interested in' },
-            { name: 'itemId', isOptional: false, isVariadic: false, summary: 'The index of the item to remove' },
+            { name: 'modelID', isOptional: false, isVariadic: false, summary: 'The model ID which you want to apply the change to' },
+            { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to get' },
         ],
-        returns: 'returns true if the item was removes successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxRemoveItem',
+        returns: 'Returns three floats indicating the position *x*, *y* and *z* of given dummy. It returns *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleModelDummyPosition',
     },
-    guiComboBoxSetItemText: {
-        summary: 'This function changes the text of a combobox item.',
+    getVehicleModelExhaustFumesPosition: {
+        summary: 'This function returns the position of the exhaust fumes the vehicle model emits.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox containing the item youre interested in' },
-            { name: 'itemId', isOptional: false, isVariadic: false, summary: 'The index of the item' },
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text you want to put in (does NOT accept numbers, use tostring() for that)' },
+            { name: 'modelID', isOptional: false, isVariadic: false, summary: 'The vehicle model ID.' },
         ],
-        returns: 'returns true if the text was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxSetItemText',
+        returns: 'Returns the position of the exhaust fumes if everything went fine or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleModelExhaustFumesPosition',
     },
-    guiComboBoxSetOpen: {
-        summary: '',
+    getVehicleModelFromName: {
+        summary: 'This function retrieves the model ID of a vehicle as an integer value from its name.',
         parameters: [
-            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox to be opened or closed.' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'The state of combobox. true, if the combobox is to be opened. false if the combobox is to be closed.' },
+            { name: 'name', isOptional: false, isVariadic: false, summary: 'A string containing the name of the vehicle.' },
         ],
-        returns: 'returns true if is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxSetOpen',
+        returns: 'Returns an integer if the name exists, *false* otherwise. If you use this function on vehicles with shared names, such as "police", it will return the earliest occurrence of that vehicle\'s ID.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleModelFromName',
+    },
+    getVehicleModelWheelSize: {
+        summary: 'This function gets the size of a group of wheels for a vehicle model.',
+        parameters: [
+            { name: 'vehicleModel', isOptional: false, isVariadic: false, summary: 'The vehicle model ID.' },
+            { name: 'wheelGroup', isOptional: true, isVariadic: false, summary: 'The group of wheels of the vehicle model to retrieve their size value. If not specified, it defaults to *all_wheels*. The following values are supported:' },
+        ],
+        returns: 'Returns a decimal number or a table, depending on the specified wheel group. If the specified vehicle model ID or wheel group are not valid, an error is raised instead. The meaning of the wheel size values is documented in setVehicleModelWheelSize.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleModelWheelSize',
+    },
+    getVehicleName: {
+        summary: 'This function returns a string containing the name of the vehicle',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you want to get the name of.' },
+        ],
+        returns: 'Returns a string containing the requested vehicle\'s name, or *false* if the vehicle passed to the function is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleName',
+    },
+    getVehicleNameFromModel: {
+        summary: 'Gets the name of a vehicle by its model ID.',
+        parameters: [
+            { name: 'model', isOptional: false, isVariadic: false, summary: 'This is the vehicle model ID. See vehicle IDs to see what values will return names.' },
+        ],
+        returns: 'Returns the name of the vehicle if the model ID was valid, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleNameFromModel',
+    },
+    getVehicleNitroCount: {
+        summary: 'This function gets the nitro count of the vehicle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle which you want to get a nitro count.' },
+        ],
+        returns: 'Returns *an integer* determining the amount of nitro counts of the vehicle, *false* if there is no nitro in the vehicle.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleNitroCount',
     },
 };

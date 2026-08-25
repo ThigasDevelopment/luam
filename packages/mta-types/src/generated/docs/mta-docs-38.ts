@@ -1,235 +1,244 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_38: ApiDocumentationCatalog = {
-    setColorFilter: {
+    removeElementData: {
+        summary: 'This function removes the element data with the given key for that element. The element data removal is synced with all the clients.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to remove the data from.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key string you wish to remove.' },
+        ],
+        returns: 'Returns *true* if the data was removed succesfully, *false* if the given key does not exist in the element or the element is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveElementData',
+    },
+    removeElementDataSubscriber: {
+        summary: 'This function unsubscribes a player from specific element data.\nThis function is used together with setElementData in *"subscribe"* mode.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to unsubscribe the player from.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key you wish to unsubscribe the player from.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish to unsubscribe.' },
+        ],
+        returns: 'Returns *true* if the player was unsubscribed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveElementDataSubscriber',
+    },
+    removeEventHandler: {
+        summary: 'This functions removes a handler function from an event, so that the function is not called anymore when the event is triggered. See event system for more information on how the event system works.',
+        parameters: [
+            { name: 'eventName', isOptional: false, isVariadic: false, summary: 'The name of the event you want to detach the handler function from.' },
+            { name: 'attachedTo', isOptional: false, isVariadic: false, summary: 'The element the handler was attached to.' },
+            { name: 'functionVar', isOptional: false, isVariadic: false, summary: 'The handler function that was attached.' },
+        ],
+        returns: 'Returns *true* if the event handler was removed successfully. Returns *false* if the specified event handler could not be found or invalid parameters were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveEventHandler',
+    },
+    removeGameWorld: {
+        summary: '',
+        parameters: [],
+        returns: 'This function does not return any value.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveGameWorld',
+    },
+    removePedClothes: {
+        summary: 'This function is used to remove the current clothes of a certain type on a ped. It will remove them if the clothesTexture and clothesModel aren\'t specified, or if they match the current clothes on that slot.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you want to remove clothes from.' },
+            { name: 'clothesType', isOptional: false, isVariadic: false, summary: 'the clothes slot/type to remove. See the clothes catalog.' },
+            { name: 'clothesTexture', isOptional: true, isVariadic: false, summary: '(Server only) A string determining the clothes texture that will be removed. See the clothes catalog.' },
+            { name: 'clothesModel', isOptional: true, isVariadic: false, summary: '(Server only) A string determining the clothes model that will be removed. See the clothes catalog.' },
+        ],
+        returns: 'This function returns *true* if the clothes were successfully removed from the ped, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemovePedClothes',
+    },
+    removePedFromVehicle: {
+        summary: 'This function removes a ped from a vehicle immediately. This works for drivers and passengers. Note that this removes the ped from the vehicle and puts him in the exact position where the command was initiated.\n\n**Available client side from 1.3.1** (It will only work with client side vehicles and peds)',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you wish to remove from a vehicle' },
+        ],
+        returns: 'Returns *true* if the operation was successful, *false* if the specified ped is not valid or if it isn\'t in a vehicle.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemovePedFromVehicle',
+    },
+    removeResourceFile: {
+        summary: 'This function removes a file from the resource.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The resource element.' },
+            { name: 'fileName', isOptional: false, isVariadic: false, summary: 'The filename what you wan\'t to delete.' },
+        ],
+        returns: 'Returns *true* if file was deleted, otherwise *false* if the resource is in use or the file doesn\'t exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveResourceFile',
+    },
+    removeRuleValue: {
+        summary: 'This function removes a set rule value that can be viewed by server browsers.',
+        parameters: [
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the rule you wish to remove' },
+        ],
+        returns: 'Returns *true* if the rule value was removed, *false* if it failed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveRuleValue',
+    },
+    removeVehicleSirens: {
+        summary: 'This function removes sirens from a vehicle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to remove the sirens of' },
+        ],
+        returns: 'Returns *true* if sirens were successfully removed from the vehicle, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveVehicleSirens',
+    },
+    removeVehicleUpgrade: {
+        summary: 'This function removes an already existing upgrade from the specified vehicle, eg: nos, hydraulics. Defined in San Andreas\\data\\maps\\veh_mods\\veh_mods.ide.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The element representing the vehicle you wish to remove the upgrade from' },
+            { name: 'upgrade', isOptional: false, isVariadic: false, summary: 'The ID of the upgrade you wish to remove.' },
+        ],
+        returns: 'Returns *true* if the upgrade was successfully removed from the vehicle, otherwise *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveVehicleUpgrade',
+    },
+    removeWorldModel: {
+        summary: '<!--\n\n-->\nThis function is used to remove a world object. Use restoreWorldModel to reverse this action.\n\n<!--\n\n-->',
+        parameters: [
+            { name: 'modelID', isOptional: false, isVariadic: false, summary: 'A whole integer specifying the GTASA object model ID.' },
+            { name: 'radius', isOptional: false, isVariadic: false, summary: 'A floating point number representing the radius that will be eliminated.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'A floating point number representing the X coordinate on the map.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Y coordinate on the map.' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Z coordinate on the map.' },
+            { name: 'interior', isOptional: true, isVariadic: false, summary: 'The interior ID to apply the removal to. Some objects in interior 13 show in all interiors so if you want to remove everything in interior 0 also remove everything in interior 13. A value of -1 here will affect all interiors.' },
+        ],
+        returns: 'Returns *true* if the world object was removed, *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveWorldModel',
+    },
+    renameResource: {
+        summary: 'This function renames a resource.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The name of resource or the resource you want to rename.' },
+            { name: 'newResourceName', isOptional: false, isVariadic: false, summary: 'The name of what the resource should be renamed to.' },
+            { name: 'organizationalPath', isOptional: true, isVariadic: false, summary: 'If you want to store the new resource inside a category.' },
+        ],
+        returns: 'Returns *true* if the resource has been renamed successfully, *false* otherwise. This could fail if the resource name already is in use, if a directory already exists with the name you\'ve specified (but this isn\'t a valid resource) or if the name you specify isn\'t valid. It could also fail if the disk was full or for other similar reasons. Won\'t work on a started resource or if the resource is not loaded (not known by MTA (use /refresh))',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RenameResource',
+    },
+    requestBrowserDomains: {
+        summary: 'This function opens a request window in order to accept the requested remote URLs.',
+        parameters: [
+            { name: 'pages', isOptional: false, isVariadic: false, summary: 'A table containing all domains' },
+            { name: 'parseAsURL', isOptional: true, isVariadic: false, summary: '*true* if the passed addresses should be converted from URLs, *false* otherwise.' },
+            { name: 'callback', isOptional: true, isVariadic: false, summary: 'A callback function that is called as soon as the result is available' },
+        ],
+        returns: 'Returns **true**, if the string was successfully read, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/RequestBrowserDomains',
+    },
+    resendPlayerACInfo: {
+        summary: 'This function will force the specified player to resend their AC info, triggering the onPlayerACInfo event again.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
+        ],
+        returns: 'Returns *true* if the AC info will be resent, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResendPlayerACInfo',
+    },
+    resendPlayerModInfo: {
+        summary: 'This function will force the specified player to resend their mod info, triggering the onPlayerModInfo event again.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
+        ],
+        returns: 'Returns *true* if the mod info will be resent, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResendPlayerModInfo',
+    },
+    resetAmbientSounds: {
+        summary: 'This function is used to reset the background sounds to the default setting.',
+        parameters: [],
+        returns: 'Returns true if the ambient sounds were reset, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetAmbientSounds',
+    },
+    resetBlurLevel: {
+        summary: 'Resets the motion blur level on the client\'s screen to default value (36).',
+        parameters: [],
+        returns: 'Returns *true* if the blur level was reset successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetBlurLevel',
+    },
+    resetColorFilter: {
+        summary: '',
+        parameters: [],
+        returns: 'Returns *true* if the color filtering was reset, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetColorFilter',
+    },
+    resetCoronaReflectionsEnabled: {
+        summary: '',
+        parameters: [],
+        returns: 'Returns *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetCoronaReflectionsEnabled',
+    },
+    resetDiscordRichPresenceData: {
+        summary: 'The function resets the Discord Rich Presence configuration to default.',
+        parameters: [],
+        returns: 'Returns *true* if function succeeds, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetDiscordRichPresenceData',
+    },
+    resetFarClipDistance: {
+        summary: 'This function resets the far clip distance to its default state.',
+        parameters: [],
+        returns: 'Returns *true* if operation was successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetFarClipDistance',
+    },
+    resetFogDistance: {
+        summary: 'This function resets the fog render distance to its default state.',
+        parameters: [],
+        returns: 'Returns *true* if operation was successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetFogDistance',
+    },
+    resetHeatHaze: {
+        summary: 'This function restores the default heat haze.',
+        parameters: [],
+        returns: 'Returns *true* if the heat haze was reset correctly, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetHeatHaze',
+    },
+    resetMapInfo: {
+        summary: 'This function is used to reset the state of a player.  It is intended to restore a player to their default state as if they had just joined the server, without any scripts affecting the player.',
+        parameters: [
+            { name: 'thePlayer', isOptional: true, isVariadic: false, summary: 'The specific player you wish to restore the state of. Not specifying this will result in all players map info being reset.' },
+        ],
+        returns: 'Returns *true* if the map info was reset successfully, otherwise *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetMapInfo',
+    },
+    resetMoonSize: {
+        summary: 'This function is used to reset the size of the moon to its normal size.',
+        parameters: [],
+        returns: 'Returns true if the size of the moon was reset, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetMoonSize',
+    },
+    resetNearClipDistance: {
+        summary: 'This function resets near clip distance set by setNearClipDistance.',
+        parameters: [],
+        returns: '***boolean:** always returns **true**',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetNearClipDistance',
+    },
+    resetPedsLODDistance: {
+        summary: 'Resets the distance of peds LOD to default. Default values depends on client setting. If client has enabled *high detail peds* in video options, value will be reset to 500 - otherwise to 60.',
+        parameters: [],
+        returns: 'Returns *true* if the peds LOD distance was reset, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetPedsLODDistance',
+    },
+    resetPedVoice: {
         summary: '',
         parameters: [
-            { name: 'aRed', isOptional: false, isVariadic: false, summary: 'The amount of red (0-255).' },
-            { name: 'aGreen', isOptional: false, isVariadic: false, summary: 'The amount of green (0-255).' },
-            { name: 'aBlue', isOptional: false, isVariadic: false, summary: 'The amount of blue (0-255).' },
-            { name: 'aAlpha', isOptional: false, isVariadic: false, summary: 'The amount of alpha (0-255).' },
-            { name: 'bRed', isOptional: false, isVariadic: false, summary: 'The amount of red (0-255).' },
-            { name: 'bGreen', isOptional: false, isVariadic: false, summary: 'The amount of green (0-255).' },
-            { name: 'bBlue', isOptional: false, isVariadic: false, summary: 'The amount of blue (0-255).' },
-            { name: 'bAlpha', isOptional: false, isVariadic: false, summary: 'The amount of alpha (0-255).' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose voice to reset.' },
         ],
-        returns: 'returns true if the color filter was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetColorFilter',
+        returns: 'Returns *true* when the voice was successfully reset, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetPedVoice',
     },
-    setColPolygonHeight: {
-        summary: 'By default, a colshape polygon is infinitely tall.',
+    resetPlayerHudComponentProperty: {
+        summary: 'This function resets the specified property to its default value.',
         parameters: [
-            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon.' },
-            { name: 'floor', isOptional: false, isVariadic: false, summary: 'The polygon floor (lowest Z coordinate). Parse false to reset this value to 0.' },
-            { name: 'ceil', isOptional: false, isVariadic: false, summary: 'The polygon ceiling (highest Z coordinate). Parse false to reset this value to infinitely tall.' },
+            { name: 'component', isOptional: false, isVariadic: false, summary: 'The component whose property you want to reset. See HUD Components.' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'The name of the property you want to reset. See HUD Properties.' },
         ],
-        returns: 'returns true if the polygon was changed, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetColPolygonHeight',
+        returns: 'Returns **true** if successful, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetPlayerHudComponentProperty',
     },
-    setColPolygonPointPosition: {
+    resetRainLevel: {
+        summary: 'This function resets the rain level of the current weather to its default.',
+        parameters: [],
+        returns: 'Returns true if the rain level was reset.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetRainLevel',
+    },
+    resetShakeCamera: {
         summary: '',
-        parameters: [
-            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon you wish to change.' },
-            { name: 'index', isOptional: false, isVariadic: false, summary: 'The index of the point you wish to change. The points are indexed in order, with 1 being the first bound point.' },
-            { name: 'fX', isOptional: false, isVariadic: false, summary: 'The new X position of the bound point.' },
-            { name: 'fY', isOptional: false, isVariadic: false, summary: 'The new Y position of the bound point.' },
-        ],
-        returns: 'returns true if the polygon was changed, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetColPolygonPointPosition',
-    },
-    setColShapeRadius: {
-        summary: '',
-        parameters: [
-            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape you wish to change the radius of.' },
-            { name: 'radius', isOptional: false, isVariadic: false, summary: 'The radius you want to set.' },
-        ],
-        returns: 'returns true if the radius was changed, or false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetColShapeRadius',
-    },
-    setColShapeSize: {
-        summary: '',
-        parameters: [
-            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape you wish to change the size of.' },
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'The collision rectangles width.' },
-            { name: 'depth', isOptional: false, isVariadic: false, summary: 'The collision cuboids depth.' },
-            { name: 'height', isOptional: false, isVariadic: false, summary: 'The collision tubess height.' },
-        ],
-        returns: 'returns true if the size was changed, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetColShapeSize',
-    },
-    setControlState: {
-        summary: 'Sets a state of a specified players control, as if they pressed or released it.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish to set the control state of.' },
-            { name: 'control', isOptional: false, isVariadic: false, summary: 'The control that you want to set the state of. See control names for a list of possible controls.' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean value representing whether or not the key will be set to pressed or not.' },
-        ],
-        returns: 'returns true if the control state was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetControlState',
-    },
-    setCoronaReflectionEnabled: {
-        summary: '',
-        parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'the corona marker that you wish set visibility of corona reflection' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'whenever corona reflection should be visible' },
-        ],
-        returns: 'returns true if setmarkertype|marker type is corona, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetCoronaReflectionEnabled',
-    },
-    setCoronaReflectionsEnabled: {
-        summary: '',
-        parameters: [
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: '0 : disabled 1 : enabled (will be visible during rain) 2 : force enabled (will be visible even if there is no rain)' },
-        ],
-        returns: 'returns true if passed arguments are correct, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetCoronaReflectionsEnabled',
-    },
-    setCursorAlpha: {
-        summary: 'This function is used to change alpha (transparency) from the clients cursor.',
-        parameters: [
-            { name: 'alpha', isOptional: false, isVariadic: false, summary: ': The alpha value to set. Value can be 0-255, where 255 is fully opaque and 0 is fully transparent.' },
-        ],
-        returns: 'returns true if the new alpha value was set, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetCursorAlpha',
-    },
-    setCursorPosition: {
-        summary: 'This function sets the current position of the mouse cursor.',
-        parameters: [
-            { name: 'cursorX', isOptional: false, isVariadic: false, summary: 'Position over the X axis' },
-            { name: 'cursorY', isOptional: false, isVariadic: false, summary: 'Position over the Y axis' },
-        ],
-        returns: 'returns true if the position has been successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetCursorPosition',
-    },
-    setDebugViewActive: {
-        summary: 'This function enables or disables the debug window.',
-        parameters: [
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'true if debug window should be visible, false otherwise.' },
-        ],
-        returns: 'returns true, false if invalid parameters are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetDebugViewActive',
-    },
-    setDevelopmentMode: {
-        summary: 'This function is used to set the development mode. Setting development mode allows access\nto special commands which can assist with script debugging.\nClient-side development mode commands:\n* Client_Commands#showcol|showcol: Enables colshapes to be viewed as a wireframe object.\n* Client_Commands#showsound|showsound: Enables world sound ids to be printed in the debug\noutput window.\nShared development mode functions:\n* debugSleep: Sets the freeze time for the client/server.',
-        parameters: [
-            { name: 'enable', isOptional: false, isVariadic: false, summary: ': A boolean to indicate whether development mode is on (true) or off (false)' },
-            { name: 'enableWeb', isOptional: true, isVariadic: false, summary: ': A boolean to indicate whether browser debug messages will be filtered (false) or not (true)' },
-        ],
-        returns: 'returns true if the mode was set correctly, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetDevelopmentMode',
-    },
-    setEffectDensity: {
-        summary: 'This function sets the density of a specified effect.\nThe limit is 1 for Low, 1.5 for Medium, and 2 for High/Very high.|true',
-        parameters: [
-            { name: 'theEffect', isOptional: false, isVariadic: false, summary: 'The effect to change the speed of.' },
-            { name: 'density', isOptional: false, isVariadic: false, summary: 'The level of density (from 0 to 2).' },
-        ],
-        returns: 'returns true if the density was succesfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetEffectDensity',
-    },
-    setEffectSpeed: {
-        summary: 'This function sets the speed of a specified effect.',
-        parameters: [
-            { name: 'theEffect', isOptional: false, isVariadic: false, summary: 'The effect to change the speed of.' },
-            { name: 'speed', isOptional: false, isVariadic: false, summary: 'The speed to set.' },
-        ],
-        returns: 'returns true if the effect speed was succesfuly changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetEffectSpeed',
-    },
-    setElementAlpha: {
-        summary: 'This function sets the alpha (transparency) value for the specified element. This can be\na player, ped, object, vehicle or Element/Weapon|weapon.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose alpha you want to set.' },
-            { name: 'alpha', isOptional: false, isVariadic: false, summary: 'The alpha value to set. Values are 0-255, where 255 is fully opaque and 0 is fully transparent. Note Objects are fully transparent at 140.' },
-        ],
-        returns: 'returns true or false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementAlpha',
-    },
-    setElementAngularVelocity: {
-        summary: '',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to apply the spin to. Can be either a player, ped, object, vehicle or a Element/Weapon|custom weapon.' },
-            { name: 'rx', isOptional: false, isVariadic: false, summary: 'velocity around the X axis' },
-            { name: 'ry', isOptional: false, isVariadic: false, summary: 'velocity around the Y axis' },
-            { name: 'rz', isOptional: false, isVariadic: false, summary: 'velocity around the Z axis' },
-        ],
-        returns: 'returns true if it was succesful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementAngularVelocity',
-    },
-    setElementAttachedOffsets: {
-        summary: 'This function updates the offsets of an element that has been attached to another element\nusing attachElements.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The attached element.' },
-            { name: 'xPosOffset', isOptional: true, isVariadic: false, summary: 'The x offset, if you want the elements to be a certain distance from one another (default 0).' },
-            { name: 'yPosOffset', isOptional: true, isVariadic: false, summary: 'The y offset (default 0).' },
-            { name: 'zPosOffset', isOptional: true, isVariadic: false, summary: 'The z offset (default 0).' },
-            { name: 'xRotOffset', isOptional: true, isVariadic: false, summary: 'The x rotation offset (default 0).' },
-            { name: 'yRotOffset', isOptional: true, isVariadic: false, summary: 'The y rotation offset (default 0).' },
-            { name: 'zRotOffset', isOptional: true, isVariadic: false, summary: 'The z rotation offset (default 0).' },
-        ],
-        returns: 'returns true if the attaching process was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementAttachedOffsets',
-    },
-    setElementBoneMatrix: {
-        summary: '',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to set the bone matrix on.' },
-            { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone. See Bone IDs.' },
-            { name: 'matrix', isOptional: false, isVariadic: false, summary: 'the MTA matrix to set.' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementBoneMatrix',
-    },
-    setElementBonePosition: {
-        summary: '',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the Element|element to set the bone position on.' },
-            { name: 'bone', isOptional: false, isVariadic: false, summary: 'the ID of the bone to set the position of. See Bone IDs.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'The X coordinate of the destination.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'The Y coordinate of the destination.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'The Z coordinate of the destination.' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementBonePosition',
-    },
-    setElementBoneRotation: {
-        summary: '',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to set the bone rotation on.' },
-            { name: 'boneId', isOptional: false, isVariadic: false, summary: 'The ID of the bone to set the rotation of. See Bone IDs.' },
-            { name: 'yaw', isOptional: false, isVariadic: false, summary: 'The yaw rotation value.' },
-            { name: 'pitch', isOptional: false, isVariadic: false, summary: 'The pitch rotation value.' },
-            { name: 'roll', isOptional: false, isVariadic: false, summary: 'The roll rotation value.' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementBoneRotation',
-    },
-    setElementCallPropagationEnabled: {
-        summary: 'This function enables/disables call propagation on a certain element. Look at the example\nfor a practical application.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose propagation behaviour youd like to change' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'Whether propagation should be enabled or not' },
-        ],
-        returns: 'returns true, if the propagation behaviour has been changed successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementCallPropagationEnabled',
-    },
-    setElementCollidableWith: {
-        summary: 'This function can be used to set an element to collide with another element. An element\nwith collisions disabled does not interact physically with the other element.\n\nNote: You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object\n* Element/Weapon|Weapon',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which colliding you want to change' },
-            { name: 'withElement', isOptional: false, isVariadic: false, summary: 'The other element you wish the first entity to collide with' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'A boolean to indicate whether elements should be able to collide with eachother (true) or not (false)' },
-        ],
-        returns: 'returns true if the collisions were set succesfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementCollidableWith',
-    },
-    setElementCollisionsEnabled: {
-        summary: 'This function can disable or enable an elements collisions. An element without collisions\ndoes not interact with the physical environment and remains static.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to set the collisions of' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'A boolean to indicate whether collisions are enabled (true) or disabled (false)' },
-        ],
-        returns: 'returns true if the collisions were set succesfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetElementCollisionsEnabled',
+        parameters: [],
+        returns: 'Always returns *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ResetShakeCamera',
     },
 };

@@ -1,9 +1,9 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_ADMIN_SERVER: ApiCatalog = {
-    addBan: fn([STRING, STRING, STRING, named('Player'), STRING, NUMBER], named('Ban'), 0),
-    banPlayer: fn([named('Player'), BOOLEAN, BOOLEAN, BOOLEAN, ANY, STRING, NUMBER], named('Ban'), 1),
+    addBan: fn([STRING, STRING, STRING, named('Player'), STRING, NUMBER], named('Ban'), 3),
+    banPlayer: fn([named('Player'), BOOLEAN, BOOLEAN, BOOLEAN, unionOf([named('Player'), STRING]), STRING, NUMBER], named('Ban'), 1),
     getBanAdmin: fn([named('Ban')], STRING, 1),
     getBanIP: fn([named('Ban')], STRING, 1),
     getBanNick: fn([named('Ban')], STRING, 1),
@@ -14,7 +14,7 @@ export const MTA_ADMIN_SERVER: ApiCatalog = {
     getBanUsername: fn([named('Ban')], STRING, 1),
     getUnbanTime: fn([named('Ban')], NUMBER, 1),
     isBan: fn([named('Ban')], BOOLEAN, 1),
-    kickPlayer: fn([named('Player'), ANY, STRING], BOOLEAN, 1),
+    kickPlayer: fn([named('Player'), unionOf([named('Player'), STRING]), STRING], BOOLEAN, 1),
     reloadBans: fn([], BOOLEAN, 0),
     removeBan: fn([named('Ban'), named('Player')], BOOLEAN, 1),
     setBanAdmin: fn([named('Ban'), STRING], BOOLEAN, 2),

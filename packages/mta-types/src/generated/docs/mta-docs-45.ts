@@ -1,239 +1,237 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_45: ApiDocumentationCatalog = {
-    setVehicleDirtLevel: {
-        summary: 'This function sets the dirt level on a vehicle.',
+    setPedAnalogControlState: {
+        summary: 'Sets an analog state of a specified ped\'s control, as if they pressed or released it.\n\nThis function only works on peds, to change the analog control state for a player, please use setAnalogControlState.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the dirt level from' },
-            { name: 'dirtLevel', isOptional: false, isVariadic: false, summary: 'The dirt level' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you wish to set the control state of.' },
+            { name: 'control', isOptional: false, isVariadic: false, summary: 'The control that you want to set the state of. See control names for a list of possible controls.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'A float between 0 and 1 indicating the amount the control is pressed.' },
         ],
-        returns: 'returns true if the dirt level was set on the vehicle, false if the dirt level was not set or if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDirtLevel',
+        returns: 'Returns *true* if the control state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedAnalogControlState',
     },
-    setVehicleDoorOpenRatio: {
-        summary: 'This function sets how much a vehicles door is open. Doors include the boot/trunk and the\nbonnet of the vehicle.',
+    setPedAnimation: {
+        summary: 'Sets the current animation of a player or ped. Not specifying the type of animation will automatically cancel the current one.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to change the door open ratio of.' },
-            { name: 'door', isOptional: false, isVariadic: false, summary: 'A whole number, 0 (hood), 1 (trunk), 2 (front left), 3 (front right), 4 (rear left), 5 (rear right)' },
-            { name: 'ratio', isOptional: false, isVariadic: false, summary: 'The ratio value, ranging from 0 (fully closed) to 1 (fully open).' },
-            { name: 'time', isOptional: true, isVariadic: false, summary: 'The number of milliseconds the door should take to reach the value you have specified. A value of 0 will change the door open ratio instantly.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped you want to apply an animation to.' },
+            { name: 'block', isOptional: true, isVariadic: false, summary: 'the animation block\'s name.' },
+            { name: 'anim', isOptional: true, isVariadic: false, summary: 'the name of the animation within the block.' },
+            { name: 'time', isOptional: true, isVariadic: false, summary: 'how long the animation will run for in milliseconds.' },
+            { name: 'loop', isOptional: true, isVariadic: false, summary: 'indicates whether or not the animation will loop.' },
+            { name: 'updatePosition', isOptional: true, isVariadic: false, summary: 'will change the actual coordinates of the ped according to the animation. Use this for e.g. walking animations.' },
+            { name: 'interruptable', isOptional: true, isVariadic: false, summary: 'if set to *false* other tasks wont be able to interupt the animation. Setting this to \'false\' also gives this function more power to override other animations that are running. For example, squatting after a jump can be terminated.' },
+            { name: 'freezeLastFrame', isOptional: true, isVariadic: false, summary: 'if set to *true* after animation the last frame will be frozen, otherwise the animation will end and controls will return.' },
+            { name: 'blendTime', isOptional: true, isVariadic: false, summary: 'how long the animation will mixed with the previous one in milliseconds.' },
+            { name: 'retainPedState', isOptional: true, isVariadic: false, summary: 'will restore the task which was playing before calling this function. Useful for restoring the crouch task after animation ends. This may be extended in the future to support other states/tasks.' },
         ],
-        returns: 'returns true if the door open ratio was successfully set, false if invalid arguments are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDoorOpenRatio',
+        returns: 'Returns *true* if succesful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedAnimation',
     },
-    setVehicleDoorState: {
-        summary: 'This function sets the state of the specified door on a vehicle.',
+    setPedAnimationProgress: {
+        summary: 'Sets the current animation progress of a player or ped.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to change the door state of.' },
-            { name: 'door', isOptional: false, isVariadic: false, summary: 'An integer representing which door to set the state of. Valid values are: 0 Shut, intact (aka Closed, undamaged) 1 Ajar, intact (aka Slightly open, undamaged) 2 Shut, damaged (aka Closed, damaged) 3 Ajar, damaged (aka Slightly open, damaged) 4 Missing 5 Rear right' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'An integer representing the state to set the door to. Valid values are: spawnFlyingComponent A boolean, if set to true, spawns flying doors etc. if you remove a component with state == 4.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped you want to change animation progress.' },
+            { name: 'anim', isOptional: true, isVariadic: false, summary: 'the animation name currently applied to ped, if not supplied, the animation will stop' },
+            { name: 'progress', isOptional: true, isVariadic: false, summary: 'current animation progress you want to apply, value from 0.0 to 1.0, if not supplied will default to 0.0' },
         ],
-        returns: 'returns true if the door state was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDoorState',
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedAnimationProgress',
     },
-    setVehicleDoorsUndamageable: {
-        summary: 'This function makes a vehicles doors undamageable, so they wont fall off when theyre hit.\nNote that the vehicle has to be locked using setVehicleLocked for this setting to have\nany effect.',
+    setPedAnimationSpeed: {
+        summary: 'Sets the speed of a currently running animation for a particular player or ped.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle of which you wish to set the car door damageability.' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean denoting whether the vehicles doors are undamageable (true) or damageable (false).' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped you want to change animation speed of.' },
+            { name: 'anim', isOptional: true, isVariadic: false, summary: 'the animation name it will affect.' },
+            { name: 'speed', isOptional: true, isVariadic: false, summary: 'a float containing the speed between 0.0–1.0 you want to apply to the animation. *This limitation may be adjusted in the future, so do not provide speeds outside this boundary.* The limit is now 0.0 to 10.0.' },
         ],
-        returns: 'returns true if the damageability state was successfully changed, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDoorsUndamageable',
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedAnimationSpeed',
     },
-    setVehicleDummyPosition: {
+    setPedArmor: {
+        summary: 'This function allows you to set the armor value of a ped.\nFunction also added client-side.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose armor you want to modify.' },
+            { name: 'armor', isOptional: false, isVariadic: false, summary: 'the amount of armor you want to set on the ped. Valid values are from 0 to 100.' },
+        ],
+        returns: 'Returns *true* if the armor was changed succesfully. Returns *false* if an invalid ped was specified, or the armor value specified is out of acceptable range.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedArmor',
+    },
+    setPedBleeding: {
         summary: '',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you want to set the dummy position for.' },
-            { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to set.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: ', y, z The new dummy position.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped whose bleeding effect you want to set of.' },
+            { name: 'bleeding', isOptional: false, isVariadic: false, summary: 'Boolean specifying whether the player or ped is bleeding or not.' },
         ],
-        returns: 'returns true if the dummy position has been successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDummyPosition',
+        returns: 'Returns *true* if the bleeding state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedBleeding',
     },
-    setVehicleEngineState: {
-        summary: 'This function turns a vehicles engine on or off. Note that the engine will always be\nturned on when someone enters the driver seat, unless you override that behaviour with\nscripts.',
+    setPedCameraRotation: {
+        summary: 'This function sets the camera rotation of a ped, e.g. where its camera will look at. Don\'t confuse this with getCameraMatrix, because that function is designed for fixed (scripted) camera moves.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle you wish to change the engine state of.' },
-            { name: 'engineState', isOptional: false, isVariadic: false, summary: ': A boolean value representing whether the engine will be turned on (true) or off (false).' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose camera rotation is to be changed.' },
+            { name: 'cameraRotation', isOptional: false, isVariadic: false, summary: 'The new direction that the ped will walk if you set their forwards control state. If the ped is the local player, it will also change where his camera is looking at if it isn\'t fixed (i.e. camera target is the local player).' },
         ],
-        returns: 'returns true if the vehicles engine state was successfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleEngineState',
+        returns: 'Returns *true* if the camera rotation was changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedCameraRotation',
     },
-    setVehicleFuelTankExplodable: {
-        summary: 'This function changes the explodable state of a vehicles fuel tank, which toggles the\nability to blow the vehicle up by shooting the tank. This function will have no effect on\nvehicles with tanks that cannot be shot in single player.',
+    setPedCanBeKnockedOffBike: {
+        summary: 'This function controls if a ped can fall of his bike by accident - namely by banging into a wall.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle you wish to change the fuel tank explodable state of.' },
-            { name: 'explodable', isOptional: false, isVariadic: false, summary: ': A boolean value representing whether or not the fuel tank will be explodable.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose knockoffstatus is being changed' },
+            { name: 'canBeKnockedOffBike', isOptional: false, isVariadic: false, summary: '*true* or *false*' },
         ],
-        returns: 'returns true if the vehicles fuel tank explodable state was successfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleFuelTankExplodable',
+        returns: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedCanBeKnockedOffBike',
     },
-    setVehicleGravity: {
-        summary: 'Sets the gravity vector of a vehicle. The vehicle will fall in this direction, and the\ncamera of any occupants will also be rotated to match it. Can be used for e.g. driving on\nwalls or upside down on ceilings.',
+    setPedChoking: {
+        summary: 'This function can be used to force the ped to do the choking (coughing) animation until he respawns or toggled off using this function. The animation can not be cancelled by a player it\'s applied to, and he will not loose health.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle of which to change the gravity. x, y, z the components of the new gravity vector. If this vector has length 1, the strength of the gravity will be same as the global gravity for other entities. If it is 2, it will be twice as strong, etc.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose choking status to toggle' },
+            { name: 'choking', isOptional: false, isVariadic: false, summary: '*true* to make the ped choke, *false* to no longer force his choking animation' },
         ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleGravity',
+        returns: 'Returns *true* if successful, *false* otherwise (e.g. player handle is invalid)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedChoking',
     },
-    setVehicleHandling: {
-        summary: 'This function is used to change the handling data of a vehicle.',
+    setPedControlState: {
+        summary: 'This function makes a ped or player press or release a certain control.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to set the handling of.' },
-            { name: 'property', isOptional: false, isVariadic: false, summary: 'The property you wish to set the handling of the vehicle to. Additionally, helicopters are not affected by custom handling. The vehicle-on-wheels handling does not affect planes when they are on the ground either. For more information on this, see [https://github.com/multitheftauto/mtasa-blue/issues/2426 issue 2426]' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value of the property you wish to set the handling of the vehicle to.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to press or release a control.' },
+            { name: 'control', isOptional: false, isVariadic: false, summary: 'the name of the control of which to change the state. See control names for a list of valid names.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'the new control state. *true* means pressed, *false* is released.' },
         ],
-        returns: 'returns true if the handling was set successfully, false otherwise. see below a list of valid properties and their required values:',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleHandling',
+        returns: 'Returns *true* if successful, *false* if otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedControlState',
     },
-    setVehicleHeadLightColor: {
-        summary: 'This function will set the headlight color of a vehicle. valid Red Green and Blue\narguments range from 0-255',
+    setPedDoingGangDriveby: {
+        summary: 'This function sets the driveby state of a ped.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to set the headlight color of.' },
-            { name: 'red', isOptional: false, isVariadic: false, summary: 'An integer indicating the amount of red for the vehicles headlights' },
-            { name: 'green', isOptional: false, isVariadic: false, summary: 'An integer indicating the amount of green for the vehicles headlights' },
-            { name: 'blue', isOptional: false, isVariadic: false, summary: 'An integer indicating the amount of blue for the vehicles headlights' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped element whose state is to be changed.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean value representing the drive-by state, *true* meaning enabled and *false* disabled.' },
         ],
-        returns: 'returns true if vehicles headlight color was set, false if an invalid vehicle or invalid color ranges were specified for red,green or blue.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleHeadLightColor',
+        returns: 'Returns *true* if the driveby state could be changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedDoingGangDriveby',
     },
-    setVehicleIdleRespawnDelay: {
-        summary: 'This function sets the time delay (in milliseconds) the vehicle will remain at its\nposition while empty.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle you wish to change the respawn delay of.' },
-            { name: 'timeDelay', isOptional: false, isVariadic: false, summary: ': The number of milliseconds the vehicle will be allowed to remain unused until it respawns.' },
-        ],
-        returns: 'returns true if the vehicle was found and edited.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleIdleRespawnDelay',
-    },
-    setVehicleLandingGearDown: {
-        summary: 'This function is used to set the landing gear state of certain vehicles.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle of which you wish to set the landing gear state.' },
-            { name: 'gearState', isOptional: false, isVariadic: false, summary: 'A bool representing the state of the landing gear. true represents a collapsed landing gear, while false represents a disabled landing gear.' },
-        ],
-        returns: 'returns true if the landing gear was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleLandingGearDown',
-    },
-    setVehicleLightState: {
-        summary: 'This function sets the state of the light on the vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A handle to the vehicle that you wish to change the light state of.' },
-            { name: 'light', isOptional: false, isVariadic: false, summary: 'A whole number determining the individual light: 0 Front left 1 Front right 2 Rear right 3 Rear left' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'A whole number determining the new state of the light. 0 represents normal lights, and 1 represents broken lights. Returns \'\'true\'\' if the light state was set successfully, \'\'false\'\' if invalid arguments were passed to the function.' },
-        ],
-        returns: 'returns true if the light state was set successfully, false if invalid arguments were passed to the function.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleLightState',
-    },
-    setVehicleLocked: {
-        summary: 'This function can be used to set the vehicles doors to be locked or unlocked.  Locking a\nvehicle restricts access to the vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle which you wish to change the lock status of' },
-            { name: 'locked', isOptional: false, isVariadic: false, summary: 'Boolean for the status you wish to set. Set true to lock, false to unlock' },
-        ],
-        returns: 'returns true if the operation was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleLocked',
-    },
-    setVehicleModelDummyPosition: {
-        summary: 'This function sets the position of the dummies contained in a vehicle model. Use\nsetVehicleComponentPosition to adjust the vehicle component positions.',
-        parameters: [
-            { name: 'modelID', isOptional: false, isVariadic: false, summary: ': The model ID which you want to apply the change to' },
-            { name: 'dummy', isOptional: false, isVariadic: false, summary: ': The dummy whose position you want to change posX , posY, posZ: The desired position' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if everything went fine, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleModelDummyPosition',
-    },
-    setVehicleModelExhaustFumesPosition: {
-        summary: 'This function sets the position of the exhaust fumes the vehicle model emits. Use\nsetVehicleComponentPosition to adjust the exhaust position.',
-        parameters: [
-            { name: 'modelID', isOptional: false, isVariadic: false, summary: ': The model ID which you want to apply the change to' },
-            { name: 'posX', isOptional: false, isVariadic: false, summary: ', posY, posZ: The desired position' },
-            { name: 'posY', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'posZ', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if everything went fine, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleModelExhaustFumesPosition',
-    },
-    setVehicleModelWheelSize: {
+    setPedEnterVehicle: {
         summary: '',
         parameters: [
-            { name: 'vehicleModel', isOptional: false, isVariadic: false, summary: ': The Vehicle IDs|vehicle model ID.' },
-            { name: 'wheelGroup', isOptional: false, isVariadic: false, summary: ': The group of wheels of the vehicle model that will have its size set by this function. The following values are supported: front_axle : Represents the wheels in the front axle. The default value for this group is read by GTA from the WheelScale_Front field of the vehicles.ide data file. rear_axle : Represents the wheels in the rear axle. The default value for this group is read by GTA from the WheelScale_Rear field of the vehicles.ide data file. all_wheels : Convenience group that contains the other wheel groups: front_axle and rear_axle.' },
-            { name: 'wheelSize', isOptional: false, isVariadic: false, summary: ': The wheel size value to set. Default GTA values for automobiles usually are around 0.7. It must be greater than 0.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped to enter the vehicle.' },
+            { name: 'theVehicle', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'passenger', isOptional: true, isVariadic: false, summary: 'If set to *true*, the ped will enter as passenger in the nearest available seat, otherwise he will enter as driver.' },
         ],
-        returns: 'returns true if the size for the specified wheel group and vehicle model has been set successfully, or an error if some parameter is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleModelWheelSize',
+        returns: 'Returns *true* if the function was successful, *false* otherwise. When this function returns *true*, the client will ask server for permission to enter a vehicle. Actually entering can still fail in the following cases *Another player or ped is already entering, exiting or jacking the same vehicle and seat. *Movement input or damage can interrupt the task. Use getPedTask to monitor what the ped is doing. This function returns *false* in the following cases *Invalid arguments were parsed. *Time passed since last enter/exit for this ped is less than 1500 ms. *onClientVehicleStartEnter was cancelled by a script. *The ped has an active TASK_PRIMARY task. Use getPedTask to monitor what the ped is doing.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedEnterVehicle',
     },
-    setVehicleNitroActivated: {
-        summary: 'This function activates or deactivates the nitro on the specified vehicle, like if a\nplayer pressed the button for activating nitro.',
+    setPedExitVehicle: {
+        summary: '',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to activate or deactivate the nitro on.' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'true if you want to activate the nitro, false if you want to disable it.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped to exit the vehicle.' },
         ],
-        returns: 'returns true if the nitro activation state was modified successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleNitroActivated',
+        returns: 'Returns *true* if the function was successful, *false* otherwise. When this function returns *true*, the client will ask server for permission to exit a vehicle. This function returns *false* in the following cases *Invalid arguments were parsed. *Time passed since last enter/exit for this ped is less than 1500 ms. *The ped is already being jacked.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedExitVehicle',
     },
-    setVehicleNitroCount: {
-        summary: 'This function sets how many times a player can activate the nitro on a specified vehicle.',
+    setPedFightingStyle: {
+        summary: 'Changes a ped\'s fighting style. Most styles only change the \'special attack\' which is done using the Aim and Enter keys.\nFunction also added client-side.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': the vehicle which you want to modify how many times a player can use its nitro.' },
-            { name: 'count', isOptional: false, isVariadic: false, summary: ': how many times should the player be able to use the nitro of this vehicle (from 0-100 times; 0 means that it cant be used and 101 means that it can be used infinite times).' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose fighting style to change.' },
+            { name: 'style', isOptional: false, isVariadic: false, summary: 'The fighting style ID to apply.' },
         ],
-        returns: 'returns true if the nitro count was set successfully to the vehicle, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleNitroCount',
+        returns: 'Returns *true* in case of success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedFightingStyle',
     },
-    setVehicleNitroLevel: {
-        summary: 'This function sets the nitro level of the vehicle.',
+    setPedFootBloodEnabled: {
+        summary: 'This function makes a ped\'s footprints bloody.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle, which you want to set.' },
-            { name: 'level', isOptional: false, isVariadic: false, summary: 'Nitro level you want to set (ranges from 0.0001 to 1.0).' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the ped to give bloody footprints to.' },
+            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'boolean specifying whether or not to have bloody feet.' },
         ],
-        returns: 'returns true if the nitro level was set successfully to the vehicle, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleNitroLevel',
+        returns: 'Returns *true* if changing the ped\'s bloody feet status worked.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedFootBloodEnabled',
     },
-    setVehicleOverrideLights: {
-        summary: 'This function changes the light overriding setting on a vehicle.',
+    setPedGravity: {
+        summary: 'This function sets the gravity level of a ped.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle you wish to change the override lights setting of.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: ': A whole number representing the state of the lights: 0 : No override, lights are set to default. 1 : Lights are forced off. 2 : Lights are forced on.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose gravity to change.' },
+            { name: 'gravity', isOptional: false, isVariadic: false, summary: '' },
         ],
-        returns: 'returns true if the vehicles lights setting was changed. otherwise false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleOverrideLights',
+        returns: 'Returns *true* if the gravity was successfully set, *false* otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedGravity',
     },
-    setVehiclePaintjob: {
-        summary: 'This function changes the paintjob on the specified vehicle.\n\nSee Paintjob|paintjob for list of supported vehicles.',
+    setPedHeadless: {
+        summary: 'With this function, you can set if a ped has a head or not.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle you wish to change the paintjob of.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: ': A whole number representing the new paintjob id. Ranges from 0 up to 3.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped to check.' },
+            { name: 'headState', isOptional: false, isVariadic: false, summary: 'head state, use true if you want the ped be headless, use false to give back the head.' },
         ],
-        returns: 'returns true if the vehicles paintjob was changed. otherwise false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehiclePaintjob',
+        returns: 'Returns *true* if successful, *false* otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedHeadless',
     },
-    setVehiclePanelState: {
-        summary: 'This function allows you to change the state of one of the six panels vehicles can have.\nWhen executed on the server-side resources, the damage will be synched for all players,\nwhereas the change is only client-side if the function is used in a client resource.',
+    setPedLookAt: {
+        summary: 'Makes a ped turn his head and look at a specific world position or element.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you would like to modify the panel of.' },
-            { name: 'panelID', isOptional: false, isVariadic: false, summary: 'An ID specifying the part of the vehicle. Possible values are: Cars 0 Engine Smoke (left engine for a Nevada or a Beagle) 1 Engine Smoke (right engine for a Nevada or a Beagle) 2 Rudder 3 Elevators 4 Ailerons 5 Unknown 6 Unknown \'\'NOTE:\'\' Settings are not applicable for all vehicles of these types, for instance panel 0 effects a Dodo, but does nothing to a hydra. Planes' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'How damaged the part is on the scale of 0 to 3, with 0 being undamaged and 3 being very damaged. How this is manifested depends on the panel and the vehicle.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped to change the lookat of.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'the x coordinate of the world position to look at.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'the y coordinate of the world position to look at.' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'the z coordinate of the world position to look at.' },
+            { name: 'time', isOptional: true, isVariadic: false, summary: 'the time, in milliseconds, during which the ped will look at the target. Once this time has elapsed, he will look ahead again like before the function was applied. A time of 0 will immediately stop any lookat. A negative time will make the ped look at the target indefinitely.' },
+            { name: 'blend', isOptional: true, isVariadic: false, summary: 'the time, in milliseconds, during which the look will blend.' },
+            { name: 'target', isOptional: true, isVariadic: false, summary: 'if this argument is specified, the position arguments will be mean offsets relative to the target and the ped\'s gaze will follow the specified element instead. Can be a player, a vehicle, another ped etc.' },
         ],
-        returns: 'returns true if the panel state has been updated, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehiclePanelState',
+        returns: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedLookAt',
     },
-    setVehiclePlateText: {
-        summary: 'This function can be used to set the numberplate text of a vehicle.',
+    setPedOnFire: {
+        summary: 'This function can be used to set a ped on fire or extinguish a fire on it.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle whose numberplate you want to change.' },
-            { name: 'numberplate', isOptional: false, isVariadic: false, summary: 'a string that will go on the number plate of the vehicle (max 8 characters).' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped that we want to set/unset' },
+            { name: 'isOnFire', isOptional: false, isVariadic: false, summary: 'true to set the ped on fire, false to extinguish any fire on him' },
         ],
-        returns: 'returns true if the numberplate was changed successfully, or false if invalid arguments were passed',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehiclePlateText',
+        returns: 'returns true if successful, false otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedOnFire',
+    },
+    setPedOxygenLevel: {
+        summary: 'This function allows you to set the oxygen level of a ped.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose oxygen level you want to modify.' },
+            { name: 'oxygen', isOptional: false, isVariadic: false, summary: 'the amount of oxygen you want to set on the ped. Native values are from 0 to 1000. Each of the stamina (22) and underwater stamina (225) stat maximum adds a bonus of 1500. So the maximum oxygen level is 4000.' },
+        ],
+        returns: 'Returns *true* if the oxygen level was changed succesfully. Returns *false* if an invalid ped and/or oxygen level was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedOxygenLevel',
+    },
+    setPedsLODDistance: {
+        summary: 'This function sets the peds LOD distance.',
+        parameters: [
+            { name: 'distance', isOptional: false, isVariadic: false, summary: 'the new peds LOD distance. This value is clamped to **0** – **500**. (Default for *high_detail_peds* on is **500**, when off, it is **60**).' },
+        ],
+        returns: 'This function returns *true* if the argument is valid. Returns *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedsLODDistance',
+    },
+    setPedStat: {
+        summary: 'This function allows you to set the value of a specific statistic for a ped. **Visual stats (FAT and BODY_MUSCLE) can only be used on the CJ skin**, they have no effect on other skins. When this function is used client-side, it can only be used on client-side created peds.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose statistic you want to modify.' },
+            { name: 'stat', isOptional: false, isVariadic: false, summary: 'the stat ID.' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'the new value of the stat. It must be between 0 and 1000.' },
+        ],
+        returns: 'Returns *true* if the statistic was changed succesfully. Returns *false* if an invalid player is specified, if the stat ID/value is out of acceptable range or if the FAT or BODY_MUSCLE stats are used on non-CJ players.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedStat',
+    },
+    setPedTargetingMarkerEnabled: {
+        summary: 'This function is used to toggle the health target marker on top of all pedestrians.',
+        parameters: [
+            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'A boolean denoting whether we want to enable (*true*) or disable (*false*) the markers.' },
+        ],
+        returns: 'Returns *true* if the markers were enabled, *false* if weren\'t or if invalid arguments are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedTargetingMarkerEnabled',
+    },
+    setPedVoice: {
+        summary: 'Changes the voice of a ped.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose voice to change.' },
+            { name: 'voiceType', isOptional: false, isVariadic: false, summary: 'the voice type. See ped voices for possible types.' },
+            { name: 'voiceName', isOptional: false, isVariadic: false, summary: 'the voice name within the specified type. See ped voices for possible voices.' },
+        ],
+        returns: 'Returns *true* when the voice was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPedVoice',
     },
 };

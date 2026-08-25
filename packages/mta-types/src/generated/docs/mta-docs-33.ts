@@ -1,242 +1,234 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_33: ApiDocumentationCatalog = {
-    isVehicleNitroActivated: {
-        summary: 'This function checks if nitro is activated on the vehicle.',
+    isControlEnabled: {
+        summary: 'Checks whether a GTA control is enabled or disabled for a certain player.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle, which you want to check for an activation.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish the control status of.' },
+            { name: 'control', isOptional: false, isVariadic: false, summary: 'The control you wish to check. See control names for a list of possible controls.' },
         ],
-        returns: 'returns true if the nitro is currently activated on the vehicle, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleNitroActivated',
+        returns: 'Returns *true* if control is enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsControlEnabled',
     },
-    isVehicleNitroRecharging: {
-        summary: 'This function checks if nitro is recharging on the vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle, which you want to check for recharging.' },
-        ],
-        returns: 'returns true if the nitro is currently recharging on the vehicle, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleNitroRecharging',
-    },
-    isVehicleOnGround: {
-        summary: 'Checks to see if a vehicle has contact with the ground.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to check.' },
-        ],
-        returns: 'returns true if vehicle is on the ground, false if it is not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleOnGround',
-    },
-    isVehicleTaxiLightOn: {
-        summary: 'This function will get the taxi light state of a taxi (vehicle IDs 420 and 438)',
-        parameters: [
-            { name: 'taxi', isOptional: false, isVariadic: false, summary: 'The vehicle element of the taxi that you wish to get the light state of.' },
-        ],
-        returns: 'returns true if the light is on, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleTaxiLightOn',
-    },
-    isVehicleWheelOnGround: {
-        summary: 'This function returns a boolean whether the vehicles wheel is on ground (true) or in air\n(false).',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle, which you want to check.' },
-            { name: 'wheel', isOptional: false, isVariadic: false, summary: 'The wheel name or number, see list below: ** "front_left" or 0 ** "rear_left" or 1 ** "front_right" or 2 ** "rear_right" or 3' },
-        ],
-        returns: 'returns true if the vehicle wheel is on ground/collided, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleWheelOnGround',
-    },
-    isVehicleWindowOpen: {
+    isCoronaReflectionEnabled: {
         summary: '',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the window state.' },
-            { name: 'window', isOptional: false, isVariadic: false, summary: 'An int|integer representing a vehicle window. It can be: 0 motorbike shield 1 rear window 2 right front window 3 right back window 4 left front (driver) window 5 left back window 6 windshield' },
+            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'marker' },
         ],
-        returns: 'this function returns a boolean which represents window open state.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleWindowOpen',
+        returns: '* Returns *false* is marker type is not *corona*. * Returns *true* if corona reflection is enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsCoronaReflectionEnabled',
     },
-    isVoiceEnabled: {
-        summary: 'Added to client side.\nThis function allows you to make the server reveal whether or not voice is currently\nenabled.',
+    isCursorShowing: {
+        summary: 'This function determines the state of a player\'s cursor.',
+        parameters: [
+            { name: 'playerElement', isOptional: false, isVariadic: false, summary: 'The player from whom we want to retrieve the cursor state.' },
+        ],
+        returns: 'Returns *true* if the player\'s cursor is visible, and *false* if it is not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsCursorShowing',
+    },
+    isDebugViewActive: {
+        summary: 'This function returns whether the ingame debug window is visible or not. This is the debugwindow visible using the "debugscript " command.',
         parameters: [],
-        returns: 'returns true if the voice is enabled on the server, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVoiceEnabled',
+        returns: 'Returns *true* if the debug view is visible, *false* if not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsDebugViewActive',
     },
-    isWaterDrawnLast: {
-        summary: 'This function determines whether water is drawn last in the rendering order.',
+    isDiscordRichPresenceConnected: {
+        summary: 'The function checks if the client has Discord Rich Presence enabled.',
         parameters: [],
-        returns: 'returns true if water is drawn last in the rendering order, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsWaterDrawnLast',
+        returns: 'Returns *true* if Discord Rich Presence is enabled on the client, *false* if disabled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsDiscordRichPresenceConnected',
     },
-    isWorldSoundEnabled: {
-        summary: '',
+    isElement: {
+        summary: 'This function checks if a value is an element or not.',
         parameters: [
-            { name: 'group', isOptional: false, isVariadic: false, summary: 'An integer representing the World sound groups|world sound group' },
-            { name: 'index', isOptional: true, isVariadic: false, summary: 'An integer representing an individual sound within the group' },
+            { name: 'theValue', isOptional: false, isVariadic: false, summary: 'The value that we want to check.' },
         ],
-        returns: 'returns true if the world sounds are enabled, false if they are disabled or invalid values were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsWorldSoundEnabled',
+        returns: 'Returns *true* if the passed value is an element, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElement',
     },
-    isWorldSpecialPropertyEnabled: {
-        summary: 'Checks if a special world property (cheat) is enabled or not.',
+    isElementAttached: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis functions checks whether or not an element is attached to another element.',
         parameters: [
-            { name: 'propname', isOptional: false, isVariadic: false, summary: 'the name of the property to retrieve. Possible values are listed on SetWorldSpecialPropertyEnabled.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check for attachment.' },
         ],
-        returns: 'returns true if the property is enabled, false if it is disabled or the specified property name is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsWorldSpecialPropertyEnabled',
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns *true* if the specified element is attached to another element, *false* if it is not attached or *nil* if an improper argument was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementAttached',
     },
-    kickPlayer: {
-        summary: 'This function will kick the specified player from the server.',
+    isElementCallPropagationEnabled: {
+        summary: 'This functions checks if certain element has call propagation enabled.',
         parameters: [
-            { name: 'kickedPlayer', isOptional: false, isVariadic: false, summary: 'The player that will be kicked from the server' },
-            { name: 'responsiblePlayer', isOptional: true, isVariadic: false, summary: 'The player that is responsible for the event. Note: If left out as in the second syntax, responsible player for the kick will be Console (Maximum 30 characters if using a string).' },
-            { name: 'reason', isOptional: true, isVariadic: false, summary: 'The reason for the kick. (Maximum 64 characters before 1.5.8, Maximum 128 characters after 1.5.8)' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check' },
         ],
-        returns: 'returns true if the player was kicked succesfully, false if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/KickPlayer',
+        returns: 'Returns *true* if the propagation is enabled, *false* if disabled or invalid arguments have been passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementCallPropagationEnabled',
     },
-    killPed: {
-        summary: 'This function kills the specified ped.\nFrom v1.5.3 onwards this function is now available client side. Only works on client side\npeds.',
+    isElementCollidableWith: {
+        summary: 'This function can be used to check whether specified element is collidable with another element.\n\n**Note:** You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped to kill' },
-            { name: 'theKiller', isOptional: true, isVariadic: false, summary: 'The ped responsible for the kill' },
-            { name: 'weapon', isOptional: true, isVariadic: false, summary: 'The ID of the weapon or Damage Types that should appear to have killed the ped (doesnt affect how they die)' },
-            { name: 'bodyPart', isOptional: true, isVariadic: false, summary: 'The ID of the body part that should appear to have been hit by the weapon (doesnt affect how they die)' },
-            { name: 'stealth', isOptional: true, isVariadic: false, summary: 'Boolean value, representing whether or not this a stealth kill' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which colliding you want to get' },
+            { name: 'withElement', isOptional: false, isVariadic: false, summary: 'The other element which colliding with the first entity you want to get' },
         ],
-        returns: 'returns true if the ped was killed, false if the ped specified could not be killed or is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/KillPed',
+        returns: 'Returns *true* if the elements collide with each other, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementCollidableWith',
     },
-    killTimer: {
-        summary: 'This function allows you to kill/halt existing timers.',
+    isElementDoubleSided: {
+        summary: 'This function checks whether an element is double-sided as set by setElementDoubleSided or not.',
         parameters: [
-            { name: 'theTimer', isOptional: false, isVariadic: false, summary: 'The timer you wish to halt.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element in which you\'d like to check the double-sidedness of.' },
         ],
-        returns: 'returns true if the timer was successfully killed, false if no such timer existed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/KillTimer',
+        returns: 'Returns *true* if the **theElement** is double-sided, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementDoubleSided',
     },
-    loadBrowserURL: {
-        summary: 'This function loads the specified URL.',
+    isElementFrozen: {
+        summary: 'This function checks if element has been frozen.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The Element/Browser|browser element which will load the URL' },
-            { name: 'url', isOptional: false, isVariadic: false, summary: 'The url you want to load. It can either contain a remote website (http:// prefix) or a website stored within a local resource (http://mta/local/gui.html for example, see Local_Scheme_Handler|Local Scheme Handler for details).' },
-            { name: 'postData', isOptional: true, isVariadic: false, summary: 'The post data passed to the website. Its content type can be any type (e.g. JSON) if urlEncoded is set to false' },
-            { name: 'urlEncoded', isOptional: true, isVariadic: false, summary: 'If set to true, it will be available f.e. in PHPs $_POST variable (the content type is: application/x-www-form-urlencoded)' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element whose freeze status we want to check.' },
         ],
-        returns: 'returns true if the url was successfully loaded.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/LoadBrowserURL',
+        returns: '*Returns *true* if the element is frozen, *false* if it isn\'t or if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementFrozen',
     },
-    loadMapData: {
-        summary: 'This function is intended to load data from a loaded XML file into the element tree. This\ncould be used for loading an external map, or part of another map.',
+    isElementInWater: {
+        summary: 'This function checks whether an element is submerged in water.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'The node that you wish to load into the element tree.' },
-            { name: 'parent', isOptional: false, isVariadic: false, summary: 'The node you wish to be the parent of the new map data.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check.' },
         ],
-        returns: 'returns an element object that corresponds to the root of the new data added, i.e. an element that represents the node xmlnode passed to the function. returns false if the arguments are invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/LoadMapData',
+        returns: 'Returns *true* if the passed element is in water, *false* if it isn\'t, or if the element is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementInWater',
     },
-    localPlayer: {
-        summary: 'The player element of the local player.',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    logIn: {
-        summary: 'This functions logs the given player in to the given account. You need to provide the\npassword needed to log into that account.',
+    isElementLocal: {
+        summary: 'This function checks whether a clientside element is local to the client (doesn\'t exist in the server) or not.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to log into an account' },
-            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account to log the player into' },
-            { name: 'thePassword', isOptional: false, isVariadic: false, summary: 'The password needed to sign into this account' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element that we want to check.' },
         ],
-        returns: 'returns true if the player was successfully logged into the given account. returns false or nil if the log in failed for some reason, ie. the player was already logged in to some account (use logout first), if the account was already in use or if it failed for some other reason.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/LogIn',
+        returns: 'Returns *true* if the passed element is local, *false* if not or if invalid parameters are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementLocal',
     },
-    logOut: {
-        summary: 'This function logs the given player out of his current account.',
+    isElementLowLOD: {
+        summary: 'This function reveals if an element is low LOD.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to log out of his current account' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose low LOD status we want to get.' },
         ],
-        returns: 'returns true if the player was successfully logged out, false or nil if it failed for some reason, ie. the player was never logged in.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/LogOut',
+        returns: 'Returns *true* if the element is low LOD, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementLowLOD',
     },
-    md5: {
-        summary: 'Calculates the MD5 hash of the specified string and returns its hexadecimal\nrepresentation.',
+    isElementOnFire: {
+        summary: 'This function checks if the specified element is on fire or not.',
         parameters: [
-            { name: 'str', isOptional: false, isVariadic: false, summary: 'the string to hash.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check.' },
         ],
-        returns: 'returns the md5 hash of the input string if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Md5',
+        returns: 'Returns *true* if the element is on fire, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementOnFire',
     },
-    moveObject: {
-        summary: 'This function will smoothly move an object from its current position to a specified\nrotation and position.',
+    isElementOnScreen: {
+        summary: 'This function will check if an element is on the screen. Elements behind objects but still in the camera view count as being on screen.\n\nThis function is particularly useful for detecting if dynamic objects are in "destroyed" state. Destroyed objects will return false.',
         parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'the object that will be moved.' },
-            { name: 'time', isOptional: false, isVariadic: false, summary: 'the time in milliseconds the object will arrive at the destination.' },
-            { name: 'targetx', isOptional: false, isVariadic: false, summary: 'the X value of the target position' },
-            { name: 'targety', isOptional: false, isVariadic: false, summary: 'the Y value of the target position' },
-            { name: 'targetz', isOptional: false, isVariadic: false, summary: 'the Z value of the target position' },
-            { name: 'moverx', isOptional: true, isVariadic: false, summary: 'the rotation along the X axis relative to its current rotation, which is its starting angle.' },
-            { name: 'movery', isOptional: true, isVariadic: false, summary: 'the rotation along the Y axis relative to its current rotation, which is its starting angle.' },
-            { name: 'moverz', isOptional: true, isVariadic: false, summary: 'the rotation along the Z axis relative to its current rotation, which is its starting angle.' },
-            { name: 'strEasingType', isOptional: true, isVariadic: false, summary: 'the Easing|easing function to use for the interpolation (default is Linear)' },
-            { name: 'fEasingPeriod', isOptional: true, isVariadic: false, summary: 'the period of the Easing|easing function (only some easing functions use this parameter)' },
-            { name: 'fEasingAmplitude', isOptional: true, isVariadic: false, summary: 'the amplitude of the Easing|easing function (only some easing functions use this parameter)' },
-            { name: 'fEasingOvershoot', isOptional: true, isVariadic: false, summary: 'the overshoot of the Easing|easing function (only some easing functions use this parameter)' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element of which you wish to check wether it\'s being rendered on screen.' },
         ],
-        returns: '* true if the function moved the object succesfully. * false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/MoveObject',
+        returns: 'Returns *true* if element is on screen, *false* if not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementOnScreen',
     },
-    navigateBrowserBack: {
-        summary: 'Returns the browser to the previous page.',
+    isElementStreamable: {
+        summary: 'This function checks whether an element is streamable as set by setElementStreamable or not.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser that you want return to the previous page.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check the streamability of.' },
         ],
-        returns: 'returns true if the browser has returned to the previous page, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/NavigateBrowserBack',
+        returns: 'Returns *true* if the passed element is streamable like normal, *false* if this element must always be streamed in.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementStreamable',
     },
-    navigateBrowserForward: {
-        summary: 'This function takes the browser to the next page.',
+    isElementStreamedIn: {
+        summary: 'This function checks whether an element is currently streamed in (not virtualized) and are actual GTA objects in the world. You can force an element to be streamed in using setElementStreamable.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser that you want to take to the next page.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check whether is streamed in or not.' },
         ],
-        returns: 'returns true if the browser has gone to the next page, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/NavigateBrowserForward',
+        returns: 'Returns *true* if the passed element is currently streamed in, *false* if it is virtualized.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementStreamedIn',
     },
-    outputChatBox: {
-        summary: 'This outputs the specified text string to the chatbox. It can be specified as a message\nto certain player(s) or all players.\nIt can optionally allow you to embed color changes into the string by setting the\ncolorCoded boolean to true. This allows:\n```lua\noutputChatBox ( #FF0000Hello #00FF00World, root, 255, 255, 255, true )\n```\nThis will display as: Hello World',
+    isElementSyncer: {
+        summary: 'This function checks whether an element is synced by the local player or not. Accepted elements are peds and vehicles.',
         parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text string that you wish to send to the chat window. If more than 256 characters it will not be showed in chat.' },
-            { name: 'visibleTo', isOptional: true, isVariadic: false, summary: 'Can also be a table of players or team.' },
-            { name: 'r', isOptional: true, isVariadic: false, summary: 'The amount of red in the color of the text. Default value is 231.' },
-            { name: 'g', isOptional: true, isVariadic: false, summary: 'The amount of green in the color of the text. Default value is 217.' },
-            { name: 'b', isOptional: true, isVariadic: false, summary: 'The amount of blue in the color of the text. Default value is 176.' },
-            { name: 'colorCoded', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether or not #RRGGBB tags should be used. Note: The #RRGGBB format must contain capital letters a-f is not acceptable but A-F is. Default RGB values in this format are: \'#E7D9B0\'.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check.' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OutputChatBox',
+        returns: 'Returns *true* if the passed element is synced by the local player, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementSyncer',
     },
-    outputConsole: {
-        summary: 'This outputs the specified text string to the console window (accessed with F8 or ~ key).\nIt can be specified as a message to certain player(s) or all players.',
+    isElementVisibleTo: {
+        summary: 'This checks if an element is visible to a player. This does not check if the player can literally see the element, just that they are aware that it exists. Some so-called per-player elements are able to be visible only to some players, as such this checks if this is the case for a particular element/player combination.',
         parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text string that you wish to send to the console window' },
-            { name: 'visibleTo', isOptional: true, isVariadic: false, summary: 'This specifies who the chat is visible to. Any players in this element will see the chat message. See visibility.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you want to check the visibility of' },
+            { name: 'visibleTo', isOptional: false, isVariadic: false, summary: 'The player you want to check against' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OutputConsole',
+        returns: 'Returns *true* if element is visible to the specified player, *false* if not or an invalid argument was passed to the function.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementVisibleTo',
     },
-    outputDebugString: {
-        summary: 'This function outputs scripting debug messages, which can be read by enabling the debug\ntextbox. The debug display level can then be set so that info or warning messages get\nfiltered out.',
+    isElementWaitingForGroundToLoad: {
+        summary: 'This function checks whether MTA has frozen an element because it is above map objects which are still loading or not.',
         parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'the text to be output to the debug box.' },
-            { name: 'level', isOptional: true, isVariadic: false, summary: 'the debug message level. Possible values are: 0 Custom message 1 Error message 2 Warning message 3 Information message (default) 4 Custom message (omits file path and line number)' },
-            { name: 'red', isOptional: true, isVariadic: false, summary: 'The amount of red in the color of the text. Default value is 255.' },
-            { name: 'green', isOptional: true, isVariadic: false, summary: 'The amount of green in the color of the text. Default value is 255.' },
-            { name: 'blue', isOptional: true, isVariadic: false, summary: 'The amount of blue in the color of the text. Default value is 255.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to check its frozen waiting for custom map objects to load status. It can be a vehicle, ped or player.' },
         ],
-        returns: 'returns true if the debug message was successfully output, false if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OutputDebugString',
+        returns: 'Returns *true* if the specified element is frozen waiting for collisions of custom map objects to load. Returns *false* if it\'s not or if the specified element is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementWaitingForGroundToLoad',
     },
-    outputServerLog: {
-        summary: 'This outputs a line of text to the servers log. This could be useful for debugging.',
+    isElementWithinColShape: {
+        summary: 'This function is used to determine if an element is within a collision shape. Please note that for legacy reasons, a colshape created on the client does not collide with elements already existing at that location until they first move. Please also note that before 1.0.3, this did not function correctly when moving a colshape.\n\nPlease note that this function doesn\'t verify whether element is in the same dimension and interior, additional checks could be implemented manually if they are needed.',
         parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text to be output to the log.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you\'re checking.' },
+            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'The colshape you\'re checking' },
         ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OutputServerLog',
+        returns: 'Returns *true* if the element is within the colshape, *false* otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementWithinColShape',
+    },
+    isElementWithinMarker: {
+        summary: 'This function is used to determine if an element is within a marker.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you\'re checking.' },
+            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker you\'re checking.' },
+        ],
+        returns: 'Returns *true* if the element is within the marker, *false* otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementWithinMarker',
+    },
+    isGarageOpen: {
+        summary: 'This function checks whether or not a specific garage door is open.',
+        parameters: [
+            { name: 'garageID', isOptional: false, isVariadic: false, summary: 'The garage ID that represents the garage door that is being checked.' },
+        ],
+        returns: 'Returns *true* if the garage is open, *false* if it is closed or an invalid garage ID was given.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsGarageOpen',
+    },
+    isGlitchEnabled: {
+        summary: 'This function retrieves whether San Andreas game glitches are enabled or not, set by using setGlitchEnabled',
+        parameters: [
+            { name: 'glitchName', isOptional: false, isVariadic: false, summary: 'the name of the property to set. Possible values are:' },
+        ],
+        returns: 'Returns *true* if if the glitch was enabled, or *false* if it is disabled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsGlitchEnabled',
+    },
+    isGuestAccount: {
+        summary: 'This function checks to see if an account is a guest account. A guest account is an account automatically created for a user when they join the server and deleted when they quit or login to another account. Data stored in a guest account is not stored after the player has left the server. As a consequence, this function will check if a player is logged in or not.',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you want to check to see if it is a guest account.' },
+        ],
+        returns: 'Returns *true* if the account is a guest account, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsGuestAccount',
+    },
+    isInsideColShape: {
+        summary: 'This function checks if a 3D position is inside a colshape or not.',
+        parameters: [
+            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'The colshape you\'re checking the position against.' },
+            { name: 'posX', isOptional: false, isVariadic: false, summary: 'The X coordinate of the position you\'re checking.' },
+            { name: 'posY', isOptional: false, isVariadic: false, summary: 'The Y coordinate of the position you\'re checking.' },
+            { name: 'posZ', isOptional: false, isVariadic: false, summary: 'The Z coordinate of the position you\'re checking.' },
+        ],
+        returns: 'Returns *true* if the position is inside the colshape, *false* if it isn\'t or if any parameters are invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsInsideColShape',
+    },
+    isInsideRadarArea: {
+        summary: 'This function checks if a 2D position is inside a radar area or not.',
+        parameters: [
+            { name: 'theArea', isOptional: false, isVariadic: false, summary: 'The radar area you\'re checking the position against.' },
+            { name: 'posX', isOptional: false, isVariadic: false, summary: 'The X coordinate of the position you\'re checking.' },
+            { name: 'posY', isOptional: false, isVariadic: false, summary: 'The Y coordinate of the position you\'re checking.' },
+        ],
+        returns: 'Returns *true* if the position is inside the radar area, *false* if it isn\'t or if any parameters are invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsInsideRadarArea',
     },
 };

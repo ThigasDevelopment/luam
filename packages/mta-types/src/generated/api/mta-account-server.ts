@@ -16,6 +16,7 @@ export const MTA_ACCOUNT_SERVER: ApiCatalog = {
     getAccountsByIP: fn([STRING], TABLE, 1),
     getAccountsBySerial: fn([STRING], TABLE, 1),
     getAccountSerial: fn([named('Account')], STRING, 1),
+    getAccountType: fn([named('Account')], STRING, 1),
     getAllAccountData: fn([named('Account')], TABLE, 1),
     getPlayerAccount: fn([named('Player')], named('Account'), 1),
     isGuestAccount: fn([named('Account')], BOOLEAN, 1),

@@ -4,6 +4,7 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-ty
 export const MTA_ELEMENT_CLIENT: ApiCatalog = {
     getElementBoneMatrix: fn([named('Element'), NUMBER], TABLE, 2),
     getElementBonePosition: fn([named('Element'), NUMBER], tupleOf([NUMBER, NUMBER, NUMBER]), 2),
+    getElementBoneQuaternion: fn([named('Element'), NUMBER], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER]), 2),
     getElementBoneRotation: fn([named('Element'), NUMBER], tupleOf([NUMBER, NUMBER, NUMBER]), 2),
     getElementBoundingBox: fn([named('Element')], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER]), 1),
     getElementDistanceFromCentreOfMassToBaseOfModel: fn([named('Element')], NUMBER, 1),
@@ -19,9 +20,11 @@ export const MTA_ELEMENT_CLIENT: ApiCatalog = {
     isElementWaitingForGroundToLoad: fn([named('Element')], BOOLEAN, 1),
     setElementBoneMatrix: fn([named('Element'), NUMBER, TABLE], BOOLEAN, 3),
     setElementBonePosition: fn([named('Element'), NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 5),
+    setElementBoneQuaternion: fn([named('Element'), NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 6),
     setElementBoneRotation: fn([named('Element'), NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 5),
     setElementCollidableWith: fn([named('Element'), named('Element'), BOOLEAN], BOOLEAN, 3),
     setElementData: fn([named('Element'), STRING, ANY, BOOLEAN], BOOLEAN, 3),
+    setElementLighting: fn([named('Element'), NUMBER], BOOLEAN, 2),
     setElementStreamable: fn([named('Element'), BOOLEAN], BOOLEAN, 2),
     updateElementRpHAnim: fn([named('Element')], BOOLEAN, 1),
 };

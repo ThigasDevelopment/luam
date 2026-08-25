@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { BOOLEAN, fn, named, NUMBER, STRING, tupleOf } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NIL, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_PED_CLIENT: ApiCatalog = {
     canPedBeKnockedOffBike: fn([named('Ped')], BOOLEAN, 1),
@@ -18,13 +18,14 @@ export const MTA_PED_CLIENT: ApiCatalog = {
     getPedTask: fn([named('Ped'), STRING, NUMBER], tupleOf([STRING, STRING, STRING, STRING]), 3),
     getPedVoice: fn([named('Ped')], tupleOf([STRING, STRING]), 1),
     getPedWeaponMuzzlePosition: fn([named('Ped')], tupleOf([NUMBER, NUMBER, NUMBER]), 1),
+    getValidPedModels: fn([BOOLEAN], TABLE, 0),
     givePedWeapon: fn([named('Ped'), NUMBER, NUMBER, BOOLEAN], BOOLEAN, 2),
     isPedBleeding: fn([named('Ped')], BOOLEAN, 1),
     isPedDoingTask: fn([named('Ped'), STRING], BOOLEAN, 2),
     isPedFootBloodEnabled: fn([named('Element')], BOOLEAN, 1),
-    isPedReloadingWeapon: fn([named('Ped')], BOOLEAN, 1),
     isPedTargetingMarkerEnabled: fn([], BOOLEAN, 0),
-    setAnalogControlState: fn([STRING, NUMBER, BOOLEAN], BOOLEAN, 1),
+    playPedVoiceLine: fn([named('Ped'), NUMBER, NUMBER], NIL, 2),
+    resetPedVoice: fn([named('Ped')], BOOLEAN, 1),
     setPedAimTarget: fn([named('Ped'), NUMBER, NUMBER, NUMBER], BOOLEAN, 4),
     setPedAnalogControlState: fn([named('Ped'), STRING, NUMBER], BOOLEAN, 3),
     setPedBleeding: fn([named('Ped'), BOOLEAN], BOOLEAN, 2),

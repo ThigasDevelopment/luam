@@ -1,11 +1,12 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_VEHICLE_SHARED: ApiCatalog = {
-    addVehicleUpgrade: fn([named('Vehicle'), ANY], BOOLEAN, 2),
+    addVehicleSirens: fn([named('Vehicle'), NUMBER, NUMBER, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN], BOOLEAN, 3),
+    addVehicleUpgrade: fn([named('Vehicle'), unionOf([STRING, NUMBER])], BOOLEAN, 2),
     attachTrailerToVehicle: fn([named('Vehicle'), named('Vehicle')], BOOLEAN, 2),
     blowVehicle: fn([named('Vehicle'), ANY], BOOLEAN, 1),
-    createVehicle: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, NUMBER, NUMBER], named('Vehicle'), 4),
+    createVehicle: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, NUMBER, NUMBER, BOOLEAN], named('Vehicle'), 4),
     detachTrailerFromVehicle: fn([named('Vehicle'), named('Vehicle')], BOOLEAN, 1),
     fixVehicle: fn([named('Vehicle')], BOOLEAN, 1),
     getOriginalHandling: fn([NUMBER], TABLE, 1),
@@ -22,11 +23,11 @@ export const MTA_VEHICLE_SHARED: ApiCatalog = {
     getVehicleDoorOpenRatio: fn([named('Vehicle'), NUMBER], NUMBER, 2),
     getVehicleDoorState: fn([named('Vehicle'), NUMBER], NUMBER, 2),
     getVehicleEngineState: fn([named('Vehicle')], BOOLEAN, 1),
-    getVehicleHandling: fn([named('Element')], TABLE, 1),
+    getVehicleHandling: fn([named('Element'), STRING], TABLE, 1),
     getVehicleHeadLightColor: fn([named('Vehicle')], tupleOf([NUMBER, NUMBER, NUMBER]), 1),
     getVehicleLandingGearDown: fn([named('Vehicle')], BOOLEAN, 1),
     getVehicleLightState: fn([named('Vehicle'), NUMBER], NUMBER, 2),
-    getVehicleMaxPassengers: fn([ANY], NUMBER, 1),
+    getVehicleMaxPassengers: fn([unionOf([named('Vehicle'), NUMBER])], NUMBER, 1),
     getVehicleModelFromName: fn([STRING], NUMBER, 1),
     getVehicleName: fn([named('Vehicle')], STRING, 1),
     getVehicleNameFromModel: fn([NUMBER], STRING, 1),
@@ -57,6 +58,7 @@ export const MTA_VEHICLE_SHARED: ApiCatalog = {
     isVehicleLocked: fn([named('Vehicle')], BOOLEAN, 1),
     isVehicleOnGround: fn([named('Vehicle')], BOOLEAN, 1),
     isVehicleTaxiLightOn: fn([named('Vehicle')], BOOLEAN, 1),
+    removeVehicleSirens: fn([named('Vehicle')], BOOLEAN, 1),
     removeVehicleUpgrade: fn([named('Vehicle'), NUMBER], BOOLEAN, 2),
     setTrainDerailable: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 2),
     setTrainDerailed: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 2),
@@ -80,9 +82,10 @@ export const MTA_VEHICLE_SHARED: ApiCatalog = {
     setVehicleLandingGearDown: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 2),
     setVehicleLightState: fn([named('Vehicle'), NUMBER, NUMBER], BOOLEAN, 3),
     setVehicleLocked: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 2),
+    setVehicleNitroActivated: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 2),
     setVehicleOverrideLights: fn([named('Vehicle'), NUMBER], BOOLEAN, 2),
     setVehiclePaintjob: fn([named('Vehicle'), NUMBER], BOOLEAN, 2),
-    setVehiclePanelState: fn([named('Vehicle'), NUMBER, NUMBER], BOOLEAN, 3),
+    setVehiclePanelState: fn([named('Vehicle'), NUMBER, NUMBER, BOOLEAN, BOOLEAN], BOOLEAN, 3),
     setVehiclePlateText: fn([named('Element'), STRING], BOOLEAN, 2),
     setVehicleSirens: fn([named('Vehicle'), NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 8),
     setVehicleSirensOn: fn([named('Vehicle'), BOOLEAN], BOOLEAN, 2),
@@ -91,4 +94,5 @@ export const MTA_VEHICLE_SHARED: ApiCatalog = {
     setVehicleTurretPosition: fn([named('Vehicle'), NUMBER, NUMBER], BOOLEAN, 3),
     setVehicleVariant: fn([named('Vehicle'), NUMBER, NUMBER], BOOLEAN, 1),
     setVehicleWheelStates: fn([named('Vehicle'), NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 2),
+    spawnVehicleFlyingComponent: fn([named('Vehicle'), NUMBER, NUMBER, NUMBER], BOOLEAN, 2),
 };

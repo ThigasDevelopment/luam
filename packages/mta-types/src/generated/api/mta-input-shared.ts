@@ -17,7 +17,11 @@ export const MTA_INPUT_SHARED: ApiCatalog = {
     executeCommandHandler: fn([STRING, ANY, ANY], BOOLEAN, 1),
     getCommandHandlers: fn([named('Resource')], TABLE, 0),
     getFunctionsBoundToKey: fn([ANY, STRING, ANY], TABLE, 2),
-    getKeyBoundToFunction: fn([unionOf([named('Player'), fn([], ANY, 0, true, [], ANY)]), unionOf([fn([], ANY, 0, true, [], ANY), ANY])], STRING, 1),
+    getKeyBoundToFunction: fn(
+        [unionOf([named('Player'), fn([], ANY, 0, true, undefined)]), unionOf([fn([], ANY, 0, true, undefined), ANY])],
+        STRING,
+        1,
+    ),
     isControlEnabled: fn([ANY, ANY], BOOLEAN, 1),
     removeCommandHandler: fn([STRING, fn([ANY, ANY], VOID, 1, true, undefined)], BOOLEAN, 1),
     toggleAllControls: fn([ANY, BOOLEAN, BOOLEAN, ANY], BOOLEAN, 1),

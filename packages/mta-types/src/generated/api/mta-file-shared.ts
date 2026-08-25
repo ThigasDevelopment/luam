@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { BOOLEAN, fn, named, NUMBER, STRING } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NIL, NUMBER, STRING, TABLE, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_FILE_SHARED: ApiCatalog = {
     fileClose: fn([named('File')], BOOLEAN, 1),
@@ -8,6 +8,8 @@ export const MTA_FILE_SHARED: ApiCatalog = {
     fileDelete: fn([STRING], BOOLEAN, 1),
     fileExists: fn([STRING], BOOLEAN, 1),
     fileFlush: fn([named('File')], BOOLEAN, 1),
+    fileGetContents: fn([named('File'), BOOLEAN], unionOf([NIL, STRING]), 1),
+    fileGetHash: fn([named('File'), STRING, TABLE], unionOf([NIL, STRING]), 2),
     fileGetPath: fn([named('File')], STRING, 1),
     fileGetPos: fn([named('File')], NUMBER, 1),
     fileGetSize: fn([named('File')], NUMBER, 1),

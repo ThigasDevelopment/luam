@@ -1,241 +1,237 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_30: ApiDocumentationCatalog = {
-    inspect: {
-        summary: 'This function returns human-readable representations of tables and MTA datatypes as a\nstring.',
+    guiGridListSetHorizontalScrollPosition: {
+        summary: 'This function is used to set the horizontal scroll position from a grid list',
         parameters: [
-            { name: 'variable', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'options', isOptional: true, isVariadic: false, summary: 'A table of options. It is not mandatory, but when it is provided, it must be a table. For a list of options, see the https://github.com/kikito/inspect.lua#options Inspects GitHub page.' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The grid list you want to set the horizontal scroll position from' },
+            { name: 'fPosition', isOptional: false, isVariadic: false, summary: 'A float representing the horizontal scroll position (0-100)' },
         ],
-        returns: 'always returns a string. the contents can change if we update the inspect library, so it is not expected to be consistent across lua versions.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Inspect',
+        returns: 'Returns *true* if the horizontal scroll position was set, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetHorizontalScrollPosition',
     },
-    interpolateBetween: {
-        summary: 'Interpolates a 3D Vector between a source value and a target value using either linear\ninterpolation or any other Easing|easing function.\nIt can also be used to interpolate 2D vectors or scalars by only setting some of the x,\ny, z values and putting 0 to the others.',
+    guiGridListSetItemColor: {
+        summary: 'This function changes the color of a gridlist item.',
         parameters: [
-            { name: 'x1', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'y1', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'z1', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'x2', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'y2', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'z2', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'fProgress', isOptional: false, isVariadic: false, summary: 'float between 0 and 1 indicating the interpolation progress (0 at the beginning of the interpolation, 1 at the end). If it is higher than 1, it will start from the beginning.' },
-            { name: 'strEasingType', isOptional: false, isVariadic: false, summary: 'the Easing|easing function to use for the interpolation' },
-            { name: 'fEasingPeriod', isOptional: true, isVariadic: false, summary: 'the period of the Easing|easing function (only some easing functions use this parameter)' },
-            { name: 'fEasingAmplitude', isOptional: true, isVariadic: false, summary: 'the amplitude of the Easing|easing function (only some easing functions use this parameter)' },
-            { name: 'fEasingOvershoot', isOptional: true, isVariadic: false, summary: 'the overshoot of the Easing|easing function (only some easing functions use this parameter)' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list element' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'Row ID' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID' },
+            { name: 'red', isOptional: false, isVariadic: false, summary: 'The amount of red in the color (0-255)' },
+            { name: 'green', isOptional: false, isVariadic: false, summary: 'The amount of green in the color (0-255)' },
+            { name: 'blue', isOptional: false, isVariadic: false, summary: 'The amount of blue in the color (0-255)' },
+            { name: 'alpha', isOptional: true, isVariadic: false, summary: 'The amount of alpha in the color (0-255).' },
         ],
-        returns: 'returns x, y, z the interpolated 3d vector/value if successful, false otherwise (error in parameters). as mentioned before, interpolatebetween can be used on 2d vectors or scalars in which case only some (x, y or just x) of the returned values are to be used (cf. alpha interpolation in marker example or size interpolation in window example).',
-        wiki: 'https://wiki.multitheftauto.com/wiki/InterpolateBetween',
+        returns: 'Returns *true* if the item color was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetItemColor',
     },
-    iprint: {
-        summary: 'This function intelligently outputs debug messages into the Debug Console.  It is similar\nto outputDebugString, but outputs useful information for any variable type, and does not\nrequire use of Luas tostring.  This includes information about element types, and table\nstructures.  It is especially useful for quick debug tasks.',
+    guiGridListSetItemData: {
+        summary: 'This function sets a Item Data associated to a grid list item.\n\n**Note:** This function will only work **after** you set the item\'s text using guiGridListSetItemText!',
         parameters: [
-            { name: 'var1', isOptional: false, isVariadic: false, summary: 'A variable of any type to print intelligent information for. var2+ Another variable to be output. An unlimited number of arguments can be supplied' },
-            { name: 'var2', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'var3', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'varargs', isOptional: false, isVariadic: true, summary: '' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'A gridlist element of the data you wish to set to' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'The row of the item you wish to set to' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'The column of the item you wish to set to' },
+            { name: 'data', isOptional: false, isVariadic: false, summary: 'The data you wish to set to the item.' },
         ],
-        returns: 'always returns nil.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Iprint',
+        returns: 'Returns *true* if the data was set successfully, false otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetItemData',
     },
-    isAmbientSoundEnabled: {
-        summary: 'This function allows you to check if some background sound effects are enabled.',
+    guiGridListSetItemText: {
+        summary: 'This function changes the text of a gridlist item.\n\nNotice: This function doesn\'t work well with Sorting. If you are using sorting, please use the optional arguments of guiGridListAddRow as much as possible.',
         parameters: [
-            { name: 'theType', isOptional: false, isVariadic: false, summary: 'The type of ambient sound to test. Can be either gunfire or general.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list element' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'Row ID' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'Column ID' },
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text you want to put in (does NOT accept numbers, use tostring() for that)' },
+            { name: 'section', isOptional: false, isVariadic: false, summary: 'Determines if the item is a section' },
+            { name: 'number', isOptional: false, isVariadic: false, summary: 'Tells whether the text item is a number value or not (used for sorting)' },
         ],
-        returns: 'returns true if the ambient sound is enabled, false if it is disabled or invalid values were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsAmbientSoundEnabled',
+        returns: 'Returns *true* if the item text was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetItemText',
     },
-    isBan: {
-        summary: 'This function checks whether the passed value is valid ban or not.',
+    guiGridListSetScrollBars: {
+        summary: 'This function allows a gridlist\'s scrollbar to be forced **on**, or returned to default.',
         parameters: [
-            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The value to check' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The GUI gridlist you wish to change the state of scrollbars' },
+            { name: 'horizontalBar', isOptional: false, isVariadic: false, summary: 'A bool where *true* forces the horizontal scrollbar on, and *false* returns them to default.' },
+            { name: 'verticalBar', isOptional: false, isVariadic: false, summary: 'A bool where *true* forces the verical scrollbar on, and *false* returns them to default.' },
         ],
-        returns: 'returns true if the value is a ban, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsBan',
+        returns: 'Returns *true* if the scrollbars were successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetScrollBars',
     },
-    isBrowserDomainBlocked: {
-        summary: 'This function checks if the specified URL is blocked from being loaded.',
+    guiGridListSetSelectedItem: {
+        summary: 'This function selects an item from a gridlist. If you wish to deselect whatever item is selected, pass *0* as both the *rowIndex* and  *columnIndex* arguments.',
         parameters: [
-            { name: 'address', isOptional: false, isVariadic: false, summary: 'A website URL' },
-            { name: 'isURL', isOptional: true, isVariadic: false, summary: 'true if address should be parsed as URL, false otherwise.' },
+            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'the grid list you want to select an item from' },
+            { name: 'rowIndex', isOptional: false, isVariadic: false, summary: 'the row you want to select (index 0 is the first row)' },
+            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'the column you want to select (index 1 is the first column)' },
+            { name: 'bReset', isOptional: true, isVariadic: false, summary: 'set to false for multiple selections' },
         ],
-        returns: 'returns false if the url is able to be loaded, true if it is blocked and nil if an invalid domain/url was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserDomainBlocked',
+        returns: 'Returns *true* if the passed arguments are correct and the item has been selected, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetSelectedItem',
     },
-    isBrowserFocused: {
-        summary: 'This function checks if a browser is focused.',
+    guiGridListSetSelectionMode: {
+        summary: 'This function sets the selection mode of a gui gridlist.  For example, the MTA *server browser* selects a whole row, while the *Controls* dialog selects a single cell. To select multiple items you must be holding down \'ctrl\'.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser' },
+            { name: 'gridlist', isOptional: false, isVariadic: false, summary: 'The gridlist in which you wish to set the selection mode.' },
+            { name: 'mode', isOptional: false, isVariadic: false, summary: 'The mode of the selection. Can be the following values:' },
         ],
-        returns: 'returns true if the browser is focused, false otherwise and nil if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserFocused',
+        returns: 'Returns *true* if the selection mode was successfully set, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetSelectionMode',
     },
-    isBrowserLoading: {
-        summary: 'This function checks if a browser is currently loading a website.',
+    guiGridListSetSortingEnabled: {
+        summary: 'This function allows the disabling or enabling of *sorting* within a gridlist.  Sorting is achieved by clicking a column header.  Gridlist items will be sorted according to the clicked column.  By default, gridlists have sorting enabled.  This function will allow you to toggle this.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The GUI gridlist you wish to toggle the sorting of.' },
+            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the sorting is enabled, or disabled.' },
         ],
-        returns: 'returns true if the browser is loading a website, false otherwise and nil if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserLoading',
+        returns: 'Returns *true* if sorting was successfully toggled., *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetSortingEnabled',
     },
-    isBrowserRenderingPaused: {
-        summary: '',
+    guiGridListSetVerticalScrollPosition: {
+        summary: 'This function is used to set the vertical scroll position from a grid list',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser element to get the rendering state of.' },
+            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The grid list you want to set the vertical scroll position from' },
+            { name: 'fPosition', isOptional: false, isVariadic: false, summary: 'A float representing the vertical scroll position (0-100)' },
         ],
-        returns: 'returns true if the browser rendering is paused, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserRenderingPaused',
+        returns: 'Returns *true* if the vertical scroll position was set, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetVerticalScrollPosition',
     },
-    isCapsLockEnabled: {
-        summary: '',
-        parameters: [],
-        returns: 'returns true if caps lock is toggled (on), false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsCapsLockEnabled',
-    },
-    isChatBoxInputActive: {
-        summary: 'This function returns whether the ingame chatbox is being used (accepting chatbox input)\nor not.',
-        parameters: [],
-        returns: 'returns true if the chatbox is receiving input, false if not active.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsChatBoxInputActive',
-    },
-    isChatInputBlocked: {
-        summary: '',
-        parameters: [],
-        returns: 'returns true if the chat input is blocked, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsChatInputBlocked',
-    },
-    isChatVisible: {
-        summary: 'This function checks if players chat is visible.',
-        parameters: [],
-        returns: 'returns true if the chat is visible, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsChatVisible',
-    },
-    isConsoleActive: {
-        summary: 'This function returns whether the ingame console window is visible or not.',
-        parameters: [],
-        returns: 'returns true if the console is visible, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsConsoleActive',
-    },
-    isControlEnabled: {
-        summary: 'Checks whether a GTA control is enabled or disabled for a certain player.',
+    guiLabelGetColor: {
+        summary: 'This function gets the color of a label.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish the control status of.' },
-            { name: 'control', isOptional: false, isVariadic: false, summary: 'The control you wish to check. See control names for a list of possible controls.' },
+            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The label to get color.' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsControlEnabled',
+        returns: 'Returns three *int* values, representing the amount of red, green, blue if successful. *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelGetColor',
     },
-    isCoronaReflectionEnabled: {
-        summary: '',
+    guiLabelGetFontHeight: {
+        summary: 'This function returns the height of the font currently used in a GUI text label.',
         parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'marker' },
+            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to get the font height from.' },
         ],
-        returns: '* returns false is setmarkertype|marker type is not corona. * returns true if corona reflection is enabled, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsCoronaReflectionEnabled',
+        returns: 'Returns the absolute height of the font currently used in the text label if the function is successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelGetFontHeight',
     },
-    isCursorShowing: {
-        summary: 'This function is used to determine whether or not a players cursor is showing.',
+    guiLabelGetTextExtent: {
+        summary: 'This function returns the extent, or width, of the current text inside a GUI text label.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you want to get cursor state of.' },
+            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to get the text extent from.' },
         ],
-        returns: 'returns true if the players cursor is showing, false if it isnt or if invalid parameters were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsCursorShowing',
+        returns: 'Returns the absolute width of the current text inside the text label if the function is successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelGetTextExtent',
     },
-    isDebugViewActive: {
-        summary: 'This function returns whether the ingame debug window is visible or not. This is the\ndebugwindow visible using the debugscript  command.',
-        parameters: [],
-        returns: 'returns true if the debug view is visible, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsDebugViewActive',
-    },
-    isElement: {
-        summary: 'This function checks if a value is an element or not.',
+    guiLabelSetColor: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis function allows you to set the color of a GUI label.',
         parameters: [
-            { name: 'theValue', isOptional: false, isVariadic: false, summary: ': The value that we want to check.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The label to be changed.' },
+            { name: 'red', isOptional: false, isVariadic: false, summary: 'An integer specifying the amount of red (0 to 255).' },
+            { name: 'green', isOptional: false, isVariadic: false, summary: 'An integer specifying the amount of green (0 to 255).' },
+            { name: 'blue', isOptional: false, isVariadic: false, summary: 'An integer specifying the amount of blue (0 to 255).' },
         ],
-        returns: 'returns true if the passed value is an element, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElement',
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns *true* if the the color of the gui label was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelSetColor',
     },
-    isElementAttached: {
-        summary: 'This functions checks whether or not an element is attached to another element.',
+    guiLabelSetHorizontalAlign: {
+        summary: 'This function sets the horizontal alignment of a text label.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check for attachment.' },
+            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to set the horizontal alignment on.' },
+            { name: 'align', isOptional: false, isVariadic: false, summary: 'The alignment type. Valid type strings are:' },
+            { name: 'wordwrap', isOptional: true, isVariadic: false, summary: 'Whether or not to enable wordwrap for the gui-label.' },
         ],
-        returns: 'returns true if the specified element is attached to another element, false if it is not attached or nil if an improper argument was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementAttached',
+        returns: 'Returns *true* on success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelSetHorizontalAlign',
     },
-    isElementCallPropagationEnabled: {
-        summary: 'This functions checks if certain element has call propagation enabled.',
+    guiLabelSetVerticalAlign: {
+        summary: 'This function sets the vertical alignment of a text label.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to check' },
+            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to set the vertical alignment on.' },
+            { name: 'align', isOptional: false, isVariadic: false, summary: 'The alignment type. Valid type strings are:' },
         ],
-        returns: 'returns true if the propagation is enabled, false if disabled or invalid arguments have been passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementCallPropagationEnabled',
+        returns: 'Returns *true* on success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelSetVerticalAlign',
     },
-    isElementCollidableWith: {
-        summary: 'This function can be used to check whether specified element is collidable with another\nelement.\n\nNote: You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object\n* Element/Weapon|Weapon',
+    guiMemoGetCaretIndex: {
+        summary: 'This function returns the caret (the text cursor) position within the memo box.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which colliding you want to get' },
-            { name: 'withElement', isOptional: false, isVariadic: false, summary: 'The other element which colliding with the first entity you want to get' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The memo box you want to get the caret position from' },
         ],
-        returns: 'returns true if the elements collide with eachother, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementCollidableWith',
+        returns: 'Returns the caret index on success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoGetCaretIndex',
     },
-    isElementDoubleSided: {
-        summary: 'This function checks whether an element is double-sided as set by setElementDoubleSided\nor not.',
+    guiMemoGetVerticalScrollPosition: {
+        summary: 'This function is used to get the vertical scroll position of a memo as a percentage.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element in which youd like to check the double-sidedness of.' },
+            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'the memo you want to know the vertical scroll position of.' },
         ],
-        returns: 'returns true if the theelement is double-sided, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementDoubleSided',
+        returns: 'Returns a float ranging between 0 and 100, or **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoGetVerticalScrollPosition',
     },
-    isElementFrozen: {
-        summary: 'This function checks if element has been frozen.',
+    guiMemoIsReadOnly: {
+        summary: 'This function checking if memo is read only or no.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element whose freeze status we want to check.' },
+            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'The memo to check read-only status of.' },
         ],
-        returns: '*returns true if the element is frozen, false if it isnt or if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementFrozen',
+        returns: 'Returns *true* if the memo is read only, *false* if the memo isn\'t read only, *nil* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoIsReadOnly',
     },
-    isElementInWater: {
-        summary: 'This function checks whether an element is submerged in water.',
+    guiMemoSetCaretIndex: {
+        summary: 'This function sets the current position of the caret (the text cursor) within the memo.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element to check.' },
+            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'The memo edit box where the caret position is to be changed.' },
+            { name: 'index', isOptional: false, isVariadic: false, summary: 'An integer referring to the desired character position within the box. 0 would be before the first character in the box, 1 before the second, etc.' },
         ],
-        returns: 'returns true if the passed element is in water, false if it isnt, or if the element is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementInWater',
+        returns: 'Returns *true* if the caret was successfully moved, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoSetCaretIndex',
     },
-    isElementLocal: {
-        summary: 'This function checks whether a clientside element is local to the client (doesnt exist in\nthe server) or not.',
+    guiMemoSetReadOnly: {
+        summary: 'This function allows you to set or remove read-only status for a GUI memo. If read-only is set to *true*, the contents are not editable.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element that we want to check.' },
+            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'The memo to change read-only status of.' },
+            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether read-only is to be enabled or disabled.' },
         ],
-        returns: 'returns true if the passed element is local, false if not or if invalid parameters are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementLocal',
+        returns: 'Returns *true* if the status was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoSetReadOnly',
     },
-    isElementLowLOD: {
-        summary: 'This function reveals if an element is low LOD.',
+    guiMemoSetVerticalScrollPosition: {
+        summary: 'This function is used to set the vertical scroll position of a memo as a percentage.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose low LOD status we want to get.' },
+            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'the memo you want to change the vertical scroll position of.' },
+            { name: 'position', isOptional: false, isVariadic: false, summary: 'a float ranging between 0 and 100.' },
         ],
-        returns: 'returns true if the element is low lod, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementLowLOD',
+        returns: 'Returns **true** if the position was set, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoSetVerticalScrollPosition',
     },
-    isElementOnScreen: {
-        summary: 'This function will check if an element is on the screen. Elements behind objects but\nstill in the camera view count as being on screen.\nThis function is particularly useful for detecting if dynamic objects are in destroyed\nstate. Destroyed objects will return false.',
+    guiMoveToBack: {
+        summary: 'This function moves a GUI element to the very back of all other GUI elements.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element of which you wish to check wether its being rendered on screen.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to move to the back' },
         ],
-        returns: 'returns true if element is on screen, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementOnScreen',
+        returns: 'Returns *true* if the function was successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMoveToBack',
     },
-    isElementStreamable: {
-        summary: 'This function checks whether an element is streamable as set by setElementStreamable or\nnot.',
+    guiProgressBarGetProgress: {
+        summary: 'This function gets the progress of a progress bar as a percentage.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element to check the streamability of.' },
+            { name: 'theProgressbar', isOptional: false, isVariadic: false, summary: 'The progressbar you want to check.' },
         ],
-        returns: 'returns true if the passed element is streamable like normal, false if this element must always be streamed in.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementStreamable',
+        returns: 'Returns a float ranging between 0 and 100.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiProgressBarGetProgress',
+    },
+    guiProgressBarSetProgress: {
+        summary: 'This function is used to set the progress of a progressbar as a percentage.',
+        parameters: [
+            { name: 'theProgressbar', isOptional: false, isVariadic: false, summary: 'The progressbar you want to change the progress of' },
+            { name: 'progress', isOptional: false, isVariadic: false, summary: 'a float ranging from 0 - 100' },
+        ],
+        returns: 'Returns true if the progress was set, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiProgressBarSetProgress',
+    },
+    guiRadioButtonGetSelected: {
+        summary: 'This function gets a radio button\'s selection state.',
+        parameters: [
+            { name: 'guiRadioButton', isOptional: false, isVariadic: false, summary: 'The radio button you wish to retrieve the selection state of.' },
+        ],
+        returns: 'Returns *true* if the radio button is selected, *false* if it is not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiRadioButtonGetSelected',
     },
 };

@@ -1,8 +1,23 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { BOOLEAN, fn, named, NUMBER, STRING } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, literal, named, NUMBER, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_MARKER_CLIENT: ApiCatalog = {
-    createMarker: fn([NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], named('Marker'), 3),
+    createMarker: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            unionOf([literal('checkpoint'), literal('ring'), literal('cylinder'), literal('arrow'), literal('corona')]),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            BOOLEAN,
+        ],
+        named('Marker'),
+        3,
+    ),
     isCoronaReflectionEnabled: fn([named('Marker')], BOOLEAN, 1),
     setCoronaReflectionEnabled: fn([named('Marker'), BOOLEAN], BOOLEAN, 2),
 };

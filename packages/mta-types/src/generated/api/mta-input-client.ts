@@ -10,11 +10,12 @@ export const MTA_INPUT_CLIENT: ApiCatalog = {
     getCommandsBoundToKey: fn([STRING, STRING], TABLE, 2),
     getFunctionsBoundToKey: fn([STRING, STRING], TABLE, 2),
     getKeyBoundToCommand: fn([STRING], STRING, 1),
-    getKeyBoundToFunction: fn([fn([], ANY, 0, true, [], ANY)], STRING, 1),
+    getKeyBoundToFunction: fn([fn([], ANY, 0, true, undefined)], STRING, 1),
     getKeyState: fn([STRING], BOOLEAN, 1),
     isCapsLockEnabled: fn([], BOOLEAN, 0),
     isControlEnabled: fn([STRING], BOOLEAN, 1),
     removeCommandHandler: fn([STRING, fn([STRING], VOID, 1, true, ['commandName'], STRING)], BOOLEAN, 1),
+    setAnalogControlState: fn([STRING, NUMBER, BOOLEAN], BOOLEAN, 1),
     toggleAllControls: fn([BOOLEAN, BOOLEAN, BOOLEAN], BOOLEAN, 1),
     toggleControl: fn([STRING, BOOLEAN], BOOLEAN, 2),
 };

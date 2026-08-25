@@ -1,9 +1,9 @@
-import { CALLBACK_TYPE_GAPS, CATALOG_OVERRIDES, ELEMENT_TYPE_ALIASES } from '#mta-types/catalog-overrides';
+import { CALLBACK_TYPE_GAPS, CATALOG_OVERRIDES } from '#mta-types/catalog-overrides';
 
 import { emitCatalog } from './catalog-emitter.ts';
-import { emitElementTypes, emitEvents, resolveElementTypes } from './catalog-data-emitter.ts';
+import { diffCatalogs, fingerprint, readIndex, type CatalogDiff, type CatalogIndex } from './catalog-fingerprint.ts';
+import { emitElementTypes, emitEvents } from './catalog-data-emitter.ts';
 import { normalize, type NormalizedCatalog } from './catalog-normalizer.ts';
-import { parseClasses, parseFunctions, parseTypeAliases, parseVariables } from './declaration-parser.ts';
 import { emitDocumentation } from './documentation-emitter.ts';
 import { parseEvents } from './event-parser.ts';
 import { emitEventSignatures } from './event-signature-emitter.ts';
@@ -11,10 +11,11 @@ import { GeneratorError, type CatalogEntry, type GeneratedFile, type ParsedDecla
 import { emitOopSurface } from './oop-emitter.ts';
 import { parseOopClasses } from './oop-parser.ts';
 import { buildOopSurface, type OopSurfaceResult } from './oop-surface-builder.ts';
-import type { MapContext } from './type-mapper.ts';
-import { classFiles, eventFiles, functionFiles, typeFiles, variableFile } from './upstream-source.ts';
+import { parseUpstream } from './upstream-catalog.ts';
+import { eventFiles } from './upstream-source.ts';
+import { wikiCatalogSource, type WikiCatalogSource } from './wiki-catalog-source.ts';
 
-const MINIMUM_DECLARATIONS = 800;
+const MINIMUM_DECLARATIONS = 1380;
 
 const MINIMUM_OOP_MEMBERS = 400;
 
@@ -26,12 +27,9 @@ export interface GenerationResult {
     elementTypes: number;
     events: { server: number; client: number };
     documented: number;
-}
-
-function declarationsFor(side: 'server' | 'client', context: MapContext, multiReturns: Set<string>): ParsedDeclaration[] {
-    const declarations = functionFiles(side).flatMap((file) => parseFunctions(file, context, multiReturns));
-
-    return [...declarations, ...parseVariables(variableFile(side), context)];
+    source: WikiCatalogSource;
+    index: CatalogIndex;
+    diff: CatalogDiff;
 }
 
 function sortedEntries(entries: readonly CatalogEntry[]): CatalogEntry[] {
@@ -94,26 +92,21 @@ function auditCallbacks(server: readonly ParsedDeclaration[], client: readonly P
 }
 
 export function generate(): GenerationResult {
-    const serverClasses = classFiles('server');
-    const clientClasses = classFiles('client');
-    const sources = [...serverClasses, ...clientClasses];
-    const classes = sources.flatMap(parseClasses);
-    const elementTypes = resolveElementTypes(classes);
-    const context: MapContext = {
-        elementTypes: new Set(elementTypes.map((entry) => entry.name)),
-        aliases: ELEMENT_TYPE_ALIASES,
-        typeParameters: new Set(),
-    };
-    const serverContext: MapContext = { ...context, typeAliases: parseTypeAliases(typeFiles('server')) };
-    const clientContext: MapContext = { ...context, typeAliases: parseTypeAliases(typeFiles('client')) };
+    const upstream = parseUpstream();
+    const { server: serverContext, client: clientContext } = upstream.contexts;
+    const elementTypes = upstream.elementTypes;
+    const source = wikiCatalogSource(serverContext.elementTypes, upstream);
 
-    const multiReturns = new Set<string>();
-    const server = declarationsFor('server', serverContext, multiReturns);
-    const client = declarationsFor('client', clientContext, multiReturns);
-
-    if (server.length + client.length < MINIMUM_DECLARATIONS) {
-        throw new GeneratorError('upstream', `parsed only ${server.length + client.length} declarations, the source looks incomplete`);
+    if (source.unparsed.length > 0) {
+        throw new GeneratorError('wiki snapshot', `${source.unparsed.length} pages carry no readable signature: ${source.unparsed.map((entry) => entry.name).join(', ')}`);
     }
+
+    if (source.listed < MINIMUM_DECLARATIONS) {
+        throw new GeneratorError('wiki snapshot', `parsed only ${source.listed} declarations, the snapshot looks incomplete`);
+    }
+
+    const server = [...source.server, ...upstream.variables.server];
+    const client = [...source.client, ...upstream.variables.client];
 
     const catalog = normalize(server, client);
     auditCallbacks(server, client, catalog);
@@ -121,8 +114,8 @@ export function generate(): GenerationResult {
     const clientEvents = parseEvents(eventFiles('client'), clientContext);
     const oop = buildOopSurface(
         [
-            ...serverClasses.flatMap((file) => parseOopClasses(file, serverContext, 'server')),
-            ...clientClasses.flatMap((file) => parseOopClasses(file, clientContext, 'client')),
+            ...upstream.classes.server.flatMap((file) => parseOopClasses(file, serverContext, 'server')),
+            ...upstream.classes.client.flatMap((file) => parseOopClasses(file, clientContext, 'client')),
         ],
         elementTypes,
         catalog,
@@ -141,14 +134,19 @@ export function generate(): GenerationResult {
         ...emitOopSurface(oop.classes),
         emitEvents(serverEvents.map((event) => event.name), clientEvents.map((event) => event.name)),
         ...emitEventSignatures(serverEvents, clientEvents),
-        emitElementTypes(elementTypes),
+        emitElementTypes([...elementTypes]),
     ];
+
+    const index = fingerprint(documented);
 
     return {
         files: files.sort((left, right) => left.path.localeCompare(right.path, 'en')),
         catalog,
         oop,
-        multiReturns: [...multiReturns].sort(),
+        source,
+        index,
+        diff: diffCatalogs(readIndex(), index),
+        multiReturns: source.multiReturns,
         elementTypes: elementTypes.length,
         events: { server: serverEvents.length, client: clientEvents.length },
         documented: documented.filter((entry) => entry.documentation.summary.length > 0).length,

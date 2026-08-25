@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { BOOLEAN, fn, NUMBER, STRING, tupleOf } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, NIL, NUMBER, STRING, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_WORLD_SHARED: ApiCatalog = {
     areTrafficLightsLocked: fn([], BOOLEAN, 0),
@@ -11,6 +11,7 @@ export const MTA_WORLD_SHARED: ApiCatalog = {
     getGameSpeed: fn([], NUMBER, 0),
     getGravity: fn([], NUMBER, 0),
     getHeatHaze: fn([], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN]), 0),
+    getInteriorSoundsEnabled: fn([], BOOLEAN, 0),
     getJetpackMaxHeight: fn([], NUMBER, 0),
     getMinuteDuration: fn([], NUMBER, 0),
     getMoonSize: fn([], NUMBER, 0),
@@ -25,6 +26,8 @@ export const MTA_WORLD_SHARED: ApiCatalog = {
     getWindVelocity: fn([], tupleOf([NUMBER, NUMBER, NUMBER]), 0),
     getZoneName: fn([NUMBER, NUMBER, NUMBER, BOOLEAN], STRING, 3),
     isGarageOpen: fn([NUMBER], BOOLEAN, 1),
+    isWorldSpecialPropertyEnabled: fn([STRING], BOOLEAN, 1),
+    removeGameWorld: fn([], NIL, 0),
     removeWorldModel: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 5),
     resetFarClipDistance: fn([], BOOLEAN, 0),
     resetFogDistance: fn([], BOOLEAN, 0),
@@ -35,7 +38,9 @@ export const MTA_WORLD_SHARED: ApiCatalog = {
     resetSunColor: fn([], BOOLEAN, 0),
     resetSunSize: fn([], BOOLEAN, 0),
     resetWindVelocity: fn([], BOOLEAN, 0),
+    resetWorldProperties: fn([BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN], NIL, 0),
     restoreAllWorldModels: fn([], BOOLEAN, 0),
+    restoreGameWorld: fn([], NIL, 0),
     restoreWorldModel: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 5),
     setAircraftMaxHeight: fn([NUMBER], BOOLEAN, 1),
     setAircraftMaxVelocity: fn([NUMBER], BOOLEAN, 1),
@@ -61,4 +66,5 @@ export const MTA_WORLD_SHARED: ApiCatalog = {
     setWeather: fn([NUMBER], BOOLEAN, 1),
     setWeatherBlended: fn([NUMBER], BOOLEAN, 1),
     setWindVelocity: fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
+    setWorldSpecialPropertyEnabled: fn([STRING, BOOLEAN], BOOLEAN, 2),
 };

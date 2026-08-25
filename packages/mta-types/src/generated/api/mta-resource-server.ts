@@ -4,12 +4,7 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, unionOf } from '@mta-ty
 export const MTA_RESOURCE_SERVER: ApiCatalog = {
     addResourceConfig: fn([STRING, STRING], named('XmlNode'), 1),
     addResourceMap: fn([STRING, NUMBER], named('XmlNode'), 1),
-    callRemote: fn(
-        [STRING, STRING, ANY, unionOf([NUMBER, fn([], ANY, 0, true, [], ANY)]), ANY, ANY, unionOf([fn([], ANY, 0, true, [], ANY), ANY])],
-        BOOLEAN,
-        4,
-        true,
-    ),
+    callRemote: fn([STRING, STRING, NUMBER, NUMBER, STRING, STRING, fn([], ANY, 0, true, undefined)], BOOLEAN, 4, true, undefined),
     copyResource: fn([named('Resource'), STRING, STRING], named('Resource'), 2),
     createResource: fn([STRING, STRING], named('Resource'), 1),
     deleteResource: fn([STRING], BOOLEAN, 1),
@@ -25,7 +20,7 @@ export const MTA_RESOURCE_SERVER: ApiCatalog = {
     isResourceProtected: fn([named('Resource')], BOOLEAN, 1),
     refreshResources: fn([BOOLEAN, named('Resource')], BOOLEAN, 0),
     removeResourceFile: fn([named('Resource'), STRING], BOOLEAN, 2),
-    renameResource: fn([ANY, STRING, STRING], BOOLEAN, 2),
+    renameResource: fn([unionOf([STRING, named('Resource')]), STRING, STRING], BOOLEAN, 2),
     restartResource: fn([named('Resource'), BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN], BOOLEAN, 1),
     setResourceInfo: fn([named('Resource'), STRING, STRING], BOOLEAN, 3),
     startResource: fn([named('Resource'), BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN, BOOLEAN], BOOLEAN, 1),

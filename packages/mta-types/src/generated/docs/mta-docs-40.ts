@@ -1,240 +1,243 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_40: ApiDocumentationCatalog = {
-    setHeatHaze: {
-        summary: 'This function changes the heat haze effect.',
+    saveMapData: {
+        summary: 'This converts a set of elements in the element tree into XML. This is a format that can then be loaded as a map file. Each element represents a single XML node.',
         parameters: [
-            { name: 'intensity', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'randomShift', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'speedMin', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'speedMax', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'scanSizeX', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'scanSizeY', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'renderSizeX', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'renderSizeY', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'bShowInside', isOptional: true, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if the heat haze effect was set correctly, false if invalid values were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetHeatHaze',
-    },
-    setHeliBladeCollisionsEnabled: {
-        summary: 'This function changes the state of the helicopter blades collisions on the specified\nvehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The helicopter that will have the blades collisions set.' },
-            { name: 'collisions', isOptional: false, isVariadic: false, summary: 'The state of the helicopter blades collisions.' },
-        ],
-        returns: 'returns true if the collisions are set for the specified vehicle, false if the collisions cant be set for the specified vehicle, if the vehicle is not a helicopter or if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetHeliBladeCollisionsEnabled',
-    },
-    setHelicopterRotorSpeed: {
-        summary: 'Sets the rotor speed of a helicopter.',
-        parameters: [
-            { name: 'heli', isOptional: false, isVariadic: false, summary: 'the helicopter to adjust the rotor of.' },
-            { name: 'speed', isOptional: false, isVariadic: false, summary: 'the new rotor speed. Usual values are 0 if the helicopter stands still, or 0.2 if the rotor is fully spun up. Higher values than normal will not affect the helicopters handling. Negative values are allowed and will make the rotor spin in the opposite direction (pushing the helicopter down).' },
-        ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetHelicopterRotorSpeed',
-    },
-    setInteriorFurnitureEnabled: {
-        summary: 'This function toggles furniture generation in interiors with the specified room ID.',
-        parameters: [
-            { name: 'roomID', isOptional: false, isVariadic: false, summary: 'The room type which you want disable or enable the furniture in: 0 : shop 1 : office 2 : lounge 3 : bedroom 4 : kitchen' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: ': A bool representing whether the interior furniture is enabled or disabled.' },
-        ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetInteriorFurnitureEnabled',
-    },
-    setInteriorSoundsEnabled: {
-        summary: 'This function disables or enables the ambient sounds played by GTA in most interiors,\nlike restaurants, casinos, clubs, houses, etc.',
-        parameters: [
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'if a boolean was passed to the function, it always succeeds and returns true.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetInteriorSoundsEnabled',
-    },
-    setJetpackMaxHeight: {
-        summary: 'This function changes the maximum flying height of jetpack.',
-        parameters: [
-            { name: 'Height', isOptional: false, isVariadic: false, summary: ': The max height starting at approximately -20.' },
-        ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetJetpackMaxHeight',
-    },
-    setJetpackWeaponEnabled: {
-        summary: 'This function sets a weapon usable while using the Jetpack.',
-        parameters: [
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'The weapon thats being set usable on a Jetpack. Names can be: (Case is ignored)' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'A bool representing whether the weapon is enabled or disabled.' },
-        ],
-        returns: 'returns true, else false if invalid arguments are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetJetpackWeaponEnabled',
-    },
-    setLightColor: {
-        summary: 'This function sets the color for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to set the color of.' },
-            { name: 'r', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'g', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'b', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetLightColor',
-    },
-    setLightDirection: {
-        summary: 'This function sets the direction for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to set the direction of.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetLightDirection',
-    },
-    setLightRadius: {
-        summary: 'This function sets the radius for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to set the radius of.' },
-            { name: 'radius', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetLightRadius',
-    },
-    setLowLODElement: {
-        summary: 'This function assigns a low LOD element to an element. The low LOD element is displayed\nwhen its associated element is not fully visible. If a low LOD element is assigned to\nseveral elements, it will be displayed when any of these elements are not fully visible.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose low LOD version we want to change.' },
-            { name: 'lowLODElement', isOptional: false, isVariadic: false, summary: 'A low LOD element to display when the first element is not fully visible.' },
-        ],
-        returns: 'returns true if the assignment was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetLowLODElement',
-    },
-    setMapName: {
-        summary: 'This function is used to set a map name that will be visible in the server browser. In\npractice you should generally rely on the mapmanager to do this for you.',
-        parameters: [
-            { name: 'mapName', isOptional: false, isVariadic: false, summary: 'The name you wish the server browser to show.' },
-        ],
-        returns: 'returns true if map name was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMapName',
-    },
-    setMarkerColor: {
-        summary: 'This function sets the color of the specified marker by modifying the values for red,\ngreen, blue and alpha.',
-        parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker that you wish to set the color of.' },
-            { name: 'r', isOptional: false, isVariadic: false, summary: 'The amount of red in the final color (0 to 255).' },
-            { name: 'g', isOptional: false, isVariadic: false, summary: 'The amount of green in the final color (0 to 255).' },
-            { name: 'b', isOptional: false, isVariadic: false, summary: 'The amount of blue in the final color (0 to 255).' },
-            { name: 'a', isOptional: false, isVariadic: false, summary: 'The amount of alpha in the final color (0 to 255).' },
+            { name: 'node', isOptional: false, isVariadic: false, summary: 'An existing node that should contain the contents of baseElement' },
+            { name: 'baseElement', isOptional: false, isVariadic: false, summary: 'The first element to output to the XML tree. This element and all its children (and their children, etc) will be output.' },
+            { name: 'childrenOnly', isOptional: true, isVariadic: false, summary: 'Defines if you want to only save children of the specified element.' },
         ],
         returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMarkerColor',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SaveMapData',
     },
-    setMarkerIcon: {
-        summary: 'This function allows changing the icon of a checkpoint marker.',
+    set: {
+        summary: 'This function is used to save arbitrary data under a certain name on the settings registry.\n\nIt\'s important to note that set *always* writes to the settings.xml file, even if get read the value from a resource\'s meta.xml. This means that the admin can specify settings in the settings.xml that override the resource\'s defaults, but that the defaults can still be retrieved if need be. As a general principle, resources should not be designed so that the admin is required to modify them, they should be \'black boxes\'.',
         parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker to change the visual style of' },
-            { name: 'icon', isOptional: false, isVariadic: false, summary: 'A string referring to the type of icon, acceptable values are: none : No icon arrow : Arrow icon finish : Finish icon (at end of race)' },
+            { name: 'settingName', isOptional: false, isVariadic: false, summary: 'The name of the setting you want to set. See setting names for information on settings names.' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value to set the setting to. This can be any Lua data type, except for functions, most userdata (only resources can\'t be stored) and threads.' },
+        ],
+        returns: 'Returns *true* if the setting has been set, *false* if you do not have access to the setting or invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/Set',
+    },
+    setAccountData: {
+        summary: 'This function sets a string to be stored in an account. This can then be retrieved using getAccountData. Data stored as account data is persistent across user\'s sessions and maps, unless they are logged into a guest account. Even if logged into a guest account, account data can be useful as a way to store a reference to your own account system, though it\'s persistence is equivalent to that of using setElementData on the player\'s element.',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you wish to retrieve the data from.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key under which you wish to store the data' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value you wish to store. Set to false to remove the data. **NOTE:** you cannot store tables as values, but you can use toJSON strings.' },
+        ],
+        returns: 'Returns a *true* if the account data was set, *false* if an invalid argument was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAccountData',
+    },
+    setAccountName: {
+        summary: 'This function sets the name of an account.',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you wish to change the name.' },
+            { name: 'name', isOptional: false, isVariadic: false, summary: 'The new name.' },
+            { name: 'allowCaseVariations', isOptional: true, isVariadic: false, summary: 'Whether the username is case sensitive (if this is set to true, usernames "Bob" and "bob" will refer to different accounts)' },
+        ],
+        returns: 'Returns a *true* if the account name was set, *false* if an invalid argument was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAccountName',
+    },
+    setAccountPassword: {
+        summary: 'This function sets the password of the specified account.',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'the account whose password you want to set' },
+            { name: 'password', isOptional: false, isVariadic: false, summary: 'the password' },
+        ],
+        returns: 'Returns *true* if the password was set correctly, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAccountPassword',
+    },
+    setAircraftMaxHeight: {
+        summary: 'This function changes the maximum flying height of aircraft.',
+        parameters: [
+            { name: 'Height', isOptional: false, isVariadic: false, summary: 'The height you want aircraft to be able to go.' },
+        ],
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAircraftMaxHeight',
+    },
+    setAircraftMaxVelocity: {
+        summary: 'This function sets the maximum velocity at which aircrafts could fly. Using this function server-side will overwrite the value that was previously set client-side.',
+        parameters: [
+            { name: 'velocity', isOptional: false, isVariadic: false, summary: 'The max velocity, can be 0 or any positive value. Default is **1.5**.' },
+        ],
+        returns: 'Returns true if the max velocity was set correctly, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAircraftMaxVelocity',
+    },
+    setAmbientSoundEnabled: {
+        summary: 'This function allows you to disable some background sound effects. See also: setWorldSoundEnabled.',
+        parameters: [
+            { name: 'theType', isOptional: false, isVariadic: false, summary: 'The type of ambient sound to toggle. Can be either "gunfire" or "general".' },
+            { name: 'enable', isOptional: false, isVariadic: false, summary: 'Set *false* to turn off, *true* to turn on' },
+        ],
+        returns: 'Returns *true* if the ambient sound was set correctly, *false* if invalid values were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAmbientSoundEnabled',
+    },
+    setAnalogControlState: {
+        summary: 'This sets the analog control state of a control for the local player. To change the analog controls for a ped, please use setPedAnalogControlState.',
+        parameters: [
+            { name: 'control', isOptional: false, isVariadic: false, summary: 'The control that you want to set the state of. See control names for a list of possible controls.' },
+            { name: 'state', isOptional: true, isVariadic: false, summary: 'A float between 0 and 1 indicating the amount the control is pressed. If no value is provided, the analog control is removed.' },
+            { name: 'forceOverrideNextFrame', isOptional: true, isVariadic: false, summary: 'A bool indicating if the player input should force fully overriden for the next frame.' },
+        ],
+        returns: 'Returns *true* if the control state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetAnalogControlState',
+    },
+    setBanAdmin: {
+        summary: 'This function sets a new admin for a ban.',
+        parameters: [
+            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban you want to change the admin of.' },
+            { name: 'theAdmin', isOptional: false, isVariadic: false, summary: 'The new admin.' },
+        ],
+        returns: 'Returns *true* if changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBanAdmin',
+    },
+    setBanNick: {
+        summary: 'This function sets a new nick for a ban.',
+        parameters: [
+            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban you want to change the nick of.' },
+            { name: 'theNick', isOptional: false, isVariadic: false, summary: 'A string representing the nick you want to set the ban to.' },
+        ],
+        returns: 'Returns *true* if changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBanNick',
+    },
+    setBanReason: {
+        summary: 'This function sets the reason for the specified ban.',
+        parameters: [
+            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban that you wish to set the reason of.' },
+            { name: 'theReason', isOptional: false, isVariadic: false, summary: 'the new reason (max 60 characters).' },
+        ],
+        returns: 'Returns *true* if the new reason was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBanReason',
+    },
+    setBirdsEnabled: {
+        summary: 'This function allows you to disable the flying birds.',
+        parameters: [
+            { name: 'enable', isOptional: false, isVariadic: false, summary: '' },
+        ],
+        returns: 'Returns *true* if the birds state was changed succesfully, *false* if an invalid argument was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBirdsEnabled',
+    },
+    setBlipColor: {
+        summary: 'This function will let you change the color of a blip. This color is only applicable to the default blip icon (,  or ). All other icons will ignore this.',
+        parameters: [
+            { name: 'theBlip', isOptional: false, isVariadic: false, summary: 'The blip who\'s color you wish to set.' },
+            { name: 'red', isOptional: false, isVariadic: false, summary: 'The amount of red in the blip\'s color (0 - 255).' },
+            { name: 'green', isOptional: false, isVariadic: false, summary: 'The amount of green in the blip\'s color (0 - 255).' },
+            { name: 'blue', isOptional: false, isVariadic: false, summary: 'The amount of blue in the blip\'s color (0 - 255).' },
+            { name: 'alpha', isOptional: false, isVariadic: false, summary: 'The amount of alpha in the blip\'s color (0 - 255). Alpha decides transparancy where 255 is opaque and 0 is transparent.' },
+        ],
+        returns: 'Returns *true* if the blip\'s color was set successfully. Returns *false* if the blip passed to the function is invalid, or any of the colors are out of the valid range.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBlipColor',
+    },
+    setBlipIcon: {
+        summary: 'This function sets the icon for an existing blip element.',
+        parameters: [
+            { name: 'theBlip', isOptional: false, isVariadic: false, summary: 'The blip you wish to set the icon of.' },
+            { name: 'icon', isOptional: false, isVariadic: false, summary: 'A number indicating the icon you wish to change it do. Valid values are listed on the Radar Blips page.' },
+        ],
+        returns: 'Returns *true* if the icon was successfully set, *false* if the element passed was not a valid blip or the icon value was not a valid icon number.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBlipIcon',
+    },
+    setBlipOrdering: {
+        summary: 'This function sets the Z ordering of a blip. It allows you to make a blip appear on top of or below other blips.',
+        parameters: [
+            { name: 'theBlip', isOptional: false, isVariadic: false, summary: 'the blip whose Z ordering to change.' },
+            { name: 'ordering', isOptional: false, isVariadic: false, summary: 'the new Z ordering value. Blips with higher values will appear on top of blips with lower values. Possible range: -32767 to 32767. Default: 0.' },
+        ],
+        returns: 'Returns *true* if the blip ordering was changed successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBlipOrdering',
+    },
+    setBlipSize: {
+        summary: 'This function sets the size of a blip\'s icon.',
+        parameters: [
+            { name: 'theBlip', isOptional: false, isVariadic: false, summary: 'The blip you wish to get the size of.' },
+            { name: 'iconSize', isOptional: false, isVariadic: false, summary: 'The size you wish the icon to be. 2 is the default value. 25 is the maximum value. Value gets clamped between 0 and 25.' },
+        ],
+        returns: 'Returns an *true* if the blip\'s size was set successfully. Returns *false* if the element passed was not a blip or if the icon size passed was invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBlipSize',
+    },
+    setBlipVisibleDistance: {
+        summary: 'This function will set the visible distance of a blip.',
+        parameters: [
+            { name: 'theBlip', isOptional: false, isVariadic: false, summary: 'The blip whose visible distance you wish to get.' },
+            { name: 'theDistance', isOptional: false, isVariadic: false, summary: 'The distance you want the blip to be visible for. Value gets clamped between 0 and 65535.' },
+        ],
+        returns: 'Returns true if successful, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBlipVisibleDistance',
+    },
+    setBlurLevel: {
+        summary: 'Sets the motion blur level on the clients screen. Accepts a value between 0 and 255.',
+        parameters: [
+            { name: 'level', isOptional: false, isVariadic: false, summary: 'The level to set the blur to (default: 36)' },
         ],
         returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMarkerIcon',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetPlayerBlurLevel',
     },
-    setMarkerSize: {
-        summary: 'This function sets the size of the specified marker.\nSetting negative value will flip the marker, do nothing or make it invisible:\n* cylinder or arrow: upside down\n* ring: inside out\n* checkpoint: disappear\n* corona: bigger',
+    setBrowserAjaxHandler: {
+        summary: 'This function provides a requestable ajax resource for Lua/Javascript communication for a browser.',
         parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker that you wish to set the size of.' },
-            { name: 'size', isOptional: false, isVariadic: false, summary: 'A float representing new size of the marker.' },
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser which will execute the Javascript code' },
+            { name: 'url', isOptional: false, isVariadic: false, summary: 'The URL endpoint to handle' },
+            { name: 'handler', isOptional: true, isVariadic: false, summary: 'The function to call if the webBrowser attempts to open the ajax endpoint. If this parameter is nil or omitted, the ajax handler for the url will be deleted.' },
         ],
-        returns: 'returns true if successful, false if failed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMarkerSize',
+        returns: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBrowserAjaxHandler',
     },
-    setMarkerTarget: {
-        summary: 'This function sets the target for a marker. Only the checkpoint and ring marker types can\nhave a target.\nFor checkpoint markers, the target is shown as an arrow aiming at the point specified.\nFor ring markers, the target is shown by rotating the whole ring so that it faces the\npoint specified.\nThis function is most useful for setting up markers for races, where each marker points\nto the next ones position.\n(This is mostly used in races!)',
+    setBrowserProperty: {
+        summary: 'This function sets a given property of a specified browser.',
         parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker to set the target of' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'The x axis of the coordinate to target the marker at' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'The y axis of the coordinate to target the marker at' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'The z axis of the coordinate to target the marker at' },
+            { name: 'theBrowser', isOptional: false, isVariadic: false, summary: 'The browser element you want to set a property of' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The browser property key. It can be:' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'A value indicating whether to enable ("1") the property or not ("0")' },
         ],
-        returns: 'returns true if target was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMarkerTarget',
+        returns: 'Returns *true* if the property was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBrowserProperty',
     },
-    setMarkerType: {
-        summary: 'This function changes a markers type. The type controls how the marker is displayed in\nthe game. Its important that you use marker types that users are used to from the single\nplayer game. For example, checkpoints are used in races, rings are used for aircraft\nraces, arrows are used for entering buildings etc.',
+    setBrowserRenderingPaused: {
+        summary: 'This function sets the rendering state of a browser.',
         parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: ': A marker element referencing the specified marker.' },
-            { name: 'markerType', isOptional: false, isVariadic: false, summary: ': A string denoting the marker type. Valid values are:' },
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser' },
+            { name: 'paused', isOptional: false, isVariadic: false, summary: '*true* to pause rendering, *false* to continue' },
         ],
-        returns: 'returns true if the marker type was changed, false if it wasnt or marker values were invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMarkerType',
+        returns: 'Returns *true* if the state was successfully changed',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBrowserRenderingPaused',
     },
-    setMaxPlayers: {
-        summary: 'This function sets the maximum number of player slots on the server.',
+    setBrowserVolume: {
+        summary: 'This function sets either a specific browser\'s volume, or the overall volume for browsers.',
         parameters: [
-            { name: 'slots', isOptional: false, isVariadic: false, summary: 'Maximum number of player slots on the server.' },
+            { name: 'webBrowser', isOptional: true, isVariadic: false, summary: 'A browser element' },
+            { name: 'volume', isOptional: false, isVariadic: false, summary: 'A floating point number representing the desired volume level. Range is from **0.0** to **1.0**' },
         ],
-        returns: 'returns true if number of player slots was successfully changed, false or nil otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMaxPlayers',
+        returns: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetBrowserVolume',
     },
-    setMinuteDuration: {
-        summary: 'Sets the real-world duration of an ingame minute. The GTA default is 1000.',
+    setCameraClip: {
+        summary: 'This function sets if the camera will "collide" with any objects or vehicles in its way. This means that if object clip is enabled an object is in the way of where the camera actually wants to be, the camera will try to be in front of it. This function can disable that.',
         parameters: [
-            { name: 'milliseconds', isOptional: false, isVariadic: false, summary: ': the new duration of an ingame minute, accepted values 0 - 2147483647.' },
+            { name: 'objects', isOptional: true, isVariadic: false, summary: 'Sets if you want the camera to clip on objects.' },
+            { name: 'vehicles', isOptional: true, isVariadic: false, summary: 'Sets if you want the camera to clip on vehicles.' },
         ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMinuteDuration',
+        returns: 'Always returns *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetCameraClip',
     },
-    setModelHandling: {
-        summary: 'This function is used to change the handling data of all vehicles of a specified model.',
+    setCameraDrunkLevel: {
+        summary: 'This function sets the camera drunk level (as seen on the *Are you going to San Fierro?* singleplayer mission). This function was renamed from setCameraShakeLevel.\n\nDrunk effect is a wavy motion of the camera depicting the player being drunk. This function used to be called setCameraShakeLevel which has since been deprecated.',
         parameters: [
-            { name: 'modelId', isOptional: false, isVariadic: false, summary: 'The Vehicle_IDs|vehicle model you wish to set the handling of.' },
-            { name: 'property', isOptional: false, isVariadic: false, summary: 'The property you wish to set the handling of the vehicle to, or nil if you want to reset the all the handling properties.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value of the modelss handling property you wish to set, or nil if you want to reset the handling property to its default value.' },
+            { name: 'shakeLevel', isOptional: false, isVariadic: false, summary: '' },
         ],
-        returns: 'returns true if the handling was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetModelHandling',
+        returns: 'Returns *true* if the camera drunk level was changed, *false* if the required argument is incorrect or missing.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetCameraDrunkLevel',
     },
-    setMoonSize: {
-        summary: 'This function sets the moon size. Using this function server-side will overwrite the\nvalue that was previously set client-side.',
+    setCameraFieldOfView: {
+        summary: 'This function sets the field of view of the *dynamic camera* - this is the field of view of the *non-fixed camera* - yes, the camera that the user can control whilst on foot or in a vehicle. The higher the field of view angle, the more you will be able to see to your sides.',
         parameters: [
-            { name: 'size', isOptional: false, isVariadic: false, summary: 'The size, can be 0 or any positive value. Default is 3.' },
+            { name: 'cameraMode', isOptional: false, isVariadic: false, summary: 'the camera mode to set the field of view of:' },
+            { name: 'fieldOfView', isOptional: false, isVariadic: false, summary: 'The field of view angle, 0 to 179.' },
+            { name: 'instant', isOptional: true, isVariadic: false, summary: 'If set to *true*, the value is applied immediately, without delay (does not work with "vehicle_max").' },
         ],
-        returns: 'returns true if the moon size was set correctly, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetMoonSize',
-    },
-    setNearClipDistance: {
-        summary: '',
-        parameters: [
-            { name: 'distance', isOptional: false, isVariadic: false, summary: 'the new near clip distance. It must be between 0.1 and 20 for the function to do any effect. Default value is 0.3.' },
-        ],
-        returns: 'this function returns true if the argument is valid. returns false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetNearClipDistance',
-    },
-    setObjectBreakable: {
-        summary: 'This function sets an object to be breakable/unbreakable.',
-        parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'breakable', isOptional: false, isVariadic: false, summary: 'a boolean whether the object is breakable (true) or unbreakable (false).' },
-        ],
-        returns: '* true if the object is now breakable. * false if it cant or if invalid arguments are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetObjectBreakable',
-    },
-    setObjectMass: {
-        summary: 'This function sets the mass of a specified object. Changing the mass leads to a different\nmovement behavior for especially dynamic objects.',
-        parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'the object whose mass will be set.' },
-            { name: 'mass', isOptional: false, isVariadic: false, summary: 'the new mass.' },
-        ],
-        returns: '* true if the new mass value has been. * false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetObjectMass',
-    },
-    setObjectProperty: {
-        summary: '',
-        parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'the object you wish to change a property of.' },
-            { name: 'property', isOptional: false, isVariadic: false, summary: 'the property you want to set the value of:' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'the new value for the property.' },
-        ],
-        returns: 'returns true if the property was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetObjectProperty',
+        returns: 'Returns *true* if the arguments are valid, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetCameraFieldOfView',
     },
 };

@@ -8,5 +8,5 @@ export const MTA_SQL_SERVER: ApiCatalog = {
     dbPoll: fn([ANY, NUMBER, BOOLEAN], TABLE, 2),
     dbPrepareString: fn([named('Connection'), STRING, ANY], STRING, 2, true, undefined),
     dbQuery: fn([unionOf([fn([], ANY, 0, true, undefined), named('Connection')]), ANY, ANY, ANY, ANY], ANY, 2, true, undefined),
-    executeSQLQuery: fn([STRING, ANY], TABLE, 1, true, undefined),
+    executeSQLQuery: fn([STRING, ANY, ANY], TABLE, 1, true, undefined),
 };

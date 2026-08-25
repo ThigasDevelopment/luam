@@ -26,13 +26,23 @@ function symbolName(module: string): string {
 function wrapDescriptor(descriptor: TypeDescriptor, indent: string): string[] {
     const single = `${indent}${printDescriptor(descriptor)},`;
 
-    if (single.length <= MAX_LINE_LENGTH || descriptor.kind !== 'tuple') {
+    if (single.length <= MAX_LINE_LENGTH) {
         return [single];
     }
 
-    const elements = descriptor.elements.map((element) => `${indent}    ${printDescriptor(element)},`);
+    if (descriptor.kind === 'tuple') {
+        const elements = descriptor.elements.map((element) => `${indent}    ${printDescriptor(element)},`);
 
-    return [`${indent}tupleOf([`, ...elements, `${indent}]),`];
+        return [`${indent}tupleOf([`, ...elements, `${indent}]),`];
+    }
+
+    if (descriptor.kind === 'union') {
+        const options = descriptor.options.map((option) => `${indent}    ${printDescriptor(option)},`);
+
+        return [`${indent}unionOf([`, ...options, `${indent}]),`];
+    }
+
+    return [single];
 }
 
 function wrapFunction(name: string, entry: CatalogEntry): string[] {
@@ -54,7 +64,7 @@ function wrapFunction(name: string, entry: CatalogEntry): string[] {
         return [`    ${name}: fn(`, inline, ...returned, ...tail.map((part) => `        ${part},`), '    ),'];
     }
 
-    const listed = ['        [', ...parameters.map((parameter) => `            ${parameter},`), '        ],'];
+    const listed = ['        [', ...entry.type.parameters.flatMap((parameter) => wrapDescriptor(parameter, '            ')), '        ],'];
 
     return [`    ${name}: fn(`, ...listed, ...returned, ...tail.map((part) => `        ${part},`), '    ),'];
 }

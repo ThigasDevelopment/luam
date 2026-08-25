@@ -1,5 +1,7 @@
 import type { TypeDescriptor } from '#mta-types/type-descriptor';
 
+import { quote } from './documentation-text.ts';
+
 const PRIMITIVES: Readonly<Record<string, string>> = {
     any: 'ANY',
     boolean: 'BOOLEAN',
@@ -27,6 +29,10 @@ export function printDescriptor(descriptor: TypeDescriptor): string {
 
     if (descriptor.kind === 'named') {
         return `named('${descriptor.name}')`;
+    }
+
+    if (descriptor.kind === 'literal') {
+        return `literal(${quote(descriptor.value)})`;
     }
 
     if (descriptor.kind === 'tuple') {
@@ -72,6 +78,12 @@ export function collectHelpers(descriptor: TypeDescriptor, helpers: Set<string>)
 
     if (descriptor.kind === 'named') {
         helpers.add('named');
+
+        return;
+    }
+
+    if (descriptor.kind === 'literal') {
+        helpers.add('literal');
 
         return;
     }

@@ -13,7 +13,9 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
+        "fetch-wiki": "node --import ./scripts/source-resolver.ts scripts/fetch-wiki.ts",
         "generate": "node --import ./scripts/source-resolver.ts scripts/generate-catalog.ts",
+        "refresh-catalog": "node --import ./scripts/source-resolver.ts scripts/refresh-catalog.ts",
         "test": "vitest run",
         "typecheck": "tsc -p tsconfig.json"
     },

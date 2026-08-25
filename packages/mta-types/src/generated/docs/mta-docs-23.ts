@@ -1,243 +1,236 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_23: ApiDocumentationCatalog = {
-    getVehiclePaintjob: {
-        summary: 'This function gets the current paintjob on the specified vehicle.',
+    getSoundMetaTags: {
+        summary: 'Used to get the meta tags attached to a sound. These provide information about the sound, for instance the title or the artist.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': the vehicle you wish to get the paintjob of.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
+            { name: 'format', isOptional: true, isVariadic: false, summary: 'a filter string to get a specific meta tag.' },
         ],
-        returns: 'returns an integer representing the current paintjob on the vehicle. * 0: the first paintjob * 1: the second paintjob * 2: the third paintjob * 3: default paintjob (no paintjob)',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehiclePaintjob',
+        returns: 'Returns a table, but only a string if **format** is given, with all data available (keys are listed below) for the sound if successful, *false* otherwise. If any data is unavailable then the associated key is not written to the table.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMetaTags',
     },
-    getVehiclePanelState: {
-        summary: 'This function returns the current state of a specifed panel on the vehicle. A vehicle can\nhave up to 7 panels.',
+    getSoundMinDistance: {
+        summary: 'Gets a custom sound Minimum distance at which the sound stops getting louder.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle that you wish to know the panel state of.' },
-            { name: 'panel', isOptional: false, isVariadic: false, summary: 'an integer specifying the panel you want to know the state of. Not every vehicle has every panel. Possible values are: 0 Front-left panel 1 Front-right panel 2 Rear-left panel 3 Rear-right panel 4 Windscreen 5 Front bumper 6 Rear bumper' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
         ],
-        returns: 'returns an int indicating the state of the specified the panel. this is a value between 0 and 3, with 0 indicating the panel is undamaged and 3 indicating it is very damaged.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehiclePanelState',
+        returns: 'Returns an *integer* of the minimum distance, *false* if invalid arguements where passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMinDistance',
     },
-    getVehiclePlateText: {
-        summary: 'This function is used to retrieve the text on the number plate of a specified vehicle.',
+    getSoundPan: {
+        summary: 'This function is used to get the pan level of the specified sound element.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle that you wish to retrieve the plate text from.' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which pan you want to get.' },
         ],
-        returns: 'returns a string that corresponds to the plate on the text, false if a bad argument was passed or if it is not a vehicle. every vehicle (including planes, boats, etc.) has a numberplate, even if its not visible.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehiclePlateText',
+        returns: 'Returns *float* value with range from *-1.0 (left)* to *1.0 (right)*, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundPan',
     },
-    getVehicleRespawnPosition: {
-        summary: '',
+    getSoundPosition: {
+        summary: 'This function is used to return the current seek position of the specified sound element.\nIf the element is a player, this function will use the players voice.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle which youd like to retrieve the respawn coordinates of.' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element which seek position you want to return.' },
         ],
-        returns: 'returns three float|floats indicating the respawn coordinates of the vehicle, x, y and z respectively.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleRespawnPosition',
+        returns: 'Returns a float value indicating the seek position of the sound element in seconds.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundPosition',
     },
-    getVehicleRespawnRotation: {
-        summary: '',
+    getSoundProperties: {
+        summary: 'This function gets the properties of a specific sound.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle which youd like to retrieve the respawn rotation of.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D' },
         ],
-        returns: 'returns three float|floats indicating the respawn rotation of the vehicle, x, y and z respectively.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleRespawnRotation',
+        returns: 'This function returns 3 floats and a boolean value: The first float is the sound\'s [http://en.wikipedia.org/wiki/Sampling_rate sample rate], the second one the sound\'s [http://en.wikipedia.org/wiki/Tempo tempo], and the third one the [http://en.wikipedia.org/wiki/Pitch_%28music%29 pitch] of the sound. The boolean representing whether the sound is reversed or not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundProperties',
     },
-    getVehicleSirenParams: {
-        summary: 'This function get the parameters of a vehicles siren.',
+    getSoundSpeed: {
+        summary: 'This function is used to return the playback speed of the specified sound element.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to get the siren parameters of' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which playback speed you want to return.' },
         ],
-        returns: 'returns a table with the siren count, siren type and a sub table for the four flags. false otherwise. ```lua int sirenparams.sirencount int sirenparams.sirentype table sirenparams.flags bool sirenparams.flags360 bool sirenparams.flags.doloscheck bool sirenparams.flags.userandomiser bool sirenparams.flags.silent ```',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleSirenParams',
+        returns: 'Returns an float value indicating the playback speed of the sound element. Default sound playback speed is **1.0**.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundSpeed',
     },
-    getVehicleSirens: {
-        summary: 'This function gets the properties of a vehicles sirens.',
+    getSoundVolume: {
+        summary: 'This function is used to return the volume level of the specified sound element.\n\nIf the element is a player, this function will use the players voice.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to get siren information of.' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which volume you want to return.' },
         ],
-        returns: 'if the vehicle is invalid, it returns false. otherwise, returns a table with sub tables containing the properties of each siren point in the following manner: ```lua float sirendatasirenpoint.x float sirendatasirenpoint.y float sirendatasirenpoint.z int sirendatasirenpoint.red int sirendatasirenpoint.green int sirendatasirenpoint.blue int sirendatasirenpoint.alpha int sirendatasirenpoint.min_alpha ```',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleSirens',
+        returns: 'Returns a float representing the volume level of the sound element, *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundVolume',
     },
-    getVehicleSirensOn: {
-        summary: 'This function returns whether the sirens are turned on for the specified vehicle.',
+    getSoundWaveData: {
+        summary: 'This function gets the wave form data for an audio stream which is a table of floats representing the current audio frame as a wave.\nThis allows things like visualisations.\n\nIf the element is a player, this function will use the players voice.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that will be checked.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D. Streams are also supported' },
+            { name: 'iSamples', isOptional: false, isVariadic: false, summary: 'allowed samples are 256, 512, 1024, 2048, 4096, 8192 and 16384.' },
         ],
-        returns: 'returns true if the sirens are turned on for the specified vehicle, false if the sirens are turned off for the specified vehicle, if the vehicle doesnt have sirens or if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleSirensOn',
+        returns: 'Returns a table of **iSamples** *floats* representing the current audio frame waveform. Returns *false* if the sound is not playing yet or hasn\'t buffered in the case of streams.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundWaveData',
     },
-    getVehiclesLODDistance: {
-        summary: 'Returns the distance of vehicles LOD.',
+    getSunColor: {
+        summary: 'This function is used to get the color of the sun.',
         parameters: [],
-        returns: '* float: general distance used for most vehicles * float: distance used for trains and planes',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehiclesLODDistance',
+        returns: 'Returns the color of the sun as six numbers, false if its default.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSunColor',
     },
-    getVehiclesOfType: {
-        summary: 'This function scans through all the current vehicles and returns the ones matching the\ngiven model.',
-        parameters: [
-            { name: 'model', isOptional: false, isVariadic: false, summary: ': The model of vehicles you want.' },
-        ],
-        returns: 'returns a table of existing vehicles matching the specified model.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehiclesOfType',
-    },
-    getVehicleTowedByVehicle: {
-        summary: 'This function is used to get the vehicle being towed by another.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle you wish to get the towed vehicle from.' },
-        ],
-        returns: 'returns the vehicle that thevehicle is towing, false if it isnt towing a vehicle.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleTowedByVehicle',
-    },
-    getVehicleTowingVehicle: {
-        summary: 'This function is used to get the vehicle that is towing another.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': the vehicle being towed.' },
-        ],
-        returns: '* the vehicle that thevehicle is being towed by. * false if it isnt being towed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleTowingVehicle',
-    },
-    getVehicleTurnVelocity: {
-        summary: 'This function is used to retrieve a vehicles turning velocity for each axis.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get the turning velocities of.' },
-        ],
-        returns: 'returns 3 floats that represent the vehicles turning velocity on the x, y and z axis or false if wrong arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleTurnVelocity',
-    },
-    getVehicleTurretPosition: {
-        summary: 'This function gets the position of a vehicles turret, if it has one. Vehicles with\nturrets include firetrucks and tanks.',
-        parameters: [
-            { name: 'turretVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle whose turret position you want to retrieve. This should be a vehicle with a turret.' },
-        ],
-        returns: 'returns two floats for the x (horizontal) and y (vertical) axis rotation respectively. these values are in radians. the function will return 0, 0 if the vehicle is not a vehicle with a turret.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleTurretPosition',
-    },
-    getVehicleType: {
-        summary: 'This function retrieves the type of a vehicle (such as if it is a car or a boat).',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns a string with vehicle type or false if an invalid modelid has been supplied, or an empty string if the vehicle is blocked internally (some trailers). possible strings returned:',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleType',
-    },
-    getVehicleUpgradeOnSlot: {
-        summary: 'This function returns the current upgrade id on the specified vehicles upgrade slot\nAn upgrade slot is a certain type of upgrade (eg: exhaust, spoiler), there are 17 slots\n(0 to 16).',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle whose upgrade you want to retrieve.' },
-            { name: 'slot', isOptional: false, isVariadic: false, summary: ': The slot id of the upgrade. (Upgrade list ordered by slot number)' },
-        ],
-        returns: 'returns an integer with the upgrade on the slot if correct arguments were passed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleUpgradeOnSlot',
-    },
-    getVehicleUpgrades: {
-        summary: 'This function returns a table of all the upgrades on a specifed vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to retrieve the upgrades of.' },
-        ],
-        returns: 'returns a table of all the upgrades on each slot of a vehicle, which may be empty, or false if a valid vehicle is not passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleUpgrades',
-    },
-    getVehicleUpgradeSlotName: {
-        summary: 'This function returns the name of an upgrade slot name (e.g. roof, spoiler).',
-        parameters: [
-            { name: 'slot_upgrade', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns a string with the slot name if a valid slot or upgrade id was given, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleUpgradeSlotName',
-    },
-    getVehicleVariant: {
-        summary: 'This function gets the variant of a specified vehicle. In GTA: San Andreas some vehicles\nare different; for example the labelling on trucks or the contents of a pick-up truck and\nthe varying types of a motor bike. For the default variant list see: Vehicle variants.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to get the variant of.' },
-        ],
-        returns: 'returns 2 int containing the vehicle variants, false otherwise (the specified vehicle doesnt exist).',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleVariant',
-    },
-    getVehicleWheelFrictionState: {
-        summary: '',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the wheel friction state.' },
-            { name: 'wheel', isOptional: false, isVariadic: false, summary: 'The wheel you want to check. (0: front left, 1: rear left, 2: front right, 3: rear right)' },
-        ],
-        returns: 'returns a int indicating the wheel friction state. this value can be: * 0: normal friction * 1: slip with acceleration (only for driving wheels) * 2: slip without acceleration * 3: locked wheel (on brake or handbrake).',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleWheelFrictionState',
-    },
-    getVehicleWheelScale: {
-        summary: '',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: ': The vehicle to get its wheel scale of.' },
-        ],
-        returns: 'returns the wheel scale of the specified vehicle as a decimal number, or an error if the vehicle is invalid. for more information about the returned number, see setvehiclewheelscale.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleWheelScale',
-    },
-    getVehicleWheelStates: {
-        summary: 'This function returns the current states of all the wheels on the vehicle.\nNo vehicles have more than 4 wheels, if they appear to they will be duplicating other\nwheels.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A handle to the vehicle that you wish to know the wheel states of.' },
-        ],
-        returns: 'returns 4 ints indicating the states of the wheels (front left, rear left, front right, rear right). these values can be: * 0: inflated * 1: flat * 2: fallen off * 3: collisionless',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleWheelStates',
-    },
-    getVersion: {
-        summary: 'This function gives you various version information about MTA and the operating system.',
+    getSunSize: {
+        summary: 'This function is used to get the size of the sun.',
         parameters: [],
-        returns: 'returns a table with version information. specifically these keys are present in the table: *number: the mta server or client version (depending where the function was called) in pure numerical form, e.g. 256 *mta: the mta server or client version (depending where the function was called) in textual form, e.g. 1.0 *name: the full mta product name, either mta:sa server or mta:sa client. *netcode: the netcode version number. *os: returns the operating system on which the server or client is running *type: the type of build. can be: **nightly rx - a nightly development build. x represents the nightly build revision. **custom - a build compiled manually **release - a build that is publicly released (provisional). *tag: the build tag (from 1.0.3 onwards). contains infomation about the underlying version used. i.e. the final version of 1.0.3 has the build tag of 1.0.3 rc-9. (this can be confirmed by using the console command ver.) *sortable: a 15 character sortable version string (from 1.0.4 onwards). format of the string is described in getplayerversion.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVersion',
+        returns: 'Returns the size of the sun as a number, false if the size of the sun is at its default.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSunSize',
     },
-    getWaterColor: {
-        summary: 'This function returns the water color of the GTA world.\nNote: The server can only return the water color, if it has actually been set by script.',
+    getTeamColor: {
+        summary: 'This function retrieves the color of a team.',
+        parameters: [
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you want to get the color of.' },
+        ],
+        returns: 'Returns 3 integers representing the red, green, and blue color components of the team if it\'s valid, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamColor',
+    },
+    getTeamFriendlyFire: {
+        summary: 'This function tells you if friendly fire is turned on for the specified team.',
+        parameters: [
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team object that will be checked' },
+        ],
+        returns: 'Returns *true* if friendly fire is on for the specified team, *false* if it is turned off or if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamFriendlyFire',
+    },
+    getTeamFromName: {
+        summary: 'This function finds a team element using the provided team name.',
+        parameters: [
+            { name: 'teamName', isOptional: false, isVariadic: false, summary: 'A string determining the name of the team you wish to find.' },
+        ],
+        returns: 'Returns the team element if it was found, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamFromName',
+    },
+    getTeamName: {
+        summary: 'This function gets the team name of a team object.',
+        parameters: [
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you want to retrieve the name of.' },
+        ],
+        returns: 'Returns a string representing the team\'s name if the team object was valid, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamName',
+    },
+    getThisResource: {
+        summary: 'This function retrieves the resource from which the function call was made.',
         parameters: [],
-        returns: 'returns 4 int|ints, indicating the color of the water. (rgba)',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaterColor',
+        returns: 'Returns the resource in which the current script is.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetThisResource',
     },
-    getWaterLevel: {
-        summary: 'This function allows you to retrieve the water level from a certain location. The water\nlevel is 0 in most places though it can vary (e.g. its higher near the dam).',
-        parameters: [
-            { name: 'posX', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'posY', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'posZ', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'ignoreDistanceToWaterThreshold', isOptional: true, isVariadic: false, summary: 'If set to false, this function returns false, if the difference between water level (without waves) and posZ is greater than 3.0' },
-        ],
-        returns: 'returns an integer of the water level if the localplayer/position is near the water (-3 to 20 on the z coordinate) else false if theres no water near the localplayer/position.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaterLevel',
-    },
-    getWaterVertexPosition: {
-        summary: 'Gets the world position of a vertex (i.e. corner) of a water area. Each water area is\neither a triangle or quad (rectangle) so each has 3 or 4 corners.',
-        parameters: [
-            { name: 'theWater', isOptional: false, isVariadic: false, summary: 'the water element to get the vertex of' },
-            { name: 'vertexIndex', isOptional: false, isVariadic: false, summary: 'the index of the vertex whose position to get. Values range from 1 to 4 for a water quad, or 1 to 3 for a triangle.' },
-        ],
-        returns: 'returns the x, y and z coordinates of the specified vertex if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaterVertexPosition',
-    },
-    getWaveHeight: {
-        summary: 'This function returns the current wave height.',
+    getTickCount: {
+        summary: 'This function returns amount of time that your system has been running in milliseconds. By comparing two values of getTickCount, you can determine how much time has passed (in milliseconds) between two events. This could be used to determine how efficient your code is, or to time how long a player takes to complete a task.',
         parameters: [],
-        returns: 'returns the height as a float, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaveHeight',
+        returns: 'Returns an integer containing the number of milliseconds since the system the server is running on started. This has the potential to wrap-around.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTickCount',
     },
-    getWeaponAmmo: {
-        summary: 'This function gets the total ammo a Element/Weapon|custom weapon has.',
-        parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: ': The weapon to get the ammo of.' },
-        ],
-        returns: 'returns an int|integer containing how many ammo left has the weapon. returns false if an error occured.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponAmmo',
+    getTime: {
+        summary: 'This function is used to get the current time in the game. If you want to get the real server time, use getRealTime.',
+        parameters: [],
+        returns: 'Returns two *ints* that represent hours and minutes.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTime',
     },
-    getWeaponClipAmmo: {
-        summary: 'This function gets the amount of ammo left in a Element/Weapon|custom weapons\nmagazine/clip.',
+    getTimerDetails: {
+        summary: 'This function is for getting the details of a running timer.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the weapon to get the clip ammo of.' },
+            { name: 'theTimer', isOptional: false, isVariadic: false, summary: 'A timer element.' },
         ],
-        returns: 'returns the amount of ammo in the element/weapon|custom weapons clip, false if an error occured.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponClipAmmo',
+        returns: '* Integer one represents the time left in miliseconds (1000th of a second) of the current time left in the loop. * Integer two represents the amount of times the timer has left to execute. * Integer three represents the time interval of timer. * Returns false if the timer doesn\'t exist or stopped running. Also, debugscript will say "Bad Argument @ \'getTimerDetails\'". To prevent this, you can check if the timer exists with isTimer().',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTimerDetails',
     },
-    getWeaponFiringRate: {
-        summary: 'This gets the firing rate to be used when a Element/Weapon|custom weapon opens fire.',
+    getTimers: {
+        summary: 'This function returns a table of all active timers that the resource that calls it has created. Alternatively, only the timers with a remaining time less than or equal to a certain value can be retrieved.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to modify the firing rate of.' },
+            { name: 'theTime', isOptional: true, isVariadic: false, summary: 'The maximum time left (in milliseconds) on the timers you wish to retrieve.' },
         ],
-        returns: 'returns an integer with the firing rate of the custom weapon, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponFiringRate',
+        returns: 'Returns a table of all the active timers.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTimers',
+    },
+    gettok: {
+        summary: 'This function splits a string using the given separating character and returns one specified substring.',
+        parameters: [
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'the string that should be split.' },
+            { name: 'tokenNumber', isOptional: false, isVariadic: false, summary: 'which token should be returned (1 for the first, 2 for the second, and so on).' },
+            { name: 'separatingCharacter', isOptional: false, isVariadic: false, summary: 'the ASCII number representing the character you want to use to separate the tokens. You can easily retrieve this by running string.byte on a string containing the separating character.' },
+        ],
+        returns: 'Returns a string containing the token if it exists, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/Gettok',
+    },
+    getTrafficLightState: {
+        summary: 'Gets the current traffic light state. This state controls the traffic light colors. For instance, state **1** will cause the north and south traffic lights to be amber, and the ones left and east will turn red.',
+        parameters: [],
+        returns: 'Returns the current state of the traffic lights.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrafficLightState',
+    },
+    getTrainDirection: {
+        summary: 'Gets the direction in which a train is driving (clockwise or counterclockwise).',
+        parameters: [
+            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train of which to get the driving direction.' },
+        ],
+        returns: 'Returns *true* if the train is driving clockwise on the train track, *false* if it is going counterclockwise or a failure occured.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrainDirection',
+    },
+    getTrainPosition: {
+        summary: 'Gets the position the train is currently on the track',
+        parameters: [
+            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train to get the position of' },
+        ],
+        returns: 'Returns a float that represents how along the track it is, *false* if there is problem with train element.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrainPosition',
+    },
+    getTrainSpeed: {
+        summary: 'Gets the speed at which a train is traveling on the rails.',
+        parameters: [
+            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train of which to retrieve the speed.' },
+        ],
+        returns: 'Returns the train\'s speed if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrainSpeed',
+    },
+    getTypeIndexFromClothes: {
+        summary: 'This function is used to get the clothes type and index from the texture and model.\n(Scans through the list of clothes for the specific type).',
+        parameters: [
+            { name: 'clothesTexture', isOptional: false, isVariadic: false, summary: 'A string determining the clothes texture that you wish to retrieve the type and index from. See the clothes catalog.' },
+            { name: 'clothesModel', isOptional: false, isVariadic: false, summary: 'A string determining the corresponding clothes model that you wish to retrieve the type and index from. See the clothes catalog.' },
+        ],
+        returns: 'This function returns two integers, type and index respectively, *false* if invalid arguments were passed to the function.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetTypeIndexFromClothes',
+    },
+    getUnbanTime: {
+        summary: 'This function will return the unbanning time of the specified ban in **seconds**.',
+        parameters: [
+            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban in which you wish to retrieve the unban time of.' },
+        ],
+        returns: '* Returns an integer of the unbanning time in the format of seconds from the year 1970. Use in conjunction with getRealTime in order to retrieve detailed information. * Returns **false** if invalid arguments are specified or if there was no unbanning time specified for the ban.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetUnbanTime',
+    },
+    getUserdataType: {
+        summary: 'This function gets the type of a userdata value, which is not always a element in the element tree.',
+        parameters: [
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'A userdata value to get the type of. Userdata types can be:' },
+        ],
+        returns: 'Returns a string containing the specified userdata\'s type, or *false* plus an error message if the given value is not userdata.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetUserdataType',
+    },
+    getValidPedModels: {
+        summary: 'This function returns all valid ped models. The syntax is different for server and client sides.',
+        parameters: [],
+        returns: 'Returns a table with all valid ped models that exist on the client, containing the custom model IDs unless **includeCustom** is false. ```lua table getValidPedModels ( ) ``` Returns a table with all valid ped models that exist on the server.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetValidPedModels',
+    },
+    getVehicleAdjustableProperty: {
+        summary: 'Use this to get the value of a vehicles adjustable property. This property relates to movable parts of a model, for example hydra jets or dump truck tray.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you want to get the adjustable property of.' },
+        ],
+        returns: 'Returns a value from 0 upwards representing adjustment. 0 is default position. Maximum varies per vehicle, for example hydra horizontal flight is 5000, while dump truck tray max tilt is 2500. Or returns *false* if the vehicle passed to the function is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleAdjustableProperty',
+    },
+    getVehicleColor: {
+        summary: 'This function returns the color of the specified vehicle. A vehicle can have up to four colors.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the color of.' },
+            { name: 'bRGB', isOptional: false, isVariadic: false, summary: 'A boolean specifying whether to return RGB values. A setting of *false* will result in the function returning color ids instead.' },
+        ],
+        returns: '*Returns 12 ints (if bRGB is *true*) indicating the red, green and blue components of each of the 4 vehicle colors. *Returns 4 ints (if bRGB is *false*) indicating the color ids of each of the 4 vehicle colors. *Returns *false* if the vehicle doesn\'t exist. Valid color ids if bRGB is set to false:',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleColor',
     },
 };

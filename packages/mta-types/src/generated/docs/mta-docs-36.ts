@@ -1,237 +1,235 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_36: ApiDocumentationCatalog = {
-    resetVehicleComponentScale: {
-        summary: 'This function reset to default component scale for vehicle.',
+    isVehicleWindowOpen: {
+        summary: 'This function gets the vehicle window state.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to reset component scale.' },
-            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the window state.' },
+            { name: 'window', isOptional: false, isVariadic: false, summary: 'An integer representing a vehicle window. It can be:' },
         ],
-        returns: 'returns true if the scale of the component was reset, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehicleComponentScale',
+        returns: 'This function returns a boolean which represents window open state.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleWindowOpen',
     },
-    resetVehicleDummyPositions: {
+    isVoiceEnabled: {
+        summary: 'Added to client side.\n\nThis function allows you to make the server reveal whether or not voice is currently enabled.',
+        parameters: [],
+        returns: 'Returns *true* if the voice is enabled on the server, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsVoiceEnabled',
+    },
+    isVolumetricShadowsEnabled: {
         summary: '',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to reset the dummy positions.' },
-        ],
-        returns: 'returns true if the dummy positions have been reset, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehicleDummyPositions',
-    },
-    resetVehicleExplosionTime: {
-        summary: 'Resets the vehicle explosion time. This is the point in time at which the vehicle last\nexploded: at this time plus the vehicles respawn delay, the vehicle is respawned. You can\nuse this function to prevent the vehicle from respawning.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to reset the explosion time from.' },
-        ],
-        returns: 'returns true if the vehicle explosion time has been reset, false if it failed to reset the explosion time.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehicleExplosionTime',
-    },
-    resetVehicleIdleTime: {
-        summary: 'Resets the vehicle idle time',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to reset the idle time from.' },
-        ],
-        returns: 'returns true if the vehicle idle time has been reset, false if it failed to reset the idle time.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehicleIdleTime',
-    },
-    resetVehiclesLODDistance: {
-        summary: 'Resets the distance of vehicles LOD to default. Default values depends on client setting.\nIf client has enabled high detail vehicles in video options, value will be reset to (500,\n500) - otherwise to (70, 150). You can check value of this option using dxGetStatus\n(SettingHighDetailVehicles).',
         parameters: [],
-        returns: 'returns true if the vehicles lod distance was reset, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehiclesLODDistance',
+        returns: 'Returns *true* if enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsVolumetricShadowsEnabled',
     },
-    resetWaterColor: {
-        summary: 'This function reset the water color of the GTA world to default.',
+    isWaterDrawnLast: {
+        summary: 'This function determines whether water is drawn last in the rendering order.',
         parameters: [],
-        returns: 'returns true if water color was reset correctly, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetWaterColor',
+        returns: 'Returns *true* if water is drawn last in the rendering order, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsWaterDrawnLast',
     },
-    resetWaterLevel: {
-        summary: 'This function resets the water of the GTA world back to its default level. water|Water\nelements are not affected.',
+    isWeaponRenderEnabled: {
+        summary: 'This function checks whether GTA weapon rendering is enabled for ped and player.',
         parameters: [],
-        returns: 'returns true if water level was reset correctly, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetWaterLevel',
+        returns: 'Returns **true** if weapon rendering is enabled, otherwise returns **false**.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsWeaponRenderEnabled',
     },
-    resetWeaponFiringRate: {
-        summary: 'This function resets the firing rate of a Element/Weapon|custom weapon to the default one.',
+    isWorldSoundEnabled: {
+        summary: 'This function allows you to check if certain world sound effects have not been disabled by setWorldSoundEnabled',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the weapon to reset the firing rate of.' },
+            { name: 'group', isOptional: false, isVariadic: false, summary: 'An integer representing the world sound group' },
+            { name: 'index', isOptional: true, isVariadic: false, summary: 'An integer representing an individual sound within the group' },
         ],
-        returns: 'returns true on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetWeaponFiringRate',
+        returns: 'Returns *true* if the world sounds are enabled, *false* if they are disabled or invalid values were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsWorldSoundEnabled',
     },
-    resetWindVelocity: {
-        summary: 'This function resets the wind velocity in San Andreas to its default state.',
-        parameters: [],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetWindVelocity',
-    },
-    resetWorldSounds: {
-        summary: 'This function is used to reset the world sounds to the default setting.',
-        parameters: [],
-        returns: 'returns true if the world sounds were reset, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResetWorldSounds',
-    },
-    resizeBrowser: {
-        summary: 'Allows resizing of CEF browsers at runtime.',
+    isWorldSpecialPropertyEnabled: {
+        summary: 'Added also as a server-side function. Previously only available as a client-side function.\n\nChecks if a special world property (cheat) is enabled or not.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser you want to resize.' },
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'The new width of the browser.' },
-            { name: 'height', isOptional: false, isVariadic: false, summary: 'The new height of the browser.' },
+            { name: 'propname', isOptional: false, isVariadic: false, summary: 'the name of the property to retrieve. Possible values are listed on SetWorldSpecialPropertyEnabled.' },
         ],
-        returns: 'returns true if the browser is resized successfully, false if theres something wrong.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ResizeBrowser',
+        returns: 'Returns *true* if the property is enabled, *false* if it is disabled or the specified property name is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsWorldSpecialPropertyEnabled',
     },
-    resource: {
-        summary: 'A resource element of the resource the snippet was executed in',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    resourceRoot: {
-        summary: 'A resource root element of the resource the snippet was executed in',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    respawnObject: {
-        summary: 'This function respawns a specific object.',
+    kickPlayer: {
+        summary: 'This function will kick the specified player from the server.',
         parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'an object element' },
+            { name: 'kickedPlayer', isOptional: false, isVariadic: false, summary: 'The player that will be kicked from the server' },
+            { name: 'responsiblePlayer', isOptional: true, isVariadic: false, summary: 'The player that is responsible for the event. **Note**: If left out as in the second syntax, responsible player for the kick will be "Console" (Maximum 30 characters if using a string).' },
+            { name: 'reason', isOptional: true, isVariadic: false, summary: 'The reason for the kick. (Maximum 64 characters before 1.5.8, Maximum 128 characters after 1.5.8)' },
         ],
-        returns: '* true if the object was sucessfully respawned. * false if the object is not breakable, or a wrong object was given.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RespawnObject',
+        returns: 'Returns *true* if the player was kicked succesfully, *false* if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/KickPlayer',
     },
-    respawnVehicle: {
-        summary: 'This function respawns a vehicle according to its set respawn position, set by\nsetVehicleRespawnPosition or the position and rotation it was created on. To spawn a\nvehicle to a specific location just once, spawnVehicle can be used.',
+    killPed: {
+        summary: 'This function kills the specified ped.\n\nFrom v1.5.3 onwards this function is now available client side. Only works on client side peds.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to respawn' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped to kill' },
+            { name: 'theKiller', isOptional: true, isVariadic: false, summary: 'The ped responsible for the kill' },
+            { name: 'weapon', isOptional: true, isVariadic: false, summary: 'The ID of the weapon or Damage Types that should appear to have killed the ped (doesn\'t affect how they die)' },
+            { name: 'bodyPart', isOptional: true, isVariadic: false, summary: 'The ID of the body part that should appear to have been hit by the weapon (doesn\'t affect how they die)' },
+            { name: 'stealth', isOptional: true, isVariadic: false, summary: 'Boolean value, representing whether or not this a stealth kill' },
         ],
-        returns: 'returns true if the vehicle respawned successfully, false if the passed argument does not exist or is not a vehicle.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RespawnVehicle',
+        returns: 'Returns *true* if the ped was killed, *false* if the ped specified could not be killed or is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/KillPed',
     },
-    restartResource: {
-        summary: 'This function restarts a running resource. Restarting will destroy all the elements that\nthe resource has created (as stopping the resource does).\n*Dont forget to give admin rights to the resource, in which you are using restartResource\nfunction or it wont work.\n*This function does not restart the resource immediately. Restarts are queued up until\nthe end of the servers frame to ensure that they occur in the correct order (and that\ndependent resources can start and stop correctly). The resource being restarted will have\nan onResourceStop event triggered and the restarted instance will receive an\nonResourceStart event. Remember that the element and resource variables will be\ninvalidated during the restart, though of course, the resources name will not.',
+    killTimer: {
+        summary: 'This function allows you to kill/halt existing timers.',
         parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource you want to restart.' },
-            { name: 'persistent', isOptional: true, isVariadic: false, summary: 'Unused' },
-            { name: 'configs', isOptional: true, isVariadic: false, summary: 'Reload configs?' },
-            { name: 'maps', isOptional: true, isVariadic: false, summary: 'Reload maps?' },
-            { name: 'scripts', isOptional: true, isVariadic: false, summary: 'Reload (server) scripts?' },
-            { name: 'html', isOptional: true, isVariadic: false, summary: 'Reload html files (for resource web access)?' },
-            { name: 'clientConfigs', isOptional: true, isVariadic: false, summary: 'Reload client configs?' },
-            { name: 'clientScripts', isOptional: true, isVariadic: false, summary: 'Reload client scripts?' },
-            { name: 'clientFiles', isOptional: true, isVariadic: false, summary: 'Reload files?' },
+            { name: 'theTimer', isOptional: false, isVariadic: false, summary: 'The timer you wish to halt.' },
         ],
-        returns: 'returns true if the resource was restarted, false if the resource wasnt running, or an invalid resource was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RestartResource',
+        returns: 'Returns *true* if the timer was successfully killed, *false* if no such timer existed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/KillTimer',
     },
-    restoreAllWorldModels: {
-        summary: 'This function allows restoring of all world objects,which were removed with\nRemoveWorldModel.',
-        parameters: [],
-        returns: 'returns true if the world objects were restored, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RestoreAllWorldModels',
-    },
-    restoreWorldModel: {
-        summary: 'This function allows restoring of world object,which was removed with RemoveWorldModel.',
+    loadBrowserURL: {
+        summary: 'This function loads the specified URL.',
         parameters: [
-            { name: 'modelID', isOptional: false, isVariadic: false, summary: 'A whole integer specifying the GTASA object model ID.' },
-            { name: 'radius', isOptional: false, isVariadic: false, summary: 'A floating point number representing the radius that will be eliminated.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'A floating point number representing the X coordinate on the map.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Y coordinate on the map.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Z coordinate on the map.' },
-            { name: 'iInterior', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser element which will load the URL' },
+            { name: 'url', isOptional: false, isVariadic: false, summary: 'The url you want to load. It can either contain a remote website ("http://" prefix) or a website stored within a local resource ("http://mta/local/gui.html" for example, see Local Scheme Handler for details).' },
+            { name: 'postData', isOptional: true, isVariadic: false, summary: 'The post data passed to the website. Its content type can be any type (e.g. JSON) if urlEncoded is set to *false*' },
+            { name: 'urlEncoded', isOptional: true, isVariadic: false, summary: 'If set to *true*, it will be available f.e. in PHP\'s $_POST variable (the content type is: *application/x-www-form-urlencoded*)' },
         ],
-        returns: 'returns true if the world object was restored, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RestoreWorldModel',
+        returns: 'Returns *true* if the URL was successfully loaded.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/LoadBrowserURL',
     },
-    root: {
-        summary: 'The root element of the server',
+    loadMapData: {
+        summary: 'This function is intended to load data from a loaded XML file into the element tree. This could be used for loading an external map, or part of another map.',
+        parameters: [
+            { name: 'node', isOptional: false, isVariadic: false, summary: 'The node that you wish to load into the element tree.' },
+            { name: 'parent', isOptional: false, isVariadic: false, summary: 'The node you wish to be the parent of the new map data.' },
+        ],
+        returns: 'Returns an element object that corresponds to the root of the new data added, i.e. an element that represents the *node* xmlnode passed to the function. Returns *false* if the arguments are invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/LoadMapData',
+    },
+    localPlayer: {
+        summary: 'The player element of the local player.',
         parameters: [],
         returns: '',
         wiki: '',
     },
-    saveMapData: {
-        summary: 'This converts a set of elements in the element tree into XML. This is a format that can\nthen be loaded as a map file. Each element represents a single XML node.',
+    logIn: {
+        summary: 'This functions logs the given player in to the given account. You need to provide the password needed to log into that account.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: ': An existing node that should contain the contents of baseElement' },
-            { name: 'baseElement', isOptional: false, isVariadic: false, summary: ': The first element to output to the XML tree. This element and all its children (and their children, etc) will be output.' },
-            { name: 'childrenOnly', isOptional: true, isVariadic: false, summary: ': Defines if you want to only save children of the specified element.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to log into an account' },
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account to log the player into' },
+            { name: 'thePassword', isOptional: false, isVariadic: false, summary: 'The password needed to sign into this account' },
+        ],
+        returns: 'Returns *true* if the player was successfully logged into the given account. Returns *false* or *nil* if the log in failed for some reason, ie. the player was already logged in to some account (use logOut first), if the account was already in use or if it failed for some other reason.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/LogIn',
+    },
+    logOut: {
+        summary: 'This function logs the given player out of his current account.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to log out of his current account' },
+        ],
+        returns: 'Returns *true* if the player was successfully logged out, *false* or *nil* if it failed for some reason, ie. the player was never logged in.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/LogOut',
+    },
+    md5: {
+        summary: 'Calculates the MD5 hash of the specified string and returns its hexadecimal representation.',
+        parameters: [
+            { name: 'str', isOptional: false, isVariadic: false, summary: 'the string to hash.' },
+        ],
+        returns: 'Returns the MD5 hash of the input string if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/Md5',
+    },
+    moveObject: {
+        summary: 'This function will smoothly move an object from its current position to a specified rotation and position.',
+        parameters: [
+            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'the object that will be moved.' },
+            { name: 'time', isOptional: false, isVariadic: false, summary: 'the time in milliseconds the object will arrive at the destination.' },
+            { name: 'targetx', isOptional: false, isVariadic: false, summary: 'the X value of the target position' },
+            { name: 'targety', isOptional: false, isVariadic: false, summary: 'the Y value of the target position' },
+            { name: 'targetz', isOptional: false, isVariadic: false, summary: 'the Z value of the target position' },
+            { name: 'moverx', isOptional: true, isVariadic: false, summary: 'the rotation along the X axis **relative** to its current rotation, which is its starting angle.' },
+            { name: 'movery', isOptional: true, isVariadic: false, summary: 'the rotation along the Y axis **relative** to its current rotation, which is its starting angle.' },
+            { name: 'moverz', isOptional: true, isVariadic: false, summary: 'the rotation along the Z axis **relative** to its current rotation, which is its starting angle.' },
+            { name: 'strEasingType', isOptional: true, isVariadic: false, summary: 'the easing function to use for the interpolation (default is "Linear")' },
+            { name: 'fEasingPeriod', isOptional: true, isVariadic: false, summary: 'the period of the easing function (only some easing functions use this parameter)' },
+            { name: 'fEasingAmplitude', isOptional: true, isVariadic: false, summary: 'the amplitude of the easing function (only some easing functions use this parameter)' },
+            { name: 'fEasingOvershoot', isOptional: true, isVariadic: false, summary: 'the overshoot of the easing function (only some easing functions use this parameter)' },
+        ],
+        returns: '* *true* if the function moved the object succesfully. * *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/MoveObject',
+    },
+    navigateBrowserBack: {
+        summary: 'Returns the browser to the previous page.',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser that you want return to the previous page.' },
+        ],
+        returns: 'Returns *true* if the browser has returned to the previous page, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/NavigateBrowserBack',
+    },
+    navigateBrowserForward: {
+        summary: 'This function takes the browser to the next page.',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser that you want to take to the next page.' },
+        ],
+        returns: 'Returns *true* if the browser has gone to the next page, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/NavigateBrowserForward',
+    },
+    outputChatBox: {
+        summary: 'This outputs the specified text string to the chatbox. It can be specified as a message to certain player(s) or all players.\n\nIt can optionally allow you to embed color changes into the string by setting the colorCoded boolean to true. This allows:\n```lua\noutputChatBox ( "#FF0000Hello #00FF00World", root, 255, 255, 255, true )\n```\nThis will display as: **Hello World **',
+        parameters: [
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text string that you wish to send to the chat window. If more than 256 characters it will not be showed in chat.' },
+            { name: 'visibleTo', isOptional: true, isVariadic: false, summary: 'Can also be a table of players or team.' },
+            { name: 'r', isOptional: true, isVariadic: false, summary: 'The amount of red in the color of the text. Default value is 231.' },
+            { name: 'g', isOptional: true, isVariadic: false, summary: 'The amount of green in the color of the text. Default value is 217.' },
+            { name: 'b', isOptional: true, isVariadic: false, summary: 'The amount of blue in the color of the text. Default value is 176.' },
+            { name: 'colorCoded', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether or not \'#RRGGBB\' tags should be used.' },
+        ],
+        returns: 'Returns *true* if the message was displayed successfully. Returns *false* if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OutputChatBox',
+    },
+    outputConsole: {
+        summary: 'This outputs the specified text string to the console window (accessed with F8 or ~ key). It can be specified as a message to certain player(s) or all players.',
+        parameters: [
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text string that you wish to send to the console window' },
+            { name: 'visibleTo', isOptional: true, isVariadic: false, summary: 'This specifies who the chat is visible to. Any players in this element will see the chat message. See visibility.' },
         ],
         returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SaveMapData',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OutputConsole',
     },
-    set: {
-        summary: 'This function is used to save arbitrary data under a certain name on the settings\nsystem|settings registry.\nIts important to note that set always writes to the settings.xml file, even if get read\nthe value from a resources meta.xml. This means that the admin can specify settings in\nthe settings.xml that override the resources defaults, but that the defaults can still be\nretrieved if need be. As a general principle, resources should not be designed so that\nthe admin is required to modify them, they should be black boxes.',
+    outputDebugString: {
+        summary: 'This function outputs scripting debug messages, which can be read by enabling the debug textbox. The debug display level can then be set so that info or warning messages get filtered out.',
         parameters: [
-            { name: 'settingName', isOptional: false, isVariadic: false, summary: 'The name of the setting you want to set. See settings system#Setting names|setting names for information on settings names.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value to set the setting to. This can be any Lua data type, except for functions, most userdata (only resources cant be stored) and threads.' },
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'the text to be output to the debug box.' },
+            { name: 'level', isOptional: true, isVariadic: false, summary: 'the debug message level. Possible values are:' },
+            { name: 'red', isOptional: true, isVariadic: false, summary: 'The amount of red in the color of the text. Default value is 255.' },
+            { name: 'green', isOptional: true, isVariadic: false, summary: 'The amount of green in the color of the text. Default value is 255.' },
+            { name: 'blue', isOptional: true, isVariadic: false, summary: 'The amount of blue in the color of the text. Default value is 255.' },
         ],
-        returns: 'returns true if the setting has been set, false if you do not have access to the setting or invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Set',
+        returns: 'Returns *true* if the debug message was successfully output, *false* if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OutputDebugString',
     },
-    setAccountData: {
-        summary: 'This function sets a string to be stored in an account. This can then be retrieved using\ngetAccountData. Data stored as account data is persistent across users sessions and maps,\nunless they are logged into a guest account. Even if logged into a guest account, account\ndata can be useful as a way to store a reference to your own account system, though its\npersistence is equivalent to that of using setElementData on the players element.',
+    outputServerLog: {
+        summary: 'This outputs a line of text to the server\'s log. This could be useful for debugging.',
         parameters: [
-            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you wish to retrieve the data from.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key under which you wish to store the data' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value you wish to store. Set to false to remove the data. NOTE: you cannot store tables as values, but you can use toJSON strings.' },
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'The text to be output to the log.' },
         ],
-        returns: 'returns a true if the account data was set, false if an invalid argument was specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAccountData',
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OutputServerLog',
     },
-    setAccountName: {
-        summary: 'This function sets the name of an account.',
+    passwordHash: {
+        summary: 'This function creates a new password hash using a specified hashing algorithm.',
         parameters: [
-            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you wish to change the name.' },
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'The new name.' },
-            { name: 'allowCaseVariations', isOptional: true, isVariadic: false, summary: 'Whether the username is case sensitive (if this is set to true, usernames Bob and bob will refer to different accounts)' },
+            { name: 'password', isOptional: false, isVariadic: false, summary: 'The password to hash.' },
+            { name: 'algorithm', isOptional: false, isVariadic: false, summary: 'The algorithm to use:' },
+            { name: 'options', isOptional: false, isVariadic: false, summary: 'table with options for the hashing algorithm, as detailed below.' },
+            { name: 'callback', isOptional: true, isVariadic: false, summary: 'providing a callback will run this function asynchronously, the arguments to the callback are the same as the returned values below.' },
         ],
-        returns: 'returns a true if the account name was set, false if an invalid argument was specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAccountName',
+        returns: 'Returns the hash as a string if hashing was successful, *false* otherwise. If a callback was provided, the aforementioned values are arguments to the callback, and this function will always return *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/PasswordHash',
     },
-    setAccountPassword: {
-        summary: 'This function sets the password of the specified account.',
+    passwordVerify: {
+        summary: 'This function verifies whether a password matches a password hash.',
         parameters: [
-            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'the account whose password you want to set' },
-            { name: 'password', isOptional: false, isVariadic: false, summary: 'the password' },
+            { name: 'password', isOptional: false, isVariadic: false, summary: 'The password to check.' },
+            { name: 'hash', isOptional: false, isVariadic: false, summary: 'A supported hash (see passwordHash). Note that only the prefix *$2y$* is supported for type bcrypt (older prefixes can cause security issues).' },
+            { name: 'options', isOptional: true, isVariadic: false, summary: 'advanced options' },
+            { name: 'callback', isOptional: true, isVariadic: false, summary: 'providing a callback will run this function asynchronously, the arguments to the callback are the same as the returned values below.' },
         ],
-        returns: 'returns true if the password was set correctly, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAccountPassword',
-    },
-    setAircraftMaxHeight: {
-        summary: 'This function changes the maximum flying height of aircraft.',
-        parameters: [
-            { name: 'Height', isOptional: false, isVariadic: false, summary: 'The height you want aircraft to be able to go.' },
-        ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAircraftMaxHeight',
-    },
-    setAircraftMaxVelocity: {
-        summary: 'This function sets the maximum velocity at which aircrafts could fly. Using this function\nserver-side will overwrite the value that was previously set client-side.',
-        parameters: [
-            { name: 'velocity', isOptional: false, isVariadic: false, summary: 'The max velocity, can be 0 or any positive value. Default is 1.5.' },
-        ],
-        returns: 'returns true if the max velocity was set correctly, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAircraftMaxVelocity',
-    },
-    setAmbientSoundEnabled: {
-        summary: 'This function allows you to disable some background sound effects. See also:\nsetWorldSoundEnabled.',
-        parameters: [
-            { name: 'theType', isOptional: false, isVariadic: false, summary: 'The type of ambient sound to toggle. Can be either gunfire or general.' },
-            { name: 'enable', isOptional: false, isVariadic: false, summary: 'Set false to turn off, true to turn on' },
-        ],
-        returns: 'returns true if the ambient sound was set correctly, false if invalid values were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAmbientSoundEnabled',
-    },
-    setAnalogControlState: {
-        summary: 'This sets the analog control state of a control for the local player. To change the\nanalog controls for a ped, please use setPedAnalogControlState.',
-        parameters: [
-            { name: 'control', isOptional: false, isVariadic: false, summary: 'The control that you want to set the state of. See control names for a list of possible controls.' },
-            { name: 'state', isOptional: true, isVariadic: false, summary: 'A float between 0 and 1 indicating the amount the control is pressed. If no value is provided, the analog control is removed. ***forceOverrideNextFrame: ** A bool indicating if the player input should force fully overriden for the next frame.' },
-            { name: 'forceOverrideNextFrame', isOptional: true, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if the control state was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetAnalogControlState',
+        returns: 'Returns true if the password matches the hash. Returns false if the password does not match, or if an unknown hash was passed. If a callback was provided, the aforementioned values are arguments to the callback, and this function will always return *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/PasswordVerify',
     },
 };

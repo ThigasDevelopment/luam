@@ -51,7 +51,7 @@ describe('full catalog coverage', () => {
 describe('imported API environments', () => {
     it('reports newly imported server-only APIs used on the client', () => {
         expect(codes('setPlayerMuted(source, true)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
-        expect(codes('getPlayerSerial(source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
+        expect(codes('kickPlayer(source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
         expect(codes('setAccountPassword(source, "x")\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
     });
 
@@ -63,7 +63,7 @@ describe('imported API environments', () => {
 
     it('rejects a one-sided API in a shared file', () => {
         expect(codes('dxDrawLine(0, 0, 1, 1)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
-        expect(codes('getPlayerSerial(source)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
+        expect(codes('banPlayer(source)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
     });
 
     it('accepts a newly imported shared API everywhere', () => {
@@ -75,5 +75,21 @@ describe('imported API environments', () => {
 
     it('keeps an undeclared name available in every environment', () => {
         expect(codes('myProjectHelper(1)\n', 'src/client/hud.luam')).toEqual([]);
+    });
+
+    it('accepts the declarations the wiki widened to shared in both environments', () => {
+        const widened = ['getControlState(source, "fire")', 'getAllElementData(source)', 'setWorldSpecialPropertyEnabled("aircars", true)', 'breakObject(source)'];
+
+        for (const call of widened) {
+            for (const path of ['src/server/main.luam', 'src/client/hud.luam', 'src/shared/tools.luam']) {
+                expect(codes(`${call}\n`, path)).toEqual([]);
+            }
+        }
+    });
+
+    it('still rejects a one-sided neighbour of a widened declaration', () => {
+        expect(codes('getPlayerACInfo(source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
+        expect(codes('setPlayerMuted(source, true)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
+        expect(codes('usePickup(source, source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
     });
 });

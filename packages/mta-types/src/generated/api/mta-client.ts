@@ -3,12 +3,15 @@ import type { ApiCatalog } from '@mta-types/api-declaration';
 import { MTA_AUDIO_CLIENT } from './mta-audio-client';
 import { MTA_BLIP_CLIENT } from './mta-blip-client';
 import { MTA_BROWSER_CLIENT } from './mta-browser-client';
+import { MTA_BUILDING_CLIENT } from './mta-building-client';
 import { MTA_CAMERA_CLIENT } from './mta-camera-client';
 import { MTA_CURSOR_CLIENT } from './mta-cursor-client';
+import { MTA_DISCORD_CLIENT } from './mta-discord-client';
 import { MTA_DRAWING_CLIENT } from './mta-drawing-client';
 import { MTA_EFFECTS_CLIENT } from './mta-effects-client';
 import { MTA_ELEMENT_CLIENT } from './mta-element-client';
 import { MTA_ENGINE_CLIENT } from './mta-engine-client';
+import { MTA_ENGINE_CLIENT_2 } from './mta-engine-client-2';
 import { MTA_EVENT_CLIENT } from './mta-event-client';
 import { MTA_EXPLOSION_CLIENT } from './mta-explosion-client';
 import { MTA_FIRE_CLIENT } from './mta-fire-client';
@@ -19,12 +22,12 @@ import { MTA_MARKER_CLIENT } from './mta-marker-client';
 import { MTA_OBJECT_CLIENT } from './mta-object-client';
 import { MTA_OUTPUT_CLIENT } from './mta-output-client';
 import { MTA_PED_CLIENT } from './mta-ped-client';
-import { MTA_PICKUP_CLIENT } from './mta-pickup-client';
 import { MTA_PLAYER_CLIENT } from './mta-player-client';
+import { MTA_POSTFX_CLIENT } from './mta-postfx-client';
 import { MTA_PROJECTILE_CLIENT } from './mta-projectile-client';
+import { MTA_RADAR_CLIENT } from './mta-radar-client';
 import { MTA_RESOURCE_CLIENT } from './mta-resource-client';
 import { MTA_SEARCHLIGHT_CLIENT } from './mta-searchlight-client';
-import { MTA_SERVER_CLIENT } from './mta-server-client';
 import { MTA_SVG_CLIENT } from './mta-svg-client';
 import { MTA_UTILITY_CLIENT } from './mta-utility-client';
 import { MTA_VARIABLE_CLIENT } from './mta-variable-client';
@@ -37,12 +40,15 @@ export const MTA_CLIENT_GLOBALS: ApiCatalog = {
     ...MTA_AUDIO_CLIENT,
     ...MTA_BLIP_CLIENT,
     ...MTA_BROWSER_CLIENT,
+    ...MTA_BUILDING_CLIENT,
     ...MTA_CAMERA_CLIENT,
     ...MTA_CURSOR_CLIENT,
+    ...MTA_DISCORD_CLIENT,
     ...MTA_DRAWING_CLIENT,
     ...MTA_EFFECTS_CLIENT,
     ...MTA_ELEMENT_CLIENT,
     ...MTA_ENGINE_CLIENT,
+    ...MTA_ENGINE_CLIENT_2,
     ...MTA_EVENT_CLIENT,
     ...MTA_EXPLOSION_CLIENT,
     ...MTA_FIRE_CLIENT,
@@ -53,12 +59,12 @@ export const MTA_CLIENT_GLOBALS: ApiCatalog = {
     ...MTA_OBJECT_CLIENT,
     ...MTA_OUTPUT_CLIENT,
     ...MTA_PED_CLIENT,
-    ...MTA_PICKUP_CLIENT,
     ...MTA_PLAYER_CLIENT,
+    ...MTA_POSTFX_CLIENT,
     ...MTA_PROJECTILE_CLIENT,
+    ...MTA_RADAR_CLIENT,
     ...MTA_RESOURCE_CLIENT,
     ...MTA_SEARCHLIGHT_CLIENT,
-    ...MTA_SERVER_CLIENT,
     ...MTA_SVG_CLIENT,
     ...MTA_UTILITY_CLIENT,
     ...MTA_VARIABLE_CLIENT,

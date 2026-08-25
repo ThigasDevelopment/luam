@@ -1,241 +1,242 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_34: ApiDocumentationCatalog = {
-    passwordHash: {
-        summary: 'This function creates a new password hash using a specified hashing algorithm.',
+    isKeyBound: {
+        summary: 'This function can be used to find out if a key has already been bound. If you do not specify a keyState or handler, any instances of key being bound will cause isKeyBound to return true.',
         parameters: [
-            { name: 'password', isOptional: false, isVariadic: false, summary: 'The password to hash.' },
-            { name: 'algorithm', isOptional: false, isVariadic: false, summary: 'The algorithm to use: bcrypt : use the bcrypt hashing algorithm. Hash length: 60 characters. Note that only the prefix $2y$ is supported (older prefixes can cause security issues).' },
-            { name: 'options', isOptional: false, isVariadic: false, summary: 'table with options for the hashing algorithm, as detailed below.' },
-            { name: 'callback', isOptional: true, isVariadic: false, summary: 'providing a callback will run this function asynchronously, the arguments to the callback are the same as the returned values below.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you\'re checking.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key you\'re checking. See Key names for a list of valid key names.' },
+            { name: 'keyState', isOptional: true, isVariadic: false, summary: 'Is the state of the key when it calls the function, Can be either:' },
+            { name: 'handler', isOptional: true, isVariadic: false, summary: 'The function you\'re checking against' },
         ],
-        returns: 'returns the hash as a string if hashing was successful, false otherwise. if a callback was provided, the aforementioned values are arguments to the callback, and this function will always return true.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PasswordHash',
+        returns: 'Returns *true* if the key is bound, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsKeyBound',
     },
-    passwordVerify: {
-        summary: 'This function verifies whether a password matches a password hash.',
+    isLineOfSightClear: {
+        summary: 'This function checks if there are obstacles between two points of the game world, optionally ignoring certain kinds of elements. Use processLineOfSight if you want more information about what the ray hits.',
         parameters: [
-            { name: 'password', isOptional: false, isVariadic: false, summary: 'The password to check.' },
-            { name: 'hash', isOptional: false, isVariadic: false, summary: 'A supported hash (see passwordHash). Note that only the prefix $2y$ is supported for type bcrypt (older prefixes can cause security issues).' },
-            { name: 'options', isOptional: true, isVariadic: false, summary: 'advanced options insecureBcrypt If set to true, you can use the $2a$ prefix for bcrypt hashes as well. It is strongly not recommended to use it though, because the underlying implementation has a bug that leads to such hashes being relatively easy to crack. This bug was fixed for $2y$.' },
-            { name: 'callback', isOptional: true, isVariadic: false, summary: 'providing a callback will run this function asynchronously, the arguments to the callback are the same as the returned values below. |11281' },
+            { name: 'startX', isOptional: false, isVariadic: false, summary: 'The first point\'s world X coordinate.' },
+            { name: 'startY', isOptional: false, isVariadic: false, summary: 'The first point\'s world Y coordinate.' },
+            { name: 'startZ', isOptional: false, isVariadic: false, summary: 'The first point\'s world Z coordinate.' },
+            { name: 'endX', isOptional: false, isVariadic: false, summary: 'The second point\'s world X coordinate.' },
+            { name: 'endY', isOptional: false, isVariadic: false, summary: 'The second point\'s world Y coordinate.' },
+            { name: 'endZ', isOptional: false, isVariadic: false, summary: 'The second point\'s world Z coordinate.' },
+            { name: 'checkBuildings', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by GTA\'s internally placed buildings, i.e. the world map.' },
+            { name: 'checkVehicles', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by vehicles.' },
+            { name: 'checkPeds', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by peds, i.e. players.' },
+            { name: 'checkObjects', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by objects.' },
+            { name: 'checkDummies', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by GTA\'s internal dummies. These are not used in the current MTA version so this argument can be set to *false*.' },
+            { name: 'seeThroughStuff', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to **pass through** collision materials that have this flag enabled (By default material IDs 52, 55 and 66 which are some fences). This flag originally allows some objects to be walked on but you can shoot throug them.' },
+            { name: 'ignoreSomeObjectsForCamera', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to **pass through** objects that have (K) property enabled in "object.dat" data file. (i.e. Most dynamic objects like boxes or barrels)' },
+            { name: 'ignoredElement', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through a certain specified element.' },
         ],
-        returns: 'returns true if the password matches the hash. returns false if the password does not match, or if an unknown hash was passed. if a callback was provided, the aforementioned values are arguments to the callback, and this function will always return true.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PasswordVerify',
+        returns: 'Returns *true* if the line between the specified points is clear, *false* if there\'s an obstacle or if invalid parameters are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsLineOfSightClear',
     },
-    playSFX: {
-        summary: 'This function plays a sound from GTAs big sound containers.\nIn case of these invalid audio files, this function returns false.\nIt also returns false when trying to play a track deleted in the recent GTA: SA Steam\npatches (and if the client is using a Steam GTA: SA copy).|true',
-        parameters: [
-            { name: 'containerName', isOptional: false, isVariadic: false, summary: 'The name of the audio container. Possible values are: feet, genrl, pain_a, script, spc_ea, spc_fa, spc_ga, spc_na, spc_pa' },
-            { name: 'bankId', isOptional: false, isVariadic: false, summary: 'The audio bank id' },
-            { name: 'soundId', isOptional: false, isVariadic: false, summary: 'The sound id within the audio bank' },
-            { name: 'looped', isOptional: true, isVariadic: false, summary: 'A boolean representing whether the sound will be looped' },
-        ],
-        returns: 'returns a sound element if the sound was successfully created, false otherwise. ```lua element playsfx ( string radio, string radiostation, int trackid , bool looped = false ) ``` *radio: the string radio (used to differentiate to the first syntax) *radiostation: the radio station. possible values are adverts, ambience, police, playback fm, k-rose, k-dst, cutscene, beats, bounce fm, sf-ur, radio los santos, radio x, csr 103.9, k-jah west, master sounds 98.3, wctr. *trackid : the radio track id within the radio station audio file *looped: a boolean representing whether the sound will be looped returns a sound element if the sound was successfully created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PlaySFX',
-    },
-    playSFX3D: {
-        summary: 'This function plays a sound in the GTA world from GTAs big sound containers.\nIn case of these invalid audio files, this function returns false.\nIt also returns false when trying to play a track deleted in the recent GTA: SA Steam\npatches (and if the client is using a Steam GTA: SA copy).|true',
-        parameters: [
-            { name: 'containerName', isOptional: false, isVariadic: false, summary: 'The name of the audio container. Possible values are: feet, genrl, pain_a, script, spc_ea, spc_fa, spc_ga, spc_na, spc_pa' },
-            { name: 'bankId', isOptional: false, isVariadic: false, summary: 'The audio bank id' },
-            { name: 'soundId', isOptional: false, isVariadic: false, summary: 'The sound id within the audio bank' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'A floating point number representing the X coordinate on the map.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Y coordinate on the map.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Z coordinate on the map.' },
-            { name: 'looped', isOptional: true, isVariadic: false, summary: 'A boolean representing whether the sound will be looped' },
-        ],
-        returns: 'returns a sound element if the sound was successfully created, false otherwise. ```lua element playsfx3d( string radio, string radiostation, int trackid, float x, float y, float z , bool looped = false ) ``` *radio: the string radio (used to differentiate to the first syntax) *radiostation: the radio station. possible values are adverts, ambience, police, playback fm, k-rose, k-dst, cutscene, beats, bounce fm, sf-ur, radio los santos, radio x, csr 103.9, k-jah west, master sounds 98.3, wctr. *trackid : the radio track id within the radio station audio file *x: a floating point number representing the x coordinate on the map. *y: a floating point number representing the y coordinate on the map. *z: a floating point number representing the z coordinate on the map. *looped: a boolean representing whether the sound will be looped returns a sound element if the sound was successfully created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PlaySFX3D',
-    },
-    playSound: {
-        summary: 'Creates a sound element and plays it immediately after creation for the local player.\n*The only supported audio formats are MP3, WAV, OGG, FLAC, RIFF, MOD, WEBM, XM, IT, S3M\nand PLS (e.g. Webstream).\n*For performance reasons, when using playSound for effects that will be played lots (i.e.\nweapon fire), it is recommend that you convert your audio file to a one channel (mono)\nWAV with sample rate of 22050 Hz or less. Also consider adding a limit on how often the\neffect can be played e.g. once every 50ms.',
-        parameters: [
-            { name: 'soundPath', isOptional: false, isVariadic: false, summary: 'filepath, raw data or URL (http://, https:// or ftp://) of the sound file you want to play. (Note: Playing sound files from other resources requires the target resource to be in the running state)' },
-            { name: 'looped', isOptional: true, isVariadic: false, summary: 'a boolean representing whether the sound will be looped. To loop the sound, use true. Loop is not available for streaming sounds, only for sound files.' },
-            { name: 'throttled', isOptional: true, isVariadic: false, summary: 'a boolean representing whether the sound will be throttled (i.e. given reduced download bandwidth). To throttle the sound, use true. Sounds will be throttled per default and only for URLs.' },
-        ],
-        returns: 'returns a sound element if the sound was successfully created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PlaySound',
-    },
-    playSound3D: {
-        summary: 'Creates a sound element in the GTA world and plays it immediately after creation for the\nlocal player. setElementPosition can be used to move the sound element around after it\nhas been created. Remember to use setElementDimension after creating the sound to play it\noutside of dimension 0.\n*The only supported audio formats are MP3, WAV, OGG, RIFF, MOD, WEBM, XM, IT and S3M.\n*For performance reasons, when using playSound3D for effects that will be played lots\n(i.e. weapon fire), it is recommend that you convert your audio file to a one channel\n(mono) WAV with sample rate of 22050 Hz or less. Also consider adding a limit on how\noften the effect can be played e.g. once every 50ms.',
-        parameters: [
-            { name: 'soundPath', isOptional: false, isVariadic: false, summary: 'raw data or filepath to the sound file you want to play. (Note: Playing sound files from other resources requires the target resource to be in the running state) soundURL the URL (http://, https:// or ftp://) of the sound file you want to play. (In this version the file does not have to be predefined in the meta.xml)' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'a floating point number representing the X coordinate on the map.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'a floating point number representing the Y coordinate on the map.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'a floating point number representing the Z coordinate on the map.' },
-            { name: 'looped', isOptional: true, isVariadic: false, summary: 'a boolean representing whether the sound will be looped. To loop the sound, use true. throttled a boolean representing whether the sound will be throttled (i.e. given reduced download bandwidth). To throttle the sound, use true.' },
-        ],
-        returns: 'returns a sound element if the sound was successfully created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PlaySound3D',
-    },
-    playSoundFrontEnd: {
-        summary: 'This function plays a frontend sound for the specified player.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player you want the sound to play for.' },
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a whole int specifying the sound id to play. Valid values are:' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PlaySoundFrontEnd',
-    },
-    pregFind: {
-        summary: 'This function stops at the first occurrence of the pattern in the input string and\nreturns the result of the search.',
-        parameters: [
-            { name: 'subject', isOptional: false, isVariadic: false, summary: 'The input string' },
-            { name: 'pattern', isOptional: false, isVariadic: false, summary: 'The pattern string to search for in the input string.' },
-            { name: 'flags', isOptional: true, isVariadic: false, summary: 'Conjuncted value that contains flags ( 1 - ignorecase, 2 - multiline, 4 - dotall, 8 - extended, 16 - unicode ) or ( i - Ignore case, m - Multiline, d - Dotall, e - Extended, u - Unicode )' },
-        ],
-        returns: 'returns true if the pattern was found in the input string, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PregFind',
-    },
-    pregMatch: {
-        summary: 'This function returns all matches.',
-        parameters: [
-            { name: 'base', isOptional: false, isVariadic: false, summary: 'The base string for replace.' },
-            { name: 'pattern', isOptional: false, isVariadic: false, summary: 'The pattern for match in base string.' },
-            { name: 'flags', isOptional: true, isVariadic: false, summary: 'Conjuncted value that contains flags ( 1 - ignorecase, 2 - multiline, 4 - dotall, 8 - extended, 16 - unicode ) or ( i - Ignore case, m - Multiline, d - Dotall, e - Extended, u - Unicode )' },
-            { name: 'maxResults', isOptional: true, isVariadic: false, summary: 'Maximum number of results to return' },
-        ],
-        returns: 'returns a table if one or more match is found, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PregMatch',
-    },
-    pregReplace: {
-        summary: 'This function performs a regular expression search and replace and returns the replaced\nstring.',
-        parameters: [
-            { name: 'subject', isOptional: false, isVariadic: false, summary: 'The input string.' },
-            { name: 'pattern', isOptional: false, isVariadic: false, summary: 'The pattern string to search for in the input string.' },
-            { name: 'replacement', isOptional: false, isVariadic: false, summary: 'The replacement string to replace all matches within the input string.' },
-            { name: 'flags', isOptional: true, isVariadic: false, summary: 'Conjuncted value that contains flags ( 1 - ignorecase, 2 - multiline, 4 - dotall, 8 - extended, 16 - unicode ) or ( i - Ignore case, m - Multiline, d - Dotall, e - Extended, u - Unicode )' },
-        ],
-        returns: 'returns the replaced string, or bool false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/PregReplace',
-    },
-    processLineOfSight: {
-        summary: 'This function casts a ray between two points in the world, and tells you information\nabout the point that was hit, if any. The two positions must be within the local players\ndraw distance as the collision data is not loaded outside this area, and the call will\njust fail as if the ray didnt hit.\nThis function is relatively expensive to call, so over use of this in scripts may have a\ndetrimental effect on performance.\nThis function is useful for checking for collisions and for editor-style scripts. If you\nwish to find what element is positioned at a particular point on the screen, use this\nfunction combined with getWorldFromScreenPosition. If you wish to just know if something\nis hit, and dont care about what or where was hit, use isLineOfSightClear.',
-        parameters: [
-            { name: 'startX', isOptional: false, isVariadic: false, summary: 'The start x position' },
-            { name: 'startY', isOptional: false, isVariadic: false, summary: 'The start y position' },
-            { name: 'startZ', isOptional: false, isVariadic: false, summary: 'The start z position' },
-            { name: 'endX', isOptional: false, isVariadic: false, summary: 'The end x position' },
-            { name: 'endY', isOptional: false, isVariadic: false, summary: 'The end y position' },
-            { name: 'endZ', isOptional: false, isVariadic: false, summary: 'The end z position' },
-            { name: 'checkBuildings', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by GTAs internally placed buildings, i.e. the world map.' },
-            { name: 'checkVehicles', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by Vehicle|vehicles.' },
-            { name: 'checkPlayers', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by Player|players.' },
-            { name: 'checkObjects', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by Object|objects.' },
-            { name: 'checkDummies', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by GTAs internal dummies. These are not used in the current MTA version so this argument can be set to false.' },
-            { name: 'seeThroughStuff', isOptional: true, isVariadic: false, summary: 'Allow the line of sight pass through collision materials that have this flag enabled (By default material IDs 52, 55 and 66 which are some fences that you can shoot throug but still walk on them).' },
-            { name: 'ignoreSomeObjectsForCamera', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through objects that have (K) property enabled in object.dat data file. (i.e. Most dynamic objects like boxes or barrels)' },
-            { name: 'shootThroughStuff', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through collision materials that have this flag enabled (By default material IDs 28, 29, 31, 32, 33, 74, 75, 76, 77, 78, 79, 96, 97, 98, 99, 100 which are exclusively sand / beach or underwater objects).' },
-            { name: 'ignoredElement', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through a certain specified element. This is usually set to the object you are tracing from so it does not interfere with the results.' },
-            { name: 'includeWorldModelInformation', isOptional: true, isVariadic: false, summary: 'Include the results of hitting a world model.' },
-            { name: 'bIncludeCarTyres', isOptional: true, isVariadic: false, summary: 'Includes car tyre hits.' },
-        ],
-        returns: '*hit: true if there is a collision, false otherwise the other values are only filled if there is a collision, they contain nil otherwise *hitx, hity, hitz: collision position *hitelement: the mta element hit if any, nil otherwise *normalx, normaly, normalz: the normal of the surface hit *material: an integer representing the material ids|gtasa material id of the surface hit when applicable (world, objects) *lighting: a float between 0 (fully dark) and 1 (bright) representing the amount of light that the hit building surface will transfer to peds or vehicles that are in contact with it. the value can be affected by the game time of day, usually with a lower (darker) value being returned during the night. *piece: an integer representing the part of the element hit if hitelement is a vehicle or a ped/player, 0 otherwise. **for a ped/player, piece represents the body part hit: **for vehicles, piece represents the vehicle part hit: *worldmodelid: if includeworldmodelinformation was set to true and a world model was hit, this will contain the model id. *worldmodelpositionx,y,z: if worldmodelid is set, this will contain the world model position. *worldmodelrotationx,y,z: if worldmodelid is set, this will contain the world model rotation. *worldlodmodelid: if worldmodelid is set, this will contain the lod model id if applicable.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ProcessLineOfSight',
-    },
-    redirectPlayer: {
-        summary: 'This function redirects the player to a specified server.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you want to redirect' },
-            { name: 'serverIP', isOptional: false, isVariadic: false, summary: 'The IP address (or domain name that resolves to the IP address) of the server you want to redirect the player to. Use an empty string to reconnect to the same server.' },
-            { name: 'serverPort', isOptional: false, isVariadic: false, summary: 'The game port of the server you want to redirect the player to, this is usually 22003. Set to zero to use the same port as the current server.' },
-            { name: 'serverPassword', isOptional: true, isVariadic: false, summary: 'The password for the server if its protected' },
-        ],
-        returns: 'returns true if the player was redirected successfully, false if bad arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RedirectPlayer',
-    },
-    ref: {
-        summary: 'This function will create a reference to the given argument.',
-        parameters: [
-            { name: 'objectToReference', isOptional: false, isVariadic: false, summary: 'The Lua element, which you want to reference' },
-        ],
-        returns: 'returns an int if the reference were successfully created. returns false if the parameter were invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Ref',
-    },
-    refreshResources: {
-        summary: 'This function finds new resources and checks for changes to the current ones.',
-        parameters: [
-            { name: 'refreshAll', isOptional: true, isVariadic: false, summary: ': If true MTA will check for changes in all resources. If false, MTA will only check for new resources and try to reload resources with errors' },
-            { name: 'targetResource', isOptional: true, isVariadic: false, summary: ': If set, the refresh is restricted to the supplied resource only **Note:** Checking for changes in all resources can result in lag for a short period of time. It should generally be avoided to set refreshAll to \'\'true\'\'.' },
-        ],
-        returns: 'returns true if refresh was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RefreshResources',
-    },
-    reloadBans: {
-        summary: 'This function will reload the server ban list file.',
+    isMainMenuActive: {
+        summary: 'This function returns whether the user is in the mainmenu or not.',
         parameters: [],
-        returns: 'returns true if the ban list was reloaded successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ReloadBans',
+        returns: 'Returns *true* if the mainmenu is visible, *false* if not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsMainMenuActive',
     },
-    reloadBrowserPage: {
-        summary: 'This function reloads the current browsers page.',
+    isMTAWindowActive: {
+        summary: 'This function returns whether any system windows that take focus are active. This includes:\n* Chatbox input\n* Console window\n* Main menu\n* Transferbox\nTo get the status of the debug view, see isDebugViewActive.',
+        parameters: [],
+        returns: 'Returns *true* if the focus is on the MTA window, *false* if it isn\'t.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsMTAWindowActive',
+    },
+    isObjectBreakable: {
+        summary: 'Added also as a server-side function. Previously only available as a client-side function.\n\nThis function checks if an object / model ID is breakable.',
         parameters: [
-            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser that you want to reload.' },
+            { name: 'modelId', isOptional: false, isVariadic: false, summary: '' },
         ],
-        returns: 'returns true if the browser has reloaded, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ReloadBrowserPage',
+        returns: '* *true* if the object is breakable. * *false* if the object is not breakable.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectBreakable',
     },
-    reloadPedWeapon: {
-        summary: 'This function makes a pedestrian reload their weapon.',
+    isObjectInACLGroup: {
+        summary: 'This function is used to determine if an object is in a group.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped who will reload their weapon.' },
+            { name: 'theObjectName', isOptional: false, isVariadic: false, summary: 'the name of the object to check. Examples: "resource.ctf", "user.Jim".' },
+            { name: 'theGroup', isOptional: false, isVariadic: false, summary: 'the ACL group pointer of the group from which the object should be found.' },
         ],
-        returns: 'returns true if the pedestrian was made to reload, or false if invalid arguments were passed or that pedestrian has a weapon which cannot be reloaded. note: this will fail but return true if 1) the ped is crouched and moving 2) the ped is using a weapon without clip ammo (or minigun/flamethrower/fire extinguisher) 3) the ped is using his weapon (shooting/aiming) 4) the ped moved while crouching recently due to these circumstances causing problems with this function',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ReloadPedWeapon',
+        returns: 'Returns *true* if the object is in the specified group, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectInACLGroup',
     },
-    removeAccount: {
-        summary: 'This function is used to delete existing player accounts.',
+    isObjectMoving: {
+        summary: 'This function is now also available on the server side.',
         parameters: [
-            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you wish to remove' },
+            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'The object element.' },
         ],
-        returns: 'returns true if account was successfully removed, false if the account does not exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveAccount',
+        returns: '* Returns *true* if the object is moving, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectMoving',
     },
-    removeBan: {
-        summary: 'This function will remove a specific ban.',
+    isObjectRespawnable: {
+        summary: 'This function checks if the object has respawn enabled, which can be toggled using toggleObjectRespawn.',
         parameters: [
-            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban to be removed.' },
-            { name: 'responsibleElement', isOptional: true, isVariadic: false, summary: 'The element that is responsible for removing the ban element. This can be a player or the root (getRootElement()).' },
+            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'an object element.' },
         ],
-        returns: 'returns true if the ban was removed succesfully, false if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveBan',
+        returns: 'Returns true if the object has respawning enabled, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectRespawnable',
     },
-    removeColPolygonPoint: {
+    isOOPEnabled: {
+        summary: 'This function checks whether *OOP* (Object Oriented Programming) is enabled in the current resource or not.',
+        parameters: [],
+        returns: 'Returns *true* or *false* if *OOP* is enabled or not. Returns *nil* if an error arised.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsOOPEnabled',
+    },
+    isPedBleeding: {
         summary: '',
         parameters: [
-            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon you wish to remove a point from.' },
-            { name: 'index', isOptional: false, isVariadic: false, summary: 'The index of the point you wish to remove. The points are indexed in order, with 1 being the first bound point. You cant remove the last 3 points.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped whose bleeding effect state you want to get.' },
         ],
-        returns: 'returns true if the polygon was changed, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveColPolygonPoint',
+        returns: 'Returns *true* if the player or ped is bleeding, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedBleeding',
     },
-    removeCommandHandler: {
-        summary: 'This function removes a command handler, that is one that has been added using\naddCommandHandler. This function can only remove command handlers that were added by the\nresource that it is called in.',
+    isPedChoking: {
+        summary: 'This function checks if the specified ped is choking (coughing) or not. This happens as a result of weapons that produce smoke - smoke grenades, fire extinguisher and the spray can.',
         parameters: [
-            { name: 'commandName', isOptional: false, isVariadic: false, summary: 'the name of the command you wish to remove.' },
-            { name: 'handler', isOptional: true, isVariadic: false, summary: 'the specific handler function to remove. If not specified, all handler functions for the command (from the calling resource) will be removed. This argument is only available in the server.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you wish to check' },
         ],
-        returns: 'returns true if the command handler was removed successfully, false if the command doesnt exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveCommandHandler',
+        returns: 'Returns *true* if the ped is choking, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedChoking',
     },
-    removeDebugHook: {
-        summary: 'This function removes hooks added by addDebugHook',
+    isPedDead: {
+        summary: 'This function checks if the specified ped is dead or not.',
         parameters: [
-            { name: 'hookType', isOptional: false, isVariadic: false, summary: 'The type of hook to remove. This can be: ** preEvent ** postEvent ** preFunction ** postFunction' },
-            { name: 'callbackFunction', isOptional: false, isVariadic: false, summary: 'The callback function to remove' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to check up on.' },
         ],
-        returns: 'returns true if the hook was successfully removed, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveDebugHook',
+        returns: 'Returns *true* if the ped is dead, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDead',
     },
-    removeElementData: {
-        summary: 'This function removes the element data with the given key for that element. The element\ndata removal is synced with all the clients.',
+    isPedDoingGangDriveby: {
+        summary: 'This function checks if the ped is in the driveby state.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to remove the data from.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key string you wish to remove.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped element whose state is to be checked.' },
         ],
-        returns: 'returns true if the data was removed succesfully, false if the given key does not exist in the element or the element is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/RemoveElementData',
+        returns: 'Returns **true** if the driveby state is enabled, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDoingGangDriveby',
+    },
+    isPedDoingTask: {
+        summary: 'This function checks if the specified ped is carrying out a certain task.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you want to check.' },
+            { name: 'taskName', isOptional: false, isVariadic: false, summary: 'A string containing the name of the task you\'re checking for.' },
+        ],
+        returns: 'Returns *true* if the player is currently doing the task, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDoingTask',
+    },
+    isPedDucked: {
+        summary: 'This function checks if the specified ped is ducked (crouched) or not.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped to check.' },
+        ],
+        returns: 'Returns *true* if the ped is ducked, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDucked',
+    },
+    isPedFootBloodEnabled: {
+        summary: 'This function checks if player feets are bleeding.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to give bloody foot prints to.' },
+        ],
+        returns: 'Returns *true* if feets are bleeding, **false** otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedFootBloodEnabled',
+    },
+    isPedHeadless: {
+        summary: 'With this function, you can check if a ped has a head or not.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped to check.' },
+        ],
+        returns: 'Returns *true* if the ped is headless, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedHeadless',
+    },
+    isPedInVehicle: {
+        summary: 'Checks whether or not a given ped is currently in a vehicle.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to check.' },
+        ],
+        returns: 'Returns *true* if the ped is in a vehicle, *false* if he is on foot or an invalid element was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedInVehicle',
+    },
+    isPedOnFire: {
+        summary: 'This function checks if the specified ped is on fire or not.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': The ped to check.' },
+        ],
+        returns: 'returns true if the ped is on fire, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedOnFire',
+    },
+    isPedOnGround: {
+        summary: 'This function is used to determine whether or not a ped is on the ground. This is for on-foot usage only.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you are checking.' },
+        ],
+        returns: 'Returns *true* if the ped is on foot and on the ground, *false* otherwise, even if he is in a car that stands still or on object outside world map.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedOnGround',
+    },
+    isPedReloadingWeapon: {
+        summary: 'This function is used to determine whether or not a ped is currently reloading their weapon. Useful to stop certain quick reload exploits.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you are checking.' },
+        ],
+        returns: 'Returns *true* if the ped is currently reloading a weapon, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedReloadingWeapon',
+    },
+    isPedTargetingMarkerEnabled: {
+        summary: 'This function checks whether health target markers are drawn as set by setPedTargetingMarkerEnabled or not.',
+        parameters: [],
+        returns: 'Returns *true* if the health target markers are enabled, *false* if not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedTargetingMarkerEnabled',
+    },
+    isPedWearingJetpack: {
+        summary: 'Checks whether or not a ped is currently wearing a jetpack.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to check' },
+        ],
+        returns: 'Returns *true* if the ped is carrying a jetpack, *false* if he is not or an invalid element was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedWearingJetpack',
+    },
+    isPickupSpawned: {
+        summary: 'This function checks if a pickup is currently spawned (is visible and can be picked up) or not (a player picked it up recently).',
+        parameters: [
+            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'the pickup you want to check.' },
+        ],
+        returns: 'Returns *true* if the pickup is spawned, *false* if it\'s not spawned or an invalid pickup was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPickupSpawned',
+    },
+    isPlayerCrosshairVisible: {
+        summary: 'This function checks if the local player has showing crosshair.',
+        parameters: [],
+        returns: 'Returns *true* if the player has the crosshair visible, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerCrosshairVisible',
+    },
+    isPlayerHudComponentVisible: {
+        summary: 'This function can be used to check whether an hud component is visable or not.',
+        parameters: [
+            { name: 'component', isOptional: false, isVariadic: false, summary: 'The component you wish to check. Valid values are:' },
+        ],
+        returns: 'Returns *true* if the component is visable, *false* if not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerHudComponentVisible',
+    },
+    isPlayerMapForced: {
+        summary: 'This function checks if the specified player\'s map (F11) has been forced on or not.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
+        ],
+        returns: 'Returns *true* if the player\'s map is forced on, *false* otherwise. ```lua bool isPlayerMapForced () ``` Returns *true* if the local player\'s map is forced on, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerMapForced',
+    },
+    isPlayerMapVisible: {
+        summary: 'This function checks if the local player has their map showing (F11).',
+        parameters: [],
+        returns: 'Returns *true* if the player has the map visible, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerMapVisible',
+    },
+    isPlayerMuted: {
+        summary: 'Use this function to check if a player has been muted.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you are checking.' },
+        ],
+        returns: 'Returns *true* if the player is muted and *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerMuted',
     },
 };

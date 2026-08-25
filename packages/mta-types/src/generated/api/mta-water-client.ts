@@ -5,4 +5,5 @@ export const MTA_WATER_CLIENT: ApiCatalog = {
     getWaterLevel: fn([NUMBER, NUMBER, NUMBER, BOOLEAN], NUMBER, 3),
     isWaterDrawnLast: fn([], BOOLEAN, 0),
     setWaterDrawnLast: fn([BOOLEAN], BOOLEAN, 1),
+    setWaterLevel: fn([NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 1),
 };

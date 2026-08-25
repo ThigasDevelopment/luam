@@ -10,6 +10,8 @@ const WIKI_LINK = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
 
 const WIKI_BOLD = /'''([^']+)'''/g;
 
+const WIKI_ITALIC = /''([^']+)''/g;
+
 const TEMPLATE_EDGE = /\{\{|\}\}/g;
 
 const BLANK_RUN = /\n{3,}/g;
@@ -25,7 +27,9 @@ function codeFences(value: string): string {
 }
 
 function wikiMarkup(value: string): string {
-    return value.replaceAll(WIKI_LINK, (_match, page: string, label: string | undefined) => label ?? page).replaceAll(WIKI_BOLD, '**$1**');
+    const linked = value.replaceAll(WIKI_LINK, (_match, page: string, label: string | undefined) => label ?? page);
+
+    return linked.replaceAll(WIKI_BOLD, '**$1**').replaceAll(WIKI_ITALIC, '*$1*');
 }
 
 export function cleanMarkup(value: string): string {

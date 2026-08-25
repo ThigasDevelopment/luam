@@ -8,6 +8,7 @@ import {
     createNamed,
     createOptional,
     createRecord,
+    createStringLiteral,
     createTuple,
     createUnion,
     NIL_TYPE,
@@ -47,6 +48,10 @@ export function descriptorToType(descriptor: TypeDescriptor): Type {
 
     if (descriptor.kind === 'named') {
         return createNamed(descriptor.name);
+    }
+
+    if (descriptor.kind === 'literal') {
+        return createStringLiteral(descriptor.value);
     }
 
     if (descriptor.kind === 'tuple') {

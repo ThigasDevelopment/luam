@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SERVER: ApiCatalog = {
     cancelEvent: fn([BOOLEAN, STRING], BOOLEAN, 0),
@@ -7,6 +7,6 @@ export const MTA_EVENT_SERVER: ApiCatalog = {
     getCancelReason: fn([], STRING, 0),
     getLatentEventHandles: fn([named('Player')], TABLE, 1),
     getLatentEventStatus: fn([named('Player'), NUMBER], TABLE, 2),
-    triggerClientEvent: fn([ANY, ANY, ANY], BOOLEAN, 2, true, undefined),
-    triggerLatentClientEvent: fn([ANY, ANY, ANY, ANY, ANY], BOOLEAN, 2, true, undefined),
+    triggerClientEvent: fn([unionOf([TABLE, named('Element')]), STRING, named('Element')], BOOLEAN, 2, true, undefined),
+    triggerLatentClientEvent: fn([unionOf([TABLE, named('Element')]), STRING, NUMBER, BOOLEAN, named('Element')], BOOLEAN, 2, true, undefined),
 };

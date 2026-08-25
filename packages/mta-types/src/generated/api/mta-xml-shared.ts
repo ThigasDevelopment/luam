@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_XML_SHARED: ApiCatalog = {
     xmlCopyFile: fn([named('XmlNode'), STRING], named('XmlNode'), 2),
@@ -11,11 +11,11 @@ export const MTA_XML_SHARED: ApiCatalog = {
     xmlLoadString: fn([STRING], named('XmlNode'), 1),
     xmlNodeGetAttribute: fn([named('XmlNode'), STRING], STRING, 2),
     xmlNodeGetAttributes: fn([named('XmlNode')], TABLE, 1),
-    xmlNodeGetChildren: fn([named('XmlNode'), NUMBER], ANY, 1),
+    xmlNodeGetChildren: fn([named('XmlNode'), NUMBER], unionOf([TABLE, named('XmlNode')]), 1),
     xmlNodeGetName: fn([named('XmlNode')], STRING, 1),
     xmlNodeGetParent: fn([named('XmlNode')], named('XmlNode'), 1),
     xmlNodeGetValue: fn([named('XmlNode')], STRING, 1),
-    xmlNodeSetAttribute: fn([named('XmlNode'), STRING, ANY], BOOLEAN, 3),
+    xmlNodeSetAttribute: fn([named('XmlNode'), STRING, unionOf([STRING, NUMBER])], BOOLEAN, 3),
     xmlNodeSetName: fn([named('XmlNode'), STRING], BOOLEAN, 2),
     xmlNodeSetValue: fn([named('XmlNode'), STRING, BOOLEAN], BOOLEAN, 2),
     xmlSaveFile: fn([named('XmlNode')], BOOLEAN, 1),

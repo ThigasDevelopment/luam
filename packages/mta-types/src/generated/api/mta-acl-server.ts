@@ -1,5 +1,5 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, STRING, TABLE } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, STRING, TABLE, unionOf } from '@mta-types/type-descriptor';
 
 export const MTA_ACL_SERVER: ApiCatalog = {
     aclCreate: fn([STRING], named('ACL'), 1),
@@ -20,10 +20,11 @@ export const MTA_ACL_SERVER: ApiCatalog = {
     aclGroupRemoveObject: fn([named('ACLGroup'), STRING], BOOLEAN, 2),
     aclList: fn([], TABLE, 0),
     aclListRights: fn([named('ACL'), STRING], TABLE, 2),
+    aclObjectGetGroups: fn([STRING], TABLE, 1),
     aclReload: fn([], BOOLEAN, 0),
     aclRemoveRight: fn([named('ACL'), STRING], BOOLEAN, 2),
     aclSave: fn([], BOOLEAN, 0),
     aclSetRight: fn([named('ACL'), STRING, BOOLEAN], BOOLEAN, 3),
-    hasObjectPermissionTo: fn([ANY, STRING, BOOLEAN], BOOLEAN, 2),
+    hasObjectPermissionTo: fn([unionOf([STRING, named('Element')]), STRING, BOOLEAN], BOOLEAN, 2),
     isObjectInACLGroup: fn([STRING, named('ACLGroup')], BOOLEAN, 2),
 };

@@ -1,240 +1,243 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_31: ApiDocumentationCatalog = {
-    isElementStreamedIn: {
-        summary: 'This function checks whether an element is currently streamed in (not virtualized) and\nare actual GTA objects in the world. You can force an element to be streamed in using\nsetElementStreamable.\n\nDP2 can return true even if this element is not fully streamed in. This can happen during\nthe period when the vehicle/object model is loading while the element is not actually\nfully created yet.',
+    guiRadioButtonSetSelected: {
+        summary: 'This function selects or unselects a radio button.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element to check whether is streamed in or not.' },
+            { name: 'guiRadioButton', isOptional: false, isVariadic: false, summary: 'The GUI radio button in which you wish to change the selection state of' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'The state of the radio button, where *true* indicates selected, and *false* indicates unselected.' },
         ],
-        returns: 'returns true if the passed element is currently streamed in, false if it is virtualized.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementStreamedIn',
+        returns: 'Returns *true* if the radio button\'s selection state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiRadioButtonSetSelected',
     },
-    isElementSyncer: {
-        summary: 'This function checks whether an element is synced by the local player or not. Accepted\nelements are ped|peds and vehicle|vehicles.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element to check.' },
-        ],
-        returns: 'returns true if the passed element is synced by the local player, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementSyncer',
-    },
-    isElementVisibleTo: {
-        summary: 'This checks if an element is visible to a player. This does not check if the player can\nliterally see the element, just that they are aware that it exists. Some so-called\nper-player elements are able to be visible only to some players, as such this checks if\nthis is the case for a particular element/player combination.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you want to check the visibility of' },
-            { name: 'visibleTo', isOptional: false, isVariadic: false, summary: 'The player you want to check against' },
-        ],
-        returns: 'returns true if element is visible to the specified player, false if not or an invalid argument was passed to the function.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementVisibleTo',
-    },
-    isElementWaitingForGroundToLoad: {
-        summary: '',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to check its frozen waiting for custom map objects to load status. It can be a vehicle, ped or player.' },
-        ],
-        returns: 'returns true if the specified element is frozen waiting for collisions of custom map objects to load. returns false if its not or if the specified element is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementWaitingForGroundToLoad',
-    },
-    isElementWithinColShape: {
-        summary: 'This function is used to determine if an element is within a collision shape. Please note\nthat for legacy reasons, a colshape created on the client does not collide with elements\nalready existing at that location until they first move. Please also note that before\n1.0.3, this did not function correctly when moving a colshape.\nPlease note that this function doesnt verify whether element is in the same dimension and\ninterior, additional checks could be implemented manually if they are needed.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element youre checking.' },
-            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'The colshape youre checking' },
-        ],
-        returns: 'returns true if the element is within the colshape, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementWithinColShape',
-    },
-    isElementWithinMarker: {
-        summary: 'This function is used to determine if an element is within a marker.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element youre checking.' },
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker youre checking.' },
-        ],
-        returns: 'returns true if the element is within the marker, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsElementWithinMarker',
-    },
-    isGarageOpen: {
-        summary: 'This function checks whether or not a specific garage door is open.',
-        parameters: [
-            { name: 'garageID', isOptional: false, isVariadic: false, summary: 'The Garage|garage ID that represents the garage door that is being checked.' },
-        ],
-        returns: 'returns true if the garage is open, false if it is closed or an invalid garage id was given.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsGarageOpen',
-    },
-    isGlitchEnabled: {
-        summary: 'This function retrieves whether San Andreas game glitches are enabled or not, set by\nusing setGlitchEnabled',
-        parameters: [
-            { name: 'glitchName', isOptional: false, isVariadic: false, summary: 'the name of the property to set. Possible values are:' },
-        ],
-        returns: 'returns true if if the glitch was enabled, or false if it is disabled.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsGlitchEnabled',
-    },
-    isGuestAccount: {
-        summary: 'This function checks to see if an account is a guest account. A guest account is an\naccount automatically created for a user when they join the server and deleted when they\nquit or login to another account. Data stored in a guest account is not stored after the\nplayer has left the server. As a consequence, this function will check if a player is\nlogged in or not.',
-        parameters: [
-            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account you want to check to see if it is a guest account.' },
-        ],
-        returns: 'returns true if the account is a guest account, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsGuestAccount',
-    },
-    isInsideColShape: {
-        summary: '',
-        parameters: [
-            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'The colshape youre checking the position against.' },
-            { name: 'posX', isOptional: false, isVariadic: false, summary: 'The X coordinate of the position youre checking.' },
-            { name: 'posY', isOptional: false, isVariadic: false, summary: 'The Y coordinate of the position youre checking.' },
-            { name: 'posZ', isOptional: false, isVariadic: false, summary: 'The Z coordinate of the position youre checking.' },
-        ],
-        returns: 'returns true if the position is inside the colshape, false if it isnt or if any parameters are invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsInsideColShape',
-    },
-    isInsideRadarArea: {
-        summary: 'This function checks if a 2D position is inside a radararea|radar area or not.',
-        parameters: [
-            { name: 'theArea', isOptional: false, isVariadic: false, summary: 'The radararea|radar area youre checking the position against.' },
-            { name: 'posX', isOptional: false, isVariadic: false, summary: 'The X coordinate of the position youre checking.' },
-            { name: 'posY', isOptional: false, isVariadic: false, summary: 'The Y coordinate of the position youre checking.' },
-        ],
-        returns: 'returns true if the position is inside the radar area, false if it isnt or if any parameters are invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsInsideRadarArea',
-    },
-    isKeyBound: {
-        summary: 'This function can be used to find out if a key has already been bound. If you do not\nspecify a keyState or handler, any instances of key being bound will cause isKeyBound to\nreturn true.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player youre checking.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key youre checking. See Key names for a list of valid key names.' },
-            { name: 'keyState', isOptional: true, isVariadic: false, summary: 'Is the state of the key when it calls the function, Can be either: up when the key is released down when the key is pressed' },
-            { name: 'handler', isOptional: true, isVariadic: false, summary: 'The function youre checking against' },
-        ],
-        returns: 'returns true if the key is bound, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsKeyBound',
-    },
-    isLineOfSightClear: {
-        summary: 'This function checks if there are obstacles between two points of the game world,\noptionally ignoring certain kinds of elements. Use processLineOfSight if you want more\ninformation about what the ray hits.',
-        parameters: [
-            { name: 'startX', isOptional: false, isVariadic: false, summary: 'The first points world X coordinate.' },
-            { name: 'startY', isOptional: false, isVariadic: false, summary: 'The first points world Y coordinate.' },
-            { name: 'startZ', isOptional: false, isVariadic: false, summary: 'The first points world Z coordinate.' },
-            { name: 'endX', isOptional: false, isVariadic: false, summary: 'The second points world X coordinate.' },
-            { name: 'endY', isOptional: false, isVariadic: false, summary: 'The second points world Y coordinate.' },
-            { name: 'endZ', isOptional: false, isVariadic: false, summary: 'The second points world Z coordinate.' },
-            { name: 'checkBuildings', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by GTAs internally placed buildings, i.e. the world map.' },
-            { name: 'checkVehicles', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by Vehicle|vehicles.' },
-            { name: 'checkPeds', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by peds, i.e. Player|players.' },
-            { name: 'checkObjects', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by Object|objects.' },
-            { name: 'checkDummies', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to be blocked by GTAs internal dummies. These are not used in the current MTA version so this argument can be set to false.' },
-            { name: 'seeThroughStuff', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through collision materials that have this flag enabled (By default material IDs 52, 55 and 66 which are some fences). This flag originally allows some objects to be walked on but you can shoot throug them.' },
-            { name: 'ignoreSomeObjectsForCamera', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through objects that have (K) property enabled in object.dat data file. (i.e. Most dynamic objects like boxes or barrels)' },
-            { name: 'ignoredElement', isOptional: true, isVariadic: false, summary: 'Allow the line of sight to pass through a certain specified element.' },
-        ],
-        returns: 'returns true if the line between the specified points is clear, false if theres an obstacle or if invalid parameters are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsLineOfSightClear',
-    },
-    isMainMenuActive: {
-        summary: 'This function returns whether the user is in the mainmenu or not.',
+    guiRoot: {
+        summary: 'The root element of all GUI elements.',
         parameters: [],
-        returns: 'returns true if the mainmenu is visible, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsMainMenuActive',
+        returns: '',
+        wiki: '',
     },
-    isMTAWindowActive: {
-        summary: 'This function returns whether any system windows that take focus are active. This\nincludes:\n* Chatbox input\n* Console window\n* Main menu\n* Transferbox\nTo get the status of the debug view, see isDebugViewActive.',
-        parameters: [],
-        returns: 'returns true if the focus is on the mta window, false if it isnt.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsMTAWindowActive',
-    },
-    isObjectBreakable: {
-        summary: 'This function checks if an object / model ID is breakable.',
+    guiScrollBarGetScrollPosition: {
+        summary: 'This function gets the scroll amount of a scrollbar as a percentage.',
         parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: '/ modelId The object / model ID thats being checked.' },
+            { name: 'theScrollBar', isOptional: false, isVariadic: false, summary: 'The scrollbar you want to check.' },
         ],
-        returns: '* true if the object is breakable. * false if the object is not breakable.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectBreakable',
+        returns: 'Returns a float ranging between 0 and 100, representing the amount the scrollbar has been scrolled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollBarGetScrollPosition',
     },
-    isObjectInACLGroup: {
-        summary: 'This function is used to determine if an object is in a group.',
+    guiScrollBarSetScrollPosition: {
+        summary: 'This function is used to set the scroll amount of a scrollbar as a percentage.',
         parameters: [
-            { name: 'theObjectName', isOptional: false, isVariadic: false, summary: 'the name of the object to check. Examples: resource.ctf, user.Jim.' },
-            { name: 'theGroup', isOptional: false, isVariadic: false, summary: 'the ACL group pointer of the group from which the object should be found.' },
+            { name: 'theScrollBar', isOptional: false, isVariadic: false, summary: 'The scrollbar you want to change the progress of' },
+            { name: 'amount', isOptional: false, isVariadic: false, summary: 'a float ranging from 0 - 100 representing the amount you wish to set the scroll bar.' },
         ],
-        returns: 'returns true if the object is in the specified group, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectInACLGroup',
+        returns: 'Returns true if the scroll position was successfully set, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollBarSetScrollPosition',
     },
-    isObjectMoving: {
-        summary: '',
+    guiScrollPaneGetHorizontalScrollPosition: {
+        summary: 'This function is used to get the position of a horizontal scroll pane as a percentage.',
         parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'The object element.' },
+            { name: 'horizontalScrollPane', isOptional: false, isVariadic: false, summary: 'The scroll pane you want to know the position of' },
         ],
-        returns: '* returns true if the object is moving, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectMoving',
+        returns: 'Returns a float ranging between 0 and 100, or **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneGetHorizontalScrollPosition',
     },
-    isOOPEnabled: {
-        summary: '',
-        parameters: [],
-        returns: 'returns true or false if oop is enabled or not. returns nil if an error arised.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsOOPEnabled',
-    },
-    isPedBleeding: {
-        summary: '',
+    guiScrollPaneGetVerticalScrollPosition: {
+        summary: 'This function is used to get the position of a vertical scroll pane as a percentage.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped whose bleeding effect state you want to get.' },
+            { name: 'verticalScrollPane', isOptional: false, isVariadic: false, summary: 'The scroll pane you want to know the position of' },
         ],
-        returns: 'returns true if the player or ped is bleeding, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedBleeding',
+        returns: 'Returns a float ranging between 0 and 100, or **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneGetVerticalScrollPosition',
     },
-    isPedChoking: {
-        summary: 'This function checks if the specified ped is choking (coughing) or not. This happens as a\nresult of weapons that produce smoke - smoke grenades, fire extinguisher and the spray\ncan.',
+    guiScrollPaneSetHorizontalScrollPosition: {
+        summary: 'This function is used to set the position of a horizontal scroll pane as a percentage.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': The ped you wish to check' },
+            { name: 'horizontalScrollPane', isOptional: false, isVariadic: false, summary: 'The scroll pane you want to change the position of' },
+            { name: 'position', isOptional: false, isVariadic: false, summary: 'a float ranging from 0 - 100' },
         ],
-        returns: 'returns true if the ped is choking, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedChoking',
+        returns: 'Returns **true** if the position was set, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneSetHorizontalScrollPosition',
     },
-    isPedDead: {
-        summary: 'This function checks if the specified ped is dead or not.',
+    guiScrollPaneSetScrollBars: {
+        summary: 'This function allows a scrollpane\'s scrollbars to be forced **on**, or returned to default.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': the ped you want to check up on.' },
+            { name: 'scrollPane', isOptional: false, isVariadic: false, summary: 'the GUI scrollpane element you want to set the scrollbars of.' },
+            { name: 'horizontal', isOptional: false, isVariadic: false, summary: 'A bool where true forces the horizontal scrollbar on, and false returns them to default.' },
+            { name: 'vertical', isOptional: false, isVariadic: false, summary: 'A bool where true forces the vertical scrollbar on, and false returns them to default.' },
         ],
-        returns: 'returns true if the ped is dead, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDead',
+        returns: 'Returns *true* if the call was successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneSetScrollBars',
     },
-    isPedDoingGangDriveby: {
-        summary: 'This function checks if the ped is in the driveby state.',
+    guiScrollPaneSetVerticalScrollPosition: {
+        summary: 'This function is used to set the position of a vertical scroll pane as a percentage.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped element whose state is to be checked.' },
+            { name: 'verticalScrollPane', isOptional: false, isVariadic: false, summary: 'The scroll pane you want to change the position of' },
+            { name: 'position', isOptional: false, isVariadic: false, summary: 'a float ranging from 0 - 100' },
         ],
-        returns: 'returns true if the driveby state is enabled, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDoingGangDriveby',
+        returns: 'Returns **true** if the position was set, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneSetVerticalScrollPosition',
     },
-    isPedDoingTask: {
-        summary: 'This function checks if the specified ped is carrying out a certain List of player\ntasks|task.',
+    guiSetAlpha: {
+        summary: 'This changes the alpha level (the visibleness/transparency) of a GUI element',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': The ped you want to check.' },
-            { name: 'taskName', isOptional: false, isVariadic: false, summary: ': A string containing the name of the List of player tasks|task youre checking for.' },
+            { name: 'guielement', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'alpha', isOptional: false, isVariadic: false, summary: 'The visibility/transparency of the GUI element. Ranges from 0 (fully transparent) to 1 (fully opaque). Default value is 0.80.' },
         ],
-        returns: 'returns true if the player is currently doing the task, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDoingTask',
+        returns: 'Returns *true* if the gui element\'s alpha was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetAlpha',
     },
-    isPedDucked: {
-        summary: 'This function checks if the specified ped is ducked (crouched) or not.',
+    guiSetEnabled: {
+        summary: 'This function enables/disables a GUI element. A disabled GUI element can\'t be used, gets a gray aspect and doesn\'t receive any events.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': The ped to check.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to enable or disable' },
+            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'the new state' },
         ],
-        returns: 'returns true if the ped is ducked, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedDucked',
+        returns: 'If the function succeeds it returns *true*, if it fails it returns *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetEnabled',
     },
-    isPedFootBloodEnabled: {
-        summary: 'This function checks if player feets are bleeding.',
+    guiSetFont: {
+        summary: 'This function sets the font of a GUI element to be used when drawing text.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to give bloody foot prints to.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The GUI element you wish to change the font of' },
+            { name: 'font', isOptional: false, isVariadic: false, summary: 'Either a custom GUI font element or the name of a built-in GUI font. See Standard GUI Font Names' },
         ],
-        returns: 'returns true if feets are bleeding, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedFootBloodEnabled',
+        returns: 'Returns *true* if the font has been successfully set on the gui element, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetFont',
     },
-    isPedHeadless: {
-        summary: 'With this function, you can check if a ped has a head or not.',
+    guiSetInputEnabled: {
+        summary: 'This function enables or disables input focus for the GUI.  This means that any keybinds or MTA binds are overidden so that text can be input into an editbox, for example.  In other words, keys such as *t* and *y* which activate the chatbox are disabled.\n\nguiSetInputMode can be used as an extended version of *guiSetInputEnabled* since it provides the same functionality with one added feature.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': The ped to check.' },
+            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'true if input should go to GUI, false if it should go to the game.' },
         ],
-        returns: 'returns true if the ped is headless, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedHeadless',
+        returns: 'Returns *true* if input mode could be changed, *false* if invalid parameters are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetInputEnabled',
+    },
+    guiSetInputMode: {
+        summary: 'This function controls the input mode to define whether or not (and when) keybinds or MTA binds are overridden (disabled) so that text can be input into an editbox, for example.\nAvailable input modes are:\n* **allow_binds:** never disabled (hence using a key such as t in an editbox will still open the chatbox)\n* **no_binds:** always disabled (hence using a key such as t will never open the chatbox)\n* **no_binds_when_editing:** only disabled when editing an editbox or a memo (binds are enabled except when an editbox or memo has input focus)\n\nThis function can be used as a replacement of guiSetInputEnabled since it provides the same functionality with one added feature.\n* *guiSetInputEnabled ( false )* is the same as *guiSetInputMode ( "allow_binds" )*\n* *guiSetInputEnabled ( true )* is the same as *guiSetInputMode ( "no_binds" )*',
+        parameters: [
+            { name: 'mode', isOptional: false, isVariadic: false, summary: 'a string representing the desired input mode. Accepted values are:' },
+        ],
+        returns: 'Returns *true* if input mode could be changed, *false* if invalid parameters are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetInputMode',
+    },
+    guiSetPosition: {
+        summary: 'This function sets the position of a GUI element.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The GUI element to change position for' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'Position over the X axis' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'Position over the Y axis' },
+            { name: 'relative', isOptional: false, isVariadic: false, summary: 'Bool that indicates if the x/y positions are relative to the elements parent element.' },
+        ],
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns *true* if the position has been successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetPosition',
+    },
+    guiSetProperty: {
+        summary: 'This function sets the value of a specific CEGUI property of a GUI element. For a list of properties and their meaning, see the [https://web.archive.org/web/20260220180628/http://static.cegui.org.uk/static/WindowsLookProperties.html CEGUI properties page (Internet archive)].',
+        parameters: [
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to get a property of.' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'the name of of property you want the value of.' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'the new value for the property.' },
+        ],
+        returns: 'If the function succeeds it returns *true*, if it fails it returns *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetProperty',
+    },
+    guiSetSelectedTab: {
+        summary: 'This function is used to change the currently selected tab in a tab panel.',
+        parameters: [
+            { name: 'tabPanel', isOptional: false, isVariadic: false, summary: 'The tab panel which current tab you want to change.' },
+            { name: 'theTab', isOptional: false, isVariadic: false, summary: 'The tab which will be the new active tab.' },
+        ],
+        returns: 'Returns *true* if the selected tab was changed to a new one successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetSelectedTab',
+    },
+    guiSetSize: {
+        summary: 'This function sets the dimensions (size) of a GUI element. It refers to the bounding box size for GUI elements. It does not make GUI elements smaller or larger in appearance.',
+        parameters: [
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element whose visibility is to be changed' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'The desired width setting for the gui element' },
+            { name: 'height', isOptional: false, isVariadic: false, summary: 'The desired height setting for the gui element' },
+            { name: 'relative', isOptional: false, isVariadic: false, summary: 'This is whether sizes and positioning are relative. If this is *true*, then all x,y,width,height floats must be between 0 and 1, representing sizes relative to the parent.' },
+        ],
+        returns: 'Returns *true* if the gui element\'s size was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetSize',
+    },
+    guiSetText: {
+        summary: 'This function sets the text of a GUI element.',
+        parameters: [
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The GUI element you wish to change the text of' },
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'The new text' },
+        ],
+        returns: 'Returns *true* if text has been successfully set on the gui element, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetText',
+    },
+    guiSetVisible: {
+        summary: 'This function changes the visibility state of a GUI element.',
+        parameters: [
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element whose visibility is to be changed' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'the new visibility state' },
+        ],
+        returns: 'Returns *true* if the element\'s visibility could be changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiSetVisible',
+    },
+    guiStaticImageGetNativeSize: {
+        summary: 'This function gets the native size of image. That means the original size in pixels of the image file.',
+        parameters: [
+            { name: 'theImage', isOptional: false, isVariadic: false, summary: 'The static image element to get the original size of.' },
+        ],
+        returns: 'Returns two integers where first is the width and second the height of the image in pixels, *false* if the image element was invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiStaticImageGetNativeSize',
+    },
+    guiStaticImageLoadImage: {
+        summary: 'This function allows you to change the image in GUI static image element to another one. **Tip**: If you set other images as children you will have to use setElementCallPropagationEnabled to only affect the parent image.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The static image element to be changed.' },
+            { name: 'filename', isOptional: false, isVariadic: false, summary: 'A string specifying the filepath of the image file being loaded in current resource.' },
+        ],
+        returns: 'Returns *true* if the the image in the static image element was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiStaticImageLoadImage',
+    },
+    guiWindowIsMovable: {
+        summary: 'This function checks if a GUI window is movable.',
+        parameters: [
+            { name: 'guiWindow', isOptional: false, isVariadic: false, summary: 'the window to check the movable flag of' },
+        ],
+        returns: 'Returns *true* if the window is movable, *false* if not, *nil* if an invalid window was provided.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowIsMovable',
+    },
+    guiWindowIsSizable: {
+        summary: 'This function checks if a GUI window is sizable.',
+        parameters: [
+            { name: 'guiWindow', isOptional: false, isVariadic: false, summary: 'the window to check the sizable flag of' },
+        ],
+        returns: 'Returns *true* if the window is sizable, *false* if not, *nil* if an invalid window was provided.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowIsSizable',
+    },
+    guiWindowSetMovable: {
+        summary: 'This function allows you to specify whether or not a user can move a GUI window.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The window to be changed.' },
+            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether the window is movable or not.' },
+        ],
+        returns: 'Returns *true* if the function is successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowSetMovable',
+    },
+    guiWindowSetSizable: {
+        summary: 'This function enables or disables user resizing of a GUI window.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The window to be changed.' },
+            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether user resizing is to be enabled or disabled.' },
+        ],
+        returns: 'Returns *true* if the function is successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiWindowSetSizable',
+    },
+    hasElementData: {
+        summary: 'This function checks if an element has element data available under a certain key.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'This is the element with data you want to check.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the element data entry you want to check for. (Maximum 31 characters.)' },
+            { name: 'inherit', isOptional: true, isVariadic: false, summary: '- toggles whether or not the function should go up the hierarchy to find the requested key in case the specified element doesn\'t have it.' },
+        ],
+        returns: 'This function returns *true* if the element contains element data for *key*, or *false* if the element doesn\'t exist or there is no data associated with the *key*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HasElementData',
     },
 };

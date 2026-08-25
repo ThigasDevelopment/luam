@@ -24,6 +24,11 @@ export interface NamedDescriptor {
     name: string;
 }
 
+export interface LiteralDescriptor {
+    kind: 'literal';
+    value: string;
+}
+
 export interface FunctionDescriptor {
     kind: 'function';
     parameters: TypeDescriptor[];
@@ -57,6 +62,7 @@ export type TypeDescriptor =
     | OptionalDescriptor
     | UnionDescriptor
     | NamedDescriptor
+    | LiteralDescriptor
     | FunctionDescriptor
     | TupleDescriptor
     | RecordDescriptor;
@@ -86,6 +92,11 @@ export function unionOf(options: TypeDescriptor[]): TypeDescriptor {
 export function named(name: string): TypeDescriptor {
     return { kind: 'named', name };
 }
+
+export function literal(value: string): TypeDescriptor {
+    return { kind: 'literal', value };
+}
+
 
 export function record(name: string, members: RecordMember[], origin: string | null = null): TypeDescriptor {
     return { kind: 'record', name, origin, members };

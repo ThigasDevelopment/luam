@@ -1,8 +1,8 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { BOOLEAN, fn, named, NUMBER, tupleOf } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_RADAR_SHARED: ApiCatalog = {
-    createRadarArea: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, named('Element')], named('RadarArea'), 4),
+    createRadarArea: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, ANY], named('RadarArea'), 4),
     getRadarAreaColor: fn([named('RadarArea')], tupleOf([NUMBER, NUMBER, NUMBER, NUMBER]), 1),
     getRadarAreaSize: fn([named('RadarArea')], tupleOf([NUMBER, NUMBER]), 1),
     isInsideRadarArea: fn([named('RadarArea'), NUMBER, NUMBER], BOOLEAN, 3),

@@ -1,19 +1,28 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, tupleOf } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_PLAYER_SHARED: ApiCatalog = {
+    countPlayersInTeam: fn([named('Team')], NUMBER, 1),
     forcePlayerMap: fn([ANY, ANY], BOOLEAN, 1),
+    getControlState: fn([named('Player'), STRING], BOOLEAN, 2),
+    getPlayerBlurLevel: fn([named('Player')], NUMBER, 1),
     getPlayerFromName: fn([STRING], named('Player'), 1),
     getPlayerMoney: fn([ANY], NUMBER, 0),
     getPlayerName: fn([named('Player')], STRING, 1),
     getPlayerNametagColor: fn([named('Player')], tupleOf([NUMBER, NUMBER, NUMBER]), 1),
     getPlayerNametagText: fn([named('Player')], STRING, 1),
     getPlayerPing: fn([named('Player')], NUMBER, 1),
+    getPlayerScriptDebugLevel: fn([ANY], NUMBER, 0),
+    getPlayerSerial: fn([ANY], STRING, 0),
+    getPlayersInTeam: fn([named('Team')], TABLE, 1),
+    getPlayerTeam: fn([named('Player')], named('Team'), 1),
     getPlayerWantedLevel: fn([ANY], NUMBER, 0),
     givePlayerMoney: fn([ANY, ANY], BOOLEAN, 1),
     isPlayerMapForced: fn([ANY], BOOLEAN, 0),
     isPlayerNametagShowing: fn([named('Player')], BOOLEAN, 1),
     isVoiceEnabled: fn([], BOOLEAN, 0),
+    setControlState: fn([named('Player'), STRING, BOOLEAN], BOOLEAN, 3),
+    setPlayerBlurLevel: fn([named('Player'), NUMBER], BOOLEAN, 2),
     setPlayerHudComponentVisible: fn([ANY, ANY, ANY], BOOLEAN, 2),
     setPlayerMoney: fn([ANY, ANY, ANY], BOOLEAN, 1),
     setPlayerNametagColor: fn([named('Player'), NUMBER, NUMBER, NUMBER], BOOLEAN, 4),

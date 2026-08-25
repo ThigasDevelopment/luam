@@ -1,244 +1,238 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_15: ApiDocumentationCatalog = {
-    getElementMatrix: {
-        summary: 'This function gets an elements transform matrix. This contains 16 float values that\nmultiplied to a point will give you the point transformed. It is most useful for matrix\ncalculations such as calculating offsets. For further information, please refer to a\ntutorial of matrices in computer graphics programming.',
+    getCameraMatrix: {
+        summary: 'This function gets the position of the camera and the position of the point it is facing.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which you wish to retrieve the matrix for.' },
-            { name: 'legacy', isOptional: true, isVariadic: false, summary: 'Set to false to return correctly setup matrix (i.e. Last column in the first 3 rows set to zero).' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose camera matrix is to be returned.' },
         ],
-        returns: 'returns a multi-dimensional array (which can be transformed into a proper matrix class using matrix.create method) containing a 4x4 matrix. returns false if the element is not streamed in, and not a vehicle, ped or object.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementMatrix',
+        returns: 'This function returns 8 floats if the argument is valid (when applicable); the first three indicate the position of the camera, the next three indicate the position of the point it\'s facing, and the last two are the roll and field of view. Returns *false* if the argument is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCameraMatrix',
     },
-    getElementModel: {
-        summary: 'Returns the model ID of a given element. This can be a player/ped skin, a pickup model,\nan object model or a vehicle model.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to retrieve the model ID of.' },
-        ],
-        returns: 'returns the model id if successful, false otherwise. * for players/peds: a gtasa player model (skin) id. see character skins. * for vehicles: the vehicle ids|vehicle id of the vehicle. * for objects: an int specifying the model id.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementModel',
+    getCameraShakeLevel: {
+        summary: 'This function gets the camera shake level set by setCameraShakeLevel.',
+        parameters: [],
+        returns: 'returns an integer representing the camera shake level, from 0 (no shaking effect) to 255 (maximum shaking effect). by default, the camera has no shaking effect.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCameraShakeLevel',
     },
-    getElementParent: {
-        summary: 'This function is used to determine the parent of an element.',
+    getCameraTarget: {
+        summary: 'This function returns an element that corresponds to the current target of the specified player\'s camera (i.e. what it is following).',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The child of the parent element you want returned.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose camera you wish to receive the target of.' },
         ],
-        returns: 'this returns the parent as an element. it returns false if theelement is invalid, or is the root node.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementParent',
+        returns: '* Returns an element of the target if the function was successful, or *false* if bad arguments were specified * Returns *false* if the camera is in Fixed mode and has no target.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCameraTarget',
     },
-    getElementPosition: {
-        summary: 'The getElementPosition function allows you to retrieve the position coordinates of an\nelement.  This can be any real world element, including:\n* Element/Player|Players\n* Element/Vehicle|Vehicles\n* Element/Object|Objects\n* Element/Pickup|Pickups\n* Element/Marker|Markers\n* Element/Collision shape|Collision shapes\n* Element/Blip|Blips\n* Element/Radar area|Radar areas',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which youd like to retrieve the location of' },
-        ],
-        returns: 'returns three floats indicating the position of the element, x, y and z respectively.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementPosition',
-    },
-    getElementRadius: {
-        summary: 'This function gets the radius of an element. Normally, sphere or circle-shaped elements\ntend to return a more accurate and expected radius than others with another shapes.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to get the radius of. It can be any entity type, such as: player|Players . ped|Peds . vehicle|Vehicles . object|Objects .' },
-        ],
-        returns: 'returns a float containing the radius if the element is valid, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementRadius',
-    },
-    getElementRotation: {
-        summary: 'Retrieve the rotation of elements.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose rotation will be retrieved' },
-            { name: 'rotOrder', isOptional: true, isVariadic: false, summary: 'A string representing the rotation order desired when returning the http://en.wikipedia.org/wiki/Euler_angles euler angles. If omitted, default value is default. Allowed values are: default default MTA behavior prior to 1.1, where rotation order depends on element type ZXY rotation about the Z axis (up), then about the resulting X axis (right) and finally about the resulting Y axis (front). This is the default rotation order for object|objects ZYX rotation about the Z axis (up), then about the resulting Y axis (front), and finally about the resulting X axis (right). This is the default rotation order for vehicle|vehicles The default rotation order for peds/players is Z-Y-X (clientside) and -Z-Y-X (serverside) but those rotation orders (set using \'\'"default"\'\' on peds) can not be used manually on other element types since they only exist due to historical and backward compatibility reasons. Specifying a rotation order other than \'\'"default"\'\' allows the same angles to later be uniformly used on several elements without having to consider their type.' },
-        ],
-        returns: '* rx, ry, rz: 3 floats representing the euler rotation angles on the axis x, y and z (with the rotation order depending on the rotorder argument) if element exists and is a valid element, false if its invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementRotation',
-    },
-    getElementsByType: {
-        summary: 'This function is used to retrieve a list of all elements of the specified type. This can\nbe useful, as it disregards where in the element tree it is. It can be used with either\nthe built in types (listed below) or with any custom type used in a .map file. For\nexample, if there is an element of type flag (e.g. ) in the .map file, the using\nflag as the type argument would find it.',
-        parameters: [
-            { name: 'theType', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'startat', isOptional: true, isVariadic: false, summary: '' },
-        ],
+    getCameraViewMode: {
+        summary: 'This function allows you to get the active camera view modes. This indicates at what distance the camera will follow the player or vehicle.',
+        parameters: [],
         returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementsByType',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCameraViewMode',
     },
-    getElementsWithinColShape: {
-        summary: 'This function is used to retrieve a list of all elements in a colshape, of the specified\ntype.\n* For legacy reasons, a colshape created on the client does not collide with elements\nalready existing at that location until they first move.\n* This function doesnt verify whether elements are in the same dimension and interior,\nadditional checks could be implemented manually if they are needed.',
-        parameters: [
-            { name: 'theShape', isOptional: false, isVariadic: false, summary: 'The colshape you want to get the elements from.' },
-            { name: 'elemType', isOptional: true, isVariadic: false, summary: 'The type of element you want a list of. This can be any element type, the common ones being: player A player connected to the server ped A ped vehicle A vehicle object An object pickup A pickup marker A marker remoteclient A remote client connected to the server' },
-        ],
-        returns: 'returns a table containing all the elements inside the colshape, of the specified type. returns an empty table if there are no elements inside. returns false if the colshape is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementsWithinColShape',
-    },
-    getElementsWithinRange: {
-        summary: 'This function is used to retrieve a list of all elements of specified type within a range\nof 3D coordinates.\n* Z argument isnt in use currently, but make your scripts like it is for future\ncompatibility reasons.\n|21438\n* Z argument is now being taken into consideration when checking for elements.\n* This function checks if elements are in a box, not in a sphere.\n* This function doesnt work with elements which are created by createElement.',
-        parameters: [
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'the x coordinate at which to retrieve elements.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'the y coordinate at which to retrieve elements.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'the z coordinate at which to retrieve elements.' },
-            { name: 'range', isOptional: false, isVariadic: false, summary: 'the range at the coordinates in which to retrieve elements.' },
-            { name: 'elemType', isOptional: true, isVariadic: false, summary: 'The type of element you want a list of. This can be any element type, such as: player A player connected to the server. ped A ped. vehicle A vehicle. object An object. pickup A pickup. marker A marker.' },
-            { name: 'interior', isOptional: true, isVariadic: false, summary: 'The interior you want to limit the search to. If not specified, it can return elements in any interior.' },
-            { name: 'dimension', isOptional: true, isVariadic: false, summary: 'The dimension you want to limit the search to. If not specified, it can return elements in any dimension.' },
-        ],
-        returns: 'returns a table containing all the elements of the specified type within range. returns an empty table if there are no elements within range. returns false if the arguments are invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementsWithinRange',
-    },
-    getElementSyncer: {
-        summary: 'This function gets the syncer of an element. The syncer is the player who is in control\nof the element.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element to get the syncer of.' },
-        ],
-        returns: 'returns the element that is the syncer of theelement or false if the element does not have a syncer.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementSyncer',
-    },
-    getElementType: {
-        summary: 'This function is used to retrieve the type of an element.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to get the type of.' },
-        ],
-        returns: 'returns a string containing the element type, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementType',
-    },
-    getElementVelocity: {
-        summary: 'This function returns three floats containing the velocity (movement speeds) along the X,\nY, and Z axis respectively. This means that velocity values can be positive and negative\nfor each axis.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: ': The element you wish to retrieve the velocity of.' },
-        ],
-        returns: 'if succesful, returns three floats that represent the elements current velocity along the x, y, and z axis respectively. this function can fail if the element is a player in a car. use the vehicle element in this case. it will also fail if the element specified does not have a velocity, or does not exist. in case of failure, the first return value will be false. the returned values are expressed in gta units per 1/50th of a secondhttp://forum.mtasa.com/viewtopic.php?f=91&t=31225. a gta unit is equal to one metrehttp://gta.wikia.com/unit#gta3.2c_gtavc_.26_gtasa.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementVelocity',
-    },
-    getElementZoneName: {
-        summary: 'This function allows you to retrieve the zone name of an element (eg. Verdant Bluffs or\nOcean Docks)\nThe same can be achieved client side by getting element coordinates and using GetZoneName.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which youd like to retrieve the zone name from' },
-            { name: 'citiesonly', isOptional: true, isVariadic: false, summary: ': An optional argument to choose if you want to return the city name (eg Las Venturas)' },
-        ],
-        returns: 'returns the string of the elements zone name.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementZoneName',
-    },
-    getEventHandlers: {
-        summary: 'This function gets the attached functions from the event and attached element from\ncurrent lua script.',
-        parameters: [
-            { name: 'eventName', isOptional: false, isVariadic: false, summary: 'The name of the event. For example ( onPlayerWasted ).' },
-            { name: 'attachedTo', isOptional: false, isVariadic: false, summary: 'The element attached to.' },
-        ],
-        returns: 'returns table with attached functions, empty table otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetEventHandlers',
-    },
-    getFarClipDistance: {
-        summary: 'This function will tell you what is the current render distance.',
+    getCancelReason: {
+        summary: 'Gets the reason for cancelling an event.',
         parameters: [],
-        returns: 'returns a float with the current render distance, false if the operation could not be completed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetFarClipDistance',
+        returns: 'Returns the reason that was given with cancelEvent',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCancelReason',
     },
-    getFogDistance: {
-        summary: 'This function will tell you what is the current fog render distance.',
+    getChatboxCharacterLimit: {
+        summary: '',
         parameters: [],
-        returns: 'returns a float with the current fog render distance, false if the operation could not be completed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetFogDistance',
+        returns: 'Returns a number between 0-255, representing the chatbox input character limit',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetChatboxCharacterLimit',
     },
-    getFPSLimit: {
-        summary: 'This function retrieves the maximum http://en.wikipedia.org/wiki/Frame_rate FPS (Frames\nper second) that players on the server can run their game at.',
+    getChatboxLayout: {
+        summary: 'Returns information about how the chatbox looks.\n\nThese values come from the file called: Chatboxpresets.xml but it depends on what type of preset you currently have, which is chosen from your settings in the \'Interface\' tab.',
+        parameters: [
+            { name: 'CVar', isOptional: true, isVariadic: false, summary: 'the name of the property you want returned. Can be the following values:' },
+        ],
+        returns: '*4 numbers if the CVar contains "color" *2 numbers if **chat_scale** was entered *1 number if any other CVar was specified *a table of all CVar values, if CVar was not specified **false* if an invalid CVar was specified',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetChatboxLayout',
+    },
+    getClothesByTypeIndex: {
+        summary: 'This function is used to get the texture and model of clothes by the clothes type and index.\n(Scans through the list of clothes for the specific type).',
+        parameters: [
+            { name: 'clothesType', isOptional: false, isVariadic: false, summary: 'An integer representing the clothes slot/type to scan through.' },
+            { name: 'clothesIndex', isOptional: false, isVariadic: false, summary: 'An integer representing the index (0 based) set of clothes in the list you wish to retrieve. Each type has a different number of valid indexes.' },
+        ],
+        returns: 'This function returns 2 strings, a texture and model respectively, *false* if invalid arguments were passed to the function.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetClothesByTypeIndex',
+    },
+    getClothesTypeName: {
+        summary: 'This function is used to get the name of a certain clothes type.',
+        parameters: [
+            { name: 'clothesType', isOptional: false, isVariadic: false, summary: 'An integer determining the type of clothes you want to get the clothes of.' },
+        ],
+        returns: 'This function returns a string (the name of the clothes type) if found, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetClothesTypeName',
+    },
+    getCloudsEnabled: {
+        summary: 'This function will tell you if clouds are enabled or disabled.',
         parameters: [],
-        returns: 'returns an integer between 25 and 100 of the maximum fps that players can run their game at.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetFPSLimit',
+        returns: 'Returns *true* if the clouds are enabled or *false* if clouds are disabled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCloudsEnabled',
     },
-    getFunctionsBoundToKey: {
-        summary: 'Gets the functions bound to a key. To bind a function to a key use the bindKey function',
+    getColorFilter: {
+        summary: '',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player to get the functions from a key. theKey The key you wish to check the functions from.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'keyState', isOptional: false, isVariadic: false, summary: 'A string that has one of the following values: up If the bound key should trigger the function when the key is released down If the bound key should trigger the function when the key is pressed both If the bound key should trigger the function when the key is pressed or released' },
+            { name: 'isOriginal', isOptional: false, isVariadic: false, summary: 'A bool indicates if the return values of color filter are GTASA original or changed by setColorFilter. If this is set to *false*, the return values would be the color filter that is currently being used.' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetFunctionsBoundToKey',
+        returns: 'Returns 8 *integers*, of which the first 4 indicate the color (R,G,B,A) of color filter A, and the last 4 indicate the color (R,G,B,A) of color filter B.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColorFilter',
     },
-    getGameSpeed: {
-        summary: 'This function gets the current game speed value.',
+    getColorFromString: {
+        summary: 'This function will extract Red, Green, Blue and Alpha values from a hex string you provide it. These strings follow the same format as used in HTML, with addition of the Alpha values.',
+        parameters: [
+            { name: 'theColor', isOptional: false, isVariadic: false, summary: 'A string containing a valid color code.' },
+        ],
+        returns: 'Returns four integers in RGBA format, with a maximum value of 255 for each. Each stands for *red*, *green*, *blue*, and *alpha*. Alpha decides transparancy where 255 is opaque and 0 is transparent. *false* is returned if the string passed is invalid (for example, is missing the preceeding # sign).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColorFromString',
+    },
+    getColPolygonHeight: {
+        summary: '',
+        parameters: [
+            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon.' },
+        ],
+        returns: 'Returns two floats, indicating the floor and ceiling of the colshape height, *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColPolygonHeight',
+    },
+    getColPolygonPointPosition: {
+        summary: 'This function is used to get the position of a bound point in a colshape polygon.',
+        parameters: [
+            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon you wish to change.' },
+            { name: 'index', isOptional: false, isVariadic: false, summary: 'The index of the point you wish to retrieve. The points are indexed in order, with 1 being the first bound point.' },
+        ],
+        returns: 'Returns two floats, x and y, indicating the position of the point, *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColPolygonPointPosition',
+    },
+    getColPolygonPoints: {
+        summary: 'This function is used to get all bound points in a colshape polygon.',
+        parameters: [
+            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon you wish to get the points of.' },
+        ],
+        returns: 'Returns a table of coordinates, each coordinate being a table containing the x and y position of a bound point, *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColPolygonPoints',
+    },
+    getColShapeRadius: {
+        summary: 'This function is used to get the radius of a colshape. Valid types are circle, sphere and tube.',
+        parameters: [
+            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape you wish to get the radius of.' },
+        ],
+        returns: 'Returns a float containing the radius of the colshape, *false* if an invalid colshape was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColShapeRadius',
+    },
+    getColShapeSize: {
+        summary: 'This function is used to get the size of a colshape. Valid types are rectangle, cuboid and tube.',
+        parameters: [
+            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape you wish to get the size of.' },
+        ],
+        returns: 'Returns up to 3 floats depending on the colshape type (see below), *false* if invalid arguments were passed. **cuboid:* width, depth, height. **rectangle:* width, height. **tube:* height.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColShapeSize',
+    },
+    getColShapeType: {
+        summary: 'This function is used to retrieve the type of an colshape.',
+        parameters: [
+            { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape you wish to get the type of.' },
+        ],
+        returns: 'Returns *false* if invalid arguments were passed, or an integer of the type of the colshape, which include: ***0:** circle ***1:** cuboid ***2:** sphere ***3:** rectangle ***4:** polygon ***5:** tube',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetColShapeType',
+    },
+    getCommandHandlers: {
+        summary: 'This function is used to retrieve a list of all the registered command handlers of a given resource (or of all resources).\n\nFunction also added client-side.',
+        parameters: [
+            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'The resource from which you wish to retrieve all command handlers. Or leave it empty to retrieve command handlers of all resources.' },
+        ],
+        returns: 'Returns a *table* containing all the commands of the given resource or a table with subtables containing the command and theResource pointer ( { "command", theResource } ). See examples below if you don\'t understand it.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCommandHandlers',
+    },
+    getCommandsBoundToKey: {
+        summary: 'Gets the commands bound to a key.',
+        parameters: [
+            { name: 'theKey', isOptional: false, isVariadic: false, summary: 'See key names for a list of possible keys' },
+            { name: 'keyState', isOptional: false, isVariadic: false, summary: 'A string that has one of the following values:' },
+        ],
+        returns: 'Returns a table of the commands bound on that key.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCommandsBoundToKey',
+    },
+    getControlState: {
+        summary: 'This function will check if a player is pressing a particular control. Controls are those that affect GTA. If you wish to get the state of another key, use bindKey and a command function.\n\nNote: Not all control states are sent to the server at all times, as such their state may be given incorrectly. As a rule, keys that move or affect the player or their vehicle are most likely to be accurate. For increased accuracy (and also increased bandwidth usage) use bindKey instead to bind a GTA control name to a function.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish to get the control state of. Do not use this parameter when scripting for client.' },
+            { name: 'controlName', isOptional: false, isVariadic: false, summary: 'The control that you want to get the state of. See control names for a list of possible controls.' },
+        ],
+        returns: 'Returns the state of the control, *false* if the control doesn\'t exist or if the player is dead.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetControlState',
+    },
+    getCoronaReflectionsEnabled: {
+        summary: '',
         parameters: [],
-        returns: 'returns a float representing the speed of the game.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGameSpeed',
+        returns: 'One of the following integers will be returned: * **0**: corona reflections are disabled * **1**: corona reflections are enabled (are visible during rain) * **2**: corona reflections are force enabled (are visible even if there is no rain)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCoronaReflectionsEnabled',
     },
-    getGameType: {
-        summary: 'This function retrieves the current gametype as set by setGameType. The game type is\ndisplayed in the server browser next to the servers name.',
+    getCursorAlpha: {
+        summary: 'This function is used to get the client\'s cursor alpha (transparency).',
         parameters: [],
-        returns: 'returns the gametype as a string. if no gametype is set it returns nil.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGameType',
+        returns: 'Returns a int between 0 and 255, where 255 is fully opaque and 0 is fully transparent.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCursorAlpha',
     },
-    getGarageBoundingBox: {
-        summary: 'This function outputs the bounding box of a garage.',
-        parameters: [
-            { name: 'garageID', isOptional: false, isVariadic: false, summary: 'The Garage|garage ID that represents the garage door that is being checked.' },
-        ],
-        returns: 'returns four floats indicating the bounding box of the garage. western x position, eastern x position, southern y position, northern y position,, false when invalid garageid was provided.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGarageBoundingBox',
-    },
-    getGaragePosition: {
-        summary: 'This function outputs X, Y and Z position of given garage.',
-        parameters: [
-            { name: 'garageID', isOptional: false, isVariadic: false, summary: 'The Garage|garage ID that represents the garage door that is being checked.' },
-        ],
-        returns: 'returns three floats indicating the position of the garage, x, y and z respectively, false when garageid was invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGaragePosition',
-    },
-    getGarageSize: {
-        summary: 'This function outputs the size of garage.',
-        parameters: [
-            { name: 'garageID', isOptional: false, isVariadic: false, summary: 'The Garage|garage ID that represents the garage door that is being checked.' },
-        ],
-        returns: 'returns three floats indicating the size of the garage, false if an invalid garageid has been provided',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGarageSize',
-    },
-    getGravity: {
-        summary: 'This function returns the current gravity level for the context in which it is called\n(server or client).',
+    getCursorPosition: {
+        summary: 'This function gets the current position of the mouse cursor. Note that for performance reasons, the world position returned is always 300 units away. If you want the exact world point (similar to onClientClick), use processLineOfSight between the camera position and the worldX/Y/Z result of this function. (See example below)',
         parameters: [],
-        returns: 'returns a float with the current server or client (depending on where you call the function) gravity level.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGravity',
+        returns: 'Returns 5 values: *cursorX*, *cursorY*, *worldX*, *worldY*, *worldZ*. The first two values are the 2D **relative** screen coordinates of the cursor. The 3 values that follow are the 3D world map coordinates that the cursor points at. If the cursor isn\'t showing, returns *false* as the first value.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetCursorPosition',
     },
-    getGroundPosition: {
-        summary: 'This function gets the Z level of the highest ground below a point.\nIt is required that the point is near enough to the local player so that its within the\narea where collision data is loaded. If this is not the case, an incorrect position will\nbe returned.',
-        parameters: [
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'A floating point number representing the X world coordinate of the point.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Y world coordinate of the point.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Z world coordinate of the point.' },
-        ],
-        returns: 'returns a float with the highest ground-level z coord if parameters are valid, 0 if the point you tried to test is outside the loaded world map, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetGroundPosition',
-    },
-    getHeatHaze: {
-        summary: 'This function will return the current heat haze effect settings.\nNote: The server can only return the heat haze settings if it has actually been set by\nscript.',
+    getDeadPlayers: {
+        summary: 'This function returns a table of all currently dead players on the server.',
         parameters: [],
-        returns: 'returns 9 values, which are the same used as arguments in setheathaze:',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetHeatHaze',
+        returns: 'Returns a table of all the dead players.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetDeadPlayers',
     },
-    getHeliBladeCollisionsEnabled: {
-        summary: 'This function gets the state of the helicopter blades collisions on the specified vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that will be checked.' },
-        ],
-        returns: 'returns true if the collisions are enabled for specified vehicle, false if the collisions arent enabled for the specified vehicle, if the vehicle is not a helicopter or if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetHeliBladeCollisionsEnabled',
-    },
-    getHelicopterRotorSpeed: {
-        summary: 'Retrieves the speed at which the rotor of a helicopter rotates.',
-        parameters: [
-            { name: 'heli', isOptional: false, isVariadic: false, summary: 'the helicopter element to get the rotor speed of.' },
-        ],
-        returns: 'returns the rotor speed if successful. this is 0 when the helicopter is parked, and about 0.2 when it is fully spun up. it can be negative if the rotor rotates counter-clockwise. returns false in case of failure (an invalid element or a vehicle element that is not a helicopter was passed).',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetHelicopterRotorSpeed',
-    },
-    getInteriorFurnitureEnabled: {
-        summary: 'This function will tell you if interior furniture are enabled or disabled in a specified\nroom ID.',
-        parameters: [
-            { name: 'roomID', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if interior furniture is enabled or false if interior furniture is disabled.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetInteriorFurnitureEnabled',
-    },
-    getInteriorSoundsEnabled: {
-        summary: 'This function checks to see if the music played by default in clubs is disabled or not.',
+    getDevelopmentMode: {
+        summary: 'This function is used to get the development mode of the client or whole server. For more information see setDevelopmentMode',
         parameters: [],
-        returns: 'returns true if music is playing, returns false if music is not playing.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetInteriorSoundsEnabled',
+        returns: 'Returns *true* if the development mode is on, *false* if off.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetDevelopmentMode',
+    },
+    getDiscordRichPresenceUserID: {
+        summary: 'The function returns the client Discord UserID.',
+        parameters: [],
+        returns: 'It will return an *empty string ("")* if the user has not given consent or has disabled the Rich Presence synchronization option. Otherwise, it will return the *userid* as a string.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetDiscordRichPresenceUserID',
+    },
+    getDistanceBetweenPoints2D: {
+        summary: 'This function returns the distance between two 2 dimensional points using the pythagorean theorem.',
+        parameters: [
+            { name: 'x1', isOptional: false, isVariadic: false, summary: 'The X position of the first point' },
+            { name: 'y1', isOptional: false, isVariadic: false, summary: 'The Y position of the first point' },
+            { name: 'x2', isOptional: false, isVariadic: false, summary: 'The X position of the second point' },
+            { name: 'y2', isOptional: false, isVariadic: false, summary: 'The Y position of the second point' },
+        ],
+        returns: 'Returns a float containing the 2D distance between the two points. Returns *false* if invalid parameters are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetDistanceBetweenPoints2D',
+    },
+    getDistanceBetweenPoints3D: {
+        summary: 'This function returns the distance between two 3 dimensional points using the pythagorean theorem.',
+        parameters: [
+            { name: 'x1', isOptional: false, isVariadic: false, summary: 'The X position of the first point' },
+            { name: 'y1', isOptional: false, isVariadic: false, summary: 'The Y position of the first point' },
+            { name: 'z1', isOptional: false, isVariadic: false, summary: 'The Z position of the first point' },
+            { name: 'x2', isOptional: false, isVariadic: false, summary: 'The X position of the second point' },
+            { name: 'y2', isOptional: false, isVariadic: false, summary: 'The Y position of the second point' },
+            { name: 'z2', isOptional: false, isVariadic: false, summary: 'The Z position of the second point' },
+        ],
+        returns: 'Returns a float containing the distance between the two points as a float. Returns *false* if an argument passed was invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetDistanceBetweenPoints3D',
+    },
+    getEasingValue: {
+        summary: 'Used for custom Lua based interpolation, returns the easing value (animation time to use in your custom interpolation) given a progress and an easing function.\nIn most cases, either moveObject or interpolateBetween can do the job. getEasingValue is only provided in case you want to do your own custom interpolation based on easing.',
+        parameters: [
+            { name: 'fProgress', isOptional: false, isVariadic: false, summary: 'float between 0 and 1 indicating the interpolation progress (0 at the beginning of the interpolation, 1 at the end).' },
+            { name: 'strEasingType', isOptional: false, isVariadic: false, summary: 'the easing function to use for the interpolation' },
+            { name: 'fEasingPeriod', isOptional: true, isVariadic: false, summary: 'the period of the easing function (only some easing functions use this parameter)' },
+            { name: 'fEasingAmplitude', isOptional: true, isVariadic: false, summary: 'the amplitude of the easing function (only some easing functions use this parameter)' },
+            { name: 'fEasingOvershoot', isOptional: true, isVariadic: false, summary: 'the overshoot of the easing function (only some easing functions use this parameter)' },
+        ],
+        returns: 'Returns *fAnimationTime * the animation time given by the easing function (can be < 0 or > 1 since some easing functions have overshoot or bounce/spring effects, *false* otherwise (error in parameters).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetEasingValue',
     },
 };

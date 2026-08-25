@@ -1,234 +1,237 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_47: ApiDocumentationCatalog = {
-    setWeaponState: {
-        summary: 'This function sets a Element/Weapon|custom weapons state.',
+    setRainLevel: {
+        summary: 'This function sets the rain level to any weather available in GTA. Use resetRainLevel to undo the changes.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: ': the weapon you wish to set the state of.' },
-            { name: 'theState', isOptional: false, isVariadic: false, summary: ': the state you wish to set: reloading : makes the weapon reload. firing : makes the weapon constantly fire its target (unless any shooting blocking flags are set) according to its assigned firing rate. ready : makes the weapon stop reloading or firing.' },
+            { name: 'level', isOptional: false, isVariadic: false, summary: 'A floating point number representing the rain level. 1 represents the maximum rain level usually available in GTA, but higher values are accepted.' },
         ],
-        returns: 'returns true on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeaponState',
+        returns: 'Returns *true* if the rain level was set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetRainLevel',
     },
-    setWeaponTarget: {
-        summary: 'This function sets the target of a Element/Weapon|custom weapon. There are 3 different\ntargeting modes, which are explained below.',
+    setResourceInfo: {
+        summary: 'This function sets the value of any attribute in a resource info tag.',
         parameters: [
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to clear the target of.' },
-            { name: 'theTarget', isOptional: false, isVariadic: false, summary: 'The element to shoot at. It can be a player, ped, vehicle or object.' },
-            { name: 'theComponent', isOptional: true, isVariadic: false, summary: 'The component of the target to shoot at. This argument is only relevant when used in the following element types: Vehicle|Vehicles : 0 : front left tire. 1 BONE_PELVIS1 position. 2 BONE_PELVIS position. 3 BONE_SPINE1 position. 255 : center of the ped (position returned by getElementPosition). Ped|Peds (players not included; see getPedBonePosition to know where each bone is located): 4 BONE_UPPERTORSO position. 5 BONE_NECK position. 6 BONE_HEAD2 position. 7 BONE_HEAD1 position. 8 BONE_HEAD position. 21 BONE_RIGHTUPPERTORSO position. 22 BONE_RIGHTSHOULDER position. 23 BONE_RIGHTELBOW position. 24 BONE_RIGHTWRIST position. 25 BONE_RIGHTHAND position. 26 BONE_RIGHTTHUMB position. 31 BONE_LEFTUPPERTORSO position. 32 BONE_LEFTSHOULDER position. 33 BONE_LEFTELBOW position. 34 BONE_LEFTWRIST position. 35 BONE_LEFTHAND position. 36 BONE_LEFTTHUMB position. 41 BONE_LEFTHIP position. 42 BONE_LEFTKNEE position. 43 BONE_LEFTANKLE position. 44 BONE_LEFTFOOT position. 51 BONE_RIGHTHIP position. 52 BONE_RIGHTKNEE position. 53 BONE_RIGHTANKLE position. 54 BONE_RIGHTFOOT position. targetX The target X. targetY The target Y. targetZ The target Z.' },
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource we are setting info to.' },
+            { name: 'attribute', isOptional: false, isVariadic: false, summary: 'the name of the attribute that is to be set.' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'the value of this attribute' },
         ],
-        returns: 'returns true on success, false otherwise. returns true on success, false otherwise. returns true on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeaponTarget',
+        returns: 'Returns *true* if the info was successfully set, *false* otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetResourceInfo',
     },
-    setWeather: {
-        summary: 'This function sets the current weather to the given valid value. To change the weather\ngradually, see setWeatherBlended.',
+    setRuleValue: {
+        summary: 'This function sets a rule value that can be viewed by server browsers.',
         parameters: [
-            { name: 'weatherID', isOptional: false, isVariadic: false, summary: ': The ID of new weather. Valid values are 0 to 255 inclusive.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the rule **(MAX 200 characters)**' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value you wish to set for the rule **(MAX 200 characters)**' },
         ],
-        returns: 'returns true if the weather was set succesfully, false if an invalid weatherid was specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeather',
+        returns: 'Returns *true* if the rule value was set, *false* if invalid arguments were specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetRuleValue',
     },
-    setWeatherBlended: {
-        summary: 'This function will change the current weather to another in a smooth manner, over the\nperiod of 1-2 in-game hours (unlike setWeather, which sets a new weather instantly). To\nensure this transition performs as expected, you should not call this function until\ngetWeather indicates that no transition is already being done.',
+    setSearchLightEndPosition: {
+        summary: 'This function sets the end position of a searchlight element.',
         parameters: [
-            { name: 'weatherID', isOptional: false, isVariadic: false, summary: 'The ID of the weather state you wish to set. Valid values are 0 to 255 inclusive.' },
+            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: 'the searchlight to modify the property of.' },
+            { name: 'endX', isOptional: false, isVariadic: false, summary: 'the X coordinate where the searchlight light cone will end.' },
+            { name: 'endY', isOptional: false, isVariadic: false, summary: 'the Y coordinate where the searchlight light cone will end.' },
+            { name: 'endZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate where the searchlight light cone will end.' },
         ],
-        returns: 'returns true if successful, false if an invalid weatherid is passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeatherBlended',
+        returns: 'If every argument is correct, this function returns *true*. If not, it will return *false* plus an error message.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSearchLightEndPosition',
     },
-    setWindowFlashing: {
+    setSearchLightEndRadius: {
+        summary: 'This function sets the end radius of a searchlight element.',
+        parameters: [
+            { name: 'theSearchlight', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'endRadius', isOptional: false, isVariadic: false, summary: 'the radius of the searchlight\'s light cone in its end.' },
+        ],
+        returns: 'If every argument is correct, this function returns *true*. If not, it will return *false* plus an error message.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSearchLightEndRadius',
+    },
+    setSearchLightStartPosition: {
+        summary: 'This function sets the start position of a searchlight element.',
+        parameters: [
+            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: 'the searchlight to modify the property of.' },
+            { name: 'startX', isOptional: false, isVariadic: false, summary: 'the X coordinate where the searchlight light cone will start.' },
+            { name: 'startY', isOptional: false, isVariadic: false, summary: 'the Y coordinate where the searchlight light cone will start.' },
+            { name: 'startZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate where the searchlight light cone will start.' },
+        ],
+        returns: 'If every argument is correct, this function returns *true*. If not, it will return *false* plus an error message.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSearchLightStartPosition',
+    },
+    setSearchLightStartRadius: {
+        summary: 'This function sets the start radius of a searchlight element.',
+        parameters: [
+            { name: 'theSearchlight', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'startRadius', isOptional: false, isVariadic: false, summary: 'the radius of the searchlight\'s light cone in its beginning.' },
+        ],
+        returns: 'If every argument is correct, this function returns *true*. If not, it will return *false* plus an error message.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSearchLightStartRadius',
+    },
+    setServerConfigSetting: {
+        summary: 'This function sets server settings which are stored in the mtaserver.conf file.',
+        parameters: [
+            { name: 'name', isOptional: false, isVariadic: false, summary: 'The name of the setting. Only certain settings from mtaserver.conf can be changed with this function. These are:' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value of the setting' },
+            { name: 'bSave', isOptional: true, isVariadic: false, summary: 'Set to *true* to make the setting permanent, or *false* for use only until the next server restart.' },
+        ],
+        returns: 'Returns *true* if the setting was successfully set, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetServerConfigSetting',
+    },
+    setServerPassword: {
+        summary: '<!-- Change this to "Client function" or "Server function" appropriately-->\n<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis function changes the password required to join the server to the given string.',
+        parameters: [
+            { name: 'thePassword', isOptional: false, isVariadic: false, summary: 'The new server password you want. Pass *nil* or an empty string to remove the password.' },
+        ],
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns *true* if the password was successfully changed or removed, *false* or *nil* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetServerPassword',
+    },
+    setSkyGradient: {
+        summary: 'This function changes the sky color to a two-color gradient.',
+        parameters: [
+            { name: 'topRed', isOptional: true, isVariadic: false, summary: 'The *red* value of the upper part of the sky, from 0 to 255.' },
+            { name: 'topGreen', isOptional: true, isVariadic: false, summary: 'The *green* value of the upper part of the sky, from 0 to 255.' },
+            { name: 'topBlue', isOptional: true, isVariadic: false, summary: 'The *blue* value of the upper part of the sky, from 0 to 255.' },
+            { name: 'bottomRed', isOptional: true, isVariadic: false, summary: 'The *red* value of the lower part of the sky, from 0 to 255.' },
+            { name: 'bottomGreen', isOptional: true, isVariadic: false, summary: 'The *green* value of the lower part of the sky, from 0 to 255.' },
+            { name: 'bottomBlue', isOptional: true, isVariadic: false, summary: 'The *blue* value of the lower part of the sky, from 0 to 255.' },
+        ],
+        returns: 'Returns *true* if sky color was set correctly, *false* if invalid values were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSkyGradient',
+    },
+    setSoundEffectEnabled: {
+        summary: 'Used to enable or disable specific sound effects.\n\nUse a player element to control a players voice with this function.',
+        parameters: [
+            { name: 'theSound/thePlayer', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'effectName', isOptional: false, isVariadic: false, summary: 'the effect you want to enable or disable' },
+            { name: 'bEnable', isOptional: false, isVariadic: false, summary: '*true* if you want to enable the effect, *false* if you want to disable it.' },
+        ],
+        returns: 'Returns *true* if the effect was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundEffectEnabled',
+    },
+    setSoundEffectParameter: {
         summary: '',
         parameters: [
-            { name: 'shouldFlash', isOptional: false, isVariadic: false, summary: 'whether the window should flash' },
-            { name: 'count', isOptional: true, isVariadic: false, summary: 'the number of times the window should flash, defaults to 10 times' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'The sound element.' },
+            { name: 'effectName', isOptional: false, isVariadic: false, summary: 'The name of the effect whose parameter you want to change:' },
+            { name: 'effectParam', isOptional: false, isVariadic: false, summary: 'The parameter name.' },
+            { name: 'paramValue', isOptional: false, isVariadic: false, summary: 'The parameter value.' },
         ],
-        returns: 'returns false if: * the window is already in focus * the client has disabled this feature returns true otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWindowFlashing',
+        returns: 'Returns *true* if effect have been set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundEffectParameter',
     },
-    setWindVelocity: {
-        summary: 'This function changes the wind velocity. The wind shakes the vegetation and makes\nparticles fly in a direction. The intensity and direction of the effect deppends of the\nwind velocity in each axis.',
-        parameters: [
-            { name: 'velocityX', isOptional: false, isVariadic: false, summary: ': The velocity of the wind along the x axis.' },
-            { name: 'velocityY', isOptional: false, isVariadic: false, summary: ': The velocity of the wind along the y axis.' },
-            { name: 'velocityZ', isOptional: false, isVariadic: false, summary: ': The velocity of the wind along the z axis.' },
-        ],
-        returns: 'returns true if successful, false if bad arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWindVelocity',
-    },
-    setWorldSoundEnabled: {
-        summary: 'This function allows you to disable world sounds. A world sound is a sound effect which\nhas not been caused by playSound or playSound3D.\n*The values for group and index can be determined by using the client command\nClient_Commands#showsound|showsound in conjunction with setDevelopmentMode.\n*This function does not affect sounds which are already playing, such as the wind sound\nthat can only be stopped by entering an interior.\n* See also: setAmbientSoundEnabled.',
-        parameters: [
-            { name: 'group', isOptional: false, isVariadic: false, summary: 'An int|integer representing the World sound groups|world sound group.' },
-            { name: 'index', isOptional: false, isVariadic: false, summary: 'An int|integer representing an individual sound within the group' },
-            { name: 'enable', isOptional: false, isVariadic: false, summary: 'Set to false to disable, true to enable.' },
-            { name: 'immediate', isOptional: true, isVariadic: false, summary: 'A boolean if set to true will cancel the sound if its already playing. This parameter only works for stopping the sound.' },
-        ],
-        returns: 'returns true if the world sound was correctly enabled/disabled, false if invalid values were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWorldSoundEnabled',
-    },
-    setWorldSpecialPropertyEnabled: {
-        summary: 'Enables or disables a special world property.',
-        parameters: [
-            { name: 'propname', isOptional: false, isVariadic: false, summary: 'the name of the property to set. Possible values are: hovercars - equivalent of the JBGVNB cheat, and allows cars to drive on water. (default: false) aircars - equivalent of the RIPAZHA cheat, and allows cars to fly. (default: false) extrabunny - equivalent of the CJPHONEHOME or JHJOECW cheat, and allows you to bunny hop on bicycles much higher. (default: false) extrajump - equivalent of the KANGAROO cheat, and allows you to jump on foot much higher. (default: false) randomfoliage - toggle randomly generated foliage on the GTA:SA map (default: true) snipermoon - toggle the GTA:SA easter egg, which increases the size of the moon every time you shoot it with a sniper rifle (default: false) extraairresistance - toggle the vehicle speed limit on cross-country roads (default: true) **New feature/item|3.0156|1.5.5|12286|**underworldwarp** - toggle warp of peds and vehicles when fall under map (default: true) **New feature/item|3.0160|1.5.9|21125|**vehiclesunglare** - toggle the vehicle sun glare effect (default: false) **New feature/item|3.0160|1.5.9|21313| **coronaztest** - disable big sun lensflare effect (default: true)' },
-            { name: 'enable', isOptional: false, isVariadic: false, summary: 'whether or not to enable the property.' },
-        ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWorldSpecialPropertyEnabled',
-    },
-    sha256: {
-        summary: '* The sha module and this function may conflict with eachother, if you use this function\nuninstall the module!\n* This function returns an uppercase string, so make sure you string.upper() anything\nelse you are checking against that has been sha256d elsewhere.\nCalculates the sha256 hash of the specified string.',
-        parameters: [
-            { name: 'str', isOptional: false, isVariadic: false, summary: 'the string to hash.' },
-        ],
-        returns: 'returns the sha256 hash of the input string if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Sha256',
-    },
-    showChat: {
-        summary: 'This function is used to show or hide the players chat.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose chat is to be hidden or shown.' },
-            { name: 'show', isOptional: false, isVariadic: false, summary: 'A boolean value determining whether to show (true) or hide (false) the chat.' },
-            { name: 'inputBlocked', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether chat input is blocked/hidden, regardless of chat visibility. If unset, this will keep the default behaviour prior to r20898 (true when chat is hidden, false when chat is visible).' },
-        ],
-        returns: 'returns true if the players chat was shown or hidden successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ShowChat',
-    },
-    showCol: {
+    setSoundLooped: {
         summary: '',
         parameters: [
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean indicating if the collision previews should be enabled or disabled.' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element to set the loop.' },
+            { name: 'loop', isOptional: false, isVariadic: false, summary: '' },
         ],
-        returns: '* returns true if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ShowCol',
+        returns: 'Returns *true* if the sound element loop state was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundLooped',
     },
-    showCursor: {
-        summary: 'This function is used to show or hide a players cursor.',
+    setSoundMaxDistance: {
+        summary: 'Sets a custom sound max distance at which the sound stops.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you want to show or hide the cursor of.' },
-            { name: 'show', isOptional: false, isVariadic: false, summary: 'A boolean value determining whether to show (true) or hide (false) the cursor.' },
-            { name: 'toggleControls', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether to disable controls whilst the cursor is showing. true implies controls are disabled, false implies controls remain enabled.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
+            { name: 'distance', isOptional: false, isVariadic: false, summary: 'the default value for this is 20' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ShowCursor',
+        returns: 'Returns a *true* if the max distance was set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundMaxDistance',
     },
-    showSound: {
-        summary: '',
+    setSoundMinDistance: {
+        summary: 'Sets a custom sound Minimum distance at which the sound stops getting louder.',
         parameters: [
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean indicating if the world sound IDs should be printed in the debug window or not.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
+            { name: 'distance', isOptional: false, isVariadic: false, summary: 'an integer representing the distance the sound stops getting louder. the default value for this is 5' },
         ],
-        returns: '* returns true if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ShowSound',
+        returns: 'Returns a *true* if the minimum distance was set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundMinDistance',
     },
-    shutdown: {
-        summary: 'This function shuts down the server.\nMake sure your server ACL setup has function.shutdown object protected.',
+    setSoundPan: {
+        summary: 'This function is used to change the pan level of the specified sound element.',
         parameters: [
-            { name: 'reason', isOptional: true, isVariadic: false, summary: 'the reason why the server has been shutdown. exitCode the server application exit code to be returned on shutdown. |20915' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element which pan you want to modify.' },
+            { name: 'pan', isOptional: false, isVariadic: false, summary: 'A floating point number representing the desired pan level. Range is from *-1.0 (left)* to *1.0 (right)*' },
         ],
-        returns: 'returns false if it was not possible to shut down the server.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Shutdown',
+        returns: 'Returns *true* if the sound element pan was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundPan',
     },
-    source: {
-        summary: 'The player or element the event was attached to',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    sourceResource: {
-        summary: 'The resource that called the event',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    sourceResourceRoot: {
-        summary: 'The root of the resource that called the event',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    sourceTimer: {
-        summary: 'Current timer in callback function.',
-        parameters: [],
-        returns: '',
-        wiki: '',
-    },
-    spawnPlayer: {
-        summary: 'This function spawns the player at an arbitary point on the map.',
+    setSoundPanningEnabled: {
+        summary: 'This function toggles the panning of a sound (hearing it closer to the left or right side of the speakers due to the camera position). By default a sound has its panning enabled.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you want to spawn.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'The x co-ordinate to spawn the player at.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'The y co-ordinate to spawn the player at.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'The z co-ordinate to spawn the player at.' },
-            { name: 'rotation', isOptional: true, isVariadic: false, summary: 'rotation of the player on spawn.' },
-            { name: 'skinID', isOptional: true, isVariadic: false, summary: 'players skin on spawn. Character Skins' },
-            { name: 'interior', isOptional: true, isVariadic: false, summary: 'interior the player will spawn into. Interior IDs' },
-            { name: 'dimension', isOptional: true, isVariadic: false, summary: 'The ID of the dimension that the player should be in.' },
-            { name: 'theTeam', isOptional: true, isVariadic: false, summary: 'the team the player will join.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element to change the panning of.' },
+            { name: 'enable', isOptional: false, isVariadic: false, summary: '*true* to enable the panning, *false* otherwise.' },
         ],
-        returns: 'returns true if the player was spawned successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SpawnPlayer',
+        returns: 'Returns *true* if the sound is valid and good arguments were passed, *false* if not. If the sound is not 3D, this function will return *true* as well, but isSoundPanningEnabled will always return *true* after this (so it has no effect).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundPanningEnabled',
     },
-    spawnVehicle: {
-        summary: 'Spawns a vehicle at any given position and rotation',
+    setSoundPaused: {
+        summary: 'This function is used to either pause or unpause the playback of the specified sound element.\n\nUse a player element to control a players voice with this function.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to spawn' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'The x position you wish to spawn the vehicle at' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'The x position you wish to spawn the vehicle at' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'The x position you wish to spawn the vehicle at' },
-            { name: 'rx', isOptional: true, isVariadic: false, summary: 'The x rotation you wish to spawn the vehicle at' },
-            { name: 'ry', isOptional: true, isVariadic: false, summary: 'The y rotation you wish to spawn the vehicle at' },
-            { name: 'rz', isOptional: true, isVariadic: false, summary: 'The z rotation you wish to spawn the vehicle at' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which you want to pause/unpause.' },
+            { name: 'paused', isOptional: false, isVariadic: false, summary: 'a boolean value representing whether the sound should be paused or not. To pause the sound, use *true*.' },
         ],
-        returns: 'returns true if the vehicle spawned successfully, false if the passed argument does not exist or is not a vehicle.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SpawnVehicle',
+        returns: 'Returns *true* if the sound element was successfully paused, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundPaused',
     },
-    split: {
-        summary: 'This function splits a string into substrings. You specify a character that will act as a\nseparating character; this will determine where to split the sub-strings. For example, it\ncan split the string Hello World into two strings containing the two words, by spliting\nusing a space as a separator.\nNote: You can use the function gettok to retrieve a single token from the string at a\nspecific index. This may be faster for one-off lookups, but considerably slower if you\nare going to check each token in a long string.',
+    setSoundPosition: {
+        summary: 'This function is used to change the seek position of the specified sound element.\nUse a player element to control a players voice with this function.',
         parameters: [
-            { name: 'stringToSplit', isOptional: false, isVariadic: false, summary: 'The string you wish to split into parts.' },
-            { name: 'separatingChar', isOptional: false, isVariadic: false, summary: 'A string of the character you want to split, or the ASCII|ASCII number representing the character you want to use to split.' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which seek position you want to modify.' },
+            { name: 'pos', isOptional: false, isVariadic: false, summary: 'a float value representing the new seek position of the sound element in seconds.' },
         ],
-        returns: 'returns a table of substrings split from the original string if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Split',
+        returns: 'Returns *true* if the sound element\'s seek position was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundPosition',
     },
-    startResource: {
-        summary: 'This function starts a resource either persistently or as a dependency of the current\nresource. If you start the resource persistently, the resource will run until stopped\neither using stopResource or by the server admin. A resource started as a dependency will\nstop when your resource stops, if no other resources have it as a depdendency. This is\nthe same effect as using an include in your meta.xml file.\nThe function also allows you to specify a number of boolean options. These allow you to\ndisable the loading of various aspects of the resource. This is generally useful for\neditors rather than for actual gamemodes. It could also be used as a way to preview a\nresource before enabling the scripting aspects, though this could produce unreliable\nresults. There is no way for a resource to tell if it is being run with any of these\nbooleans set.',
+    setSoundProperties: {
+        summary: 'This function edits the properties of a specific sound.',
         parameters: [
-            { name: 'resourceToStart', isOptional: false, isVariadic: false, summary: 'The resource that should be started.' },
-            { name: 'persistent', isOptional: true, isVariadic: false, summary: 'A boolean specifying if the resource should continue to run even after the current resource has been stopped or not. If this is true then the resource will run until another resource or user terminates it or the server shuts down. If this is false then resourceToStart will stop when thisResource stops.' },
-            { name: 'startIncludedResources', isOptional: true, isVariadic: false, summary: 'A boolean specifying if the resources included/dependant resources will be started.' },
-            { name: 'loadServerConfigs', isOptional: true, isVariadic: false, summary: 'A boolean specifying if server side config (XML) files should be loaded with the resource.' },
-            { name: 'loadMaps', isOptional: true, isVariadic: false, summary: 'A boolean specifying if any .map files will be started with the resource.' },
-            { name: 'loadServerScripts', isOptional: true, isVariadic: false, summary: 'A boolean specifying if server side script files should be started alongside the resource.' },
-            { name: 'loadHTML', isOptional: true, isVariadic: false, summary: 'A boolean specifying if HTML files should be started alongside the resource.' },
-            { name: 'loadClientConfigs', isOptional: true, isVariadic: false, summary: 'A boolean specifying if client configs should be loaded alongside the resource.' },
-            { name: 'loadClientScripts', isOptional: true, isVariadic: false, summary: 'A boolean specifying if client scripts should be loaded and started alongside the resource.' },
-            { name: 'loadFiles', isOptional: true, isVariadic: false, summary: 'A boolean specifying if client-side files should be loaded alongside the resource.' },
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D' },
+            { name: 'fSampleRate', isOptional: false, isVariadic: false, summary: 'a float that defines the new sound\'s [http://en.wikipedia.org/wiki/Sampling_rate sample rate]' },
+            { name: 'fTempo', isOptional: false, isVariadic: false, summary: 'a float that defines the new sound [http://en.wikipedia.org/wiki/Tempo tempo]' },
+            { name: 'fPitch', isOptional: false, isVariadic: false, summary: 'a float that defines the new sound [http://en.wikipedia.org/wiki/Pitch_%28music%29 pitch]' },
+            { name: 'bReverse', isOptional: true, isVariadic: false, summary: 'a boolean representing whether the sound will be reversed or not.' },
         ],
-        returns: 'returns true if the resource has been started successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/StartResource',
+        returns: 'Returns *true* if the properties sucessfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundProperties',
     },
-    stopObject: {
-        summary: 'This will allow you to stop an object that is currently moving.',
+    setSoundSpeed: {
+        summary: 'This function can be used to change the playback speed of the specified sound element.',
         parameters: [
-            { name: 'theobject', isOptional: false, isVariadic: false, summary: 'the object whose movement you wish to stop' },
+            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which volume you want to modify.' },
+            { name: 'speed', isOptional: false, isVariadic: false, summary: 'a floating point number representing the desired sound playback speed.' },
         ],
-        returns: '* true if successful. * false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/StopObject',
+        returns: 'Returns *true* if the sound element playback speed was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundSpeed',
     },
-    stopResource: {
-        summary: 'This function stops a running resource.',
+    setSoundVolume: {
+        summary: 'This function is used to change the volume level of the specified sound element.\nUse a player element to control a players voice with this function.',
         parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource that should be stopped.' },
+            { name: 'theSound/thePlayer', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'volume', isOptional: false, isVariadic: false, summary: 'A floating point number representing the desired volume level. Range is from **0.0** to **1.0**. This can go above **1.0** for amplification.' },
         ],
-        returns: 'returns true if the resource was stopped, false if the stopping failed, or an invalid resource was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/StopResource',
+        returns: 'Returns *true* if the sound element volume was successfully changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundVolume',
     },
-    stopSound: {
-        summary: 'Stops the sound playback for specified sound element. The sound element is also destroyed.',
+    setSunColor: {
+        summary: 'This function is used to set the color of the sun.',
         parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element you want to stop playing.' },
+            { name: 'aRed', isOptional: false, isVariadic: false, summary: 'The amount of red (0-255) you want the sun to be.' },
+            { name: 'aGreen', isOptional: false, isVariadic: false, summary: 'The amount of green (0-255) you want the sun to be.' },
+            { name: 'aBlue', isOptional: false, isVariadic: false, summary: 'The amount of blue (0-255) you want the sun to be.' },
+            { name: 'bRed', isOptional: false, isVariadic: false, summary: 'The amount of red (0-255) you want the sun to be.' },
+            { name: 'bGreen', isOptional: false, isVariadic: false, summary: 'The amount of green (0-255) you want the sun to be.' },
+            { name: 'bBlue', isOptional: false, isVariadic: false, summary: 'The amount of blue (0-255) you want the sun to be.' },
         ],
-        returns: 'returns true if the sound was successfully stopped, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/StopSound',
+        returns: 'Returns true if the color of the sun was set, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSunColor',
+    },
+    setSunSize: {
+        summary: 'This function is used to set the size of the sun.',
+        parameters: [
+            { name: 'Size', isOptional: false, isVariadic: false, summary: 'The size you want the sun to be in the sky.' },
+        ],
+        returns: 'Returns true if the size of the sun was set, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSunSize',
     },
 };

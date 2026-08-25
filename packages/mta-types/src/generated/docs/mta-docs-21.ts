@@ -1,238 +1,239 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_21: ApiDocumentationCatalog = {
-    getSoundPan: {
-        summary: 'This function is used to get the pan level of the specified sound element.',
+    getPlayerWantedLevel: {
+        summary: 'This function gets a player\'s current wanted level. The wanted level is indicated by the amount of stars a player has on the GTA HUD.',
         parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which pan you want to get.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose wanted level you wish to get' },
         ],
-        returns: 'returns float value with range from -1.0 (left) to 1.0 (right), false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundPan',
+        returns: 'Returns an *int* from 0 to 6 representing the player\'s wanted level, *false* if the player does not exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerWantedLevel',
     },
-    getSoundPosition: {
-        summary: 'This function is used to return the current seek position of the specified sound element.\nIf the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element which seek position you want to return.' },
-        ],
-        returns: 'returns a float value indicating the seek position of the sound element in seconds.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundPosition',
-    },
-    getSoundProperties: {
-        summary: 'This function gets the properties of a specific sound.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D' },
-        ],
-        returns: 'this function returns 3 float|floats and a boolean value: the first float is the sounds http://en.wikipedia.org/wiki/sampling_rate sample rate, the second one the sounds http://en.wikipedia.org/wiki/tempo tempo, and the third one the http://en.wikipedia.org/wiki/pitch_%28music%29 pitch of the sound. the boolean representing whether the sound is reversed or not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundProperties',
-    },
-    getSoundSpeed: {
-        summary: 'This function is used to return the playback speed of the specified sound element.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which playback speed you want to return.' },
-        ],
-        returns: 'returns an float value indicating the playback speed of the sound element. default sound playback speed is 1.0.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundSpeed',
-    },
-    getSoundVolume: {
-        summary: 'This function is used to return the volume level of the specified sound element.\nIf the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which volume you want to return.' },
-        ],
-        returns: 'returns a float representing the volume level of the sound element, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundVolume',
-    },
-    getSoundWaveData: {
-        summary: 'This function gets the wave form data for an audio stream which is a table of floats\nrepresenting the current audio frame as a wave.\nThis allows things like visualisations.\nIf the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D. Streams are also supported' },
-            { name: 'iSamples', isOptional: false, isVariadic: false, summary: 'allowed samples are 256, 512, 1024, 2048, 4096, 8192 and 16384.' },
-        ],
-        returns: 'returns a table of isamples floats representing the current audio frame waveform. returns false if the sound is not playing yet or hasnt buffered in the case of streams.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundWaveData',
-    },
-    getSunColor: {
-        summary: 'This function is used to get the color of the sun.',
+    getPostFXMode: {
+        summary: 'Gets the current mode of PostFX.',
         parameters: [],
-        returns: 'returns the color of the sun as six numbers, false if its default.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSunColor',
+        returns: 'An integer for the current PostFX mode: * 0: Disabled * 1: Enabled in fullscreen mode * 2: Enabled in windowed/borderless mode',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPostFXMode',
     },
-    getSunSize: {
-        summary: 'This function is used to get the size of the sun.',
-        parameters: [],
-        returns: 'returns the size of the sun as a number, false if the size of the sun is at its default.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSunSize',
-    },
-    getTeamColor: {
-        summary: 'This function retrieves the color of a team.',
+    getPostFXValue: {
+        summary: 'Gets the current float value of the selected PostFX type.',
         parameters: [
-            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you want to get the color of.' },
+            { name: 'fxType', isOptional: false, isVariadic: false, summary: 'An string of the PostFX. Possible values are:' },
         ],
-        returns: 'returns 3 integers representing the red, green, and blue color components of the team if its valid, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamColor',
+        returns: 'Returns the current value of the specified PostFX parameter.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPostFXValue',
     },
-    getTeamFriendlyFire: {
-        summary: 'This function tells you if friendly fire is turned on for the specified team.',
-        parameters: [
-            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team object that will be checked' },
-        ],
-        returns: 'returns true if friendly fire is on for the specified team, false if it is turned off or if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamFriendlyFire',
-    },
-    getTeamFromName: {
-        summary: 'This function finds a team element using the provided team name.',
-        parameters: [
-            { name: 'teamName', isOptional: false, isVariadic: false, summary: 'A string determining the name of the team you wish to find.' },
-        ],
-        returns: 'returns the team element if it was found, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamFromName',
-    },
-    getTeamName: {
-        summary: 'This function gets the team name of a team object.',
-        parameters: [
-            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you want to retrieve the name of.' },
-        ],
-        returns: 'returns a string representing the teams name if the team object was valid, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTeamName',
-    },
-    getThisResource: {
-        summary: 'This function retrieves the resource from which the function call was made.',
-        parameters: [],
-        returns: 'returns the resource in which the current script is.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetThisResource',
-    },
-    getTickCount: {
-        summary: 'This function returns amount of time that your system has been running in milliseconds.\nBy comparing two values of getTickCount, you can determine how much time has passed (in\nmilliseconds) between two events. This could be used to determine how efficient your code\nis, or to time how long a player takes to complete a task.',
-        parameters: [],
-        returns: 'returns an integer containing the number of milliseconds since the system the server is running on started. this has the potential to wrap-around.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTickCount',
-    },
-    getTime: {
-        summary: 'This function is used to get the current time in the game. If you want to get the real\nserver time, use getRealTime.',
-        parameters: [],
-        returns: 'returns two ints that represent hours and minutes.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTime',
-    },
-    getTimerDetails: {
-        summary: 'This function is for getting the details of a running timer.',
-        parameters: [
-            { name: 'theTimer', isOptional: false, isVariadic: false, summary: 'A timer element.' },
-        ],
-        returns: '* integer one represents the time left in miliseconds (1000th of a second) of the current time left in the loop. * integer two represents the amount of times the timer has left to execute. * integer three represents the time interval of timer. * returns false if the timer doesnt exist or stopped running. also, debugscript will say bad argument @ gettimerdetails. to prevent this, you can check if the timer exists with istimer().',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTimerDetails',
-    },
-    getTimers: {
-        summary: 'This function returns a table of all active timers that the resource that calls it has\ncreated. Alternatively, only the timers with a remaining time less than or equal to a\ncertain value can be retrieved.',
-        parameters: [
-            { name: 'theTime', isOptional: true, isVariadic: false, summary: 'The maximum time left (in milliseconds) on the timers you wish to retrieve.' },
-        ],
-        returns: 'returns a table of all the active timers.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTimers',
-    },
-    gettok: {
-        summary: 'This function splits a string using the given separating character and returns one\nspecified substring.',
-        parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'the string that should be split.' },
-            { name: 'tokenNumber', isOptional: false, isVariadic: false, summary: 'which token should be returned (1 for the first, 2 for the second, and so on).' },
-            { name: 'separatingCharacter', isOptional: false, isVariadic: false, summary: 'the ASCII|ASCII number representing the character you want to use to separate the tokens. You can easily retrieve this by running string.byte on a string containing the separating character.' },
-        ],
-        returns: 'returns a string containing the token if it exists, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/Gettok',
-    },
-    getTrafficLightState: {
-        summary: 'Gets the current traffic light state. This state controls the traffic light colors. For\ninstance, state 1 will cause the north and south traffic lights to be amber, and the ones\nleft and east will turn red.',
-        parameters: [],
-        returns: 'returns the current traffic_light_states|state of the traffic lights.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrafficLightState',
-    },
-    getTrainDirection: {
-        summary: 'Gets the direction in which a train is driving (clockwise or counterclockwise).',
-        parameters: [
-            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train of which to get the driving direction.' },
-        ],
-        returns: 'returns true if the train is driving clockwise on the train track, false if it is going counterclockwise or a failure occured.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrainDirection',
-    },
-    getTrainPosition: {
-        summary: 'Gets the position the train is currently on the track',
-        parameters: [
-            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train to get the position of' },
-        ],
-        returns: 'returns a float that represents how along the track it is, false if there is problem with train element.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrainPosition',
-    },
-    getTrainSpeed: {
-        summary: 'Gets the speed at which a train is traveling on the rails.',
-        parameters: [
-            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train of which to retrieve the speed.' },
-        ],
-        returns: 'returns the trains speed if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTrainSpeed',
-    },
-    getTypeIndexFromClothes: {
-        summary: 'This function is used to get the clothes type and index from the texture and model.\n(Scans through the list of clothes for the specific type).',
-        parameters: [
-            { name: 'clothesTexture', isOptional: false, isVariadic: false, summary: ': A string determining the clothes texture that you wish to retrieve the type and index from. See the CJ Clothes|clothes catalog.' },
-            { name: 'clothesModel', isOptional: false, isVariadic: false, summary: ': A string determining the corresponding clothes model that you wish to retrieve the type and index from. See the CJ Clothes|clothes catalog.' },
-        ],
-        returns: 'this function returns two integers, type and index respectively, false if invalid arguments were passed to the function.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetTypeIndexFromClothes',
-    },
-    getUnbanTime: {
-        summary: 'This function will return the unbanning time of the specified ban in seconds.',
-        parameters: [
-            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban in which you wish to retrieve the unban time of.' },
-        ],
-        returns: '* returns an integer of the unbanning time in the format of seconds from the year 1970. use in conjunction with getrealtime in order to retrieve detailed information. * returns false if invalid arguments are specified or if there was no unbanning time specified for the ban.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetUnbanTime',
-    },
-    getUserdataType: {
+    getProcessMemoryStats: {
         summary: '',
-        parameters: [
-            { name: 'value', isOptional: false, isVariadic: false, summary: ': A userdata value to get the type of. Userdata types can be: Shared resource-data : a Resource|resource pointer. xml-node : a Xmlnode|XML node. lua-timer : a timer. vector2 : a 2D vector, used in the Vector/Vector2|Vector2 class. vector3 : a 3D vector, used in the Vector/Vector3|Vector3 class. vector4 : a 4D vector, used in the Vector/Vector4|Vector4 class. matrix : a matrix, used in the Matrix class. request : a userdata type returned via fetchRemote (since https://buildinfo.mtasa.com/?Revision=21436&Branch= r21436) userdata : a fallback userdata type return value, when no other type could be found for the object. Server only account : a Account|player account. db-query : a dbQuery|database query handle. acl : an ACL|ACL entry. acl-group : an Aclgroup|ACL group. ban : a Ban|player ban. text-item : a Textitem|text display item. text-display : a Textdisplay|text display item. Source code commit: https://github.com/multitheftauto/mtasa-blue/commit/df8576fc3f80fa2d7a73e70a68e8f116b591cb 68#diff-09a3546021ff952dc0f94a99aae11356R297 weapon : a Weapon|custom weapon.' },
-        ],
-        returns: 'returns a string containing the specified userdatas type, or false plus an error message if the given value is not userdata.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetUserdataType',
-    },
-    getValidPedModels: {
-        summary: 'This function returns all valid ped models.',
         parameters: [],
-        returns: 'returns a table with all valid ped models.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetValidPedModels',
+        returns: 'Returns a table if successful, otherwise returns **nil** {| class="wikitable" style="cellpadding: 10px;" |- ! Property || Description |- | virtual || total program size |- | resident || resident set size (memory in physical space/ram, also known as *working set*) |- | shared || size of resident shared memory (shared with other processes) |- | private || size of resident private memory (only for this process) |} **Note:** Resident set size should be roughly shared + private from the table.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetProcessMemoryStats',
     },
-    getVehicleAdjustableProperty: {
-        summary: 'Use this to get the value of a vehicles adjustable property. This property relates to\nmovable parts of a model, for example hydra jets or dump truck tray.',
+    getProjectileCounter: {
+        summary: 'Get the time left before a projectile detonates.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you want to get the adjustable property of.' },
+            { name: 'projectile', isOptional: false, isVariadic: false, summary: 'the projectile to get the timer of.' },
         ],
-        returns: 'returns a value from 0 upwards representing adjustment. 0 is default position. maximum varies per vehicle, for example hydra horizontal flight is 5000, while dump truck tray max tilt is 2500. or returns false if the vehicle passed to the function is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleAdjustableProperty',
+        returns: 'Returns the the time in milliseconds to detonation which depending on the projectile type will do different things: * Grenades will explode when it hits 0 * Teargas may be a duration timer * Both types of rockets will explode when it hits 0 * Satchels restarts so I do not think it does anything',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileCounter',
     },
-    getVehicleColor: {
-        summary: 'This function returns the color of the specified vehicle. A vehicle can have up to four\ncolors.',
+    getProjectileCreator: {
+        summary: 'This function returns the creator of the specified projectile.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the color of.' },
-            { name: 'bRGB', isOptional: false, isVariadic: false, summary: 'A boolean specifying whether to return RGB values. A setting of false will result in the function returning color ids instead.' },
+            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectile element which creator you want to retrieve.' },
         ],
-        returns: '*returns 12 int|ints (if brgb is true) indicating the red, green and blue components of each of the 4 vehicle colors. *returns 4 int|ints (if brgb is false) indicating the color ids of each of the 4 vehicle colors. *returns false if the vehicle doesnt exist. valid color ids if brgb is set to false:',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleColor',
+        returns: 'Returns the element which created the projectile if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileCreator',
     },
-    getVehicleCompatibleUpgrades: {
-        summary: 'This function returns a table of all the compatible upgrades (or all for a specified\nslot, optionally) for a specified vehicle.',
+    getProjectileForce: {
+        summary: 'This function returns the force of the specified projectile.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle you wish to retrieve the list of compatible upgrades of.' },
-            { name: 'slot', isOptional: true, isVariadic: false, summary: 'the upgrade slot number for which youre getting the list (from 0 to 16). Compatible upgrades for all slots are listed if this is not specified.' },
+            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectile element which force you want to retrieve.' },
         ],
-        returns: 'returns a table with all the compatible upgrades, or false if invalid arguments are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleCompatibleUpgrades',
+        returns: 'Returns a float if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileForce',
     },
-    getVehicleComponentPosition: {
-        summary: 'This function gets the component position of a vehicle. The vehicle must be streamed in.',
+    getProjectileTarget: {
+        summary: 'This function returns the target of the specified projectile.',
         parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get component position of.' },
-            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A Vehicle_Components|vehicle component (this is the frame name from the model file of the component you wish to modify)' },
-            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the returned position is relative to. It can be one of the following values: parent The position is relative to the parent component. root The position is relative to the root component. world The position is a world position.' },
+            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectile element which target you want to retrieve.' },
         ],
-        returns: 'returns three floats indicating the position of the component, x, y and z respectively.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleComponentPosition',
+        returns: 'Returns the element which is the projectile\'s target if the projectile is valid and can have a target (like a heat-seeking rocket), *false* otherwise. If the projectile is a satchel charge, returns the element at which it is glued to (or *nil* if it isn\'t glued to any).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileTarget',
+    },
+    getProjectileType: {
+        summary: 'This function returns the type of the specified projectile.',
+        parameters: [
+            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectile element which type you want to retrieve.' },
+        ],
+        returns: 'Returns an integer over the type of the projectile or *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileType',
+    },
+    getRadarAreaColor: {
+        summary: 'This function can be used to retrieve the current color of a radar area.',
+        parameters: [
+            { name: 'theRadararea', isOptional: false, isVariadic: false, summary: 'The radar area you wish to retrieve the colour of.' },
+        ],
+        returns: 'Returns four integers in RGBA format (*red*, *green*, *blue*, *alpha*), with a maximum value of 255 for each. Alpha decides transparency where 255 is opaque and 0 is transparent. Returns *false* if the radararea is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadarAreaColor',
+    },
+    getRadarAreaSize: {
+        summary: 'This function is used for getting the X and Y size of an existing radar area.',
+        parameters: [
+            { name: 'theRadararea', isOptional: false, isVariadic: false, summary: 'The radar area element whose size you wish to get.' },
+        ],
+        returns: 'Returns two *floats* indicating the X and Y length of the radar area respectively, *false* if the radar area is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadarAreaSize',
+    },
+    getRadioChannel: {
+        summary: 'The function is used to retrieve the ID of the current radio channel.',
+        parameters: [],
+        returns: 'Returns the ID of the radio channel.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadioChannel',
+    },
+    getRadioChannelName: {
+        summary: 'This function gets the given radio channel name.',
+        parameters: [
+            { name: 'id', isOptional: false, isVariadic: false, summary: 'The ID of the radio station you want to get the name of. It is a number from 0 to 12.' },
+        ],
+        returns: 'Returns a string containing the station name if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadioChannelName',
+    },
+    getRainLevel: {
+        summary: 'This function is used to get the current rain level.',
+        parameters: [],
+        returns: 'Returns the rain level as a number.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRainLevel',
+    },
+    getRandomPlayer: {
+        summary: 'This function returns a random player.',
+        parameters: [],
+        returns: 'Returns a random player, *false* if the server is empty.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRandomPlayer',
+    },
+    getRealTime: {
+        summary: 'This function gets the server or client (if used client sided it returns time as set on client\'s computer) real time and returns it in a table. If you want to get the in-game time (shown on GTA\'s clock) use getTime.',
+        parameters: [
+            { name: 'seconds', isOptional: true, isVariadic: false, summary: 'A count in seconds from the year 1970. Useful for storing points in time, or for retrieving time information for getBanTime. The valid range of this argument is 0 to 32,000,000,000' },
+            { name: 'localTime', isOptional: true, isVariadic: false, summary: 'Set to *true* to adjust for the locally set timezone.' },
+        ],
+        returns: 'Returns a *table* of substrings with different time format or *false* if the **seconds** argument is out of range. {| border="2" cellpadding="2" cellspacing="0" style="margin: 1em 1em 1em 0; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse; font-size: 95%;" |**Member** |**Meaning** |**Range** |- |second |seconds after the minute |0-61* |- |minute |minutes after the hour |0-59 |- |hour |hours since midnight |0-23 |- |monthday |day of the month |1-31 |- |month |months since January |0-11 |- |year |years since 1900 |- |weekday |days since Sunday |0-6 |- |yearday |days since January 1 |0-365 |- |isdst |Daylight Saving Time flag |- |timestamp |seconds since 1970 (Ignoring set timezone) | |} ** second* is generally 0-59. Extra range to accommodate for leap seconds in certain systems.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRealTime',
+    },
+    getRemoteRequestInfo: {
+        summary: 'Gets informations of an fetchRemote or callRemote request info.',
+        parameters: [
+            { name: 'theRequest', isOptional: false, isVariadic: false, summary: 'returned from fetchRemote, callRemote or getRemoteRequests' },
+            { name: 'postDataLength', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'includeHeaders', isOptional: true, isVariadic: false, summary: '' },
+        ],
+        returns: 'Returns a table when valid, false otherwise The table contains: ***bytesReceived:** A number specifying the amount of data received so far. Zero means the download is queued ***bytesTotal:** A number specifying the final download size. Will be zero if the remote HTTP server has not set the \'Content-Length\' header ***currentAttempt:** A number specifying the current connection attempt ***type:** A string specifying either "fetch" or "call" ***url:** A string specifying the URL ***resource:** The resource which started the request, or false if the resource has since been stopped/restarted ***queue:** A string specifying the queue name ***method:** A string specifying the HTTP method. e.g. "GET" or "POST" ***connectionAttempts:** A number specifying max number connection attempts as declared in the fetchRemote call ***connectionTimeout:** A number specifying connection attempt timeout as declared in the fetchRemote call ***postData:** A string containing the request post data as declared in the fetchRemote call ***headers:** A table containing the request HTTP headers as declared in the fetchRemote call',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRemoteRequestInfo',
+    },
+    getRemoteRequests: {
+        summary: 'Gets all fetchRemote and callRemote requests currently running.',
+        parameters: [
+            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'the resource to get all requests from' },
+        ],
+        returns: 'Returns a table with all requests, false if an invalid resource was provided',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetRemoteRequests',
+    },
+    getResourceACLRequests: {
+        summary: 'This function retrieves the ACL request section from the meta.xml file of the given resource.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource to get the ACL requests for.' },
+        ],
+        returns: 'Returns a *table* with the ACL requests for the given resource, or *false* if the resource is not valid. A valid resource with no ACL requests will return an empty table.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceACLRequests',
+    },
+    getResourceConfig: {
+        summary: 'This function is used to return the root node of a configuration file. Config files must be predefined in a resource\'s meta file.  An alternative way to load XML files is to use xmlLoadFile.',
+        parameters: [
+            { name: 'filePath', isOptional: false, isVariadic: false, summary: 'The filepath of the file in the following format: **":resourceName/path"**. \'resourceName\' is the name of the resource the file is in, and \'path\' is the path from the root directory of the resource to the file.' },
+        ],
+        returns: 'Returns the root node of the specified configuration file. If the file is corrupted, not defined in the meta file or doesn\'t exist, returns false.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceConfig',
+    },
+    getResourceDynamicElementRoot: {
+        summary: 'This function retrieves the *dynamic element root* of a specified resource. The *dynamic element root* is the parent of elements that are created by scripts (e.g. with createObject) unless they specify a different parent.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource of which dynamic element root we want.' },
+        ],
+        returns: 'Returns an element of the resource\'s dynamic element root if the resource specified was valid and active (currently running), *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceDynamicElementRoot',
+    },
+    getResourceExportedFunctions: {
+        summary: 'Returns a table containing the names of the functions that a resource exports. It will return the exports of the current resource if there is no argument passed in.',
+        parameters: [
+            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'the resource of which you want to know the exported functions.' },
+        ],
+        returns: 'Returns a table of function names if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceExportedFunctions',
+    },
+    getResourceFromName: {
+        summary: 'This function is used to retrieve a resource from its name. A resource\'s name is the same as its folder or file archive name on the server (without the extension).',
+        parameters: [
+            { name: 'resourceName', isOptional: false, isVariadic: false, summary: 'the name of the resource you wish to get.' },
+        ],
+        returns: 'Returns the resource with the specified name, or *false* if no resource of that name exists. Note that clientside this will also return *false* for resources that are in the *loaded* state, since the client is unaware of resources that have not been started.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceFromName',
+    },
+    getResourceGUIElement: {
+        summary: 'This function retrieves a resource\'s GUI element. The resource\'s GUI element is the element in the element tree which is the default parent of all GUI elements that belong to a particular resource. It has a predefined variable called **guiRoot**, and each resource has one of these. You can attach event handlers to this element to easily capture events that originate from your resource (and global events that originate from the root element).',
+        parameters: [
+            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'the resource whose GUI element we are getting. If not specified, assumes the current resource.' },
+        ],
+        returns: 'Returns the root GUI element that contains all the other GUI elements.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceGUIElement',
+    },
+    getResourceInfo: {
+        summary: 'This function retrieves the value of any attribute in a resource info tag.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource we are getting the info from.' },
+            { name: 'attribute', isOptional: false, isVariadic: false, summary: 'the name of the attribute we want info about.' },
+        ],
+        returns: 'Returns a *string* with the attribute value if it exists, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceInfo',
+    },
+    getResourceLastStartTime: {
+        summary: 'Used to check the last starting time and date of a resource',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The resource of which you\'d like to check the last starting time.' },
+        ],
+        returns: 'If successful, returns the UNIX timestamp when the resource was last started, or the string "never" if the resource has not been started yet, otherwise false. Use in conjunction with getRealTime in order to retrieve detailed information.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceLastStartTime',
+    },
+    getResourceLoadFailureReason: {
+        summary: 'This function retrieves the reason why a resource failed to start.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The resource you wish to check.' },
+        ],
+        returns: 'If the resource failed to load, returns a string with the failure reason in it. If it loaded successfully, returns an empty string. Returns *false* if the resource doesn\'t exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceLoadFailureReason',
+    },
+    getResourceLoadTime: {
+        summary: 'Gets the date and time at which a resource was last loaded in the server.',
+        parameters: [
+            { name: 'res', isOptional: false, isVariadic: false, summary: 'the resource you want to know the load time of.' },
+        ],
+        returns: 'If successful, returns the UNIX timestamp when the resource was loaded, otherwise false. Use in conjunction with getRealTime in order to retrieve detailed information.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceLoadTime',
+    },
+    getResourceMapRootElement: {
+        summary: 'This function retrieves the root element of a certain map in a specified resource.',
+        parameters: [
+            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource where the map is located' },
+            { name: 'mapName', isOptional: false, isVariadic: false, summary: 'name of the maps which root element we want to retrieve, file extension is required' },
+        ],
+        returns: 'Returns an the resource\'s map root element if the map exists and resource specified was valid and active (currently running), *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceMapRootElement',
+    },
+    getResourceName: {
+        summary: 'This function gets the name of the specified resource.\n\nSpecifying the resource parameter is not mandatory now, in this case this resource is used as a basis',
+        parameters: [
+            { name: 'res', isOptional: true, isVariadic: false, summary: 'The resource you wish to get the name of.' },
+        ],
+        returns: 'Returns a string with the resource name in it, or *false* if the resource does not exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceName',
     },
 };

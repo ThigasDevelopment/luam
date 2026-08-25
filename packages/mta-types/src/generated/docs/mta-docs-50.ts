@@ -1,220 +1,239 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_50: ApiDocumentationCatalog = {
-    utfChar: {
-        summary: 'The function returns the string of the specified UTF code.',
+    setVehicleRespawnPosition: {
+        summary: 'This function sets the position (and rotation) the vehicle will respawn to.',
         parameters: [
-            { name: 'characterCode', isOptional: false, isVariadic: false, summary: 'The UTF code, to get the string of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to change the respawn position of.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'A floating point number representing the X coordinate on the map.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Y coordinate on the map.' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'A floating point number representing the Z coordinate on the map.' },
+            { name: 'rx', isOptional: true, isVariadic: false, summary: 'A floating point number representing the rotation about the X axis in Degrees.' },
+            { name: 'ry', isOptional: true, isVariadic: false, summary: 'A floating point number representing the rotation about the Y axis in Degrees.' },
+            { name: 'rz', isOptional: true, isVariadic: false, summary: 'A floating point number representing the rotation about the Z axis in Degrees.' },
         ],
-        returns: 'returns a string if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/UtfChar',
+        returns: 'Returns *true* if the vehicle was found and edited, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleRespawnPosition',
     },
-    utfCode: {
-        summary: 'The function returns the UTF codes of the given string.',
+    setVehicleRespawnRotation: {
+        summary: 'This function sets the rotation the vehicle will respawn to.',
         parameters: [
-            { name: 'theString', isOptional: false, isVariadic: false, summary: 'The string to get the UTF code of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to change the respawn position of.' },
+            { name: 'rx', isOptional: false, isVariadic: false, summary: 'A float representing the rotation about the X axis in degrees.' },
+            { name: 'ry', isOptional: false, isVariadic: false, summary: 'A float representing the rotation about the Y axis in degrees.' },
+            { name: 'rz', isOptional: false, isVariadic: false, summary: 'A float representing the rotation about the Z axis in degrees.' },
         ],
-        returns: 'returns an int if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/UtfCode',
+        returns: 'Returns *true* if the vehicle respawn rotation was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleRespawnRotation',
     },
-    utfLen: {
-        summary: 'The function gets the real length of a string, in characters.',
+    setVehicleRotorSpeed: {
+        summary: 'Sets the rotor speed of a helicopter or plane. This function now applies to both helicopters and planes.',
         parameters: [
-            { name: 'theString', isOptional: false, isVariadic: false, summary: 'The string to get the length of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle (helicopter or plane) to adjust the rotor of.' },
+            { name: 'speed', isOptional: false, isVariadic: false, summary: 'the new rotor speed. Usual values are 0 if the vehicle is stationary, or 0.2 if the rotor is fully spun up. Higher values than normal will not affect the vehicle\'s handling. Negative values are allowed and will make the rotor spin in the opposite direction (for helicopters, this pushes it down).' },
         ],
-        returns: 'returns an int if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/UtfLen',
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleRotorSpeed',
     },
-    utfSeek: {
-        summary: 'The function returns the byte position at specified character position.',
+    setVehicleRotorState: {
+        summary: 'Turns the rotor on/off for an plane or helicopter. A vehicle with the rotor turned off cannot hover in the air.',
         parameters: [
-            { name: 'theString', isOptional: false, isVariadic: false, summary: 'The string.' },
-            { name: 'position', isOptional: false, isVariadic: false, summary: 'An int with the specified charachter position.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle (helicopter or plane) whose rotor you want to toggle.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'The rotor state, which determines whether it should be on (**true**) or off (**false**).' },
+            { name: 'stopRotor', isOptional: true, isVariadic: false, summary: 'Specifies whether the rotor should be stopped after being turned off. If false, the rotor will continue spinning at a constant speed (it won\'t slow down or accelerate). It will also not be able to lift off the ground. You can also use setVehicleRotorSpeed to manage the rotor speed.' },
         ],
-        returns: 'returns an int if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/UtfSeek',
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleRotorState',
     },
-    utfSub: {
-        summary: 'The function returns a sub string, from the specified positions on a character.',
+    setVehicleSirens: {
+        summary: 'This function changes the properties of a vehicles siren point.',
         parameters: [
-            { name: 'theString', isOptional: false, isVariadic: false, summary: 'The string.' },
-            { name: 'Start', isOptional: false, isVariadic: false, summary: 'An int with the start position.' },
-            { name: 'End', isOptional: false, isVariadic: false, summary: 'An int with the end position.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to modify' },
+            { name: 'sirenPoint', isOptional: false, isVariadic: false, summary: 'The siren point to modify' },
+            { name: 'posX', isOptional: false, isVariadic: false, summary: 'The x position of this siren point from the center of the vehicle' },
+            { name: 'posY', isOptional: false, isVariadic: false, summary: 'The y position of this siren point from the center of the vehicle' },
+            { name: 'posZ', isOptional: false, isVariadic: false, summary: 'The z position of this siren point from the center of the vehicle' },
+            { name: 'red', isOptional: false, isVariadic: false, summary: 'The amount of red from 0 to 255' },
+            { name: 'green', isOptional: false, isVariadic: false, summary: 'The amount of green from 0 to 255' },
+            { name: 'blue', isOptional: false, isVariadic: false, summary: 'The amount of blue from 0 to 255' },
+            { name: 'alpha', isOptional: true, isVariadic: false, summary: 'The alpha of the siren from 0 to 255' },
+            { name: 'minAlpha', isOptional: true, isVariadic: false, summary: 'The minimum alpha of the light during day time' },
         ],
-        returns: 'returns a string if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/UtfSub',
+        returns: 'Returns *true* if the siren point was successfully changed on the vehicle, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleSirens',
     },
-    warpPedIntoVehicle: {
-        summary: 'This function is used to warp or force a ped into a vehicle.  There are no animations\ninvolved when this happens.\nAvailable client side from 1.3.1 (It will only work with client side vehicles and peds)',
+    setVehicleSirensOn: {
+        summary: 'This function changes the state of the sirens on the specified vehicle.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped which you wish to force inside the vehicle' },
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to force the ped into' },
-            { name: 'seat', isOptional: true, isVariadic: false, summary: 'An integer representing the seat ID. 0 Front-left 1 Front-right 2 Rear-left 3 Rear-right' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that will have the sirens set' },
+            { name: 'sirensOn', isOptional: false, isVariadic: false, summary: 'The state to set the sirens to' },
         ],
-        returns: 'returns true if the operation is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/WarpPedIntoVehicle',
+        returns: 'Returns *true* if the sirens are set for the specified vehicle, *false* if the sirens can\'t be set for the specified vehicle, if the vehicle doesn\'t have sirens or if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleSirensOn',
     },
-    wasEventCancelled: {
-        summary: 'This function checks if the last completed event was cancelled. This is mainly useful for\ncustom events created by scripts.\nEvents can be cancelled using cancelEvent, this indicates that the resource which\ntriggered the event should do whatever it can to reverse any changes made by whatever\ncaused the event. See triggerEvent for a more detailed explanation of this.',
-        parameters: [],
-        returns: 'returns true if the event was cancelled, false if it wasnt or doesnt exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/WasEventCancelled',
-    },
-    xmlCopyFile: {
-        summary: 'This function copies all contents of a certain node in a XML document to a new document\nfile, so the copied node becomes the new files root node.\nThe new file will not be saved to file system until xmlSaveFile() is called',
+    setVehiclesLODDistance: {
+        summary: 'Sets the distance of vehicles LOD.',
         parameters: [
-            { name: 'nodeToCopy', isOptional: false, isVariadic: false, summary: 'the xmlnode that is to be copied to a new document.' },
-            { name: 'newFilePath', isOptional: false, isVariadic: false, summary: 'the path of the file that is to be created, in the following format: :resourceName/path. resourceName is the name of the resource the file is in, and path is the path from the root directory of the resource to the file. :For example, to create a file named \'newfile.xml\' with myNode as the root node in the resource \'ctf\', it can be done from another resource this way: \'\'xmlCopyFile(myNode, ":ctf/newfile.xml")\'\'. :If the file is to be in the current resource, only the file path is necessary, e.g. \'\'xmlCopyFile(myNode, "newfile.xml")\'\'.' },
+            { name: 'vehiclesDistance', isOptional: false, isVariadic: false, summary: 'general distance used for most vehicles, this value is clamped to 0 – 500' },
+            { name: 'trainsAndPlanesDistance', isOptional: true, isVariadic: false, summary: 'distance used for trains and planes, this value is clamped to 0 – 500' },
         ],
-        returns: 'returns the xmlnode of the copy if the node was successfully copied, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlCopyFile',
+        returns: 'This function returns *true* if arguments are valid. Returns *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehiclesLODDistance',
     },
-    xmlCreateChild: {
-        summary: 'This function creates a new child node under an XML node.',
-        parameters: [
-            { name: 'parentNode', isOptional: false, isVariadic: false, summary: 'the xmlnode you want to create a new child node under.' },
-            { name: 'tagName', isOptional: false, isVariadic: false, summary: 'the type of the child node that will be created.' },
-        ],
-        returns: 'returns the created xmlnode if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlCreateChild',
-    },
-    xmlCreateFile: {
-        summary: 'This function creates a new XML document, which can later be saved to a file by using\nxmlSaveFile. This function will overwrite the file specified if it already exists.',
-        parameters: [
-            { name: 'filePath', isOptional: false, isVariadic: false, summary: 'The filepath of the file in the following format: :resourceName/path. resourceName is the name of the resource the file will be in, and path is the path from the root directory of the resource to the file. :For example, if you want to create a file named \'new.xml\' in the resource \'ctf\', it can be created from another resource this way: \'\'xmlCreateFile(":ctf/new.xml", "newroot")\'\'. :If the file is in the current resource, only the file path is necessary, e.g. \'\'xmlCreateFile("new.xml", "newroot")\'\'. :Note that if a different resource than default is being accessed, the caller resource needs access to general.ModifyOtherObjects in the ACL.' },
-            { name: 'rootNodeName', isOptional: false, isVariadic: false, summary: 'the name of the root node in the XML document.' },
-        ],
-        returns: 'returns the root xmlnode object of the new xml file if successful, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlCreateFile',
-    },
-    xmlDestroyNode: {
-        summary: 'This function destroys a XML node from the XML node tree.',
-        parameters: [
-            { name: 'theXMLNode', isOptional: false, isVariadic: false, summary: 'The xml node you want to destroy.' },
-        ],
-        returns: 'returns true if the xml node was successfully destroyed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlDestroyNode',
-    },
-    xmlFindChild: {
-        summary: 'This function returns a named child node of an XML node.',
-        parameters: [
-            { name: 'parent', isOptional: false, isVariadic: false, summary: ': This is an xmlnode that you want to find the child node under.' },
-            { name: 'tagName', isOptional: false, isVariadic: false, summary: ': This is the name of the child node you wish to find (case-sensitive).' },
-            { name: 'index', isOptional: false, isVariadic: false, summary: ': This is the 0-based index of the node you wish to find. For example, to find the 5th subnode with a particular name, you would use 4 as the index value. To find the first occurence, use 0.' },
-        ],
-        returns: 'returns an xmlnode if the node was found, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlFindChild',
-    },
-    xmlLoadFile: {
-        summary: 'This function provides an alternative way to load XML files to getResourceConfig.\nThis function loads an XML file and returns the node by specifying a specific file path,\nwhile getResourceConfig allows for loading an XML file from a resource.',
-        parameters: [
-            { name: 'filePath', isOptional: false, isVariadic: false, summary: 'The filepath of the file in the following format: :resourceName/path. resourceName is the name of the resource the file is in, and path is the path from the root directory of the resource to the file. :For example, if there is a file named \'settings.xml\' in the resource \'ctf\', it can be accessed from another resource this way: \'\'xmlLoadFile(":ctf/settings.xml")\'\'. :If the file is in the current resource, only the file path is necessary, e.g. \'\'xmlLoadFile("settings.xml")\'\'.' },
-            { name: 'readOnly', isOptional: true, isVariadic: false, summary: 'By default, the XML file is opened with reading and writing access. You can specify true for this parameter if you only need reading access.' },
-        ],
-        returns: 'returns the root xmlnode object of an xml file if successful, or false otherwise. print error if something wrong with xml. |7485',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlLoadFile',
-    },
-    xmlLoadString: {
+    setVehicleSmokeTrailEnabled: {
         summary: '',
         parameters: [
-            { name: 'xmlString', isOptional: false, isVariadic: false, summary: 'A string containing XML data' },
+            { name: 'veh', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the smoke trail.' },
+            { name: 'enable', isOptional: false, isVariadic: false, summary: 'A boolean if set to true it will enabled the smoke trail.' },
         ],
-        returns: 'returns the root xmlnode object of an xml string if successful, or false otherwise (invalid xml string).',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlLoadString',
+        returns: 'If successful returns *true*, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleSmokeTrailEnabled',
     },
-    xmlNodeGetAttribute: {
-        summary: 'This function is used to return an attribute of a node in a configuration file.',
+    setVehicleTaxiLightOn: {
+        summary: 'This function will set the taxi light on in a taxi (vehicle ID\'s 420 and 438)',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'The node from which you wish to return the attribute' },
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'The name of the attribute.' },
+            { name: 'taxi', isOptional: false, isVariadic: false, summary: 'The vehicle element of the taxi that you wish to turn the light on.' },
+            { name: 'LightState', isOptional: false, isVariadic: false, summary: 'whether the light is on. *True* for on, *False* for off.' },
         ],
-        returns: 'returns the attribute in string form or false, if the attribute is not defined.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetAttribute',
+        returns: 'Returns *true* if the state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleTaxiLightOn',
     },
-    xmlNodeGetAttributes: {
-        summary: 'Returns all the attributes of a specific XML node.',
+    setVehicleTurnVelocity: {
+        summary: 'Sets the angular velocity of a vehicle. Basically applies a spin to it.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'the XML node to get the attributes of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to apply the spin to.' },
+            { name: 'rx', isOptional: false, isVariadic: false, summary: 'velocity around the X axis' },
+            { name: 'ry', isOptional: false, isVariadic: false, summary: 'velocity around the Y axis' },
+            { name: 'rz', isOptional: false, isVariadic: false, summary: 'velocity around the Z axis' },
         ],
-        returns: 'if successful, returns a table with as keys the names of the attributes and as values the corresponding attribute values. if the node has no attributes, returns an empty table. in case of failure, returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetAttributes',
+        returns: 'returns true if it was succesful, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleTurnVelocity',
     },
-    xmlNodeGetChildren: {
-        summary: 'This function returns all children of a particular XML node, or a particular child node.',
+    setVehicleTurretPosition: {
+        summary: 'This function sets the position of a vehicle\'s turret, if it has one. This can be used to influence the turret\'s rotation, so it doesn\'t follow the camera. Vehicles with turrets include firetrucks and tanks.',
         parameters: [
-            { name: 'parent', isOptional: false, isVariadic: false, summary: 'This is the xmlnode you want to retrieve one or all child nodes of.' },
-            { name: 'index', isOptional: true, isVariadic: false, summary: 'If you only want to retrieve one particular child node, specify its (0-based) index here. For example if you only want the first node, specify 0; the fifth node has index 4, etc.' },
+            { name: 'turretVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle whose turret position you want to retrieve. This should be a vehicle with a turret.' },
+            { name: 'positionX', isOptional: false, isVariadic: false, summary: 'The horizontal position of the turret. In radians' },
+            { name: 'positionY', isOptional: false, isVariadic: false, summary: 'The vertical position of the turret. In radians' },
         ],
-        returns: 'if index isnt specified, returns a table containing all child nodes. if index is specified, returns the corresponding child node if it exists. if no nodes are found, it returns an empty table. returns false in case of failure.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetChildren',
+        returns: 'Returns a *true* if a valid vehicle element and valid positions were passed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleTurretPosition',
     },
-    xmlNodeGetName: {
-        summary: 'Gets the tag name of the specified XML node.',
+    setVehicleVariant: {
+        summary: 'This function sets the variant of a specified vehicle. In GTA: San Andreas some vehicles are different; for example the labelling on trucks or the contents of a pick-up truck and the varying types of a motor bike. For the default variant list see: Vehicle variants.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'the node to get the tag name of.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the variant.' },
+            { name: 'variant1', isOptional: true, isVariadic: false, summary: 'An integer for the first variant. See Vehicle variants.' },
+            { name: 'variant2', isOptional: true, isVariadic: false, summary: 'An integer for the second variant. See Vehicle variants.' },
         ],
-        returns: 'returns the tag name of the node if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetName',
+        returns: 'Returns *true* if the vehicle variants were successfully set, *false* otherwise (the specified vehicle doesn\'t exist or the specified variants are invalid).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleVariant',
     },
-    xmlNodeGetParent: {
-        summary: 'Returns the parent node of an xml node.',
+    setVehicleWheelScale: {
+        summary: 'This function sets the scale of all the wheels of a vehicle. The wheel scale multiplies the visible height and length (but not width) of all the wheels in a vehicle, without affecting their collisions or the handling, similarly to setVehicleComponentScale. The wheel scale is applied after the model wheel size.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'the node of which you want to know the parent.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle whose wheel scale you wish to modify.' },
+            { name: 'wheelScale', isOptional: false, isVariadic: false, summary: 'The wheel scale value to set.' },
         ],
-        returns: 'returns the parent node of the specified node if successful. returns false if the specified node is the root node or an invalid node was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetParent',
+        returns: 'Returns *true* if the wheel scale has been set successfully, or an error if some parameter is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleWheelScale',
     },
-    xmlNodeGetValue: {
-        summary: 'This function is made to be able to read tag values in XML files (eg.\nanything).',
+    setVehicleWheelsRotation: {
+        summary: 'This function is used to manipulate the wheel rotation of a vehicle. Cars, Bikes (including BMX) and Trailers are supported.',
         parameters: [
-            { name: 'theXMLNode', isOptional: false, isVariadic: false, summary: 'The xml node of which you need to know the value.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle whose wheel rotation is to be set.' },
+            { name: 'rotation', isOptional: false, isVariadic: false, summary: 'the new wheel rotation value.' },
         ],
-        returns: 'returns the value of the node as a string if it was received successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetValue',
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleWheelsRotation',
     },
-    xmlNodeSetAttribute: {
-        summary: 'This function is used to edit an attribute of a node in a configuration file.',
+    setVehicleWheelStates: {
+        summary: 'This function sets the state of wheels on the vehicle.\n\nInternally, no vehicles have more than 4 wheels. If they appear to, they will be duplicating other wheels.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'The node of which you wish to edit an attribute.' },
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'The name of the attribute.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value which you wish to change the attribute to. (Note: nil will delete the attribute)' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A handle to the vehicle that you wish to change the wheel states of.' },
+            { name: 'frontLeft', isOptional: false, isVariadic: false, summary: 'A whole number representing the wheel state (-1 for no change)' },
+            { name: 'rearLeft', isOptional: true, isVariadic: false, summary: 'A whole number representing the wheel state (-1 for no change)' },
+            { name: 'frontRight', isOptional: true, isVariadic: false, summary: 'A whole number representing the wheel state (-1 for no change)' },
+            { name: 'rearRight', isOptional: true, isVariadic: false, summary: 'A whole number representing the wheel state (-1 for no change)' },
         ],
-        returns: 'returns true if the attribute was set successfully, false if the node and/or attribute do not exist, or if theyre faulty.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeSetAttribute',
+        returns: 'Returns a boolean value *true* or *false* that tells you if it was successful or not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleWheelStates',
     },
-    xmlNodeSetName: {
-        summary: 'Sets the tag name of the specified XML node.',
+    setVehicleWindowOpen: {
+        summary: 'This function sets the vehicle window state.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'the node to change the tag name of.' },
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'the new tag name to set.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to change the window state.' },
+            { name: 'window', isOptional: false, isVariadic: false, summary: 'An integer representing window.' },
+            { name: 'open', isOptional: false, isVariadic: false, summary: 'Boolean which represent window open state.' },
         ],
-        returns: 'returns true if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeSetName',
+        returns: '* when the vehicle is not streamed in: ** if the window ID does lie within the acceptable list of values, it will return **true** ** if the window ID does *not* lie within the acceptable list of values, it will return **false** * when the vehicle is streamed in: ** if the vehicle has the window, it will return **true** ** if the vehicle does not have the window, it will return **false**',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleWindowOpen',
     },
-    xmlNodeSetValue: {
-        summary: 'This function is made to be able to assign values to tags in XML files (eg.\nanything).',
+    setVolumetricShadowsEnabled: {
+        summary: '',
         parameters: [
-            { name: 'theXMLNode', isOptional: false, isVariadic: false, summary: 'The xml node you want to set the value of.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The string value you want the node to have.' },
-            { name: 'setCDATA', isOptional: true, isVariadic: false, summary: 'A boolean indicating if you want the value to be enclosed inside CDATA tags.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'if set true it will enable the volumetric shadows, false otherwise.' },
         ],
-        returns: 'returns true if value was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeSetValue',
+        returns: 'Always returns *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVolumetricShadowsEnabled',
     },
-    xmlSaveFile: {
-        summary: 'This function saves a loaded XML file.',
+    setWaterColor: {
+        summary: 'This function changes the water color of the GTA world.',
         parameters: [
-            { name: 'rootNode', isOptional: false, isVariadic: false, summary: 'the root xmlnode of the loaded XML file.' },
+            { name: 'red', isOptional: false, isVariadic: false, summary: 'The *red* value of the water, from 0 to 255.' },
+            { name: 'green', isOptional: false, isVariadic: false, summary: 'The *green* value of the water, from 0 to 255.' },
+            { name: 'blue', isOptional: false, isVariadic: false, summary: 'The *blue* value of the water, from 0 to 255.' },
+            { name: 'alpha', isOptional: true, isVariadic: false, summary: 'The *alpha* (visibility) value of the water, from 0 to 255. Defaults to 200 if not declared.' },
         ],
-        returns: 'returns true if save was successful, false if the xml file does not exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlSaveFile',
+        returns: 'Returns *true* if water color was set correctly, *false* if invalid values were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWaterColor',
     },
-    xmlUnloadFile: {
-        summary: 'Unloads an XML document from memory.',
+    setWaterDrawnLast: {
+        summary: 'This function changes the water rendering order.',
         parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'root of the XML document to unload' },
+            { name: 'bEnabled', isOptional: false, isVariadic: false, summary: 'A boolean value determining whether water should be drawn last.' },
         ],
-        returns: 'returns true if the document was unloaded successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlUnloadFile',
+        returns: 'Returns *true* if the rendering order was changed successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWaterDrawnLast',
+    },
+    setWaterLevel: {
+        summary: 'Sets the height of some or all the water in the game world.',
+        parameters: [
+            { name: 'theWater', isOptional: true, isVariadic: false, summary: 'the water element to change.' },
+            { name: 'level', isOptional: false, isVariadic: false, summary: 'the new Z coordinate of the water surface' },
+        ],
+        returns: 'Returns *true* if successful, *false* in case of failure. Returns *true* if successful, *false* in case of failure (there is no water at the specified coordinates).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWaterLevel',
+    },
+    setWaterVertexPosition: {
+        summary: 'Sets the world position of a corner point of a water area.',
+        parameters: [
+            { name: 'theWater', isOptional: false, isVariadic: false, summary: 'the water element of which to change a vertex.' },
+            { name: 'vertexIndex', isOptional: false, isVariadic: false, summary: 'the index of the vertex to move. Values range from 1 to 4 for water quads, and 1 to 3 for triangles.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'the X coordinate to set for the vertex.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'the Y coordinate to set for the vertex.' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'the Z coordinate to set for the vertex.' },
+        ],
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWaterVertexPosition',
+    },
+    setWaveHeight: {
+        summary: 'This function sets the wave height to the desired value, the default is 0.',
+        parameters: [
+            { name: 'height', isOptional: false, isVariadic: false, summary: 'A float between 0 and 100.' },
+        ],
+        returns: 'Returns a boolean value *true* or *false* that tells you if it was successful or not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWaveHeight',
+    },
+    setWeaponAmmo: {
+        summary: 'Sets the ammo to a certain amount for a specified weapon (if they already have it), regardless of current ammo.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a weapon ID.' },
+            { name: 'totalAmmo', isOptional: false, isVariadic: false, summary: 'A whole number integer serving as the total ammo amount for the given weapon (including ammo in clip).' },
+            { name: 'ammoInClip', isOptional: true, isVariadic: false, summary: 'The amount of ammo to set in the player\'s clip. This will be taken from the main ammo. If left unspecified or set to 0, the current clip will remain.' },
+        ],
+        returns: 'Returns a boolean value *true* or *false* that tells you if it was successful or not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeaponAmmo',
     },
 };

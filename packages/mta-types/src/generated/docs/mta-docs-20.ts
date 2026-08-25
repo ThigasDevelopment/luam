@@ -1,240 +1,243 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_20: ApiDocumentationCatalog = {
-    getResourceOrganizationalPath: {
-        summary: 'This function returns the organizational file path (e.g. admin) of a resource.',
+    getPedWeapon: {
+        summary: 'This function tells you which weapon type is in a certain **weapon slot** of a ped.',
         parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource of which you want to know the organizational path' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to get the weapon type from.' },
+            { name: 'weaponSlot', isOptional: true, isVariadic: false, summary: 'an integer representing the weapon slot (set to the ped\'s current slot if not given).' },
         ],
-        returns: 'returns the organizational folder name of the resource. it returns empty string if the resource is on root resources folder. it returns false if the resource could not be found.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceOrganizationalPath',
+        returns: 'Returns an int indicating the type of the weapon the ped has in the specified slot. If the slot is empty, it returns 0. It should be noted that if a ped runs out of ammo for a weapon, it will still return the ID of that weapon in the slot (even if it appears as if the ped does not have a weapon at all), though getPedTotalAmmo will return **0**. Therefore, getPedTotalAmmo should be used in conjunction with getPedWeapon in order to check if a ped has a weapon.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedWeapon',
     },
-    getResourceRootElement: {
-        summary: 'This function retrieves a resources root element. The resources root element is the\nelement in the element tree which is the parent of all elements that belong to a\nparticular resource (except for elements specifically created elsewhere). You can attach\nevent handlers to this element to easily capture events that originate from your resource\n(and global events that originate from the root element).\nNote: every resource has a Predefined_variables_list|predefined global variable called\nresourceRoot whose value is the root element of that resource.',
+    getPedWeaponMuzzlePosition: {
+        summary: 'Returns the world position of the muzzle of the weapon that a ped is currently carrying. The weapon muzzle is the end of the gun barrel where the bullets/rockets/... come out.\n\nThe position may not be accurate if the ped is off screen.',
         parameters: [
-            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'the resource whose root element we are getting. If not specified, assumes the current resource. (the resource returned from getThisResource)' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose weapon muzzle position to retrieve.' },
         ],
-        returns: 'returns an element representing the resources root, false if the specified resource doesnt exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceRootElement',
+        returns: 'If successful, returns the x/y/z coordinates of the weapon muzzle. Returns *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedWeaponMuzzlePosition',
     },
-    getResources: {
-        summary: 'This function retrieves a table of all the resources that exist on the server.',
+    getPedWeaponSlot: {
+        summary: 'This function gets a ped\'s selected weapon slot.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped to get the current weapon slot of.' },
+        ],
+        returns: 'Returns the selected weapon slot ID on success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedWeaponSlot',
+    },
+    getPerformanceStats: {
+        summary: 'This function returns performance information.',
+        parameters: [
+            { name: 'category', isOptional: false, isVariadic: false, summary: 'Performance statistics category. If empty string is given, list of all categories is returned.See categories for more information.' },
+            { name: 'options', isOptional: true, isVariadic: false, summary: 'Category specific \',\' separated options. All categories supports \'h\' option for help.' },
+            { name: 'filter', isOptional: true, isVariadic: false, summary: 'Case-sensitive filter used to select returned rows. Only \'name\' column is filtered.' },
+        ],
+        returns: 'Returns two tables. First contains column names. The second contains result rows. Each row is table of cells.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPerformanceStats',
+    },
+    getPickupAmmo: {
+        summary: 'This function retrieves the amount of ammo in a weapon pickup.',
+        parameters: [
+            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'The pickup in which you wish to retrieve the ammo of' },
+        ],
+        returns: 'Returns an *integer* of the amount of ammo in the pickup, *false* if the pickup element is invalid, 0 if it\'s no weapon pickup.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPickupAmmo',
+    },
+    getPickupAmount: {
+        summary: 'This function retrieves the amount of health or armor given from a pickup.',
+        parameters: [
+            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'The pickup you wish to retrieve the amount from.' },
+        ],
+        returns: 'Returns an *integer* of the amount the pickup is set to, *false* if it\'s invalid, 0 if it\'s no health or amor pickup.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPickupAmount',
+    },
+    getPickupRespawnInterval: {
+        summary: 'Returns the time it takes before a pickup respawns after a player picked it up. The time is specified in milliseconds.',
+        parameters: [
+            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'the pickup you want the respawn time of' },
+        ],
+        returns: 'Returns the respawn time of the pickup if successful, *false* in case of failure.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPickupRespawnInterval',
+    },
+    getPickupType: {
+        summary: 'This function retrieves the type of a pickup, either a health, armour or weapon pickup.',
+        parameters: [
+            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'The pickup you wish to retrieve the type of.' },
+        ],
+        returns: 'Returns *false* if the pickup is invalid, or an integer of the type of the pickup, which include: ***0:** Health pickup ***1:** Armour pickup ***2:** Weapon pickup ***3:** Custom Pickup',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPickupType',
+    },
+    getPickupWeapon: {
+        summary: 'This function retrieves the weapon ID of a weapon pickup.',
+        parameters: [
+            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'The pickup of which you wish to retrieve the weapon' },
+        ],
+        returns: 'Returns the Weapon ID of the pickup, or *false* if the pickup is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPickupWeapon',
+    },
+    getPlayerAccount: {
+        summary: 'This function returns the specified player\'s account object.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player element you want to get the account of.' },
+        ],
+        returns: 'Returns the player\'s account object, or *false* if the player passed to the function is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerAccount',
+    },
+    getPlayerACInfo: {
+        summary: 'This function returns anti-cheat info for a player. The info returned by this function\ncan change over time, so use the server event onPlayerACInfo instead.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose anti-cheat info you want to check.' },
+        ],
+        returns: 'returns a table with the following entries: * detectedac: a string containing a comma separated list of anti-cheat_guide|anti-cheat codes the player has triggered. *d3d9size: a number representing the file size of any custom d3d9.dll the player may have installed. *d3d9md5: a string containing the md5 of any custom d3d9.dll the player may have installed. *d3d9sha256: a string containing the sha256 of any custom d3d9.dll the player may have installed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerACInfo',
+    },
+    getPlayerAnnounceValue: {
+        summary: 'This function retrieves a players ASE announce value under a certain key.|',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'This is the Player whos value you want to retrieve.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the key.' },
+        ],
+        returns: 'This function returns a *string* containing the requested value if a valid key was specified or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerAnnounceValue',
+    },
+    getPlayerBlurLevel: {
+        summary: 'This function allows you to check the current blur level of a specified player.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose blur level you want to check.' },
+        ],
+        returns: 'Returns the player\'s blur level if successful, *false* if an invalid player was given. ```lua int getBlurLevel () ``` Returns the local blur level.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerBlurLevel',
+    },
+    getPlayerCount: {
+        summary: 'This function returns the number of players currently connected to the server.',
         parameters: [],
-        returns: 'returns a table of resources.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResources',
+        returns: 'Returns the number of players connected to the server as an int.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerCount',
     },
-    getResourceState: {
-        summary: 'This function returns the state of a given resource',
+    getPlayerFromName: {
+        summary: 'This function returns a player element for the player with the name passed to the function.',
         parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The resource you wish to get the state of.' },
+            { name: 'playerName', isOptional: false, isVariadic: false, summary: 'A string containing the name of the player you want to reference' },
         ],
-        returns: 'if successful returns a string with the resource state in it, false otherwise. the state can be one of: *loaded *running *starting *stopping *failed to load - use getresourceloadfailurereason to find out why it failed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceState',
+        returns: 'Returns a player element for the player with the nickname provided. If there is no player with that name, *false* is returned.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerFromName',
     },
-    getRoofPosition: {
+    getPlayerHudComponentProperty: {
+        summary: 'This function gets the value of the specified HUD property.',
+        parameters: [
+            { name: 'component', isOptional: false, isVariadic: false, summary: 'The component whose property you want to retrieve. See HUD Components.' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'The name of the property you want to read. See HUD Properties.' },
+        ],
+        returns: 'Returns different values depending on the type. It can be *bool*, *string*, *int*, *int int*, or *int int int int*. If something goes wrong, it returns **false**.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerHudComponentProperty',
+    },
+    getPlayerIdleTime: {
+        summary: 'This function gets the amount of time in milliseconds that a players position has not changed.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish to get the idle time of.' },
+        ],
+        returns: 'Returns the amount of **time in milliseconds** that a player has been idle, **false** otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerIdleTime',
+    },
+    getPlayerIP: {
+        summary: 'This function returns a string containing the IP address of the player.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player element you want to get the IP of.' },
+        ],
+        returns: 'Returns a string containing the requested players\'s IP, or *false* if the player passed to the function is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerIP',
+    },
+    getPlayerMapBoundingBox: {
+        summary: 'This function gets the GUI bounding box of the player map (F11) texture.',
+        parameters: [],
+        returns: '* If the player\'s map is showing, it returns four integers: *minX*, *minY*, *maxX*, *maxY*. These are **absolute** position coordinates of where the player\'s map is drawn on the screen. ** *minX, minY* represent the world coordinates *-3000, 3000* (upper-left corner of the world map). ** *maxX, maxY* represent the world coordinates *3000, -3000* (lower-right corner of the world map). ** Negative values may be returned if these coordinates are off screen. * If the map is not showing, a *false* boolean value is returned.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerMapBoundingBox',
+    },
+    getPlayerMapOpacity: {
         summary: '',
-        parameters: [
-            { name: 'x', isOptional: false, isVariadic: false, summary: ': A float representing the X world coordinate of the point.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: ': A float representing the Y world coordinate of the point.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: ': A float representing the Z world coordinate of the point.' },
-        ],
-        returns: 'returns a float with the lowest roof-level z coord if parameters are valid, false if the point you tried to test is outside the loaded world map.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRoofPosition',
-    },
-    getRootElement: {
-        summary: 'This function returns the root node of the element tree, called root. This node contains\nevery other element: all resource root elements, players and remote clients. It is never\ndestroyed and cannot be destroyed using destroyElement.\nIt is often used to attach handler functions to events triggered for any element, or also\nto make a scripting function affect all elements.',
         parameters: [],
-        returns: 'returns the root element.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRootElement',
+        returns: 'Returns an integer with a value from 0 to 255, where 0 is fully transparent and 255 is fully opaque.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerMapOpacity',
     },
-    getRuleValue: {
-        summary: 'This function gets a rule value. A rule value is a string that can be viewed by server\nbrowsers and used for filtering the server list.',
+    getPlayerMoney: {
+        summary: 'Returns the amount of money a player currently has.',
         parameters: [
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the rule' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish the retrieve the amount of money from.' },
         ],
-        returns: 'returns a string containing the value set for the specified key, false if invalid arguments were specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRuleValue',
+        returns: 'Returns an integer with the amount of money the specified player has, *false* if the player is invalid. ```lua int getPlayerMoney ( ) ``` Returns an integer with the amount of money the local player has.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerMoney',
     },
-    getScreenFromWorldPosition: {
-        summary: 'This function gets the screen position of a point in the world. This is useful for\nattaching 2D gui elements to parts of the world (e.g. players) or detecting if a point is\non the screen (though it does not check if it is actually visible, you should use\nprocessLineOfSight for that).',
+    getPlayerName: {
+        summary: 'This function returns a string containing the name of the specified player.',
         parameters: [
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'A float value indicating the x position in the world.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'A float value indicating the y position in the world.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'A float value indicating the z position in the world.' },
-            { name: 'edgeTolerance', isOptional: true, isVariadic: false, summary: 'A float value indicating the distance the position can be off screen before the function returns false. Note: its clamped down on both axies to the size of screen at the given axis*10' },
-            { name: 'relative', isOptional: true, isVariadic: false, summary: 'A boolean value that indicates if edgeTolerance is in pixels false, or relative to the screen size true.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player you want to get the name of' },
         ],
-        returns: 'returns two x, y floats indicating the screen position and float distance between screen and given position if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetScreenFromWorldPosition',
+        returns: 'Returns a string containing the requested player\'s name, or *false* if the player passed to the function is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerName',
     },
-    getSearchLightEndPosition: {
-        summary: 'This function gets the end position of a Element/Searchlight|searchlight element.',
+    getPlayerNametagColor: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis function gets the current color of a player\'s name tag as RGB values. These are in the range 0-255.',
         parameters: [
-            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: ': the searchlight to get the position where the searchlights light cone ends.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose name tag RGB color values you wish to retrieve.' },
         ],
-        returns: 'if the specified searchlight element is valid, this function will return three float, which are the three coordinates of searchlights end position. if not, it will return false plus an error message.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSearchLightEndPosition',
+        returns: 'Returns *red*, *green* and *blue* values if an existent player was specified, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerNametagColor',
     },
-    getSearchLightEndRadius: {
-        summary: 'This function gets the end radius of a Element/Searchlight|searchlight element.',
+    getPlayerNametagText: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis will allow you to retrieve the name tag a player is currently using.',
         parameters: [
-            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: ': the searchlight to get the radius of the searchlights light cone in its end.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The person whose name tag you want to retrieve' },
         ],
-        returns: 'if the specified searchlight element is valid, this function will return one float, which is the searchlights end radius. if not, it will return false plus an error message.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSearchLightEndRadius',
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns a *string* with the nametag text, *false* if the player is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerNametagText',
     },
-    getSearchLightStartPosition: {
-        summary: 'This function gets the start position of a Element/Searchlight|searchlight element.',
+    getPlayerPing: {
+        summary: 'This function returns the ping of a specified player. The ping is the number of milliseconds that data takes to travel from the player\'s client to the server or vice versa. If a player is using a VPN their ping will still be returned correctly.',
         parameters: [
-            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: ': the searchlight to get the position where the searchlights light cone starts.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose ping you want to determine.' },
         ],
-        returns: 'if the specified searchlight element is valid, this function will return three float, which are the three coordinates of searchlights start position. if not, it will return false plus an error message.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSearchLightStartPosition',
+        returns: 'Returns the ping as an int, or *false* if the player is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerPing',
     },
-    getSearchLightStartRadius: {
-        summary: 'This function gets the start radius of a Element/Searchlight|searchlight element.',
+    getPlayerScriptDebugLevel: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\n\nThis will allow you to retrieve the player current debug script level.\n\nThis function has a client-sided variant, which can only retrieve the local player\'s script debug level.',
         parameters: [
-            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: ': the searchlight to get the radius of the searchlights light cone in its beginning.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The person whose debug script level you want' },
         ],
-        returns: 'if the specified searchlight element is valid, this function will return one float, which is the searchlights start radius. if not, it will return false plus an error message.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSearchLightStartRadius',
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns an *int* with the player debug script level, *false* if the player is invalid. ```lua int getPlayerScriptDebugLevel() ``` <!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> Returns an *int* with the local player\'s debug script level.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerScriptDebugLevel',
     },
-    getServerConfigSetting: {
-        summary: 'This function retrieves server settings which are usually stored in the mtaserver.conf\nfile.\nAvailable in 1.1 and onwards',
+    getPlayerSerial: {
+        summary: 'This function returns the serial for a specified player.',
         parameters: [
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'The name of the setting (setting names can be found Server_mtaserver.conf|here)' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player.' },
         ],
-        returns: 'returns a string containing the current value for the named setting, or false if the setting does not exist. if the setting name is serverip, may return the string auto on local servers.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetServerConfigSetting',
+        returns: 'Returns the serial as a *string* if it was found, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerSerial',
     },
-    getServerHttpPort: {
-        summary: 'This function retrieves the servers HTTP port.',
-        parameters: [],
-        returns: 'an integer corresponding to the servers http port.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetServerHttpPort',
-    },
-    getServerName: {
-        summary: 'This function retrieves the servers name.',
-        parameters: [],
-        returns: 'a string containing the servers name.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetServerName',
-    },
-    getServerPassword: {
-        summary: 'This function returns the current password required to join the server.',
-        parameters: [],
-        returns: 'returns the current server password as a string if it has a password, if not it returns nil.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetServerPassword',
-    },
-    getServerPort: {
-        summary: 'This function retrieves the servers port.',
-        parameters: [],
-        returns: 'an integer corresponding to the servers port.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetServerPort',
-    },
-    getSFXStatus: {
-        summary: 'This function checks if a big sound container is available to use or not.\nIn case of these invalid audio files, this function returns false.|true',
+    getPlayersInTeam: {
+        summary: 'This function retrieves all the players of the specified team.',
         parameters: [
-            { name: 'audioContainer', isOptional: false, isVariadic: false, summary: 'The container name. Possible values are: feet, genrl, pain_a, script, spc_ea, spc_fa, spc_ga, spc_na, spc_pa' },
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you wish to retrieve all the players from.' },
         ],
-        returns: 'returns true if the sound container is available, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSFXStatus',
+        returns: 'Returns a table of all the players in the team, or an empty one if there are none else false if invalid arguments are passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayersInTeam',
     },
-    getSkyGradient: {
-        summary: 'This function will return the current sky color.\nNote: The server can only return the sky color if it has actually been set by script.',
-        parameters: [],
-        returns: 'returns 6 int|ints, of which the first 3 represent the skys top color, (in rgb) and the last 3 represent the bottom colors.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSkyGradient',
-    },
-    getSlotFromWeapon: {
-        summary: 'This function allows you to identify the weapon slot that a weapon belongs to.',
+    getPlayerTeam: {
+        summary: 'This function gets the current team a player is on.',
         parameters: [
-            { name: 'weaponid', isOptional: false, isVariadic: false, summary: 'Weapon to find the weapon slot of.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose team you want to find out.' },
         ],
-        returns: 'returns an integer representing the given weapon ids associated weapon slot, false if the id was invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSlotFromWeapon',
+        returns: 'Returns a *team* element representing the team the player is on, *false* if the player is not part of a team.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerTeam',
     },
-    getSoundBPM: {
-        summary: 'This function gets the beats per minute of a specific sound element.',
+    getPlayerVersion: {
+        summary: 'This function gets the client version of the specified player as a **sortable string**. The string is always 15 characters long and is formatted as follows:\n\n* 1 character representing the major version\n* 1 dot character\n* 1 character representing the minor version\n* 1 dot character\n* 1 character representing the maintenance version\n* 1 dash character\n* 1 character representing the build type\n* 1 dot character\n* 5 characters representing the build number\n* 1 dot character\n* 1 character representing the build revision\n\nAn example of a version string would be: 1.0.4-9.01746.0\n\nWhere the first three numbers represent the major/minor/maintenance version, i.e. 1.0.4\n\nThe fourth number is 9, which means it\'s a release build, (Development and beta builds have lower numbers here)\n\nAnd the fifth and sixth numbers represent the build number.',
         parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose client version you wish to get.' },
         ],
-        returns: 'returns the beats per minute of the given sound.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundBPM',
-    },
-    getSoundBufferLength: {
-        summary: '',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which buffer length you want to get.' },
-        ],
-        returns: '* a float value indicating the buffer playback length of the sound in seconds. * false if the sound is not a stream. * nil if the sound is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundBufferLength',
-    },
-    getSoundEffectParameters: {
-        summary: '',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: ': The sound element to get the sound effect parameters of.' },
-            { name: 'effectName', isOptional: false, isVariadic: false, summary: ': The name of the effect whose parameters you want to retrieve:' },
-        ],
-        returns: 'returns a table with the parameter names as the keys, and their values. if the specified effect name is not valid, false is returned.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundEffectParameters',
-    },
-    getSoundEffects: {
-        summary: 'Returns the states of all effects of a sound.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
-        ],
-        returns: 'returns a table with the effect names as the keys, and their states as the values if successful. otherwise, it returns false. sound effect names:',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundEffects',
-    },
-    getSoundFFTData: {
-        summary: 'This function gets the fast fourier transform data for an audio stream which is a table\nof floats representing the current audio frame. This allows things like visualisations.\nA fast fourier transform generates a table of all the frequencies of the current audio\nframe which starts at the bass end of the spectrum to mids to highs in that order.\nShould you have any problems there is an example resource located on the resources\nrepository:\nhttps://github.com/multitheftauto/mtasa-resources/tree/master/%5Bgameplay%5D/visualiser\nVisualiser\nJust type startmusic mystreamurl in your console and it will play on the cinema billboard\nnear A51. If the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element that is created using playSound or playSound3D. Streams are also supported' },
-            { name: 'iSamples', isOptional: false, isVariadic: false, summary: 'allowed samples are 256, 512, 1024, 2048, 4096, 8192 and 16384.' },
-            { name: 'iBands', isOptional: true, isVariadic: false, summary: 'post processing option allows you to split the samples into the desired amount of bands or bars so if you only need 5 bars this saves a lot of cpu power compared to trying to do it in Lua.' },
-        ],
-        returns: 'returns a table of isamples/2 (or ibands if ibands is used) floats representing the current audio frame. returns false if the sound is not playing yet or hasnt buffered in the case of streams.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundFFTData',
-    },
-    getSoundLength: {
-        summary: 'This function is used to return the playback length of the specified sound element.\nIf the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which length you want to return.' },
-        ],
-        returns: 'returns an float value indicating the playback length of the sound element in seconds.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundLength',
-    },
-    getSoundLevelData: {
-        summary: 'This function gets the left/right level from a sound element.\nIf the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which level data you want to return.' },
-        ],
-        returns: 'returns a two integers in range from 0 to 32768.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundLevelData',
-    },
-    getSoundMaxDistance: {
-        summary: 'Gets a custom sound max distance at which the sound stops.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
-        ],
-        returns: 'returns an integer of the max distance, false if invalid arguments where passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMaxDistance',
-    },
-    getSoundMetaTags: {
-        summary: 'Used to get the meta tags attached to a sound. These provide information about the sound,\nfor instance the title or the artist.\n*This function does not work on remote WAV files',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
-            { name: 'format', isOptional: true, isVariadic: false, summary: 'a filter string to get a specific meta tag.' },
-        ],
-        returns: 'returns a table, but only a string if format is given, with all data available (keys are listed below) for the sound if successful, false otherwise. if any data is unavailable then the associated key is not written to the table.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMetaTags',
-    },
-    getSoundMinDistance: {
-        summary: 'Gets a custom sound Minimum distance at which the sound stops getting louder.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
-        ],
-        returns: 'returns an integer of the minimum distance, false if invalid arguements where passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMinDistance',
+        returns: 'Returns a string containing the client version, or false if the player is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerVersion',
     },
 };

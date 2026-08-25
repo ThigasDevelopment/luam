@@ -1,244 +1,243 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_32: ApiDocumentationCatalog = {
-    isPedInVehicle: {
-        summary: 'Checks whether or not a given ped is currently in a vehicle.',
+    hasElementDataSubscriber: {
+        summary: 'This function returns whether a player is subscribed to specific element data.\nThis function is used together with setElementData in *"subscribe"* mode.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to check.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you wish to check whether the player is subscribed to.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key you wish to check whether the player is subscribed to.' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you wish to check.' },
         ],
-        returns: 'returns true if the ped is in a vehicle, false if he is on foot or an invalid element was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedInVehicle',
+        returns: 'Returns *true* if the player is subscribed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HasElementDataSubscriber',
     },
-    isPedOnFire: {
-        summary: 'This function checks if the specified ped is on fire or not.',
+    hash: {
+        summary: 'This function returns a hash of the specified string in the specified algorithm.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': The ped to check.' },
+            { name: 'algorithm', isOptional: false, isVariadic: false, summary: 'A string which must be one of these: "md5", "sha1", "sha224", "sha256", "sha384", "sha512", "hmac"' },
+            { name: 'dataToHash', isOptional: false, isVariadic: false, summary: 'A string of the data to hash.' },
+            { name: 'options', isOptional: true, isVariadic: false, summary: 'A table with options and other necessary data for the algorithm, as detailed below.' },
         ],
-        returns: 'returns true if the ped is on fire, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedOnFire',
+        returns: 'Returns the hash of the data, false if an invalid argument was used.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/Hash',
     },
-    isPedOnGround: {
-        summary: 'This function is used to determine whether or not a ped is on the ground. This is for\non-foot usage only.',
+    hasObjectPermissionTo: {
+        summary: 'This function returns whether or not the given object has access to perform the given action.\n\nScripts frequently wish to limit access to features to particular users. The naive way to do this would be to check if the player who is attempting to perform an action is in a particular group (usually the Admin group). The main issue with doing this is that the Admin group is not guaranteed to exist. It also doesn\'t give the server admin any flexibility. He might want to allow his \'moderators\' access to the function you\'re limiting access to, or he may want it disabled entirely.\n\nThis is where using the ACL properly comes in, and luckily this is very easy. It all comes down to using this function. This, somewhat confusingly named function lets you check if an ACL object (a player or a resource) has a particular ACL right. In this case, we just care about players.\n\nSo, first of all, think of a name for your \'right\'. Let\'s say we want a private area only certain people can go in, we\'ll call our right accessPrivateArea. Then, all you need to do is add one \'if\' statement to your code:\n```lua\nif hasObjectPermissionTo ( player, "resource.YourResourceName.accessPrivateArea", false ) then\n-- Whatever you want to happen if they\'re allowed in\nelse\n-- Whatever you want to happen if they aren\'t\nend\n```\nNotice that we\'ve named the *right* using *resource.YourResourceName.accessPrivateArea* - this is just for neatness, so that the admin knows what resource the right belongs to. It\'s strongly advised you follow this convention. The *false* argument specifies the \'defaultPermission\', false indicating that if the user hasn\'t had the right allowed or dissallowed (i.e. the admin hasn\'t added it to the config), that it should default to being not allowed.\n\nThe only downside of using this method is that the admin has to modify his config. The upsides are that the admin has much more control and your script will work for any server, however the admin has configured it.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you are checking.' },
+            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'The object to test if has permission to. This can be a client element (ie. a player), a resource or a string in the form "user." or "resource.".' },
+            { name: 'theAction', isOptional: false, isVariadic: false, summary: 'The action to test if the given object has access to. Ie. "function.kickPlayer".' },
+            { name: 'defaultPermission', isOptional: true, isVariadic: false, summary: 'The default permission if none is specified in either of the groups the given object is a member of. If this is left to true, the given object will have permissions to perform the action unless the opposite is explicitly specified in the ACL. If false, the action will be denied by default unless explicitly approved by the Access Control List.' },
         ],
-        returns: 'returns true if the ped is on foot and on the ground, false otherwise, even if he is in a car that stands still or on object outside world map.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedOnGround',
+        returns: 'Returns *true* if the given object has permission to perform the given action, *false* otherwise. Returns *nil* if the function failed because of bad arguments.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HasObjectPermissionTo',
     },
-    isPedReloadingWeapon: {
-        summary: 'This function is used to determine whether or not a ped is currently reloading their\nweapon. Useful to stop certain quick reload exploits.',
-        parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you are checking.' },
-        ],
-        returns: 'returns true if the ped is currently reloading a weapon, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedReloadingWeapon',
-    },
-    isPedTargetingMarkerEnabled: {
-        summary: 'This function checks whether health target markers are drawn as set by\nsetPedTargetingMarkerEnabled or not.',
+    httpClear: {
+        summary: 'This function removes all text from the current HTML output.',
         parameters: [],
-        returns: 'returns true if the health target markers are enabled, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedTargetingMarkerEnabled',
+        returns: 'Returns *true* if the output buffer was cleared successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HttpClear',
     },
-    isPedWearingJetpack: {
+    httpRequestLogin: {
+        summary: 'This function makes the user\'s browser show a \'basic authentication\' login box. The result of the login is handled automatically by the server. If the user has not logged in satisfactorily, you should just call the httpRequestLogin function again. It is the script\'s responsibility to judge when the user is logged in satisfactorily - you can use the *user* variable can be used to check if the user has logged in with an account you are happy with. If the logged in user doesn\'t meet whatever criteria you have, you can just call httpRequestLogin again and they will be re-promoted for their password.\n\nThis function works by setting a header (\'Authentication\') and a return code (403 - Authentication required). As such, nothing happens until you finish the page. The content of the page is generally not displayed unless the login fails.',
+        parameters: [],
+        returns: 'Returns *true* if the relevant headers and return codes have been set, *false* otherwise. Essentially, always returns *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HttpRequestLogin',
+    },
+    httpSetResponseCode: {
+        summary: 'This function sets the HTTP status code that will be sent for the current HTML page.',
+        parameters: [
+            { name: 'code', isOptional: false, isVariadic: false, summary: 'the HTTP status code to be set.' },
+        ],
+        returns: 'Returns *true* if the code was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HttpSetResponseCode',
+    },
+    httpSetResponseCookie: {
+        summary: 'This function sets the value for the specified HTTP cookie of the current HTML page.',
+        parameters: [
+            { name: 'cookieName', isOptional: false, isVariadic: false, summary: 'the HTTP cookie whose value is being set.' },
+            { name: 'cookieValue', isOptional: false, isVariadic: false, summary: 'the new value for the specified cookie.' },
+        ],
+        returns: 'Returns *true* if the cookie value was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HttpSetResponseCookie',
+    },
+    httpSetResponseHeader: {
+        summary: 'This function sets the value for the specified HTTP response header of the current HTML page.',
+        parameters: [
+            { name: 'headerName', isOptional: false, isVariadic: false, summary: 'the HTTP header whose value is being set. You can find a list of header names [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html here]. Header names should be all *lower case* letters.' },
+            { name: 'headerValue', isOptional: false, isVariadic: false, summary: 'the new value for the specified header.' },
+        ],
+        returns: 'Returns *true* if the header value was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HttpSetResponseHeader',
+    },
+    httpWrite: {
+        summary: 'This function adds text to the output of the current HTTP file of the HTTP interface. The function can only be used on parsed (i.e not marked as *raw*) HTTP pages. httpWrite can support outputing binary data, if you specify the length of the data you are outtputing. If you do this, you should ensure you set an accurate content-type using httpSetResponseHeader otherwise it may be displayed inconsistently by browsers.',
+        parameters: [
+            { name: 'data', isOptional: false, isVariadic: false, summary: 'the data to be added to the page\'s output.' },
+            { name: 'length', isOptional: true, isVariadic: false, summary: 'The length of the data being written. Generally only should be required for writing binary data.' },
+        ],
+        returns: 'Returns *true* if the text was added to the output buffer successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/HttpWrite',
+    },
+    injectBrowserMouseDown: {
+        summary: 'This function injects a mouse click (state: down).',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser' },
+            { name: 'mouseButton', isOptional: false, isVariadic: false, summary: 'The mouse button (Possible values: *left*, *middle*, *right*)' },
+            { name: 'doubleClick', isOptional: true, isVariadic: false, summary: 'Specifies whether it is a double click or not.' },
+        ],
+        returns: 'Returns *true* if the click was successfully injected, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseDown',
+    },
+    injectBrowserMouseMove: {
+        summary: 'This function injects a mouse movement.',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser which will retrieve the mouse movement' },
+            { name: 'posX', isOptional: false, isVariadic: false, summary: 'Absolute X screen coordinate' },
+            { name: 'posY', isOptional: false, isVariadic: false, summary: 'Absolute Y screen coordinate' },
+        ],
+        returns: 'Returns *true* if the movement was injected successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseMove',
+    },
+    injectBrowserMouseUp: {
+        summary: 'This function injects a mouse click (state: up).',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser' },
+            { name: 'mouseButton', isOptional: false, isVariadic: false, summary: 'The mouse button (Possible values: *left*, *middle*, *right*)' },
+        ],
+        returns: 'Returns *true* if the click was successfully injected, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseUp',
+    },
+    injectBrowserMouseWheel: {
+        summary: 'This function injects mouse wheel events.',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The web browser' },
+            { name: 'verticalScroll', isOptional: false, isVariadic: false, summary: 'Amount of units you want the browser to scroll along the Y-axe.' },
+            { name: 'horizontalScroll', isOptional: false, isVariadic: false, summary: 'Amount of units you want the browser to scroll along the X-axe.' },
+        ],
+        returns: 'Returns *true* if the mouse action was successfully injected, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/InjectBrowserMouseWheel',
+    },
+    inspect: {
+        summary: 'This function returns human-readable representations of tables and MTA datatypes as a string.',
+        parameters: [
+            { name: 'var', isOptional: false, isVariadic: false, summary: 'A variable of any datatype.' },
+            { name: 'options', isOptional: true, isVariadic: false, summary: 'A table of options. It is not mandatory, but when it is provided, it must be a table. For a list of options, see the [https://github.com/kikito/inspect.lua#options Inspect\'s GitHub page].' },
+        ],
+        returns: 'Always returns a string. The contents can change if we update the inspect library, so it is not expected to be consistent across Lua versions.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/Inspect',
+    },
+    interpolateBetween: {
+        summary: 'Interpolates a 3D Vector between a source value and a target value using either linear interpolation or any other easing function.\nIt can also be used to interpolate 2D vectors or scalars by only setting some of the x, y, z values and putting 0 to the others.',
+        parameters: [
+            { name: 'x1', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'y1', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'z1', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'x2', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'y2', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'z2', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'fProgress', isOptional: false, isVariadic: false, summary: 'float between 0 and 1 indicating the interpolation progress (0 at the beginning of the interpolation, 1 at the end). If it is higher than 1, it will start from the beginning.' },
+            { name: 'strEasingType', isOptional: false, isVariadic: false, summary: 'the easing function to use for the interpolation' },
+            { name: 'fEasingPeriod', isOptional: true, isVariadic: false, summary: 'the period of the easing function (only some easing functions use this parameter)' },
+            { name: 'fEasingAmplitude', isOptional: true, isVariadic: false, summary: 'the amplitude of the easing function (only some easing functions use this parameter)' },
+            { name: 'fEasingOvershoot', isOptional: true, isVariadic: false, summary: 'the overshoot of the easing function (only some easing functions use this parameter)' },
+        ],
+        returns: 'Returns *x, y, z* the interpolated 3D vector/value if successful, *false* otherwise (error in parameters). As mentioned before, interpolateBetween can be used on 2D vectors or scalars in which case only some (x, y or just x) of the returned values are to be used (cf. alpha interpolation in marker example or size interpolation in window example).',
+        wiki: 'https://wiki.multitheftauto.com/wiki/InterpolateBetween',
+    },
+    iprint: {
+        summary: 'This function intelligently outputs debug messages into the Debug Console.  It is similar to outputDebugString, but outputs useful information for **any** variable type, and does not require use of Lua\'s tostring.  This includes information about element types, and table structures.  It is especially useful for quick debug tasks.',
+        parameters: [
+            { name: 'var1', isOptional: false, isVariadic: false, summary: 'A variable of any type to print intelligent information for.' },
+            { name: 'var2', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'var3', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'arguments', isOptional: true, isVariadic: true, summary: '' },
+        ],
+        returns: 'Always returns *nil*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/Iprint',
+    },
+    isAmbientSoundEnabled: {
+        summary: 'This function allows you to check if some background sound effects are enabled.',
+        parameters: [
+            { name: 'theType', isOptional: false, isVariadic: false, summary: 'The type of ambient sound to test. Can be either "gunfire" or "general".' },
+        ],
+        returns: 'Returns *true* if the ambient sound is enabled, *false* if it is disabled or invalid values were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsAmbientSoundEnabled',
+    },
+    isBan: {
+        summary: 'This function checks whether the passed value is valid ban or not.',
+        parameters: [
+            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The value to check' },
+        ],
+        returns: 'Returns *true* if the value is a ban, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsBan',
+    },
+    isBrowserDomainBlocked: {
+        summary: 'This function checks if the specified URL is blocked from being loaded.',
+        parameters: [
+            { name: 'address', isOptional: false, isVariadic: false, summary: 'A website URL' },
+            { name: 'isURL', isOptional: true, isVariadic: false, summary: '*true* if *address* should be parsed as URL, *false* otherwise.' },
+        ],
+        returns: 'Returns *false* if the URL is able to be loaded, *true* if it is blocked and *nil* if an invalid domain/URL was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserDomainBlocked',
+    },
+    isBrowserFocused: {
+        summary: 'This function checks if a browser is focused.',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser' },
+        ],
+        returns: 'Returns *true* if the browser is focused, *false* otherwise and *nil* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserFocused',
+    },
+    isBrowserGPUEnabled: {
+        summary: 'This function checks if the client has the "Enable GPU rendering" setting enabled, which allows the usage of things like WebGL in browsers.\n\n**Note**: this is a global setting, not specific to any browser instance and can only be changed by the client.',
+        parameters: [],
+        returns: 'Returns *true* if the client has browser GPU rendering enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserGPUEnabled',
+    },
+    isBrowserLoading: {
+        summary: 'This function checks if a browser is currently loading a website.',
+        parameters: [
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser' },
+        ],
+        returns: 'Returns *true* if the browser is loading a website, *false* otherwise and *nil* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserLoading',
+    },
+    isBrowserRenderingPaused: {
         summary: '',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to check' },
+            { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser element to get the rendering state of.' },
         ],
-        returns: 'returns true if the ped is carrying a jetpack, false if he is not or an invalid element was passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPedWearingJetpack',
+        returns: 'Returns *true* if the browser rendering is paused, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserRenderingPaused',
     },
-    isPickupSpawned: {
-        summary: 'This function checks if a pickup is currently spawned (is visible and can be picked up)\nor not (a player picked it up recently).',
-        parameters: [
-            { name: 'thePickup', isOptional: false, isVariadic: false, summary: 'the pickup you want to check.' },
-        ],
-        returns: 'returns true if the pickup is spawned, false if its not spawned or an invalid pickup was specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPickupSpawned',
-    },
-    isPlayerHudComponentVisible: {
-        summary: 'This function can be used to check whether an hud component is visable or not.',
-        parameters: [
-            { name: 'component', isOptional: false, isVariadic: false, summary: 'The component you wish to check. Valid values are: ammo The display showing how much ammo the player has in their weapon area_name The text that appears containing the name of the area a player has entered armour The display showing the players armor breath The display showing the players breath clock The display showing the in-game time health The display showing the players health money The display showing how much money the player has radar The bottom-left corner miniradar vehicle_name The text that appears containing the players vehicle name when the player enters a vehicle weapon The display showing the players weapon radio The display showing the radio label wanted The display showing the players wanted level crosshair The weapon crosshair and sniper scope' },
-        ],
-        returns: 'returns true if the component is visable, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerHudComponentVisible',
-    },
-    isPlayerMapForced: {
-        summary: 'This function checks if the specified players radar map has been forced on or not.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
-        ],
-        returns: 'returns true if the players radar map is forced on, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerMapForced',
-    },
-    isPlayerMapVisible: {
-        summary: 'This function checks if the local player has their map showing.',
+    isCapsLockEnabled: {
+        summary: 'This function returns the state of the caps lock.',
         parameters: [],
-        returns: 'returns true if the player has the map visible, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerMapVisible',
+        returns: 'Returns *true* if caps lock is toggled (on), *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsCapsLockEnabled',
     },
-    isPlayerMuted: {
-        summary: 'Use this function to check if a player has been muted.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you are checking.' },
-        ],
-        returns: 'returns true if the player is muted and false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerMuted',
+    isChatBoxInputActive: {
+        summary: 'This function returns whether the ingame chatbox is being used (accepting chatbox input) or not.',
+        parameters: [],
+        returns: 'Returns *true* if the chatbox is receiving input, *false* if not active.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsChatBoxInputActive',
     },
-    isPlayerNametagShowing: {
-        summary: 'This function will allow you to determine if a players name tag is currently showing.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose current name tag condition you want to check' },
-        ],
-        returns: 'returns true if the players name tag is being shown, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsPlayerNametagShowing',
-    },
-    isRadarAreaFlashing: {
-        summary: 'This function allows detection of whether a radar area is flashing or not.',
-        parameters: [
-            { name: 'theRadararea', isOptional: false, isVariadic: false, summary: 'The radar area you wish to check the state of flashing' },
-        ],
-        returns: 'returns true if the radar area is flashing, false if it is not or if it doesnt exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsRadarAreaFlashing',
-    },
-    isResourceArchived: {
-        summary: 'Checks whether a resource is currently archived (running from within a ZIP file).',
-        parameters: [
-            { name: 'resourceElement', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true if a resource is archived, false if it is not archived, or nil if there is problem with resource.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsResourceArchived',
-    },
-    isResourceProtected: {
-        summary: 'This will check if a resource is currently protected, as defined in\nServer_mtaserver.conf#resource|mtaserver.conf.',
-        parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource to check' },
-        ],
-        returns: 'returns true if the resource is protected, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsResourceProtected',
-    },
-    isShowCollisionsEnabled: {
+    isChatInputBlocked: {
         summary: '',
         parameters: [],
-        returns: '* returns true if the collision previews are enabled, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsShowCollisionsEnabled',
+        returns: 'Returns *true* if the chat input is blocked, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsChatInputBlocked',
     },
-    isShowSoundEnabled: {
-        summary: '',
+    isChatVisible: {
+        summary: 'This function checks if player\'s chat is visible.',
         parameters: [],
-        returns: '* returns true if world sound ids should be printed in the debug window, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsShowSoundEnabled',
+        returns: 'Returns *true* if the chat is visible, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsChatVisible',
     },
-    isSoundLooped: {
-        summary: '',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element which you want to get the loop state.' },
-        ],
-        returns: 'returns true if the sound element is looped, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsSoundLooped',
-    },
-    isSoundPanningEnabled: {
-        summary: 'This function checks whether panning is enabled in a sound element or not.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'A valid sound element.' },
-        ],
-        returns: 'returns true if the sound is valid and it has panning enabled, false if it does not or is not valid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsSoundPanningEnabled',
-    },
-    isSoundPaused: {
-        summary: 'This function is used to return the current pause state of the specified sound element.\nIf the element is a player, this function will use the players voice.',
-        parameters: [
-            { name: 'theSound', isOptional: false, isVariadic: false, summary: 'the sound element which pause state you want to return.' },
-        ],
-        returns: 'returns true if the sound element is paused, false if unpaused or invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsSoundPaused',
-    },
-    isTimer: {
-        summary: 'This function checks if a variable is a timer.',
-        parameters: [
-            { name: 'theTimer', isOptional: false, isVariadic: false, summary: ': The variable that we want to check.' },
-        ],
-        returns: 'returns true if the passed value is a timer, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTimer',
-    },
-    isTrainChainEngine: {
-        summary: 'This function checks if a Element/Vehicle|train is a chain engine (moves the rest of the\nchains carriages) or not.',
-        parameters: [
-            { name: 'theTrain', isOptional: false, isVariadic: false, summary: 'a Element/Vehicle|train to check if its a chain engine or not.' },
-        ],
-        returns: '* true if a element/vehicle|train was passed to the function and if its a chain engine. * false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTrainChainEngine',
-    },
-    isTrainDerailable: {
-        summary: 'This function will check if a train or tram is derailable.',
-        parameters: [
-            { name: 'vehicleToCheck', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to check.' },
-        ],
-        returns: 'returns true if the train is derailable, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTrainDerailable',
-    },
-    isTrainDerailed: {
-        summary: 'This function will check if a train or tram is derailed.',
-        parameters: [
-            { name: 'vehicleToCheck', isOptional: false, isVariadic: false, summary: 'the vehicle that you wish to check is derailed.' },
-        ],
-        returns: 'returns true if the train is derailed, false if the train is still on the rails',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTrainDerailed',
-    },
-    isTransferBoxActive: {
-        summary: 'This function returns whether the file downloading dialog box is active or not. This\nappears when a resource is started and the client doesnt have all the files that resource\nrequires the client to have.\nIts important to note that resources arent started on the client until theyre completely\ndownloaded, so a resource cannot use this function to detect if its own files are\ndownloaded. A client-side resource triggers the onClientResourceStart event when the\nfiles it requires are downloaded.',
+    isConsoleActive: {
+        summary: 'This function returns whether the ingame console window is visible or not.',
         parameters: [],
-        returns: 'returns true if the file transfer box is visible, false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTransferBoxActive',
-    },
-    isTransferBoxAlwaysVisible: {
-        summary: '',
-        parameters: [],
-        returns: 'returns a boolean, whether the transfer box should be always visible or not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTransferBoxAlwaysVisible',
-    },
-    isTransferBoxVisible: {
-        summary: '',
-        parameters: [],
-        returns: 'on server this returns a boolean, whether the transfer box should be visible during downloads or not. on client this returns a boolean, whether the transfer box should be visible or not at the time of invocation.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTransferBoxVisible',
-    },
-    isTrayNotificationEnabled: {
-        summary: 'This function returns a boolean value whether the client has enabled tray notifications\nin his settings or not.',
-        parameters: [],
-        returns: 'returns true if the tray notifications are enabled in the settings, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsTrayNotificationEnabled',
-    },
-    isVehicleBlown: {
-        summary: 'This function allows you to determine whether a vehicle is blown or still intact.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to obtain the blown status of.' },
-        ],
-        returns: 'returns true if the vehicle specified has blown up, false if it is still intact or the vehicle specified is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleBlown',
-    },
-    isVehicleDamageProof: {
-        summary: 'This function checks if a vehicle is damage proof (set with setVehicleDamageProof).',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle whose invincibility status we want to check.' },
-        ],
-        returns: 'returns true if the vehicle is damage proof, false if it isnt or if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleDamageProof',
-    },
-    isVehicleFuelTankExplodable: {
-        summary: 'This will tell you if a vehicles petrol tank is explodable.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to obtain the fuel tank status of.' },
-        ],
-        returns: 'returns true if the specified vehicle is valid and its fuel tank is explodable, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleFuelTankExplodable',
-    },
-    isVehicleLocked: {
-        summary: 'This will tell you if a vehicle is locked.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to obtain the locked status of.' },
-        ],
-        returns: 'returns true if the vehicle specified is locked, false if is unlocked or the vehicle specified is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleLocked',
+        returns: 'Returns *true* if the console is visible, *false* if not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/IsConsoleActive',
     },
 };

@@ -1,242 +1,241 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_26: ApiDocumentationCatalog = {
-    guiDeleteTab: {
-        summary: 'This function deletes a tab from a tab panel.',
-        parameters: [
-            { name: 'tabToDelete', isOptional: false, isVariadic: false, summary: 'This is an element representing the tab that you want to delete.' },
-            { name: 'tabPanel', isOptional: false, isVariadic: false, summary: 'This is the guiCreateTabPanel|tab panel parent that the tab is attached to.' },
-        ],
-        returns: 'returns true the tab was successfully deleted, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiDeleteTab',
-    },
-    guiEditGetCaretIndex: {
-        summary: 'This function returns the caret (the text cursor) position within the editbox.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The edit box you want to get the caret position from' },
-        ],
-        returns: 'returns the caret index on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditGetCaretIndex',
-    },
-    guiEditGetMaxLength: {
-        summary: '',
-        parameters: [
-            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: 'The edit box you want to get the maximum text length of.' },
-        ],
-        returns: 'returns the maximum text length on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditGetMaxLength',
-    },
-    guiEditIsMasked: {
-        summary: '',
-        parameters: [
-            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: 'the edit box to check masked flag of.' },
-        ],
-        returns: 'returns true if the edit box is masked, false if not, nil if an invalid edit box was provided.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditIsMasked',
-    },
-    guiEditIsReadOnly: {
-        summary: '',
-        parameters: [
-            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: 'The edit box to check read-only status of.' },
-        ],
-        returns: 'returns true if the edit box is read-only, false if not, nil if an invalid edit box was provided.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditIsReadOnly',
-    },
-    guiEditSetCaretIndex: {
-        summary: 'This function sets the current position of the caret (the text cursor) within the edit\nbox.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The edit box to be changed.' },
-            { name: 'index', isOptional: false, isVariadic: false, summary: 'An integer referring to the desired position within the box.' },
-        ],
-        returns: 'returns true if the index was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetCaretIndex',
-    },
-    guiEditSetMasked: {
-        summary: 'This function sets or removes masking (covering up the text being typed) for password\ntext fields.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The edit box to be changed.' },
-            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether masking is to be enabled or disabled.' },
-        ],
-        returns: 'returns true if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetMasked',
-    },
-    guiEditSetMaxLength: {
-        summary: 'This function sets the maximum text length that can be typed into an edit box.',
-        parameters: [
-            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'length', isOptional: false, isVariadic: false, summary: 'An integer indicating the maximum number of characters that can be typed into the box.' },
-        ],
-        returns: 'returns true if the max length was set successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetMaxLength',
-    },
-    guiEditSetReadOnly: {
-        summary: 'This function allows you to set or remove read-only status for an edit box. If read-only\nis set to true, the box is not editable.',
-        parameters: [
-            { name: 'editField', isOptional: false, isVariadic: false, summary: 'The element of the Element/GUI/Edit field|edit field to be modified.' },
-            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether read-only is to be enabled or disabled.' },
-        ],
-        returns: 'returns true if edit fields read-only status was changed successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetReadOnly',
-    },
-    guiFocus: {
-        summary: '',
-        parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to focus' },
-        ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiFocus',
-    },
-    guiGetAlpha: {
-        summary: 'Alpha represents the transparency of a gui element.  This function allows retrieval of a\ngui elements current alpha.',
-        parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The gui element in which you want to retrieve the alpha of.' },
-        ],
-        returns: 'this function returns a positive integer in between 0 and 1 of the gui elements current alpha, or false if it could not be retrieved.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetAlpha',
-    },
-    guiGetBrowser: {
-        summary: 'This function gets the browser element behind a gui-browser (a browser that has been\ncreated via guiCreateBrowser).',
-        parameters: [
-            { name: 'theBrowser', isOptional: false, isVariadic: false, summary: 'The gui-browser' },
-        ],
-        returns: 'returns the element/browser|browser element if a correct element/gui-browser|gui-browser has been passed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetBrowser',
-    },
-    guiGetCursorType: {
-        summary: 'This function is used to get the type of the current cursor image.',
+    getWaterColor: {
+        summary: 'This function returns the water color of the GTA world.\n\n**Note:** The server can only return the water color, if it has actually been set by script.',
         parameters: [],
-        returns: 'returns a string containing the cursor type: * none // cursor has no image * arrow // default cursor * sizing_ns // n-s (up-down) sizing cursor * sizing_ew // e-w (left-right) sizing cursor * sizing_nwse // nw-se diagonal sizing cursor * sizing_nesw // ne-sw diagonal sizing cursor * sizing_eswe // es-we horizontal sizing cursor * move // move cursor * container_drag // drag container cursor (note: not in use) * segment_moving // segment moving cursor (note: not in use) * segment_sizing // segment sizing cursor (note: not in use)',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetCursorType',
+        returns: 'Returns 4 ints, indicating the color of the water. (RGBA)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaterColor',
     },
-    guiGetEnabled: {
-        summary: 'This function determines if a GUI element is enabled.',
+    getWaterLevel: {
+        summary: 'This function allows you to retrieve the water level from a certain location. The water level is 0 in most places though it can vary (e.g. it\'s higher near the dam).',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element to be checked.' },
+            { name: 'posX', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'posY', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'posZ', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'ignoreDistanceToWaterThreshold', isOptional: true, isVariadic: false, summary: 'If set to false, this function returns false, if the difference between water level (without waves) and posZ is greater than 3.0' },
         ],
-        returns: 'returns true if the element is enabled, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetEnabled',
+        returns: 'Returns an *integer* of the water level if the localPlayer/position is near the water (-3 to 20 on the Z coordinate) else *false* if there\'s no water near the localPlayer/position.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaterLevel',
     },
-    guiGetFont: {
-        summary: 'This function is used to get the current font that is used to draw text in GUI elements.',
+    getWaterVertexPosition: {
+        summary: 'Gets the world position of a vertex (i.e. corner) of a water area. Each water area is either a triangle or quad (rectangle) so each has 3 or 4 corners.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'element you wish to get the font of.' },
+            { name: 'theWater', isOptional: false, isVariadic: false, summary: 'the water element to get the vertex of' },
+            { name: 'vertexIndex', isOptional: false, isVariadic: false, summary: 'the index of the vertex whose position to get. Values range from 1 to 4 for a water quad, or 1 to 3 for a triangle.' },
         ],
-        returns: '*string a string containing the name of the elements current font, or false if the gui element passed to the function is invalid. *element the custom gui font that is used, or nil otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetFont',
+        returns: 'Returns the x, y and z coordinates of the specified vertex if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaterVertexPosition',
     },
-    guiGetInputEnabled: {
-        summary: 'This function checks whether user input is focused on the GUI or the game.',
+    getWaveHeight: {
+        summary: 'This function returns the current wave height.',
         parameters: [],
-        returns: 'returns true if input is focused on gui, false if its focused on the game.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetInputEnabled',
+        returns: 'Returns the height as a float, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWaveHeight',
     },
-    guiGetInputMode: {
-        summary: 'This function returns the current input mode as set by guiSetInputMode.\nDefault mode is allow_binds.',
+    getWeaponAmmo: {
+        summary: 'This function gets the total ammo a custom weapon has.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to get the ammo of.' },
+        ],
+        returns: 'Returns an integer containing how many ammo left has the weapon. Returns *false* if an error occured.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponAmmo',
+    },
+    getWeaponClipAmmo: {
+        summary: 'This function gets the amount of ammo left in a custom weapon\'s magazine/clip.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the weapon to get the clip ammo of.' },
+        ],
+        returns: 'Returns the amount of ammo in the custom weapon\'s clip, *false* if an error occured.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponClipAmmo',
+    },
+    getWeaponFiringRate: {
+        summary: 'This gets the firing rate to be used when a custom weapon opens fire.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to modify the firing rate of.' },
+        ],
+        returns: 'Returns an *integer* with the firing rate of the custom weapon, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponFiringRate',
+    },
+    getWeaponFlags: {
+        summary: 'This function gets the flags of a custom weapon.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the weapon to get the flag of.' },
+            { name: 'theFlag', isOptional: false, isVariadic: false, summary: 'the weapon flag to get:' },
+        ],
+        returns: 'Returns the *true* or *false* on success (*flags* flag returns 8 values) if the flag is enabled or not. Returns *false* if the weapon element isn\'t valid or an error occured.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponFlags',
+    },
+    getWeaponIDFromName: {
+        summary: 'This function will obtain the ID of a particular weapon from its name.',
+        parameters: [
+            { name: 'name', isOptional: false, isVariadic: false, summary: 'A string containing the name of the weapon. Names can be: (Case is ignored)' },
+        ],
+        returns: 'Returns an int if the name matches that of a weapon, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponIDFromName',
+    },
+    getWeaponNameFromID: {
+        summary: 'This function allows you to retrieve the name of a weapon from an ID.',
+        parameters: [
+            { name: 'id', isOptional: false, isVariadic: false, summary: 'The ID you wish to retrieve the name of' },
+        ],
+        returns: 'Returns a string of the name of the weapon or death type, *false* otherwise. Names will be like these: (Ignoring case)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponNameFromID',
+    },
+    getWeaponOwner: {
+        summary: 'This function gets the owner of a Element/Weapon|custom weapon. Weapon ownership system\nwas, however, disabled, so this function always returns false. Please refer to\nsetWeaponOwner for details.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to get the owner of.' },
+        ],
+        returns: 'this function was intended to return the player which owns the element/weapon|custom weapon, and false if an error occured. however, at the moment it always returns false.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponOwner',
+    },
+    getWeaponProperty: {
+        summary: 'This function gets a weapon property of the specified custom weapon (clientside only) or specified player-held weapon (both client and server).',
+        parameters: [
+            { name: 'weaponName', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'weaponSkill', isOptional: false, isVariadic: false, summary: 'Either: "pro", "std" or "poor"' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'The property you want to get the value of:' },
+        ],
+        returns: 'On success: **int:** The weapon property On failure: **bool:** False if the passed arguments were invalid',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponProperty',
+    },
+    getWeaponState: {
+        summary: 'This function gets the state of a custom weapon.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'the weapon to get the state of.' },
+        ],
+        returns: '* A string if the weapon is valid, indicating the weapon state, which can be: ** **reloading**: the weapon is reloading. ** **firing**: the weapon is constantly shooting (unless any shooting blocking flags are set) according to its assigned firing rate. ** **ready**: the weapon is idle. * *false* if an error occured or the weapon is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponState',
+    },
+    getWeaponTarget: {
+        summary: 'This functions gets the target of a custom weapon.',
+        parameters: [
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'The weapon to get the target of.' },
+        ],
+        returns: '* Returns the *target* of the custom weapon, which can be: ***nil* if the weapon is in rotation based targeting. **3 floats if the weapon is firing at a fixed point. **an element if the weapon is firing an entity. * Returns *false* if the weapon element is not valid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeaponTarget',
+    },
+    getWeather: {
+        summary: 'This function returns the current Weather ID.',
         parameters: [],
-        returns: 'returns a string defining the current input mode, potential values are: * allow_binds: binds are enabled, hence using a key such as t in an editbox will still activate the chatbox * no_binds: binds are disabled, hence using a key such as t in an editbox will not activate the chatbox * no_binds_when_editing: binds are always enabled except when an editable editbox or memo has input focus',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetInputMode',
+        returns: 'Returns two integers indicating the weather type that is currently active. The first integer says what weather is currently considered to be active. The second integer is the weather id that is being blended into if any, otherwise it is *nil*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWeather',
     },
-    guiGetPosition: {
-        summary: 'This function allows retrieval of a GUI elements current position, relative to its parent.',
-        parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The gui element of which you wish to retrieve the position.' },
-            { name: 'relative', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the position should be relative to the elements parent width, or the number of offset pixels from the parents origin.' },
-        ],
-        returns: 'returns floats representing the x and y position of the element, or false if the position could not be retrieved.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetPosition',
-    },
-    guiGetProperties: {
-        summary: 'This function gets a list of the CEGUI property names and values of a GUI element. To\nfind out what the different properties mean, check out the\nhttp://static.cegui.org.uk/static/WindowsLookProperties.html CEGUI properties page.',
-        parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to get the properties of.' },
-        ],
-        returns: 'if the function succeeds, the return value is a table. its keys are property names, the corresponding values are the values of the properties (both names and values are always strings). if the function fails, it returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetProperties',
-    },
-    guiGetProperty: {
-        summary: 'This function gets the value of a specific CEGUI property of a GUI element. For a list of\nproperties and their meaning, see the\nhttp://static.cegui.org.uk/static/WindowsLookProperties.html CEGUI properties page.',
-        parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to get a property of.' },
-            { name: 'property', isOptional: false, isVariadic: false, summary: 'the name of of property you want the value of.' },
-        ],
-        returns: 'if the function succeeds, it returns a string with the value of the property. if it fails, it returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetProperty',
-    },
-    guiGetScreenSize: {
-        summary: 'This function retrieves the local screen size according to the resolution they are using.',
+    getWindVelocity: {
+        summary: 'This function gets the wind velocity in San Andreas.',
         parameters: [],
-        returns: 'this returns two floats representing the players screen resolution, width and height.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetScreenSize',
+        returns: '***velocityX**: The velocity on the x-coordinate or false if the wind velocity is default. ***velocityY**: The velocity on the y-coordinate or nil if the wind velocity is default. ***velocityZ**: The velocity on the z-coordinate or nil if the wind velocity is default.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWindVelocity',
     },
-    guiGetSelectedTab: {
-        summary: 'This function returns the currently selected tab in the specified Element/GUI/Tab\npanel|tab panel.',
+    getWorldFromScreenPosition: {
+        summary: 'This function allows you to retrieve the world position corresponding to a 2D position on the screen, at a certain depth.\n\nIf you want to detect what element is at a particular point on the screen, use processLineOfSight between the camera position and the position returned from this function when passed a high depth value (100 or so, depending how far away you want to detect elements at).\n\nAs expected, setting 0 as the distance will cause the point retrived to be within the camera itself. That means that drawing any 3D thing in that point would result in it not being visible. Depending on the camera near clip distance, however, the minimum distance to be able to view it can vary.',
         parameters: [
-            { name: 'tabPanel', isOptional: false, isVariadic: false, summary: 'The Element/GUI/Tab panel|tab panel which current tab you want to retrieve.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'A float value indicating the x position on the screen, in pixels.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'A float value indicating the y position on the screen, in pixels.' },
+            { name: 'depth', isOptional: false, isVariadic: false, summary: 'A float value indicating the distance from the camera of the point whose coordinates we are retrieving, in units.' },
         ],
-        returns: 'returns an element of the element/gui/tab|tab if a tab was selected or nil if no tab was selected. if passed arguments were invalid or something went wrong, the function will return false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetSelectedTab',
+        returns: 'Returns three *x*, *y*, *z* floats indicating the world position if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWorldFromScreenPosition',
     },
-    guiGetSize: {
-        summary: 'This function gets the size of a GUI element.',
+    getWorldProperty: {
+        summary: 'This function is used to get the values of time cycle and weather related properties.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The GUI element to get size of.' },
-            { name: 'relative', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the size should be relative to the elements parent width, or an absolute size in pixels.' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'The property you wish to retrieve.' },
         ],
-        returns: 'returns the gui element size x and y if the function has been successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetSize',
+        returns: 'Returns the value of property represented by either 1 or 3 numbers (RGB, FLOAT, INT) if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetWorldProperty',
     },
-    guiGetText: {
-        summary: 'This function is used to get the text of GUI elements like edit boxes, labels, buttons\netc.',
+    getZoneName: {
+        summary: 'This function allows you to retrieve the zone name of a certain location.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'element you wish to get text of.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'The X axis position' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'The Y axis position' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'The Z axis position' },
+            { name: 'citiesonly', isOptional: true, isVariadic: false, summary: 'An optional argument to choose if you want to return one of the following city names:' },
         ],
-        returns: 'returns a string containing the requested elements text, or false if the gui element passed to the function is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetText',
+        returns: 'Returns the string of the zone name.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetZoneName',
     },
-    guiGetVisible: {
-        summary: 'This function determines if a GUI element is visible.',
+    givePedWeapon: {
+        summary: 'This function gives the specified weapon to the specified ped. This function can\'t be used on players, use giveWeapon for that.\n\nThis function is mainly useful for client side created peds however you can use it on a server side ped, though note that the weapon wouldn\'t be synced between clients unless your script gives the weapon to the ped on every client.\n\nThere is an optional argument to specify ammunition and whether to set as the current weapon. If you don\'t specify an ammo value it will give 30 ammo by default and for a melee weapon you can specify just 1 or above.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element to be checked' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'A ped element.' },
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a Weapon ID. Click here for a list of possible weapon IDs.' },
+            { name: 'ammo', isOptional: true, isVariadic: false, summary: 'A whole number integer serving as the ammo amount for the given weapon. For weapons that do not require ammo, such as melee, this should be at least 1.' },
+            { name: 'setAsCurrent', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether or not the weapon will be set as the peds currently selected weapon.' },
         ],
-        returns: 'returns true if the element is visible, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetVisible',
+        returns: 'Returns *true* if weapon was successfully given to the ped, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GivePedWeapon',
     },
-    guiGridListAddColumn: {
-        summary: 'This function is used to create columns in grid lists.',
+    givePlayerMoney: {
+        summary: 'This function adds money to a player\'s current money amount.  To set absolute values, setPlayerMoney can be used.',
         parameters: [
-            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a column to' },
-            { name: 'title', isOptional: false, isVariadic: false, summary: 'Title of the column' },
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'Column width, relative to the grid list width' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player you are giving the money to.' },
+            { name: 'amount', isOptional: false, isVariadic: false, summary: 'a positive integer number specifying the amount of money to give to the player.' },
         ],
-        returns: 'returns the column id if it was created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListAddColumn',
+        returns: 'Returns *true* if the money was added, or *false* if invalid parameters were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GivePlayerMoney',
     },
-    guiGridListAddRow: {
-        summary: 'Adds a row to a grid list, and optionally add simple text items with your rows.  Use\nguiGridListSetItemText to add row headers.\nATTENTION: Without guiGridListSetItemText there is no row added to the grid.\nLook at the example, first you give the row a name with row = guiGridListAddRow (\nplayerList ), and then you use guiGridListSetItemText.',
+    giveWeapon: {
+        summary: 'giveWeapon gives a specified weapon to a certain player or ped. There is an optional argument to specify ammunition. For example, a melee weapon doesn\'t need an ammo argument.',
         parameters: [
-            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list you want to add a row to' },
-            { name: 'itemText1', isOptional: true, isVariadic: false, summary: 'The text for the first column item in the row. Either a string or a number can be passed (use numbers for sorting purposes).' },
-            { name: 'itemText2', isOptional: true, isVariadic: false, summary: 'The text for the second column item in the row. Either a string or a number can be passed (use numbers for sorting purposes). ... Item text for any other columns' },
-            { name: 'varargs', isOptional: false, isVariadic: true, summary: '' },
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player or ped object referencing the specified player (or ped)' },
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a Weapon ID.' },
+            { name: 'ammo', isOptional: true, isVariadic: false, summary: 'A whole number integer serving as the ammo amount for the given weapon. For weapons that do not require ammo, such as melee, this should be at least 1.' },
+            { name: 'setAsCurrent', isOptional: true, isVariadic: false, summary: 'A boolean value determining whether or not the weapon will be set as the players current.' },
         ],
-        returns: 'returns the row id if it has been created, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListAddRow',
+        returns: 'Returns *true* if weapon was successfully acquired, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GiveWeapon',
     },
-    guiGridListAutoSizeColumn: {
-        summary: 'This allows you to automatically size a column to display everything in it correctly,\nwith the most minimal width.',
+    guiBlur: {
+        summary: 'This function defocuses a focused GUI element. Used primarily for edit fields and memos.',
         parameters: [
-            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The Element/GUI/Gridlist|grid list element where the column is located.' },
-            { name: 'columnIndex', isOptional: false, isVariadic: false, summary: 'The ID of the column you want to be auto-sized.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to defocus' },
         ],
-        returns: 'returns true if the column was auto-sized, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListAutoSizeColumn',
+        returns: 'Returns *true* if the function was successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiBlur',
     },
-    guiGridListClear: {
-        summary: 'This function clears all the data from a grid list.',
+    guiBringToFront: {
+        summary: 'This function brings a GUI element on top of others.',
         parameters: [
-            { name: 'gridList', isOptional: false, isVariadic: false, summary: 'The grid list element to be cleared' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to move to the front.' },
         ],
-        returns: 'returns true if the grid list element is valid and has been cleared successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListClear',
+        returns: 'Returns *true* if the function was successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiBringToFront',
+    },
+    guiCheckBoxGetSelected: {
+        summary: 'This function gets a checkbox\'s selection state.',
+        parameters: [
+            { name: 'theCheckbox', isOptional: false, isVariadic: false, summary: 'The checkbox you wish to retrieve the selection state of.' },
+        ],
+        returns: 'Returns *true* if the checkbox is selected, *false* if it is not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCheckBoxGetSelected',
+    },
+    guiCheckBoxSetSelected: {
+        summary: 'This function selects (ticks) or unselects a checkbox.',
+        parameters: [
+            { name: 'theCheckbox', isOptional: false, isVariadic: false, summary: 'The GUI element in which you wish to change the selection state of' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'The state of the checkbox, where *true* indicates selected, and *false* indicates unselected.' },
+        ],
+        returns: 'Returns *true* if the checkbox\'s selection state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCheckBoxSetSelected',
+    },
+    guiComboBoxAddItem: {
+        summary: 'Adds an item to a combobox.',
+        parameters: [
+            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox you want to add a row to' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'The text that the item will contain.' },
+        ],
+        returns: 'Returns the item ID if it has been created, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxAddItem',
+    },
+    guiComboBoxClear: {
+        summary: 'This function removes all the items from a combobox.',
+        parameters: [
+            { name: 'comboBox', isOptional: false, isVariadic: false, summary: 'The combobox element to be cleared' },
+        ],
+        returns: 'Returns *true* if the combobox element is valid and has been cleared successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiComboBoxClear',
     },
 };

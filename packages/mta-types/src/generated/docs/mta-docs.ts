@@ -50,6 +50,11 @@ import { MTA_DOCS_47 } from './mta-docs-47';
 import { MTA_DOCS_48 } from './mta-docs-48';
 import { MTA_DOCS_49 } from './mta-docs-49';
 import { MTA_DOCS_50 } from './mta-docs-50';
+import { MTA_DOCS_51 } from './mta-docs-51';
+import { MTA_DOCS_52 } from './mta-docs-52';
+import { MTA_DOCS_53 } from './mta-docs-53';
+import { MTA_DOCS_54 } from './mta-docs-54';
+import { MTA_DOCS_55 } from './mta-docs-55';
 
 export const MTA_API_DOCS: ApiDocumentationCatalog = {
     ...MTA_DOCS_1,
@@ -102,4 +107,9 @@ export const MTA_API_DOCS: ApiDocumentationCatalog = {
     ...MTA_DOCS_48,
     ...MTA_DOCS_49,
     ...MTA_DOCS_50,
+    ...MTA_DOCS_51,
+    ...MTA_DOCS_52,
+    ...MTA_DOCS_53,
+    ...MTA_DOCS_54,
+    ...MTA_DOCS_55,
 };

@@ -17,6 +17,11 @@ export const MTA_EFFECTS_CLIENT: ApiCatalog = {
     fxAddWaterHydrant: fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
     fxAddWaterSplash: fn([NUMBER, NUMBER, NUMBER], BOOLEAN, 3),
     fxAddWood: fn([NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 6),
+    fxCreateParticle: fn(
+        [STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN, NUMBER, NUMBER, NUMBER, BOOLEAN, NUMBER],
+        BOOLEAN,
+        11,
+    ),
     getEffectDensity: fn([named('Effect')], NUMBER, 1),
     getEffectSpeed: fn([named('Effect')], NUMBER, 1),
     setEffectDensity: fn([named('Effect'), NUMBER], BOOLEAN, 2),

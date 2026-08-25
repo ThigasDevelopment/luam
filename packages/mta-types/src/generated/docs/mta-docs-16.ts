@@ -1,238 +1,239 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_16: ApiDocumentationCatalog = {
-    getJetpackMaxHeight: {
-        summary: 'This function gets the maximum height at which your jetpack can fly without failing to go\nhigher.',
-        parameters: [],
-        returns: 'returns a float containing the max jetpack height.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetJetpackMaxHeight',
-    },
-    getJetpackWeaponEnabled: {
-        summary: 'This function checks if a weapon is usable while on a Jetpack.',
+    getEffectDensity: {
+        summary: 'This function gets the density of certain effect.',
         parameters: [
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'The weapon thats being checked if its usable on a Jetpack.' },
+            { name: 'theEffect', isOptional: false, isVariadic: false, summary: 'The effect to get density of.' },
         ],
-        returns: 'returns true if the weapon is enabled, else false if the weapon isnt or invalid arguments are passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetJetpackWeaponEnabled',
+        returns: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetEffectDensity',
     },
-    getKeyboardLayout: {
+    getEffectSpeed: {
+        summary: 'This function gets the speed of a specified effect.',
+        parameters: [
+            { name: 'theEffect', isOptional: false, isVariadic: false, summary: 'The effect to get the speed of.' },
+        ],
+        returns: 'Returns float containing the effect\'s speed, *false* if invalid arguments were specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetEffectSpeed',
+    },
+    getElementAlpha: {
+        summary: 'This function returns the alpha (transparency) value for the specified element. This can be a player, ped, object, vehicle or weapon.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose alpha you want to retrieve.' },
+        ],
+        returns: 'Returns an integer (0-255; 0 = transparent) indicating the element\'s alpha, or *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementAlpha',
+    },
+    getElementAngularVelocity: {
+        summary: 'Gets the current angular velocity of a specified, supported element.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to retrieve the angular velocity from. Can be either a player, ped, object, vehicle or a custom weapon. **Server side supports only vehicles currently.**' },
+        ],
+        returns: 'Returns three floats describing the x, y and z rotation',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementAngularVelocity',
+    },
+    getElementAttachedOffsets: {
+        summary: 'This function returns the offsets of an element that has been attached to another element using attachElements.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The attached element.' },
+        ],
+        returns: 'Returns 6 floats, of which the first 3 indicate the position offset (x, y, z), and the last 3 indicate the rotation offset (x, y, z), if successful. *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementAttachedOffsets',
+    },
+    getElementAttachedTo: {
+        summary: 'This function determines the element that the specified element is attached to.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you require the information for.' },
+        ],
+        returns: 'Returns the element that the chosen element is attached to, or *false* if the element isn\'t attached to another element.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementAttachedTo',
+    },
+    getElementBoneMatrix: {
         summary: '',
-        parameters: [],
-        returns: 'returns a table with keyboard layout properties: {| class=wikitable style=cellpadding: 10px; |- ! property || values and description |- | readinglayout || {| class=prettytable |- | ltr || left to right (english) |- | rtl || right to left (arabic, hebrew) |- | ttb-rtl-ltr || either read vertically from top to bottom with columns going from right to left, or read in horizontal rows from left to right, as for the japanese (japan) locale. |- | ttb-ltr || read vertically from top to bottom with columns going from left to right, as for the mongolian (mongolian) locale. |} |}',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetKeyboardLayout',
-    },
-    getKeyBoundToCommand: {
-        summary: 'This function allow you get first key bound to command.',
         parameters: [
-            { name: 'command', isOptional: false, isVariadic: false, summary: 'command what you need check.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to get the bone matrix on.' },
+            { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone to get the matrix of. See Bone IDs.' },
         ],
-        returns: 'returns a string of first key binded to current command.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetKeyBoundToCommand',
+        returns: 'Returns a multi-dimensional array (which can be transformed into a proper matrix class using *Matrix.create* method) containing a 4x4 matrix. Returns *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBoneMatrix',
     },
-    getKeyBoundToFunction: {
-        summary: 'getKeyBoundToFunction allows retrieval of the first key bound to a function.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you are checking the function bound to a key' },
-            { name: 'theFunction', isOptional: false, isVariadic: false, summary: 'The function in which you would like to check the bound key' },
-        ],
-        returns: 'returns a string of the first key the function was bound to.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetKeyBoundToFunction',
-    },
-    getKeyState: {
-        summary: 'This function determines if a certain key is pressed or not.\nNote: ralt may trigger both ralt and lctrl, this is due to AltGr',
-        parameters: [
-            { name: 'keyName', isOptional: false, isVariadic: false, summary: 'The name of the key youre checking state of. See Key names.' },
-        ],
-        returns: 'returns true if the specified key is pressed, false if it isnt or if an invalid key name is passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetKeyState',
-    },
-    getLatentEventHandles: {
-        summary: 'Gets the currently queued latent events. The last one in the table is always the latest\nevent queued. Each returned handle can be used with getLatentEventStatus or\ncancelLatentEvent',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player who is receiving the events.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLatentEventHandles',
-    },
-    getLatentEventStatus: {
-        summary: 'Gets the status of one queued latent event.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player who is receiving the event.' },
-            { name: 'handle', isOptional: false, isVariadic: false, summary: 'A handle previous got from getLatentEventHandles.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLatentEventStatus',
-    },
-    getLightColor: {
-        summary: 'This function returns the color for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to retrieve the color of.' },
-        ],
-        returns: 'returns three ints corresponding to the amount of red, green and blue (respectively) of the light, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLightColor',
-    },
-    getLightDirection: {
-        summary: 'This function returns the direction for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to retrieve the direction of.' },
-        ],
-        returns: 'returns three ints corresponding to the x, y and z coordinates (respectively) of the light direction, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLightDirection',
-    },
-    getLightRadius: {
-        summary: 'This function returns the radius for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to retrieve the radius of.' },
-        ],
-        returns: 'returns a float containing the radius of the specified light, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLightRadius',
-    },
-    getLightType: {
-        summary: 'This function returns the type for a Element/Light|light element.',
-        parameters: [
-            { name: 'theLight', isOptional: false, isVariadic: false, summary: 'The Element/Light|light that you wish to retrieve the type of.' },
-        ],
-        returns: 'returns an int containing the type of the specified light, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLightType',
-    },
-    getLoadedModules: {
-        summary: 'This function returns all the currently loaded modules of the server.',
-        parameters: [],
-        returns: 'returns a table of all the currently loaded modules. if no modules are loaded, the table will be empty.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLoadedModules',
-    },
-    getLocalization: {
-        summary: 'This function gets the players localization setting as set in the MTA client.',
-        parameters: [],
-        returns: 'returns a table with the following entries: *code : the language code (eg. en_us for english (united states) or ar for arabic). *name : the name of the language (eg. english (united states) or arabic).',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLocalization',
-    },
-    getLocalPlayer: {
-        summary: 'This function gets the player element of the client running the current script.\nYou can use the predefined variable localPlayer instead of typing getLocalPlayer()',
-        parameters: [],
-        returns: 'returns the local player element.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLocalPlayer',
-    },
-    getLowLODElement: {
-        summary: 'This function return the low LOD element that an element is associated with.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose low LOD version we want to get.' },
-        ],
-        returns: 'returns a low lod element if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetLowLODElement',
-    },
-    getMapName: {
-        summary: 'This function retrieves the current mapname as set by setMapName.',
-        parameters: [],
-        returns: 'returns the mapname as a string. if no mapname is set it returns nil.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMapName',
-    },
-    getMarkerColor: {
-        summary: 'This function returns the color and transparency for a marker element. Not all marker\ntypes support transparency.',
-        parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: ': The marker that you wish to retrieve the color of.' },
-        ],
-        returns: 'returns four ints corresponding to the amount of red, green, blue and alpha (respectively) of the marker, false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMarkerColor',
-    },
-    getMarkerCount: {
-        summary: 'Returns the number of markers that currently exist in the world.',
-        parameters: [],
-        returns: 'returns the number of markers that currently exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMarkerCount',
-    },
-    getMarkerIcon: {
-        summary: 'This function returns the icon name for a marker.',
-        parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: ': A marker element referencing the specified marker.' },
-        ],
-        returns: 'returns false if the marker passed is invalid or a string containing one of the following: * none: no icon * arrow: arrow icon * finish: finish (end-race) icon',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMarkerIcon',
-    },
-    getMarkerSize: {
-        summary: 'This function returns a float containing the size of the specified marker.',
-        parameters: [
-            { name: 'myMarker', isOptional: false, isVariadic: false, summary: ': The marker that you wish to retrieve the size of.' },
-        ],
-        returns: 'returns a float containing the size of the specified marker.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMarkerSize',
-    },
-    getMarkerTarget: {
-        summary: 'This function returns the position of the specified markers target, the position it\npoints to. This only works for checkpoint markers and ring markers. For checkpoints it\nreturns the position the arrow is pointing to, for ring markers it returns the position\nthe ring is facing. You can set this target with setMarkerTarget.',
-        parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'The marker you wish to retrieve the target position of.' },
-        ],
-        returns: 'returns three floats if a target is set, or false in the first variable and nil in the two others if the marker is invalid or no target is set.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMarkerTarget',
-    },
-    getMarkerType: {
-        summary: 'This function returns a markers type.',
-        parameters: [
-            { name: 'theMarker', isOptional: false, isVariadic: false, summary: ': A marker element referencing the specified marker.' },
-        ],
-        returns: '* returns one of the following strings: if an invalid marker is specified, false is returned.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMarkerType',
-    },
-    getMaxPlayers: {
-        summary: 'This function returns the maximum number of player slots on the server.',
-        parameters: [],
-        returns: 'returns the maximum number of players allowed on the server.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMaxPlayers',
-    },
-    getMinuteDuration: {
-        summary: 'Tells you how long an ingame minute takes in real-world milliseconds. The default GTA\nvalue is 1000.',
-        parameters: [],
-        returns: 'returns the number of real-world milliseconds that go in an ingame minute.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMinuteDuration',
-    },
-    getModelHandling: {
-        summary: 'This function returns a table containing the handling data of the specified vehicle model.\nNote: the data returned may not reflect the actual handling of a particular vehicle,\nsince this may be overriden by the setVehicleHandling function.',
-        parameters: [
-            { name: 'modelId', isOptional: false, isVariadic: false, summary: 'the vehicle model you wish to get the handling data of.' },
-        ],
-        returns: 'returns a table containing all the handling data, false if an invalid vehicle model is specified. here is a list of valid table properties and what they return:',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetModelHandling',
-    },
-    getModuleInfo: {
-        summary: 'This function returns information about the specified Modules|module.',
-        parameters: [
-            { name: 'moduleName', isOptional: false, isVariadic: false, summary: 'A string containing the module you wish to get information of e.g. hashing.dll' },
-        ],
-        returns: 'returns a table containing information about module. these keys are present in the table: *version: module version in format x.xx *name: module name *author: module author if invalid name for module is passed, it will return false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetModuleInfo',
-    },
-    getMoonSize: {
-        summary: 'This function returns the moon size.',
-        parameters: [],
-        returns: 'returns a integer being the moon size that is currently set, depending on which side it is used.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetMoonSize',
-    },
-    getNearClipDistance: {
+    getElementBonePosition: {
         summary: '',
-        parameters: [],
-        returns: 'this function returns a float containing the actual near clip distance.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetNearClipDistance',
-    },
-    getNetworkStats: {
-        summary: 'This function returns network status information.',
         parameters: [
-            { name: 'thePlayer', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to get the bone position on.' },
+            { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone to get the position of. See Bone IDs.' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetNetworkStats',
+        returns: 'Returns 3 floats, representing the X, Y, Z world position of the bone.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBonePosition',
     },
-    getNetworkUsageData: {
-        summary: 'This function returns a table containing network usage information about inbound and\noutbound packets.',
-        parameters: [],
-        returns: 'returns a table with two fields: in and out. each of these contain a table with two fields: bits and count. each of these contain a table with 256 numeric fields ranging from 0 to 255, containing the appropriate network usage data for such packet id.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetNetworkUsageData',
-    },
-    getObjectMass: {
-        summary: 'This function returns the mass of a specified object.',
+    getElementBoneQuaternion: {
+        summary: 'This function retrieves how a particular bone rotates in relation to the element.\n\nThe use of [https://en.wikipedia.org/wiki/Quaternion quaternions] are more effective and do not generate issues like gimbal lock that might arise with [https://en.wikipedia.org/wiki/Euler_angles Euler angles], so they are a preferable choice for rotation.',
         parameters: [
-            { name: 'theObject', isOptional: false, isVariadic: false, summary: 'the object whose mass you want to get.' },
+            { name: 'ped', isOptional: false, isVariadic: false, summary: 'The element (ped or player) from which the bone\'s rotation will be retrieved.' },
+            { name: 'bone', isOptional: false, isVariadic: false, summary: 'The ID of the bone to retrieve the quaternion of.' },
         ],
-        returns: '* a float representing the mass of the object. * false if invalid arguments were passed. * -1 if object was never streamed in.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetObjectMass',
+        returns: 'Returns four float values: * **x:** The quaternion\'s coefficient of the 𝑖 component, representing rotation around the x-axis. * **y:** The quaternion\'s coefficient of the 𝑗 component, representing rotation around the y-axis. * **z:** The quaternion\'s coefficient of the 𝑘 component, representing rotation around the z-axis. * **w:** The real part of the quaternion, which is linked to the angle of rotation.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBoneQuaternion',
+    },
+    getElementBoneRotation: {
+        summary: '',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to get the bone rotation on.' },
+            { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone to get the rotation of. See Bone IDs.' },
+        ],
+        returns: 'Returns 3 floats, representing the yaw, pitch, roll rotation values.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBoneRotation',
+    },
+    getElementBoundingBox: {
+        summary: 'This function returns the minimum and maximum coordinates of an element\'s bounding box.\n\nIt should be noted that the values returned are relative to the position of the element, and as such if you wish to get world coordinates for drawing, etc., you should retrieve the position of the element and add the returned values onto that.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element whose bounding box we want to get.' },
+        ],
+        returns: '*Returns *min x, min y, min z, max x, max y, max z* if the passed element is valid and streamed in, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBoundingBox',
+    },
+    getElementByID: {
+        summary: 'This function returns an element from the specified ID. If more than one element with the same ID exists, only the first one in the order it appears in the XML tree will be returned by this function.',
+        parameters: [
+            { name: 'id', isOptional: false, isVariadic: false, summary: 'The ID of the element as it appears in the XML file or as set by setElementID.' },
+            { name: 'index', isOptional: true, isVariadic: false, summary: 'If there are two or more elements of the same ID it will return the element with the specified index starting at 0.' },
+        ],
+        returns: 'Returns the element with the given ID, or *false* if no such element exists.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementByID',
+    },
+    getElementByIndex: {
+        summary: 'This function returns an element of the specified type with the specified index.',
+        parameters: [
+            { name: 'theType', isOptional: false, isVariadic: false, summary: 'the type of the element to be returned. Examples include "player", "vehicle", or a custom type.' },
+            { name: 'index', isOptional: false, isVariadic: false, summary: 'the element\'s index (0 for the first element, 1 for the second, etc).' },
+        ],
+        returns: 'Returns the requested element, or *false* if it doesn\'t exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementByIndex',
+    },
+    getElementChild: {
+        summary: 'This function returns one of the child elements of a given parent element. The child element is selected by its index (0 for the first child, 1 for the second and so on).',
+        parameters: [
+            { name: 'parent', isOptional: false, isVariadic: false, summary: 'the element above the one to be returned in the hierarchy.' },
+            { name: 'index', isOptional: false, isVariadic: false, summary: 'the element\'s index (0 for the first element, 1 for the second, etc).' },
+        ],
+        returns: 'Returns the requested element if it exists, or *false* if it doesn\'t.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementChild',
+    },
+    getElementChildren: {
+        summary: 'This function is used to retrieve a list of the child elements of a given parent element. Note that it will only return direct children and not elements that are further down the element tree.',
+        parameters: [
+            { name: 'parent', isOptional: false, isVariadic: false, summary: 'Supply this argument with the parent of the children you want returned.' },
+            { name: 'theType', isOptional: true, isVariadic: false, summary: 'The type of element you want a list of. This is the same as the tag name in the .map file, so this can be used with a custom element type if desired. Built in types are:' },
+        ],
+        returns: 'This function returns a *table* that contains a list of elements that the parent has. If the element has no children, it will return an empy *table*. It will return *false* if the parent element does not exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementChildren',
+    },
+    getElementChildrenCount: {
+        summary: 'This function returns the number of children an element has. Note that only the direct children are counted and not elements that are further down the element tree.',
+        parameters: [
+            { name: 'parent', isOptional: false, isVariadic: false, summary: 'the parent element' },
+        ],
+        returns: 'Returns an *int* with the number of child elements, or *false* if the parent element does not exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementChildrenCount',
+    },
+    getElementCollisionsEnabled: {
+        summary: 'This function indicates if a specific element is set to have collisions disabled. An element without collisions does not interact with the physical environment and remains static.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element for which you want to check whether collisions are enabled' },
+        ],
+        returns: 'Returns *true* if the collisions are enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementCollisionsEnabled',
+    },
+    getElementColShape: {
+        summary: 'Some elements have an associated colshape, for example Marker and Pickup. This function is used to get the associated colshape.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element you want to get the colshape of' },
+        ],
+        returns: 'Returns *colshape* of the element, *false* if not or an invalid argument was passed to the function.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementColShape',
+    },
+    getElementData: {
+        summary: 'This function retrieves element data attached to an element under a certain key.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'This is the element with data you want to retrieve.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the element data entry you want to retrieve. (Maximum 31 characters.)' },
+            { name: 'inherit', isOptional: true, isVariadic: false, summary: '- toggles whether or not the function should go up the hierarchy to find the requested key in case the specified element doesn\'t have it.' },
+        ],
+        returns: 'This function returns a *variable* containing the requested element data, or *false* if the element or the element data does not exist. When getting data corresponding to a XML attribute, this is always a *string*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementData',
+    },
+    getElementDimension: {
+        summary: 'This function allows you to retrieve the dimension of an element. See Dimension for the list of valid element types. The dimension determines what/who the element is visible to.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element in which you\'d like to retrieve the dimension of.' },
+        ],
+        returns: 'Returns an integer for the dimension if **theElement** is valid, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementDimension',
+    },
+    getElementDistanceFromCentreOfMassToBaseOfModel: {
+        summary: 'This function is used to retrieve the distance between a element\'s centre of mass to the base of the model. This can be used to calculate the position the element has to be set to, to have it on ground level.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: '' },
+        ],
+        returns: 'Returns a *float* with the distance, or *false* if the element is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementDistanceFromCentreOfMassToBaseOfModel',
+    },
+    getElementHealth: {
+        summary: 'This function returns the current health for the specified element. This can be a player, a ped, a vehicle, or an object.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The player or vehicle whose health you want to check.' },
+        ],
+        returns: 'Returns a float indicating the element\'s health, or *false* if invalid arguments were passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementHealth',
+    },
+    getElementID: {
+        summary: 'This function gets the ID of an element. This is the "id" attribute of the element and is a string, NOT a number like a model ID, weapons ID or similar.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element from which to retrieve the ID.' },
+        ],
+        returns: 'This returns a *string* containing the element ID. It will return an empty *string* if it has no ID. It will return *false* if the element is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementID',
+    },
+    getElementInterior: {
+        summary: 'This function allows you to retrieve the interior of any element. An interior is the current loaded place, 0 being outside.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element of which you\'d like to retrieve the interior' },
+        ],
+        returns: 'Returns an int for the interior if **theElement** is valid, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementInterior',
+    },
+    getElementLighting: {
+        summary: '',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose lighting you want to retrieve.' },
+        ],
+        returns: 'Returns a float (0.0-0.5; 0 = dark; 0.5 = light) indicating the element\'s lighting, or *false* if invalid arguments were passed. This function will fail if called right after element creation.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementLighting',
+    },
+    getElementMatrix: {
+        summary: 'This function gets an element\'s transform matrix. This contains 16 float values that multiplied to a point will give you the point transformed. It is most useful for matrix calculations such as calculating offsets. For further information, please refer to a tutorial of matrices in computer graphics programming.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which you wish to retrieve the matrix for.' },
+            { name: 'legacy', isOptional: true, isVariadic: false, summary: 'Set to *false* to return correctly setup matrix (i.e. Last column in the first 3 rows set to zero).' },
+        ],
+        returns: 'Returns a multi-dimensional array (which can be transformed into a proper matrix class using *Matrix.create* method) containing a 4x4 matrix. Returns *false* if the element is not streamed in, and not a vehicle, ped or object.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementMatrix',
+    },
+    getElementModel: {
+        summary: 'Returns the model ID of a given element. This can be a player/ped skin, a pickup model, an object model or a vehicle model.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to retrieve the model ID of.' },
+        ],
+        returns: 'Returns the model ID if successful, *false* otherwise. * For players/peds: A GTASA player model (skin) ID. See Character Skins. * For vehicles: The vehicle ID of the vehicle. * For objects: An int specifying the model id.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementModel',
+    },
+    getElementParent: {
+        summary: 'This function is used to determine the parent of an *element*.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The child of the parent element you want returned.' },
+        ],
+        returns: 'This returns the parent as an *element*. It returns *false* if *theElement* is invalid, or is the root node.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetElementParent',
     },
 };

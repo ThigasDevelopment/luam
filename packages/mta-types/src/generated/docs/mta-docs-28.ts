@@ -1,236 +1,241 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_28: ApiDocumentationCatalog = {
-    guiGridListSetSelectionMode: {
-        summary: 'This function sets the selection mode of a gui gridlist.  For example, the MTA server\nbrowser selects a whole row, while the Controls dialog selects a single cell. To select\nmultiple items you must be holding down ctrl.',
+    guiCreateScrollPane: {
+        summary: 'This creates a GUI scroll pane.',
         parameters: [
-            { name: 'gridlist', isOptional: false, isVariadic: false, summary: 'The gridlist in which you wish to set the selection mode.' },
-            { name: 'mode', isOptional: false, isVariadic: false, summary: 'The mode of the selection. Can be the following values: 0 Single row selection 1 Multiple row selection 2 Single cell selection 3 Multiple cell selection 4 Nominated(First) single column selection 5 Nominated(First) multiple column selection 6 Single column selection 7 Multiple column selection 8 Nominated(First) single row selection 9 Nominated(First) multiple row selection' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'the 2D x offset of the GUI scrollpane from its parent. This is affected by the relative argument.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'the 2D y offset of the GUI scrollpane from its parent. This is affected by the relative argument.' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'the width of the GUI scrollpane. This is affected by the relative argument.' },
+            { name: 'height', isOptional: false, isVariadic: false, summary: 'the height of the GUI scrollpane. This is affected by the relative argument.' },
+            { name: 'relative', isOptional: true, isVariadic: false, summary: 'whether sizes and positions are relative to their parent\'s. If this is true, then all measures must be between 0 and 1, representing sizes/positions as a fraction of the parent widget\'s size.' },
+            { name: 'parent', isOptional: true, isVariadic: false, summary: 'the gui-element this scrollpane is attached to. By default, it is nil, meaning the widget is attached to the background.' },
         ],
-        returns: 'returns true if the selection mode was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetSelectionMode',
+        returns: 'The gui-element if created, otherwise false.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCreateScrollPane',
     },
-    guiGridListSetSortingEnabled: {
-        summary: 'This function allows the disabling or enabling of sorting within a gridlist.  Sorting is\nachieved by clicking a column header.  Gridlist items will be sorted according to the\nclicked column.  By default, gridlists have sorting enabled.  This function will allow\nyou to toggle this.',
+    guiCreateStaticImage: {
+        summary: 'This function creates a static image using a .png image in the resource.',
         parameters: [
-            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: 'The GUI gridlist you wish to toggle the sorting of.' },
-            { name: 'enabled', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the sorting is enabled, or disabled.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'A float of the 2D x position of the image on a player\'s screen. This is affected by the *relative* argument.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'A float of the 2D y position of the image on a player\'s screen. This is affected by the *relative* argument.' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'A float of the width of the image. This is affected by the *relative* argument.' },
+            { name: 'height', isOptional: false, isVariadic: false, summary: 'A float of the height of the image. This is affected by the *relative* argument.' },
+            { name: 'path', isOptional: false, isVariadic: false, summary: 'The filepath of the image file that is being loaded.' },
+            { name: 'relative', isOptional: true, isVariadic: false, summary: 'This is whether sizes and positioning are relative. If this is *true*, then all x,y,width,height floats must be between 0 and 1, representing measures relative to the parent.' },
+            { name: 'parent', isOptional: true, isVariadic: false, summary: 'This is the parent that the image is attached to. If the *relative* argument is true, sizes and positioning will be made relative to this parent. If the *relative* argument is false, positioning will be the number of offset pixels from the parent\'s origin. If no parent is passed, the parent will become the screen - causing positioning and sizing according to screen positioning.' },
         ],
-        returns: 'returns true if sorting was successfully toggled., false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetSortingEnabled',
+        returns: 'Returns element if image was created successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCreateStaticImage',
     },
-    guiGridListSetVerticalScrollPosition: {
-        summary: 'This function is used to set the vertical scroll position from a grid list',
+    guiCreateTab: {
+        summary: 'This function creates a tab on a pre-existing tab panel. A tab is a button as well as a \'dimension\' that can be used to switch between information by clicking on the tabs.  Tabs are sorted on a tab panel in the order that they are created.',
         parameters: [
-            { name: 'guiGridlist', isOptional: false, isVariadic: false, summary: ': The grid list you want to set the vertical scroll position from' },
-            { name: 'fPosition', isOptional: false, isVariadic: false, summary: ': A float representing the vertical scroll position (0-100)' },
+            { name: 'text', isOptional: false, isVariadic: false, summary: 'The caption for the tab' },
+            { name: 'parent', isOptional: false, isVariadic: false, summary: 'The parent tab panel, as a tab panel element type' },
         ],
-        returns: 'returns true if the vertical scroll position was set, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGridListSetVerticalScrollPosition',
+        returns: 'Returns a tab element if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCreateTab',
     },
-    guiLabelGetColor: {
-        summary: 'This function gets the color of a label.',
+    guiCreateTabPanel: {
+        summary: 'This function creates a Tab Panel, which acts as a template to create Tabs upon.',
         parameters: [
-            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The label to get color.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'A float of the 2D x position of the GUI tab panel on a player\'s screen. This is affected by the *relative* argument.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'A float of the 2D y position of the GUI tab panel on a player\'s screen. This is affected by the *relative* argument.' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'A float of the width of the GUI tab panel. This is affected by the *relative* argument.' },
+            { name: 'height', isOptional: false, isVariadic: false, summary: 'A float of the height of the GUI tab panel. This is affected by the *relative* argument.' },
+            { name: 'relative', isOptional: true, isVariadic: false, summary: 'This is whether sizes and positioning are relative. If this is *true*, then all x,y,width,height floats must be between 0 and 1, representing sizes relative to the parent.' },
+            { name: 'parent', isOptional: true, isVariadic: false, summary: 'This is the parent that the tab panel is attached to. If the *relative* argument is true, sizes and positioning will be made relative to this parent. If the *relative* argument is false, positioning will be the number of offset pixels from the parent\'s origin. If no parent is passed, the parent will become the screen - causing positioning and sizing according to screen positioning.' },
         ],
-        returns: 'returns three int values, representing the amount of red, green, blue if successful. false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelGetColor',
+        returns: 'Returns a GUI tab panel element if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCreateTabPanel',
     },
-    guiLabelGetFontHeight: {
-        summary: 'This function returns the height of the font currently used in a GUI text label.',
+    guiCreateWindow: {
+        summary: 'This function is for creating a new GUI window.  This provides a base for other gui elements to be created within.  However, windows do not have a parent and cannot be created in any GUI elements.',
         parameters: [
-            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to get the font height from.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'A float of the 2D x position of the GUI window on a player\'s screen. This is affected by the *relative* argument.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'A float of the 2D y position of the GUI window on a player\'s screen. This is affected by the *relative* argument.' },
+            { name: 'width', isOptional: false, isVariadic: false, summary: 'A float of the width of the GUI window. This is affected by the *relative* argument.' },
+            { name: 'height', isOptional: false, isVariadic: false, summary: 'A float of the height of the GUI window. This is affected by the *relative* argument.' },
+            { name: 'titleBarText', isOptional: false, isVariadic: false, summary: 'A string of the text that will be displayed in the title bar of the window.' },
+            { name: 'relative', isOptional: true, isVariadic: false, summary: 'This is whether sizes and positioning are relative. If this is *true*, then all x,y,width,height floats must be between 0 and 1, representing sizes/positions as a fraction of the screen size. If *false*, then the size and co-ordinates are based on client\'s resolution, accessible using guiGetScreenSize.' },
         ],
-        returns: 'returns the absolute height of the font currently used in the text label if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelGetFontHeight',
+        returns: 'Returns a gui window element if it was created successfully, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiCreateWindow',
     },
-    guiLabelGetTextExtent: {
-        summary: 'This function returns the extent, or width, of the current text inside a GUI text label.',
+    guiDeleteTab: {
+        summary: 'This function deletes a tab from a tab panel.',
         parameters: [
-            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to get the text extent from.' },
+            { name: 'tabToDelete', isOptional: false, isVariadic: false, summary: 'This is an element representing the tab that you want to delete.' },
+            { name: 'tabPanel', isOptional: false, isVariadic: false, summary: 'This is the tab panel parent that the tab is attached to.' },
         ],
-        returns: 'returns the absolute width of the current text inside the text label if the function is successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelGetTextExtent',
+        returns: 'Returns *true* the tab was successfully deleted, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiDeleteTab',
     },
-    guiLabelSetColor: {
-        summary: 'This function allows you to set the color of a GUI label.',
+    guiEditGetCaretIndex: {
+        summary: 'This function returns the caret (the text cursor) position within the editbox.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The label to be changed.' },
-            { name: 'red', isOptional: false, isVariadic: false, summary: 'An integer specifying the amount of red (0 to 255).' },
-            { name: 'green', isOptional: false, isVariadic: false, summary: 'An integer specifying the amount of green (0 to 255).' },
-            { name: 'blue', isOptional: false, isVariadic: false, summary: 'An integer specifying the amount of blue (0 to 255).' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The edit box you want to get the caret position from' },
         ],
-        returns: 'returns true if the the color of the gui label was successfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelSetColor',
+        returns: 'Returns the caret index on success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditGetCaretIndex',
     },
-    guiLabelSetHorizontalAlign: {
-        summary: 'This function sets the horizontal alignment of a text label.',
+    guiEditGetMaxLength: {
+        summary: 'This function returns the maximum text length that can be typed within an edit box.',
         parameters: [
-            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to set the horizontal alignment on.' },
-            { name: 'align', isOptional: false, isVariadic: false, summary: 'The alignment type. Valid type strings are: **"left" **"center" **"right"' },
-            { name: 'wordwrap', isOptional: true, isVariadic: false, summary: 'Whether or not to enable wordwrap for the gui-label.' },
+            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: 'The edit box you want to get the maximum text length of.' },
         ],
-        returns: 'returns true on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelSetHorizontalAlign',
+        returns: 'Returns the maximum text length on success, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditGetMaxLength',
     },
-    guiLabelSetVerticalAlign: {
-        summary: 'This function sets the vertical alignment of a text label.',
+    guiEditIsMasked: {
+        summary: 'This function checks if an edit box is masked.',
         parameters: [
-            { name: 'theLabel', isOptional: false, isVariadic: false, summary: 'The text label to set the vertical alignment on.' },
-            { name: 'align', isOptional: false, isVariadic: false, summary: 'The alignment type. Valid type strings are: **"top" **"center" **"bottom"' },
+            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: 'the edit box to check masked flag of.' },
         ],
-        returns: 'returns true on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiLabelSetVerticalAlign',
+        returns: 'Returns *true* if the edit box is masked, *false* if not, *nil* if an invalid edit box was provided.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditIsMasked',
     },
-    guiMemoGetCaretIndex: {
-        summary: 'This function returns the caret (the text cursor) position within the memo box.',
+    guiEditIsReadOnly: {
+        summary: 'This function checks if an edit box is read-only.',
         parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The memo box you want to get the caret position from' },
+            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: 'The edit box to check read-only status of.' },
         ],
-        returns: 'returns the caret index on success, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoGetCaretIndex',
+        returns: 'Returns *true* if the edit box is read-only, *false* if not, *nil* if an invalid edit box was provided.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditIsReadOnly',
     },
-    guiMemoGetVerticalScrollPosition: {
-        summary: '',
+    guiEditSetCaretIndex: {
+        summary: 'This function sets the current position of the caret (the text cursor) within the edit box.',
         parameters: [
-            { name: 'theMemo', isOptional: false, isVariadic: false, summary: ': the guiCreateMemo|memo you want to know the vertical scroll position of.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The edit box to be changed.' },
+            { name: 'index', isOptional: false, isVariadic: false, summary: 'An integer referring to the desired position within the box.' },
         ],
-        returns: 'returns a float ranging between 0 and 100, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoGetVerticalScrollPosition',
+        returns: 'Returns *true* if the index was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetCaretIndex',
     },
-    guiMemoIsReadOnly: {
-        summary: '',
+    guiEditSetMasked: {
+        summary: 'This function sets or removes masking (covering up the text being typed) for password text fields.',
         parameters: [
-            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'The memo to check read-only status of.' },
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The edit box to be changed.' },
+            { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether masking is to be enabled or disabled.' },
         ],
-        returns: 'returns true if the memo is read only, false if the memo isnt read only, nil otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoIsReadOnly',
+        returns: 'Returns *true* if the function is successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetMasked',
     },
-    guiMemoSetCaretIndex: {
-        summary: 'This function sets the current position of the caret (the text cursor) within the memo.',
+    guiEditSetMaxLength: {
+        summary: 'This function sets the maximum text length that can be typed into an edit box.',
         parameters: [
-            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'The memo edit box where the caret position is to be changed.' },
-            { name: 'index', isOptional: false, isVariadic: false, summary: 'An integer referring to the desired character position within the box. 0 would be before the first character in the box, 1 before the second, etc.' },
+            { name: 'guiEdit', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'length', isOptional: false, isVariadic: false, summary: 'An integer indicating the maximum number of characters that can be typed into the box.' },
         ],
-        returns: 'returns true if the caret was successfully moved, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoSetCaretIndex',
+        returns: 'Returns *true* if the max length was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetMaxLength',
     },
-    guiMemoSetReadOnly: {
-        summary: 'This function allows you to set or remove read-only status for a GUI memo. If read-only\nis set to true, the contents are not editable.',
+    guiEditSetReadOnly: {
+        summary: 'This function allows you to set or remove read-only status for an edit box. If read-only is set to *true*, the box is not editable.',
         parameters: [
-            { name: 'theMemo', isOptional: false, isVariadic: false, summary: 'The memo to change read-only status of.' },
+            { name: 'editField', isOptional: false, isVariadic: false, summary: 'The element of the edit field to be modified.' },
             { name: 'status', isOptional: false, isVariadic: false, summary: 'A boolean value indicating whether read-only is to be enabled or disabled.' },
         ],
-        returns: 'returns true if the status was successfully changed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoSetReadOnly',
+        returns: 'Returns *true* if edit field\'s read-only status was changed successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiEditSetReadOnly',
     },
-    guiMemoSetVerticalScrollPosition: {
-        summary: '',
+    guiFocus: {
+        summary: 'This function focuses a defocused GUI element. Used primarily for edit fields and memos.',
         parameters: [
-            { name: 'theMemo', isOptional: false, isVariadic: false, summary: ': the guiCreateMemo|memo you want to change the vertical scroll position of.' },
-            { name: 'position', isOptional: false, isVariadic: false, summary: ': a float ranging between 0 and 100.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to focus' },
         ],
-        returns: 'returns true if the position was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMemoSetVerticalScrollPosition',
+        returns: 'Returns *true* if the function was successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiFocus',
     },
-    guiMoveToBack: {
-        summary: 'This function moves a GUI element to the very back of all other GUI elements.',
+    guiGetAlpha: {
+        summary: 'Alpha represents the transparency of a gui element.  This function allows retrieval of a gui element\'s current alpha.',
         parameters: [
-            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element that you want to move to the back' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The gui element in which you want to retrieve the alpha of.' },
         ],
-        returns: 'returns true if the function was successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiMoveToBack',
+        returns: 'This function returns a positive integer in between 0 and 1 of the gui element\'s current alpha, or false if it could not be retrieved.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetAlpha',
     },
-    guiProgressBarGetProgress: {
-        summary: 'This function gets the progress of a progress bar as a percentage.',
+    guiGetBrowser: {
+        summary: 'This function gets the browser element behind a gui-browser (a browser that has been created via guiCreateBrowser).',
         parameters: [
-            { name: 'theProgressbar', isOptional: false, isVariadic: false, summary: ': The progressbar you want to check.' },
+            { name: 'theBrowser', isOptional: false, isVariadic: false, summary: 'The gui-browser' },
         ],
-        returns: 'returns a float ranging between 0 and 100.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiProgressBarGetProgress',
+        returns: 'Returns the Browser element if a correct gui-browser has been passed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetBrowser',
     },
-    guiProgressBarSetProgress: {
-        summary: 'This function is used to set the progress of a progressbar as a percentage.',
-        parameters: [
-            { name: 'theProgressbar', isOptional: false, isVariadic: false, summary: ': The progressbar you want to change the progress of' },
-            { name: 'progress', isOptional: false, isVariadic: false, summary: ': a float ranging from 0 - 100' },
-        ],
-        returns: 'returns true if the progress was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiProgressBarSetProgress',
-    },
-    guiRadioButtonGetSelected: {
-        summary: 'This function gets a radio buttons selection state.',
-        parameters: [
-            { name: 'guiRadioButton', isOptional: false, isVariadic: false, summary: 'The radio button you wish to retrieve the selection state of.' },
-        ],
-        returns: 'returns true if the radio button is selected, false if it is not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiRadioButtonGetSelected',
-    },
-    guiRadioButtonSetSelected: {
-        summary: 'This function selects or unselects a radio button.',
-        parameters: [
-            { name: 'guiRadioButton', isOptional: false, isVariadic: false, summary: 'The GUI radio button in which you wish to change the selection state of' },
-            { name: 'state', isOptional: false, isVariadic: false, summary: 'The state of the radio button, where true indicates selected, and false indicates unselected.' },
-        ],
-        returns: 'returns true if the radio buttons selection state was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiRadioButtonSetSelected',
-    },
-    guiRoot: {
-        summary: 'The root element of all GUI elements.',
+    guiGetCursorType: {
+        summary: 'This function is used to get the type of the current cursor image.',
         parameters: [],
-        returns: '',
-        wiki: '',
+        returns: 'Returns a string containing the cursor type: * **"none"** // cursor has no image * **"arrow"** // default cursor * **"sizing_ns"** // N-S (up-down) sizing cursor * **"sizing_ew"** // E-W (left-right) sizing cursor * **"sizing_nwse"** // NW-SE diagonal sizing cursor * **"sizing_nesw"** // NE-SW diagonal sizing cursor * **"sizing_eswe"** // ES-WE horizontal sizing cursor * **"move"** // move cursor * **"container_drag"** // drag container cursor (note: not in use) * **"segment_moving"** // segment moving cursor (note: not in use) * **"segment_sizing"** // segment sizing cursor (note: not in use)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetCursorType',
     },
-    guiScrollBarGetScrollPosition: {
-        summary: 'This function gets the scroll amount of a scrollbar as a percentage.',
+    guiGetEnabled: {
+        summary: 'This function determines if a GUI element is enabled.',
         parameters: [
-            { name: 'theScrollBar', isOptional: false, isVariadic: false, summary: ': The scrollbar you want to check.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element to be checked.' },
         ],
-        returns: 'returns a float ranging between 0 and 100, representing the amount the scrollbar has been scrolled.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollBarGetScrollPosition',
+        returns: 'Returns *true* if the element is enabled, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetEnabled',
     },
-    guiScrollBarSetScrollPosition: {
-        summary: 'This function is used to set the scroll amount of a scrollbar as a percentage.',
+    guiGetFont: {
+        summary: '<!-- Describe in plain english what this function does. Don\'t go into details, just give an overview -->\nThis function is used to get the current font that is used to draw text in GUI elements.',
         parameters: [
-            { name: 'theScrollBar', isOptional: false, isVariadic: false, summary: ': The scrollbar you want to change the progress of' },
-            { name: 'amount', isOptional: false, isVariadic: false, summary: ': a float ranging from 0 - 100 representing the amount you wish to set the scroll bar.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'element you wish to get the font of.' },
         ],
-        returns: 'returns true if the scroll position was successfully set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollBarSetScrollPosition',
+        returns: '<!-- Make this descriptive. Explain what cases will return false. If you\'re unsure, add a tag to it so we can check --> ***string** A string containing the name of the element\'s current font, or false if the gui element passed to the function is invalid. ***element ** The custom GUI font that is used, or nil otherwise',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetFont',
     },
-    guiScrollPaneGetHorizontalScrollPosition: {
-        summary: 'This function is used to get the position of a horizontal scroll pane as a percentage.',
-        parameters: [
-            { name: 'horizontalScrollPane', isOptional: false, isVariadic: false, summary: ': The scroll pane you want to know the position of' },
-        ],
-        returns: 'returns a float ranging between 0 and 100, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneGetHorizontalScrollPosition',
+    guiGetInputEnabled: {
+        summary: 'This function checks whether user input is focused on the GUI or the game.',
+        parameters: [],
+        returns: 'Returns *true* if input is focused on GUI, *false* if it\'s focused on the game.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetInputEnabled',
     },
-    guiScrollPaneGetVerticalScrollPosition: {
-        summary: 'This function is used to get the position of a vertical scroll pane as a percentage.',
-        parameters: [
-            { name: 'verticalScrollPane', isOptional: false, isVariadic: false, summary: ': The scroll pane you want to know the position of' },
-        ],
-        returns: 'returns a float ranging between 0 and 100, or false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneGetVerticalScrollPosition',
+    guiGetInputMode: {
+        summary: 'This function returns the current input mode as set by guiSetInputMode.\nDefault mode is *"allow_binds"*.\n\nThis function is **not** a replacement of guiGetInputEnabled, indeed for the mode *"no_binds_when_editing"* the actual state of binds depends on the currently focused GUI widget. However:\n* when *guiGetInputMode ( )* returns *"allow_binds"* you can be sure that *guiGetInputEnabled ()* will return *false*\n* when *guiGetInputMode ( )* returns *"no_binds"* you can be sure that *guiGetInputEnabled ()* will return *true*',
+        parameters: [],
+        returns: 'Returns a string defining the current input mode, potential values are: * **"allow_binds":** binds are enabled, hence using a key such as t in an editbox will still activate the chatbox * **"no_binds":** binds are disabled, hence using a key such as t in an editbox will not activate the chatbox * **"no_binds_when_editing":** binds are always enabled except when an editable editbox or memo has input focus',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetInputMode',
     },
-    guiScrollPaneSetHorizontalScrollPosition: {
-        summary: 'This function is used to set the position of a horizontal scroll pane as a percentage.',
+    guiGetPosition: {
+        summary: 'This function allows retrieval of a GUI element\'s current position, relative to its parent.',
         parameters: [
-            { name: 'horizontalScrollPane', isOptional: false, isVariadic: false, summary: ': The scroll pane you want to change the position of' },
-            { name: 'position', isOptional: false, isVariadic: false, summary: ': a float ranging from 0 - 100' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'The gui element of which you wish to retrieve the position.' },
+            { name: 'relative', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the position should be relative to the element\'s parent width, or the number of offset pixels from the parent\'s origin.' },
         ],
-        returns: 'returns true if the position was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneSetHorizontalScrollPosition',
+        returns: 'Returns floats representing the *x* and *y* position of the element, or false if the position could not be retrieved.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetPosition',
     },
-    guiScrollPaneSetScrollBars: {
-        summary: 'This function allows a scrollpanes scrollbars to be forced on, or returned to default.',
+    guiGetProperties: {
+        summary: 'This function gets a list of the CEGUI property names and values of a GUI element. To find out what the different properties mean, check out the [http://static.cegui.org.uk/static/WindowsLookProperties.html CEGUI properties page].',
         parameters: [
-            { name: 'scrollPane', isOptional: false, isVariadic: false, summary: 'the GUI scrollpane element you want to set the scrollbars of.' },
-            { name: 'horizontal', isOptional: false, isVariadic: false, summary: 'A bool where true forces the horizontal scrollbar on, and false returns them to default.' },
-            { name: 'vertical', isOptional: false, isVariadic: false, summary: 'A bool where true forces the vertical scrollbar on, and false returns them to default.' },
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to get the properties of.' },
         ],
-        returns: 'returns true if the call was successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GuiScrollPaneSetScrollBars',
+        returns: 'If the function succeeds, the return value is a table. Its keys are property names, the corresponding values are the values of the properties (both names and values are always strings). If the function fails, it returns *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetProperties',
+    },
+    guiGetProperty: {
+        summary: 'This function gets the value of a specific CEGUI property of a GUI element. For a list of properties and their meaning, see the [http://static.cegui.org.uk/static/WindowsLookProperties.html CEGUI properties page].',
+        parameters: [
+            { name: 'guiElement', isOptional: false, isVariadic: false, summary: 'the GUI element you wish to get a property of.' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'the name of of property you want the value of.' },
+        ],
+        returns: 'If the function succeeds, it returns a string with the value of the property. If it fails, it returns *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetProperty',
+    },
+    guiGetScreenSize: {
+        summary: 'This function retrieves the local screen size according to the resolution they are using.',
+        parameters: [],
+        returns: 'This returns two floats representing the player\'s screen resolution, *width* and *height*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetScreenSize',
+    },
+    guiGetSelectedTab: {
+        summary: 'This function returns the currently selected tab in the specified tab panel.',
+        parameters: [
+            { name: 'tabPanel', isOptional: false, isVariadic: false, summary: 'The tab panel which current tab you want to retrieve.' },
+        ],
+        returns: 'Returns an element of the tab if a tab was selected or nil if no tab was selected. If passed arguments were invalid or something went wrong, the function will return *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GuiGetSelectedTab',
     },
 };

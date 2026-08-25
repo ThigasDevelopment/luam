@@ -1,241 +1,244 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_19: ApiDocumentationCatalog = {
-    getPlayerTeam: {
-        summary: 'This function gets the current team a player is on.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: ': The player whose team you want to find out.' },
-        ],
-        returns: 'returns a team element representing the team the player is on, false if the player is not part of a team.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerTeam',
-    },
-    getPlayerVersion: {
-        summary: 'This function gets the client version of the specified player as a sortable string. The\nstring is always 15 characters long and is formatted as follows:\n* 1 character representing the major version\n* 1 dot character\n* 1 character representing the minor version\n* 1 dot character\n* 1 character representing the maintenance version\n* 1 dash character\n* 1 character representing the build type\n* 1 dot character\n* 5 characters representing the build number\n* 1 dot character\n* 1 character representing the build revision\nAn example of a version string would be: 1.0.4-9.01746.0\nWhere the first three numbers represent the major/minor/maintenance version, i.e.\n1.0.4\n\nThe fourth number is 9, which means its a release build, (Development and beta builds\nhave lower numbers here)\n\nAnd the fifth and sixth numbers represent the build number.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose client version you wish to get.' },
-        ],
-        returns: 'returns a string containing the client version, or false if the player is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerVersion',
-    },
-    getPlayerWantedLevel: {
-        summary: 'This function gets a players current wanted level. The wanted level is indicated by the\namount of stars a player has on the GTA HUD.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player whose wanted level you wish to get' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerWantedLevel',
-    },
-    getProcessMemoryStats: {
-        summary: '',
+    getOcclusionsEnabled: {
+        summary: 'This function is used to get "occlusions enabled" state.',
         parameters: [],
-        returns: 'returns a table if successful, otherwise returns nil {| class=wikitable style=cellpadding: 10px; |- ! property || description |- | virtual || total program size |- | resident || resident set size (memory in physical space/ram, also known as working set) |- | shared || size of resident shared memory (shared with other processes) |- | private || size of resident private memory (only for this process) |} note: resident set size should be roughly shared + private from the table.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetProcessMemoryStats',
+        returns: 'Returns *true* if occlusions are enabled, or *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetOcclusionsEnabled',
     },
-    getProjectileCounter: {
-        summary: 'Get the time left before a projectile detonates.',
+    getOriginalHandling: {
+        summary: 'This function returns a table of the original vehicle handling. Use getVehicleHandling if you wish to get the current handling of a vehicle, or getModelHandling for a specific vehicle model.',
         parameters: [
-            { name: 'projectile', isOptional: false, isVariadic: false, summary: ': the projectile to get the timer of.' },
+            { name: 'modelID', isOptional: false, isVariadic: false, summary: 'The vehicle ID you wish to get the original handling from.' },
         ],
-        returns: 'returns the the time in milliseconds to detonation which depending on the projectile type will do different things: * grenades will explode when it hits 0 * teargas may be a duration timer * both types of rockets will explode when it hits 0 * satchels restarts so i do not think it does anything',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileCounter',
+        returns: 'Returns a *table* containing all the handling data, *false* otherwise. Here a list of valid table properties and what they return:',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetOriginalHandling',
     },
-    getProjectileCreator: {
-        summary: 'This function returns the creator of the specified projectile.',
+    getOriginalWeaponProperty: {
+        summary: 'This function gets the original weapon property of the specified weapons specified weapon type.',
         parameters: [
-            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectiles| projectile element which creator you want to retrieve.' },
+            { name: 'weaponName', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'weaponSkill', isOptional: false, isVariadic: false, summary: 'Either: "pro", "std" or "poor"' },
+            { name: 'property', isOptional: false, isVariadic: false, summary: 'The property you want to get the value of:' },
         ],
-        returns: 'returns the element which created the projectile if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileCreator',
+        returns: 'On success: **int:** The weapon property On failure: **bool:** False if the passed arguments were invalid',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetOriginalWeaponProperty',
     },
-    getProjectileForce: {
-        summary: 'This function returns the force of the specified projectile.',
+    getPedAmmoInClip: {
+        summary: 'This function returns an integer that contains the ammo in a specified ped\'s weapon. See Weapon Info',
         parameters: [
-            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectiles| projectile element which force you want to retrieve.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose ammo you want to check.' },
+            { name: 'weaponSlot', isOptional: true, isVariadic: false, summary: 'an integer representing the weapon slot (set to the ped\'s currently selected slot if not specified).' },
         ],
-        returns: 'returns a float if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileForce',
+        returns: 'Returns an int containing the amount of ammo in the specified ped\'s currently selected or specified clip, or 0 if the ped specified is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedAmmoInClip',
     },
-    getProjectileTarget: {
-        summary: 'This function returns the target of the specified projectile.',
+    getPedAnalogControlState: {
+        summary: 'This function retrieves the analog control state of a ped, as set by setPedAnalogControlState.',
         parameters: [
-            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The projectiles| projectile element which target you want to retrieve.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped you wish to retrieve the control state of.' },
+            { name: 'controlName', isOptional: false, isVariadic: false, summary: 'The control. See control names for a list of possible controls.' },
+            { name: 'rawValue', isOptional: true, isVariadic: false, summary: 'A bool indicating if it should return the raw player input value (will always return script value for non-player peds).' },
         ],
-        returns: 'returns the element which is the projectiles target if the projectile is valid and can have a target (like a heat-seeking rocket), false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileTarget',
+        returns: 'Returns a float between 0 (full release) and 1 (full push) indicating the amount the control is pushed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedAnalogControlState',
     },
-    getProjectileType: {
-        summary: 'This function returns the type of the specified projectile.',
+    getPedAnimation: {
+        summary: 'Gets the animation of a player or ped that was set using setPedAnimation.',
         parameters: [
-            { name: 'theProjectile', isOptional: false, isVariadic: false, summary: 'The Element/Projectile|projectile element which type you want to retrieve.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped you want to get the animation of.' },
         ],
-        returns: 'returns an integer over the type of the projectile or false if invalid arguments were passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetProjectileType',
+        returns: 'The function returns 9 values in the same order as required by setPedAnimation: ```lua string block, string anim, int time, bool loop, bool updatePosition, bool interruptable, bool freezeLastFrame, int blendTime, bool restoreTaskOnAnimEnd ```',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedAnimation',
     },
-    getRadarAreaColor: {
-        summary: 'This function can be used to retrieve the current color of a radararea|radar area.',
+    getPedArmor: {
+        summary: 'This function returns the current armor of the specified ped.',
         parameters: [
-            { name: 'theRadararea', isOptional: false, isVariadic: false, summary: 'The radararea|radar area you wish to retrieve the colour of.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose armor you want to check' },
         ],
-        returns: 'returns four integers in rgba format (red, green, blue, alpha), with a maximum value of 255 for each. alpha decides transparency where 255 is opaque and 0 is transparent. returns false if the radararea is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadarAreaColor',
+        returns: 'A *float* with the armor, *false* if an invalid ped was given.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedArmor',
     },
-    getRadarAreaSize: {
-        summary: 'This function is used for getting the X and Y size of an existing radararea|radar area.',
+    getPedBonePosition: {
+        summary: 'Returns the 3D world coordinates of a specific bone of a given ped.',
         parameters: [
-            { name: 'theRadararea', isOptional: false, isVariadic: false, summary: 'The radararea|radar area element whose size you wish to get.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to inspect.' },
+            { name: 'bone', isOptional: false, isVariadic: false, summary: 'the number of the bone to get the position of.' },
         ],
-        returns: 'returns two floats indicating the x and y length of the radar area respectively, false if the radar area is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadarAreaSize',
+        returns: 'Returns the x, y, z world position of the bone.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedBonePosition',
     },
-    getRadioChannel: {
-        summary: 'The function is used to retrieve the ID of the current radio channel.',
+    getPedCameraRotation: {
+        summary: 'This function gets the current camera rotation of a ped.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped to retrieve the camera rotation of.' },
+        ],
+        returns: 'Returns the camera rotation of the ped in degrees if successful. Returns *false* if an invalid element was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedCameraRotation',
+    },
+    getPedClothes: {
+        summary: 'This function is used to get the current clothes texture and model of a certain type on a ped.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose clothes you want to retrieve.' },
+            { name: 'clothesType', isOptional: false, isVariadic: false, summary: 'The type/slot of clothing you want to get.' },
+        ],
+        returns: 'This function returns 2 strings, the clothes texture and model. The first return value will be *false* if this player\'s clothes type is empty or an invalid player was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedClothes',
+    },
+    getPedContactElement: {
+        summary: 'This function detects the element a ped is standing on. This can be a vehicle or an object.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped of which you want to get the element he is standing on.' },
+        ],
+        returns: 'Returns an object or a vehicle if the ped is standing on one, *false* if he is touching none or an invalid element was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedContactElement',
+    },
+    getPedControlState: {
+        summary: 'Checks whether a ped or the localplayer has a certain control pressed.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped you want to check.' },
+            { name: 'control', isOptional: false, isVariadic: false, summary: 'the control to get the status of. See control names for a list of valid names.' },
+        ],
+        returns: 'Returns *true* if the ped is pressing the specified control, *false* if not or an invalid argument was passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedControlState',
+    },
+    getPedFightingStyle: {
+        summary: 'Retrieves the fighting style a player/ped is currently using.\nFunction also added client-side.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose current fighting style ID you wish to retrieve.' },
+        ],
+        returns: 'Returns the ped\'s current fighting style as an integer ID, *false* if it fails to retrieve a value.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedFightingStyle',
+    },
+    getPedGravity: {
+        summary: 'This function returns the current gravity for the specified ped. The default gravity is 0.008.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose gravity you want to check.' },
+        ],
+        returns: 'Returns a float indicating the ped\'s gravity, or *false* if the ped is invalid. Default value is 0.008.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedGravity',
+    },
+    getPedMoveState: {
+        summary: 'This function returns the current move state for the specified ped.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose move state you want to know' },
+        ],
+        returns: 'Returns a string indicating the ped\'s move state, or *false* if the ped is not streamed in, the movement type is unknown, the ped is in a vehicle or the ped is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedMoveState',
+    },
+    getPedOccupiedVehicle: {
+        summary: 'This function gets the vehicle that the ped is currently in or is trying to enter, if any.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose vehicle you\'re looking up.' },
+        ],
+        returns: 'Returns the vehicle that the specified ped is in, or *false* if the ped is not in a vehicle or is an invalid ped.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedOccupiedVehicle',
+    },
+    getPedOccupiedVehicleSeat: {
+        summary: 'This function gets the seat that a specific ped is sitting in in a vehicle.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose vehicle seat you\'re looking up.' },
+        ],
+        returns: '* Returns an integer containing the number of the seat that the ped is currently in: ** **0:** Front-left ** **1:** Front-right ** **2:** Rear-left ** **3:** Rear-right Returns *false* if the ped is on foot, or the ped doesn\'t exist.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedOccupiedVehicleSeat',
+    },
+    getPedOxygenLevel: {
+        summary: 'This function returns the current oxygen level of the specified ped.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose oxygen level you want to check' },
+        ],
+        returns: 'A *float* with the oxygen level, *false* if an invalid ped was given.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedOxygenLevel',
+    },
+    getPedSimplestTask: {
+        summary: 'This function is used to get the name of a specified ped\'s current simplest task.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose task you want to retrieve.' },
+        ],
+        returns: 'Returns a string representing the name of the ped\'s simplest, active task.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedSimplestTask',
+    },
+    getPedsLODDistance: {
+        summary: 'This function gets the peds LOD distance.',
         parameters: [],
-        returns: 'returns the id of the radio channel.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadioChannel',
+        returns: 'This function returns a *float* containing the peds LOD distance.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedsLODDistance',
     },
-    getRadioChannelName: {
-        summary: 'This function gets the given radio channel name.',
+    getPedStat: {
+        summary: 'This function returns the value of the specified statistic of a specific ped.',
         parameters: [
-            { name: 'id', isOptional: false, isVariadic: false, summary: 'The ID of the radio station you want to get the name of. It is a number from 0 to 12.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose stat you want to retrieve.' },
+            { name: 'stat', isOptional: false, isVariadic: false, summary: 'A whole number determining the stat ID.' },
         ],
-        returns: 'returns a string containing the station name if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRadioChannelName',
+        returns: 'Returns the value of the requested statistic.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedStat',
     },
-    getRainLevel: {
-        summary: 'This function is used to get the current rain level.',
-        parameters: [],
-        returns: 'returns the rain level as a number.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRainLevel',
-    },
-    getRandomPlayer: {
-        summary: 'This function returns a random player.',
-        parameters: [],
-        returns: 'returns a random player, false if the server is empty.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRandomPlayer',
-    },
-    getRealTime: {
-        summary: 'This function gets the server or client (if used client sided it returns time as set on\nclients computer) real time and returns it in a table. If you want to get the in-game\ntime (shown on GTAs clock) use getTime.',
+    getPedTarget: {
+        summary: 'This function is used to get the element a ped is currently targeting.',
         parameters: [
-            { name: 'seconds', isOptional: true, isVariadic: false, summary: 'A count in seconds from the year 1970. Useful for storing points in time, or for retrieving time information for getBanTime. The valid range of this argument is 0 to 32,000,000,000' },
-            { name: 'localTime', isOptional: true, isVariadic: false, summary: 'Set to true to adjust for the locally set timezone.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose target you want to retrieve.' },
         ],
-        returns: 'returns a table of substrings with different time format or false if the seconds argument is out of range. {| border=2 cellpadding=2 cellspacing=0 style=margin: 1em 1em 1em 0; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse; font-size: 95%; |member |meaning |range |- |second |seconds after the minute |0-61* |- |minute |minutes after the hour |0-59 |- |hour |hours since midnight |0-23 |- |monthday |day of the month |1-31 |- |month |months since january |0-11 |- |year |years since 1900 |- |weekday |days since sunday |0-6 |- |yearday |days since january 1 |0-365 |- |isdst |daylight saving time flag |- |timestamp |seconds since 1970 (ignoring set timezone) | |} * second is generally 0-59. extra range to accommodate for leap seconds in certain systems.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRealTime',
+        returns: 'Returns the element that\'s being targeted, or *false* if there isn\'t one. This is only effective on physical GTA elements, namely: * Players * Peds * Vehicles * Objects',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedTarget',
     },
-    getRemoteRequestInfo: {
-        summary: 'Gets informations of an FetchRemote|fetchRemote or CallRemote|callRemote request info.',
+    getPedTargetCollision: {
+        summary: 'This function allows retrieval of where a ped\'s target is blocked. It will only be blocked if there is an obstacle within a ped\'s target range.',
         parameters: [
-            { name: 'theRequest', isOptional: false, isVariadic: false, summary: ': returned from FetchRemote|fetchRemote, CallRemote|callRemote or GetRemoteRequests|getRemoteRequests' },
-            { name: 'postDataLength', isOptional: true, isVariadic: false, summary: '' },
-            { name: 'includeHeaders', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'targetingPed', isOptional: false, isVariadic: false, summary: 'This is the ped whose target collision you wish to retrieve' },
         ],
-        returns: 'returns a table when valid, false otherwise the table contains: *bytesreceived: a number specifying the amount of data received so far. zero means the download is queued *bytestotal: a number specifying the final download size. will be zero if the remote http server has not set the content-length header *currentattempt: a number specifying the current connection attempt *type: a string specifying either fetch or call *url: a string specifying the url *resource: the resource which started the request, or false if the resource has since been stopped/restarted *queue: a string specifying the queue name *method: a string specifying the http method. e.g. get or post *connectionattempts: a number specifying max number connection attempts as declared in the fetchremote call *connectiontimeout: a number specifying connection attempt timeout as declared in the fetchremote call *postdata: a string containing the request post data as declared in the fetchremote call *headers: a table containing the request http headers as declared in the fetchremote call',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRemoteRequestInfo',
+        returns: 'Returns three floats, *x*,*y*,*z*, representing the position where the ped\'s target collides, or *false* if it was unsuccessful.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedTargetCollision',
     },
-    getRemoteRequests: {
-        summary: 'Gets all FetchRemote|fetchRemote and CallRemote|callRemote requests currently running.',
+    getPedTargetEnd: {
+        summary: 'This function allows retrieval of the position where a ped\'s target range ends, when he is aiming with a weapon.',
         parameters: [
-            { name: 'theResource', isOptional: true, isVariadic: false, summary: ': the resource to get all requests from' },
+            { name: 'targetingPed', isOptional: false, isVariadic: false, summary: 'the ped who is targeting whose target end you wish to retrieve' },
         ],
-        returns: 'returns a table with all requests, false if an invalid resource was provided',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetRemoteRequests',
+        returns: 'Returns three floats, *x*,*y*,*z*, representing the position where the ped\'s target ends according to his range, or *false* if it was unsuccessful.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedTargetEnd',
     },
-    getResourceACLRequests: {
-        summary: 'This function retrieves the ACL request section from the meta.xml file of the given\nresource.',
+    getPedTargetStart: {
+        summary: 'This function allows retrieval of the position a ped\'s target range begins, when he is aiming with a weapon.',
         parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource to get the ACL requests for.' },
+            { name: 'targetingPed', isOptional: false, isVariadic: false, summary: 'The ped whose target start you wish to retrieve' },
         ],
-        returns: 'returns a table with the acl requests for the given resource, or false if the resource is not valid. a valid resource with no acl requests will return an empty table.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceACLRequests',
+        returns: 'Returns three floats, x,y,z, representing the position where the ped\'s target starts, or *false* if it was unsuccessful.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedTargetStart',
     },
-    getResourceConfig: {
-        summary: 'This function is used to return the root node of a configuration file. Config files must\nbe predefined in a resources Meta.xml|meta file.  An alternative way to load XML files is\nto use xmlLoadFile.',
+    getPedTask: {
+        summary: 'This function is used to get any simple or complex task of a certain type for a ped.\n\nIt can provide feedback on all tasks relating to a ped. For example, while jumping, getPedSimplestTask will return TASK_SIMPLE_IN_AIR. If you wanted to know specifically if the player has jumped, you would use this function. If you did you will discover that while jumping Primary task 3 is TASK_COMPLEX_JUMP.',
         parameters: [
-            { name: 'filePath', isOptional: false, isVariadic: false, summary: 'The filepath of the file in the following format: :resourceName/path. resourceName is the name of the resource the file is in, and path is the path from the root directory of the resource to the file. :For example, if there is a file named \'settings.xml\' in the resource \'ctf\', it can be accessed from another resource this way: \'\'getResourceConfig(":ctf/settings.xml")\'\'. :If the file is in the current resource, only the file path is necessary, e.g. \'\'getResourceConfig("settings.xml")\'\'.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose task you want to retrieve.' },
+            { name: 'priority', isOptional: false, isVariadic: false, summary: 'A string determining which set of tasks you want to retrieve it from. This must be either "primary" or "secondary".' },
+            { name: 'taskType', isOptional: false, isVariadic: false, summary: 'An integer value representing the task type (or slot) you want to get the task from. Types can be:' },
         ],
-        returns: 'returns the root node of the specified configuration file. if the file is corrupted, not defined in the meta file or doesnt exist, returns false.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceConfig',
+        returns: 'Returns the name of the most complex task. See list of player tasks for valid strings. Returns *false* if invalid arguments are specified or if there is no task of the type specified. Returns between 1 and 4 strings. The first string contains the name of the most complex task, with simpler sub-tasks being named in the following strings. See list of player tasks for valid strings. Returns *false* if invalid arguments are specified or if there is no task of the type specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedTask',
     },
-    getResourceDynamicElementRoot: {
-        summary: 'This function retrieves the dynamic element root of a specified resource. The dynamic\nelement root is the parent of elements that are created by scripts (e.g. with\ncreateObject) unless they specify a different parent.',
+    getPedTotalAmmo: {
+        summary: 'This function returns an integer that contains the total ammo in a specified ped\'s weapon. See Weapon Info',
         parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource of which dynamic element root we want.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The ped whose ammo you want to check.' },
+            { name: 'weaponSlot', isOptional: true, isVariadic: false, summary: 'an integer representing the weapon slot (set to the ped\'s current slot if not given)' },
         ],
-        returns: 'returns an element of the resources dynamic element root if the resource specified was valid and active (currently running), false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceDynamicElementRoot',
+        returns: 'Returns an int containing the total amount of ammo for the specified ped\'s weapon, or 0 if the ped specified is invalid.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedTotalAmmo',
     },
-    getResourceExportedFunctions: {
-        summary: 'Returns a table containing the names of the functions that a resource exports. It will\nreturn the exports of the current resource if there is no argument passed in.',
+    getPedVoice: {
+        summary: 'Gets the current voice of a ped.',
         parameters: [
-            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'the resource of which you want to know the call|exported functions.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped to get the voice of.' },
         ],
-        returns: 'returns a table of function names if successful, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceExportedFunctions',
+        returns: 'If successul, returns the current voice type name and the voice name of the ped (see ped voices for possible names). Returns *false* in case of failure.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedVoice',
     },
-    getResourceFromName: {
-        summary: 'This function is used to retrieve a resource from its name. A resources name is the same\nas its folder or file archive name on the server (without the extension).',
+    getPedWalkingStyle: {
+        summary: 'Returns the walking style ID of a ped. This ID determines the set of animations that is used for walking, running etc.',
         parameters: [
-            { name: 'resourceName', isOptional: false, isVariadic: false, summary: 'the name of the resource you wish to get.' },
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose walking style to retrieve.' },
         ],
-        returns: 'returns the resource with the specified name, or false if no resource of that name exists. note that clientside this will also return false for resources that are in the loaded state, since the client is unaware of resources that have not been started.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceFromName',
-    },
-    getResourceGUIElement: {
-        summary: 'This function retrieves a resources GUI element. The resources GUI element is the element\nin the element tree which is the default parent of all GUI elements that belong to a\nparticular resource. It has a predefined variable called guiRoot, and each resource has\none of these. You can attach event handlers to this element to easily capture events that\noriginate from your resource (and global events that originate from the root element).',
-        parameters: [
-            { name: 'theResource', isOptional: true, isVariadic: false, summary: 'the resource whose GUI element we are getting. If not specified, assumes the current resource.' },
-        ],
-        returns: 'returns the root gui element that contains all the other gui elements.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceGUIElement',
-    },
-    getResourceInfo: {
-        summary: 'This function retrieves the value of any attribute in a resource info tag.',
-        parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource we are getting the info from.' },
-            { name: 'attribute', isOptional: false, isVariadic: false, summary: 'the name of the attribute we want info about.' },
-        ],
-        returns: 'returns a string with the attribute value if it exists, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceInfo',
-    },
-    getResourceLastStartTime: {
-        summary: 'Used to check the last starting time and date of a resource',
-        parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The resource of which youd like to check the last starting time.' },
-        ],
-        returns: 'if successful, returns the unix timestamp when the resource was last started, or the string never if the resource has not been started yet, otherwise false. use in conjunction with getrealtime in order to retrieve detailed information. returns a string with the time and date, or false if the resource does not exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceLastStartTime',
-    },
-    getResourceLoadFailureReason: {
-        summary: 'This function retrieves the reason why a resource failed to start.',
-        parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'The resource you wish to check.' },
-        ],
-        returns: 'if the resource failed to load, returns a string with the failure reason in it. if it loaded successfully, returns an empty string. returns false if the resource doesnt exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceLoadFailureReason',
-    },
-    getResourceLoadTime: {
-        summary: 'Gets the date and time at which a resource was last loaded in the server.',
-        parameters: [
-            { name: 'res', isOptional: false, isVariadic: false, summary: 'the resource you want to know the load time of.' },
-        ],
-        returns: 'if successful, returns the unix timestamp when the resource was loaded, otherwise false. use in conjunction with getrealtime in order to retrieve detailed information. if successful, returns a string with the date and time that the resource was last loaded into memory (for example when the server started, or when the resource was changed and reloaded). returns false on failure. an example string is fri mar 28 13:51:04 2008.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceLoadTime',
-    },
-    getResourceMapRootElement: {
-        summary: 'This function retrieves the root element of a certain map in a specified resource.',
-        parameters: [
-            { name: 'theResource', isOptional: false, isVariadic: false, summary: 'the resource where the map is located' },
-            { name: 'mapName', isOptional: false, isVariadic: false, summary: 'name of the maps which root element we want to retrieve, file extension is required' },
-        ],
-        returns: 'returns an the resources map root element if the map exists and resource specified was valid and active (currently running), false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceMapRootElement',
-    },
-    getResourceName: {
-        summary: 'This function gets the name of the specified resource.',
-        parameters: [
-            { name: 'res', isOptional: false, isVariadic: false, summary: 'The resource you wish to get the name of.' },
-        ],
-        returns: 'returns a string with the resource name in it, or false if the resource does not exist.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceName',
+        returns: 'Returns the walking style ID if successful, *false* otherwise. The possible walking styles are as follows:',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetPedWalkingStyle',
     },
 };

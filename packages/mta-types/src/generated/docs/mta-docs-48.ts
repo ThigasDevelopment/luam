@@ -1,243 +1,244 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_48: ApiDocumentationCatalog = {
-    svgCreate: {
-        summary: 'Creates an svg from size (blank document), filepath or raw data.',
+    setTeamColor: {
+        summary: 'This function is for setting the color of a specified team. This color is shown, for example, in the team players\' nametags.',
         parameters: [
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'Desired width, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
-            { name: 'height', isOptional: false, isVariadic: false, summary: 'Desired height, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
-            { name: 'pathOrRawData', isOptional: true, isVariadic: false, summary: 'A string representing the path to your SVG file, or the raw SVG data' },
-            { name: 'callback', isOptional: true, isVariadic: false, summary: 'A callback function which is stored on the SVG and fired every time the SVG texture is updated (for example, via svgSetDocumentXML). **Note:** See svgSetUpdateCallback for setting an svg\'s callback function after it has been created.' },
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you want to change the color of.' },
+            { name: 'colorR', isOptional: false, isVariadic: false, summary: 'An integer representing the red color value, from 0 to 255.' },
+            { name: 'colorG', isOptional: false, isVariadic: false, summary: 'An integer representing the green color value, from 0 to 255.' },
+            { name: 'colorB', isOptional: false, isVariadic: false, summary: 'An integer representing the blue color value, from 0 to 255.' },
         ],
-        returns: '* returns an svg if created successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SvgCreate',
+        returns: 'Returns *true* if the team is valid and the color is different, otherwise *false*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTeamColor',
     },
-    svgGetDocumentXML: {
+    setTeamFriendlyFire: {
+        summary: 'This function sets the friendly fire value for the specified team.',
+        parameters: [
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team that will have friendly fire set' },
+            { name: 'friendlyFire', isOptional: false, isVariadic: false, summary: 'A boolean denoting whether the players from the same team can kill each other (*true*) or whether the players can\'t kill each other (*false*).' },
+        ],
+        returns: 'Returns *true* if the friendly fire value is set for the specified team, *false* if the friendly fire value can\'t be set for the specified team or if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTeamFriendlyFire',
+    },
+    setTeamName: {
+        summary: 'This function is used to set a team\'s name.',
+        parameters: [
+            { name: 'theTeam', isOptional: false, isVariadic: false, summary: 'The team you want to change the name of.' },
+            { name: 'newName', isOptional: false, isVariadic: false, summary: 'A string representing the name you want the team to be called.' },
+        ],
+        returns: 'Returns *true* if the team was valid and the name was changed, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTeamName',
+    },
+    setTime: {
+        summary: 'This function sets the current GTA time to the given time.',
+        parameters: [
+            { name: 'hour', isOptional: false, isVariadic: false, summary: 'The hour of the new time (range 0-23).' },
+            { name: 'minute', isOptional: false, isVariadic: false, summary: 'The minute of the new time (range 0-59).' },
+        ],
+        returns: 'Returns *true* if the new time was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTime',
+    },
+    setTimeFrozen: {
         summary: '',
         parameters: [
-            { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg element you want to get the XML document of.' },
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'if set to true it will freeze the time, false otherwise.' },
         ],
-        returns: '* returns an xmlnode if successful, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SvgGetDocumentXML',
+        returns: 'Always returns *true*.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTimeFrozen',
     },
-    svgGetSize: {
+    setTimer: {
+        summary: 'This function allows you to trigger a function after a number of milliseconds have elapsed. You can call one of your own functions or a built-in function. For example, you could set a timer to spawn a player after a number of seconds have elapsed.\n\nOnce a timer has finished repeating, it no longer exists.\n\nThe minimum accepted interval is 0ms.\n\nMulti Theft Auto guarantees that the timer will be triggered after *at least* the interval you specify. The resolution of the timer is tied to the frame rate (server side and client-side). All the overdue timers are triggered at a single point each frame. This means that if, for example, the player is running at 30 frames per second, then two timers specified to occur after 100ms and 110ms would more than likely occur during the same frame, as the difference in time between the two timers (10ms) is less than half the length of the frame (33ms). As with most timers provided by other languages, you shouldn\'t rely on the timer triggering at an exact point in the future.',
+        parameters: [
+            { name: 'theFunction', isOptional: false, isVariadic: false, summary: 'The function you wish the timer to call.' },
+            { name: 'timeInterval', isOptional: false, isVariadic: false, summary: 'The number of milliseconds that should elapse before the function is called. The minimum is 0 ms; 1000 milliseconds = 1 second)' },
+            { name: 'timesToExecute', isOptional: false, isVariadic: false, summary: 'The number of times you want the timer to execute, or 0 for infinite repetitions.' },
+            { name: 'arguments', isOptional: true, isVariadic: true, summary: '' },
+        ],
+        returns: 'Returns a timer pointer if the timer was set successfully, *false* if the arguments are invalid or the timer could not be set.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTimer',
+    },
+    setTimerPaused: {
+        summary: 'This function is used to either pause or resume a timer.',
+        parameters: [
+            { name: 'theTimer', isOptional: false, isVariadic: false, summary: 'The timer you wish to pause or resume.' },
+            { name: 'paused', isOptional: false, isVariadic: false, summary: 'a boolean value representing whether the timer should be paused or not. To pause the timer, use *true*.' },
+        ],
+        returns: 'Returns *true* if the timer was successfully paused or resumed, *false* if no such timer existed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTimerPaused',
+    },
+    setTrafficLightsLocked: {
+        summary: 'Toggles whether you want the traffic lights to be locked. If the lights are locked, it means they won\'t change unless you do setTrafficLightState.',
+        parameters: [
+            { name: 'toggle', isOptional: false, isVariadic: false, summary: 'A bool indicating whether you want the traffic lights to change automatically, or not' },
+        ],
+        returns: 'Returns *true* if the successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrafficLightsLocked',
+    },
+    setTrafficLightState: {
+        summary: 'Sets the current traffic light state. This state controls the traffic light colors. For instance, state **1** will cause the north and south traffic lights to be amber, and the ones left and east will turn red.',
+        parameters: [
+            { name: 'state', isOptional: false, isVariadic: false, summary: 'If an integer is provided, the state you wish to use (possible values: 0-9). Else, one of the following strings:' },
+        ],
+        returns: 'Returns *true* if the state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrafficLightState',
+    },
+    setTrainDerailable: {
+        summary: 'This function will set a train or tram as derailable. This is, if it can derail when it goes above the maximum speed.',
+        parameters: [
+            { name: 'derailableVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to set derailable.' },
+            { name: 'derailable', isOptional: false, isVariadic: false, summary: 'whether the train or tram is derailable. *True as derailable, False as non-derailable.*' },
+        ],
+        returns: 'Returns *true* if the state was successfully set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrainDerailable',
+    },
+    setTrainDerailed: {
+        summary: 'This function will set a train or tram as derailed.',
+        parameters: [
+            { name: 'vehicleToDerail', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to derail.' },
+            { name: 'derailed', isOptional: false, isVariadic: false, summary: 'whether the train is derailed.' },
+        ],
+        returns: 'Returns *true* if the state was successfully set',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrainDerailed',
+    },
+    setTrainDirection: {
+        summary: 'Sets the direction in which a train or tram drives over the rails (clockwise or counterclockwise).',
+        parameters: [
+            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train whose direction to change.' },
+            { name: 'clockwise', isOptional: false, isVariadic: false, summary: 'if *true*, will make the train go clockwise. If *false*, makes it go counterclockwise.' },
+        ],
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrainDirection',
+    },
+    setTrainPosition: {
+        summary: 'Sets the position the train is currently on the track',
+        parameters: [
+            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train of which to set the track' },
+            { name: 'position', isOptional: false, isVariadic: false, summary: 'the position along the track (0 - 18107 a complete way round)' },
+        ],
+        returns: 'Returns *true* if the train position was set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrainPosition',
+    },
+    setTrainSpeed: {
+        summary: 'Sets the on-track speed of a train.',
+        parameters: [
+            { name: 'train', isOptional: false, isVariadic: false, summary: 'the train whose speed to change.' },
+            { name: 'speed', isOptional: false, isVariadic: false, summary: 'the new on-track speed of the train. A positive value will make it go clockwise, a negative value counter clockwise.' },
+        ],
+        returns: 'Returns *true* if successful, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTrainSpeed',
+    },
+    setTransferBoxVisible: {
         summary: '',
         parameters: [
-            { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg you want to get the size of.' },
+            { name: 'visible', isOptional: false, isVariadic: false, summary: 'The new transfer box visibility state.' },
         ],
-        returns: '* returns two ints, representing width and height',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SvgGetSize',
+        returns: 'Returns *true* if the visibility was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetTransferBoxVisible',
     },
-    svgSetDocumentXML: {
-        summary: '',
+    setUnbanTime: {
+        summary: 'This function sets a new unban time of a given ban using unix timestamp (seconds since Jan 01 1970).',
         parameters: [
-            { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg element you want to set the XML document of' },
-            { name: 'xmlDocument', isOptional: false, isVariadic: false, summary: 'An xmlnode containing the data to be set on the SVG document' },
-            { name: 'callback', isOptional: true, isVariadic: false, summary: 'A callback function which is stored on the SVG and fired every time the SVG texture is updated (for example, via svgSetSize). Note: if present, this will overwrite the current callback stored on the svg' },
+            { name: 'theBan', isOptional: false, isVariadic: false, summary: 'The ban of which to change the unban time of' },
+            { name: 'theTime', isOptional: false, isVariadic: false, summary: 'the new unban time' },
         ],
-        returns: '* returns true if successful, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SvgSetDocumentXML',
+        returns: 'Returns *true* if changed successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetUnbanTime',
     },
-    svgSetSize: {
-        summary: '',
+    setVehicleAdjustableProperty: {
+        summary: 'This function is used for adjusting the movable parts of a model, for example hydra jets or dump truck tray.\nThis function only works on vehicles with adjustable properties.',
         parameters: [
-            { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg element you want to set the size of.' },
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'Desired width, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
-            { name: 'height', isOptional: false, isVariadic: false, summary: 'Desired height, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
-            { name: 'callback', isOptional: true, isVariadic: false, summary: 'A callback function which is stored on the SVG and fired every time the SVG texture is updated (for example, via svgSetDocumentXML). Note: if present, this will overwrite the current callback stored on the svg' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to change the adjustable property of.' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'A value from 0 between ?. (Set the adjustable value between 0 and N. 0 is the default value. It is possible to force the setting beyond default maximum, for example setting above 5000 on the dump truck (normal max 2500) will cause the tray to be fully vertical.)' },
         ],
-        returns: '* returns true if successful, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SvgSetSize',
+        returns: 'Returns true if the adjustable property was set, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleAdjustableProperty',
     },
-    svgSetUpdateCallback: {
-        summary: '',
+    setVehicleColor: {
+        summary: 'This function will set the color of a vehicle using either a RGB format, or the standard San Andreas color IDs. Vehicles can have up to 4 colors, most of the vehicles have 2 colors only.',
         parameters: [
-            { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg you want to set the callback function of.' },
-            { name: 'callback', isOptional: false, isVariadic: false, summary: 'The callback function to store on the SVG. If false is provided, any existing callback function will be removed from the SVG.' },
+            { name: 'veh', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'r1', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'g1', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'b1', isOptional: false, isVariadic: false, summary: '' },
+            { name: 'r2', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'g2', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'b2', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'r3', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'g3', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'b3', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'r4', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'g4', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'b4', isOptional: true, isVariadic: false, summary: '' },
         ],
-        returns: '* returns true if successful, false otherwise',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SvgSetUpdateCallback',
+        returns: 'Returns *true* if vehicle\'s color was set, *false* if an invalid vehicle or invalid colors were specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleColor',
     },
-    takeAllWeapons: {
-        summary: 'This function removes every weapons from a specified ped, rendering it unarmed.',
+    setVehicleComponentPosition: {
+        summary: 'This function sets the component position of a vehicle.',
         parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: ': A ped element referencing the specified ped' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to set component position.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'posX', isOptional: false, isVariadic: false, summary: 'The new x position of this component.' },
+            { name: 'posY', isOptional: false, isVariadic: false, summary: 'The new y position of this component.' },
+            { name: 'posZ', isOptional: false, isVariadic: false, summary: 'The new z position of this component.' },
+            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the supplied position (*posX*, *posY*, *posZ*) is relative to. It can be one of the following values:' },
         ],
-        returns: 'returns true if the function succeeded, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TakeAllWeapons',
+        returns: 'Returns *true* if component position was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleComponentPosition',
     },
-    takePlayerMoney: {
-        summary: 'This function subtracts money from a players current money amount.',
+    setVehicleComponentRotation: {
+        summary: 'This function sets the component rotation of a vehicle.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player you are taking the money from.' },
-            { name: 'amount', isOptional: false, isVariadic: false, summary: 'an integer number specifying the amount of money to take from the player.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to set component rotation of.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'rotX', isOptional: false, isVariadic: false, summary: 'The component\'s rotation around the x axis in degrees.' },
+            { name: 'rotY', isOptional: false, isVariadic: false, summary: 'The component\'s rotation around the y axis in degrees.' },
+            { name: 'rotZ', isOptional: false, isVariadic: false, summary: 'The component\'s rotation around the z axis in degrees.' },
+            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the supplied rotation (*rotX*, *rotY*, *rotZ*) is relative to. It can be one of the following values:' },
         ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TakePlayerMoney',
+        returns: 'Returns *true* if the component rotation was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleComponentRotation',
     },
-    takePlayerScreenShot: {
-        summary: 'This function forces a client to capture the current screen output and send it back to\nthe server. The image will contain the GTA HUD and the output of any dxDraw functions\nthat are not flagged as post GUI. The image specifically excludes the chat box and all\nGUI (including the client console). The result is received with the event\nonPlayerScreenShot.',
+    setVehicleComponentScale: {
+        summary: 'This function sets the component scale of a vehicle.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player to get the screen capture from.' },
-            { name: 'width', isOptional: false, isVariadic: false, summary: 'the width of the capture image.' },
-            { name: 'height', isOptional: false, isVariadic: false, summary: 'the height of the capture image.' },
-            { name: 'tag', isOptional: true, isVariadic: false, summary: 'A string to help identify the screen capture. The string is passed to the matching onPlayerScreenShot event for your personal convenience.' },
-            { name: 'quality', isOptional: true, isVariadic: false, summary: 'Quality of the final JPEG image from 0 to 100. A lower value can reduce the memory used by the image considerably which will result in faster and less intrusive uploads.' },
-            { name: 'maxBandwith', isOptional: true, isVariadic: false, summary: 'The amount of client upload bandwidth to use (in bytes per second) when sending the image. ***maxPacketSize: ** The maximum size of one packet.' },
-            { name: 'maxPacketSize', isOptional: true, isVariadic: false, summary: '' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to set component scale.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the frame name from the model file of the component you wish to modify)' },
+            { name: 'scaleX', isOptional: false, isVariadic: false, summary: 'The new x scale of this component.' },
+            { name: 'scaleY', isOptional: false, isVariadic: false, summary: 'The new y scale of this component.' },
+            { name: 'scaleZ', isOptional: false, isVariadic: false, summary: 'The new z scale of this component.' },
+            { name: 'base', isOptional: true, isVariadic: false, summary: 'A string representing what the supplied scale (*scaleX*, *scaleY*, *scaleZ*) is relative to. It can be one of the following values:' },
         ],
-        returns: 'returns true if the function was successfully, false if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TakePlayerScreenShot',
+        returns: 'Returns *true* if component scale was set successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleComponentScale',
     },
-    takeWeapon: {
-        summary: 'This function removes a specified weapon or ammo from a certain players inventory.',
+    setVehicleComponentVisible: {
+        summary: 'This function sets component visibility for vehicle.',
         parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: ': A player object referencing the specified player.' },
-            { name: 'weaponId', isOptional: false, isVariadic: false, summary: ': An integer that refers to a weapon that you wish to remove.' },
-            { name: 'ammo', isOptional: true, isVariadic: false, summary: ': If used, this amount of ammo will be taken instead and the weapon will not be removed.' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to set component visibility of.' },
+            { name: 'theComponent', isOptional: false, isVariadic: false, summary: 'A vehicle component (this is the component\'s frame name (also called \'dummy\') from the vehicle model\'s DFF file of which you want to manipulate components)' },
+            { name: 'visible', isOptional: false, isVariadic: false, summary: 'a *bool* which determines if the component should be visible' },
         ],
-        returns: 'returns a true if the weapon/ammo was removed successfully, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TakeWeapon',
+        returns: 'Returns a *bool* indicating if the visiblity was changed successfully.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleComponentVisible',
     },
-    teaDecode: {
-        summary: 'This function decrypts given https://en.wikipedia.org/wiki/Base64 base64 representation\nof encrypted data using the https://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm Tiny\nEncryption Algorithm.',
+    setVehicleDamageProof: {
+        summary: 'This functions makes a vehicle damage proof, so it won\'t take damage from bullets, hits, explosions or fire. A damage proof\'s vehicle health can still be changed via script.',
         parameters: [
-            { name: 'data', isOptional: false, isVariadic: false, summary: 'The block of data you want to decrypt' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key that should be used for decryption (Only first 16 characters are used)' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to make damage proof.' },
+            { name: 'damageProof', isOptional: false, isVariadic: false, summary: '*true* is damage proof, *false* is damageable.' },
         ],
-        returns: 'returns string containing the decrypted data if the decryption process was successfully completed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TeaDecode',
+        returns: 'Returns *true* if the vehicle was set damage proof succesfully, *false* if the arguments are invalid or it failed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDamageProof',
     },
-    teaEncode: {
-        summary: 'This functions performs the https://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm Tiny\nEncryption Algorithm on the given string and returns the\nhttps://en.wikipedia.org/wiki/Base64 base64 representation of the encrypted string.',
+    setVehicleDirtLevel: {
+        summary: 'This function sets the dirt level on a vehicle.',
         parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'The string you want to encrypt. (See second example if you want to encode binary data)' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The key that should be used for encryption (Only first 16 characters are used)' },
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the dirt level from' },
+            { name: 'dirtLevel', isOptional: false, isVariadic: false, summary: 'The dirt level' },
         ],
-        returns: 'returns the https://en.wikipedia.org/wiki/base64 base64 representation of the encrypted string if the encryption process was successfully completed, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TeaEncode',
-    },
-    testLineAgainstWater: {
-        summary: 'This function checks to see if a line between two points collides with the water. This is\nsimilar to processLineOfSight, but only collides with water. Waves are not taken into\naccount when testing the line.',
-        parameters: [
-            { name: 'startX', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'startY', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'startZ', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'endX', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'endY', isOptional: false, isVariadic: false, summary: '' },
-            { name: 'endZ', isOptional: false, isVariadic: false, summary: '' },
-        ],
-        returns: 'returns true and the position of the intersection point of the line and the water surface if there is a collision, or false if there is no collision.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TestLineAgainstWater',
-    },
-    textCreateDisplay: {
-        summary: 'A textdisplay|text display is like a canvas that can contain many textitem|items of text.\nEach display can be seen by multiple observers (players) and each player can see multiple\ndisplays.',
-        parameters: [],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextCreateDisplay',
-    },
-    textCreateTextItem: {
-        summary: 'This function creates a text item. A text item represents a single area of text, much\nlike a label does in standard GUI programming. A text item can only be seen by players if\nit is added to a textdisplay using textDisplayAddText. Each text item can be added to\nmultiple displays, if need be.',
-        parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: ': A string of text you want to display' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: ': A floating point number between 0.0 and 1.0 indicating how far across the screen the text should be shown, as a percentage of the width, from the left hand side.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: ': A floating point number between 0.0 and 1.0 indicating how far down the screen the text should be shown, as a percentage of the height, from the top.' },
-            { name: 'priority', isOptional: true, isVariadic: false, summary: ': How important it is that this text should be up to date on clients screens. Valid values are: low, medium, high which are aliases for 0, 1 and 2 respectively.' },
-            { name: 'red', isOptional: true, isVariadic: false, summary: ': A value between 0 and 255 indicating how red the text should be.' },
-            { name: 'green', isOptional: true, isVariadic: false, summary: ': A value between 0 and 255 indicating how green the text should be.' },
-            { name: 'blue', isOptional: true, isVariadic: false, summary: ': A value between 0 and 255 indicating how blue the text should be.' },
-            { name: 'alpha', isOptional: true, isVariadic: false, summary: ': A value between 0 and 255 indicating how transparent the text should be, with 0 being fully transparent, and 255 being opaque.' },
-            { name: 'scale', isOptional: true, isVariadic: false, summary: ': A floating point value indicating the scale of the text. The default is 1.0, which is around 12pt.' },
-            { name: 'alignX', isOptional: true, isVariadic: false, summary: ': A string representing the X-alignment of the text. (left, center, right)' },
-            { name: 'alignY', isOptional: true, isVariadic: false, summary: ': A string representing the Y-alignment of the text. (top, center, bottom)' },
-            { name: 'shadowAlpha', isOptional: true, isVariadic: false, summary: ': A value between 0 and 255 indicating how dark the drop shadow should be.' },
-        ],
-        returns: 'returns a textitem object.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextCreateTextItem',
-    },
-    textDestroyDisplay: {
-        summary: 'This function destroys a text display and will unlink all the textitems on it. This does\nnot stop the textitems existing, but anyone who was observing the textitems through this\ndisplay will stop seeing them.',
-        parameters: [
-            { name: 'display', isOptional: false, isVariadic: false, summary: 'This is the textdisplay that you wish to have destroyed.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDestroyDisplay',
-    },
-    textDestroyTextItem: {
-        summary: 'This function destroys a textitem object.',
-        parameters: [
-            { name: 'theTextitem', isOptional: false, isVariadic: false, summary: 'The text item you wish to destroy.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDestroyTextItem',
-    },
-    textDisplayAddObserver: {
-        summary: 'This function adds a player as an observer of a textdisplay. This allows the player to\nsee any textitems that the textdisplay contains.',
-        parameters: [
-            { name: 'display', isOptional: false, isVariadic: false, summary: ': The textdisplay to add the player to as an observer.' },
-            { name: 'playerToAdd', isOptional: false, isVariadic: false, summary: ': The player that should observe the textdisplay.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDisplayAddObserver',
-    },
-    textDisplayAddText: {
-        summary: 'This function adds a textitem to a textdisplay. This allows any observers of the\ntextdisplay to see the textitem.',
-        parameters: [
-            { name: 'displayToAddTo', isOptional: false, isVariadic: false, summary: ': The textdisplay to add the textitem to.' },
-            { name: 'itemToAdd', isOptional: false, isVariadic: false, summary: ': The textitem to add to the display.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDisplayAddText',
-    },
-    textDisplayGetObservers: {
-        summary: 'This function can be used to retrieve all the players  currently observing a specified\ntextdisplay.',
-        parameters: [
-            { name: 'theDisplay', isOptional: false, isVariadic: false, summary: ': The textdisplay of which observers you want to get.' },
-        ],
-        returns: 'returns a table of players that are observers of the display or false if invalid textdisplay is passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDisplayGetObservers',
-    },
-    textDisplayIsObserver: {
-        summary: 'This function checks if a player can see the specified textdisplay.',
-        parameters: [
-            { name: 'display', isOptional: false, isVariadic: false, summary: ': The textdisplay.' },
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: ': The player.' },
-        ],
-        returns: 'return true if textdisplay is showing, or false if not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDisplayIsObserver',
-    },
-    textDisplayRemoveObserver: {
-        summary: 'This function removes a player observer of a textdisplay. This stops the player from\nbeing able to see textitems that the textdisplay contains.',
-        parameters: [
-            { name: 'display', isOptional: false, isVariadic: false, summary: ': The textdisplay to remove the player from as an observer.' },
-            { name: 'playerToRemove', isOptional: false, isVariadic: false, summary: ': The player that should be removed from the textdisplay.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDisplayRemoveObserver',
-    },
-    textDisplayRemoveText: {
-        summary: 'This function removes a textitem from a textdisplay. This stops any observers of the\ntextdisplay from being able to see the textitem.',
-        parameters: [
-            { name: 'displayToRemoveFrom', isOptional: false, isVariadic: false, summary: ': The textdisplay to remove the textitem from.' },
-            { name: 'itemToRemove', isOptional: false, isVariadic: false, summary: ': The textitem to remove from the display.' },
-        ],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextDisplayRemoveText',
-    },
-    textItemGetColor: {
-        summary: 'This function allows you to retrieve the color of a text item.',
-        parameters: [
-            { name: 'theTextItem', isOptional: false, isVariadic: false, summary: 'The text item you wish to retrieve the color of.' },
-        ],
-        returns: 'returns four integers in rgba format, with a maximum value of 255 for each. the values are, in order, red, green, blue, and alpha. alpha decides transparency where 255 is opaque and 0 is transparent. false is returned if the text item is invalid.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextItemGetColor',
-    },
-    textItemGetPosition: {
-        summary: 'This function allows retrieval of the position of a text item.',
-        parameters: [
-            { name: 'theTextItem', isOptional: false, isVariadic: false, summary: 'The textitem you wish to retrieve the position of' },
-        ],
-        returns: 'returns two floats of the x and y position on the screen, where the maximum value is 1.0.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextItemGetPosition',
+        returns: 'returns true if the dirt level was set on the vehicle, false if the dirt level was not set or if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDirtLevel',
     },
 };
