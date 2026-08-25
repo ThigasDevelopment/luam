@@ -1,6 +1,4 @@
-class ReservedSlot extends VehicleSlot {
-    reason: string = 'staff'
-}
+local reserved = new VehicleSlot()
 
 class VehicleSlot {
     model: number = 411
