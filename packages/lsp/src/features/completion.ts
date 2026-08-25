@@ -38,9 +38,9 @@ import {
     superItem,
     symbolItem,
 } from '@lsp/features/completion-items';
-import { eventItems, isEventArgument } from '@lsp/features/event-completion';
+import { eventItems, insideEventHandler, isEventArgument } from '@lsp/features/event-completion';
 import { manifestCompletion } from '@lsp/features/manifest-completion';
-import { expectedStringType, literalItems, stringLiteralValues } from '@lsp/features/literal-completion';
+import { expectedStringType, literalItems, onlyStringLiterals, quotedLiteralItems, stringLiteralValues } from '@lsp/features/literal-completion';
 import { scanContext, type SourceContext } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
@@ -126,8 +126,21 @@ function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: Arg
         .map((declaration) => withArgumentRank(symbolItem(declaration), declaration.type, expectation));
 }
 
-function apiItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
-    return globalsFor(analysis.environment).map((declaration) => withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation));
+const EVENT_CONTEXT_GLOBALS: readonly string[] = ['source', 'client', 'eventName', 'sourceResource', 'sourceResourceRoot'];
+
+function withEventContextRank(item: CompletionItem, inHandler: boolean): CompletionItem {
+    const rank = EVENT_CONTEXT_GLOBALS.indexOf(item.label);
+
+    if (!inHandler || rank === -1) {
+        return item;
+    }
+
+    return { ...item, sortText: `0${rank}${item.label}` };
+}
+
+function apiItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null, inHandler: boolean): CompletionItem[] {
+    return globalsFor(analysis.environment).map((declaration) =>
+        withEventContextRank(withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation), inHandler));
 }
 
 function projectItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
@@ -180,11 +193,17 @@ function deduplicate(items: readonly CompletionItem[]): CompletionItem[] {
     return unique;
 }
 
-function stringItems(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[], context: SourceContext): CompletionItem[] {
+function stringItems(
+    analysis: DocumentAnalysis,
+    offset: number,
+    others: readonly DocumentAnalysis[],
+    context: SourceContext,
+    snippets: boolean,
+): CompletionItem[] {
     const frame = context.frame;
 
     if (frame !== null && frame.isCall && isEventArgument(analysis.text, frame)) {
-        return eventItems(analysis, others, frame);
+        return eventItems(analysis, others, frame, { stringStart: context.stringStart, snippets });
     }
 
     const expected = expectedStringType(analysis, context.stringStart) ?? expectedArgument(analysis, offset, frame)?.type ?? null;
@@ -192,7 +211,7 @@ function stringItems(analysis: DocumentAnalysis, offset: number, others: readonl
     return expected === null ? [] : literalItems(stringLiteralValues(expected));
 }
 
-export function completionAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): CompletionItem[] {
+export function completionAt(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[], snippets = true): CompletionItem[] {
     if (analysis.manifest !== null) {
         return deduplicate(manifestCompletion(analysis, offset));
     }
@@ -208,7 +227,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     }
 
     if (lexical.inString) {
-        return deduplicate(stringItems(analysis, offset, others, lexical));
+        return deduplicate(stringItems(analysis, offset, others, lexical, snippets));
     }
 
     if (hasDecoratorPrefix(analysis.text, offset)) {
@@ -252,15 +271,22 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
     const constructor = classBodyNeedsConstructor(analysis, lexical.frame, offset) ? [constructorItem()] : [];
     const expectation = expectedArgument(analysis, offset, lexical.frame);
+    const inHandler = insideEventHandler(analysis.text, lexical.frames);
+    const expected = expectation === null ? [] : quotedLiteralItems(stringLiteralValues(expectation.type));
+
+    if (expected.length > 0 && expectation !== null && onlyStringLiterals(expectation.type)) {
+        return deduplicate(expected);
+    }
 
     return deduplicate([
+        ...expected,
         ...plainItems(tableKeyItems(analysis, offset), expectation),
         ...scopeItems(analysis, offset, expectation),
         ...projectItems(analysis, expectation),
         ...plainItems(workspaceItems(analysis, others), expectation),
         ...plainItems(mtaClassItems(analysis), expectation),
         ...plainItems(superItems(analysis, offset), expectation),
-        ...apiItems(analysis, expectation),
+        ...apiItems(analysis, expectation, inHandler),
         ...plainItems(directives, expectation),
         ...plainItems(constructor, expectation),
         ...plainItems(KEYWORD_ITEMS, expectation),

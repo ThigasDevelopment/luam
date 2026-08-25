@@ -93,6 +93,7 @@ export function startServer(connection: Connection): LanguageService {
 
     connection.onInitialize((params: InitializeParams): InitializeResult => {
         service.loadWorkspace(workspaceRoots(params));
+        service.useSnippets(params.capabilities.textDocument?.completion?.completionItem?.snippetSupport === true);
 
         return { capabilities: SERVER_CAPABILITIES };
     });

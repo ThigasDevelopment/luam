@@ -4,6 +4,7 @@ import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { isIdentifierChar } from '@lsp/support/source-text';
 
+import { valueText } from './api-text';
 import { localType } from './argument-expectation';
 import { tableLiteralMembers } from './table-literal';
 
@@ -96,5 +97,33 @@ export function literalItems(values: readonly string[]): CompletionItem[] {
         kind: CompletionItemKind.Constant,
         detail: `'${value}'`,
         insertText: value,
+    }));
+}
+
+export function onlyStringLiterals(type: Type): boolean {
+    if (type.kind === 'optional') {
+        return onlyStringLiterals(type.element);
+    }
+
+    if (type.kind === 'string-literal') {
+        return true;
+    }
+
+    if (type.kind !== 'union') {
+        return false;
+    }
+
+    const options = type.options.filter((option) => option.kind !== 'nil');
+
+    return options.length > 0 && options.every(onlyStringLiterals);
+}
+
+export function quotedLiteralItems(values: readonly string[]): CompletionItem[] {
+    return values.map((value) => ({
+        label: value,
+        kind: CompletionItemKind.Constant,
+        detail: `'${value}'`,
+        insertText: valueText('string', value),
+        sortText: `0${value}`,
     }));
 }

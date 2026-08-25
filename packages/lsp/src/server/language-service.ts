@@ -14,6 +14,8 @@ import { WorkspaceIndex } from '@lsp/workspace/workspace-index';
 export class LanguageService {
     private readonly workspace = new WorkspaceIndex();
 
+    private snippets = true;
+
     loadWorkspace(roots: readonly string[]): void {
         this.workspace.load(roots);
     }
@@ -61,7 +63,11 @@ export class LanguageService {
     completion(uri: string, position: Position): CompletionItem[] {
         const analysis = this.workspace.get(uri);
 
-        return analysis === null ? [] : completionAt(analysis, this.offset(analysis, position), this.workspace.others(uri));
+        return analysis === null ? [] : completionAt(analysis, this.offset(analysis, position), this.workspace.others(uri), this.snippets);
+    }
+
+    useSnippets(supported: boolean): void {
+        this.snippets = supported;
     }
 
     signatureHelp(uri: string, position: Position): SignatureHelp | null {
