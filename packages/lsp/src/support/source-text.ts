@@ -60,13 +60,19 @@ export function locateWord(text: string, from: number, word: string): number | n
     return null;
 }
 
-export function wordAt(text: string, offset: number): string | null {
+export function wordStart(text: string, offset: number): number {
     let start = offset;
-    let end = offset;
 
     while (start > 0 && isIdentifierChar(text[start - 1])) {
         start -= 1;
     }
+
+    return start;
+}
+
+export function wordAt(text: string, offset: number): string | null {
+    const start = wordStart(text, offset);
+    let end = offset;
 
     while (end < text.length && isIdentifierChar(text[end])) {
         end += 1;

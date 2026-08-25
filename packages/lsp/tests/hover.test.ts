@@ -130,8 +130,61 @@ describe('hover', () => {
         const boolean = 'class Player {\n    @Getter\n    admin: boolean\n}\n';
         const alias = 'type Flag = boolean\nclass Player {\n    @Getter\n    admin: Flag\n}\n';
 
-        expect(hoverText(boolean, '@', 'Getter')).toContain('Generates `isAdmin(): boolean`');
-        expect(hoverText(alias, '@', 'Getter')).toContain('Generates `isAdmin(): Flag`');
+        expect(hoverText(boolean, '@', 'Getter')).toContain('isAdmin(): boolean');
+        expect(hoverText(alias, '@', 'Getter')).toContain('isAdmin(): Flag');
+    });
+
+    it('documents the placement, the generated api, and the diagnostics of a decorator', () => {
+        const hover = hoverText('class Player {\n    @Getter\n    admin: boolean\n}\n', '@', 'Getter');
+
+        expect(hover).toContain('Generates a typed getter for each decorated field.');
+        expect(hover).toContain('Valid on a class and on a field. It takes no arguments.');
+        expect(hover).toContain('- `getField(): FieldType`, returning the field unchanged.');
+        expect(hover).toContain('**Rules**');
+        expect(hover).toContain('- `check-decorator-conflict` when a generated name is already declared by a hand-written member.');
+    });
+
+    it('shows the companion class a builder decorator declares', () => {
+        const hover = hoverText("@Builder\nclass Account {\n    name: string = ''\n    balance: number = 0\n}\n", '@', 'Builder');
+
+        expect(hover).toContain('class AccountBuilder {\n    withName(value: string): AccountBuilder\n    withBalance(value: number): AccountBuilder\n    build(): Account\n}');
+        expect(hover).toContain('Generates a companion builder class.');
+    });
+
+    it('shows every member a class decorator generates', () => {
+        const observable = 'class Session {\n    @Observable\n    connected: boolean = false\n}\n';
+        const hover = hoverText(observable, '@', 'Observable');
+
+        expect(hover).toContain('setConnected(value: boolean): void');
+        expect(hover).toContain('onConnectedChanged(listener: any): void');
+    });
+
+    it('explains a decorator that only validates, on a field and on a method', () => {
+        const source = 'class Entity {\n    describe = function (): string\n        return self.name\n    end\n}\n';
+        const player = 'class Player extends Entity {\n    @ReadOnly\n    id: number = 1\n\n    @Override\n    describe = function (): string\n        return self.name\n    end\n}\n';
+        const text = `${source}${player}`;
+
+        expect(hoverText(text, '@ReadOnly', 'ReadOnly')).toContain('@ReadOnly\nid: number');
+        expect(hoverText(text, '@ReadOnly', 'ReadOnly')).toContain('`check-readonly-assignment` on an assignment outside the declaring class.');
+        expect(hoverText(text, '@Override', 'Override')).toContain('@Override\ndescribe(): string');
+        expect(hoverText(text, '@Override', 'Override')).toContain('Valid on a method. It takes no arguments.');
+    });
+
+    it('shows the instance behind self with the shape of its class', () => {
+        const text = 'class Round {\n    label: string = \'a\'\n\n    describe = function (): string\n        return self.label\n    end\n}\n';
+        const hover = hoverText(text, 'return ', 'self');
+
+        expect(hover).toContain('self: Round');
+        expect(hover).toContain('`self` is the receiver of the current class member.');
+        expect(hover).toContain('class Round {\n    label: string\n\n    describe(): string\n}');
+        expect(hover).toContain('check-explicit-self-parameter');
+    });
+
+    it('reports self as unbound outside a class member', () => {
+        const hover = hoverText('print(self)\n', 'print(', 'self');
+
+        expect(hover).toContain('check-invalid-self');
+        expect(hover).toContain('It is not bound here');
     });
 
     it('shows generated methods like authored methods', () => {

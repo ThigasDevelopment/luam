@@ -198,3 +198,10 @@ método `@Override` ausente na superclasse ou com assinatura diferente é
 Membros gerados são membros comuns: a completação após `:` os lista, o hover
 mostra a assinatura e ir-para-definição leva ao campo ou classe que os gerou.
 Digitar `@` também sugere todos os decorators conhecidos.
+
+O hover do próprio decorator responde o que ele faz *ali*: o primeiro bloco é a
+API exata produzida naquele ponto — `isAdmin(): boolean` para um `@Getter` em um
+campo booleano, a classe `AccountBuilder` inteira para um `@Builder`, o próprio
+membro decorado para `@ReadOnly`, `@Deprecated` e `@Override`, que não geram
+nada. Abaixo vêm a regra de posicionamento, a forma gerada em abstrato, as notas
+de comportamento e os diagnósticos que o decorator pode emitir.

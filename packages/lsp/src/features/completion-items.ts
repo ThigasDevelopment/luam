@@ -1,5 +1,5 @@
 import type { MemberInfo } from '@compiler/checker/registry';
-import { KNOWN_DECORATORS } from '@compiler/checker/decorators';
+import { KNOWN_DECORATORS } from '@compiler/checker/decorator-catalog';
 import { typeToString, type Type } from '@compiler/checker/types';
 import { NATIVE_EXTENSIONS } from '@compiler/extensions/native-extensions';
 import { KEYWORDS } from '@compiler/lexer/token';
@@ -10,6 +10,7 @@ import { LIBRARY_MEMBERS, type LibraryName } from '@mta-types/library-members';
 import { CompletionItemKind, InsertTextFormat, InsertTextMode, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
 import { descriptorShapeText, descriptorText, namedDescriptorText, valueText } from '@lsp/features/api-text';
+import { decoratorDocumentation } from '@lsp/features/decorator-text';
 import { documentationBody, documentationFor } from '@lsp/features/documentation-text';
 import type { SymbolDeclaration, SymbolKind } from '@lsp/symbols/symbol';
 
@@ -63,7 +64,7 @@ export function decoratorItems(): CompletionItem[] {
         label: decorator.name,
         kind: CompletionItemKind.Function,
         detail: `@${decorator.name}`,
-        documentation: { kind: MarkupKind.Markdown, value: decorator.documentation },
+        documentation: { kind: MarkupKind.Markdown, value: decoratorDocumentation(decorator) },
     }));
 }
 

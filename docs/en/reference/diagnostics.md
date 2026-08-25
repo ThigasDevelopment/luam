@@ -112,10 +112,14 @@ writes nothing.
 
 | Code | Meaning |
 | --- | --- |
-| `check-unknown-decorator` | The decorator name is not `@Getter` or `@Setter`. |
+| `check-unknown-decorator` | The name is not one of the known decorators. |
 | `check-decorator-target` | A decorator on something that cannot carry one. |
 | `check-duplicate-decorator` | The same decorator twice on one target. |
 | `check-decorator-conflict` | The combination cannot be satisfied. |
+| `check-lazy-initializer` | A `@Lazy` field with no initializer. |
+| `check-readonly-assignment` | A write to a `@ReadOnly` field outside the declaring class. |
+| `check-deprecated-use` | A use of a `@Deprecated` member. |
+| `check-invalid-override` | An `@Override` method the superclass does not declare with the same signature. |
 
 ## Checker — MTA
 

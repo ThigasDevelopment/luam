@@ -21,6 +21,15 @@ Every heading below is a released version and the date it shipped, newest first.
   boundary, upstream constraint or platform constraint, states which ones are
   never coming back — `__index`, `__newindex` and `__call`, implicit runtime
   checks, a build that reads `config.lua` — and names the release it describes.
+- [Editors](/en/tooling/editors) lists the keyword hover and the decorator hover
+  as their own rows: `self` carries its class and that class shape, and a
+  decorator carries the members it generates at that site.
+  [Decorators](/en/language/decorators) describes what the decorator hover shows,
+  including the three that generate nothing.
+- [Diagnostics](/en/reference/diagnostics) stops saying the only decorators are
+  `@Getter` and `@Setter`, and lists the four decorator codes that were missing:
+  `check-lazy-initializer`, `check-readonly-assignment`, `check-deprecated-use`
+  and `check-invalid-override`.
 
 ### Fixed
 

@@ -23,6 +23,15 @@ da versão atual.
   decisão de projeto, restrição da fonte ou restrição da plataforma, diz o que
   nunca volta — `__index`, `__newindex` e `__call`, verificações implícitas em
   execução, um build que lê o `config.lua` — e nomeia a versão que descreve.
+- [Editores](/pt-br/tooling/editors) lista o hover de palavra-chave e o de
+  decorator em linhas próprias: `self` carrega sua classe e a forma dessa classe,
+  e um decorator carrega os membros que gera naquele ponto.
+  [Decorators](/pt-br/language/decorators) descreve o que o hover de decorator
+  mostra, incluindo os três que não geram nada.
+- [Diagnósticos](/pt-br/reference/diagnostics) deixa de dizer que os únicos
+  decoradores são `@Getter` e `@Setter` e lista os quatro códigos que faltavam:
+  `check-lazy-initializer`, `check-readonly-assignment`, `check-deprecated-use` e
+  `check-invalid-override`.
 
 ### Corrigido
 

@@ -112,10 +112,14 @@ erro não escreve nada.
 
 | Código | Significado |
 | --- | --- |
-| `check-unknown-decorator` | O nome do decorador não é `@Getter` nem `@Setter`. |
+| `check-unknown-decorator` | O nome não é um dos decoradores conhecidos. |
 | `check-decorator-target` | Um decorador em algo que não pode recebê-lo. |
 | `check-duplicate-decorator` | O mesmo decorador duas vezes em um alvo. |
 | `check-decorator-conflict` | A combinação não pode ser satisfeita. |
+| `check-lazy-initializer` | Um campo `@Lazy` sem inicializador. |
+| `check-readonly-assignment` | Uma escrita em campo `@ReadOnly` fora da classe que o declara. |
+| `check-deprecated-use` | Um uso de um membro `@Deprecated`. |
+| `check-invalid-override` | Um método `@Override` que a superclasse não declara com a mesma assinatura. |
 
 ## Checker — MTA
 

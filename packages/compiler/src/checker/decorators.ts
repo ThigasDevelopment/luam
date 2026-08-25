@@ -8,29 +8,8 @@ import type {
 
 import { accessorNames } from './accessor-names';
 import type { CheckContext } from './context';
+import { KNOWN_DECORATORS, type DecoratorTarget } from './decorator-catalog';
 import { isBooleanType, type Type } from './types';
-
-export interface DecoratorDefinition {
-    name: string;
-    documentation: string;
-}
-
-export const KNOWN_DECORATORS: ReadonlyMap<string, DecoratorDefinition> = new Map([
-    ['Getter', { name: 'Getter', documentation: 'Generates a typed getter for each decorated field.' }],
-    ['Setter', { name: 'Setter', documentation: 'Generates a typed setter for each decorated field.' }],
-    ['FluentSetter', { name: 'FluentSetter', documentation: 'Generates a setter that returns self.' }],
-    ['ToString', { name: 'ToString', documentation: 'Generates a shallow string representation.' }],
-    ['Equals', { name: 'Equals', documentation: 'Generates shallow field equality.' }],
-    ['Clone', { name: 'Clone', documentation: 'Generates a shallow clone.' }],
-    ['Serializable', { name: 'Serializable', documentation: 'Generates toTable().' }],
-    ['Deserialize', { name: 'Deserialize', documentation: 'Generates fromTable(values).' }],
-    ['Lazy', { name: 'Lazy', documentation: 'Generates a caching getter for an initialized field.' }],
-    ['Observable', { name: 'Observable', documentation: 'Generates a notifying setter and listener registration.' }],
-    ['ReadOnly', { name: 'ReadOnly', documentation: 'Prevents writes outside methods of the declaring class.' }],
-    ['Deprecated', { name: 'Deprecated', documentation: 'Reports a warning when the decorated member is used.' }],
-    ['Override', { name: 'Override', documentation: 'Requires a matching superclass method.' }],
-    ['Builder', { name: 'Builder', documentation: 'Generates a companion builder class.' }],
-]);
 
 function memberExpression(field: ClassFieldDeclaration) {
     return {
@@ -85,12 +64,14 @@ function typeName(name: string, node: { position: TypeAnnotation['position'] }):
     return { kind: 'type-name', name, typeArguments: [], position: node.position };
 }
 
-function validateDecorators(context: CheckContext, decorators: readonly Decorator[], target: 'class' | 'field' | 'method'): Decorator[] {
+function validateDecorators(context: CheckContext, decorators: readonly Decorator[], target: DecoratorTarget): Decorator[] {
     const valid: Decorator[] = [];
     const seen = new Set<string>();
 
     for (const decorator of decorators) {
-        if (!KNOWN_DECORATORS.has(decorator.name)) {
+        const definition = KNOWN_DECORATORS.get(decorator.name);
+
+        if (definition === undefined) {
             context.report('check-unknown-decorator', `Unknown decorator "@${decorator.name}".`, decorator.position);
 
             continue;
@@ -104,18 +85,7 @@ function validateDecorators(context: CheckContext, decorators: readonly Decorato
 
         seen.add(decorator.name);
 
-        const classOnly = new Set(['ToString', 'Equals', 'Clone', 'Serializable', 'Deserialize', 'Builder']);
-        const methodOnly = new Set(['Override']);
-        const memberOnly = new Set(['Deprecated']);
-        const classAllowed = new Set(['Getter', 'Setter', ...classOnly]);
-        const fieldAllowed = new Set(['Getter', 'Setter', 'FluentSetter', 'Lazy', 'Observable', 'ReadOnly', ...memberOnly]);
-        const methodAllowed = new Set([...methodOnly, ...memberOnly]);
-
-        if (
-            (target === 'class' && !classAllowed.has(decorator.name)) ||
-            (target === 'field' && !fieldAllowed.has(decorator.name)) ||
-            (target === 'method' && !methodAllowed.has(decorator.name))
-        ) {
+        if (!definition.targets.includes(target)) {
             context.report('check-decorator-target', `Decorator "@${decorator.name}" is not valid on this ${target}.`, decorator.position);
 
             continue;
