@@ -22,6 +22,11 @@ jobs:
             - uses: ./.github/actions/setup
             - run: pnpm -r typecheck
 
+            - name: Regenerate the MTA catalog offline and check it is committed
+              run: |
+                  pnpm --filter @luam/mta-types generate
+                  git diff --exit-code -- packages/mta-types/src/generated packages/mta-types/data/catalog-index.json
+
     test:
         name: Test on Node ${{ matrix.node-version }}
         needs: typecheck
