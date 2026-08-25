@@ -34,9 +34,27 @@ if (!existsSync(distRoot)) {
     process.exit(1);
 }
 
+const SEARCH_TOKENS: readonly string[] = [
+    '--vp-local-search-bg',
+    '--vp-local-search-result-bg',
+    '--vp-local-search-result-border',
+    '--vp-local-search-result-selected-bg',
+    '--vp-local-search-result-selected-border',
+    '--vp-local-search-highlight-bg',
+    '--vp-local-search-highlight-text',
+];
+
 const pages = htmlFiles(distRoot);
 const errors: string[] = [];
 let tables = 0;
+
+const tokens = readFileSync(resolve(scriptDir, '..', '.vitepress', 'theme', 'tokens.css'), 'utf8');
+
+for (const token of SEARCH_TOKENS) {
+    if (!tokens.includes(token)) {
+        errors.push(`tokens.css does not map "${token}". Search results then fall back to a solid brand fill that is unreadable in the dark theme.`);
+    }
+}
 
 for (const page of pages) {
     const html = readFileSync(join(distRoot, page), 'utf8');
@@ -60,3 +78,4 @@ if (errors.length > 0) {
 }
 
 process.stdout.write(`Layout check passed: ${tables} tables across ${pages.length} pages scroll inside a wrapper.\n`);
+process.stdout.write(`${SEARCH_TOKENS.length} search result tokens follow the theme instead of the raw brand colour.\n`);

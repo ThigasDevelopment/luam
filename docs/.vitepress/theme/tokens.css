@@ -45,6 +45,14 @@
     --vp-c-danger-1: var(--luam-danger);
     --vp-c-warning-1: var(--luam-warn);
 
+    --vp-local-search-bg: var(--luam-paper);
+    --vp-local-search-result-bg: var(--luam-paper-2);
+    --vp-local-search-result-border: var(--luam-line);
+    --vp-local-search-result-selected-bg: var(--luam-paper-3);
+    --vp-local-search-result-selected-border: var(--luam-brand);
+    --vp-local-search-highlight-bg: var(--vp-c-brand-soft);
+    --vp-local-search-highlight-text: var(--luam-ink);
+
     --vp-code-font-size: 0.86em;
     --vp-code-line-height: 1.7;
     --vp-layout-max-width: 1440px;
