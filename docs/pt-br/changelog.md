@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.17.0 - 2026-08-25
+
 ### Alterado
 
 - [APIs e eventos](/pt-br/mta/apis-and-events) e a

@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.17.0 - 2026-08-25
+
 ### Changed
 
 - [APIs and events](/en/mta/apis-and-events) and the
