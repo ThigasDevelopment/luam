@@ -13,6 +13,10 @@ da versão atual.
 
 ### Alterado
 
+- [APIs e eventos](/pt-br/mta/apis-and-events) e a
+  [visão geral do MTA](/pt-br/mta) informam o novo tamanho do catálogo: 1413
+  declarações de API e 58 tipos de elemento, geradas a partir de um snapshot do
+  wiki do MTA versionado no repositório, cobrindo o MTA 1.7.0.
 - [Enums e interfaces](/pt-br/language/enums-and-interfaces) informa que um
   membro opcional de interface é opcional para a classe que a implementa.
 

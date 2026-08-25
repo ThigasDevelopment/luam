@@ -8,9 +8,9 @@ shipped inside the compiler. It is the single source of truth for what a
 
 | Kind | Count |
 | --- | --- |
-| API declarations | 1294 |
+| API declarations | 1413 |
 | Events | 203 |
-| Element types | 57 |
+| Element types | 58 |
 
 The Lua 5.1 standard library — `math`, `string`, `table`, `os`, `tostring`,
 `tonumber` and the rest — is declared alongside it.

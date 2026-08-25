@@ -14,8 +14,69 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- Accepting an event name inside `addEventHandler` now writes the whole handler.
+  Typing `addEventHandler('onPlayerLo` and taking the completion produces the
+  call, `root`, and a `function` whose parameters carry the event's real names
+  and types, with the cursor left in the body. It keeps the quote style you
+  typed, nests under the indentation of the line it lands on, and leaves a call
+  that already carries a handler untouched. A client without snippet support
+  gets the same scaffolding without the tab stop.
+- `source`, `client`, `eventName`, `sourceResource`, and `sourceResourceRoot`
+  rank above everything else while the cursor is inside an event handler body,
+  including inside a nested call.
+- 43 string parameters carry the exact values MTA accepts instead of a bare
+  `string`. Typing `engineSetPoolCapacity('` now lists the twenty engine pools,
+  `createMarker` lists `'checkpoint' | 'ring' | 'cylinder' | 'arrow' | 'corona'`,
+  and `dxDrawText` lists the alignments and the ten built-in fonts. A value the
+  enumeration does not carry reports `check-type-mismatch`, so
+  `engineSetPoolCapacity('player', 1000)` is now an error rather than a silent
+  runtime failure. The values are read from the wiki templates and parameter
+  lists that document them, carried in the committed snapshot, and a curated map
+  records which parameter each list describes.
+  At such an argument the completion offers those values and nothing else, ready
+  quoted, whether or not a quote has been typed yet. An argument whose union also
+  accepts an element keeps the rest of the list, so a variable holding one stays
+  completable.
+  `dxDrawText`'s `font` takes a built-in name or a `DxFont`; because any value
+  is assignable to an element type, that parameter gains the suggestions without
+  the check.
+- The MTA catalog is generated from the MTA wiki again. It came from
+  `mtasa-lua-types`, which stopped being published on 2023-02-05, so the
+  declarations had been frozen against MTA as it stood three and a half years
+  ago. `packages/mta-types/data/mta-wiki.json` is now a committed,
+  revision-stamped snapshot of every page the wiki's two curated function lists
+  name, and generation reads that file and nothing else — a clone with no
+  network still regenerates the catalog byte for byte.
+- 119 MTA functions that MTA has shipped since 2023 are declared for the first
+  time, among them engine streaming and IMG, Discord Rich Presence, PostFX,
+  `createBuilding`, and the HTTP server. The catalog covers 1413 declarations
+  against 1294, up to MTA 1.7.0.
+- 100 multi-return functions such as `getElementPosition` now return a tuple
+  instead of `any`, because the wiki states the return list directly.
+- Catalog drift now fails the test suite. A test compares the snapshot's
+  function list to the catalog and fails on any missing function or environment
+  disagreement an allowlist does not cover, and reports the MTA release the
+  snapshot covers.
+- A scheduled workflow refreshes the snapshot weekly and opens a pull request
+  summarising the diff by blast radius, linking each entry to the wiki revision
+  it came from. It never merges one, refuses to write a catalog when the parse
+  degrades or the diff looks like upstream breakage, and never deletes a
+  declaration because a page was blanked.
+
 ### Fixed
 
+- 24 functions named the wrong environment, so the checker rejected code MTA
+  accepts. `getPlayerSerial`, `getControlState`, `setControlState`,
+  `getAllElementData`, `setWorldSpecialPropertyEnabled`, `addVehicleSirens`,
+  `breakObject`, and the rest gained a second side in a later MTA release and
+  are now `shared`. `usePickup` moves the other way, to server only, which can
+  reject a client call that compiles today.
+- 93 existing signatures gained real types where the second-hand source had
+  `any`, and picked up the optional parameters MTA has added since — among them
+  `setElementData`, `createVehicle`, `processLineOfSight`, `shutdown`,
+  `injectBrowserMouseDown`, and `reloadBrowserPage`.
 - An optional interface member is optional for the class that implements it. A
   class omitting `name?: string` no longer reports
   `check-unimplemented-interface`; declaring it with the wrong type still does.

@@ -19,13 +19,13 @@ The compiler ships a generated catalog of the MTA surface:
 
 | Kind | Count |
 | --- | --- |
-| API declarations | 1294 |
+| API declarations | 1413 |
 | Events | 203 |
-| Element types | 57 |
-| OOP classes | 57 |
-| OOP methods | 652 |
-| OOP static methods | 118 |
-| OOP constructors | 46 |
+| Element types | 58 |
+| OOP classes | 58 |
+| OOP methods | 656 |
+| OOP static methods | 120 |
+| OOP constructors | 47 |
 
 The Lua 5.1 standard library is declared alongside it. The catalog is generated
 from the MTA wiki, so it can lag a release: a name the catalog does not know stays

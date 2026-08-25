@@ -20,13 +20,13 @@ O compilador traz um catálogo gerado da superfície do MTA:
 
 | Tipo | Quantidade |
 | --- | --- |
-| Declarações de API | 1294 |
+| Declarações de API | 1413 |
 | Eventos | 203 |
-| Tipos de elemento | 57 |
-| Classes OOP | 57 |
-| Métodos OOP | 652 |
-| Métodos estáticos OOP | 118 |
-| Construtores OOP | 46 |
+| Tipos de elemento | 58 |
+| Classes OOP | 58 |
+| Métodos OOP | 656 |
+| Métodos estáticos OOP | 120 |
+| Construtores OOP | 47 |
 
 A biblioteca padrão de Lua 5.1 é declarada junto. O catálogo é gerado a partir do
 wiki do MTA, então pode ficar atrás de uma versão: um nome que o catálogo não
