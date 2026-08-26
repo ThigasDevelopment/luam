@@ -108,6 +108,69 @@ describe('hover', () => {
         expect(hoverText(text, 'one.', 'name')).toContain('field name: string');
     });
 
+    it('documents the class keyword', () => {
+        const text = 'class Player {\n    name: string\n}\n';
+
+        expect(hoverText(text, '', 'class')).toContain('`class` declares a runtime class');
+    });
+
+    it('documents extends and implements in a class header', () => {
+        const text = 'interface Named {\n    name: string\n}\n\nclass Entity {\n    name: string = \'a\'\n}\n\nclass Player extends Entity implements Named {\n}\n';
+
+        expect(hoverText(text, 'Player ', 'extends')).toContain('`extends` declares inheritance');
+        expect(hoverText(text, 'Entity ', 'implements')).toContain('`implements` asks the checker');
+    });
+
+    it('documents the new keyword on instantiation', () => {
+        const text = 'class Player {\n}\n\nlocal one = new Player()\n';
+
+        expect(hoverText(text, 'one = ', 'new')).toContain('`new` instantiates a class');
+    });
+
+    it('documents enum, interface, and continue keywords', () => {
+        const text = 'enum State {\n    LOBBY,\n}\n\ninterface Named {\n    name: string\n}\n\nfor index = 1, 3 do\n    continue\nend\n';
+
+        expect(hoverText(text, '', 'enum')).toContain('`enum` declares a fixed set of named numbers');
+        expect(hoverText(text, '\n\ninterface', 'interface')).toContain('`interface` declares a compile-only contract');
+        expect(hoverText(text, '    ', 'continue')).toContain('`continue` skips to the next iteration');
+    });
+
+    it('documents Lua keywords', () => {
+        const text = 'local total: number = 0\n\nfor index = 1, 3 do\n    if index > 1 then\n        total += index\n    end\nend\n\nwhile total > 0 do\n    total -= 1\nend\n';
+
+        expect(hoverText(text, '', 'local')).toContain('`local` declares a block-scoped name');
+        expect(hoverText(text, '\n\nfor', 'for')).toContain('`for` loops in two forms');
+        expect(hoverText(text, '    ', 'if')).toContain('`if` starts a conditional');
+        expect(hoverText(text, '\nend\n\n', 'while')).toContain('`while` runs its body');
+    });
+
+    it('documents nil and the boolean operators', () => {
+        const text = 'local ready: boolean? = nil\n\nlocal label: string = ready and \'yes\' or \'no\'\n';
+
+        expect(hoverText(text, '= ', 'nil')).toContain('`nil` is the absent value');
+        expect(hoverText(text, 'ready ', 'and')).toContain('`and` is the boolean conjunction');
+        expect(hoverText(text, "'yes' ", 'or')).toContain('`or` is the boolean disjunction');
+    });
+
+    it('documents http only as an export modifier', () => {
+        const text = 'export http function getCount(): number\n    return 1\nend\n\nlocal http = 1\nprint(http)\n';
+
+        expect(hoverText(text, 'export ', 'http')).toContain('`http` is a contextual modifier');
+        expect(hoverText(text, 'print(', 'http')).not.toContain('`http` is a contextual modifier');
+    });
+
+    it('does not document a keyword used as a property name', () => {
+        const text = 'local settings: table = { export = true }\n\nprint(settings.export)\n';
+
+        expect(hoverText(text, 'settings.', 'export')).not.toContain('`export` marks a top-level function');
+    });
+
+    it('shows the inferred type of an unannotated field with an initializer', () => {
+        const text = "class Example {\n    lastname = 'Hello, World',\n}\n";
+
+        expect(hoverText(text, '    ', 'lastname')).toContain('field lastname: string');
+    });
+
     it('shows the inferred return type of an unannotated class method', () => {
         const text = 'class Text {\n    name: string\n    describe = function ()\n        return self.name\n    end\n}\nlocal text = new Text()\ntext:describe()\n';
 

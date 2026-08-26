@@ -12,6 +12,7 @@ import { declarationDocumentation } from '@lsp/features/declaration-documentatio
 import { markdown, summaryText } from '@lsp/features/declaration-shape';
 import { decoratorHover } from '@lsp/features/decorator-hover';
 import { eventHover } from '@lsp/features/event-hover';
+import { keywordHover } from '@lsp/features/keyword-hover';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
@@ -175,7 +176,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
     const declaration = analysis.index.declarationFor(offset);
 
     if (declaration === null) {
-        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset);
+        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset) ?? keywordHover(analysis, offset);
     }
 
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;
