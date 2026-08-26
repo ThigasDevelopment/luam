@@ -19,11 +19,11 @@ For the narrative version, see [.luam.manifest](/en/tooling/luam-manifest).
 
 | Field | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `compilerOptions.strict` | `boolean` | no | `true` | Project-wide strict mode. A `#!strict` or `#!nonstrict` directive still wins for the file that carries it. |
-| `compilerOptions.oop` | `boolean` | no | `false` | Enables the MTA OOP API and writes `<oop>true</oop>`. See [OOP API](/en/mta/oop). |
-| `compilerOptions.noUnusedLocals` | `boolean` | no | `false` | Reports a local that is never read as `check-unused-local`. |
-| `compilerOptions.noUnusedParameters` | `boolean` | no | `false` | Reports a parameter that is never read as `check-unused-parameter`. |
-| `compilerOptions.warningsAsErrors` | `boolean` | no | `false` | Promotes every warning to an error. |
+| `compiler.strict` | `boolean` | no | `true` | Project-wide strict mode. A `#!strict` or `#!nonstrict` directive still wins for the file that carries it. |
+| `compiler.oop` | `boolean` | no | `false` | Enables the MTA OOP API and writes `<oop>true</oop>`. See [OOP API](/en/mta/oop). |
+| `compiler.noUnusedLocals` | `boolean` | no | `false` | Reports a local that is never read as `check-unused-local`. |
+| `compiler.noUnusedParameters` | `boolean` | no | `false` | Reports a parameter that is never read as `check-unused-parameter`. |
+| `compiler.warningsAsErrors` | `boolean` | no | `false` | Promotes every warning to an error. |
 
 A binding whose name starts with `_` is never reported as unused.
 
@@ -132,7 +132,8 @@ and names its replacement.
 
 | Field | Replacement |
 | --- | --- |
-| `oop` | `compilerOptions = { oop = true }` |
+| `oop` | `compiler = { oop = true }` |
+| `compilerOptions` | `compiler = { ... }` |
 | `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |

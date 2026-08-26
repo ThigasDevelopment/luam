@@ -28,10 +28,10 @@ luam-docs-server-command/
 - **Argumentos de comando chegam como strings.** O MTA passa o nome do comando
   como segundo parâmetro e cada argumento seguinte como texto, por isso `amount` é
   `string?`.
-- **`tonumber(amount) or MAX_HEALTH` é uma união.** O tipo é `number? | number`, e
-  o Luam não faz estreitamento, então o local é anotado como `any`. Essa é a forma
-  idiomática para um padrão com `or`. Veja
-  [Limitações](/pt-br/reference/limitations).
+- **`tonumber(amount) or MAX_HEALTH` é um `number`.** Um `or` descarta o nil do
+  lado esquerdo, então o `number?` que o `tonumber` devolve e o `number` padrão se
+  encontram em um tipo só, e o local pode ser anotado como `number`. Veja
+  [Guardas de tipo](/pt-br/language/types#guardas-de-tipo).
 - **`target.clamp(0, MAX_HEALTH)`** é uma
   [extensão de número](/pt-br/language/extensions) que compila para `math.clamp`,
   o que traz `lib/math.lua` para o build.

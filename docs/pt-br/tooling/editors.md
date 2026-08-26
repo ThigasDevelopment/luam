@@ -8,6 +8,8 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Recurso | Detalhes |
 | --- | --- |
 | Realce de sintaxe | Arquivos `.luam`, incluindo anotações de tipo, diretivas `#!` e strings de template. |
+| Realce semântico | Uma nativa do MTA, uma chamada da biblioteca Lua, um método e uma função sua leem diferente, e uma nativa carrega o ambiente a que pertence. |
+| Temas | `Luam Dark` e `Luam Light`, gerados de uma tabela de papéis compartilhada com os exports para Zed, Neovim e TextMate. |
 | Diagnósticos | Ao abrir e a cada tecla, limpos quando você corrige o arquivo. |
 | Completação | Símbolos do escopo, globais do workspace, APIs do MTA no ambiente do arquivo, palavras-chave. |
 | Completação de membros | `.` completa campos e métodos estáticos; `:` completa métodos de instância, incluindo membros herdados do MTA. |
@@ -16,6 +18,9 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Ordenação de argumentos | Dentro de uma chamada, candidatos do tipo esperado do parâmetro vêm primeiro, depois funções que o retornam. |
 | Eventos | Dentro das aspas, completa os eventos alcançáveis da chamada; o handler e o payload de um evento conhecido carregam os parâmetros tipados. |
 | Hover | Tipo declarado ou inferido, assinatura da função, o ambiente de uma API do MTA e o contrato de um evento. |
+| Hover de documentação | As linhas de comentário `#` logo acima de qualquer declaração — função, método, classe, interface, enum, alias de tipo, evento declarado, campo, local ou global — aparecem sob a assinatura dela, na declaração e em cada uso. Decorators entre o comentário e a declaração não quebram o par. |
+| Hover de palavra-chave | `self` carrega a classe a que está vinculado e a forma dessa classe; `super(...)` carrega como a implementação do pai é escolhida. |
+| Hover de decorator | Os membros exatos que o decorator gera naquele ponto, onde ele pode ficar e os diagnósticos que pode emitir. |
 | Navegação | Ir para definição, encontrar referências e renomear — entre arquivos para globais. |
 
 A completação tem exatamente o mesmo escopo do checker: `dxDrawText` nunca aparece
@@ -82,7 +87,8 @@ code --extensionDevelopmentPath=packages/vscode
 
 A extensão ativa quando o workspace contém um `.luam.manifest` ou qualquer arquivo
 `.luam`, então **abra a pasta do seu resource como raiz do workspace**. Ela observa
-`**/*.luam`, então arquivos alterados fora do editor também chegam ao servidor.
+`**/*.luam`, `.luam.manifest` e `.env*`, então arquivos alterados fora do editor
+também chegam ao servidor.
 
 ## Comandos
 
@@ -97,10 +103,53 @@ A extensão ativa quando o workspace contém um `.luam.manifest` ou qualquer arq
 | --- | --- | --- |
 | `luam.cliPath` | `"luam"` | Comando usado para rodar a CLI. Aponte para um bundle para testar uma build não publicada. |
 | `luam.ensureWatch` | `true` | Passa `--watch` quando o comando ensure roda. |
+| `luam.semanticHighlighting` | `true` | Colore Luam com os tokens semânticos do servidor. Desligue para manter só a camada da gramática. |
 | `luam.trace.server` | `"off"` | Registra o tráfego LSP. Use `"verbose"` ao relatar um bug. |
 
-## Uma limitação conhecida
+## Cores
 
-O servidor não reverifica um arquivo já aberto quando **outro** arquivo muda,
-então uma violação entre módulos pode aparecer só no `luam check`. Rode
-**Luam: Restart Language Server** para forçar uma nova varredura.
+A extensão traz `Luam Dark` e `Luam Light`, gerados a partir de uma única
+tabela de papéis, para que todo editor leia Luam do mesmo jeito. Instalar a
+extensão não muda as suas cores — escolha o tema em **File → Preferences →
+Theme → Color Theme**. A regra que o tema ensina, e cada elemento que ele
+pinta, estão em [O tema Luam](/pt-br/tooling/theme).
+
+| Editor | Como instalar o tema | O que ele colore |
+| --- | --- | --- |
+| VS Code e seus forks | Vem com a extensão; escolha no seletor de temas. | Tudo: a camada da gramática e a camada semântica. |
+| Zed | Copie `packages/theme/dist-themes/luam-zed.json` para `~/.config/zed/themes/`. | A camada base; registre o servidor de linguagem antes. |
+| Neovim | Copie `packages/theme/dist-themes/luam.lua` para o runtime path e chame `require('luam').setup()`. | Tudo que o servidor reporta, inclusive o ambiente de uma nativa. |
+| Sublime Text e TextMate | Instale `packages/theme/dist-themes/luam-dark.tmTheme` ou `luam-light.tmTheme` junto das gramáticas `.tmLanguage.json`. | Somente a camada da gramática. |
+
+O formato TextMate não tem tokens semânticos, então nessa família uma nativa do
+MTA e uma função sua compartilham a cor, assim como um parâmetro e um local.
+Esse é o limite do formato, não um defeito do tema.
+
+Zed e Neovim precisam do servidor de linguagem configurado antes de qualquer
+coisa — veja [Servidor de linguagem](/pt-br/tooling/language-server).
+
+### JetBrains
+
+Não há esquema de cores Luam para as IDEs JetBrains. O formato delas é `.icls`,
+o realce vem de um plugin de linguagem em vez de uma gramática, e as IDEs da
+comunidade não mapeiam tokens semânticos LSP para um esquema de cores sem esse
+plugin. Publicar um `.icls` que não colorisse nada específico de Luam seria uma
+promessa pior do que não publicar nada. A questão reabre se um plugin Luam for
+construído.
+
+## O que uma mudança reverifica
+
+Editar um arquivo republica diagnóstico daquele arquivo. Os outros só são
+reanalisados quando a edição muda o que o arquivo **declara** — uma classe, uma
+interface, um enum ou um global, incluindo o tipo de qualquer membro. Uma edição
+de corpo custa um arquivo; uma edição de declaração custa todo arquivo que
+enxerga aquela declaração.
+
+Essa última parte é mais larga do que precisa ser: uma mudança de declaração
+reverifica os arquivos que a enxergam, não os que a usam. Estreitar isso é
+[planejado](/pt-br/reference/limitations).
+
+Nada disso espera um arquivo ser aberto. O servidor varre o workspace ao iniciar
+e a extensão observa os padrões de arquivo acima, então um arquivo criado, movido
+ou apagado fora do editor chega até ele sem reinício. **Luam: Restart Language
+Server** é a saída se o servidor e o projeto ainda discordarem.

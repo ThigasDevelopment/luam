@@ -11,7 +11,7 @@ import type { StrictMode } from './directives';
 import { builtinSymbols } from './globals';
 import { mtaClassRegistry } from './oop-classes';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
-import { DeclarationRegistry } from './registry';
+import { DeclarationRegistry, type ClassInfo } from './registry';
 import { missingKeyHint } from './shape-hint';
 import { mergeIntersection } from './type-intersection';
 import { substituteType } from './type-substitution';
@@ -123,9 +123,13 @@ export class CheckContext {
 
     private readonly projectEnvironments = new Map<string, ApiEnvironment>();
 
+    private readonly predeclared = new Map<string, ClassInfo>();
+
     private readonly ambientClasses = new Set<string>();
 
     private readonly ambientInterfaces = new Set<string>();
+
+    private readonly ambientEnums = new Set<string>();
 
     constructor(
         mode: StrictMode,
@@ -182,12 +186,53 @@ export class CheckContext {
         return null;
     }
 
+    predeclareClass(info: ClassInfo): void {
+        this.predeclared.set(info.name, info);
+    }
+
+    takePredeclaredClass(name: string): ClassInfo | null {
+        const info = this.predeclared.get(name) ?? null;
+
+        this.predeclared.delete(name);
+
+        return info;
+    }
+
+    isPredeclaredClass(name: string): boolean {
+        return this.predeclared.has(name);
+    }
+
+    awaitsDeclaration(name: string): boolean {
+        const seen = new Set<string>();
+
+        let current: ClassInfo | null = this.declarations.lookupClass(name);
+
+        while (current !== null && !seen.has(current.name)) {
+            if (this.predeclared.has(current.name)) {
+                return true;
+            }
+
+            seen.add(current.name);
+            current = current.superClass === null ? null : this.declarations.lookupClass(current.superClass);
+        }
+
+        return false;
+    }
+
+    insideFunction(): boolean {
+        return this.returnStack.length > 0;
+    }
+
     isAmbientClass(name: string): boolean {
         return this.ambientClasses.has(name);
     }
 
     isAmbientInterface(name: string): boolean {
         return this.ambientInterfaces.has(name);
+    }
+
+    isAmbientEnum(name: string): boolean {
+        return this.ambientEnums.has(name);
     }
 
     noteExternalReference(name: string, position: SourcePosition): void {
@@ -394,6 +439,7 @@ export class CheckContext {
         }
 
         for (const info of ambient.enums) {
+            this.ambientEnums.add(info.name);
             this.declarations.declareEnum(info);
             this.binder.declareGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: info.position });
         }

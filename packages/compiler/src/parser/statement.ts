@@ -3,7 +3,7 @@ import type { Token } from '@compiler/lexer/token';
 
 import type { DeclareStatement, Expression, Statement, TypeAliasStatement, VariableDeclarator } from './ast';
 import { parseDoStatement, parseForStatement, parseIfStatement, parseRepeatStatement, parseWhileStatement } from './control-flow';
-import { isDeclarationStart, parseDeclaration, parseDecorators } from './declarations';
+import { isDeclarationStart, parseDeclaration, parseDecorators, parseEnumDeclaration } from './declarations';
 import type { EventDeclaration } from './declaration-nodes';
 import { absorbDeclarationTerminator } from './erased-declarations';
 import { isDirectiveStart, parseDirective } from './directives';
@@ -205,7 +205,11 @@ function parseKeywordStatement(stream: TokenStream, value: string): Statement | 
     if (value === 'local') {
         stream.next();
 
-        return stream.check('keyword', 'function') ? parseFunctionDeclaration(stream, true) : parseLocalStatement(stream, token.position);
+        if (stream.check('keyword', 'function')) {
+            return parseFunctionDeclaration(stream, true);
+        }
+
+        return stream.check('keyword', 'enum') ? parseEnumDeclaration(stream, true) : parseLocalStatement(stream, token.position);
     }
 
     if (value === 'function') {

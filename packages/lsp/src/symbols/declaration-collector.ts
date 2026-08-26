@@ -20,7 +20,7 @@ import {
 } from './collector-state';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { fieldText, parameterText, signatureText, variableText } from './signature-text';
+import { fieldText, inferredFieldText, parameterText, signatureText, variableText } from './signature-text';
 import { collectFunctionScope } from './statement-collector';
 
 const KEYWORD_LENGTHS: Readonly<Record<DeclarationStatement['kind'], number>> = {
@@ -58,8 +58,9 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
             collectExpression(state, block, member.value);
         }
 
-        const detail = member.annotation === null ? `field ${member.name}` : fieldText(member.name, member.annotation);
-        const type = member.annotation === null ? null : annotationType(member.annotation);
+        const checked = member.annotation === null ? (state.checkerDeclarations.lookupMember(owner, member.name)?.type ?? null) : null;
+        const detail = member.annotation === null ? inferredFieldText(member.name, checked) : fieldText(member.name, member.annotation);
+        const type = member.annotation === null ? checked : annotationType(member.annotation);
 
         declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner, type });
 
@@ -170,7 +171,7 @@ function collectInterface(state: CollectorState, block: BlockContext, statement:
 function collectEnum(state: CollectorState, statement: EnumDeclaration): void {
     const position = namePosition(state, statement);
 
-    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'enum', position, detail: `enum ${statement.name}` });
+    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'enum', position, detail: `${statement.isLocal ? 'local ' : ''}enum ${statement.name}` });
 
     statement.members.forEach((member, index) => {
         declareSymbol(state, ROOT_SCOPE, {

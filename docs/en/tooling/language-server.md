@@ -105,6 +105,12 @@ On `initialize` the server scans the workspace folders for `.luam` files and
 analyzes them. Open documents always win over the scanned copy, so unsaved edits
 drive diagnostics and navigation immediately.
 
+It also handles `workspace/didChangeWatchedFiles`: a file the client reports as
+created or changed is read from disk and analyzed, and a deleted one drops its
+declarations before diagnostics are republished. Registering those watchers is
+the client's half — a client that registers none keeps what the initial scan
+found plus whatever you open.
+
 ## The manifest
 
 [`.luam.manifest`](/en/tooling/luam-manifest) is scanned and analyzed like any
@@ -138,6 +144,8 @@ Any LSP client needs three things:
 2. **Document selector** — files matching `**/*.luam`, language id `luam`.
 3. **Root** — the folder holding `.luam.manifest`, so the workspace scan finds every
    module.
+4. **File watchers** — optional, over `**/*.luam`, `.luam.manifest` and `.env*`,
+   so a change made outside the editor reaches the server.
 
 There is no configuration section the server requires; the settings listed under
 [Editors](/en/tooling/editors) belong to the VS Code extension, not to the

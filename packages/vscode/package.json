@@ -3,7 +3,7 @@
     "displayName": "Luam",
     "icon": "icon.png",
     "description": "Language support for Luam, a typed Lua that compiles to Multi Theft Auto resources.",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "private": true,
     "type": "module",
     "main": "./dist/extension.cjs",
@@ -21,7 +21,8 @@
         "vscode": "^1.82.0"
     },
     "categories": [
-        "Programming Languages"
+        "Programming Languages",
+        "Themes"
     ],
     "keywords": [
         "mta",
@@ -138,13 +139,124 @@
                     ],
                     "default": "off",
                     "description": "Trace the communication with the Luam language server."
+                },
+                "luam.semanticHighlighting": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Colours Luam with the semantic tokens the language server serves."
                 }
             }
-        }
+        },
+        "themes": [
+            {
+                "label": "Luam Dark",
+                "uiTheme": "vs-dark",
+                "path": "./themes/luam-dark.json"
+            },
+            {
+                "label": "Luam Light",
+                "uiTheme": "vs",
+                "path": "./themes/luam-light.json"
+            }
+        ],
+        "semanticTokenScopes": [
+            {
+                "language": "luam",
+                "scopes": {
+                    "*.generated": [
+                        "entity.name.function.luam"
+                    ],
+                    "function.defaultLibrary.mtaNative.serverOnly": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "function.defaultLibrary.mtaNative.clientOnly": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "function.defaultLibrary.mtaNative": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "variable.defaultLibrary.mtaNative.serverOnly": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "variable.defaultLibrary.mtaNative.clientOnly": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "variable.defaultLibrary.mtaNative": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "type.defaultLibrary.erased": [
+                        "support.type.primitive.luam"
+                    ],
+                    "function.defaultLibrary": [
+                        "support.function.library.luam"
+                    ],
+                    "variable.defaultLibrary": [
+                        "support.function.library.luam"
+                    ],
+                    "class.declaration": [
+                        "entity.name.type.class.luam"
+                    ],
+                    "interface.declaration": [
+                        "entity.name.type.class.luam"
+                    ],
+                    "enum.declaration": [
+                        "entity.name.type.class.luam"
+                    ],
+                    "type.declaration": [
+                        "entity.name.type.class.luam"
+                    ],
+                    "enumMember.declaration": [
+                        "entity.other.attribute.luam"
+                    ],
+                    "class.erased": [
+                        "entity.name.type.luam"
+                    ],
+                    "enum.erased": [
+                        "entity.name.type.luam"
+                    ],
+                    "decorator": [
+                        "entity.name.function.decorator.luam"
+                    ],
+                    "event": [
+                        "string.quoted.single.luam"
+                    ],
+                    "class": [
+                        "entity.name.function.constructor.luam"
+                    ],
+                    "interface": [
+                        "entity.name.type.luam"
+                    ],
+                    "enum": [
+                        "variable.other.luam"
+                    ],
+                    "type": [
+                        "entity.name.type.luam"
+                    ],
+                    "function": [
+                        "entity.name.function.call.luam"
+                    ],
+                    "method": [
+                        "entity.name.function.method.luam"
+                    ],
+                    "parameter": [
+                        "variable.parameter.luam"
+                    ],
+                    "variable": [
+                        "variable.other.luam"
+                    ],
+                    "property": [
+                        "entity.other.attribute.luam"
+                    ],
+                    "enumMember": [
+                        "entity.other.attribute.luam"
+                    ]
+                }
+            }
+        ]
     },
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
-        "bundle": "node scripts/bundle.ts",
+        "bundle": "node ../theme/scripts/build-theme.ts && node scripts/bundle.ts",
         "test": "vitest run",
         "typecheck": "tsc -p tsconfig.json"
     },
@@ -153,10 +265,13 @@
         "vscode-languageclient": "^9.0.1"
     },
     "devDependencies": {
+        "@luam/theme": "workspace:*",
         "@types/node": "^22.9.0",
         "@types/vscode": "^1.82.0",
         "esbuild": "^0.21.5",
         "typescript": "^5.6.3",
-        "vitest": "^2.1.4"
+        "vitest": "^2.1.4",
+        "vscode-oniguruma": "^2.0.1",
+        "vscode-textmate": "^9.3.2"
     }
 }

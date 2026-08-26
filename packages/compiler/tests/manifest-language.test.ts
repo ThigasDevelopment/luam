@@ -147,12 +147,12 @@ describe('manifest evaluation', () => {
     });
 
     it('evaluates arithmetic, concatenation and comparison', () => {
-        const source = [NAME, "version = '1.' .. 2 .. '.' .. 3", 'compilerOptions = { oop = 2 > 1 }', 'development = { logs = { rateLimit = 10 * 3 } }'].join('\n');
+        const source = [NAME, "version = '1.' .. 2 .. '.' .. 3", 'compiler = { oop = 2 > 1 }', 'development = { logs = { rateLimit = 10 * 3 } }'].join('\n');
         const analysis = analyze(source);
 
         expect(analysis.diagnostics).toEqual([]);
         expect(analysis.value.version).toBe('1.2.3');
-        expect(analysis.value.compilerOptions).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false });
+        expect(analysis.value.compiler).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false });
         expect(analysis.value.development).toEqual({ logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 }, server: {} });
     });
 

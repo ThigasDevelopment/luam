@@ -103,7 +103,7 @@ export const MANIFEST_FIELDS: readonly ManifestField[] = [
     field('author', OPTIONAL_STRING, 'Author written to the generated meta.xml.', { owner: 'identity' }),
     field('version', OPTIONAL_STRING, 'Version written to the generated meta.xml.', { owner: 'identity' }),
     field('description', OPTIONAL_STRING, 'Description written to the generated meta.xml.', { owner: 'identity' }),
-    table('compilerOptions', 'Settings that change how the source is checked and emitted.', COMPILER_OPTION_FIELDS, { defaultValue: {}, owner: 'compiler' }),
+    table('compiler', 'Settings that change how the source is checked and emitted.', COMPILER_OPTION_FIELDS, { defaultValue: {}, owner: 'compiler' }),
     table('sources', 'Paths and patterns that make up the project, grouped by the side each file runs on.', SOURCE_FIELDS, {
         defaultValue: {},
         owner: 'sources',
@@ -151,7 +151,8 @@ export const MANIFEST_RECORD: Type = recordType('Manifest', MANIFEST_FIELDS);
 export const ENV_MEMBER_TYPE: Type = OPTIONAL_STRING;
 
 export const REMOVED_FIELDS: Readonly<Record<string, string>> = {
-    oop: 'Move it to "compilerOptions = { oop = true }".',
+    oop: 'Move it to "compiler = { oop = true }".',
+    compilerOptions: 'Rename it to "compiler = { ... }".',
     sourceDirs: 'Replace it with "sources = { server = { ... }, client = { ... }, shared = { ... } }", listing paths or patterns per side.',
     assetDirs: 'Replace it with "assets = { { from = \'assets/**/*\', to = \'assets\' } }", naming a destination for each entry.',
     mta: 'Replace it with "engine = { minVersion = \'1.6.0\' }".',

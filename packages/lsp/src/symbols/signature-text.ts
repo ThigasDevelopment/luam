@@ -90,6 +90,14 @@ export function fieldText(name: string, annotation: TypeAnnotation): string {
     return `field ${namedAnnotationText(name, annotation)}`;
 }
 
+export function inferredFieldText(name: string, type: Type | null): string {
+    if (type === null || type.kind === 'any') {
+        return `field ${name}`;
+    }
+
+    return `field ${name}: ${typeToString(type)}`;
+}
+
 export function assignedText(declaration: string, value: string | null): string {
     return value === null ? declaration : `${declaration} = ${value}`;
 }

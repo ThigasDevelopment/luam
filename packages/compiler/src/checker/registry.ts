@@ -33,6 +33,7 @@ export interface InterfaceInfo {
 export interface EnumInfo {
     name: string;
     members: string[];
+    isLocal?: boolean;
     position: SourcePosition;
 }
 

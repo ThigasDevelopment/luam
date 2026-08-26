@@ -1,0 +1,58 @@
+#!server
+#!strict
+
+# A line comment.
+#* A block
+   comment. *#
+
+# A line comment with a block comment inside. #* A block comment. *#
+interface Describable {
+    label: string
+    describe(): string
+}
+
+type Id = number | nil
+
+declare score: number
+
+enum MatchState {
+    LOBBY,
+    PLAYING,
+    FINISHED,
+}
+
+@Builder
+@ToString
+class Round extends Entity implements Describable {
+    @Getter
+    id: Id = 1
+    label: string = 'round'
+    tags: string[] = { 'a', 'b' }
+    state: number = MatchState.LOBBY
+    hex: number = 0xFF
+
+    constructor = function (label: string)
+        super(label)
+        self.label = label
+    end
+
+    describe = function (): string
+        local raw: string = [[a long
+bracket string]]
+        local escaped: string = 'a\tb'
+        local greeting: string = `Hello ${self.label}`
+        local ok: boolean = true and not false
+
+        return raw .. escaped .. greeting .. tostring(ok)
+    end
+}
+
+export http function report(player: Element, tag?: string, ...): void
+    local round: Round = new Round('final')
+    local total: number = 1 + 2 * 3
+
+    outputChatBox(round:describe(), player)
+    triggerClientEvent('onRoundReported', player)
+    print(string.format('%d', total))
+    addEventHandler('onPlayerJoin', root, function (name: string) end)
+end

@@ -6,13 +6,13 @@ import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
 import { buildFunctionType, checkFunctionBody } from './statements';
-import { ANY_TYPE, createFunction, createNamed, typeToString, VOID_TYPE, type Type } from './types';
+import { ANY_TYPE, createFunction, createNamed, typeToString, VOID_TYPE, widenInferred, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     const valueType = member.value === null ? null : checkExpression(context, member.value);
 
     if (member.annotation === null) {
-        return valueType ?? ANY_TYPE;
+        return valueType === null ? ANY_TYPE : widenInferred(valueType);
     }
 
     const declared = context.resolveAnnotation(member.annotation);
@@ -48,7 +48,7 @@ function syntheticMethodType(context: CheckContext, member: ClassMethodDeclarati
     return buildFunctionType(context, member.parameters, member.returnAnnotation);
 }
 
-function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): ClassMethodDeclaration[] {
+export function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): ClassMethodDeclaration[] {
     const fieldTypes = new Map<ClassFieldDeclaration, Type>();
 
     for (const member of statement.members) {
@@ -81,7 +81,7 @@ function registerMembers(context: CheckContext, info: ClassInfo, statement: Clas
     return generated;
 }
 
-function declareBuilder(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
+export function declareBuilder(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
     if (!statement.decorators.some((decorator) => decorator.name === 'Builder')) {
         return;
     }
@@ -120,7 +120,7 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
     context.popClassMethod();
 }
 
-function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): string | null {
+export function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): string | null {
     if (statement.superClass === null) {
         return null;
     }
@@ -149,32 +149,53 @@ function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): 
     return null;
 }
 
-export function checkClassDeclaration(context: CheckContext, statement: ClassDeclaration): void {
+export function declareClassInfo(context: CheckContext, statement: ClassDeclaration): ClassInfo | null {
     if (context.declarations.lookupClass(statement.name) !== null) {
         context.report('check-duplicate-class', `Class "${statement.name}" is already defined.`, statement.position);
 
-        return;
+        return null;
     }
 
     if (context.mtaClasses !== null && context.mtaClasses.lookupClass(statement.name) !== null) {
         context.report('check-duplicate-class', `Class "${statement.name}" is reserved by MTA when OOP is enabled.`, statement.position);
 
-        return;
+        return null;
     }
 
     const info: ClassInfo = {
         name: statement.name,
-        superClass: resolveSuperClass(context, statement),
+        superClass: null,
         interfaces: statement.interfaces,
         members: new Map(),
         position: statement.position,
     };
 
-    const generated = registerMembers(context, info, statement);
-
-    context.generatedMembers.set(statement, generated);
     context.declarations.declareClass(info);
     context.declareModuleGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: statement.position });
+
+    return info;
+}
+
+function declareLocalClass(context: CheckContext, statement: ClassDeclaration): ClassInfo | null {
+    const info = declareClassInfo(context, statement);
+
+    if (info === null) {
+        return null;
+    }
+
+    info.superClass = resolveSuperClass(context, statement);
+
+    return info;
+}
+
+export function checkClassDeclaration(context: CheckContext, statement: ClassDeclaration): void {
+    const info = context.takePredeclaredClass(statement.name) ?? declareLocalClass(context, statement);
+
+    if (info === null) {
+        return;
+    }
+
+    context.generatedMembers.set(statement, registerMembers(context, info, statement));
     declareBuilder(context, info, statement);
     checkInterfaces(context, info);
     checkOverrides(context, info, statement);
@@ -184,7 +205,6 @@ export function checkClassDeclaration(context: CheckContext, statement: ClassDec
             checkMethodBody(context, info, member);
         }
     }
-
 }
 
 export function checkInterfaceDeclaration(context: CheckContext, statement: InterfaceDeclaration): void {
@@ -251,7 +271,10 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
 }
 
 export function checkEnumDeclaration(context: CheckContext, statement: EnumDeclaration): void {
-    if (context.declarations.lookupEnum(statement.name) !== null) {
+    const existing = context.declarations.lookupEnum(statement.name);
+    const shadowsAmbient = statement.isLocal && existing?.isLocal !== true && context.isAmbientEnum(statement.name);
+
+    if (existing !== null && !shadowsAmbient) {
         context.report('check-duplicate-enum', `Enum "${statement.name}" is already defined.`, statement.position);
 
         return;
@@ -259,6 +282,11 @@ export function checkEnumDeclaration(context: CheckContext, statement: EnumDecla
 
     const members = statement.members.map((member) => member.name);
 
-    context.declarations.declareEnum({ name: statement.name, members, position: statement.position });
-    context.declareModuleGlobal({ name: statement.name, type: createNamed(statement.name), isLocal: false, position: statement.position });
+    context.declarations.declareEnum({ name: statement.name, members, isLocal: statement.isLocal, position: statement.position });
+
+    if (statement.isLocal) {
+        context.binder.declare({ name: statement.name, type: createNamed(statement.name), isLocal: true, position: statement.position, origin: 'local' });
+    } else {
+        context.declareModuleGlobal({ name: statement.name, type: createNamed(statement.name), isLocal: false, position: statement.position });
+    }
 }

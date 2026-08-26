@@ -8,10 +8,10 @@ configuration flag.
 
 ```luam
 name = 'my-resource'
-compilerOptions = { oop = true }
+compiler = { oop = true }
 ```
 
-`compilerOptions.oop` is `false` by default. With it on the compiler:
+`compiler.oop` is `false` by default. With it on the compiler:
 
 - writes `<oop>true</oop>` into `meta.xml`, above `<info>` — which is what makes
   the object form exist at runtime;
@@ -70,7 +70,7 @@ required.
 ## Which form should I use?
 
 Both compile to the same Lua. The object form is shorter and gives better
-completion; the procedural form works with `compilerOptions.oop` off and matches most existing
+completion; the procedural form works with `compiler.oop` off and matches most existing
 MTA code. Pick one per project and stay with it — mixing them is legal but makes
 a codebase harder to read.
 
@@ -84,7 +84,7 @@ a codebase harder to read.
 
 | You wrote | Diagnostic |
 | --- | --- |
-| `player:getName()` with `compilerOptions.oop` off | `check-oop-disabled` |
+| `player:getName()` with `compiler.oop` off | `check-oop-disabled` |
 | `player:getNmae()` | `check-unknown-member` |
 | `class Mine extends Player` | `check-native-class-inheritance` |
 | `Player('x')` where `Player` is not callable | `check-not-callable-class` |

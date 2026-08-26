@@ -74,10 +74,34 @@ class PremiumAccount extends Account {
   inexistente na classe pai é `check-unknown-super-method`.
 - `self:super(...)` não é válido; chame `super(...)` diretamente.
 
-::: warning A ordem de declaração importa
-`extends` e `new` resolvem contra classes declaradas **antes, no mesmo arquivo**.
-Declare a classe pai antes das filhas.
-:::
+## Ordem de declaração
+
+Uma classe é um **tipo em todo o arquivo** e um **valor a partir da linha em que
+a declaração roda**. O `extends` pode nomear uma classe pai escrita mais abaixo,
+e uma função pode instanciar uma classe declarada depois dela:
+
+```luam static
+class VIPAccount extends Account {
+    tier: number = 1
+}
+
+class Account {
+    balance: number = 0
+}
+```
+
+Da segunda metade saem duas regras:
+
+- Instanciar uma classe antes de a declaração dela rodar é
+  `check-class-before-declaration`, e isso só acontece onde o código é um efeito
+  de topo — uma instrução de topo ou o valor inicial de um campo. Dentro do corpo
+  de uma função, o `new` de uma classe declarada mais abaixo funciona.
+- Uma referência escrita acima da declaração enxerga a classe, mas ainda não os
+  membros dela: um membro lê como `any` e a aridade do construtor não é
+  verificada.
+
+Um ciclo de herança — `A extends B` com `B extends A`, ou uma classe que estende
+a si mesma — é `check-class-cycle`.
 
 ## Interfaces
 

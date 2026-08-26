@@ -89,7 +89,7 @@ author = 'Thigas'
 version = '1.0.0'
 description = 'A demo resource'
 
-compilerOptions = {
+compiler = {
     strict = true,
     oop = false,
     noUnusedLocals = false,
@@ -148,7 +148,7 @@ development = {
 | ----- | ------- | ------- |
 | `name` | required | Resource name. Names the output folder and the resource `ensure` syncs. It never reaches `meta.xml` — MTA reads the name from the folder. |
 | `author`, `version`, `description` | unset | Optional `meta.xml` info attributes. |
-| `compilerOptions` | see below | How the checker reads the project: `strict`, `oop`, `noUnusedLocals`, `noUnusedParameters`, `warningsAsErrors`. |
+| `compiler` | see below | How the checker reads the project: `strict`, `oop`, `noUnusedLocals`, `noUnusedParameters`, `warningsAsErrors`. |
 | `sources` | `src/<side>/**/*.luam` | Patterns per side. The matched side is the file's environment unless a directive overrides it. |
 | `assets` | `{ }` | `{ from, to }` mappings. Everything a mapping names is copied and declared as `<file>`; nothing else is copied. |
 | `dependencies` | `{ }` | Resources written as `<include resource="..." />`. |
@@ -180,7 +180,7 @@ so. Order is meaningful for assets too, since a shader can depend on another. An
 entry that names a file the project does not produce is a build error that names
 the entry, so a rename cannot break the order silently.
 
-`compilerOptions.oop` is off by default. With it on, the compiler writes `<oop>true</oop>` above
+`compiler.oop` is off by default. With it on, the compiler writes `<oop>true</oop>` above
 `<info>` and types the object form of the MTA API, so `player:getName()` returns
 `string` and a typo is a build error. With it off, the same call is
 `check-oop-disabled` and the message names the procedural function to use

@@ -120,7 +120,7 @@ describe('mta oop gate', () => {
     it('reports check-oop-disabled and names the procedural function', () => {
         expect(codes(`${PLAYER}player:getName()\n`, SERVER_FILE, false)).toEqual(['check-oop-disabled']);
         expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Call "getPlayerName" instead.');
-        expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Set "compilerOptions = { oop = true }" in .luam.manifest');
+        expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Set "compiler = { oop = true }" in .luam.manifest');
     });
 
     it('reports check-oop-disabled for a property too', () => {

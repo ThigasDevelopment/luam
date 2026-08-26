@@ -69,25 +69,39 @@ para `any` em vez de falhar, então uma declaração faltando nunca bloqueia um 
 ## `player:getName()` é rejeitado
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compilerOptions = { oop = true }" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Defina `compilerOptions = { oop = true }` no `.luam.manifest`. Isso também escreve `<oop>true</oop>` no
+Defina `compiler = { oop = true }` no `.luam.manifest`. Isso também escreve `<oop>true</oop>` no
 `meta.xml`, que é o que faz a forma de objeto existir em tempo de execução. Veja
 [API OOP](/pt-br/mta/oop).
 
 ## Um valor é `string?` e nada o estreita
 
-O Luam **não faz estreitamento de tipos**: `if value ~= nil then` não refina
-`string?` para `string` dentro do bloco, e `tonumber(x) or 0` tem o tipo
-`number? | number`. Anote o local que recebe como `any` quando você já garantiu
-que o valor está presente:
+Uma guarda estreita um **nome**, não um campo. `if value ~= nil then` refina sim
+um local ou um parâmetro dentro do bloco, e `tonumber(amount) or 100` é `number`,
+porque o `or` descarta o nil do lado esquerdo:
 
 ```luam
-local requested: any = tonumber(amount) or MAX_HEALTH
+local amount = '25'
+local requested: number = tonumber(amount) or 100
 ```
 
-Veja [Limitações](/pt-br/reference/limitations).
+O que mantém o tipo declarado é um campo: `self.value` continua `string?` não
+importa como você teste. Copie para um local e teste o local:
+
+```luam static
+local connection = self.connection
+
+if connection ~= nil then
+    local handle: userdata = connection
+end
+```
+
+O estreitamento também termina onde o bloco termina, e cai assim que o nome
+recebe outro valor. Veja [Guardas de tipo](/pt-br/language/types#guardas-de-tipo)
+para todas as formas que estreitam, e [Limitações](/pt-br/reference/limitations)
+para o que não estreita.
 
 ## A interpolação diz que um nome não está no escopo
 
@@ -151,9 +165,15 @@ com código `1` e não imprime resolução para aquela entrada. Veja
 
 ## O editor discorda do `luam check`
 
-O servidor de linguagem não reverifica um arquivo já aberto quando *outro* arquivo
-muda, então uma violação entre módulos pode aparecer só no `luam check`. Rode
-**Luam: Restart Language Server** para forçar uma nova varredura.
+O servidor de linguagem reanalisa os outros arquivos quando uma edição muda o que
+um arquivo **declara**, e ele enxerga arquivos que você nunca abriu — varre o
+workspace ao iniciar e a extensão observa `**/*.luam`, `.luam.manifest` e
+`.env*`. O que ele não lê é um arquivo fora da raiz do workspace, então abra uma
+pasta que contenha o seu `.luam.manifest`, não uma subpasta dele.
+
+Se os dois continuarem discordando, rode **Luam: Restart Language Server** e
+relate: o build e o editor compartilham um frontend, então uma diferença real é
+um bug.
 
 ## Cor e progresso em CI
 

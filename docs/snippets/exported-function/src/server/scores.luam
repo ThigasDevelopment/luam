@@ -2,14 +2,14 @@ local scores: table = {}
 
 export function getScore(player: Player): number
     local name: string = getPlayerName(player)
-    local value: any = scores[name] or 0
+    local value: number = scores[name] or 0
 
     return value
 end
 
 export function addScore(player: Player, amount: number): boolean
     local name: string = getPlayerName(player)
-    local current: any = scores[name] or 0
+    local current: number = scores[name] or 0
 
     scores[name] = current + amount
 

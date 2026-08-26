@@ -14,6 +14,84 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.18.0 - 2026-08-25
+
+### Added
+
+- A class is now a type everywhere in its file. `extends` may name a parent
+  written further down, and a function may instantiate a class declared after
+  it, so a file can be ordered by meaning instead of by inheritance. The
+  checker collects every class header before it checks a statement; the runtime
+  helper links a child to a pending shell of the parent and fills that same
+  table when the parent's declaration runs
+  ([ADR-006](docs/adr/006-two-phase-class-declaration.md)).
+  What did not move is the runtime: a class declaration is a statement, so
+  instantiating a class before its line has run is the new
+  `check-class-before-declaration`, reported only where the code is a top-level
+  effect — a top-level statement or a field initializer. Inside a function body
+  `new` on a class declared further down is accepted. An inheritance cycle,
+  which the old ordering rule made impossible, is the new `check-class-cycle`.
+  No generated line moves or appears: a file that compiled before emits exactly
+  the same Lua.
+
+### Changed
+
+- The manifest table that holds `strict`, `oop`, `noUnusedLocals`,
+  `noUnusedParameters` and `warningsAsErrors` is now named `compiler` instead of
+  `compilerOptions`. The members and their defaults are unchanged. The old name
+  is not aliased: `compilerOptions` reports `config-removed-field` and names
+  `compiler` as its replacement, so a stale manifest fails loudly instead of
+  building with the defaults. Rename the table to migrate.
+
+- Hovering `self` or a decorator now answers what it is, not just what it is
+  named. `self` was one line, `self: Round`, next to a `super(...)` hover that
+  explains itself in full; it now carries the class it is bound to and that
+  class shape, where it is bound, and the two diagnostics that govern it, and
+  outside a class member it says it is unbound instead of showing nothing. A
+  decorator opens with the exact API it produces at that site — `isAdmin():
+  boolean` for a `@Getter` on a boolean field, the whole `AccountBuilder` class
+  for a `@Builder`, the decorated member itself for the three that generate
+  nothing — followed by where it may sit, the shape it generates, how it
+  behaves, and the diagnostics it can raise. A decorator on a method had no
+  hover at all and now has one, and the same text backs the `@` completion.
+  Where a decorator may sit is read from one catalog the checker validates
+  against, so the editor text and the rule cannot drift apart.
+
+- Every published limitation now opens with one label — planned, design
+  boundary, upstream constraint, or platform constraint — so a reader can tell
+  what is going to move from what is not. Three boundaries stop being implicit
+  and are recorded as decisions: annotations are erased and no implicit runtime
+  guard is ever generated for them
+  ([ADR-003](docs/adr/003-erased-type-annotations.md)), `config.lua` is never
+  parsed or executed by a build
+  ([ADR-004](docs/adr/004-opaque-native-configuration.md)), and the environment
+  is a property of the file because MTA assigns a side to each `<script>` entry
+  ([ADR-005](docs/adr/005-file-level-environments.md)). Each records what a
+  future opt-in feature may and may not change.
+
+### Fixed
+
+- The README, the troubleshooting guide and the editor guide claimed Luam does
+  no type narrowing, and that the language server never re-checks an open file
+  when a different one changes. Both had been false for releases: a guard
+  narrows a name, an `or` drops the nil on its left, and an edit that changes
+  what a file declares re-analyzes every file that can see the declaration. The
+  same pages now describe what actually holds — a field keeps its declared type,
+  and the re-check is wider than it needs to be rather than absent — and say
+  that the server scans the workspace and watches `.luam`, `.luam.manifest` and
+  `.env*` instead of telling the reader to restart it.
+- Two recipes annotated a local `any` and blamed the missing narrowing.
+  `tonumber(amount) or MAX_HEALTH` is a `number` and `scores[name] or 0` is a
+  `number`, so both now carry the real type.
+
+### Added
+
+- `pnpm docs:limitations` fails the documentation build when a limitation
+  carries no label, when the two locales disagree about one, when a limitation
+  points at an owning task the roadmap has already closed, or when one of the
+  corrected claims comes back. It runs in the documentation workflow and in
+  `pnpm docs:verify`.
+
 ## 0.17.0 - 2026-08-25
 
 ### Added

@@ -38,6 +38,7 @@ export interface WikiSnapshot {
     endpoint: string;
     lists: { client: readonly string[]; server: readonly string[] };
     pages: readonly WikiSnapshotPage[];
+    events: readonly WikiSnapshotPage[];
     templates: readonly WikiSnapshotTemplate[];
 }
 
@@ -124,6 +125,7 @@ export function parseSnapshot(contents: string): WikiSnapshot {
         endpoint: parsed.endpoint,
         lists: { client: readNames(parsed.lists.client, 'client'), server: readNames(parsed.lists.server, 'server') },
         pages: parsed.pages.map(readPage),
+        events: (Array.isArray(parsed.events) ? parsed.events : []).map(readPage),
         templates: (Array.isArray(parsed.templates) ? parsed.templates : []).map(readTemplate),
     };
 

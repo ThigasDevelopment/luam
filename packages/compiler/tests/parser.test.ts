@@ -109,6 +109,25 @@ describe('parser', () => {
         expect(result.program.body.map((statement) => statement.kind)).toEqual(['class-declaration']);
     });
 
+    it('reports a decorator sharing its line with the class', () => {
+        const result = parse('@ToString class Player {\n}\n');
+
+        expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['parse-decorator-line']);
+        expect(result.program.body.map((statement) => statement.kind)).toEqual(['class-declaration']);
+    });
+
+    it('reports a decorator sharing its line with the field', () => {
+        const result = parse("class Player {\n    @Getter name: string = 'a'\n}\n");
+
+        expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['parse-decorator-line']);
+    });
+
+    it('keeps stacked decorators on one line valid', () => {
+        const result = parse('@Getter @Setter\nclass Player {\n    name: string = \'a\'\n}\n');
+
+        expect(result.diagnostics).toEqual([]);
+    });
+
     it('reports unsupported decorator targets and retains the declaration', () => {
         const result = parse('@Getter\nlocal value = 1\n');
 

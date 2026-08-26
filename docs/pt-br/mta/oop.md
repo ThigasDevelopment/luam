@@ -8,10 +8,10 @@ opção de configuração.
 
 ```luam
 name = 'my-resource'
-compilerOptions = { oop = true }
+compiler = { oop = true }
 ```
 
-`compilerOptions.oop` é `false` por padrão. Com ele ligado, o compilador:
+`compiler.oop` é `false` por padrão. Com ele ligado, o compilador:
 
 - escreve `<oop>true</oop>` no `meta.xml`, acima de `<info>` — que é o que faz a
   forma de objeto existir em tempo de execução;
@@ -70,7 +70,7 @@ precisar de acesso somente leitura.
 ## Qual forma usar?
 
 As duas compilam para o mesmo Lua. A forma de objeto é mais curta e dá melhor
-completação; a procedural funciona com `compilerOptions.oop` desligado e combina com a maior parte
+completação; a procedural funciona com `compiler.oop` desligado e combina com a maior parte
 do código MTA existente. Escolha uma por projeto e mantenha — misturar é legal, mas
 deixa a base de código mais difícil de ler.
 
@@ -84,7 +84,7 @@ deixa a base de código mais difícil de ler.
 
 | Você escreveu | Diagnóstico |
 | --- | --- |
-| `player:getName()` com `compilerOptions.oop` desligado | `check-oop-disabled` |
+| `player:getName()` com `compiler.oop` desligado | `check-oop-disabled` |
 | `player:getNmae()` | `check-unknown-member` |
 | `class Mine extends Player` | `check-native-class-inheritance` |
 | `Player('x')` sendo `Player` não chamável | `check-not-callable-class` |

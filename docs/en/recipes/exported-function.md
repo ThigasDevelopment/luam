@@ -30,8 +30,9 @@ luam-docs-exported-function/
   in `meta.xml`. The generated function is an ordinary global.
 - **`reset` has no `export`,** so it stays internal. Exporting is opt-in per
   function.
-- **`scores[name] or 0` is annotated `any`,** because Luam does no narrowing and
-  an `or` default produces a union.
+- **`scores[name] or 0` is a `number`.** Reading a key out of a `table` gives
+  `any`, and the `or` default settles it on `number`, so the local carries a real
+  type rather than `any`.
 - **The export type follows the environment.** These functions live in
   `src/server`, so they are exported to the server side.
 

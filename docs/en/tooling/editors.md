@@ -8,6 +8,8 @@ uses, so the editor and the build never disagree about a file.
 | Feature | Details |
 | --- | --- |
 | Syntax highlighting | `.luam` files, including type annotations, `#!` directives and template strings. |
+| Semantic highlighting | An MTA native, a Lua library call, a method and one of your own functions each read differently, and a native carries the environment it belongs to. |
+| Themes | `Luam Dark` and `Luam Light`, generated from one role table shared with the Zed, Neovim and TextMate exports. |
 | Diagnostics | On open and on every keystroke, cleared when you fix the file. |
 | Completion | Scope symbols, workspace globals, MTA APIs scoped to the file's environment, keywords. |
 | Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members. |
@@ -16,6 +18,9 @@ uses, so the editor and the build never disagree about a file.
 | Argument ranking | Inside a call, candidates matching the expected parameter type sort first, then functions returning it. |
 | Events | Inside the quotes, completes the events reachable from the call; the handler and the payload of a known event carry its typed parameters. |
 | Hover | Declared or inferred type, function signature, the environment of an MTA API, and the contract of an event. |
+| Documentation hover | The `#` comment lines directly above any declaration — function, method, class, interface, enum, type alias, declared event, field, local or global — appear under its signature, at the declaration and at every use. Decorators between the comment and the declaration do not break the pair. |
+| Keyword hover | `self` carries the class it is bound to and the shape of that class; `super(...)` carries how the parent implementation is selected. |
+| Decorator hover | The exact members the decorator generates at that site, where it may sit, and the diagnostics it can raise. |
 | Navigation | Go to definition, find references, and rename — across files for globals. |
 
 Completion is scoped exactly like the checker: `dxDrawText` never appears in a
@@ -82,7 +87,8 @@ code --extensionDevelopmentPath=packages/vscode
 
 The extension activates when the workspace holds a `.luam.manifest` or any `.luam`
 file, so **open your resource folder as the workspace root**. It watches
-`**/*.luam`, so files changed outside the editor still reach the server.
+`**/*.luam`, `.luam.manifest` and `.env*`, so files changed outside the editor
+still reach the server.
 
 ## Commands
 
@@ -97,10 +103,52 @@ file, so **open your resource folder as the workspace root**. It watches
 | --- | --- | --- |
 | `luam.cliPath` | `"luam"` | Command used to run the CLI. Point it at a bundle to test an unreleased build. |
 | `luam.ensureWatch` | `true` | Pass `--watch` when the ensure command runs. |
+| `luam.semanticHighlighting` | `true` | Colour Luam with the semantic tokens the server serves. Turn it off to keep only the grammar layer. |
 | `luam.trace.server` | `"off"` | Trace LSP traffic. Set to `"verbose"` when reporting a bug. |
 
-## A known limitation
+## Colours
 
-The server does not re-check an already open file when a **different** file
-changes, so a cross-module violation can surface only in `luam check`. Run
-**Luam: Restart Language Server** to force a rescan.
+The extension ships `Luam Dark` and `Luam Light`, generated from one role
+table so every editor reads Luam the same way. Installing the extension does
+not change your colours — pick the theme from **File → Preferences → Theme →
+Color Theme**. The rule the theme teaches, and every element it paints, is on
+[The Luam theme](/en/tooling/theme).
+
+| Editor | How to install the theme | What it colours |
+| --- | --- | --- |
+| VS Code and its forks | Included with the extension; pick it in the theme picker. | Everything: the grammar layer and the semantic layer. |
+| Zed | Copy `packages/theme/dist-themes/luam-zed.json` into `~/.config/zed/themes/`. | The base layer; register the language server first. |
+| Neovim | Copy `packages/theme/dist-themes/luam.lua` onto your runtime path and call `require('luam').setup()`. | Everything the server reports, including the environment of a native. |
+| Sublime Text and TextMate | Install `packages/theme/dist-themes/luam-dark.tmTheme` or `luam-light.tmTheme` alongside the `.tmLanguage.json` grammars. | The grammar layer only. |
+
+The TextMate format has no semantic tokens, so in that family an MTA native and
+one of your own functions share a colour, as do a parameter and a local. That is
+the limit of the format, not a defect in the theme.
+
+Zed and Neovim both need the language server configured before any of this
+applies — see [Language server](/en/tooling/language-server).
+
+### JetBrains
+
+There is no Luam colour scheme for the JetBrains IDEs. Their scheme format is
+`.icls`, their highlighting comes from a language plugin rather than from a
+grammar, and the community IDEs do not map LSP semantic tokens onto a colour
+scheme without one. Shipping an `.icls` that coloured nothing Luam-specific
+would be a worse promise than shipping nothing. The question reopens if a Luam
+plugin is ever built.
+
+## What a change re-checks
+
+Editing a file republishes diagnostics for that file. The other files are
+re-analyzed only when the edit changes what the file **declares** — a class, an
+interface, an enum, or a global, including the type of any member. A body edit
+costs one file; a declaration edit costs every file that can see it.
+
+That last part is wider than it needs to be: a declaration change re-checks the
+files it is visible to rather than the files that use it. Narrowing it is
+[planned](/en/reference/limitations).
+
+Nothing here waits for a file to be opened. The server scans the workspace when
+it starts and the extension watches the file patterns above, so a file created,
+moved or deleted outside the editor reaches it without a restart. **Luam: Restart
+Language Server** is the way out if the server and the project still disagree.

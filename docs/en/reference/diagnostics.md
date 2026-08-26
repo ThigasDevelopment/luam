@@ -87,6 +87,8 @@ writes nothing.
 | --- | --- |
 | `check-unknown-class` | `new` or `extends` names a class that is not declared. |
 | `check-duplicate-class` | Two classes with the same name in one file. |
+| `check-class-cycle` | A class extends itself, directly or through its parents. |
+| `check-class-before-declaration` | A top-level effect instantiates a class declared further down the file. |
 | `check-unknown-interface` | `implements` or interface `extends` names an interface that is not declared. |
 | `check-duplicate-interface` | Two interfaces with the same name in one file. |
 | `check-duplicate-interface-parent` | An interface extends the same parent more than once. |
@@ -103,17 +105,21 @@ writes nothing.
 | `check-unknown-super-method` | The parent has no method of that name. |
 | `check-declare-outside-declaration-file` | `declare` outside a `.d.luam` file. |
 | `check-declaration-file-statement` | A `.d.luam` file contains a statement. |
-| `check-unused-local` | A local is never read, with `compilerOptions.noUnusedLocals` on, or anywhere in the manifest. |
-| `check-unused-parameter` | A parameter is never read, with `compilerOptions.noUnusedParameters` on. |
+| `check-unused-local` | A local is never read, with `compiler.noUnusedLocals` on, or anywhere in the manifest. |
+| `check-unused-parameter` | A parameter is never read, with `compiler.noUnusedParameters` on. |
 
 ## Checker — decorators
 
 | Code | Meaning |
 | --- | --- |
-| `check-unknown-decorator` | The decorator name is not `@Getter` or `@Setter`. |
+| `check-unknown-decorator` | The name is not one of the known decorators. |
 | `check-decorator-target` | A decorator on something that cannot carry one. |
 | `check-duplicate-decorator` | The same decorator twice on one target. |
 | `check-decorator-conflict` | The combination cannot be satisfied. |
+| `check-lazy-initializer` | A `@Lazy` field with no initializer. |
+| `check-readonly-assignment` | A write to a `@ReadOnly` field outside the declaring class. |
+| `check-deprecated-use` | A use of a `@Deprecated` member. |
+| `check-invalid-override` | An `@Override` method the superclass does not declare with the same signature. |
 
 ## Checker — MTA
 
@@ -121,7 +127,7 @@ writes nothing.
 | --- | --- |
 | `check-environment-api` | The API belongs to another environment. |
 | `check-environment-event` | The event belongs to another environment. |
-| `check-oop-disabled` | An OOP call with `compilerOptions.oop` off. |
+| `check-oop-disabled` | An OOP call with `compiler.oop` off. |
 | `check-not-callable-class` | A class used as a constructor that MTA does not make callable. |
 | `check-native-constructor` | Wrong arguments to a native constructor. |
 | `check-native-class-inheritance` | A project class tried to extend a native class. |

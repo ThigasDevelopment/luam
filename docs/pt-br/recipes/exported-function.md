@@ -30,8 +30,9 @@ luam-docs-exported-function/
   `meta.xml`. A função gerada é um global comum.
 - **`reset` não tem `export`,** então continua interna. Exportar é opcional por
   função.
-- **`scores[name] or 0` é anotado como `any`,** porque o Luam não faz estreitamento
-  e um padrão com `or` produz uma união.
+- **`scores[name] or 0` é um `number`.** Ler uma chave de uma `table` devolve
+  `any`, e o padrão com `or` fecha o tipo em `number`, então o local carrega um
+  tipo de verdade em vez de `any`.
 - **O tipo do export segue o ambiente.** Estas funções vivem em `src/server`, então
   são exportadas para o lado do servidor.
 

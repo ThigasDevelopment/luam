@@ -1,0 +1,11 @@
+# The resource manifest.
+name = 'luam-theme-sample'
+description = `Built in ${mode} from ${root}`
+sources = {
+    server = { 'src/server' },
+    client = { 'src/client' },
+    shared = { 'src/shared' },
+}
+engine = { minVersion = '1.6.0' }
+output = { bundle = true, minify = false, map = nil }
+local port = 22003 + 1

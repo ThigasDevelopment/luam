@@ -22,6 +22,7 @@ const FIXTURES: readonly Fixture[] = [
         lowered: [1, 4],
     },
     { name: 'enum', source: 'enum GameState {\n    LOBBY,\n    RUNNING\n}\n\nprint(GameState.LOBBY)\n', lowered: [1, 2, 3] },
+    { name: 'local enum', source: 'local enum Weather {\n    CLEAR,\n    RAIN\n}\n\nprint(Weather.RAIN)\n', lowered: [1, 2, 3] },
     { name: 'compound assignment', source: 'local total: number = 0\n\ntotal += 1\n\nprint(total)\n', lowered: [1, 3] },
     { name: 'native extension', source: "local label: string = ' a '\n\nprint(label.trim)\n", lowered: [1, 3] },
     { name: 'new', source: 'class Point {\n    x = 0\n}\n\nlocal value = new Point ()\n\nprint(value)\n', lowered: [1, 5] },
@@ -117,12 +118,68 @@ describe('development output', () => {
         expect(developmentCode(source)).not.toContain('Unused');
     });
 
-    it('falls back to canonical emission when a declaration cannot fit its authored span', () => {
+    it('keeps a builder class on the closing line of its decorated class', () => {
         const source = "@Builder\nclass Built {\n    label = 'a'\n}\n\nprint(1)\n";
         const code = developmentCode(source);
+        const lines = toLines(code);
 
-        expect(code).toContain("class 'BuiltBuilder' {");
-        expect(code).toContain("class 'Built' {");
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[0]).toBe('--@Builder');
+        expect(lines[1]).toBe("class 'Built' {");
+        expect(lines[3]).toContain("} class 'BuiltBuilder' { withLabel = function(self, value)");
+        expect(lines[5]).toBe('print(1)');
+    });
+
+    it('comments the decorators and injects the accessors without adding lines', () => {
+        const source =
+            '@Getter\n@Setter\nclass Example {\n    id: number = -1;\n\n    constructor = function (id: number): void\n        self.id = id;\n    end\n}\n';
+        const code = developmentCode(source);
+        const lines = toLines(code);
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[0]).toBe('--@Getter');
+        expect(lines[1]).toBe('--@Setter');
+        expect(lines[6]).toBe('        self.id = id;');
+        expect(lines[8]).toContain('getId = function(self) return self.id end');
+        expect(lines[8]).toContain('setId = function(self, value) self.id = value end');
+    });
+
+    it('comments a field decorator on its own line above the field', () => {
+        const source = 'class Holder {\n    @Getter\n    id: number = 1\n}\n\nprint(1)\n';
+        const code = developmentCode(source);
+        const lines = toLines(code);
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[1]).toBe('    --@Getter');
+        expect(lines[3]).toContain('getId = function(self) return self.id end');
+    });
+
+    it('wraps a lazy field in a comment and injects its accessor', () => {
+        const source = 'class Holder {\n    @Lazy\n    total: number = 40 + 2\n}\n\nprint(1)\n';
+        const code = developmentCode(source);
+        const lines = toLines(code);
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[1]).toBe('    --[[@Lazy');
+        expect(lines[2]).toBe('    total: number = 40 + 2]]');
+        expect(lines[3]).toContain('getTotal = function(self) if self.total == nil then self.total = 40 + 2 end return self.total end');
+        expect(lines[5]).toBe('print(1)');
+    });
+
+    it('keeps an erased comment out of the release build for a decorated class', () => {
+        const source = "@Builder\nclass Built {\n    label = 'a'\n}\n\nprint(1)\n";
+
+        expect(releaseCode(source)).not.toContain('--@');
+        expect(releaseCode(source)).toContain("class 'BuiltBuilder'");
+    });
+
+    it('keeps the interface comment when a decorated class shares the file', () => {
+        const source = "interface Named {\n    label: string;\n}\n\n@ToString\nclass Tagged implements Named {\n    label = 'a'\n}\n";
+        const code = developmentCode(source);
+
+        expect(toLines(code).length).toBe(toLines(source).length);
+        expect(code).toContain('--[[interface Named {\n    label: string;\n}]]');
+        expect(code).toContain('--@ToString');
     });
 
     it('keeps the loop header and the closing line of a continue loop byte-identical', () => {

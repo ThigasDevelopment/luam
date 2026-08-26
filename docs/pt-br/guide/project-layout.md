@@ -79,7 +79,7 @@ CLI escreve fora do `outDir`, e ela é gerada — ignore `.luam/` no controle de
 versão.
 
 Não há snapshot de configuração. O servidor de linguagem lê o `.luam.manifest`
-diretamente, então uma mudança em `compilerOptions` passa a valer assim que o
+diretamente, então uma mudança em `compiler` passa a valer assim que o
 arquivo é salvo.
 
 ## Configurando a estrutura

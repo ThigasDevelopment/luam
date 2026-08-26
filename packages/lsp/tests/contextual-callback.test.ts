@@ -27,7 +27,7 @@ function hoverText(service: LanguageService, uri: string, text: string, anchor: 
 
 function oopProject(source: string): { service: LanguageService; uri: string } {
     const root = createWorkspace({
-        '.luam.manifest': "name = 'callbacks'\ncompilerOptions = { oop = true }\n",
+        '.luam.manifest': "name = 'callbacks'\ncompiler = { oop = true }\n",
         'src/server/main.luam': source,
     });
     const service = new LanguageService();

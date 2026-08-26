@@ -70,25 +70,39 @@ completion and argument checking for that call.
 ## `player:getName()` is rejected
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compilerOptions = { oop = true }" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Set `compilerOptions = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
+Set `compiler = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
 `meta.xml`, which is what makes the object form exist at runtime. See
 [OOP API](/en/mta/oop).
 
 ## A value is `string?` and nothing narrows it
 
-Luam does **no type narrowing**: `if value ~= nil then` does not refine `string?`
-to `string` inside the branch, and `tonumber(x) or 0` has the type
-`number? | number`. Annotate the receiving local as `any` when you have already
-established the value is present:
+A guard narrows a **name**, not a field. `if value ~= nil then` does refine a
+local or a parameter inside the branch, and `tonumber(amount) or 100` is
+`number`, because `or` drops the nil on its left:
 
 ```luam
-local requested: any = tonumber(amount) or MAX_HEALTH
+local amount = '25'
+local requested: number = tonumber(amount) or 100
 ```
 
-See [Limitations](/en/reference/limitations).
+What keeps its declared type is a field: `self.value` stays `string?` however you
+test it. Copy it into a local, and test the local:
+
+```luam static
+local connection = self.connection
+
+if connection ~= nil then
+    local handle: userdata = connection
+end
+```
+
+The narrowing also ends where the block ends, and it is dropped as soon as the
+name is assigned again. See [Type guards](/en/language/types#type-guards) for
+every form that narrows, and [Limitations](/en/reference/limitations) for what
+does not.
 
 ## Template interpolation says a name is not in scope
 
@@ -150,9 +164,14 @@ resolution for that input. See
 
 ## The editor disagrees with `luam check`
 
-The language server does not re-check an already open file when a *different*
-file changes, so a cross-module violation can surface only in `luam check`. Run
-**Luam: Restart Language Server** to force a rescan.
+The language server re-analyzes other files when an edit changes what a file
+**declares**, and it sees files you never opened — it scans the workspace on
+start and the extension watches `**/*.luam`, `.luam.manifest` and `.env*`. What
+it does not read is a file outside the workspace root, so open a folder that
+holds your `.luam.manifest`, not a subfolder of it.
+
+If the two still disagree, run **Luam: Restart Language Server** and report it:
+the build and the editor share one frontend, so a real difference is a bug.
 
 ## Colour and progress in CI
 

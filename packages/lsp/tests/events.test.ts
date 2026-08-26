@@ -85,6 +85,18 @@ describe('event callback typing', () => {
         expect(hover).toContain('mta event (server)');
     });
 
+    it('documents a built-in event name from the wiki catalog', () => {
+        const text = "addEventHandler('onPlayerQuit', root, function ()\nend)\n";
+        const hover = hoverAt(text, 'addEventHandler(', 'onPlayerQuit');
+
+        expect(hover).toContain('This event is triggered when a player disconnects from the server.');
+        expect(hover).toContain('**Parameters**');
+        expect(hover).toContain('- `reason` — If the player was kicked or banned');
+        expect(hover).toContain('**Source** — The source of this event is the player that left the server.');
+        expect(hover).toContain('**Cancel effect** — This event cannot be canceled.');
+        expect(hover).toContain('mta event (server) · [wiki](https://wiki.multitheftauto.com/wiki/OnPlayerQuit)');
+    });
+
     it('keeps unknown event names permissive', () => {
         const text = "addEventHandler('onWhateverHappens', root, function ()\nend)\n";
 
@@ -133,6 +145,20 @@ describe('declared event contracts', () => {
         const value = contents === undefined || typeof contents === 'string' || Array.isArray(contents) ? '' : contents.value;
 
         expect(value).toContain("event 'onMatchStart'(player: Player, round: number, ...: string)");
+        expect(value).toContain('custom event declared in src/shared/events.d.luam (shared)');
+    });
+
+    it('documents a declared event from the comment above its declaration', () => {
+        const project = eventProject({
+            'src/shared/events.d.luam': `# Fired when a new match begins.\n# The round counter starts at one.\n${contract}`,
+            'src/server/main.luam': "triggerEvent('onMatchStart', root)\n",
+        });
+        const uri = uriFor(project.root, 'src/server/main.luam');
+        const text = "triggerEvent('onMatchStart', root)\n";
+        const contents = project.service.hover(uri, positionOf(text, 'triggerEvent(', 'onMatchStart'))?.contents;
+        const value = contents === undefined || typeof contents === 'string' || Array.isArray(contents) ? '' : contents.value;
+
+        expect(value).toContain('Fired when a new match begins.\nThe round counter starts at one.');
         expect(value).toContain('custom event declared in src/shared/events.d.luam (shared)');
     });
 

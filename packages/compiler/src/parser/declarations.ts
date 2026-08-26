@@ -99,6 +99,12 @@ export function parseDecorators(stream: TokenStream): Decorator[] {
         }
     }
 
+    const last = decorators[decorators.length - 1];
+
+    if (last !== undefined && !stream.isEof() && stream.current().position.line === last.position.line) {
+        stream.report('parse-decorator-line', `Expected a line break after "@${last.name}".`, stream.current().position);
+    }
+
     return decorators;
 }
 
@@ -281,7 +287,7 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
     return declaration;
 }
 
-function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {
+export function parseEnumDeclaration(stream: TokenStream, isLocal = false): EnumDeclaration {
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
     const members: EnumMember[] = [];
@@ -300,7 +306,7 @@ function parseEnumDeclaration(stream: TokenStream): EnumDeclaration {
 
     stream.expect('punctuation', '}');
 
-    return { kind: 'enum-declaration', name, members, position };
+    return { kind: 'enum-declaration', name, isLocal, members, position };
 }
 
 export function parseDeclaration(stream: TokenStream): DeclarationStatement {

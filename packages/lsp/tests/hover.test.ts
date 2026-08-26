@@ -108,6 +108,69 @@ describe('hover', () => {
         expect(hoverText(text, 'one.', 'name')).toContain('field name: string');
     });
 
+    it('documents the class keyword', () => {
+        const text = 'class Player {\n    name: string\n}\n';
+
+        expect(hoverText(text, '', 'class')).toContain('`class` declares a runtime class');
+    });
+
+    it('documents extends and implements in a class header', () => {
+        const text = 'interface Named {\n    name: string\n}\n\nclass Entity {\n    name: string = \'a\'\n}\n\nclass Player extends Entity implements Named {\n}\n';
+
+        expect(hoverText(text, 'Player ', 'extends')).toContain('`extends` declares inheritance');
+        expect(hoverText(text, 'Entity ', 'implements')).toContain('`implements` asks the checker');
+    });
+
+    it('documents the new keyword on instantiation', () => {
+        const text = 'class Player {\n}\n\nlocal one = new Player()\n';
+
+        expect(hoverText(text, 'one = ', 'new')).toContain('`new` instantiates a class');
+    });
+
+    it('documents enum, interface, and continue keywords', () => {
+        const text = 'enum State {\n    LOBBY,\n}\n\ninterface Named {\n    name: string\n}\n\nfor index = 1, 3 do\n    continue\nend\n';
+
+        expect(hoverText(text, '', 'enum')).toContain('`enum` declares a fixed set of named numbers');
+        expect(hoverText(text, '\n\ninterface', 'interface')).toContain('`interface` declares a compile-only contract');
+        expect(hoverText(text, '    ', 'continue')).toContain('`continue` skips to the next iteration');
+    });
+
+    it('documents Lua keywords', () => {
+        const text = 'local total: number = 0\n\nfor index = 1, 3 do\n    if index > 1 then\n        total += index\n    end\nend\n\nwhile total > 0 do\n    total -= 1\nend\n';
+
+        expect(hoverText(text, '', 'local')).toContain('`local` declares a block-scoped name');
+        expect(hoverText(text, '\n\nfor', 'for')).toContain('`for` loops in two forms');
+        expect(hoverText(text, '    ', 'if')).toContain('`if` starts a conditional');
+        expect(hoverText(text, '\nend\n\n', 'while')).toContain('`while` runs its body');
+    });
+
+    it('documents nil and the boolean operators', () => {
+        const text = 'local ready: boolean? = nil\n\nlocal label: string = ready and \'yes\' or \'no\'\n';
+
+        expect(hoverText(text, '= ', 'nil')).toContain('`nil` is the absent value');
+        expect(hoverText(text, 'ready ', 'and')).toContain('`and` is the boolean conjunction');
+        expect(hoverText(text, "'yes' ", 'or')).toContain('`or` is the boolean disjunction');
+    });
+
+    it('documents http only as an export modifier', () => {
+        const text = 'export http function getCount(): number\n    return 1\nend\n\nlocal http = 1\nprint(http)\n';
+
+        expect(hoverText(text, 'export ', 'http')).toContain('`http` is a contextual modifier');
+        expect(hoverText(text, 'print(', 'http')).not.toContain('`http` is a contextual modifier');
+    });
+
+    it('does not document a keyword used as a property name', () => {
+        const text = 'local settings: table = { export = true }\n\nprint(settings.export)\n';
+
+        expect(hoverText(text, 'settings.', 'export')).not.toContain('`export` marks a top-level function');
+    });
+
+    it('shows the inferred type of an unannotated field with an initializer', () => {
+        const text = "class Example {\n    lastname = 'Hello, World',\n}\n";
+
+        expect(hoverText(text, '    ', 'lastname')).toContain('field lastname: string');
+    });
+
     it('shows the inferred return type of an unannotated class method', () => {
         const text = 'class Text {\n    name: string\n    describe = function ()\n        return self.name\n    end\n}\nlocal text = new Text()\ntext:describe()\n';
 
@@ -130,8 +193,61 @@ describe('hover', () => {
         const boolean = 'class Player {\n    @Getter\n    admin: boolean\n}\n';
         const alias = 'type Flag = boolean\nclass Player {\n    @Getter\n    admin: Flag\n}\n';
 
-        expect(hoverText(boolean, '@', 'Getter')).toContain('Generates `isAdmin(): boolean`');
-        expect(hoverText(alias, '@', 'Getter')).toContain('Generates `isAdmin(): Flag`');
+        expect(hoverText(boolean, '@', 'Getter')).toContain('isAdmin(): boolean');
+        expect(hoverText(alias, '@', 'Getter')).toContain('isAdmin(): Flag');
+    });
+
+    it('documents the placement, the generated api, and the diagnostics of a decorator', () => {
+        const hover = hoverText('class Player {\n    @Getter\n    admin: boolean\n}\n', '@', 'Getter');
+
+        expect(hover).toContain('Generates a typed getter for each decorated field.');
+        expect(hover).toContain('Valid on a class and on a field. It takes no arguments.');
+        expect(hover).toContain('- `getField(): FieldType`, returning the field unchanged.');
+        expect(hover).toContain('**Rules**');
+        expect(hover).toContain('- `check-decorator-conflict` when a generated name is already declared by a hand-written member.');
+    });
+
+    it('shows the companion class a builder decorator declares', () => {
+        const hover = hoverText("@Builder\nclass Account {\n    name: string = ''\n    balance: number = 0\n}\n", '@', 'Builder');
+
+        expect(hover).toContain('class AccountBuilder {\n    withName(value: string): AccountBuilder\n    withBalance(value: number): AccountBuilder\n    build(): Account\n}');
+        expect(hover).toContain('Generates a companion builder class.');
+    });
+
+    it('shows every member a class decorator generates', () => {
+        const observable = 'class Session {\n    @Observable\n    connected: boolean = false\n}\n';
+        const hover = hoverText(observable, '@', 'Observable');
+
+        expect(hover).toContain('setConnected(value: boolean): void');
+        expect(hover).toContain('onConnectedChanged(listener: any): void');
+    });
+
+    it('explains a decorator that only validates, on a field and on a method', () => {
+        const source = 'class Entity {\n    describe = function (): string\n        return self.name\n    end\n}\n';
+        const player = 'class Player extends Entity {\n    @ReadOnly\n    id: number = 1\n\n    @Override\n    describe = function (): string\n        return self.name\n    end\n}\n';
+        const text = `${source}${player}`;
+
+        expect(hoverText(text, '@ReadOnly', 'ReadOnly')).toContain('@ReadOnly\nid: number');
+        expect(hoverText(text, '@ReadOnly', 'ReadOnly')).toContain('`check-readonly-assignment` on an assignment outside the declaring class.');
+        expect(hoverText(text, '@Override', 'Override')).toContain('@Override\ndescribe(): string');
+        expect(hoverText(text, '@Override', 'Override')).toContain('Valid on a method. It takes no arguments.');
+    });
+
+    it('shows the instance behind self with the shape of its class', () => {
+        const text = 'class Round {\n    label: string = \'a\'\n\n    describe = function (): string\n        return self.label\n    end\n}\n';
+        const hover = hoverText(text, 'return ', 'self');
+
+        expect(hover).toContain('self: Round');
+        expect(hover).toContain('`self` is the receiver of the current class member.');
+        expect(hover).toContain('class Round {\n    label: string\n\n    describe(): string\n}');
+        expect(hover).toContain('check-explicit-self-parameter');
+    });
+
+    it('reports self as unbound outside a class member', () => {
+        const hover = hoverText('print(self)\n', 'print(', 'self');
+
+        expect(hover).toContain('check-invalid-self');
+        expect(hover).toContain('It is not bound here');
     });
 
     it('shows generated methods like authored methods', () => {
@@ -202,6 +318,21 @@ describe('hover', () => {
         const source = 'class Marker {\n}\n\nlocal marker: Marker = nil\n';
 
         expect(hoverText(source, 'local marker: ', 'Marker')).toContain('class Marker {}');
+    });
+
+    it('lists the members of an enum with the value each one carries', () => {
+        const source = 'enum MatchState {\n    LOBBY,\n    PLAYING,\n    FINISHED,\n}\n\nlocal state: number = MatchState.LOBBY\n';
+        const shape = 'enum MatchState {\n    LOBBY = 0\n    PLAYING = 1\n    FINISHED = 2\n}';
+
+        expect(hoverText(source, 'enum ', 'MatchState')).toContain(shape);
+        expect(hoverText(source, 'local state: number = ', 'MatchState')).toContain(shape);
+        expect(hoverText(source, 'MatchState.', 'LOBBY')).toContain('MatchState.LOBBY = 0');
+    });
+
+    it('shows an empty body for an enum without members', () => {
+        const source = 'enum Empty {\n}\n\nlocal value: number = 0\n';
+
+        expect(hoverText(source, 'enum ', 'Empty')).toContain('enum Empty {}');
     });
 
     it('names the origin relative to the workspace root', () => {

@@ -1,0 +1,342 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`tokenization > records what the dark theme paints on a luam file 1`] = `
+"#! | punctuation.definition.directive.luam | punctuation #9197a2
+server | keyword.control.directive.environment.server.luam | directive.environment #e1c1ecbold
+#! | punctuation.definition.directive.luam | punctuation #9197a2
+strict | keyword.control.directive.strictness.luam | directive.strictness #68bac5italic
+# | comment.line.number-sign.luam | comment #767b84italic
+ A line comment. | comment.line.number-sign.luam | comment #767b84italic
+#* | comment.block.luam | comment #767b84italic
+ A block | comment.block.luam | comment #767b84italic
+   comment.  | comment.block.luam | comment #767b84italic
+*# | comment.block.luam | comment #767b84italic
+# | comment.line.number-sign.luam | comment #767b84italic
+ A line comment with a block comment inside. #* A block comment. *# | comment.line.number-sign.luam | comment #767b84italic
+interface | storage.type.interface.luam | keyword #d19ae3bold
+Describable | entity.name.type.interface.luam | name.type #caa96dbold
+{ | punctuation.section.braces.begin.luam | punctuation #9197a2
+label | variable.other.property.luam | identifier.member #e7999e
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+describe | entity.name.function.call.luam | call.function #adcff5
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+} | punctuation.section.braces.end.luam | punctuation #9197a2
+type | storage.type.alias.luam | keyword #d19ae3bold
+Id | entity.name.type.alias.luam | name.type #caa96dbold
+= | keyword.operator.assignment.luam | punctuation #9197a2
+number | support.type.primitive.luam | type.primitive #4a9faa
+| | keyword.operator.type.luam | punctuation #9197a2
+nil | constant.language.luam | literal.constant #d5a47a
+declare | storage.type.declare.luam | keyword #d19ae3bold
+score | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+number | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+enum | storage.type.enum.luam | keyword #d19ae3bold
+MatchState | entity.name.type.enum.luam | name.type #caa96dbold
+{ | punctuation.section.braces.begin.luam | punctuation #9197a2
+LOBBY | variable.other.enummember.luam | identifier.member #e7999e
+, | punctuation.separator.comma.luam | punctuation #9197a2
+PLAYING | variable.other.enummember.luam | identifier.member #e7999e
+, | punctuation.separator.comma.luam | punctuation #9197a2
+FINISHED | variable.other.enummember.luam | identifier.member #e7999e
+, | punctuation.separator.comma.luam | punctuation #9197a2
+} | punctuation.section.braces.end.luam | punctuation #9197a2
+@ | punctuation.definition.decorator.luam | punctuation #9197a2
+Builder | entity.name.function.decorator.luam | call.decorator #68bac5italic
+@ | punctuation.definition.decorator.luam | punctuation #9197a2
+ToString | entity.name.function.decorator.luam | call.decorator #68bac5italic
+class | storage.type.class.luam | keyword #d19ae3bold
+Round | entity.name.type.class.luam | name.type #caa96dbold
+extends | storage.modifier.extends.luam | keyword.modifier #c275d8
+Entity | entity.other.inherited-class.luam | name.inherited #caa96d
+implements | storage.modifier.luam | keyword.modifier #c275d8
+Describable  | entity.other.inherited-interface.luam | name.inherited #caa96d
+{ | punctuation.section.braces.begin.luam | punctuation #9197a2
+@ | punctuation.definition.decorator.luam | punctuation #9197a2
+Getter | entity.name.function.decorator.luam | call.decorator #68bac5italic
+id | variable.other.property.luam | identifier.member #e7999e
+: | punctuation.separator.type.luam | punctuation #9197a2
+Id | meta.type.luam entity.name.type.luam | type.name #68bac5
+= | keyword.operator.assignment.luam | punctuation #9197a2
+1 | constant.numeric.luam | literal.constant #d5a47a
+label | variable.other.property.luam | identifier.member #e7999e
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+round | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+tags | variable.other.property.luam | identifier.member #e7999e
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+[] | meta.type.luam punctuation.definition.array.luam | punctuation #9197a2
+= | keyword.operator.assignment.luam | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+a | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+, | punctuation.separator.comma.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+b | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+} | punctuation.section.braces.end.luam | punctuation #9197a2
+state | variable.other.property.luam | identifier.member #e7999e
+: | punctuation.separator.type.luam | punctuation #9197a2
+number | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+MatchState | variable.other.luam | identifier.local #6fb4f0
+. | punctuation.accessor.luam | punctuation #9197a2
+LOBBY | entity.other.attribute.luam | identifier.member #e7999e
+hex | variable.other.property.luam | identifier.member #e7999e
+: | punctuation.separator.type.luam | punctuation #9197a2
+number | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+0xFF | constant.numeric.luam | literal.constant #d5a47a
+constructor | storage.type.constructor.luam | keyword #d19ae3bold
+= | keyword.operator.assignment.luam | punctuation #9197a2
+function | storage.type.function.luam | keyword #d19ae3bold
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+label | variable.parameter.luam | identifier.parameter #e17179
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+super | variable.language.self.luam | identifier.language #eec0c3
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+label | variable.other.luam | identifier.local #6fb4f0
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+self | variable.language.self.luam | identifier.language #eec0c3
+. | punctuation.accessor.luam | punctuation #9197a2
+label | entity.other.attribute.luam | identifier.member #e7999e
+= | keyword.operator.assignment.luam | punctuation #9197a2
+label | variable.other.luam | identifier.local #6fb4f0
+end | keyword.control.luam | keyword #d19ae3bold
+describe | entity.name.function.luam | call.function #adcff5
+= | keyword.operator.assignment.luam | punctuation #9197a2
+function | storage.type.function.luam | keyword #d19ae3bold
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+local | keyword.local.luam | keyword #d19ae3bold
+raw | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+[[ | string.quoted.other.long.luam | literal.string #90ba73
+a long | string.quoted.other.long.luam | literal.string #90ba73
+bracket string | string.quoted.other.long.luam | literal.string #90ba73
+]] | string.quoted.other.long.luam | literal.string #90ba73
+local | keyword.local.luam | keyword #d19ae3bold
+escaped | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+a | string.quoted.single.luam | literal.string #90ba73
+\\t | string.quoted.single.luam constant.character.escape.luam | literal.constant #d5a47a
+b | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+local | keyword.local.luam | keyword #d19ae3bold
+greeting | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+\` | string.template.luam | literal.string #90ba73
+Hello  | string.template.luam | literal.string #90ba73
+\${ | string.template.luam meta.embedded.expression.luam punctuation.definition.template-expression.begin.luam | punctuation.interpolation #9197a2
+self.label | string.template.luam meta.embedded.expression.luam variable.other.luam | identifier.local #6fb4f0
+} | string.template.luam meta.embedded.expression.luam punctuation.definition.template-expression.end.luam | punctuation.interpolation #9197a2
+\` | string.template.luam | literal.string #90ba73
+local | keyword.local.luam | keyword #d19ae3bold
+ok | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+boolean | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+true | constant.language.luam | literal.constant #d5a47a
+and | keyword.operator.logical.luam | operator.logical #c275d8
+not | keyword.operator.logical.luam | operator.logical #c275d8
+false | constant.language.luam | literal.constant #d5a47a
+return | keyword.control.luam | keyword #d19ae3bold
+raw | variable.other.luam | identifier.local #6fb4f0
+.. | keyword.operator.arithmetic.luam | punctuation #9197a2
+escaped | variable.other.luam | identifier.local #6fb4f0
+.. | keyword.operator.arithmetic.luam | punctuation #9197a2
+greeting | variable.other.luam | identifier.local #6fb4f0
+.. | keyword.operator.arithmetic.luam | punctuation #9197a2
+tostring | support.function.luam | call.library #c275d8bold
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+ok | variable.other.luam | identifier.local #6fb4f0
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+end | keyword.control.luam | keyword #d19ae3bold
+} | punctuation.section.braces.end.luam | punctuation #9197a2
+export | storage.modifier.export.luam | keyword.modifier #c275d8
+http | storage.modifier.http.luam | keyword.modifier #c275d8
+function | storage.type.function.luam | keyword #d19ae3bold
+report | entity.name.function.luam | call.function #adcff5
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+player | variable.parameter.luam | identifier.parameter #e17179
+: | punctuation.separator.type.luam | punctuation #9197a2
+Element | meta.type.luam entity.name.type.luam | type.name #68bac5
+, | punctuation.separator.comma.luam | punctuation #9197a2
+tag | variable.parameter.luam | identifier.parameter #e17179
+? | keyword.operator.optional.luam | punctuation #9197a2
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+, | punctuation.separator.comma.luam | punctuation #9197a2
+... | variable.language.vararg.luam | identifier.language #eec0c3
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+: | punctuation.separator.type.luam | punctuation #9197a2
+void | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+local | keyword.local.luam | keyword #d19ae3bold
+round | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+Round | meta.type.luam entity.name.type.luam | type.name #68bac5
+= | keyword.operator.assignment.luam | punctuation #9197a2
+new | keyword.operator.new.luam | keyword #d19ae3bold
+Round | entity.name.function.constructor.luam | call.constructor #e8c78f
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+final | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+local | keyword.local.luam | keyword #d19ae3bold
+total | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.separator.type.luam | punctuation #9197a2
+number | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+= | keyword.operator.assignment.luam | punctuation #9197a2
+1 | constant.numeric.luam | literal.constant #d5a47a
++ | keyword.operator.arithmetic.luam | punctuation #9197a2
+2 | constant.numeric.luam | literal.constant #d5a47a
+* | keyword.operator.arithmetic.luam | punctuation #9197a2
+3 | constant.numeric.luam | literal.constant #d5a47a
+outputChatBox | entity.name.function.call.luam | call.function #adcff5
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+round | variable.other.luam | identifier.local #6fb4f0
+: | punctuation.accessor.luam | punctuation #9197a2
+describe | entity.name.function.method.luam | call.method #5499d1
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+, | punctuation.separator.comma.luam | punctuation #9197a2
+player | variable.other.luam | identifier.local #6fb4f0
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+triggerClientEvent | entity.name.function.call.luam | call.function #adcff5
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+onRoundReported | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+, | punctuation.separator.comma.luam | punctuation #9197a2
+player | variable.other.luam | identifier.local #6fb4f0
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+print | support.function.luam | call.library #c275d8bold
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+string.format | support.function.library.luam | call.library #c275d8bold
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+%d | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+, | punctuation.separator.comma.luam | punctuation #9197a2
+total | variable.other.luam | identifier.local #6fb4f0
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+addEventHandler | entity.name.function.call.luam | call.function #adcff5
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+' | string.quoted.single.luam | literal.string #90ba73
+onPlayerJoin | string.quoted.single.luam | literal.string #90ba73
+' | string.quoted.single.luam | literal.string #90ba73
+, | punctuation.separator.comma.luam | punctuation #9197a2
+root | variable.other.luam | identifier.local #6fb4f0
+, | punctuation.separator.comma.luam | punctuation #9197a2
+function | storage.type.function.luam | keyword #d19ae3bold
+( | punctuation.section.parens.begin.luam | punctuation #9197a2
+name | variable.parameter.luam | identifier.parameter #e17179
+: | punctuation.separator.type.luam | punctuation #9197a2
+string | meta.type.luam support.type.primitive.luam | type.primitive #4a9faa
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+end | keyword.control.luam | keyword #d19ae3bold
+) | punctuation.section.parens.end.luam | punctuation #9197a2
+end | keyword.control.luam | keyword #d19ae3bold"
+`;
+
+exports[`tokenization > records what the dark theme paints on a manifest 1`] = `
+"# | comment.line.number-sign.luam-manifest | comment #767b84italic
+ The resource manifest. | comment.line.number-sign.luam-manifest | comment #767b84italic
+name | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+luam-theme-sample | string.quoted.single.luam-manifest | literal.string #90ba73
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+description | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+\` | string.template.luam-manifest | literal.string #90ba73
+Built in  | string.template.luam-manifest | literal.string #90ba73
+\${ | string.template.luam-manifest meta.embedded.expression.luam-manifest punctuation.definition.template-expression.begin.luam-manifest | punctuation.interpolation #9197a2
+mode | string.template.luam-manifest meta.embedded.expression.luam-manifest variable.language.luam-manifest | identifier.language #eec0c3
+} | string.template.luam-manifest meta.embedded.expression.luam-manifest punctuation.definition.template-expression.end.luam-manifest | punctuation.interpolation #9197a2
+ from  | string.template.luam-manifest | literal.string #90ba73
+\${ | string.template.luam-manifest meta.embedded.expression.luam-manifest punctuation.definition.template-expression.begin.luam-manifest | punctuation.interpolation #9197a2
+root | string.template.luam-manifest meta.embedded.expression.luam-manifest variable.language.luam-manifest | identifier.language #eec0c3
+} | string.template.luam-manifest meta.embedded.expression.luam-manifest punctuation.definition.template-expression.end.luam-manifest | punctuation.interpolation #9197a2
+\` | string.template.luam-manifest | literal.string #90ba73
+sources | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam-manifest | punctuation #9197a2
+server | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam-manifest | punctuation #9197a2
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+src/server | string.quoted.single.luam-manifest | literal.string #90ba73
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+} | punctuation.section.braces.end.luam-manifest | punctuation #9197a2
+, | punctuation.separator.comma.luam-manifest | punctuation #9197a2
+client | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam-manifest | punctuation #9197a2
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+src/client | string.quoted.single.luam-manifest | literal.string #90ba73
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+} | punctuation.section.braces.end.luam-manifest | punctuation #9197a2
+, | punctuation.separator.comma.luam-manifest | punctuation #9197a2
+shared | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam-manifest | punctuation #9197a2
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+src/shared | string.quoted.single.luam-manifest | literal.string #90ba73
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+} | punctuation.section.braces.end.luam-manifest | punctuation #9197a2
+, | punctuation.separator.comma.luam-manifest | punctuation #9197a2
+} | punctuation.section.braces.end.luam-manifest | punctuation #9197a2
+engine | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam-manifest | punctuation #9197a2
+minVersion | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+1.6.0 | string.quoted.single.luam-manifest | literal.string #90ba73
+' | string.quoted.single.luam-manifest | literal.string #90ba73
+} | punctuation.section.braces.end.luam-manifest | punctuation #9197a2
+output | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+{ | punctuation.section.braces.begin.luam-manifest | punctuation #9197a2
+bundle | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+true | constant.language.luam-manifest | literal.constant #d5a47a
+, | punctuation.separator.comma.luam-manifest | punctuation #9197a2
+minify | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+false | constant.language.luam-manifest | literal.constant #d5a47a
+, | punctuation.separator.comma.luam-manifest | punctuation #9197a2
+map | support.type.property-name.luam-manifest | identifier.member #e7999e
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+nil | constant.language.luam-manifest | literal.constant #d5a47a
+} | punctuation.section.braces.end.luam-manifest | punctuation #9197a2
+local | storage.modifier.local.luam-manifest | keyword #d19ae3bold
+port | variable.other.readwrite.luam-manifest | identifier.local #6fb4f0
+= | keyword.operator.assignment.luam-manifest | punctuation #9197a2
+22003 | constant.numeric.luam-manifest | literal.constant #d5a47a
++ | keyword.operator.arithmetic.luam-manifest | punctuation #9197a2
+1 | constant.numeric.luam-manifest | literal.constant #d5a47a"
+`;

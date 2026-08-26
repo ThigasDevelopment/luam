@@ -63,6 +63,7 @@ export const en: LocaleStrings = {
         'tooling/cli': 'CLI commands',
         'tooling/luam-manifest': '.luam.manifest',
         'tooling/editors': 'Editors',
+        'tooling/theme': 'The Luam theme',
         'tooling/language-server': 'Language server',
         'tooling/ci-and-deployment': 'CI and deployment',
         'recipes/index': 'Overview',

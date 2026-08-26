@@ -9,6 +9,7 @@ import { CheckContext } from './context';
 import { checkDeclarationFile } from './declaration-file';
 import type { StrictMode } from './directives';
 import { checkJumps } from './jumps';
+import { predeclareModule } from './predeclaration';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import type { DeclarationRegistry, EventInfo } from './registry';
 import { checkStatements } from './statements';
@@ -62,6 +63,7 @@ export function check(program: Program, mode: StrictMode, environment: Environme
     const structure = context.isDeclarationFile ? checkDeclarationFile(program.body) : checkJumps(program.body);
     const directives = collectDirectives(program.body, { isDeclarationFile: context.isDeclarationFile });
 
+    predeclareModule(context, program.body);
     checkStatements(context, program.body);
     reportUnknownTypes(context);
     reportUnusedSymbols(context, options.noUnusedLocals === true, options.noUnusedParameters === true);

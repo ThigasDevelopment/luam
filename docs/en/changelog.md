@@ -9,6 +9,51 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.18.0 - 2026-08-25
+
+### Changed
+
+- [The manifest](/en/tooling/luam-manifest) and
+  [Configuration fields](/en/reference/configuration-fields) rename the
+  `compilerOptions` table to `compiler`, with the same members and defaults, and
+  list `compilerOptions` among the removed fields that report
+  `config-removed-field`. [OOP API](/en/mta/oop),
+  [Project layout](/en/guide/project-layout),
+  [Troubleshooting](/en/guide/troubleshooting) and
+  [Diagnostics](/en/reference/diagnostics) use the new name throughout.
+- [Classes](/en/language/classes) documents declaration order as two rules
+  instead of one warning: a class is a type everywhere in its file, and a value
+  from the line its declaration runs. `extends` may name a parent written
+  further down; a top-level `new` of a class declared below is
+  `check-class-before-declaration`.
+
+- [Limitations](/en/reference/limitations) labels every entry planned, design
+  boundary, upstream constraint or platform constraint, states which ones are
+  never coming back — `__index`, `__newindex` and `__call`, implicit runtime
+  checks, a build that reads `config.lua` — and names the release it describes.
+- [Editors](/en/tooling/editors) lists the keyword hover and the decorator hover
+  as their own rows: `self` carries its class and that class shape, and a
+  decorator carries the members it generates at that site.
+  [Decorators](/en/language/decorators) describes what the decorator hover shows,
+  including the three that generate nothing.
+- [Diagnostics](/en/reference/diagnostics) stops saying the only decorators are
+  `@Getter` and `@Setter`, and lists the four decorator codes that were missing:
+  `check-lazy-initializer`, `check-readonly-assignment`, `check-deprecated-use`
+  and `check-invalid-override`.
+
+### Fixed
+
+- [Troubleshooting](/en/guide/troubleshooting) said Luam does no narrowing. A
+  guard narrows a name, an `or` drops the nil on its left, and it is a **field**
+  that keeps its declared type. The page now shows both.
+- [Editors](/en/tooling/editors) and [Troubleshooting](/en/guide/troubleshooting)
+  said the server never re-checks an open file when another one changes, and told
+  you to restart it to pick up files. It re-analyzes on a declaration change, and
+  it scans the workspace and watches `**/*.luam`, `.luam.manifest` and `.env*`.
+- The [server command](/en/recipes/server-command) and
+  [exported function](/en/recipes/exported-function) recipes annotated a local
+  `any` for a limitation that does not exist. Both locals are `number`.
+
 ## 0.17.0 - 2026-08-25
 
 ### Changed

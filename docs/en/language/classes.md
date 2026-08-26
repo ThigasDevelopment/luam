@@ -74,10 +74,33 @@ class PremiumAccount extends Account {
   that does not exist is `check-unknown-super-method`.
 - `self:super(...)` is not valid; call `super(...)` directly.
 
-::: warning Declaration order matters
-`extends` and `new` resolve against classes declared **earlier in the same
-file**. Declare a parent before its children.
-:::
+## Declaration order
+
+A class is a **type everywhere in its file** and a **value from the line its
+declaration runs**. `extends` may name a parent written further down, and a
+function may instantiate a class declared after it:
+
+```luam static
+class VIPAccount extends Account {
+    tier: number = 1
+}
+
+class Account {
+    balance: number = 0
+}
+```
+
+Two rules follow from the second half:
+
+- Instantiating a class before its declaration has run is
+  `check-class-before-declaration`, and that only happens where the code is a
+  top-level effect — a top-level statement or a field initializer. Inside a
+  function body, `new` on a class declared further down is fine.
+- A reference written above the declaration sees the class but not its members
+  yet, so a member reads as `any` and the constructor arity is not checked.
+
+An inheritance cycle — `A extends B` with `B extends A`, or a class extending
+itself — is `check-class-cycle`.
 
 ## Interfaces
 

@@ -8,7 +8,7 @@ author = 'Thigas'
 version = '1.0.0'
 description = 'A demo resource'
 
-compilerOptions = {
+compiler = {
     strict = true,
     oop = false,
     noUnusedLocals = false,
@@ -93,7 +93,7 @@ sublinha o trecho exatamente como faz com um arquivo de código.
 
 Um `local` que nenhum campo lê é configuração morta, então o manifesto o reporta
 como `check-unused-local` — um aviso, não um erro. Isso não depende de
-`compilerOptions.noUnusedLocals`, que governa os arquivos de código; o manifesto é
+`compiler.noUnusedLocals`, que governa os arquivos de código; o manifesto é
 sempre verificado no seu próprio modo estrito. Renomeie o local com `_` inicial
 para mantê-lo de propósito.
 
@@ -151,7 +151,7 @@ aparecem enquanto você digita, o autocompletar oferece os campos válidos no cu
 os valores de `mode`) completam dentro das aspas. O hover nomeia o caminho
 completo do campo e seu tipo.
 
-Como o servidor lê o arquivo diretamente, mudar `compilerOptions.oop` passa a
+Como o servidor lê o arquivo diretamente, mudar `compiler.oop` passa a
 valer ao salvar. Não há snapshot para atualizar nem execução da CLI para esperar;
 o `.luam/settings.json` deixou de existir.
 
@@ -164,7 +164,7 @@ dois lugares.
 | Domínio | Possui |
 | --- | --- |
 | identidade | `name`, `author`, `version`, `description` |
-| `compilerOptions` | Como o verificador lê o projeto. |
+| `compiler` | Como o verificador lê o projeto. |
 | `sources` | Quais arquivos pertencem ao projeto e a qual ambiente. |
 | `assets` | Quais arquivos são copiados para o resource e onde eles ficam. |
 | `dependencies` | Resources que este exige em tempo de execução. |
@@ -176,7 +176,7 @@ dois lugares.
 Uma tabela campo a campo completa, incluindo cada regra de validação, está em
 [Campos de configuração](/pt-br/reference/configuration-fields).
 
-## `compilerOptions`
+## `compiler`
 
 | Chave | Padrão | Significado |
 | --- | --- | --- |
@@ -377,7 +377,8 @@ diz:
 
 | Removido | Substituto |
 | --- | --- |
-| `oop` | `compilerOptions = { oop = true }` |
+| `oop` | `compiler = { oop = true }` |
+| `compilerOptions` | `compiler = { ... }` |
 | `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
 | `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
 | `mta` | `engine = { minVersion = '1.6.0' }` |

@@ -106,6 +106,12 @@ No `initialize`, o servidor varre as pastas do workspace em busca de arquivos
 `.luam` e os analisa. Documentos abertos sempre vencem a cópia varrida, então
 edições não salvas guiam diagnósticos e navegação imediatamente.
 
+Ele também trata `workspace/didChangeWatchedFiles`: um arquivo que o cliente
+reporta como criado ou alterado é lido do disco e analisado, e um apagado perde
+suas declarações antes de os diagnósticos serem republicados. Registrar esses
+observadores é a metade que cabe ao cliente — um cliente que não registra nenhum
+fica com o que a varredura inicial encontrou mais o que você abrir.
+
 ## O manifesto
 
 O [`.luam.manifest`](/pt-br/tooling/luam-manifest) é varrido e analisado como
@@ -140,6 +146,8 @@ Qualquer cliente LSP precisa de três coisas:
    `luam`.
 3. **Raiz** — a pasta com o `.luam.manifest`, para que a varredura do workspace encontre
    todos os módulos.
+4. **Observadores de arquivo** — opcionais, sobre `**/*.luam`, `.luam.manifest` e
+   `.env*`, para que uma mudança feita fora do editor chegue ao servidor.
 
 Não há seção de configuração exigida pelo servidor; as configurações listadas em
 [Editores](/pt-br/tooling/editors) pertencem à extensão do VS Code, não ao

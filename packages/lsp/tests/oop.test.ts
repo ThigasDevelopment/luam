@@ -19,7 +19,7 @@ interface Workspace {
 }
 
 function openProject(oop: boolean, files: Readonly<Record<string, string>>): Workspace {
-    const root = createWorkspace({ '.luam.manifest': `name = 'demo'\ncompilerOptions = { oop = ${oop} }\n`, ...files });
+    const root = createWorkspace({ '.luam.manifest': `name = 'demo'\ncompiler = { oop = ${oop} }\n`, ...files });
     const service = new LanguageService();
 
     roots.push(root);
@@ -217,8 +217,8 @@ describe('project settings', () => {
     }
 
     it('reads the oop flag from the manifest', () => {
-        expect(oopOf("name = 'demo'\ncompilerOptions = { oop = true }\n")).toBe(true);
-        expect(oopOf("name = 'demo'\ncompilerOptions = { oop = false }\n")).toBe(false);
+        expect(oopOf("name = 'demo'\ncompiler = { oop = true }\n")).toBe(true);
+        expect(oopOf("name = 'demo'\ncompiler = { oop = false }\n")).toBe(false);
     });
 
     it('falls back to the default when the manifest says nothing', () => {

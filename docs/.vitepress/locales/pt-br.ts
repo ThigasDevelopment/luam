@@ -63,6 +63,7 @@ export const ptBR: LocaleStrings = {
         'tooling/cli': 'Comandos da CLI',
         'tooling/luam-manifest': '.luam.manifest',
         'tooling/editors': 'Editores',
+        'tooling/theme': 'O tema Luam',
         'tooling/language-server': 'Servidor de linguagem',
         'tooling/ci-and-deployment': 'CI e implantação',
         'recipes/index': 'Visão geral',

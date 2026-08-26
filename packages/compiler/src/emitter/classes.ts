@@ -4,7 +4,7 @@ import { indentLine, markSource, requireHelper, withSymbol, type EmitState } fro
 import type { Parameter } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration, EnumDeclaration } from '@compiler/parser/declaration-nodes';
 
-function emitMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {
+export function emitMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {
     const self: Parameter = { name: 'self', annotation: null, isVararg: false, position: member.position };
 
     if (member.generated !== undefined) {
@@ -99,7 +99,7 @@ function emitClassHeader(statement: ClassDeclaration): string {
     return statement.superClass === null ? `class ${name}` : `class ${name} :extends ${emitString(statement.superClass)}`;
 }
 
-function emitBuilder(state: EmitState, statement: ClassDeclaration): string | null {
+export function emitBuilder(state: EmitState, statement: ClassDeclaration): string | null {
     if (!statement.decorators.some((decorator) => decorator.name === 'Builder')) {
         return null;
     }
@@ -140,6 +140,7 @@ export function emitEnumDeclaration(state: EmitState, statement: EnumDeclaration
     requireHelper(state, 'class');
 
     const names = statement.members.map((member) => emitString(member.name));
+    const target = statement.isLocal ? `local ${statement.name}` : statement.name;
 
-    return names.length === 0 ? `${statement.name} = enum {}` : `${statement.name} = enum { ${names.join(', ')} }`;
+    return names.length === 0 ? `${target} = enum {}` : `${target} = enum { ${names.join(', ')} }`;
 }

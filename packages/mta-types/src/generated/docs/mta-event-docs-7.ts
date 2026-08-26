@@ -1,0 +1,236 @@
+import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
+
+export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
+    onMarkerHit: {
+        summary: 'This event is triggered when an element enters a marker created using createMarker.',
+        parameters: [
+            { name: 'hitElement', isOptional: false, isVariadic: false, summary: 'the element that hit the marker.' },
+            { name: 'matchingDimension', isOptional: false, isVariadic: false, summary: 'a boolean representing whether the element is in the same dimension as the marker.' },
+        ],
+        source: 'The source of this event is the marker that got hit by the element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnMarkerHit',
+    },
+    onMarkerLeave: {
+        summary: 'This event is triggered when an element leaves the area of a marker created using createMarker.',
+        parameters: [
+            { name: 'leftElement', isOptional: false, isVariadic: false, summary: 'the element that left the marker\'s area.' },
+            { name: 'matchingDimension', isOptional: false, isVariadic: false, summary: 'a boolean representing whether the element is in the same dimension as the marker.' },
+        ],
+        source: 'The source of this event is the marker that the element left.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnMarkerLeave',
+    },
+    onPedDamage: {
+        summary: 'This event is triggered when a ped is damaged. For player damage, use onPlayerDamage instead.',
+        parameters: [
+            { name: 'loss', isOptional: false, isVariadic: false, summary: 'an int representing the percentage of health the ped lost.' },
+        ],
+        source: 'The source of this event is the ped that got damaged.',
+        cancel: 'Canceling this event has no effect. Cancel the client-side event onClientPedDamage instead.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPedDamage',
+    },
+    onPedVehicleEnter: {
+        summary: '',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A vehicle element representing the vehicle that was entered.' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'An int representing the seat in which the ped is entering.' },
+            { name: 'jacked', isOptional: false, isVariadic: false, summary: 'A player or ped element representing who has been jacked.' },
+        ],
+        source: 'The source of this event is the ped that entered the vehicle.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPedVehicleEnter',
+    },
+    onPedVehicleExit: {
+        summary: '',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A vehicle element representing the vehicle in which the ped exited from.' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'An int representing the seat in which the ped was before exiting.' },
+            { name: 'jacker', isOptional: false, isVariadic: false, summary: 'A player or ped element representing who jacked the driver.' },
+            { name: 'forcedByScript', isOptional: false, isVariadic: false, summary: 'A boolean representing whether the exit was forced using removePedFromVehicle or by the ped.' },
+        ],
+        source: 'The source of this event is the ped that left the vehicle.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPedVehicleExit',
+    },
+    onPedWasted: {
+        summary: 'This event is triggered when a ped is killed or dies. It is not triggered for players.',
+        parameters: [
+            { name: 'totalAmmo', isOptional: false, isVariadic: false, summary: 'an int representing the total ammo the victim had when he died.' },
+            { name: 'killer', isOptional: false, isVariadic: false, summary: 'an element representing the player, ped or vehicle who was the killer. If there was no killer this is *false*.' },
+            { name: 'killerWeapon', isOptional: false, isVariadic: false, summary: 'an int representing the killer weapon or the damage types.' },
+            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'an int representing the bodypart ID the victim was hit on when he died.' },
+            { name: 'stealth', isOptional: false, isVariadic: false, summary: 'a boolean representing whether or not this was a stealth kill.' },
+            { name: 'animGroup', isOptional: false, isVariadic: false, summary: 'an integer representing the ped\'s current animation group.' },
+            { name: 'animID', isOptional: false, isVariadic: false, summary: 'an integer representing the ped\'s current animation ID.' },
+        ],
+        source: 'The source of this event is the ped that died or got killed.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPedWasted',
+    },
+    onPedWeaponSwitch: {
+        summary: 'This event is triggered when a ped switches weapons.',
+        parameters: [
+            { name: 'previousWeaponID', isOptional: false, isVariadic: false, summary: 'an int representing the weapon that was switched from.' },
+            { name: 'currentWeaponID', isOptional: false, isVariadic: false, summary: 'an int representing the weapon that was switched to.' },
+        ],
+        source: 'The source of this event is the ped that switched his weapon.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPedWeaponSwitch',
+    },
+    onPickupHit: {
+        summary: 'This event is triggered when a player hits a pickup.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'a player element referring to the player who moved over the pickup.' },
+        ],
+        source: 'The source of this event is the pickup that was hit by the player.',
+        cancel: 'If this event is canceled, the pickup does not disappear and the player does not receive its bonus.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPickupHit',
+    },
+    onPickupLeave: {
+        summary: 'This event is triggered when a player leaves a pickup.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'a player element referring to the player who left the pickup.' },
+        ],
+        source: 'The source of this event is the pickup that was left by the player.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPickupLeave',
+    },
+    onPickupSpawn: {
+        summary: 'This event is triggered when a pickup is spawned or respawned.',
+        parameters: [],
+        source: 'The source of this event is the pickup that just spawned or respawned.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPickupSpawn',
+    },
+    onPickupUse: {
+        summary: 'This event is triggered when a player stands on a pickup while not in a vehicle.',
+        parameters: [
+            { name: 'playerWhoUsed', isOptional: false, isVariadic: false, summary: 'a player element referring to the player who used the pickup.' },
+        ],
+        source: 'The source of this event is the pickup that is getting used by the player.',
+        cancel: 'If this event is canceled, the player will not be given the item they picked up.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPickupUse',
+    },
+    onPlayerACInfo: {
+        summary: 'This event is triggered when a player trips anti-cheat detections. It can be used to script a white/blacklist of custom d3d9.dll files, or a white/blacklist of players with certain anti-cheat codes. The relevant anti-cheat code has to be disabled (or not enabled) in the server mtaserver.conf to be of use here.',
+        parameters: [
+            { name: 'detectedACList', isOptional: false, isVariadic: false, summary: 'A table of anti-cheat codes the player has triggered.' },
+            { name: 'd3d9Size', isOptional: false, isVariadic: false, summary: 'A number representing the file size of any custom d3d9.dll the player may have installed.' },
+            { name: 'd3d9MD5', isOptional: false, isVariadic: false, summary: 'A string containing the MD5 of any custom d3d9.dll the player may have installed.' },
+            { name: 'd3d9SHA256', isOptional: false, isVariadic: false, summary: 'A string containing the SHA256 of any custom d3d9.dll the player may have installed.' },
+        ],
+        source: 'The source of this event is the player',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerACInfo',
+    },
+    onPlayerBan: {
+        summary: 'This event is triggered when a player added a ban (like onBan).',
+        parameters: [
+            { name: 'banPointer', isOptional: false, isVariadic: false, summary: 'the ban pointer which was added.' },
+            { name: 'responsibleElement', isOptional: false, isVariadic: false, summary: 'the player who added the ban.' },
+        ],
+        source: 'The source of this event is the player who was banned.',
+        cancel: 'This event cannot be canceled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerBan',
+    },
+    onPlayerChangeNick: {
+        summary: 'This event is triggered when a player changes his nickname.',
+        parameters: [
+            { name: 'oldNick', isOptional: false, isVariadic: false, summary: 'the nickname the player had before.' },
+            { name: 'newNick', isOptional: false, isVariadic: false, summary: 'the new nickname of the player.' },
+            { name: 'changedByUser', isOptional: false, isVariadic: false, summary: 'a boolean representing whether the name was changed using setPlayerName or by the user.' },
+        ],
+        source: 'The source of this event is the player that changed his nick',
+        cancel: 'Cancelling this event depends on how it is called, if it is called by the scripting event then it is NOT cancelable. If it is called from the /nick command it IS cancelable. If this event is cancelled and can be cancelled then the name will not change.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerChangeNick',
+    },
+    onPlayerChat: {
+        summary: 'This event is triggered when a player chats inside the chatbox.',
+        parameters: [
+            { name: 'message', isOptional: false, isVariadic: false, summary: 'a string representing the message typed into the chat.' },
+            { name: 'messageType', isOptional: false, isVariadic: false, summary: 'an int value representing the message type:' },
+        ],
+        source: 'The source of this event is the player who sent the chatbox message.',
+        cancel: 'If this event is canceled, the game\'s chat system won\'t deliver the posts. You may use outputChatBox to send the messages then. Cancelling this event also means the chat will not appear in the server console or logs. If you want chat logging, you will have to add a call to outputServerLog - See the second example.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerChat',
+    },
+    onPlayerClick: {
+        summary: 'This event is triggered when a player clicks using the mouse cursor.',
+        parameters: [
+            { name: 'mouseButton', isOptional: false, isVariadic: false, summary: 'a string representing the mouse button that was pressed. Value can be *left*, *middle* or *right*.' },
+            { name: 'buttonState', isOptional: false, isVariadic: false, summary: 'a string representing the button state. Value can be *up* or *down*.' },
+            { name: 'clickedElement', isOptional: false, isVariadic: false, summary: 'the element the player clicked on. This value is *nil* if none.' },
+            { name: 'worldPosX', isOptional: false, isVariadic: false, summary: 'the X position in the world the player clicked on.' },
+            { name: 'worldPosY', isOptional: false, isVariadic: false, summary: 'the Y position in the world the player clicked on.' },
+            { name: 'worldPosZ', isOptional: false, isVariadic: false, summary: 'the Z position in the world the player clicked on.' },
+            { name: 'screenPosX', isOptional: false, isVariadic: false, summary: 'the X position on the screen the player clicked on.' },
+            { name: 'screenPosY', isOptional: false, isVariadic: false, summary: 'the Y position on the screen the player clicked on.' },
+        ],
+        source: 'The source of this event is the player that clicked.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerClick',
+    },
+    onPlayerCommand: {
+        summary: 'This event is triggered when a player issues a command.',
+        parameters: [
+            { name: 'command', isOptional: false, isVariadic: false, summary: 'a string containing the name of the command executed.' },
+        ],
+        source: 'The source of this event is the player who tried to execute a command.',
+        cancel: 'The command will not be executed. (Only server-side commands can be canceled.)',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerCommand',
+    },
+    onPlayerConnect: {
+        summary: 'This event is triggered when a player attempts to connect to the server.',
+        parameters: [
+            { name: 'playerNick', isOptional: false, isVariadic: false, summary: 'The player\'s current nickname.' },
+            { name: 'playerIP', isOptional: false, isVariadic: false, summary: 'The player\'s current IP.' },
+            { name: 'playerUsername', isOptional: false, isVariadic: false, summary: 'The player\'s community username.' },
+            { name: 'playerSerial', isOptional: false, isVariadic: false, summary: 'The player\'s serial number.' },
+            { name: 'playerVersionNumber', isOptional: false, isVariadic: false, summary: 'The player\'s MTA version in pure numerical form, e.g. \'**256**\' for 1.0, \'**257**\' for 1.0.1, etc.' },
+            { name: 'playerVersionString', isOptional: false, isVariadic: false, summary: 'The player\'s MTA version in sortable string form. Same as the return value from getPlayerVersion.' },
+        ],
+        source: 'The source of this event is the client\'s root element.',
+        cancel: 'If this event is canceled, the player will be disconnected with an error message saying the reason specified in cancelEvent or "Disconnected: server refused the connection" if none was specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerConnect',
+    },
+    onPlayerContact: {
+        summary: 'This event is triggered when a player stands on a different element than before.',
+        parameters: [
+            { name: 'previousElement', isOptional: false, isVariadic: false, summary: 'the element player was standing on before. *nil* if none.' },
+            { name: 'currentElement', isOptional: false, isVariadic: false, summary: 'the new element that the player is standing on now. *nil* if none.' },
+        ],
+        source: 'The source of this event is the player who hit an element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerContact',
+    },
+    onPlayerDamage: {
+        summary: 'This event is triggered when a player is damaged, in any way.\n\n*This event is not triggered when attacked by a team member if friendly fire is enabled.\n*Canceling this event has no effect. Cancel the client-side event onClientPlayerDamage instead.\n*onPlayerDamage doesn\'t trigger if the damage kills the player, onPlayerWasted is called instead.',
+        parameters: [
+            { name: 'attacker', isOptional: false, isVariadic: false, summary: 'a player element representing the player who was the attacker. If there was no attacker this returns false.' },
+            { name: 'damage_causing', isOptional: false, isVariadic: false, summary: 'an int representing the cause of damage, either a attacker weapon, or some other types of damage.' },
+            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'an int representing the bodypart ID the player was hit on when he got damaged.' },
+            { name: 'loss', isOptional: false, isVariadic: false, summary: 'a float representing the percentage of health the player lost.' },
+        ],
+        source: 'The source of this event is the player who was damaged.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerDamage',
+    },
+    onPlayerJoin: {
+        summary: 'This event is triggered when a player joins the server. This event is not cancellable.',
+        parameters: [],
+        source: 'The source of this event is the player who joined.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerJoin',
+    },
+    onPlayerLogin: {
+        summary: 'This event is triggered when a player logs into their account in-game.',
+        parameters: [
+            { name: 'thePreviousAccount', isOptional: false, isVariadic: false, summary: 'The account the player was logged into before.' },
+            { name: 'theCurrentAccount', isOptional: false, isVariadic: false, summary: 'The account the player logged into just now.' },
+        ],
+        source: 'The source of this event is the player element that just logged in.',
+        cancel: 'If this event is canceled the player will not be logged in.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerLogin',
+    },
+};

@@ -11,7 +11,8 @@
         { "include": "#constant" },
         { "include": "#injected" },
         { "include": "#operator" },
-        { "include": "#identifier" }
+        { "include": "#identifier" },
+        { "include": "#punctuation" }
     ],
     "repository": {
         "comment": {
@@ -56,7 +57,7 @@
             "end": "\\}",
             "beginCaptures": { "0": { "name": "punctuation.definition.template-expression.begin.luam-manifest" } },
             "endCaptures": { "0": { "name": "punctuation.definition.template-expression.end.luam-manifest" } },
-            "patterns": [{ "include": "#injected" }, { "include": "#identifier" }]
+            "patterns": [{ "include": "#injected" }, { "include": "#identifier" }, { "include": "#punctuation" }]
         },
         "escape": {
             "name": "constant.character.escape.luam-manifest",
@@ -96,6 +97,18 @@
         "identifier": {
             "name": "variable.other.luam-manifest",
             "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        },
+        "punctuation": {
+            "patterns": [
+                { "name": "punctuation.section.parens.begin.luam-manifest", "match": "\\(" },
+                { "name": "punctuation.section.parens.end.luam-manifest", "match": "\\)" },
+                { "name": "punctuation.section.brackets.begin.luam-manifest", "match": "\\[" },
+                { "name": "punctuation.section.brackets.end.luam-manifest", "match": "\\]" },
+                { "name": "punctuation.section.braces.begin.luam-manifest", "match": "\\{" },
+                { "name": "punctuation.section.braces.end.luam-manifest", "match": "\\}" },
+                { "name": "punctuation.separator.comma.luam-manifest", "match": "," },
+                { "name": "punctuation.accessor.luam-manifest", "match": "\\." }
+            ]
         }
     }
 }

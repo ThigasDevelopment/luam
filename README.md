@@ -232,7 +232,7 @@ name = 'my-resource'
 serverPath = 'C:/MTA Server'
 ```
 
-Optional fields cover `meta.xml` info, `compilerOptions`, `sources`, `assets`,
+Optional fields cover `meta.xml` info, `compiler`, `sources`, `assets`,
 `dependencies`, `engine.minVersion`, `environment`, `outDir`, `loadOrder`,
 `output`, `helpers`, `resourcesDir`, `development.logs` and
 `development.server.executable`.
@@ -262,16 +262,22 @@ VSCodium and Windsurf. The language server itself is editor-agnostic and speaks
 
 ## Known limitations
 
-- **No type narrowing.** `if value ~= nil then` does not refine `string?`.
-- **Declaration order matters for classes within a file.**
+- **Narrowing reaches names, not fields.** `if value ~= nil then` refines a local;
+  `self.value` keeps its declared type however you test it.
+- **A class is a type everywhere, a value from its declaration** — `extends` may
+  name a parent written further down, a top-level `new` may not.
 - **The MTA catalog can lag a release** — a newer function stays `any`.
 - **No static members, declared metamethods, or generic classes.**
-- **The editor does not re-check an open file when another one changes.**
+- **The editor re-checks by declaration** — a declaration change re-analyzes every
+  file that can see it, an edit inside a function body only its own file.
 - **An export is named, never verified** against the side that calls it.
+- **Type annotations are erased**, so validate anything a client can send.
 
 > [Limitations](https://thigasdevelopment.github.io/luam/en/reference/limitations)
 > · [Limitações](https://thigasdevelopment.github.io/luam/pt-br/reference/limitations)
-> — with the workaround for each.
+> — each one labelled planned, design boundary, upstream or platform constraint,
+> with the workaround. The decisions behind the boundaries are recorded in
+> [`docs/adr`](docs/adr).
 
 ---
 

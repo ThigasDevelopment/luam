@@ -10,25 +10,55 @@
         { "include": "#string" },
         { "include": "#number" },
         { "include": "#buildDirective" },
+        { "include": "#enumBody" },
         { "include": "#declaration" },
+        { "include": "#field" },
         { "include": "#function" },
         { "include": "#method" },
         { "include": "#annotation" },
         { "include": "#support" },
         { "include": "#keyword" },
         { "include": "#constant" },
+        { "include": "#vararg" },
         { "include": "#operator" },
         { "include": "#call" },
+        { "include": "#tableLiteral" },
         { "include": "#attribute" },
-        { "include": "#identifier" }
+        { "include": "#identifier" },
+        { "include": "#punctuation" }
     ],
     "repository": {
         "directive": {
-            "match": "^\\s*(#!)[ \\t]*(strict|nonstrict|nocheck|server|client|shared)\\b",
-            "captures": {
-                "1": { "name": "punctuation.definition.comment.luam" },
-                "2": { "name": "keyword.control.directive.luam" }
-            }
+            "patterns": [
+                {
+                    "match": "^\\s*(#!)[ \\t]*(strict|nonstrict|nocheck)\\b",
+                    "captures": {
+                        "1": { "name": "punctuation.definition.directive.luam" },
+                        "2": { "name": "keyword.control.directive.strictness.luam" }
+                    }
+                },
+                {
+                    "match": "^\\s*(#!)[ \\t]*(server)\\b",
+                    "captures": {
+                        "1": { "name": "punctuation.definition.directive.luam" },
+                        "2": { "name": "keyword.control.directive.environment.server.luam" }
+                    }
+                },
+                {
+                    "match": "^\\s*(#!)[ \\t]*(client)\\b",
+                    "captures": {
+                        "1": { "name": "punctuation.definition.directive.luam" },
+                        "2": { "name": "keyword.control.directive.environment.client.luam" }
+                    }
+                },
+                {
+                    "match": "^\\s*(#!)[ \\t]*(shared)\\b",
+                    "captures": {
+                        "1": { "name": "punctuation.definition.directive.luam" },
+                        "2": { "name": "keyword.control.directive.environment.shared.luam" }
+                    }
+                }
+            ]
         },
         "decorator": {
             "match": "^\\s*(@)([A-Za-z_][A-Za-z0-9_]*)\\b",
@@ -117,6 +147,24 @@
                 }
             ]
         },
+        "enumBody": {
+            "begin": "\\b(enum)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*(\\{)",
+            "beginCaptures": {
+                "1": { "name": "storage.type.enum.luam" },
+                "2": { "name": "entity.name.type.enum.luam" },
+                "3": { "name": "punctuation.section.braces.begin.luam" }
+            },
+            "end": "(\\})",
+            "endCaptures": { "1": { "name": "punctuation.section.braces.end.luam" } },
+            "patterns": [
+                { "include": "#comment" },
+                { "include": "#string" },
+                { "include": "#number" },
+                { "name": "variable.other.enummember.luam", "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b" },
+                { "include": "#operator" },
+                { "include": "#punctuation" }
+            ]
+        },
         "declaration": {
             "patterns": [
                 {
@@ -124,30 +172,30 @@
                     "captures": {
                         "1": { "name": "storage.type.class.luam" },
                         "2": { "name": "entity.name.type.class.luam" },
-                        "3": { "name": "storage.modifier.luam" },
+                        "3": { "name": "storage.modifier.extends.luam" },
                         "4": { "name": "entity.other.inherited-class.luam" }
                     }
                 },
                 {
                     "match": "\\b(interface)\\s+([A-Za-z_][A-Za-z0-9_]*)(?:\\s+(extends)\\s+([A-Za-z_][A-Za-z0-9_,\\s]*))?",
                     "captures": {
-                        "1": { "name": "storage.type.luam" },
-                        "2": { "name": "entity.name.type.luam" },
+                        "1": { "name": "storage.type.interface.luam" },
+                        "2": { "name": "entity.name.type.interface.luam" },
                         "3": { "name": "storage.modifier.luam" },
-                        "4": { "name": "entity.other.inherited-class.luam" }
+                        "4": { "name": "entity.other.inherited-interface.luam" }
                     }
                 },
                 {
                     "match": "\\b(enum)\\s+([A-Za-z_][A-Za-z0-9_]*)",
                     "captures": {
-                        "1": { "name": "storage.type.luam" },
-                        "2": { "name": "entity.name.type.luam" }
+                        "1": { "name": "storage.type.enum.luam" },
+                        "2": { "name": "entity.name.type.enum.luam" }
                     }
                 },
                 {
                     "match": "\\b(type)\\s+([A-Za-z_][A-Za-z0-9_]*)",
                     "captures": {
-                        "1": { "name": "storage.type.luam" },
+                        "1": { "name": "storage.type.alias.luam" },
                         "2": { "name": "entity.name.type.alias.luam" }
                     }
                 },
@@ -155,24 +203,39 @@
                     "match": "\\b(implements)\\s+([A-Za-z_][A-Za-z0-9_,\\s]*)",
                     "captures": {
                         "1": { "name": "storage.modifier.luam" },
-                        "2": { "name": "entity.other.inherited-class.luam" }
+                        "2": { "name": "entity.other.inherited-interface.luam" }
                     }
                 },
                 {
                     "match": "\\b(new)\\s+([A-Za-z_][A-Za-z0-9_]*)",
                     "captures": {
                         "1": { "name": "keyword.operator.new.luam" },
-                        "2": { "name": "entity.name.type.class.luam" }
+                        "2": { "name": "entity.name.function.constructor.luam" }
                     }
                 }
             ]
         },
+        "field": {
+            "match": "^[ \\t]*([A-Za-z_][A-Za-z0-9_]*)[ \\t]*(?=\\??[ \\t]*:[ \\t]*(?:fun[ \\t]*\\([^)]*\\)[ \\t]*:[ \\t]*)?[A-Za-z_][A-Za-z0-9_.]*(?:<[^>]*>)?(?:\\[\\])*\\??(?:[ \\t]*[|&][ \\t]*[A-Za-z_][A-Za-z0-9_.]*(?:\\[\\])*\\??)*[ \\t]*(?:=[^=]|$))",
+            "captures": { "1": { "name": "variable.other.property.luam" } }
+        },
         "function": {
             "patterns": [
                 {
+                    "begin": "\\b(function)\\s*([A-Za-z_][A-Za-z0-9_]*(?:[.:][A-Za-z_][A-Za-z0-9_]*)*)?\\s*(\\()",
+                    "beginCaptures": {
+                        "1": { "name": "storage.type.function.luam" },
+                        "2": { "name": "entity.name.function.luam" },
+                        "3": { "name": "punctuation.section.parens.begin.luam" }
+                    },
+                    "end": "(\\))",
+                    "endCaptures": { "1": { "name": "punctuation.section.parens.end.luam" } },
+                    "patterns": [{ "include": "#parameterList" }]
+                },
+                {
                     "match": "\\b(function)\\s+([A-Za-z_][A-Za-z0-9_]*(?:[.:][A-Za-z_][A-Za-z0-9_]*)*)?",
                     "captures": {
-                        "1": { "name": "keyword.control.luam" },
+                        "1": { "name": "storage.type.function.luam" },
                         "2": { "name": "entity.name.function.luam" }
                     }
                 },
@@ -184,10 +247,23 @@
                 }
             ]
         },
+        "parameterList": {
+            "patterns": [
+                { "include": "#comment" },
+                { "include": "#annotation" },
+                { "include": "#vararg" },
+                { "include": "#string" },
+                { "include": "#number" },
+                { "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\b", "captures": { "1": { "name": "variable.parameter.luam" } } },
+                { "include": "#operator" },
+                { "include": "#punctuation" }
+            ]
+        },
         "method": {
             "match": "(:)\\s*(?!fun\\b)([A-Za-z_][A-Za-z0-9_]*)\\b(?=\\s*[({'\"`]|\\s*\\[\\[)",
             "captures": {
-                "2": { "name": "support.function.any-method.luam" }
+                "1": { "name": "punctuation.accessor.luam" },
+                "2": { "name": "entity.name.function.method.luam" }
             }
         },
         "support": {
@@ -214,16 +290,38 @@
                     "match": "(:)\\s*((?:fun\\s*\\([^)]*\\)\\s*:\\s*)?[A-Za-z_][A-Za-z0-9_.]*(?:<[^>]*>)?(?:\\[\\])*\\??(?:\\s*[|&]\\s*[A-Za-z_][A-Za-z0-9_.]*(?:\\[\\])*\\??)*)",
                     "captures": {
                         "1": { "name": "punctuation.separator.type.luam" },
-                        "2": { "name": "support.type.luam" }
+                        "2": { "name": "meta.type.luam", "patterns": [{ "include": "#typeBody" }] }
                     }
                 }
+            ]
+        },
+        "typeBody": {
+            "patterns": [
+                { "name": "storage.type.fun.luam", "match": "\\bfun\\b" },
+                { "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\b(?=\\s*\\??\\s*:)", "captures": { "1": { "name": "variable.parameter.luam" } } },
+                {
+                    "name": "support.type.primitive.luam",
+                    "match": "\\b(?:any|boolean|number|string|table|thread|unknown|userdata|void)\\b"
+                },
+                { "name": "entity.name.type.luam", "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b" },
+                { "name": "punctuation.definition.array.luam", "match": "\\[\\]" },
+                { "name": "keyword.operator.type.luam", "match": "[|&]" },
+                { "name": "punctuation.definition.typeparameters.begin.luam", "match": "<" },
+                { "name": "punctuation.definition.typeparameters.end.luam", "match": ">" },
+                { "name": "keyword.operator.optional.luam", "match": "\\?" },
+                { "name": "punctuation.separator.type.luam", "match": ":" },
+                { "include": "#punctuation" }
             ]
         },
         "keyword": {
             "patterns": [
                 {
                     "name": "keyword.control.luam",
-                    "match": "\\b(?:break|continue|do|else|elseif|end|for|function|if|in|repeat|return|then|until|while)\\b"
+                    "match": "\\b(?:break|continue|do|else|elseif|end|for|if|in|repeat|return|then|until|while)\\b"
+                },
+                {
+                    "name": "storage.type.function.luam",
+                    "match": "\\bfunction\\b"
                 },
                 {
                     "name": "keyword.local.luam",
@@ -231,11 +329,35 @@
                 },
                 {
                     "name": "storage.modifier.luam",
-                    "match": "\\b(?:constructor|declare|export|extends|implements)\\b"
+                    "match": "\\b(?:extends|implements)\\b"
                 },
                 {
-                    "name": "storage.type.luam",
-                    "match": "\\b(?:class|interface|enum)\\b|\\btype\\b(?=\\s+[A-Za-z_])"
+                    "name": "storage.type.constructor.luam",
+                    "match": "\\bconstructor\\b"
+                },
+                {
+                    "name": "storage.type.declare.luam",
+                    "match": "\\bdeclare\\b"
+                },
+                {
+                    "name": "storage.modifier.export.luam",
+                    "match": "\\bexport\\b"
+                },
+                {
+                    "name": "storage.type.class.luam",
+                    "match": "\\bclass\\b"
+                },
+                {
+                    "name": "storage.type.interface.luam",
+                    "match": "\\binterface\\b"
+                },
+                {
+                    "name": "storage.type.enum.luam",
+                    "match": "\\benum\\b"
+                },
+                {
+                    "name": "storage.type.alias.luam",
+                    "match": "\\btype\\b(?=\\s+[A-Za-z_])"
                 },
                 {
                     "name": "keyword.operator.new.luam",
@@ -247,9 +369,13 @@
                 }
             ]
         },
+        "vararg": {
+            "name": "variable.language.vararg.luam",
+            "match": "\\.\\.\\."
+        },
         "constant": {
             "patterns": [
-                { "name": "variable.language.vararg.luam", "match": "\\.\\.\\." },
+                { "include": "#vararg" },
                 { "name": "constant.language.luam", "match": "\\b(?:true|false|nil)\\b" },
                 {
                     "name": "support.type.primitive.luam",
@@ -262,6 +388,7 @@
                 { "name": "keyword.operator.logical.luam", "match": "\\b(?:and|or|not)\\b" },
                 { "name": "keyword.operator.increment.luam", "match": "\\+\\+" },
                 { "name": "keyword.operator.optional.luam", "match": "\\?(?=\\s*:)" },
+                { "name": "keyword.operator.type.luam", "match": "[|&]" },
                 { "name": "keyword.operator.comparison.luam", "match": "==|~=|<=|>=|<|>" },
                 { "name": "keyword.operator.assignment.luam", "match": "\\.\\.=|\\+=|-=|\\*=|/=|=" },
                 { "name": "keyword.operator.arithmetic.luam", "match": "\\+|-|\\*|/|%|\\^|#|\\.\\." }
@@ -269,7 +396,38 @@
         },
         "call": {
             "match": "([A-Za-z_][A-Za-z0-9_]*)\\s*(?=\\()",
-            "captures": { "1": { "name": "support.function.any-method.luam" } }
+            "captures": { "1": { "name": "entity.name.function.call.luam" } }
+        },
+        "tableLiteral": {
+            "begin": "\\{",
+            "end": "\\}",
+            "beginCaptures": { "0": { "name": "punctuation.section.braces.begin.luam" } },
+            "endCaptures": { "0": { "name": "punctuation.section.braces.end.luam" } },
+            "patterns": [
+                { "include": "#decorator" },
+                { "include": "#comment" },
+                { "include": "#string" },
+                { "include": "#number" },
+                { "include": "#declaration" },
+                { "include": "#field" },
+                { "include": "#function" },
+                { "include": "#method" },
+                { "include": "#annotation" },
+                { "include": "#attribute" },
+                {
+                    "match": "\\b(?!constructor\\b)([A-Za-z_][A-Za-z0-9_]*)\\s*(?==[^=])",
+                    "captures": { "1": { "name": "meta.object-literal.key.luam" } }
+                },
+                { "include": "#support" },
+                { "include": "#keyword" },
+                { "include": "#constant" },
+                { "include": "#operator" },
+                { "include": "#call" },
+                { "include": "#tableLiteral" },
+                { "include": "#attribute" },
+                { "include": "#identifier" },
+                { "include": "#punctuation" }
+            ]
         },
         "attribute": {
             "name": "entity.other.attribute.luam",
@@ -278,6 +436,19 @@
         "identifier": {
             "name": "variable.other.luam",
             "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        },
+        "punctuation": {
+            "patterns": [
+                { "name": "punctuation.section.parens.begin.luam", "match": "\\(" },
+                { "name": "punctuation.section.parens.end.luam", "match": "\\)" },
+                { "name": "punctuation.section.brackets.begin.luam", "match": "\\[" },
+                { "name": "punctuation.section.brackets.end.luam", "match": "\\]" },
+                { "name": "punctuation.section.braces.begin.luam", "match": "\\{" },
+                { "name": "punctuation.section.braces.end.luam", "match": "\\}" },
+                { "name": "punctuation.separator.comma.luam", "match": "," },
+                { "name": "punctuation.terminator.statement.luam", "match": ";" },
+                { "name": "punctuation.accessor.luam", "match": "[.:]" }
+            ]
         }
     }
 }

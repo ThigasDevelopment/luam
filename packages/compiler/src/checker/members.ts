@@ -86,6 +86,10 @@ export function resolveNamedMember(context: CheckContext, name: string, expressi
         return resolveMtaMember(context, name, expression.property, expression.position)?.type ?? ANY_TYPE;
     }
 
+    if (context.awaitsDeclaration(name)) {
+        return ANY_TYPE;
+    }
+
     const contract = context.declarations.lookupClass(name) === null ? context.declarations.lookupInterface(name) : null;
 
     if (contract === null) {
@@ -128,6 +132,12 @@ export function checkNewExpression(context: CheckContext, expression: NewExpress
         context.report('check-unknown-class', `Class "${expression.className}" is not defined.`, expression.position);
 
         return ANY_TYPE;
+    }
+
+    if (context.isPredeclaredClass(expression.className) && !context.insideFunction()) {
+        const message = `Class "${expression.className}" is declared further down this file, so it does not exist yet at this point.`;
+
+        context.report('check-class-before-declaration', message, expression.position);
     }
 
     const constructor = context.declarations.lookupMember(expression.className, 'constructor');

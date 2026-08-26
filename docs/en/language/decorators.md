@@ -196,3 +196,10 @@ Using `player:oldName()` produces the `check-deprecated-use` warning. Assigning
 Generated members are ordinary members: completion after `:` lists them, hover
 shows their signature, and go-to-definition lands on the field or class that
 generated them. Typing `@` also suggests every known decorator.
+
+Hovering the decorator itself answers what it does *here*: the first block is the
+exact API produced at that site — `isAdmin(): boolean` for a `@Getter` on a
+boolean field, the whole `AccountBuilder` class for a `@Builder`, the decorated
+member itself for `@ReadOnly`, `@Deprecated`, and `@Override`, which generate
+nothing. Below it come the placement rule, the generated shape in the abstract,
+the behavior notes, and the diagnostics the decorator can raise.

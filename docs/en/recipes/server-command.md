@@ -28,10 +28,10 @@ luam-docs-server-command/
 - **Command arguments arrive as strings.** MTA passes the command name as the
   second parameter and every argument after it as text, which is why `amount` is
   `string?`.
-- **`tonumber(amount) or MAX_HEALTH` is a union.** Its type is
-  `number? | number`, and Luam does no narrowing, so the local is annotated
-  `any`. That is the idiom for an `or` default. See
-  [Limitations](/en/reference/limitations).
+- **`tonumber(amount) or MAX_HEALTH` is a `number`.** An `or` drops the nil on its
+  left, so the `number?` that `tonumber` returns and the `number` default meet as
+  one type and the local can be annotated `number`. See
+  [Type guards](/en/language/types#type-guards).
 - **`target.clamp(0, MAX_HEALTH)`** is a [number extension](/en/language/extensions)
   compiling to `math.clamp`, which pulls `lib/math.lua` into the build.
 
