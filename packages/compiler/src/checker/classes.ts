@@ -6,13 +6,13 @@ import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
 import { buildFunctionType, checkFunctionBody } from './statements';
-import { ANY_TYPE, createFunction, createNamed, typeToString, VOID_TYPE, type Type } from './types';
+import { ANY_TYPE, createFunction, createNamed, typeToString, VOID_TYPE, widenInferred, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     const valueType = member.value === null ? null : checkExpression(context, member.value);
 
     if (member.annotation === null) {
-        return valueType ?? ANY_TYPE;
+        return valueType === null ? ANY_TYPE : widenInferred(valueType);
     }
 
     const declared = context.resolveAnnotation(member.annotation);
