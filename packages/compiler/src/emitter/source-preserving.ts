@@ -39,8 +39,7 @@ function surgery(collector: Collector, statement: Statement): Surgery | null {
     }
 
     if (statement.kind === 'class-declaration') {
-        const generated = input.generatedMembers.get(statement)?.length ?? 0;
-        const edits = classEdits(input.source, statement, generated, input.types, { span, members: input.spans });
+        const edits = classEdits(input, statement, { span, members: input.spans });
 
         return edits === null ? null : { edits, wrapsBody: false };
     }

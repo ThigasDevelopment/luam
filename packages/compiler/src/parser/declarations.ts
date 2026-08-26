@@ -99,6 +99,12 @@ export function parseDecorators(stream: TokenStream): Decorator[] {
         }
     }
 
+    const last = decorators[decorators.length - 1];
+
+    if (last !== undefined && !stream.isEof() && stream.current().position.line === last.position.line) {
+        stream.report('parse-decorator-line', `Expected a line break after "@${last.name}".`, stream.current().position);
+    }
+
     return decorators;
 }
 

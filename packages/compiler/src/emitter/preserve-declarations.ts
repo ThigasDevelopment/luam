@@ -1,9 +1,11 @@
 import { escapeStringLiteral } from './escape';
 import type { HybridSourceEdit } from './hybrid-source-map';
-import { blankSpan } from './preserve-comments';
-import { isPreservableExpression, type ExpressionTypes } from './preserve-guards';
+import { blankSpan, longComment } from './preserve-comments';
+import { builderClassText, injectedMembersText } from './preserve-decorators';
+import { isPreservableExpression } from './preserve-guards';
+import type { PreserveInput } from './preserve-input';
 
-import type { ClassDeclaration, ClassMember, ClassMethodDeclaration, EnumDeclaration } from '@compiler/parser/declaration-nodes';
+import type { ClassDeclaration, ClassMember, ClassMethodDeclaration, Decorator, EnumDeclaration } from '@compiler/parser/declaration-nodes';
 import type { SourceSpan, SpannedNode } from '@compiler/parser/source-metadata';
 
 const NAME = '[A-Za-z_][A-Za-z0-9_]*';
@@ -83,31 +85,57 @@ function selfEdit(source: string, member: ClassMethodDeclaration, span: SourceSp
 }
 
 function isKept(member: ClassMember): boolean {
-    return member.kind === 'class-method' || member.value !== null;
+    return !isLazyField(member) && (member.kind === 'class-method' || member.value !== null);
 }
 
-function isLowered(statement: ClassDeclaration, generated: number, types: ExpressionTypes): boolean {
-    if (statement.decorators.length > 0 || generated > 0) {
+function isLazyField(member: ClassMember): boolean {
+    return member.kind === 'class-field' && member.decorators.some((decorator) => decorator.name === 'Lazy');
+}
+
+function isLowered(input: PreserveInput, statement: ClassDeclaration): boolean {
+    const generated = input.generatedMembers.get(statement)?.length ?? 0;
+    const decorated = statement.decorators.length > 0 || generated > 0 || statement.members.some((member) => member.decorators.length > 0);
+
+    if (decorated && !input.development) {
         return true;
     }
 
-    return statement.members.some((member) => {
-        if (member.decorators.length > 0) {
-            return true;
-        }
-
-        return member.kind === 'class-field' && member.value !== null && !isPreservableExpression(member.value, types);
-    });
+    return statement.members.some(
+        (member) => member.kind === 'class-field' && member.value !== null && !isPreservableExpression(member.value, input.types),
+    );
 }
 
-export function classEdits(
-    source: string,
-    statement: ClassDeclaration,
-    generated: number,
-    types: ExpressionTypes,
-    spans: DeclarationSpans,
-): HybridSourceEdit[] | null {
-    if (isLowered(statement, generated, types)) {
+function decoratorCommentEdits(statement: ClassDeclaration): HybridSourceEdit[] {
+    const firstByLine = new Map<number, number>();
+    const note = (position: Decorator['position']): void => {
+        const existing = firstByLine.get(position.line);
+
+        if (existing === undefined || position.offset < existing) {
+            firstByLine.set(position.line, position.offset);
+        }
+    };
+
+    for (const decorator of statement.decorators) {
+        note(decorator.position);
+    }
+
+    for (const member of statement.members) {
+        if (!isKept(member)) {
+            continue;
+        }
+
+        for (const decorator of member.decorators) {
+            note(decorator.position);
+        }
+    }
+
+    return [...firstByLine.values()].map((offset) => ({ start: offset, end: offset, replacement: '--' }));
+}
+
+export function classEdits(input: PreserveInput, statement: ClassDeclaration, spans: DeclarationSpans): HybridSourceEdit[] | null {
+    const { source } = input;
+
+    if (isLowered(input, statement)) {
         return null;
     }
 
@@ -117,6 +145,7 @@ export function classEdits(
         return null;
     }
 
+    const injected = input.development ? injectedMembersText(input, statement) : null;
     const edits: HybridSourceEdit[] = [header];
     const kept = statement.members.filter(isKept);
     const limit = spans.span.end;
@@ -132,8 +161,9 @@ export function classEdits(
 
         if (!isKept(member)) {
             const end = separator === null ? span.end : separator + 1;
+            const text = source.slice(span.start, end);
 
-            edits.push({ start: span.start, end, replacement: blankSpan(source.slice(span.start, end)) });
+            edits.push({ start: span.start, end, replacement: isLazyField(member) ? longComment(text) : blankSpan(text) });
 
             continue;
         }
@@ -148,9 +178,27 @@ export function classEdits(
             edits.push(self);
         }
 
-        if (separator === null && member !== kept[kept.length - 1]) {
+        if (separator === null && (member !== kept[kept.length - 1] || injected !== null)) {
             edits.push({ start: span.end, end: span.end, replacement: ',' });
         }
+    }
+
+    edits.push(...decoratorCommentEdits(statement));
+
+    if (injected !== null) {
+        const brace = source.lastIndexOf('}', limit);
+
+        if (brace <= spans.span.start) {
+            return null;
+        }
+
+        edits.push({ start: brace, end: brace, replacement: `${injected} ` });
+    }
+
+    const builder = input.development ? builderClassText(input, statement) : null;
+
+    if (builder !== null) {
+        edits.push({ start: limit, end: limit, replacement: ` ${builder}` });
     }
 
     return edits;
