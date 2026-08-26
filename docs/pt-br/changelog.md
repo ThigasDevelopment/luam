@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.18.0 - 2026-08-25
+
 ### Alterado
 
 - [O manifesto](/pt-br/tooling/luam-manifest) e

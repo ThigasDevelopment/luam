@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.18.0 - 2026-08-25
+
 ### Added
 
 - A class is now a type everywhere in its file. `extends` may name a parent

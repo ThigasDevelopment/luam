@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.18.0 - 2026-08-25
+
 ### Changed
 
 - [The manifest](/en/tooling/luam-manifest) and
