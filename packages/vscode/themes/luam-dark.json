@@ -180,28 +180,28 @@
             "fontStyle": "italic"
         },
         "function.defaultLibrary.mtaNative.serverOnly": {
-            "foreground": "#c275d8",
-            "fontStyle": ""
+            "foreground": "#adcff5",
+            "fontStyle": "italic"
         },
         "function.defaultLibrary.mtaNative.clientOnly": {
-            "foreground": "#c275d8",
-            "fontStyle": ""
+            "foreground": "#adcff5",
+            "fontStyle": "italic"
         },
         "function.defaultLibrary.mtaNative": {
-            "foreground": "#c275d8",
-            "fontStyle": ""
+            "foreground": "#adcff5",
+            "fontStyle": "italic"
         },
         "variable.defaultLibrary.mtaNative.serverOnly": {
-            "foreground": "#c275d8",
-            "fontStyle": ""
+            "foreground": "#adcff5",
+            "fontStyle": "italic"
         },
         "variable.defaultLibrary.mtaNative.clientOnly": {
-            "foreground": "#c275d8",
-            "fontStyle": ""
+            "foreground": "#adcff5",
+            "fontStyle": "italic"
         },
         "variable.defaultLibrary.mtaNative": {
-            "foreground": "#c275d8",
-            "fontStyle": ""
+            "foreground": "#adcff5",
+            "fontStyle": "italic"
         },
         "type.defaultLibrary.erased": {
             "foreground": "#4a9faa",

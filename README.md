@@ -248,7 +248,20 @@ Optional fields cover `meta.xml` info, `compiler`, `sources`, `assets`,
 The **Luam** VS Code extension runs a language server built on the same frontend
 as the CLI, so the editor and the build never disagree: syntax highlighting,
 diagnostics on every keystroke, scoped completion, hover types, go to
-definition, find references and rename.
+definition, find references and rename. It ships the `Luam Dark` and
+`Luam Light` themes — pick one under **File → Preferences → Theme → Color
+Theme**:
+
+<table>
+<tr>
+<td><img src="assets/theme-luam-dark.svg" alt="The README example highlighted by the Luam Dark theme" width="100%"></td>
+<td><img src="assets/theme-luam-light.svg" alt="The README example highlighted by the Luam Light theme" width="100%"></td>
+</tr>
+<tr>
+<td align="center"><sub><b>Luam Dark</b></sub></td>
+<td align="center"><sub><b>Luam Light</b></sub></td>
+</tr>
+</table>
 
 Supported and auto-installed by `luam setup`: VS Code, VS Code Insiders, Cursor,
 VSCodium and Windsurf. The language server itself is editor-agnostic and speaks

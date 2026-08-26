@@ -16,8 +16,8 @@ The rest of the palette names what a thing is rather than whether it survives:
 
 | Hue | What it names |
 | --- | --- |
-| Blue | Your own code: locals, functions, and methods. |
-| Violet | Vocabulary you were given: keywords, MTA natives, and the Lua standard library. |
+| Blue | Code that runs by name: locals, functions, and methods — and MTA natives, in italic because you did not write them. |
+| Violet | Vocabulary you were given: keywords and the Lua standard library. |
 | Gold | The name a class, interface, enum, or type alias introduces. |
 | Salmon | Members reached through a dot, parameters, `self`, and `super`. |
 | Green | Strings. |

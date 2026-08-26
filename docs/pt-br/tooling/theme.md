@@ -16,8 +16,8 @@ O resto da paleta nomeia o que a coisa é, não se ela sobrevive:
 
 | Matiz | O que nomeia |
 | --- | --- |
-| Azul | O seu código: locais, funções e métodos. |
-| Violeta | Vocabulário que te deram: palavras-chave, nativas do MTA e a stdlib do Lua. |
+| Azul | Código que roda pelo nome: locais, funções e métodos — e as nativas do MTA, em itálico porque você não as escreveu. |
+| Violeta | Vocabulário que te deram: palavras-chave e a stdlib do Lua. |
 | Dourado | O nome que uma classe, interface, enum ou alias introduz. |
 | Salmão | Membros alcançados por ponto, parâmetros, `self` e `super`. |
 | Verde | Strings. |

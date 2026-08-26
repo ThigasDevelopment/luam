@@ -17,7 +17,7 @@ const CALLABLE: readonly Role[] = [
     role('call.constructor', 'callable', 'gold/strong/none', 'runtime', 'A class instantiated through new'),
     role('call.function', 'callable', 'blue/strong/none', 'runtime', 'A function the user declared, called by name'),
     role('call.method', 'callable', 'blue/muted/none', 'runtime', 'A method reached through a colon call'),
-    role('call.native', 'callable', 'violet/muted/none', 'runtime', 'An MTA native: vocabulary the platform gave you'),
+    role('call.native', 'callable', 'blue/strong/italic', 'runtime', 'An MTA native: vocabulary the platform gave you'),
     role('call.library', 'callable', 'violet/muted/bold', 'runtime', 'A Lua standard library symbol: the vocabulary underneath everything'),
     role('call.decorator', 'callable', 'cyan/base/italic', 'erased', 'A decorator name, erased before the Lua is written'),
 ];
