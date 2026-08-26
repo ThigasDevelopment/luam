@@ -5,7 +5,7 @@
 | `call.constructor` | `callable` | `#e8c78f` | `#644200` | — | runtime |
 | `call.function` | `callable` | `#adcff5` | `#224590` | — | runtime |
 | `call.method` | `callable` | `#5499d1` | `#3a6ddd` | — | runtime |
-| `call.native` | `callable` | `#c275d8` | `#ad4dab` | — | runtime |
+| `call.native` | `callable` | `#adcff5` | `#224590` | italic | runtime |
 | `call.library` | `callable` | `#c275d8` | `#ad4dab` | bold | runtime |
 | `call.decorator` | `callable` | `#68bac5` | `#01648e` | italic | erased |
 | `name.type` | `declaration-name` | `#caa96d` | `#7f5500` | bold | neutral |

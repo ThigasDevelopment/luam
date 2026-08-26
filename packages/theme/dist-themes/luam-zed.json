@@ -242,33 +242,33 @@
                         "font_weight": null
                     },
                     "lsp.function.defaultLibrary.mtaNative.serverOnly": {
-                        "color": "#c275d8",
-                        "font_style": null,
+                        "color": "#adcff5",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.function.defaultLibrary.mtaNative.clientOnly": {
-                        "color": "#c275d8",
-                        "font_style": null,
+                        "color": "#adcff5",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.function.defaultLibrary.mtaNative": {
-                        "color": "#c275d8",
-                        "font_style": null,
+                        "color": "#adcff5",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.variable.defaultLibrary.mtaNative.serverOnly": {
-                        "color": "#c275d8",
-                        "font_style": null,
+                        "color": "#adcff5",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.variable.defaultLibrary.mtaNative.clientOnly": {
-                        "color": "#c275d8",
-                        "font_style": null,
+                        "color": "#adcff5",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.variable.defaultLibrary.mtaNative": {
-                        "color": "#c275d8",
-                        "font_style": null,
+                        "color": "#adcff5",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.type.defaultLibrary.erased": {
@@ -622,33 +622,33 @@
                         "font_weight": null
                     },
                     "lsp.function.defaultLibrary.mtaNative.serverOnly": {
-                        "color": "#ad4dab",
-                        "font_style": null,
+                        "color": "#224590",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.function.defaultLibrary.mtaNative.clientOnly": {
-                        "color": "#ad4dab",
-                        "font_style": null,
+                        "color": "#224590",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.function.defaultLibrary.mtaNative": {
-                        "color": "#ad4dab",
-                        "font_style": null,
+                        "color": "#224590",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.variable.defaultLibrary.mtaNative.serverOnly": {
-                        "color": "#ad4dab",
-                        "font_style": null,
+                        "color": "#224590",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.variable.defaultLibrary.mtaNative.clientOnly": {
-                        "color": "#ad4dab",
-                        "font_style": null,
+                        "color": "#224590",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.variable.defaultLibrary.mtaNative": {
-                        "color": "#ad4dab",
-                        "font_style": null,
+                        "color": "#224590",
+                        "font_style": "italic",
                         "font_weight": null
                     },
                     "lsp.type.defaultLibrary.erased": {
