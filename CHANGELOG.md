@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.0 - 2026-08-27
+
 ### Added
 
 - A type guard now refines a stable access path, not only a name. A path is a

@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.0 - 2026-08-27
+
 ### Alterado
 
 - [Limitações](/pt-br/reference/limitations) troca "O estreitamento alcança

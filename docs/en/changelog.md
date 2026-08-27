@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.0 - 2026-08-27
+
 ### Changed
 
 - [Limitations](/en/reference/limitations) replaces "Narrowing reaches names,
