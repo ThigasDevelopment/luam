@@ -9,6 +9,7 @@ dist/
 .claude/*
 !.claude/docs/
 .claude/docs/*
+!.claude/docs/roadmap.md
 !.claude/docs/adr/
 !.claude/plans/
 docs/.vitepress/cache/
