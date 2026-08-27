@@ -106,14 +106,16 @@ A reference that appears before the declaration sees the class but not yet its
 members: reading one gives `any`, and the constructor arity is not checked.
 Move the reference below the declaration to have both checked.
 
-## No static members, metamethods or generic classes
+## No metamethods or generic classes
 
-**Planned.** Static members and generic classes are gaps, and a reviewed subset
-of metamethods follows them.
+**Planned.** Generic classes are a gap, and a reviewed subset of metamethods
+follows them.
 
-- A class has no static fields or static methods.
 - Metamethods cannot be declared on a class.
 - Classes take no type parameters.
+
+Static members are not on this list any more: `static` declares a field or a
+method on the class value, and [classes](../language/classes.md) covers it.
 
 Generic **type aliases** do work:
 

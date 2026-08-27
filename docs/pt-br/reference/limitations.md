@@ -108,14 +108,16 @@ Uma referência que aparece antes da declaração enxerga a classe, mas ainda n�
 membros dela: ler um membro dá `any`, e a aridade do construtor não é verificada.
 Mova a referência para baixo da declaração para ter as duas coisas checadas.
 
-## Sem membros estáticos, metamétodos ou classes genéricas
+## Sem metamétodos ou classes genéricas
 
-**Planejado.** Membros estáticos e classes genéricas são lacunas, e um
-subconjunto revisado de metamétodos vem depois delas.
+**Planejado.** Classes genéricas são uma lacuna, e um subconjunto revisado de
+metamétodos vem depois delas.
 
-- Uma classe não tem campos nem métodos estáticos.
 - Metamétodos não podem ser declarados em uma classe.
 - Classes não recebem parâmetros de tipo.
+
+Membros estáticos saíram desta lista: `static` declara um campo ou um método no
+valor da classe, e [classes](../language/classes.md) cobre o assunto.
 
 **Aliases** de tipo genéricos funcionam:
 

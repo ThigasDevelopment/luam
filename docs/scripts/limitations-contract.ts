@@ -19,9 +19,9 @@ export const LIMITATIONS_PAGE = 'reference/limitations.md';
 
 export const LIMITATIONS: readonly Limitation[] = [
     { id: 'path-narrowing-aliasing', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/025-access-path-narrowing.md' },
-    { id: 'flow-narrowing', label: 'planned', owners: ['26.13'], decision: null },
+    { id: 'flow-narrowing', label: 'planned', owners: ['26.4'], decision: null },
     { id: 'class-runtime-visibility', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/024-two-phase-class-declaration.md' },
-    { id: 'class-members', label: 'planned', owners: ['26.6', '26.7', '26.10'], decision: null },
+    { id: 'class-members', label: 'planned', owners: ['26.7', '26.10'], decision: null },
     { id: 'catalog-lag', label: 'upstream-constraint', owners: [], decision: '.github/workflows/catalog-refresh.yml' },
     { id: 'unverified-exports', label: 'planned', owners: ['26.8'], decision: null },
     { id: 'declaration-recheck', label: 'planned', owners: ['26.3'], decision: null },
@@ -56,6 +56,11 @@ export const STALE_CLAIMS: readonly StaleClaim[] = [
         id: 'absent-narrowing',
         pattern: /\b(does no (type )?narrowing|no type narrowing|não faz estreitamento)\b/i,
         correction: 'A guard narrows a name. Say that fields are what keep their declared type.',
+    },
+    {
+        id: 'absent-static-members',
+        pattern: /\b(no static (fields or )?(members|methods)|has no static|não tem campos nem métodos estáticos|sem membros estáticos)\b/i,
+        correction: 'A class declares statics with the static modifier. Say what the class value holds instead.',
     },
     {
         id: 'absent-cross-file-recheck',
