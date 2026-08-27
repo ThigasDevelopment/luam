@@ -2,21 +2,26 @@ import type { SymbolDeclaration } from './symbol';
 
 export const ROOT_SCOPE = 0;
 
+export interface ScopeOwner {
+    name: string | null;
+}
+
 export interface Scope {
     id: number;
     parent: number | null;
     start: number;
     end: number;
+    owner: ScopeOwner | null;
     declarations: SymbolDeclaration[];
 }
 
 export class ScopeTree {
-    private readonly scopes: Scope[] = [{ id: ROOT_SCOPE, parent: null, start: 0, end: Number.MAX_SAFE_INTEGER, declarations: [] }];
+    private readonly scopes: Scope[] = [{ id: ROOT_SCOPE, parent: null, start: 0, end: Number.MAX_SAFE_INTEGER, owner: null, declarations: [] }];
 
-    open(parent: number, start: number): number {
+    open(parent: number, start: number, owner: ScopeOwner | null = null): number {
         const id = this.scopes.length;
 
-        this.scopes.push({ id, parent, start, end: Number.MAX_SAFE_INTEGER, declarations: [] });
+        this.scopes.push({ id, parent, start, end: Number.MAX_SAFE_INTEGER, owner, declarations: [] });
 
         return id;
     }
@@ -74,6 +79,16 @@ export class ScopeTree {
         const declared = this.search(chain, name, offset, accept);
 
         return declared ?? this.search(chain, name, Number.MAX_SAFE_INTEGER, accept);
+    }
+
+    enclosingFunction(offset: number): ScopeOwner | null {
+        for (const scope of this.chain(this.innermostAt(offset))) {
+            if (scope.owner !== null) {
+                return scope.owner;
+            }
+        }
+
+        return null;
     }
 
     visible(scopeId: number): SymbolDeclaration[] {

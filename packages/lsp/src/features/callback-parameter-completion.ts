@@ -107,7 +107,7 @@ export function callbackParameterItems(analysis: DocumentAnalysis, offset: numbe
         return null;
     }
 
-    const expected = expectedArgument(analysis, offset, callFrame);
+    const expected = expectedArgument(analysis, offset, callFrame, true);
     const callback = contextualFunction(expected?.type ?? null);
 
     if (callback === null) {

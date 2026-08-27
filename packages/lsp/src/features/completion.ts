@@ -10,7 +10,8 @@ import { oopClassesFor } from '@mta-types/oop-surface';
 import { CompletionItemKind, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
-import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { conflictsWithExpectation, expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { contextGlobalFilter, EVENT_CONTEXT_GLOBALS } from '@lsp/features/context-globals';
 import { callbackParameterItems } from '@lsp/features/callback-parameter-completion';
 import { classBodyNeedsConstructor } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
@@ -124,10 +125,9 @@ function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: Arg
     return analysis.index
         .visibleAt(offset)
         .filter((declaration) => !MEMBER_KINDS.has(declaration.kind) && declaration.kind !== 'event')
+        .filter((declaration) => !conflictsWithExpectation(expectation, declaration.type))
         .map((declaration) => withArgumentRank(symbolItem(declaration), declaration.type, expectation));
 }
-
-const EVENT_CONTEXT_GLOBALS: readonly string[] = ['source', 'client', 'eventName', 'sourceResource', 'sourceResourceRoot'];
 
 function withEventContextRank(item: CompletionItem, inHandler: boolean): CompletionItem {
     const rank = EVENT_CONTEXT_GLOBALS.indexOf(item.label);
@@ -139,19 +139,35 @@ function withEventContextRank(item: CompletionItem, inHandler: boolean): Complet
     return { ...item, sortText: `0${rank}${item.label}` };
 }
 
-function apiItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null, inHandler: boolean): CompletionItem[] {
-    return globalsFor(analysis.environment).map((declaration) =>
-        withEventContextRank(withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation), inHandler));
+function apiItems(analysis: DocumentAnalysis, offset: number, expectation: ArgumentExpectation | null, inHandler: boolean): CompletionItem[] {
+    const inContext = contextGlobalFilter(analysis, offset);
+
+    return globalsFor(analysis.environment)
+        .filter((declaration) => inContext(declaration.name))
+        .filter((declaration) => !conflictsWithExpectation(expectation, descriptorToType(declaration.type)))
+        .map((declaration) =>
+            withEventContextRank(withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation), inHandler));
 }
 
 function projectItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
     return analysis.project.globals
         .filter((declaration) => isAvailableIn(declaration.environment, analysis.environment))
+        .filter((declaration) => !conflictsWithExpectation(expectation, descriptorToType(declaration.type)))
         .map((declaration) => withArgumentRank(projectItem(declaration, analysis.env), descriptorToType(declaration.type), expectation));
 }
 
 function plainItems(items: readonly CompletionItem[], expectation: ArgumentExpectation | null): CompletionItem[] {
     return items.map((item) => withArgumentRank(item, null, expectation));
+}
+
+const EXPRESSION_KEYWORDS: ReadonlySet<string> = new Set(['function', 'new', 'nil', 'not', 'true', 'false']);
+
+function keywordItems(expectation: ArgumentExpectation | null): CompletionItem[] {
+    if (expectation === null) {
+        return [...KEYWORD_ITEMS];
+    }
+
+    return KEYWORD_ITEMS.filter((item) => EXPRESSION_KEYWORDS.has(item.label));
 }
 
 function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
@@ -292,9 +308,9 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...plainItems(workspaceItems(analysis, others), expectation),
         ...plainItems(mtaClassItems(analysis), expectation),
         ...plainItems(superItems(analysis, offset), expectation),
-        ...apiItems(analysis, expectation, inHandler),
+        ...apiItems(analysis, offset, expectation, inHandler),
         ...plainItems(directives, expectation),
         ...plainItems(constructor, expectation),
-        ...plainItems(KEYWORD_ITEMS, expectation),
+        ...plainItems(keywordItems(expectation), expectation),
     ]);
 }

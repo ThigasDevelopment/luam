@@ -98,6 +98,7 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
         body: member.body,
         selfType: owner,
         container: owner,
+        owner: member.name,
     });
 }
 

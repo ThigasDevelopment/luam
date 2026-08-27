@@ -104,7 +104,8 @@ describe('literal argument completion', () => {
         const items = service.completion(CLIENT, markerAt(text, "'ped', "));
 
         expect(items.length).toBeGreaterThan(100);
-        expect(items.map((item) => item.label)).toContain('math');
+        expect(items.map((item) => item.label)).toContain('getTickCount');
+        expect(items.map((item) => item.label)).not.toContain('math');
     });
 
     it('leaves an argument that takes a plain string untouched', () => {
