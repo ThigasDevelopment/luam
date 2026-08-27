@@ -16,7 +16,7 @@ export const MTA_OOP_4: readonly OopClass[] = [
     ],
     oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN], named('GuiWindow'), 6), 'guiCreateWindow'),
     ),
-    oopClass('Light', null, [
+    oopClass('Light', 'Element', [
         oopProperty('color', 'client', 'getLightColor', tupleOf([NUMBER, NUMBER, NUMBER])),
         oopProperty('direction', 'client', 'getLightDirection', tupleOf([NUMBER, NUMBER, NUMBER])),
         oopMethod('getColor', 'client', 'getLightColor', fn([], tupleOf([NUMBER, NUMBER, NUMBER]), 0)),

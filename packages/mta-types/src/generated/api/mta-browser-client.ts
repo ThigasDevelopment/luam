@@ -4,7 +4,7 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE } from '@mta-types/type-
 export const MTA_BROWSER_CLIENT: ApiCatalog = {
     canBrowserNavigateBack: fn([named('Browser')], BOOLEAN, 1),
     canBrowserNavigateForward: fn([named('Browser')], BOOLEAN, 1),
-    createBrowser: fn([NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Element'), 3),
+    createBrowser: fn([NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Browser'), 3),
     executeBrowserJavascript: fn([named('Browser'), STRING], BOOLEAN, 2),
     focusBrowser: fn([named('Browser')], BOOLEAN, 1),
     getBrowserProperty: fn([named('Browser'), STRING], BOOLEAN, 2),

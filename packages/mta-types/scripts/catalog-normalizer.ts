@@ -90,6 +90,14 @@ function collapse(declarations: readonly ParsedDeclaration[]): Map<string, Parse
     return byName;
 }
 
+function withReturnType(type: TypeDescriptor, returnType: TypeDescriptor | undefined): TypeDescriptor {
+    if (returnType === undefined || type.kind !== 'function') {
+        return type;
+    }
+
+    return { ...type, returnType };
+}
+
 function applyOverride(entry: CatalogEntry): CatalogEntry {
     const override = CATALOG_OVERRIDES[entry.name];
 
@@ -100,7 +108,7 @@ function applyOverride(entry: CatalogEntry): CatalogEntry {
     return {
         ...entry,
         environment: override.environment ?? entry.environment,
-        type: override.type ?? entry.type,
+        type: withReturnType(override.type ?? entry.type, override.returnType),
     };
 }
 

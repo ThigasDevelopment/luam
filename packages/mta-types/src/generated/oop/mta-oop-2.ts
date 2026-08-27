@@ -2,12 +2,12 @@ import { oopClass, oopConstructor, oopMethod, oopProperty, type OopClass } from 
 import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf } from '@mta-types/type-descriptor';
 
 export const MTA_OOP_2: readonly OopClass[] = [
-    oopClass('DxShader', null, [
+    oopClass('DxShader', 'Element', [
     ], [
     ],
     oopConstructor('client', fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], named('DxShader'), 1), 'dxCreateShader'),
     ),
-    oopClass('DxTexture', null, [
+    oopClass('DxTexture', 'Element', [
         oopMethod('getPixels', 'client', 'dxGetTexturePixels', fn([ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], STRING, 1)),
         oopMethod('setEdge', 'client', 'dxSetTextureEdge', fn([STRING, NUMBER], BOOLEAN, 1)),
         oopMethod('setPixels', 'client', 'dxSetTexturePixels', fn([ANY, ANY, ANY, NUMBER, NUMBER, NUMBER, ANY], BOOLEAN, 2)),
