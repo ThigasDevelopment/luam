@@ -14,6 +14,22 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- Three paired manual pages, in English and Portuguese: how a build works end to
+  end, Luam beside Lua 5.1, Luau and TypeScript, and a migration guide covering
+  every release since `0.2.0` that asks an author to change something. The
+  landing page carries a short comparison and links to the full one.
+- A per-page report link that opens a GitHub issue prefilled with the page URL,
+  its language and the documented version. It requires an explicit submission,
+  and no page sends anything in the background — there is no voting endpoint and
+  no third-party analytics.
+
+### Fixed
+
+- The playground's no-JavaScript line had no text in either locale, because the
+  string the component reads was never declared.
+
 ## 0.19.1 - 2026-08-27
 
 ### Added

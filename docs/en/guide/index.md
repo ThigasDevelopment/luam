@@ -5,10 +5,13 @@ server, and then to the loop you leave running while you work.
 
 | Page | What it covers |
 | --- | --- |
+| [Luam compared](/en/guide/comparison) | What differs from Lua 5.1, Luau, and TypeScript. |
 | [Installation](/en/guide/installation) | Node.js, the `luam` CLI, and the editor extension. |
 | [Quick start](/en/guide/quick-start) | Scaffold, write, check, build, and start a resource. |
 | [Project layout](/en/guide/project-layout) | The source tree, what the folder names mean, and what a build writes. |
 | [Daily development](/en/guide/daily-development) | `luam ensure`, `luam dev`, incremental rebuilds, and logs. |
+| [How Luam works](/en/guide/how-luam-works) | The five stages between a `.luam` file and a running resource. |
+| [Migration](/en/guide/migration) | What each release asks you to change, oldest first. |
 | [Troubleshooting](/en/guide/troubleshooting) | The failures a new project hits, and how to read a diagnostic. |
 
 ## Before you begin

@@ -2,6 +2,7 @@ import DefaultTheme from 'vitepress/theme';
 import { defineAsyncComponent, h } from 'vue';
 import type { Theme } from 'vitepress';
 
+import PageFeedback from './PageFeedback.vue';
 import VersionBanner from './VersionBanner.vue';
 import './tokens.css';
 import './shell.css';
@@ -12,7 +13,11 @@ import './custom.css';
 
 const theme: Theme = {
     extends: DefaultTheme,
-    Layout: () => h(DefaultTheme.Layout, null, { 'layout-top': () => h(VersionBanner) }),
+    Layout: () =>
+        h(DefaultTheme.Layout, null, {
+            'layout-top': () => h(VersionBanner),
+            'doc-after': () => h(PageFeedback),
+        }),
     enhanceApp({ app }) {
         app.component(
             'Playground',

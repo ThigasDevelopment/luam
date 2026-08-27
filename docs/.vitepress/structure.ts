@@ -10,7 +10,17 @@ export const LOCALES: readonly LocaleId[] = ['en', 'pt-br'];
 export const SECTIONS: readonly Section[] = [
     {
         id: 'guide',
-        pages: ['index', 'installation', 'quick-start', 'project-layout', 'daily-development', 'troubleshooting'],
+        pages: [
+            'index',
+            'comparison',
+            'installation',
+            'quick-start',
+            'project-layout',
+            'daily-development',
+            'how-luam-works',
+            'migration',
+            'troubleshooting',
+        ],
     },
     {
         id: 'language',

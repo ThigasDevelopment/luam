@@ -11,6 +11,28 @@ da versão atual.
 
 ## Não lançado
 
+### Adicionado
+
+- [Como o Luam funciona](/pt-br/guide/how-luam-works) segue um build pelos cinco
+  estágios dele, com um diagrama e os mesmos estágios em palavras, e explica por
+  que a CLI, o editor e o playground concordam: existe um parser, um checador e
+  um emissor atrás dos três.
+- [Luam em comparação](/pt-br/guide/comparison) coloca o Luam ao lado de Lua
+  5.1, Luau e TypeScript — alvo, apagamento, comentários, opcionais, classes,
+  reuso entre arquivos e conhecimento da plataforma — com uma versão mais curta
+  na página inicial.
+- [Migração](/pt-br/guide/migration) registra o que cada release desde a `0.2.0`
+  pede que o autor mude, da mais antiga para a mais nova, com a forma removida
+  ao lado da forma a escrever e um link para a página de referência de cada uma.
+- Toda página do manual termina com um link de relato que abre uma issue no
+  GitHub preenchida com a página, o idioma dela e a versão documentada. Nada é
+  enviado até o leitor publicar, e nenhuma página envia nada em segundo plano.
+
+### Corrigido
+
+- O playground diz o que fazer quando o JavaScript não está disponível, nos dois
+  idiomas, em vez de deixar essa linha em branco.
+
 ## 0.19.1 - 2026-08-27
 
 ### Adicionado
