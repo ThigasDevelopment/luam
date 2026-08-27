@@ -208,10 +208,6 @@ export class CheckContext {
         return info;
     }
 
-    isPredeclaredClass(name: string): boolean {
-        return this.predeclared.has(name);
-    }
-
     pendingDeclarationOf(name: string): string | null {
         const seen = new Set<string>();
 
