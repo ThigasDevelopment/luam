@@ -92,7 +92,7 @@ export const MTA_DOCS_24: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleDoorState',
     },
     getVehicleDummyPosition: {
-        summary: '',
+        summary: 'This function returns the position of the dummy for the given vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you want to get the dummy positions from.' },
             { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to get.' },
@@ -142,7 +142,7 @@ export const MTA_DOCS_24: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleHeadLightColor',
     },
     getVehicleIdleRespawnDelay: {
-        summary: '',
+        summary: 'This function gets the time delay (in milliseconds)\nthe vehicle will remain at its position while empty.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get the idle delay of.' },
         ],
@@ -175,7 +175,7 @@ export const MTA_DOCS_24: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleMaxPassengers',
     },
     getVehicleModelDummyDefaultPosition: {
-        summary: '',
+        summary: 'This function gets the default position of the dummies contained in a vehicle model.',
         parameters: [
             { name: 'modelId', isOptional: false, isVariadic: false, summary: 'The model ID which you want to apply the change to.' },
             { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to get.' },

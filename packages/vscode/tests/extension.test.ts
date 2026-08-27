@@ -7,7 +7,7 @@ import { CLIENT_ID, ENVIRONMENT_PATTERN, MANIFEST_PATTERN, SERVER_MODULE, SOURCE
 import { BUILD_NO_FOLDER_MESSAGE, BUILD_TERMINAL_NAME } from '@vscode-extension/commands/build-command';
 import { ensureCommandLine, NO_FOLDER_MESSAGE, TERMINAL_NAME } from '@vscode-extension/commands/ensure-command';
 import { DEFAULT_SETTINGS, readSettings } from '@vscode-extension/config/settings';
-import { activate, BUILD_COMMAND, deactivate, ENSURE_COMMAND, RESTART_COMMAND } from '@vscode-extension/extension';
+import { activate, BUILD_COMMAND, deactivate, ENSURE_COMMAND, RESCAN_COMMAND, RESTART_COMMAND } from '@vscode-extension/extension';
 
 import { clients, resetClients, type LanguageClient } from './support/language-client-mock';
 import { resetMock, state } from './support/vscode-mock';
@@ -67,11 +67,11 @@ describe('activation', () => {
         expect(state.watchers).toEqual([SOURCE_PATTERN, MANIFEST_PATTERN, ENVIRONMENT_PATTERN]);
     });
 
-    it('registers the build, ensure and restart commands', () => {
+    it('registers the build, ensure, restart and rescan commands', () => {
         const { context } = activateExtension();
 
-        expect([...state.registered.keys()].sort()).toEqual([BUILD_COMMAND, ENSURE_COMMAND, RESTART_COMMAND].sort());
-        expect(context.subscriptions).toHaveLength(3);
+        expect([...state.registered.keys()].sort()).toEqual([BUILD_COMMAND, ENSURE_COMMAND, RESCAN_COMMAND, RESTART_COMMAND].sort());
+        expect(context.subscriptions).toHaveLength(4);
     });
 
     it('stops the client on deactivate', async () => {
@@ -88,6 +88,14 @@ describe('activation', () => {
         await state.registered.get(RESTART_COMMAND)?.();
 
         expect(client.restarted).toBe(1);
+    });
+
+    it('asks the server to rescan the workspace through its command', async () => {
+        const { client } = activateExtension();
+
+        await state.registered.get(RESCAN_COMMAND)?.();
+
+        expect(client.requests).toEqual([{ method: 'workspace/executeCommand', params: { command: RESCAN_COMMAND } }]);
     });
 });
 

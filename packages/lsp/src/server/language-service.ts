@@ -21,7 +21,7 @@ import { definitionAt, referencesAt, renameAt } from '@lsp/features/navigation';
 import { semanticTokens } from '@lsp/features/semantic-tokens';
 import { signatureHelpAt } from '@lsp/features/signature-help';
 import { offsetAt } from '@lsp/support/source-text';
-import { WorkspaceIndex } from '@lsp/workspace/workspace-index';
+import { WorkspaceIndex, type RescanResult } from '@lsp/workspace/workspace-index';
 
 export class LanguageService {
     private readonly workspace = new WorkspaceIndex();
@@ -42,6 +42,14 @@ export class LanguageService {
 
     refresh(): DocumentAnalysis[] {
         return this.workspace.refresh();
+    }
+
+    rescan(): RescanResult {
+        return this.workspace.rescan();
+    }
+
+    reload(): RescanResult {
+        return this.workspace.reload();
     }
 
     reloadSettings(): DocumentAnalysis[] {

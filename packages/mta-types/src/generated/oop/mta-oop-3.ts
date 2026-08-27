@@ -36,7 +36,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
         'guiCreateBrowser',
     ),
     ),
-    oopClass('GuiButton', null, [
+    oopClass('GuiButton', 'GuiElement', [
     ], [
     ],
     oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiButton'), 6), 'guiCreateButton'),
@@ -82,7 +82,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
     ],
     oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiEdit'), 6), 'guiCreateEdit'),
     ),
-    oopClass('GuiElement', null, [
+    oopClass('GuiElement', 'Element', [
         oopProperty('alpha', 'client', 'guiGetAlpha', NUMBER),
         oopMethod('blur', 'client', 'guiBlur', fn([], BOOLEAN, 0)),
         oopMethod('bringToFront', 'client', 'guiBringToFront', fn([], BOOLEAN, 0)),
@@ -131,7 +131,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
     ],
     null,
     ),
-    oopClass('GuiFont', null, [
+    oopClass('GuiFont', 'Element', [
     ], [
     ],
     oopConstructor('client', fn([STRING, NUMBER], named('GuiFont'), 1), 'guiCreateFont'),
@@ -208,7 +208,7 @@ export const MTA_OOP_3: readonly OopClass[] = [
     ],
     oopConstructor('client', fn([NUMBER, NUMBER, NUMBER, NUMBER, STRING, BOOLEAN, named('Element')], named('GuiMemo'), 6), 'guiCreateMemo'),
     ),
-    oopClass('GuiRadioButton', null, [
+    oopClass('GuiRadioButton', 'GuiElement', [
         oopMethod('getSelected', 'client', 'guiRadioButtonGetSelected', fn([], BOOLEAN, 0)),
         oopProperty('selected', 'client', 'guiRadioButtonGetSelected', BOOLEAN),
         oopMethod('setSelected', 'client', 'guiRadioButtonSetSelected', fn([BOOLEAN], BOOLEAN, 1)),

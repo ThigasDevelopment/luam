@@ -22,7 +22,7 @@ export const MTA_DOCS_11: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineStreamingGetModelLoadState',
     },
     engineStreamingGetUsedMemory: {
-        summary: '',
+        summary: 'This function gets the amount of memory (in bytes) used by the GTA streamer.',
         parameters: [],
         returns: '* Returns a int containing the amount of memory in bytes.',
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineStreamingGetUsedMemory',
@@ -205,7 +205,7 @@ export const MTA_DOCS_11: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/FileFlush',
     },
     fileGetContents: {
-        summary: 'Please note that even if you enable SD #22 and #23 on your server, you are not protected from user attacks, which can happen after verification of the file, but before you read the contents of such verified file. This function enables you to safely read the contents of a meta.xml-listed file on both client and server.',
+        summary: 'Reads the entire contents of the file, optionally verifies the read contents by computing and comparing the checksum with the expected one, and returns the content as string. The file cursor position is not modified by calls to this function. File must be added in the meta.xml.\n\nPlease note that even if you enable SD #22 and #23 on your server, you are not protected from user attacks, which can happen after verification of the file, but before you read the contents of such verified file. This function enables you to safely read the contents of a meta.xml-listed file on both client and server.',
         parameters: [
             { name: 'theFile', isOptional: false, isVariadic: false, summary: 'A handle to the file you wish to get the contents from. Use fileOpen to obtain this handle.' },
             { name: 'verifyContents', isOptional: true, isVariadic: false, summary: 'Set to true, to compare the computed and the expected checksum of the file content.' },
@@ -214,7 +214,7 @@ export const MTA_DOCS_11: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/FileGetContents',
     },
     fileGetHash: {
-        summary: '',
+        summary: 'This function returns a hash of the entire file in the specified algorithm. This function *does not* move the file pointer/position. Beware though, there will always be a minuscule period of time between checking the hash and loading the contents of the file, which can be abused by a potential attacker to modify the contents.',
         parameters: [
             { name: 'theFile', isOptional: false, isVariadic: false, summary: 'A handle to the file you wish to get the hash from. Use fileOpen to obtain this handle.' },
             { name: 'algorithm', isOptional: false, isVariadic: false, summary: 'A string which must be one of these: "md5", "sha1", "sha224", "sha256", "sha384", "sha512", "hmac"' },

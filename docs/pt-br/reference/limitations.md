@@ -52,12 +52,13 @@ atravessa funções, e a alternativa — descartar todo fato de campo em qualque
 chamada — apagaria o refinamento sempre que um único `outputDebugString`
 estivesse entre a guarda e o uso. O Luam não faz nem uma coisa nem outra.
 
-## O estreitamento não atravessa um ramo nem um laço
+## Uma condição guardada em variável não é uma guarda
 
-**Planejado.** Um grafo de fluxo de controle é o que resolve isso.
+**Decisão de projeto.** Registrada na
+[ADR-031](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/031-flow-narrowing.md).
 
-Um fato vive dentro do bloco que a condição protege. Guardar a condição em uma
-variável não leva o fato adiante, porque a variável não é o teste:
+Um fato fica preso ao caminho que a condição testou. Guardar a condição em uma
+variável não prende nada, porque a variável não é o teste:
 
 <<< @/snippets/errors/flow-narrowing/src/server/adapter.luam{luam}
 
@@ -71,11 +72,16 @@ if self.connection ~= nil then
 end
 ```
 
-Uma guarda com saída antecipada vale: quando o bloco sempre sai com `return` ou
-`break`, a condição negada refina o resto do bloco que a contém. O que não vale
-é qualquer coisa mais sutil — um campo refinado nos dois ramos de um `if` e lido
-depois dele, um `while` que só às vezes dá `break`, uma flag definida em um ramo
-e lida em outro.
+Todo o resto do fluxo vale. Um ramo que sai com `return`, `break` ou `continue`
+entrega o outro lado ao resto do bloco; um caminho refinado do mesmo jeito em
+todos os ramos mantém aquele tipo depois da junção; uma atribuição refina uma
+união ou um opcional para o membro que escreveu; e um `while` deixa a negação da
+condição para trás. Veja
+[o que um fato sobrevive](/pt-br/language/types#o-que-um-fato-sobrevive).
+
+Um laço continua conservador de propósito: todo caminho que o corpo atribui
+perde o fato dele no laço inteiro, mesmo onde a escrita não pode rodar. O corpo é
+analisado uma vez, contra o estado que veria em qualquer iteração.
 
 Uma operação ainda precisa ser válida para a união inteira: `key + 1` em
 `string | number` é `check-invalid-operand`, porque um dos membros não soma. A
@@ -108,25 +114,28 @@ Uma referência que aparece antes da declaração enxerga a classe, mas ainda n�
 membros dela: ler um membro dá `any`, e a aridade do construtor não é verificada.
 Mova a referência para baixo da declaração para ter as duas coisas checadas.
 
-## Sem membros estáticos, metamétodos ou classes genéricas
+## Três metamétodos continuam bloqueados
 
-**Planejado.** Membros estáticos e classes genéricas são lacunas, e um
-subconjunto revisado de metamétodos vem depois delas.
+**Decisão de projeto.** Registrada na
+[ADR-035](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/035-safe-class-metamethods.md).
 
-- Uma classe não tem campos nem métodos estáticos.
-- Metamétodos não podem ser declarados em uma classe.
-- Classes não recebem parâmetros de tipo.
+Uma classe declara um metamétodo pelo nome dele em Lua — `__tostring`, `__eq`,
+`__lt`, `__le`, `__len`, `__concat`, `__unm` e os operadores aritméticos. Veja
+[classes](/pt-br/language/classes#metametodos).
 
-**Aliases** de tipo genéricos funcionam:
+O que continua bloqueado, independentemente do que for exposto:
 
-```luam
-type Nullable<T> = T | nil
-```
+- `__index` substitui a busca de membro, que o helper de classe controla.
+- `__newindex` engole uma escrita de campo, que o helper de classe controla.
+- `__call` torna uma instância chamável, o que esconde a construção.
+- `__gc` não roda para uma tabela em Lua 5.1.
+- `__metatable` e `__mode` escondem ou enfraquecem a metatable que o helper usa.
 
-Nem tudo volta. `__index`, `__newindex` e `__call` continuam bloqueados
-independentemente do que for exposto, porque cada um deles pode substituir a
-busca de membro, engolir uma escrita ou tornar uma instância chamável — e o
-helper de classe constrói identidade, herança e construção em cima dos três.
+O `__eq` segue o Lua 5.1: ele só é chamado quando os dois operandos são tabelas
+que compartilham o mesmo metamétodo, então comparar instâncias de duas classes
+diferentes cai em identidade, seja lá o que cada classe declare. E o checker não
+verifica se os operandos de um operador declaram o metamétodo correspondente —
+um `__add` ausente aparece quando o código roda, não quando compila.
 
 ## O catálogo do MTA pode ficar atrás de uma versão
 
@@ -142,38 +151,25 @@ Um job agendado relê o wiki e propõe a atualização como um pull request. Ele
 nunca faz o merge, então a versão do MTA que uma versão do Luam descreve é sempre
 uma decisão revisada.
 
-## Exports são nomeados, nunca verificados
+## Só uma chamada que o build consegue nomear é verificada
 
-**Planejado.** Um contrato de export versionado vai verificar as chamadas que um
-build consegue identificar.
+**Decisão de projeto.** Registrada na
+[ADR-033](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/033-resource-export-abi.md).
 
-`export` escreve uma entrada `<export>` no `meta.xml`, e `export http` marca
-`http="true"` nela. O que ele não faz é verificar o lado que chama: um
-`call(resource, 'name', ...)` de outro resource nunca é checado contra a
-assinatura que você exportou.
+Um build escreve um [contrato de export](/pt-br/language/exports#o-contrato-de-export),
+e uma chamada para uma dependência declarada é checada contra ele quando o nome
+do resource e o nome do export são literais. Todo o resto compila e passa
+intacto:
 
-Uma chamada cujo nome de resource ou de função é calculado em execução continua
-sem verificação mesmo depois disso. Não há o que um compilador resolva ali.
+- Uma chamada cujo nome de resource ou de export é calculado em execução. Não há
+  o que um compilador resolva, e recusar quebraria código que funciona.
+- Uma chamada para um resource sem contrato em disco — um escrito em Lua puro,
+  um que ainda não foi buildado, ou um cujo contrato nunca foi compartilhado.
+- A própria execução. O contrato é um artefato de compilação; o MTA não o lê, e
+  nada verifica em execução que o resource chamado é o que o contrato descreveu.
 
-## O editor reverifica por declaração, não por edição
-
-**Planejado.** Um grafo de dependências vai estreitar o que uma mudança de
-declaração reverifica.
-
-Editar um arquivo reanalisa os outros só quando muda o que aquele arquivo
-**declara** — uma classe, uma interface, um enum ou um global, incluindo o tipo
-de qualquer membro. Editar o corpo de uma função republica diagnóstico só
-daquele arquivo, que é o que mantém a digitação barata em projeto grande.
-
-Quando uma declaração muda, todo arquivo que enxerga aquela declaração é
-reanalisado, não só os que a usam. Em projeto grande isso é mais trabalho do que
-a mudança exige.
-
-Nada disso depende de o arquivo estar aberto. O servidor varre o workspace ao
-iniciar, e a extensão observa `**/*.luam`, `.luam.manifest` e `.env*`, então um
-arquivo criado, movido ou apagado fora do editor chega até ele sem reinício. Um
-cliente LSP que não registra observadores de arquivo enxerga só o que você abre —
-essa é a metade do protocolo que cabe ao cliente, não uma configuração do Luam.
+Um contrato desatualizado é checado como está escrito. O build lê o arquivo que
+encontra; ele não compila o provedor para confirmar que o arquivo ainda bate.
 
 ## O `config.lua` nunca é analisado
 
@@ -182,13 +178,17 @@ significado.
 
 Ele é copiado como está, então o compilador não sabe nada sobre o seu conteúdo.
 Descreva-o com um
-[arquivo de declaração](/pt-br/language/declaration-files) para obter tipos.
+[arquivo de declaração](/pt-br/language/declaration-files) para obter tipos, ou
+gere um com [`luam config`](/pt-br/tooling/cli#luam-config) — um comando que você
+roda e um arquivo que você commita, nunca uma etapa dentro do build. Esse comando
+lê os dados literais e nada mais: uma chamada, uma concatenação ou uma função no
+`config.lua` é reportada e pulada, e você a declara à mão.
 
 Executá-lo para ler os valores faria um build rodar código do projeto, que é
-justamente o que o compilador se recusa a fazer. Um extrator futuro pode escrever
-o arquivo de declaração para você a partir de dados literais — como um comando
-que você roda e um arquivo que você commita, nunca como uma etapa dentro do
-build.
+justamente o que o compilador se recusa a fazer, então o extrator lê o arquivo em
+vez de carregá-lo. Um valor que ele produz é tão verdadeiro quanto o arquivo que
+leu: mude o `config.lua` e a declaração fica velha até você rodar o comando de
+novo.
 
 ## O Lua gerado é o código, não uma reescrita
 
@@ -231,16 +231,25 @@ separados, então um `local` compartilhado por elas teria que virar global, uma
 closure sobre um local ao redor não poderia ser movida de jeito nenhum, e a ordem
 dos efeitos de topo deixaria de existir.
 
-## Escopo dos logs de desenvolvimento
+## Os logs de desenvolvimento saem do disco, nunca de um servidor
 
-**Planejado.** Uma ponte autenticada vai cobrir um servidor de desenvolvimento
-remoto.
+**Decisão de projeto.** A CLI não abre conexão com um servidor MTA.
 
-O `luam dev` lê apenas o log **local** do servidor MTA. Ele não coleta logs
-remotos, não avalia expressões e não observa valores em execução. Linhas nativas de
-outros resources nomeados são ignoradas, e linhas da engine sem atribuição podem
-aparecer como saída simples do servidor porque a origem delas não pode ser
-classificada com segurança.
+O `luam dev` lê o log **local** do servidor MTA. O `luam dev --start-server` sobe
+o servidor no seu terminal e acompanha
+`<serverPath>/mods/deathmatch/logs/server.log` a partir dali, que é o que faz os
+registros estruturados e as posições no código-fonte funcionarem.
 
-Avaliar uma expressão em um servidor rodando continua fora dessa ponte. Isso é um
-depurador, e precisa do próprio protocolo e da própria decisão de segurança.
+Não existe modo remoto. Coletar log de um servidor que você não consegue ler do
+disco exigiria a CLI se conectar a ele, e o produto andou no sentido oposto: o
+campo `transport` do manifest, que configurava uma conexão com o servidor, foi
+removido, e o `ensure` sincronizando arquivos com o `dev --start-server`
+reiniciando o servidor que ele mesmo sobe é o que ficou no lugar. Monte o
+diretório de log remoto, ou leia onde ele está.
+
+Duas bordas menores: linhas nativas de outros resources nomeados são ignoradas, e
+linhas da engine sem atribuição podem aparecer como saída simples do servidor
+porque a origem delas não pode ser classificada com segurança.
+
+Avaliar uma expressão em um servidor rodando não faz parte de nada disso. Isso é
+um depurador, e precisa do próprio protocolo e da própria decisão de segurança.

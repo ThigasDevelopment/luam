@@ -14,8 +14,9 @@ import { aliasType, sharedRecord } from './type-shape';
 
 export type ReceiverTarget =
     | { kind: 'library'; library: LibraryName }
-    | { kind: 'class'; name: string }
+    | { kind: 'class'; name: string; typeArguments: readonly Type[] }
     | { kind: 'static-class'; name: string }
+    | { kind: 'class-value'; name: string }
     | { kind: 'enum'; name: string }
     | { kind: 'record'; record: RecordType }
     | { kind: 'native'; receiver: 'table' | 'string' | 'number' };
@@ -102,7 +103,7 @@ function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<strin
             return fromType(analysis, alias, seen);
         }
 
-        return { kind: 'class', name: type.name };
+        return { kind: 'class', name: type.name, typeArguments: type.typeArguments ?? [] };
     }
 
     if (type.kind === 'table' || type.kind === 'array') {
@@ -174,13 +175,17 @@ function rootTarget(analysis: DocumentAnalysis, offset: number, name: string): R
     }
 
     if (declaration.kind === 'class') {
-        return { kind: 'class', name: declaration.name };
+        return { kind: 'class-value', name: declaration.name };
     }
 
     return fromType(analysis, declaration.type);
 }
 
 function memberTarget(analysis: DocumentAnalysis, target: ReceiverTarget, name: string): ReceiverTarget | null {
+    if (target.kind === 'class-value') {
+        return fromType(analysis, analysis.declarations.lookupStaticMember(target.name, name)?.type ?? null);
+    }
+
     if (target.kind === 'record') {
         return fromType(analysis, target.record.members.get(name) ?? null);
     }

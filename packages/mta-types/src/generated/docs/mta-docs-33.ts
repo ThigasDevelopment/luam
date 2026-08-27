@@ -11,7 +11,7 @@ export const MTA_DOCS_33: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsControlEnabled',
     },
     isCoronaReflectionEnabled: {
-        summary: '',
+        summary: 'This function gets visibility of corona reflection.',
         parameters: [
             { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'marker' },
         ],
@@ -63,7 +63,7 @@ export const MTA_DOCS_33: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsElementCallPropagationEnabled',
     },
     isElementCollidableWith: {
-        summary: 'This function can be used to check whether specified element is collidable with another element.\n\n**Note:** You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object',
+        summary: 'This function can be used to check whether specified element is collidable with another element.\n\n**Note:** You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object\n\n* Weapon',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which colliding you want to get' },
             { name: 'withElement', isOptional: false, isVariadic: false, summary: 'The other element which colliding with the first entity you want to get' },

@@ -32,7 +32,7 @@ export const MTA_DOCS_22: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetResourceState',
     },
     getRoofPosition: {
-        summary: '',
+        summary: 'This function gets the Z level of the lowest roof above a point. It is required that the point is near enough to the local player so that it\'s within the area where collision data is loaded.',
         parameters: [
             { name: 'x', isOptional: false, isVariadic: false, summary: 'A float representing the X world coordinate of the point.' },
             { name: 'y', isOptional: false, isVariadic: false, summary: 'A float representing the Y world coordinate of the point.' },
@@ -184,7 +184,7 @@ export const MTA_DOCS_22: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundBufferLength',
     },
     getSoundEffectParameters: {
-        summary: '',
+        summary: 'This function gets the parameters of a sound effect.',
         parameters: [
             { name: 'sound', isOptional: false, isVariadic: false, summary: 'The sound element to get the sound effect parameters of.' },
             { name: 'effectName', isOptional: false, isVariadic: false, summary: 'The name of the effect whose parameters you want to retrieve:' },

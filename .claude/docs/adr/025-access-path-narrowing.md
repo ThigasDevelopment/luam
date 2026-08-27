@@ -1,6 +1,6 @@
 # ADR-025: Key narrowing facts on stable access paths
 
-**Status:** Accepted
+**Status:** Accepted, superseded in part by [ADR-031](031-flow-narrowing.md)
 
 **Context:**
 Narrowing was a lexical stack of `Map<string, Type>` frames keyed by identifier name. A guard refined a name, and exactly one reader consulted the frames: the `identifier` case of `checkExpression`. `checkMember` never looked, and `discriminantTest` required the tested object to be an `identifier`.

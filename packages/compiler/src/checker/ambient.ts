@@ -1,5 +1,7 @@
 import type { ClassInfo, DeclarationRegistry, EnumInfo, EventInfo, GlobalInfo, InterfaceInfo } from './registry';
 
+export const EVENT_NAME_PREFIX = 'event:';
+
 export interface AmbientDeclarations {
     classes: readonly ClassInfo[];
     interfaces: readonly InterfaceInfo[];

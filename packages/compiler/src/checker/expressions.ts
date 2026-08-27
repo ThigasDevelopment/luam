@@ -8,9 +8,13 @@ import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
 import { specializeEventCall } from './event-calls';
+import { memberOf } from './generic-class';
+import { checkResourceCall } from './resource-exports';
 import {
     checkNewExpression,
     checkSuperCall,
+    isUserClassReference,
+    resolveStaticMember,
     NATIVE_CONSTRUCTOR,
     nativeConstructor,
     resolveLibraryMember,
@@ -83,6 +87,12 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
         return context.record(expression, narrowed);
     }
 
+    if (expression.object.kind === 'identifier' && isUserClassReference(context, expression.object.name)) {
+        context.references.add(expression.object.name);
+
+        return context.record(expression, resolveStaticMember(context, expression.object.name, expression));
+    }
+
     if (expression.object.kind === 'identifier' && isMtaClassReference(context, expression.object.name)) {
         context.references.add(expression.object.name);
 
@@ -122,7 +132,7 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
         return context.record(expression, objectType.value);
     }
 
-    const named = objectType.kind === 'named' ? resolveNamedMember(context, objectType.name, expression) : null;
+    const named = objectType.kind === 'named' ? resolveNamedMember(context, objectType, expression) : null;
 
     if (named !== null) {
         return context.record(expression, named);
@@ -210,7 +220,7 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
         return ANY_TYPE;
     }
 
-    const declared = context.declarations.lookupMember(receiver.name, method);
+    const declared = memberOf(context, receiver, method);
 
     if (declared?.type.kind === 'function') {
         if (declared.deprecated === true) {
@@ -238,6 +248,12 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
 }
 
 function checkCall(context: CheckContext, expression: CallExpression): Type {
+    const contracted = checkResourceCall(context, expression);
+
+    if (contracted !== null) {
+        return context.record(expression, contracted);
+    }
+
     if (isLegacySuperCall(expression)) {
         checkValueList(context, expression.args);
         context.report('check-invalid-super', 'Call "super(...)" directly instead of "self:super(...)".', expression.position);
@@ -261,6 +277,16 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
         }
 
         return context.record(expression, checkSignature(context, expression.args, constructor, expression.position));
+    }
+
+    if (expression.method !== null && expression.callee.kind === 'identifier' && isUserClassReference(context, expression.callee.name)) {
+        const name = expression.callee.name;
+        const message = `Call the static member "${expression.method}" as "${name}.${expression.method}(...)". A class value has no "self" to pass.`;
+
+        context.report('check-static-receiver', message, expression.position);
+        checkValueList(context, expression.args);
+
+        return context.record(expression, ANY_TYPE);
     }
 
     if (expression.method === null) {
@@ -365,6 +391,10 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
 
             if (symbol === null) {
                 checkGlobalReference(context, expression.name, expression.position);
+            }
+
+            if (symbol === null || symbol.isLocal !== true) {
+                context.noteGlobalReference(expression.name);
             }
 
             return context.record(expression, context.narrowedType(expression.name) ?? symbol?.type ?? ANY_TYPE);

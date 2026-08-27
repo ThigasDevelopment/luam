@@ -11,7 +11,9 @@ export function emitMethod(state: EmitState, className: string, member: ClassMet
         return emitGeneratedMethod(state, className, member);
     }
 
-    return withSymbol(state, `${className}:${member.name}`, () => emitFunctionBody(state, [self, ...member.parameters], member.body, `${member.name} = function`));
+    const parameters = member.isStatic ? member.parameters : [self, ...member.parameters];
+
+    return withSymbol(state, `${className}${member.isStatic ? '.' : ':'}${member.name}`, () => emitFunctionBody(state, parameters, member.body, `${member.name} = function`));
 }
 
 function emitGeneratedMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {
@@ -34,6 +36,14 @@ function emitGeneratedMethod(state: EmitState, className: string, member: ClassM
         return listener
             ? `${member.name} = function(self, listener)\n        self.${key} = self.${key} or {}\n        table.insert(self.${key}, listener)\n    end`
             : `${member.name} = function(self, value)\n        self.${field.name} = value\n        for _, listener in ipairs(self.${key} or {}) do\n            listener(value)\n        end\n    end`;
+    }
+
+    if (member.generated?.kind === 'validate' || member.generated?.kind === 'matches') {
+        const helper = member.generated.kind === 'validate' ? '__luam_validate' : '__luam_matches';
+
+        requireHelper(state, 'validate');
+
+        return `${member.name} = function(value)\n        return ${helper}(value, ${member.generated.descriptor ?? '{ kind = \'table\' }'})\n    end`;
     }
 
     if (member.generated?.kind === 'to-string') {
@@ -73,7 +83,7 @@ function emitMembers(state: EmitState, statement: ClassDeclaration): string[] {
 
     for (const member of statement.members) {
         if (member.kind === 'class-method') {
-            entries.push(indentLine(state, `${markSource(state, member.position.line, `${statement.name}:${member.name}`)}${emitMethod(state, statement.name, member)}`));
+            entries.push(indentLine(state, `${markSource(state, member.position.line, `${statement.name}${member.isStatic ? '.' : ':'}${member.name}`)}${emitMethod(state, statement.name, member)}`));
 
             continue;
         }

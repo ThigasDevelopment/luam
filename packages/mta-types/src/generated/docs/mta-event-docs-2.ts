@@ -55,7 +55,7 @@ export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementDestroy',
     },
     onClientElementDimensionChange: {
-        summary: '',
+        summary: 'This event is triggered when the dimension of an element is changed using setElementDimension.',
         parameters: [
             { name: 'oldDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element was in before.' },
             { name: 'newDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element is in now.' },
@@ -65,7 +65,7 @@ export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientElementDimensionChange',
     },
     onClientElementInteriorChange: {
-        summary: '',
+        summary: 'This event is triggered when the interior of an element is changed using setElementInterior.',
         parameters: [
             { name: 'oldInterior', isOptional: false, isVariadic: false, summary: 'An int representing the interior the element was in before.' },
             { name: 'newInterior', isOptional: false, isVariadic: false, summary: 'An int representing the interior the element is in now.' },

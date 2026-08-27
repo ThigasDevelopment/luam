@@ -438,15 +438,35 @@ end
   [discriminated unions](#discriminated-unions).
 - `and` chains apply every fact they carry.
 
-The narrowing ends with the block, and it is dropped as soon as the path, a
-prefix of it, or its root is assigned or shadowed — including a write inside a
-loop body or inside a function declared in the same block. A call or a dynamic
-index in the path produces no narrowing at all. An assignment is always checked
-against the declared type, so reassigning a narrowed path to its original type
-is accepted. What a guard cannot follow is a second reference to the same table;
-see [Limitations](/en/reference/limitations).
+A fact is dropped as soon as the path, a prefix of it, or its root is assigned
+or shadowed — including a write inside a loop body or inside a function declared
+in the same block. A call or a dynamic index in the path produces no narrowing
+at all. An assignment is always checked against the declared type, so
+reassigning a narrowed path to its original type is accepted. What a guard
+cannot follow is a second reference to the same table; see
+[Limitations](/en/reference/limitations).
 
-A guard clause narrows the rest of the block when it always exits:
+### What a fact survives
+
+A fact outlives the block that established it when every path into the code
+after it agrees. Where the branches disagree, the path goes back to its declared
+type.
+
+An assignment refines a union or an optional to the member it wrote, so a
+branch that fills a missing value counts as agreement:
+
+```luam
+function label(name?: string): string
+    if name == nil then
+        name = 'anonymous'
+    end
+
+    return name
+end
+```
+
+A branch that exits carries the other side to the rest of the block, whether it
+`return`s, `break`s, or `continue`s:
 
 ```luam
 function announce(name?: string): void
@@ -457,6 +477,23 @@ function announce(name?: string): void
     outputChatBox(name)
 end
 ```
+
+A loop is analyzed as if its body may run again, so every path the body writes
+loses its fact for the whole loop. What survives the loop is the negation of its
+condition:
+
+```luam
+function fill(name?: string): string
+    while name == nil do
+        name = 'anonymous'
+    end
+
+    return name
+end
+```
+
+What does not carry is a condition stored in a variable: the variable is not the
+test. Write the test where the value is used, or narrow into a local.
 
 An `or` keeps only what both sides agree on, and unions the two types:
 
@@ -477,9 +514,10 @@ one-liner:
 local label: string = ok and 'yes' or 'no'
 ```
 
-::: warning Names only
-A field like `self.connection` keeps its declared type. Copy it into a local
-first when you need the guard.
+::: warning One table, two names
+A guard follows the path it tested, not the table behind it. If a second name
+reaches the same table and clears the field, the fact stays and the program
+fails at runtime. See [Limitations](/en/reference/limitations).
 :::
 
 ## A complete example

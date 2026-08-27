@@ -447,15 +447,34 @@ end
   [uniões discriminadas](#unioes-discriminadas).
 - Cadeias com `and` aplicam todos os fatos que carregam.
 
-O estreitamento termina com o bloco e cai assim que o caminho, um prefixo dele
-ou a raiz dele é atribuído ou sombreado — incluindo uma escrita dentro do corpo
-de um laço ou dentro de uma função declarada no mesmo bloco. Uma chamada ou um
-índice dinâmico no caminho não produz estreitamento nenhum. Uma atribuição
-sempre é checada contra o tipo declarado, então reatribuir um caminho estreitado
-ao tipo original é aceito. O que uma guarda não consegue seguir é uma segunda
-referência à mesma tabela; veja [Limitações](/pt-br/reference/limitations).
+Um fato cai assim que o caminho, um prefixo dele ou a raiz dele é atribuído ou
+sombreado — incluindo uma escrita dentro do corpo de um laço ou dentro de uma
+função declarada no mesmo bloco. Uma chamada ou um índice dinâmico no caminho
+não produz estreitamento nenhum. Uma atribuição sempre é checada contra o tipo
+declarado, então reatribuir um caminho estreitado ao tipo original é aceito. O
+que uma guarda não consegue seguir é uma segunda referência à mesma tabela; veja
+[Limitações](/pt-br/reference/limitations).
 
-Uma guarda com saída antecipada estreita o resto do bloco:
+### O que um fato sobrevive
+
+Um fato passa do bloco que o estabeleceu quando todo caminho até o código
+seguinte concorda. Onde os ramos discordam, o caminho volta ao tipo declarado.
+
+Uma atribuição refina uma união ou um opcional para o membro que escreveu, então
+um ramo que preenche o valor ausente conta como concordância:
+
+```luam
+function label(name?: string): string
+    if name == nil then
+        name = 'anonymous'
+    end
+
+    return name
+end
+```
+
+Um ramo que sai leva o outro lado para o resto do bloco, seja com `return`,
+`break` ou `continue`:
 
 ```luam
 function announce(name?: string): void
@@ -466,6 +485,23 @@ function announce(name?: string): void
     outputChatBox(name)
 end
 ```
+
+Um laço é analisado como se o corpo pudesse rodar de novo, então todo caminho
+que o corpo escreve perde o fato dele no laço inteiro. O que sobrevive ao laço é
+a negação da condição:
+
+```luam
+function fill(name?: string): string
+    while name == nil do
+        name = 'anonymous'
+    end
+
+    return name
+end
+```
+
+O que não carrega é uma condição guardada em variável: a variável não é o teste.
+Escreva o teste onde o valor é usado, ou estreite para um local.
 
 Um `or` mantém só o que os dois lados concordam, e une os dois tipos:
 
@@ -486,9 +522,10 @@ sempre:
 local label: string = ok and 'yes' or 'no'
 ```
 
-::: warning Só nomes
-Um campo como `self.connection` mantém o tipo declarado. Copie para um local
-antes quando precisar da guarda.
+::: warning Uma tabela, dois nomes
+Uma guarda segue o caminho que testou, não a tabela por trás dele. Se um segundo
+nome alcança a mesma tabela e limpa o campo, o fato continua valendo e o
+programa falha em execução. Veja [Limitações](/pt-br/reference/limitations).
 :::
 
 ## Um exemplo completo

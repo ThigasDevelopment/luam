@@ -48,6 +48,11 @@ A herança funciona como o MTA define: um método de instância declarado em
 `Element` está disponível em um `Vehicle`, e a completação após `:` também lista os
 membros herdados.
 
+O hover sobre um nome de classe explica a classe em vez de listá-la: o que um
+`Player` ou um `Vehicle` é, a cadeia que ela herda, quantos membros e métodos
+estáticos alcança naquele ambiente e se é chamável como construtor. Ele funciona
+com `compiler.oop` desligado também, e aí diz que o nome é apenas um tipo.
+
 ## Métodos estáticos e construtores
 
 ```luam env=server oop

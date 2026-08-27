@@ -90,6 +90,13 @@ print(pool.new, pool.type, pool.class)
 constructor, so it has to be a method. Declaring it as a field is
 `check-invalid-constructor`.
 
+## `static` is contextual
+
+`static` is a modifier only inside a class body, and only when a member name
+follows it on the same line. Everywhere else it is an ordinary name, so a local
+named `static` and a class field named `static` both keep working. See
+[Static members](/en/language/classes#static-members).
+
 ## `self` and `super` are contextual
 
 Neither is reserved by the lexer, so both stay ordinary names outside a class.

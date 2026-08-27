@@ -258,3 +258,84 @@
         white-space: normal;
     }
 }
+
+.luam-feedback {
+    margin-top: 40px;
+    padding: 16px 18px;
+    border: 1px solid var(--luam-line);
+    border-radius: var(--luam-radius);
+    background-color: var(--luam-paper-2);
+}
+
+.luam-feedback p {
+    margin: 0;
+}
+
+.luam-feedback-question {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--luam-ink);
+}
+
+.luam-feedback-action {
+    margin-top: 6px !important;
+    font-size: 14px;
+}
+
+.luam-feedback-action a {
+    color: var(--luam-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.luam-feedback-note {
+    margin-top: 6px !important;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--luam-ink-3);
+}
+
+.vp-doc .luam-diagram {
+    margin: 26px 0;
+    padding: 18px;
+    border: 1px solid var(--luam-line);
+    border-radius: var(--luam-radius-lg);
+    background-color: var(--luam-paper-2);
+    overflow-x: auto;
+}
+
+.vp-doc .luam-diagram svg {
+    display: block;
+    width: 100%;
+    min-width: 560px;
+    height: auto;
+}
+
+.vp-doc .luam-diagram .luam-diagram-box {
+    fill: var(--luam-paper);
+    stroke: var(--luam-line-strong);
+    stroke-width: 1;
+}
+
+.vp-doc .luam-diagram .luam-diagram-stage {
+    fill: var(--luam-ink);
+    font-family: var(--luam-sans);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.vp-doc .luam-diagram .luam-diagram-detail {
+    fill: var(--luam-ink-3);
+    font-family: var(--luam-mono);
+    font-size: 10px;
+}
+
+.vp-doc .luam-diagram .luam-diagram-flow {
+    stroke: var(--luam-brand);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.vp-doc .luam-diagram .luam-diagram-head {
+    fill: var(--luam-brand);
+}

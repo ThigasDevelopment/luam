@@ -26,7 +26,7 @@ export const MTA_DOCS_15: ApiDocumentationCatalog = {
     getCameraViewMode: {
         summary: 'This function allows you to get the active camera view modes. This indicates at what distance the camera will follow the player or vehicle.',
         parameters: [],
-        returns: '',
+        returns: 'Returns two ints indicating the current vehicle and ped camera view mode respectively. Their meanings can be seen below.',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetCameraViewMode',
     },
     getCancelReason: {
@@ -36,7 +36,7 @@ export const MTA_DOCS_15: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetCancelReason',
     },
     getChatboxCharacterLimit: {
-        summary: '',
+        summary: 'Gets the current maximum amount of characters that can be input via chatbox',
         parameters: [],
         returns: 'Returns a number between 0-255, representing the chatbox input character limit',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetChatboxCharacterLimit',
@@ -73,7 +73,7 @@ export const MTA_DOCS_15: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetCloudsEnabled',
     },
     getColorFilter: {
-        summary: '',
+        summary: 'This function is used to get the values of color filtering.',
         parameters: [
             { name: 'isOriginal', isOptional: false, isVariadic: false, summary: 'A bool indicates if the return values of color filter are GTASA original or changed by setColorFilter. If this is set to *false*, the return values would be the color filter that is currently being used.' },
         ],
@@ -89,7 +89,7 @@ export const MTA_DOCS_15: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetColorFromString',
     },
     getColPolygonHeight: {
-        summary: '',
+        summary: 'This function is used to get the height of an existing colshape polygon.\nBy default, a colshape polygon is infinitely tall.',
         parameters: [
             { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon.' },
         ],
@@ -164,7 +164,7 @@ export const MTA_DOCS_15: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetControlState',
     },
     getCoronaReflectionsEnabled: {
-        summary: '',
+        summary: 'This function gets visibility of corona reflections.',
         parameters: [],
         returns: 'One of the following integers will be returned: * **0**: corona reflections are disabled * **1**: corona reflections are enabled (are visible during rain) * **2**: corona reflections are force enabled (are visible even if there is no rain)',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetCoronaReflectionsEnabled',

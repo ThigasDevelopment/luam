@@ -43,8 +43,8 @@ export const MTA_AUDIO_CLIENT: ApiCatalog = {
     isSoundPaused: fn([named('Element')], BOOLEAN, 1),
     playSFX: fn([STRING, NUMBER, NUMBER, BOOLEAN], named('Element'), 3),
     playSFX3D: fn([STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, BOOLEAN], named('Element'), 6),
-    playSound: fn([STRING, BOOLEAN, BOOLEAN], named('Element'), 1),
-    playSound3D: fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Element'), 4),
+    playSound: fn([STRING, BOOLEAN, BOOLEAN], named('Sound'), 1),
+    playSound3D: fn([STRING, NUMBER, NUMBER, NUMBER, BOOLEAN, BOOLEAN], named('Sound3D'), 4),
     playSoundFrontEnd: fn([NUMBER], BOOLEAN, 1),
     setRadioChannel: fn([NUMBER], BOOLEAN, 1),
     setSoundEffectEnabled: fn(

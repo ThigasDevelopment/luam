@@ -13,6 +13,8 @@ const BULLET = /^\*+\s*'''\s*([A-Za-z_][A-Za-z0-9_]*)\s*:?\s*'''\s*:?\s*(.*)$/gm
 const MEDIA_LINK = /\[\[(?:File|Image|Media):[^\]]*\]\]/gi;
 
 const DESCRIBING_TEMPLATE: Readonly<Record<string, number>> = {
+    'added feature': 3,
+    'added feature/item': 4,
     'new feature': 3,
     'new feature/item': 4,
     'new items': 3,

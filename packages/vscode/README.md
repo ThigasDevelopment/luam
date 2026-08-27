@@ -26,6 +26,7 @@ TextMate grammar that highlights Luam source.
 | ------- | ----------- | -------- |
 | `Luam: Ensure Resource` | `ctrl+alt+e` | Runs `luam ensure` in a dedicated terminal. |
 | `Luam: Restart Language Server` | — | Restarts the language server. |
+| `Luam: Rescan Workspace` | — | Rebuilds the language server index from disk. |
 
 ## Settings
 

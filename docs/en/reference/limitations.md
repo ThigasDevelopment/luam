@@ -50,12 +50,13 @@ function boundaries, and the alternative — dropping every field fact at every
 call — would erase the refinement whenever a single `outputDebugString` sits
 between the guard and the use. Neither is what Luam does.
 
-## Narrowing does not cross a branch or a loop
+## A condition stored in a variable is not a guard
 
-**Planned.** A control-flow graph is what lifts it.
+**Design boundary.** Recorded in
+[ADR-031](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/031-flow-narrowing.md).
 
-A fact lives inside the block the condition guards. Storing the condition in a
-variable does not carry it, because the variable is not the test:
+A fact is attached to the path a condition tested. Storing the condition in a
+variable attaches nothing, because the variable is not the test:
 
 <<< @/snippets/errors/flow-narrowing/src/server/adapter.luam{luam}
 
@@ -69,11 +70,16 @@ if self.connection ~= nil then
 end
 ```
 
-A guard clause does carry: when the block always exits with `return` or `break`,
-the negated condition refines the rest of the enclosing block. What does not
-carry is anything subtler — a field refined in both branches of an `if` and read
-after it, a `while` that only sometimes breaks, a flag set in one branch and read
-in another.
+Everything else about flow does carry. A branch that `return`s, `break`s, or
+`continue`s hands the other side to the rest of the block; a path refined the
+same way in every branch keeps that type after the join; an assignment refines a
+union or an optional to the member it wrote; and a `while` leaves the negation of
+its condition behind. See
+[what a fact survives](/en/language/types#what-a-fact-survives).
+
+A loop stays conservative on purpose: every path its body assigns loses its fact
+for the whole loop, even where the write cannot run. The body is analyzed once,
+against the state it would see on any iteration.
 
 An operation must still be valid for the whole union: `key + 1` on
 `string | number` is `check-invalid-operand`, because one of the members cannot
@@ -106,25 +112,28 @@ A reference that appears before the declaration sees the class but not yet its
 members: reading one gives `any`, and the constructor arity is not checked.
 Move the reference below the declaration to have both checked.
 
-## No static members, metamethods or generic classes
+## Three metamethods stay blocked
 
-**Planned.** Static members and generic classes are gaps, and a reviewed subset
-of metamethods follows them.
+**Design boundary.** Recorded in
+[ADR-035](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/035-safe-class-metamethods.md).
 
-- A class has no static fields or static methods.
-- Metamethods cannot be declared on a class.
-- Classes take no type parameters.
+A class declares a metamethod by its Lua name — `__tostring`, `__eq`, `__lt`,
+`__le`, `__len`, `__concat`, `__unm` and the arithmetic operators. See
+[classes](/en/language/classes#metamethods).
 
-Generic **type aliases** do work:
+What stays blocked, whatever else is exposed:
 
-```luam
-type Nullable<T> = T | nil
-```
+- `__index` replaces member lookup, which the class helper owns.
+- `__newindex` swallows a field write, which the class helper owns.
+- `__call` makes an instance callable, which hides construction.
+- `__gc` does not run for a table in Lua 5.1.
+- `__metatable` and `__mode` hide or weaken the metatable the helper needs.
 
-Not all of it is coming back. `__index`, `__newindex` and `__call` stay blocked
-whatever else is exposed, because each of them can replace member lookup,
-swallow a write, or make an instance callable — and the class helper builds
-identity, inheritance and construction on all three.
+`__eq` follows Lua 5.1: it is called only when both operands are tables sharing
+the same metamethod, so comparing instances of two different classes falls back
+to identity whatever either class declares. And the checker does not verify that
+an operator's operands declare the matching metamethod — a missing `__add`
+surfaces when the code runs, not when it compiles.
 
 ## The MTA catalog can lag a release
 
@@ -140,49 +149,42 @@ A scheduled job re-reads the wiki and proposes the refresh as a pull request. It
 never merges one, so the MTA release a Luam release describes is always a
 reviewed decision.
 
-## Exports are named, never verified
+## A call only the build can name is verified
 
-**Planned.** A versioned export contract will check the calls a build can
-identify.
+**Design boundary.** Recorded in
+[ADR-033](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/033-resource-export-abi.md).
 
-`export` writes an `<export>` entry into `meta.xml`, and `export http` sets
-`http="true"` on it. What it does not do is verify the calling side: a
-`call(resource, 'name', ...)` from another resource is never checked against the
-signature you exported.
+A build writes an [export contract](/en/language/exports#the-export-contract),
+and a call into a declared dependency is checked against it when the resource
+name and the export name are both literal. Everything else is compiled and left
+alone:
 
-A call whose resource or function name is computed at runtime stays unverified
-even then. There is nothing for a compiler to resolve.
+- A call whose resource or export name is computed at runtime. There is nothing
+  for a compiler to resolve, and rejecting it would break code that works.
+- A call into a resource with no contract on disk — one written in plain Lua,
+  one not built yet, or one whose contract was never shared.
+- The runtime itself. The contract is a compile-time artifact; MTA does not read
+  it, and nothing checks at run time that the resource you call is the one the
+  contract described.
 
-## The editor re-checks by declaration, not by edit
-
-**Planned.** A dependency graph will narrow what a declaration change re-checks.
-
-Editing a file re-analyzes the other files only when what that file **declares**
-changes — a class, an interface, an enum, or a global, including the type of any
-member. Editing a function body republishes diagnostics for that file alone,
-which is what keeps typing cheap in a large project.
-
-When a declaration does change, every file that can see it is re-analyzed, not
-only the files that use it. In a large project that is more work than the change
-requires.
-
-Files do not have to be open for any of it. The server scans the workspace when
-it starts, and the extension watches `**/*.luam`, `.luam.manifest` and `.env*`,
-so a file created, moved or deleted outside the editor reaches it without a
-restart. An LSP client that registers no file watchers sees only what you open —
-that is the client's half of the protocol, not a Luam setting.
+A stale contract is checked as written. The build reads the file it finds; it
+does not compile the provider to confirm the file still matches it.
 
 ## `config.lua` is never parsed
 
 **Design boundary.** A build never reads project Lua for meaning.
 
 It is copied verbatim, so the compiler knows nothing about its contents. Describe
-it with a [declaration file](/en/language/declaration-files) to get types.
+it with a [declaration file](/en/language/declaration-files) to get types, or
+generate one with [`luam config`](/en/tooling/cli#luam-config) — a command you
+run and a file you commit, never a step inside the build. That command reads the
+literal data and nothing else: a call, a concatenation, or a function in
+`config.lua` is reported and skipped, and you declare it by hand.
 
 Executing it to read its values would make a build run project code, which is
-what the compiler refuses to do. A future extractor may write the declaration
-file for you from literal data — as a command you run and a file you commit,
-never as a step inside a build.
+what the compiler refuses to do, so the extractor reads the file rather than
+loading it. A value it produces is only as true as the file it read: change
+`config.lua` and the declaration is stale until you run the command again.
 
 ## Generated Lua is the source, not a rewrite
 
@@ -224,14 +226,25 @@ would load as separate chunks in separate processes, so a `local` they share
 would have to become a global, a closure over a surrounding local could not be
 lifted at all, and the order of their top-level effects would stop existing.
 
-## Scope of the development logs
+## Development logs are read from disk, never from a server
 
-**Planned.** An authenticated bridge will cover a remote development server.
+**Design boundary.** The CLI opens no connection to an MTA server.
 
-`luam dev` reads the **local** MTA server log only. It does not collect remote
-logs, evaluate expressions, or observe runtime values. Native lines for other
-named resources are ignored, and unattributed engine lines can appear as plain
-server output because their origin cannot be classified reliably.
+`luam dev` reads the **local** MTA server log. `luam dev --start-server` starts
+the server in your terminal and follows
+`<serverPath>/mods/deathmatch/logs/server.log` from there, which is what makes
+the structured records and their source positions work.
 
-Evaluating an expression on a running server stays outside that bridge. That is a
-debugger, and it needs its own protocol and its own security decision.
+There is no remote mode. Collecting logs from a server you cannot read from disk
+would mean the CLI connecting to it, and the product went the other way: the
+`transport` manifest field that used to configure a server connection was
+removed, and `ensure` syncing files with `dev --start-server` restarting the
+server it owns is what replaced it. Mount the remote log directory, or read it
+where it is.
+
+Two smaller edges: native lines for other named resources are ignored, and
+unattributed engine lines can appear as plain server output because their origin
+cannot be classified reliably.
+
+Evaluating an expression on a running server is not part of any of this. That is
+a debugger, and it needs its own protocol and its own security decision.

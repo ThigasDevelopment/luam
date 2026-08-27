@@ -110,7 +110,7 @@ export const MTA_DOCS_47: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundEffectEnabled',
     },
     setSoundEffectParameter: {
-        summary: '',
+        summary: 'This function sets the parameter of a sound effect.',
         parameters: [
             { name: 'sound', isOptional: false, isVariadic: false, summary: 'The sound element.' },
             { name: 'effectName', isOptional: false, isVariadic: false, summary: 'The name of the effect whose parameter you want to change:' },
@@ -121,7 +121,7 @@ export const MTA_DOCS_47: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetSoundEffectParameter',
     },
     setSoundLooped: {
-        summary: '',
+        summary: 'This function is used to change the loop state of the sound element.',
         parameters: [
             { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element to set the loop.' },
             { name: 'loop', isOptional: false, isVariadic: false, summary: '' },

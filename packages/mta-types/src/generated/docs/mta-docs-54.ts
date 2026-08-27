@@ -79,7 +79,7 @@ export const MTA_DOCS_54: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/UnbindKey',
     },
     updateElementRpHAnim: {
-        summary: '',
+        summary: 'This function updates GTA bone animation for a given element. Currently the Player and Ped element types are accepted. It must be called after setElementBoneRotation for changes to take effect. It should only be called once per frame, after you are done rotating bones on that element, as it is quite heavy.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to update the bone animations.' },
         ],

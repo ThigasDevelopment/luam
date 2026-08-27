@@ -115,14 +115,14 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientObjectDamage',
     },
     onClientObjectMoveStart: {
-        summary: '',
+        summary: 'This event is triggered when an object starts moving.',
         parameters: [],
         source: 'The source of this event is the object which was moved.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientObjectMoveStart',
     },
     onClientObjectMoveStop: {
-        summary: '',
+        summary: 'This event is triggered when an object\'s movements stop.',
         parameters: [],
         source: 'The source of this event is the object which was moved.',
         cancel: '',
@@ -168,7 +168,7 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedHitByWaterCannon',
     },
     onClientPedsProcessed: {
-        summary: '',
+        summary: 'This event is triggered after GTA updates bone transformations for all peds. This event can be used for updating bones.',
         parameters: [],
         source: 'The source of this event is the client\'s root element.',
         cancel: '',
@@ -184,7 +184,7 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedStep',
     },
     onClientPedVehicleEnter: {
-        summary: '',
+        summary: 'This event is fired when a ped has entered a vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that the ped entered.' },
             { name: 'seat', isOptional: false, isVariadic: false, summary: 'The seat that the ped now is on. Driver\'s seat = 0, higher numbers are passenger seats.' },
@@ -194,7 +194,7 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedVehicleEnter',
     },
     onClientPedVehicleExit: {
-        summary: '',
+        summary: 'This event is fired when a ped has exited a vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that the ped exited.' },
             { name: 'seat', isOptional: false, isVariadic: false, summary: 'The number of the seat that the ped was sitting on.' },
@@ -209,7 +209,7 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
             { name: 'killer', isOptional: false, isVariadic: false, summary: 'A player, ped or vehicle element representing the killer.' },
             { name: 'weapon', isOptional: false, isVariadic: false, summary: 'An integer representing the killer weapon or the damage types.' },
             { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'An integer representing the bodypart the player was damaged.' },
-            { name: 'lossOrStealth', isOptional: false, isVariadic: false, summary: 'A float representing the percentage of health the ped lost in the final "hit" (*only for client-side created peds.*) or a boolean representing whether or not this was a stealth kill' },
+            { name: 'loss', isOptional: false, isVariadic: false, summary: 'A float representing the percentage of health the ped lost in the final "hit" (*only for client-side created peds.*) or a boolean representing whether or not this was a stealth kill' },
         ],
         source: 'The source of this event is the ped that died.',
         cancel: '',

@@ -41,6 +41,7 @@ export interface FunctionScopeInput {
     body: readonly Statement[];
     selfType: string | null;
     container: string | null;
+    owner?: string | null;
 }
 
 export function collectBlock(state: CollectorState, block: BlockContext, start: number, body: readonly Statement[]): void {
@@ -51,7 +52,7 @@ export function collectBlock(state: CollectorState, block: BlockContext, start: 
 }
 
 export function collectFunctionScope(state: CollectorState, block: BlockContext, input: FunctionScopeInput): void {
-    const scopeId = state.scopes.open(block.scopeId, input.start);
+    const scopeId = state.scopes.open(block.scopeId, input.start, { name: input.owner ?? null });
     const inner: BlockContext = { scopeId, end: input.end, container: input.container };
 
     if (input.selfType !== null) {
@@ -159,6 +160,7 @@ function collectFunctionDeclaration(state: CollectorState, block: BlockContext, 
         body: statement.body,
         selfType: statement.isMethod ? owner : null,
         container: block.container,
+        owner: statement.name.kind === 'identifier' ? statement.name.name : statement.name.property,
     });
 }
 

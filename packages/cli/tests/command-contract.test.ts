@@ -9,12 +9,13 @@ import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from '
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
-const COMMANDS: readonly string[] = ['build', 'check', 'dev', 'doctor', 'ensure', 'init', 'server', 'setup', 'trace'];
+const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'init', 'server', 'setup', 'trace'];
 
 const ACCEPTED: readonly [string, readonly string[]][] = [
     ['build', ['--manifest', '.luam.manifest', '--bundle', '--no-map', '--offline', '--no-color']],
     ['build', ['--no-bundle']],
     ['check', ['--manifest', '.luam.manifest', '--no-color']],
+    ['config', ['--source', 'config.lua', '--out', 'config.d.luam', '--no-color']],
     ['dev', ['--no-watch', '--manifest', '.luam.manifest', '--no-map', '--offline']],
     ['ensure', ['--no-watch', '--bundle', '--no-map', '--offline']],
     ['ensure', ['--watch']],
@@ -41,6 +42,8 @@ const REJECTED: readonly [string, readonly string[]][] = [
     ['setup', ['--force']],
     ['init', ['--manifest', '.luam.manifest']],
     ['trace', ['--bundle']],
+    ['config', ['--bundle']],
+    ['config', ['--source']],
     ['ensure', ['--fast']],
     ['ensure', ['--start-server']],
     ['build', ['--cwd']],

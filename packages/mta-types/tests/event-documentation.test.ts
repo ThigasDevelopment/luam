@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { eventDocumentation, findEventDocumentation } from '#mta-types/event-documentation-lookup';
+import { eventHandler } from '#mta-types/event-lookup';
+import { MTA_EVENTS } from '#mta-types/generated/mta-events';
 import { wikiEventDocumentation } from '@generator/event-documentation-parser';
+
+const EVENT_NAMES = [...MTA_EVENTS.shared, ...MTA_EVENTS.server, ...MTA_EVENTS.client];
 
 const PAGE = [
     '__NOTOC__',
@@ -26,7 +30,7 @@ const PAGE = [
 
 describe('wiki event documentation', () => {
     it('reads the summary, parameters, source, and cancel effect of an event page', () => {
-        const documentation = wikiEventDocumentation('OnVehicleEnter', PAGE);
+        const documentation = wikiEventDocumentation('OnVehicleEnter', PAGE, ['thePed', 'seat']);
 
         expect(documentation.summary).toBe('This event is triggered when a player or ped enters a vehicle.');
         expect(documentation.parameters).toEqual([
@@ -36,6 +40,41 @@ describe('wiki event documentation', () => {
         expect(documentation.source).toBe('The source of this event is the vehicle that was entered.');
         expect(documentation.cancel).toBe('If this event is canceled, the ped will not enter.');
         expect(documentation.wiki).toBe('https://wiki.multitheftauto.com/wiki/OnVehicleEnter');
+    });
+
+    it('summarizes every built-in event, including the ones the wiki wraps in a version template', () => {
+        const unexplained = EVENT_NAMES.filter((name) => eventDocumentation(name).summary.length === 0);
+
+        expect(unexplained).toEqual([]);
+        expect(eventDocumentation('onPedVehicleEnter').summary).toBe('This event is triggered when a ped enters a vehicle.');
+    });
+
+    it('documents the parameters the handler signature declares, in order', () => {
+        const drifted: string[] = [];
+
+        for (const environment of ['server', 'client'] as const) {
+            for (const name of MTA_EVENTS[environment]) {
+                const signature = eventHandler(name, environment)?.parameterNames ?? [];
+                const documented = eventDocumentation(name).parameters.map((parameter) => parameter.name);
+
+                if (signature.join() !== documented.join()) {
+                    drifted.push(`${name}: ${signature.join()} vs ${documented.join()}`);
+                }
+            }
+        }
+
+        expect(drifted).toEqual([]);
+    });
+
+    it('keeps the wiki text off the parameters the signature does not carry', () => {
+        expect(eventDocumentation('onPlayerWasted').parameters.map((parameter) => parameter.name)).toEqual(['totalAmmo', 'killer', 'killerWeapon', 'bodypart', 'stealth']);
+        expect(eventDocumentation('onDebugMessage').parameters.map((parameter) => parameter.name)).toEqual(['message', 'level', 'file', 'line']);
+    });
+
+    it('links every built-in event to its wiki page', () => {
+        const unlinked = EVENT_NAMES.filter((name) => !eventDocumentation(name).wiki.startsWith('https://wiki.multitheftauto.com/wiki/'));
+
+        expect(unlinked).toEqual([]);
     });
 
     it('serves the generated catalog for every built-in event side', () => {

@@ -5,10 +5,13 @@ em um servidor, e depois até o laço que você deixa rodando enquanto trabalha.
 
 | Página | O que cobre |
 | --- | --- |
+| [Luam em comparação](/pt-br/guide/comparison) | O que muda em relação a Lua 5.1, Luau e TypeScript. |
 | [Instalação](/pt-br/guide/installation) | Node.js, a CLI `luam` e a extensão do editor. |
 | [Início rápido](/pt-br/guide/quick-start) | Criar, escrever, verificar, construir e iniciar um resource. |
 | [Estrutura do projeto](/pt-br/guide/project-layout) | A árvore de código, o que os nomes de pasta significam e o que um build escreve. |
 | [Desenvolvimento diário](/pt-br/guide/daily-development) | `luam ensure`, `luam dev`, rebuilds incrementais e logs. |
+| [Como o Luam funciona](/pt-br/guide/how-luam-works) | Os cinco estágios entre um arquivo `.luam` e um resource rodando. |
+| [Migração](/pt-br/guide/migration) | O que cada release pede que você mude, do mais antigo ao mais novo. |
 | [Solução de problemas](/pt-br/guide/troubleshooting) | As falhas que um projeto novo encontra, e como ler um diagnóstico. |
 
 ## Antes de começar

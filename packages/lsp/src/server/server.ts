@@ -3,8 +3,9 @@ import { readFileSync } from 'node:fs';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { FileChangeType, TextDocuments, type Connection, type FileEvent, type InitializeParams, type InitializeResult } from 'vscode-languageserver';
 
+import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { LanguageService } from '@lsp/server/language-service';
-import { capabilitiesFor } from '@lsp/server/capabilities';
+import { capabilitiesFor, RESCAN_COMMAND } from '@lsp/server/capabilities';
 import { uriToPath } from '@lsp/workspace/document-uri';
 
 function workspaceRoots(params: InitializeParams): string[] {
@@ -19,11 +20,7 @@ function workspaceRoots(params: InitializeParams): string[] {
 
 function registerDocuments(connection: Connection, documents: TextDocuments<TextDocument>, service: LanguageService): void {
     documents.onDidChangeContent((event) => {
-        const affected = service.update(event.document.uri, event.document.version, event.document.getText());
-
-        for (const analysis of affected) {
-            void connection.sendDiagnostics({ uri: analysis.uri, diagnostics: service.diagnostics(analysis.uri) });
-        }
+        publish(connection, service, service.update(event.document.uri, event.document.version, event.document.getText()));
     });
 
     documents.onDidClose((event) => {
@@ -31,23 +28,31 @@ function registerDocuments(connection: Connection, documents: TextDocuments<Text
     });
 }
 
-function updateWatchedDocument(documents: TextDocuments<TextDocument>, service: LanguageService, change: FileEvent): void {
+function updateWatchedDocument(documents: TextDocuments<TextDocument>, service: LanguageService, change: FileEvent): DocumentAnalysis[] {
     const document = documents.get(change.uri);
 
     if (document !== undefined) {
-        service.update(change.uri, document.version, document.getText());
-        return;
+        return service.update(change.uri, document.version, document.getText());
     }
 
     try {
-        service.update(change.uri, 0, readFileSync(uriToPath(change.uri), 'utf8'));
+        return service.update(change.uri, 0, readFileSync(uriToPath(change.uri), 'utf8'));
     } catch {
         service.close(change.uri);
+
+        return [];
+    }
+}
+
+function publish(connection: Connection, service: LanguageService, analyses: readonly DocumentAnalysis[]): void {
+    for (const analysis of analyses) {
+        void connection.sendDiagnostics({ uri: analysis.uri, diagnostics: service.diagnostics(analysis.uri) });
     }
 }
 
 function registerWorkspace(connection: Connection, documents: TextDocuments<TextDocument>, service: LanguageService): void {
     connection.onDidChangeWatchedFiles((params) => {
+        const affected = new Map<string, DocumentAnalysis>();
         let environmentChanged = false;
 
         for (const change of params.changes) {
@@ -58,22 +63,50 @@ function registerWorkspace(connection: Connection, documents: TextDocuments<Text
             }
 
             if (change.type === FileChangeType.Deleted) {
-                service.close(change.uri);
-                void connection.sendDiagnostics({ uri: change.uri, diagnostics: [] });
+                continue;
+            }
+
+            for (const analysis of updateWatchedDocument(documents, service, change)) {
+                affected.set(analysis.uri, analysis);
             }
         }
 
-        for (const change of params.changes) {
-            if (!service.isEnvironmentFile(uriToPath(change.uri)) && change.type !== FileChangeType.Deleted) {
-                updateWatchedDocument(documents, service, change);
-            }
+        if (environmentChanged) {
+            publish(connection, service, service.reloadSettings());
+
+            return;
         }
 
-        const analyses = environmentChanged ? service.reloadSettings() : service.refresh();
+        const rescan = service.rescan();
 
-        for (const analysis of analyses) {
-            void connection.sendDiagnostics({ uri: analysis.uri, diagnostics: service.diagnostics(analysis.uri) });
+        for (const uri of rescan.removed) {
+            affected.delete(uri);
+            void connection.sendDiagnostics({ uri, diagnostics: [] });
         }
+
+        for (const analysis of rescan.updated) {
+            affected.set(analysis.uri, analysis);
+        }
+
+        publish(connection, service, [...affected.values()]);
+    });
+}
+
+function registerCommands(connection: Connection, service: LanguageService): void {
+    connection.onExecuteCommand((params) => {
+        if (params.command !== RESCAN_COMMAND) {
+            return null;
+        }
+
+        const reloaded = service.reload();
+
+        for (const uri of reloaded.removed) {
+            void connection.sendDiagnostics({ uri, diagnostics: [] });
+        }
+
+        publish(connection, service, reloaded.updated);
+
+        return null;
     });
 }
 
@@ -106,6 +139,7 @@ export function startServer(connection: Connection): LanguageService {
     registerDocuments(connection, documents, service);
     registerWorkspace(connection, documents, service);
     registerFeatures(connection, service);
+    registerCommands(connection, service);
     registerSemanticTokens(connection, service);
 
     documents.listen(connection);

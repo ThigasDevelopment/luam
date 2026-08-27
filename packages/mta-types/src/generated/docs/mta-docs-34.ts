@@ -63,7 +63,7 @@ export const MTA_DOCS_34: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsObjectInACLGroup',
     },
     isObjectMoving: {
-        summary: 'This function is now also available on the server side.',
+        summary: 'This function checks if an object is moving. This function is now also available on the server side.',
         parameters: [
             { name: 'theObject', isOptional: false, isVariadic: false, summary: 'The object element.' },
         ],
@@ -85,7 +85,7 @@ export const MTA_DOCS_34: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsOOPEnabled',
     },
     isPedBleeding: {
-        summary: '',
+        summary: 'This function gets the state of a player\'s or ped\'s bleeding effect.',
         parameters: [
             { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped whose bleeding effect state you want to get.' },
         ],

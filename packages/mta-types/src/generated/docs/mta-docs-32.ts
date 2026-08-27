@@ -203,7 +203,7 @@ export const MTA_DOCS_32: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsBrowserLoading',
     },
     isBrowserRenderingPaused: {
-        summary: '',
+        summary: 'This function gets the rendering state of a browser element.',
         parameters: [
             { name: 'webBrowser', isOptional: false, isVariadic: false, summary: 'The browser element to get the rendering state of.' },
         ],
@@ -223,7 +223,7 @@ export const MTA_DOCS_32: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsChatBoxInputActive',
     },
     isChatInputBlocked: {
-        summary: '',
+        summary: 'This function checks if the player\'s chat input is blocked.',
         parameters: [],
         returns: 'Returns *true* if the chat input is blocked, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsChatInputBlocked',

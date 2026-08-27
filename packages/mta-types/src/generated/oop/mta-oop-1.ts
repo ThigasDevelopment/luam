@@ -222,7 +222,7 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ],
     oopConstructor('server', fn([STRING, STRING, STRING, STRING, STRING], named('Connection'), 2), 'dbConnect'),
     ),
-    oopClass('DxFont', null, [
+    oopClass('DxFont', 'Element', [
         oopMethod('getHeight', 'client', 'dxGetFontHeight', fn([NUMBER, ANY], NUMBER, 0)),
         oopMethod('getSize', 'client', 'dxGetTextSize', fn([STRING, NUMBER, NUMBER, NUMBER, ANY, BOOLEAN, BOOLEAN], tupleOf([NUMBER, NUMBER]), 1)),
         oopMethod('getTextWidth', 'client', 'dxGetTextWidth', fn([STRING, NUMBER, ANY, BOOLEAN], NUMBER, 1)),
@@ -230,12 +230,12 @@ export const MTA_OOP_1: readonly OopClass[] = [
     ],
     oopConstructor('client', fn([STRING, NUMBER, BOOLEAN, STRING], named('DxFont'), 1), 'dxCreateFont'),
     ),
-    oopClass('DxRenderTarget', null, [
+    oopClass('DxRenderTarget', 'Element', [
     ], [
     ],
     oopConstructor('client', fn([NUMBER, NUMBER, BOOLEAN], named('DxRenderTarget'), 2), 'dxCreateRenderTarget'),
     ),
-    oopClass('DxScreenSource', null, [
+    oopClass('DxScreenSource', 'Element', [
         oopMethod('update', 'client', 'dxUpdateScreenSource', fn([BOOLEAN], BOOLEAN, 0)),
     ], [
     ],

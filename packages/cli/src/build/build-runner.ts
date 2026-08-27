@@ -1,4 +1,5 @@
 import type { PhaseDuration } from '@cli/build/build-phase';
+import { readDependencyContracts } from '@cli/build/contract-files';
 import { readHelperSource } from '@cli/build/helper-files';
 import { createPhaseTracker, type PhaseTracker } from '@cli/build/phase-tracker';
 import { readProjectInputs, type ProjectInputs } from '@cli/build/project-inputs';
@@ -8,6 +9,7 @@ import { hasCliErrors, type CliDiagnostic } from '@cli/reporting/cli-diagnostic'
 import { projectDeclarations } from '@compiler/checker/project-declarations';
 import type { FileDiagnostic, ProjectFile, ProjectStats } from '@compiler/project/module';
 import { createProjectCache, type ProjectCache } from '@compiler/project/project-cache';
+import { buildResourceAbi, type ResourceAbi } from '@compiler/project/export-abi';
 import type { AssemblyStep } from '@compiler/project/progress';
 import {
     assembleResource,
@@ -31,6 +33,7 @@ export interface BuildOutcome {
     phases: PhaseDuration[];
     sources: ReadonlyMap<string, string>;
     map: ResourceMap | null;
+    contract: ResourceAbi | null;
 }
 
 export interface CompileOptions {
@@ -122,10 +125,11 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('discovery');
 
-    const excluded = [config.outDir];
+    const excluded = [config.outDir, config.contracts];
     const sources = discoverSources(root, config.sources, excluded);
     const inputs = readProjectInputs(root, { assets: config.assets, environment: config.environment, excluded });
-    const diagnostics = [...sources.diagnostics, ...inputs.diagnostics];
+    const contracts = readDependencyContracts(root, config);
+    const diagnostics = [...sources.diagnostics, ...inputs.diagnostics, ...contracts.diagnostics];
 
     if (hasCliErrors(diagnostics)) {
         tracker.end('failed');
@@ -141,6 +145,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
             phases: tracker.durations(),
             sources: new Map(),
             map: null,
+            contract: null,
         };
     }
 
@@ -149,6 +154,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
     const declarations = projectDeclarations(inputs.declared?.entries ?? null, config.environment.file);
     const project = cache.compile(sources.files, {
         project: declarations,
+        contracts: contracts.contracts,
         compilerOptions: config.compilerOptions,
         development: options.development === true,
         onProgress: (event) => tracker.advance(event.item, event.index, event.total),
@@ -181,5 +187,6 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
         phases: tracker.durations(),
         sources: diagnosticSources(sources.files, assembly.diagnostics),
         map: build?.map ?? null,
+        contract: build === null ? null : buildResourceAbi(config.name, project.modules.flatMap((module) => module.contributions)),
     };
 }

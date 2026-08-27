@@ -9,6 +9,49 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Added
+
+- [How Luam works](/en/guide/how-luam-works) follows a build through its five
+  stages, with a diagram and the same stages in words, and explains why the CLI,
+  the editor and the playground agree: there is one parser, one checker and one
+  emitter behind all three.
+- [Luam compared](/en/guide/comparison) puts Luam beside Lua 5.1, Luau and
+  TypeScript — target, erasure, comments, optionals, classes, reuse across files
+  and platform knowledge — with a shorter version on the landing page.
+- [Migration](/en/guide/migration) records what every release since `0.2.0` asks
+  an author to change, oldest first, with the removed form beside the one to
+  write and a link to the reference page for each.
+- Every documentation page ends with a report link that opens a GitHub issue
+  prefilled with the page, its language and the documented version. Nothing is
+  sent until the reader submits it, and no page sends anything in the
+  background.
+
+### Fixed
+
+- The playground names what to do when JavaScript is unavailable, in both
+  locales, instead of leaving that line blank.
+
+## 0.19.1 - 2026-08-27
+
+### Added
+
+- [OOP API](/en/mta/oop) and [Editors](/en/tooling/editors) record the MTA class
+  hover: a class name explains the class, the chain it inherits, the surface it
+  reaches in that environment and whether it is callable, instead of listing its
+  members.
+- [Classes](/en/language/classes#static-members) documents `static`: what
+  belongs to the class value rather than an instance, how the two spaces stay
+  apart, and the diagnostics that report a read across them.
+  [Keywords](/en/reference/keywords) records `static` as contextual, and
+  [Diagnostics](/en/reference/diagnostics) lists
+  `check-duplicate-class-member` and `check-static-receiver`.
+
+### Changed
+
+- [Limitations](/en/reference/limitations) no longer claims a class has no
+  static fields or methods. The entry is now "No metamethods or generic
+  classes", and it points at [Classes](/en/language/classes) for `static`.
+
 ## 0.19.0 - 2026-08-27
 
 ### Changed

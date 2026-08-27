@@ -45,6 +45,7 @@ a getter for every field and a setter for `nickname` and `banned`.
 | `@Serializable` | class | `toTable()` containing shallow field values |
 | `@Deserialize` | class | `fromTable(values)` assigning shallow field values |
 | `@Builder` | class | `ClassNameBuilder`, `withField(value)`, and `build()` |
+| `@Validated` | class | Static `validate(value)` and `matches(value)` checking the declared field types at run time |
 
 A decorator on anything else — a method, a statement, a function — is
 `check-decorator-target`. An unknown name is `check-unknown-decorator`, the same
@@ -186,6 +187,46 @@ Using `player:oldName()` produces the `check-deprecated-use` warning. Assigning
 `player.id = 2` outside a `Player` method is `check-readonly-assignment`. An
 `@Override` method missing from the superclass or using a different signature is
 `check-invalid-override`.
+
+## Runtime validation at a boundary
+
+Type annotations are erased, so a payload that crossed a network boundary is
+whatever the sender put there. `@Validated` is the one decorator that asks the
+compiler to check a shape at run time, and it does so only where you write it:
+
+```luam env=server
+@Validated
+class JoinPayload {
+    id: string
+    score: number
+    tag?: string
+}
+
+function handleJoin(payload: table): void
+    local checked: JoinPayload = JoinPayload.validate(payload)
+
+    outputChatBox(checked.id, root)
+end
+```
+
+Both generated members are **static**, so they are called on the class:
+
+- `ClassName.validate(value)` returns the value, or raises a Lua error naming
+  the path and the expected type — `luam-validate: "score" expected "number"`.
+  The value itself is never in the message, so a rejected payload cannot leak a
+  token into a log.
+- `ClassName.matches(value)` runs the same check and answers `true` or `false`.
+
+The check walks the declared field types: primitives, literals, optionals,
+unions, arrays, maps, object types, interfaces expanded into their members, and
+a class field as an instance check. It stops at fixed limits — 16 levels of
+nesting, 4096 entries in one table, 65536 characters in one string — so a
+payload built to exhaust the server is rejected rather than walked.
+
+A field whose type has no runtime shape, such as `any` or `unknown`, is
+`check-unreifiable-type`, reported before anything is emitted. Nothing is
+generated for a class without the decorator, and a project that never writes
+`@Validated` ships no validation code at all.
 
 ## A complete example
 

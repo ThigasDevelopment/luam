@@ -74,7 +74,7 @@ describe('runtime helpers', () => {
     });
 
     it('injects a helper from a language feature, a referenced global, or an opt-in', () => {
-        expect(automaticHelpers()).toEqual(['class', 'math', 'string', 'table']);
+        expect(automaticHelpers()).toEqual(['class', 'math', 'string', 'table', 'validate']);
         expect(manualHelpers()).toEqual(['env']);
         expect(referenceHelpers()).toEqual(['async', 'threads']);
     });

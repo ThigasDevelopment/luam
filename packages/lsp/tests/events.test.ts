@@ -97,6 +97,15 @@ describe('event callback typing', () => {
         expect(hover).toContain('mta event (server) · [wiki](https://wiki.multitheftauto.com/wiki/OnPlayerQuit)');
     });
 
+    it('documents an event the wiki wraps in a version template', () => {
+        const text = "addEventHandler('onPedVehicleEnter', root, function ()\nend)\n";
+        const hover = hoverAt(text, 'addEventHandler(', 'onPedVehicleEnter');
+
+        expect(hover).toContain('This event is triggered when a ped enters a vehicle.');
+        expect(hover).toContain('- `theVehicle` — A vehicle element representing the vehicle that was entered.');
+        expect(hover).toContain('mta event (server) · [wiki](https://wiki.multitheftauto.com/wiki/OnPedVehicleEnter)');
+    });
+
     it('keeps unknown event names permissive', () => {
         const text = "addEventHandler('onWhateverHappens', root, function ()\nend)\n";
 

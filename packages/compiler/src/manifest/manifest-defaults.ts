@@ -40,6 +40,8 @@ export const DEFAULT_ASSET_DESTINATION = '.';
 
 export const DEFAULT_OUT_DIR = 'build';
 
+export const DEFAULT_CONTRACTS_DIR = '.luam/contracts';
+
 export const DEFAULT_RESOURCES_DIR = 'mods/deathmatch/resources';
 
 export const DEFAULT_COMPILER_OPTIONS: CompilerOptions = {

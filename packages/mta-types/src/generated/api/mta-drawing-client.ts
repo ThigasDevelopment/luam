@@ -3,10 +3,10 @@ import { ANY, BOOLEAN, fn, literal, named, NUMBER, STRING, TABLE, tupleOf, union
 
 export const MTA_DRAWING_CLIENT: ApiCatalog = {
     dxConvertPixels: fn([STRING, STRING, NUMBER], STRING, 2),
-    dxCreateFont: fn([STRING, NUMBER, BOOLEAN, STRING], named('Element'), 1),
-    dxCreateRenderTarget: fn([NUMBER, NUMBER, BOOLEAN], named('Element'), 2),
-    dxCreateScreenSource: fn([NUMBER, NUMBER], named('Element'), 2),
-    dxCreateShader: fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], tupleOf([named('Element'), STRING]), 1),
+    dxCreateFont: fn([STRING, NUMBER, BOOLEAN, STRING], named('DxFont'), 1),
+    dxCreateRenderTarget: fn([NUMBER, NUMBER, BOOLEAN], named('DxRenderTarget'), 2),
+    dxCreateScreenSource: fn([NUMBER, NUMBER], named('DxScreenSource'), 2),
+    dxCreateShader: fn([STRING, NUMBER, NUMBER, BOOLEAN, STRING], tupleOf([named('DxShader'), STRING]), 1),
     dxCreateTexture: fn(
         [
             STRING,

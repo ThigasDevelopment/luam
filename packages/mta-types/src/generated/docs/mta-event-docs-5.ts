@@ -55,7 +55,7 @@ export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientRender',
     },
     onClientResourceFileDownload: {
-        summary: '',
+        summary: 'This event is triggered every time a resource file download is queued, finished or has failed.',
         parameters: [
             { name: 'fileResource', isOptional: false, isVariadic: false, summary: 'Resource the file belongs to.' },
             { name: 'fileName', isOptional: false, isVariadic: false, summary: 'Relative resource file path.' },
@@ -169,7 +169,7 @@ export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientTrailerDetach',
     },
     onClientTransferBoxProgressChange: {
-        summary: '',
+        summary: 'This event is triggered every time the resource file downloader (aka. transfer box) updates the download progress.',
         parameters: [
             { name: 'downloadedSizeTotal', isOptional: false, isVariadic: false, summary: 'The total progress in bytes.' },
             { name: 'downloadTotalBytes', isOptional: false, isVariadic: false, summary: 'The total size of the download in bytes.' },
@@ -179,7 +179,7 @@ export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientTransferBoxProgressChange',
     },
     onClientTransferBoxVisibilityChange: {
-        summary: '',
+        summary: 'This event is triggered every time the resource file downloader (aka. transfer box) is shown or hidden by MTA.',
         parameters: [
             { name: 'isVisible', isOptional: false, isVariadic: false, summary: 'A boolean, indicating the new visibility status of the transfer box.' },
         ],
@@ -192,7 +192,7 @@ export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
         parameters: [
             { name: 'theHitElement', isOptional: false, isVariadic: false, summary: 'the other entity, or nil if the vehicle collided with the world' },
             { name: 'damageImpulseMag', isOptional: false, isVariadic: false, summary: 'the impact magnitude (Note: this is NOT the damage it is a force value which is then multiplied by the vehicles collision damage multiplier. for an example of this see below)' },
-            { name: 'bodyPart', isOptional: false, isVariadic: false, summary: 'the bodypart that hit the other element' },
+            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'the bodypart that hit the other element' },
             { name: 'collisionX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the position the collision took place' },
             { name: 'collisionY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the position the collision took place' },
             { name: 'collisionZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate of the position the collision took place' },

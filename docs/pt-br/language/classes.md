@@ -74,6 +74,51 @@ class PremiumAccount extends Account {
   inexistente na classe pai é `check-unknown-super-method`.
 - `self:super(...)` não é válido; chame `super(...)` diretamente.
 
+## Membros estáticos
+
+O `static` coloca um campo ou um método na **classe** em vez de nas instâncias
+dela:
+
+```luam
+class Counter {
+    static total: number = 0
+
+    static bump = function (amount: number): number
+        Counter.total = Counter.total + amount
+
+        return Counter.total
+    end
+
+    label: string = 'counter'
+}
+```
+
+Alcance um estático nomeando a classe, e um membro de instância através de um
+valor:
+
+| Escrito | Resolve para | Forma errada |
+| --- | --- | --- |
+| `Counter.total` | o campo estático | `counter.total` é `check-static-receiver` |
+| `Counter.bump(1)` | o método estático | `Counter:bump(1)` é `check-static-receiver` |
+| `counter.label` | o campo de instância | `Counter.label` é `check-unknown-member` |
+
+As regras que saem dessa separação:
+
+- Um método estático não tem `self` — escrever um é `check-invalid-self` — nem
+  `super(...)`, que é `check-invalid-super`.
+- Um nome não pode ser estático e de instância na mesma classe; isso é
+  `check-duplicate-class-member`.
+- Estáticos são **herdados e compartilhados**: `Child.origin` lê o espaço que
+  `Base.origin` guarda, e escrever por qualquer um dos nomes aparece nos dois.
+  Um estático que sombreia um herdado precisa carregar o mesmo tipo, ou é
+  `check-invalid-override`.
+- O valor inicial de um campo estático roda uma vez, quando a declaração da
+  classe roda.
+
+O `static` só é modificador quando um nome de membro vem depois dele na mesma
+linha, então um campo chamado `static` e um local chamado `static` continuam
+funcionando.
+
 ## Ordem de declaração
 
 Uma classe é um **tipo em todo o arquivo** e um **valor a partir da linha em que
@@ -119,6 +164,109 @@ class Round implements Describable {
 
 Veja [Enums e interfaces](/pt-br/language/enums-and-interfaces).
 
+## Parâmetros de tipo
+
+Uma classe recebe parâmetros de tipo como um
+[alias de tipo](/pt-br/language/types#aliases) recebe. Todo uso do parâmetro
+dentro da classe — um campo, um parâmetro, um tipo de retorno — é trocado pelo
+argumento no ponto de uso:
+
+```luam
+class Box<T> {
+    value: T
+
+    constructor = function (value: T)
+        self.value = value
+    end
+
+    read = function (): T
+        return self.value
+    end
+}
+
+local text: Box<string> = new Box<string>('ready')
+local value: string = text:read()
+```
+
+`new Box('ready')` infere `Box<string>` a partir do argumento do construtor,
+então vale escrever os argumentos de tipo só quando a inferência não tem de onde
+partir. A quantidade errada é `check-generic-arity`, e duas especializações
+diferentes da mesma classe não se atribuem entre si.
+
+`extends` também recebe argumentos, repassando um parâmetro ou fixando um:
+
+```luam static
+class Labelled<T> extends Box<T> {
+    label: string = ''
+}
+
+class Tag extends Box<string> {
+    prefix: string = ''
+}
+```
+
+Um parâmetro pode carregar uma restrição, que todo argumento precisa satisfazer
+— uma classe que a estende, que a implementa ou que a atende estruturalmente.
+Qualquer outra coisa é `check-generic-constraint`:
+
+```luam static
+class Holder<T extends Shape> {
+    item: T
+}
+```
+
+Nada disso chega na saída. Uma classe emite uma implementação, seja qual for a
+especialização; os parâmetros e os argumentos são apagados junto com as outras
+anotações. Aninhar uma especialização dentro de outra além de oito níveis é
+`check-generic-depth` — nomeie o tipo interno com um alias.
+
+## Metamétodos
+
+Uma classe responde a um operador de Lua declarando o metamétodo com o nome dele:
+
+```luam
+class Money {
+    amount: number = 0
+
+    constructor = function (amount: number)
+        self.amount = amount
+    end
+
+    __tostring = function (): string
+        return tostring(self.amount)
+    end
+
+    __eq = function (other: Money): boolean
+        return self.amount == other.amount
+    end
+
+    __add = function (other: Money): Money
+        return new Money(self.amount + other.amount)
+    end
+}
+```
+
+| Metamétodo | Além de `self` | Retorna | Responde |
+| --- | --- | --- | --- |
+| `__tostring` | — | `string` | `tostring` e coerção para string |
+| `__eq` | um | `boolean` | `==` |
+| `__lt`, `__le` | um | `boolean` | `<`, `>`, `<=`, `>=` |
+| `__len` | — | `number` | `#` |
+| `__concat` | um | qualquer | `..` |
+| `__unm` | — | qualquer | `-` unário |
+| `__add`, `__sub`, `__mul`, `__div`, `__mod`, `__pow` | um | qualquer | o operador correspondente |
+
+A quantidade errada de parâmetros ou o retorno errado é
+`check-invalid-metamethod`. Um método cujo nome começa com `__` e não está na
+lista — bloqueado ou escrito errado — é `check-blocked-metamethod`. Um **campo**
+com o mesmo prefixo fica intacto.
+
+Um metamétodo é herdado como qualquer outro membro, e um filho que declara o
+mesmo sobrescreve. Ele não faz parte da superfície de membros: a completação não
+o oferece, e `tostring(instance)` é como se chega nele, não
+`instance:__tostring()`. Veja [Limitações](/pt-br/reference/limitations) para o
+que continua bloqueado.
+
 ## O que é emitido
 
 Uma classe compila para uma chamada ao helper de runtime `class`, incluído apenas
@@ -144,10 +292,7 @@ separada, liberada por `"oop": true`. Veja [API OOP](/pt-br/mta/oop).
 
 ## Não suportado
 
-- Membros estáticos.
-- Metamétodos declarados.
-- Classes genéricas. (**Aliases** de tipo genéricos funcionam — veja
-  [Tipos](/pt-br/language/types).)
+- Os três metamétodos que a [Limitações](/pt-br/reference/limitations) lista.
 
 ## Um exemplo completo
 

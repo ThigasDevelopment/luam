@@ -47,6 +47,7 @@ export interface NumberLiteralType {
 export interface NamedType {
     kind: 'named';
     name: string;
+    typeArguments?: readonly Type[];
 }
 
 export interface FunctionType {
@@ -106,8 +107,8 @@ export function createArray(element: Type): Type {
     return { kind: 'array', element };
 }
 
-export function createNamed(name: string): Type {
-    return { kind: 'named', name };
+export function createNamed(name: string, typeArguments: readonly Type[] = []): NamedType {
+    return typeArguments.length === 0 ? { kind: 'named', name } : { kind: 'named', name, typeArguments };
 }
 
 export function createMap(key: Type, value: Type): Type {
@@ -265,6 +266,14 @@ export function createUnion(options: Type[]): Type {
     return { kind: 'union', options: flattened };
 }
 
+export function namedNesting(type: Type): number {
+    if (type.kind !== 'named') {
+        return 0;
+    }
+
+    return 1 + Math.max(0, ...(type.typeArguments ?? []).map(namedNesting));
+}
+
 export function typeToString(type: Type): string {
     if (type.kind === 'array') {
         return `${typeToString(type.element)}[]`;
@@ -290,7 +299,13 @@ export function typeToString(type: Type): string {
         return String(type.value);
     }
 
-    if (type.kind === 'named' || type.kind === 'record') {
+    if (type.kind === 'named') {
+        const args = type.typeArguments ?? [];
+
+        return args.length === 0 ? type.name : `${type.name}<${args.map(typeToString).join(', ')}>`;
+    }
+
+    if (type.kind === 'record') {
         return type.name;
     }
 
@@ -412,6 +427,17 @@ function isRecordAssignable(source: RecordType, target: RecordType, options: Ass
     return true;
 }
 
+function isNamedAssignable(source: NamedType, target: NamedType, options: AssignabilityOptions): boolean {
+    const sourceArguments = source.typeArguments ?? [];
+    const targetArguments = target.typeArguments ?? [];
+
+    if (source.name !== target.name || sourceArguments.length === 0 || targetArguments.length !== sourceArguments.length) {
+        return true;
+    }
+
+    return sourceArguments.every((argument, index) => isAssignable(argument, targetArguments[index] ?? ANY_TYPE, options));
+}
+
 export function isAssignable(source: Type, target: Type, options: AssignabilityOptions = { allowNil: false }): boolean {
     if (source.kind === 'any' || target.kind === 'any' || target.kind === 'unknown') {
         return true;
@@ -419,6 +445,10 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
 
     if (source.kind === 'tuple' || target.kind === 'tuple') {
         return isAssignable(firstValueOf(source), firstValueOf(target), options);
+    }
+
+    if (source.kind === 'named' && target.kind === 'named') {
+        return isNamedAssignable(source, target, options);
     }
 
     if (source.kind === 'named' || target.kind === 'named') {

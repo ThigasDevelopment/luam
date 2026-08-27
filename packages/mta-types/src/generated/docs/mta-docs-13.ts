@@ -87,7 +87,7 @@ export const MTA_DOCS_13: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/FxCreateParticle',
     },
     generateKeyPair: {
-        summary: '',
+        summary: 'This function creates a new public key and private key for encrypting data',
         parameters: [
             { name: 'algorithm', isOptional: false, isVariadic: false, summary: 'The algorithm to use:' },
             { name: 'options', isOptional: false, isVariadic: false, summary: 'table with options for the hashing algorithm, as detailed below.' },

@@ -1,5 +1,6 @@
 import { registerBuildCommand } from '@cli/cli/registry/build-registration';
 import { registerCheckCommand } from '@cli/cli/registry/check-registration';
+import { registerConfigCommand } from '@cli/cli/registry/config-registration';
 import { registerDevCommand } from '@cli/cli/registry/dev-registration';
 import { registerDoctorCommand } from '@cli/cli/registry/doctor-registration';
 import { registerEnsureCommand } from '@cli/cli/registry/ensure-registration';
@@ -16,6 +17,7 @@ export type CommandRegistrar = (program: Command, runtime: CliRuntime) => void;
 export const COMMAND_REGISTRARS: readonly CommandRegistrar[] = [
     registerBuildCommand,
     registerCheckCommand,
+    registerConfigCommand,
     registerDevCommand,
     registerDoctorCommand,
     registerEnsureCommand,

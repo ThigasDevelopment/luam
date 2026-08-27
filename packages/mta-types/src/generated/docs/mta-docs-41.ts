@@ -62,7 +62,7 @@ export const MTA_DOCS_41: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetCameraViewMode',
     },
     setChatboxCharacterLimit: {
-        summary: '',
+        summary: 'Sets the maximum amount of characters that can be input via chatbox',
         parameters: [
             { name: 'charLimit', isOptional: false, isVariadic: false, summary: 'an integer between 0-255. Passing -1 will reset the character limit (96)' },
         ],
@@ -86,7 +86,7 @@ export const MTA_DOCS_41: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetCloudsEnabled',
     },
     setColorFilter: {
-        summary: '',
+        summary: 'This function is used to override the default color filtering values.',
         parameters: [
             { name: 'aRed', isOptional: false, isVariadic: false, summary: 'The amount of red (0-255).' },
             { name: 'aGreen', isOptional: false, isVariadic: false, summary: 'The amount of green (0-255).' },
@@ -101,7 +101,7 @@ export const MTA_DOCS_41: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetColorFilter',
     },
     setColPolygonHeight: {
-        summary: '',
+        summary: 'This function is used to change the height of an existing colshape polygon.\nBy default, a colshape polygon is infinitely tall.',
         parameters: [
             { name: 'shape', isOptional: false, isVariadic: false, summary: 'The colshape polygon.' },
             { name: 'floor', isOptional: false, isVariadic: false, summary: 'The polygon floor (lowest Z coordinate). Parse *false* to reset this value to 0.' },
@@ -152,7 +152,7 @@ export const MTA_DOCS_41: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetControlState',
     },
     setCoronaReflectionEnabled: {
-        summary: '',
+        summary: 'This function sets visibility of corona reflection.',
         parameters: [
             { name: 'theMarker', isOptional: false, isVariadic: false, summary: 'the corona marker that you wish set visibility of corona reflection' },
             { name: 'enabled', isOptional: false, isVariadic: false, summary: 'whenever corona reflection should be visible' },
@@ -161,7 +161,7 @@ export const MTA_DOCS_41: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetCoronaReflectionEnabled',
     },
     setCoronaReflectionsEnabled: {
-        summary: '',
+        summary: 'This function sets visibility of corona reflections.',
         parameters: [
             { name: 'enabled', isOptional: false, isVariadic: false, summary: '** **0**: disabled' },
         ],

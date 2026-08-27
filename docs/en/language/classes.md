@@ -74,6 +74,47 @@ class PremiumAccount extends Account {
   that does not exist is `check-unknown-super-method`.
 - `self:super(...)` is not valid; call `super(...)` directly.
 
+## Static members
+
+`static` puts a field or a method on the **class** instead of on its instances:
+
+```luam
+class Counter {
+    static total: number = 0
+
+    static bump = function (amount: number): number
+        Counter.total = Counter.total + amount
+
+        return Counter.total
+    end
+
+    label: string = 'counter'
+}
+```
+
+Reach a static by naming the class, an instance member through a value:
+
+| Written | Resolves to | Wrong form |
+| --- | --- | --- |
+| `Counter.total` | the static field | `counter.total` is `check-static-receiver` |
+| `Counter.bump(1)` | the static method | `Counter:bump(1)` is `check-static-receiver` |
+| `counter.label` | the instance field | `Counter.label` is `check-unknown-member` |
+
+The rules that follow from that split:
+
+- A static method has no `self` — writing one is `check-invalid-self` — and no
+  `super(...)`, which is `check-invalid-super`.
+- One name cannot be both static and instance in the same class; that is
+  `check-duplicate-class-member`.
+- Statics are **inherited and shared**: `Child.origin` reads the slot
+  `Base.origin` holds, and writing through either name is visible through both.
+  A static that shadows an inherited one must carry the same type, or it is
+  `check-invalid-override`.
+- A static field initializer runs once, when the class declaration runs.
+
+`static` is only a modifier when a member name follows it on the same line, so a
+field named `static` and a local named `static` both keep working.
+
 ## Declaration order
 
 A class is a **type everywhere in its file** and a **value from the line its
@@ -118,6 +159,108 @@ class Round implements Describable {
 
 See [Enums and interfaces](/en/language/enums-and-interfaces).
 
+## Type parameters
+
+A class takes type parameters the way a [type alias](/en/language/types#aliases)
+does. Every use of the parameter inside the class — a field, a parameter, a
+return type — is replaced by the argument at the point of use:
+
+```luam
+class Box<T> {
+    value: T
+
+    constructor = function (value: T)
+        self.value = value
+    end
+
+    read = function (): T
+        return self.value
+    end
+}
+
+local text: Box<string> = new Box<string>('ready')
+local value: string = text:read()
+```
+
+`new Box('ready')` infers `Box<string>` from the constructor argument, so the
+type arguments are worth writing only when inference has nothing to work from.
+The wrong count is `check-generic-arity`, and two different specializations of
+the same class do not assign to each other.
+
+`extends` takes arguments too, either forwarding a parameter or pinning it:
+
+```luam static
+class Labelled<T> extends Box<T> {
+    label: string = ''
+}
+
+class Tag extends Box<string> {
+    prefix: string = ''
+}
+```
+
+A parameter can carry a constraint, which every argument must satisfy — a class
+that extends it, implements it, or matches it structurally. Anything else is
+`check-generic-constraint`:
+
+```luam static
+class Holder<T extends Shape> {
+    item: T
+}
+```
+
+None of it reaches the output. One class emits one implementation whatever it is
+specialized to; the parameters and the arguments are erased with every other
+annotation. Nesting one specialization inside another more than eight levels
+deep is `check-generic-depth` — name the inner type with an alias instead.
+
+## Metamethods
+
+A class answers a Lua operator by declaring the metamethod under its own name:
+
+```luam
+class Money {
+    amount: number = 0
+
+    constructor = function (amount: number)
+        self.amount = amount
+    end
+
+    __tostring = function (): string
+        return tostring(self.amount)
+    end
+
+    __eq = function (other: Money): boolean
+        return self.amount == other.amount
+    end
+
+    __add = function (other: Money): Money
+        return new Money(self.amount + other.amount)
+    end
+}
+```
+
+| Metamethod | Beside `self` | Returns | Answers |
+| --- | --- | --- | --- |
+| `__tostring` | — | `string` | `tostring` and string coercion |
+| `__eq` | one | `boolean` | `==` |
+| `__lt`, `__le` | one | `boolean` | `<`, `>`, `<=`, `>=` |
+| `__len` | — | `number` | `#` |
+| `__concat` | one | any | `..` |
+| `__unm` | — | any | unary `-` |
+| `__add`, `__sub`, `__mul`, `__div`, `__mod`, `__pow` | one | any | the matching operator |
+
+The wrong parameter count or return type is `check-invalid-metamethod`. A method
+whose name starts with `__` and is not on the list — a blocked one, or a
+misspelling — is `check-blocked-metamethod`. A **field** named with the same
+prefix is untouched.
+
+A metamethod is inherited like any other member, and a child that declares the
+same one overrides it. It is not part of the member surface: completion does not
+offer it, and `tostring(instance)` is how it is reached rather than
+`instance:__tostring()`. See [Limitations](/en/reference/limitations) for what
+stays blocked.
+
 ## What is emitted
 
 A class compiles to a call into the `class` runtime helper, included only when
@@ -143,10 +286,7 @@ gated behind `"oop": true`. See [OOP API](/en/mta/oop).
 
 ## Not supported
 
-- Static members.
-- Declared metamethods.
-- Generic classes. (Generic **type aliases** work — see
-  [Types](/en/language/types).)
+- The three metamethods [Limitations](/en/reference/limitations) names.
 
 ## A complete example
 

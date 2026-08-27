@@ -37,7 +37,7 @@ export const MTA_DOCS_37: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/PlaySFX3D',
     },
     playSound: {
-        summary: 'Creates a sound element and plays it immediately after creation for the local player.',
+        summary: 'Creates a sound element and plays it immediately after creation for the local player.\nAdded the feature of playing WebM files.',
         parameters: [
             { name: 'soundPath', isOptional: false, isVariadic: false, summary: 'filepath, raw data or URL (http://, https:// or ftp://) of the sound file you want to play. (**Note:** Playing sound files from other resources requires the target resource to be in the running state)' },
             { name: 'looped', isOptional: true, isVariadic: false, summary: 'a boolean representing whether the sound will be looped. To loop the sound, use *true*. Loop is not available for streaming sounds, only for sound files.' },
@@ -47,7 +47,7 @@ export const MTA_DOCS_37: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/PlaySound',
     },
     playSound3D: {
-        summary: 'Creates a sound element in the GTA world and plays it immediately after creation for the local player. setElementPosition can be used to move the sound element around after it has been created. Remember to use setElementDimension after creating the sound to play it outside of dimension 0.',
+        summary: 'Creates a sound element in the GTA world and plays it immediately after creation for the local player. setElementPosition can be used to move the sound element around after it has been created. Remember to use setElementDimension after creating the sound to play it outside of dimension 0.\nAdded the feature of playing WebM files.',
         parameters: [
             { name: 'soundPath', isOptional: false, isVariadic: false, summary: 'raw data or filepath to the sound file you want to play. (**Note:** Playing sound files from other resources requires the target resource to be in the running state)' },
             { name: 'x', isOptional: false, isVariadic: false, summary: 'a floating point number representing the X coordinate on the map.' },

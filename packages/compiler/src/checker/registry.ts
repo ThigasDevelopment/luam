@@ -17,9 +17,13 @@ export interface MemberInfo {
 
 export interface ClassInfo {
     name: string;
+    typeParameters: readonly string[];
+    typeConstraints: readonly (Type | null)[];
     superClass: string | null;
+    superArguments: readonly Type[];
     interfaces: string[];
     members: Map<string, MemberInfo>;
+    statics: Map<string, MemberInfo>;
     position: SourcePosition;
 }
 
@@ -205,6 +209,65 @@ export class DeclarationRegistry {
         }
 
         return null;
+    }
+
+    lookupMemberOwner(name: string, member: string): string | null {
+        const visited = new Set<string>();
+
+        let current = this.lookupClass(name);
+
+        while (current !== null && !visited.has(current.name)) {
+            if (current.members.has(member)) {
+                return current.name;
+            }
+
+            visited.add(current.name);
+
+            current = current.superClass === null ? null : this.lookupClass(current.superClass);
+        }
+
+        return null;
+    }
+
+    lookupStaticMember(name: string, member: string): MemberInfo | null {
+        const visited = new Set<string>();
+
+        let current = this.lookupClass(name);
+
+        while (current !== null && !visited.has(current.name)) {
+            const found = current.statics.get(member);
+
+            if (found !== undefined) {
+                return found;
+            }
+
+            visited.add(current.name);
+
+            current = current.superClass === null ? null : this.lookupClass(current.superClass);
+        }
+
+        return null;
+    }
+
+    collectStatics(name: string): MemberInfo[] {
+        const collected = new Map<string, MemberInfo>();
+        const visited = new Set<string>();
+
+        let current = this.lookupClass(name);
+
+        while (current !== null && !visited.has(current.name)) {
+            for (const [member, info] of current.statics) {
+                if (!collected.has(member)) {
+                    collected.set(member, info);
+                }
+            }
+
+            visited.add(current.name);
+
+            current = current.superClass === null ? null : this.lookupClass(current.superClass);
+        }
+
+        return [...collected.values()];
     }
 
     lookupMember(name: string, member: string): MemberInfo | null {

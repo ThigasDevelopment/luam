@@ -1,16 +1,6 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
-    onPlayerLogout: {
-        summary: 'This event is triggered when a user logs out of their account in-game.',
-        parameters: [
-            { name: 'thePreviousAccount', isOptional: false, isVariadic: false, summary: 'the account the client was logged in as.' },
-            { name: 'theCurrentAccount', isOptional: false, isVariadic: false, summary: 'the account the client is a part of now (usually a guest account).' },
-        ],
-        source: 'The source of this event is the player that logged out.',
-        cancel: 'If you cancel this event the player will not be logged out.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerLogout',
-    },
     onPlayerMarkerHit: {
         summary: 'This event is triggered when a player hits a marker.',
         parameters: [
@@ -36,14 +26,6 @@ export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
         parameters: [
             { name: 'filename', isOptional: false, isVariadic: false, summary: 'a string with the filename of the modified file.' },
             { name: 'itemlist', isOptional: false, isVariadic: false, summary: 'a table with the details of each modification within the file. Possible keys for each sub-table are:' },
-            { name: 'id', isOptional: false, isVariadic: false, summary: 'GTA model or texture id.' },
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'GTA name.' },
-            { name: 'length', isOptional: false, isVariadic: false, summary: 'length in bytes of the item.' },
-            { name: 'md5', isOptional: false, isVariadic: false, summary: 'md5 of the item bytes.' },
-            { name: 'sha256', isOptional: false, isVariadic: false, summary: 'sha256 of the item bytes.' },
-            { name: 'paddedLength', isOptional: false, isVariadic: false, summary: 'length in bytes of the item padded to 2048 byte boundary.' },
-            { name: 'paddedMd5', isOptional: false, isVariadic: false, summary: 'md5 of the item bytes padded to 2048 byte boundary.' },
-            { name: 'paddedSha256', isOptional: false, isVariadic: false, summary: 'sha256 of the item bytes padded to 2048 byte boundary.' },
         ],
         source: 'The source of this event is the player.',
         cancel: '',
@@ -96,9 +78,8 @@ export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
     onPlayerPrivateMessage: {
         summary: 'This event is triggered when a player sends a private message with *msg* command.',
         parameters: [
-            { name: 'fullMessage', isOptional: false, isVariadic: false, summary: 'a string representing the message along with the nickname' },
+            { name: 'message', isOptional: false, isVariadic: false, summary: '' },
             { name: 'recipient', isOptional: false, isVariadic: false, summary: 'the player to whom the message is being sent.' },
-            { name: 'content', isOptional: false, isVariadic: false, summary: 'a string representing the message content only. This parameter is available since **1.6.0-9.22430** version.' },
         ],
         source: 'The source of this event is the player who sent the private message.',
         cancel: 'If this event is canceled, the game\'s chat system won\'t deliver the message. You may use outputChatBox to send the messages then.',
@@ -116,7 +97,7 @@ export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerQuit',
     },
     onPlayerResourceStart: {
-        summary: '',
+        summary: 'This event is triggered when a resource has loaded client-side for a player.',
         parameters: [
             { name: 'loadedResource', isOptional: false, isVariadic: false, summary: 'The resource that was loaded on the client.' },
         ],
@@ -223,11 +204,35 @@ export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
             { name: 'killerWeapon', isOptional: false, isVariadic: false, summary: 'an int representing the killer weapon or the damage type.' },
             { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'an int representing the bodypart ID the victim was hit on when they died.' },
             { name: 'stealth', isOptional: false, isVariadic: false, summary: 'a boolean value representing whether or not this was a stealth kill.' },
-            { name: 'animGroup', isOptional: false, isVariadic: false, summary: 'an integer representing the player\'s current animation group.' },
-            { name: 'animID', isOptional: false, isVariadic: false, summary: 'an integer representing the player\'s current animation ID.' },
         ],
         source: 'The source of this event is the player that died or got killed.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerWasted',
+    },
+    onPlayerWeaponFire: {
+        summary: 'This event is called when a player fires a weapon.  This does not trigger for projectiles, melee weapons, or camera. For projectiles use onPlayerProjectileCreation.',
+        parameters: [
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'an int representing weapon used for making a shot.' },
+            { name: 'endX', isOptional: false, isVariadic: false, summary: 'float world X coordinate representing the end point.' },
+            { name: 'endY', isOptional: false, isVariadic: false, summary: 'float world Y coordinate representing the end point.' },
+            { name: 'endZ', isOptional: false, isVariadic: false, summary: 'float world Z coordinate representing the end point.' },
+            { name: 'hitElement', isOptional: false, isVariadic: false, summary: 'an element which was hit by a shot. Currently this can be only another player. **Note: hitElement could be incorrect and should not be relied upon.**' },
+            { name: 'startX', isOptional: false, isVariadic: false, summary: 'float world X coordinate representing the start of the bullet. **Note: This is not the gun muzzle.**' },
+            { name: 'startY', isOptional: false, isVariadic: false, summary: 'float world Y coordinate representing the start of the bullet.' },
+            { name: 'startZ', isOptional: false, isVariadic: false, summary: 'float world Z coordinate representing the start of the bullet.' },
+        ],
+        source: 'The source of this event is the player who fired the weapon.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerWeaponFire',
+    },
+    onPlayerWeaponSwitch: {
+        summary: 'This event is triggered whenever a player\'s equipped weapon **slot** changes. This means giveWeapon and takeWeapon will trigger this event if the equipped slot is forced to change.',
+        parameters: [
+            { name: 'previousWeaponID', isOptional: false, isVariadic: false, summary: 'An integer representing the weapon that was switched from.' },
+            { name: 'currentWeaponID', isOptional: false, isVariadic: false, summary: 'An integer representing the weapon that was switched to.' },
+        ],
+        source: 'The source of this event is the player that switched his weapon.',
+        cancel: 'If this event is canceled, then the player\'s weapon won\'t be switched.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerWeaponSwitch',
     },
 };

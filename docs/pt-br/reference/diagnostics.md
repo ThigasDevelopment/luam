@@ -72,6 +72,9 @@ erro não escreve nada.
 | `check-unknown-union-key` | error | A chave falta em pelo menos um membro da união. |
 | `check-invalid-intersection` | error | Uma parte da interseção não é um tipo objeto, uma interface ou uma classe. |
 | `check-conflicting-intersection-member` | error | Duas partes da interseção declaram a mesma chave com tipos diferentes. |
+| `check-generic-arity` | error | Um alias de tipo ou uma classe recebeu a quantidade errada de argumentos de tipo. |
+| `check-generic-constraint` | error | Um argumento de tipo não satisfaz a restrição declarada pelo parâmetro. |
+| `check-generic-depth` | error | Uma especialização está aninhada além da profundidade que o checker expande. |
 | `check-unknown-type` | warning | O nome de tipo não é declarado em nenhum lugar que o arquivo alcance. |
 
 ## Checker — fluxo de controle
@@ -85,10 +88,14 @@ erro não escreve nada.
 
 | Código | Significado |
 | --- | --- |
+| `check-unknown-resource-export` | Uma chamada literal nomeia um export que o contrato da dependência não declara. |
+| `check-resource-export-side` | Um export é chamado de um lado em que ele não roda. |
 | `check-unknown-class` | `new` ou `extends` nomeia uma classe não declarada. |
 | `check-duplicate-class` | Duas classes com o mesmo nome em um arquivo. |
 | `check-class-cycle` | Uma classe estende a si mesma, direta ou indiretamente. |
 | `check-class-before-declaration` | Um efeito de topo instancia uma classe declarada mais abaixo no arquivo. |
+| `check-duplicate-class-member` | Um nome é declarado como membro estático e de instância. |
+| `check-static-receiver` | Um estático lido por uma instância, ou chamado com dois-pontos. |
 | `check-unknown-interface` | `implements` ou `extends` de interface nomeia uma interface não declarada. |
 | `check-duplicate-interface` | Duas interfaces com o mesmo nome em um arquivo. |
 | `check-duplicate-interface-parent` | Uma interface estende a mesma interface pai mais de uma vez. |
@@ -112,6 +119,9 @@ erro não escreve nada.
 
 | Código | Significado |
 | --- | --- |
+| `check-blocked-metamethod` | Um método de classe nomeia um metamétodo que o Luam não expõe. |
+| `check-invalid-metamethod` | Um metamétodo declara a quantidade errada de parâmetros ou o retorno errado. |
+| `check-unreifiable-type` | O `@Validated` nomeia um tipo de campo que não tem forma em execução. |
 | `check-unknown-decorator` | O nome não é um dos decoradores conhecidos. |
 | `check-decorator-target` | Um decorador em algo que não pode recebê-lo. |
 | `check-duplicate-decorator` | O mesmo decorador duas vezes em um alvo. |
@@ -170,6 +180,7 @@ erro não escreve nada.
 | `build-source-unreadable` | Um arquivo de código não pôde ser lido. |
 | `build-asset-unreadable` | Um asset não pôde ser lido. |
 | `build-env-malformed` | O `.env` não pôde ser interpretado. |
+| `build-invalid-contract` | Um contrato de export de dependência estava ilegível ou nomeava outro resource, e foi ignorado. |
 | `build-empty-configuration` | A configuração não produziu nada para construir. |
 
 ## Configuração

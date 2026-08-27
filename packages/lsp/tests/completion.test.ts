@@ -271,6 +271,14 @@ describe('argument aware completion', () => {
         return item?.sortText?.slice(0, 1) ?? '';
     }
 
+    function offers(text: string, marker: string, label: string): boolean {
+        const service = new LanguageService();
+
+        service.update(SERVER_FILE, 1, text);
+
+        return service.completion(SERVER_FILE, markerAt(text, marker)).some((candidate) => candidate.label === label);
+    }
+
     const HANDLER = 'local root = getRootElement()\nlocal count = 1\naddEventHandler("onPlayerWasted", ';
 
     it('ranks element values first on the element argument of addEventHandler', () => {
@@ -281,9 +289,29 @@ describe('argument aware completion', () => {
         expect(rankOf(`${HANDLER})\n`, HANDLER, 'getRootElement')).toBe('1');
     });
 
-    it('ranks unrelated values and keywords last', () => {
-        expect(rankOf(`${HANDLER})\n`, HANDLER, 'count')).toBe('2');
-        expect(rankOf(`${HANDLER})\n`, HANDLER, 'local')).toBe('2');
+    it('keeps only the keywords that can open an expression in an argument', () => {
+        expect(offers(`${HANDLER})\n`, HANDLER, 'function')).toBe(true);
+        expect(offers(`${HANDLER})\n`, HANDLER, 'nil')).toBe(true);
+        expect(offers(`${HANDLER})\n`, HANDLER, 'local')).toBe(false);
+        expect(offers(`${HANDLER})\n`, HANDLER, 'end')).toBe(false);
+    });
+
+    it('ranks keywords last outside of a typed argument', () => {
+        expect(rankOf('local count = 1\nco\n', 'co', 'local')).toBe('');
+    });
+
+    it('hides values that cannot reach the expected argument type', () => {
+        expect(offers(`${HANDLER})\n`, HANDLER, 'root')).toBe(true);
+        expect(offers(`${HANDLER})\n`, HANDLER, 'count')).toBe(false);
+        expect(offers(`${HANDLER})\n`, HANDLER, 'eventName')).toBe(false);
+    });
+
+    it('offers only functions on the handler argument', () => {
+        const callback = `${HANDLER}root, `;
+
+        expect(offers(`${callback})\n`, callback, 'getRootElement')).toBe(true);
+        expect(offers(`${callback})\n`, callback, 'root')).toBe(false);
+        expect(offers(`${callback})\n`, callback, 'count')).toBe(false);
     });
 
     it('ranks values that match the declared parameter of a project function first', () => {
@@ -301,7 +329,7 @@ describe('argument aware completion', () => {
         ].join('\n');
 
         expect(rankOf(text, 'equip(', 'gun')).toBe('0');
-        expect(rankOf(text, 'equip(', 'count')).toBe('2');
+        expect(offers(text, 'equip(', 'count')).toBe(false);
     });
 
     it('leaves items unranked outside of a typed argument', () => {

@@ -65,11 +65,44 @@ collide with the `--` decrement operator. Annotations, classes, enums and
 interfaces are erased at build time, and what lands in your resource is readable
 Lua 5.1 you can debug directly on the server.
 
+## If you already write something else
+
+<div class="luam-split">
+<div>
+
+### From Lua
+
+Same `end`, same `~=`, same standard library. Comments move to `#`, because `--`
+became the decrement statement, and a `:` after a name introduces a type.
+
+</div>
+<div>
+
+### From Luau
+
+Also gradual types over Lua, also erased. Luam targets an unmodified Lua 5.1
+host, writes `name?: T`, has `class`, and has no `require`.
+
+</div>
+<div>
+
+### From TypeScript
+
+The type system will feel familiar. The syntax underneath is Lua: `end`, `~=`,
+1-based tables, and `export` that publishes to other MTA resources.
+
+</div>
+</div>
+
+The [full comparison](/en/guide/comparison) puts Luam, Lua 5.1, Luau and
+TypeScript side by side.
+
 ## Where to go next
 
 <ul class="luam-next">
 <li><a href="/en/guide/installation"><strong>Installation</strong><span>Install the CLI and the editor extension.</span></a></li>
 <li><a href="/en/guide/quick-start"><strong>Quick start</strong><span>Build and run your first resource.</span></a></li>
+<li><a href="/en/guide/how-luam-works"><strong>How Luam works</strong><span>From source to a resource MTA starts.</span></a></li>
 <li><a href="/en/language/types"><strong>Types</strong><span>The type system, end to end.</span></a></li>
 <li><a href="/en/mta/environments"><strong>Environments</strong><span>Which MTA API each file may call.</span></a></li>
 <li><a href="/en/recipes/"><strong>Recipes</strong><span>Complete projects, verified on every build.</span></a></li>

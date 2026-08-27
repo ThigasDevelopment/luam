@@ -72,9 +72,57 @@ print(settings.export)
 
 Veja [Palavras-chave](/pt-br/reference/keywords).
 
+## O contrato de export
+
+Um build que exporta alguma coisa escreve um contrato ao lado do resource — um
+arquivo JSON por resource, no diretório que
+[`contracts`](/pt-br/reference/configuration-fields) nomeia, por padrão
+`.luam/contracts`. Ele registra nome, lado, flag HTTP, nomes e tipos dos
+parâmetros, quantidade mínima de argumentos e tipo de retorno de cada export.
+Ele não faz parte do resource executável; nada é copiado para `build/<nome>`.
+
+```json
+{
+    "abi": 1,
+    "resource": "core",
+    "exports": [
+        {
+            "name": "getBalance",
+            "side": "server",
+            "http": false,
+            "parameters": [{ "name": "id", "type": "string" }],
+            "minimumArguments": 1,
+            "variadic": false,
+            "returns": "number"
+        }
+    ]
+}
+```
+
+Um projeto que declara `core` em `dependencies` e encontra `core.abi.json`
+naquele diretório tem as chamadas checadas — argumentos, quantidade, tipo de
+retorno e o lado em que o export roda:
+
+```luam static
+local balance: number = call(getResourceFromName('core'), 'getBalance', 'thigas')
+local same: number = exports.core:getBalance('thigas')
+```
+
+Passar um `number` onde o contrato diz `string` é `check-type-mismatch`, nomear
+um export que o contrato não declara é `check-unknown-resource-export`, e chamar
+um export só de cliente de um arquivo de servidor é
+`check-resource-export-side`.
+
+Aponte vários projetos para um diretório compartilhado e o workspace inteiro
+passa a ser checado entre resources. Um contrato ausente, ilegível ou que nomeia
+outro resource é ignorado com `build-invalid-contract`; o build segue e aquelas
+chamadas ficam sem verificação.
+
 ## O que não é verificado
 
-Um export é **nomeado, nunca verificado** contra o lado que chama. Veja
+Uma chamada cujo nome de resource ou de export é calculado em execução nunca é
+checada, com ou sem contrato — não há o que resolver. Uma chamada para um
+resource sem contrato em disco também não. Veja
 [Limitações](/pt-br/reference/limitations).
 
 ## Um exemplo completo

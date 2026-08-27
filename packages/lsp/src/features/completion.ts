@@ -1,15 +1,18 @@
 import { descriptorToType } from '@compiler/checker/api-types';
 import { mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classes';
+import { specializedMembers } from '@compiler/checker/generic-class';
 import { isMtaElementName } from '@compiler/checker/oop-members';
-import { typeToString, type RecordType } from '@compiler/checker/types';
+import { createNamed, typeToString, type RecordType, type Type } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
 import { isAvailableIn } from '@mta-types/api-declaration';
 import { globalsFor } from '@mta-types/catalog';
+import { oopClassDocumentation } from '@mta-types/oop-documentation';
 import { oopClassesFor } from '@mta-types/oop-surface';
-import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
+import { CompletionItemKind, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
-import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { conflictsWithExpectation, expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { contextGlobalFilter, EVENT_CONTEXT_GLOBALS } from '@lsp/features/context-globals';
 import { callbackParameterItems } from '@lsp/features/callback-parameter-completion';
 import { classBodyNeedsConstructor } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
@@ -45,15 +48,14 @@ import { scanContext, type SourceContext } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
 
-function classItems(analysis: DocumentAnalysis, name: string, isMethod: boolean): CompletionItem[] {
+function classItems(analysis: DocumentAnalysis, name: string, typeArguments: readonly Type[], isMethod: boolean): CompletionItem[] {
     if (analysis.compilerOptions.oop && isMtaElementName(analysis.declarations, name)) {
         return mtaMembersFor(name, analysis.environment)
             .filter((member) => member.isMethod === isMethod)
             .map((member) => mtaMemberItem(member, name));
     }
 
-    return analysis.declarations
-        .collectMembers(name)
+    return specializedMembers(analysis.declarations, createNamed(name, typeArguments))
         .filter((member) => member.isMethod === isMethod)
         .map((member) => memberItem(member.name, member.type, member.isMethod, name));
 }
@@ -87,7 +89,18 @@ function tableKeyItems(analysis: DocumentAnalysis, offset: number): CompletionIt
         }));
 }
 
+function staticItems(analysis: DocumentAnalysis, name: string, isMethod: boolean): CompletionItem[] {
+    return analysis.declarations
+        .collectStatics(name)
+        .filter((member) => member.isMethod === isMethod)
+        .map((member) => memberItem(member.name, member.type, member.isMethod, name));
+}
+
 function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger: '.' | ':'): CompletionItem[] {
+    if (target.kind === 'class-value') {
+        return trigger === ':' ? [] : [...staticItems(analysis, target.name, false), ...staticItems(analysis, target.name, true)];
+    }
+
     if (target.kind === 'static-class') {
         return trigger === ':' ? [] : mtaStaticMembersFor(target.name, analysis.environment).map((member) => mtaMemberItem(member, target.name));
     }
@@ -104,7 +117,7 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
         return recordItems(analysis, target.record);
     }
 
-    return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
+    return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, target.typeArguments, trigger === ':');
 }
 
 function superItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
@@ -123,10 +136,9 @@ function scopeItems(analysis: DocumentAnalysis, offset: number, expectation: Arg
     return analysis.index
         .visibleAt(offset)
         .filter((declaration) => !MEMBER_KINDS.has(declaration.kind) && declaration.kind !== 'event')
+        .filter((declaration) => !conflictsWithExpectation(expectation, declaration.type))
         .map((declaration) => withArgumentRank(symbolItem(declaration), declaration.type, expectation));
 }
-
-const EVENT_CONTEXT_GLOBALS: readonly string[] = ['source', 'client', 'eventName', 'sourceResource', 'sourceResourceRoot'];
 
 function withEventContextRank(item: CompletionItem, inHandler: boolean): CompletionItem {
     const rank = EVENT_CONTEXT_GLOBALS.indexOf(item.label);
@@ -138,19 +150,35 @@ function withEventContextRank(item: CompletionItem, inHandler: boolean): Complet
     return { ...item, sortText: `0${rank}${item.label}` };
 }
 
-function apiItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null, inHandler: boolean): CompletionItem[] {
-    return globalsFor(analysis.environment).map((declaration) =>
-        withEventContextRank(withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation), inHandler));
+function apiItems(analysis: DocumentAnalysis, offset: number, expectation: ArgumentExpectation | null, inHandler: boolean): CompletionItem[] {
+    const inContext = contextGlobalFilter(analysis, offset);
+
+    return globalsFor(analysis.environment)
+        .filter((declaration) => inContext(declaration.name))
+        .filter((declaration) => !conflictsWithExpectation(expectation, descriptorToType(declaration.type)))
+        .map((declaration) =>
+            withEventContextRank(withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation), inHandler));
 }
 
 function projectItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
     return analysis.project.globals
         .filter((declaration) => isAvailableIn(declaration.environment, analysis.environment))
+        .filter((declaration) => !conflictsWithExpectation(expectation, descriptorToType(declaration.type)))
         .map((declaration) => withArgumentRank(projectItem(declaration, analysis.env), descriptorToType(declaration.type), expectation));
 }
 
 function plainItems(items: readonly CompletionItem[], expectation: ArgumentExpectation | null): CompletionItem[] {
     return items.map((item) => withArgumentRank(item, null, expectation));
+}
+
+const EXPRESSION_KEYWORDS: ReadonlySet<string> = new Set(['function', 'new', 'nil', 'not', 'true', 'false']);
+
+function keywordItems(expectation: ArgumentExpectation | null): CompletionItem[] {
+    if (expectation === null) {
+        return [...KEYWORD_ITEMS];
+    }
+
+    return KEYWORD_ITEMS.filter((item) => EXPRESSION_KEYWORDS.has(item.label));
 }
 
 function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
@@ -160,7 +188,12 @@ function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
 
     return oopClassesFor(analysis.environment)
         .filter((declaration) => declaration.constructor !== null || declaration.staticMethods.length > 0)
-        .map((declaration) => ({ label: declaration.name, kind: CompletionItemKind.Class, detail: `MTA OOP class ${declaration.name}` }));
+        .map((declaration) => ({
+            label: declaration.name,
+            kind: CompletionItemKind.Class,
+            detail: `MTA OOP class ${declaration.name}`,
+            documentation: { kind: MarkupKind.Markdown, value: oopClassDocumentation(declaration.name) },
+        }));
 }
 
 function workspaceItems(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[]): CompletionItem[] {
@@ -286,9 +319,9 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...plainItems(workspaceItems(analysis, others), expectation),
         ...plainItems(mtaClassItems(analysis), expectation),
         ...plainItems(superItems(analysis, offset), expectation),
-        ...apiItems(analysis, expectation, inHandler),
+        ...apiItems(analysis, offset, expectation, inHandler),
         ...plainItems(directives, expectation),
         ...plainItems(constructor, expectation),
-        ...plainItems(KEYWORD_ITEMS, expectation),
+        ...plainItems(keywordItems(expectation), expectation),
     ]);
 }

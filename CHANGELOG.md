@@ -14,9 +14,167 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- Three paired manual pages, in English and Portuguese: how a build works end to
+  end, Luam beside Lua 5.1, Luau and TypeScript, and a migration guide covering
+  every release since `0.2.0` that asks an author to change something. The
+  landing page carries a short comparison and links to the full one.
+- A per-page report link that opens a GitHub issue prefilled with the page URL,
+  its language and the documented version. It requires an explicit submission,
+  and no page sends anything in the background — there is no voting endpoint and
+  no third-party analytics.
+- `Luam: Rescan Workspace`, a command that rebuilds the language server index
+  from disk without restarting the server.
+- `luam config`, a command that derives a declaration file from the literal data
+  in a native `config.lua`. It reads the file and never executes it, accepts
+  top-level assignments of literals and table constructors, reports anything
+  else with its position, and refuses to overwrite a declaration it did not
+  generate ([ADR-036](.claude/docs/adr/036-config-declaration-extraction.md)).
+  `check` and `build` are unchanged: `config.lua` is still copied verbatim and
+  never compiled.
+- A class declares a metamethod under its Lua name. `__tostring`, `__eq`,
+  `__lt`, `__le`, `__len`, `__concat`, `__unm` and the arithmetic operators are
+  exposed with a checked signature, inherited like any other member, and
+  installed on the instance metatable by the class helper
+  ([ADR-035](.claude/docs/adr/035-safe-class-metamethods.md)). `__index`,
+  `__newindex`, `__call`, `__gc`, `__metatable` and `__mode` stay blocked, in
+  the checker and in the helper. New diagnostics: `check-blocked-metamethod`
+  and `check-invalid-metamethod`.
+- `@Validated`, the one decorator that adds a runtime check. On a class it
+  generates static `validate(value)` and `matches(value)` members that walk a
+  value against the declared field types, with a fixed depth, entry-count and
+  string-length limit, and a failure that names the path and the expected type
+  but never the value
+  ([ADR-034](.claude/docs/adr/034-opt-in-boundary-validation.md)). A field type
+  with no runtime shape is `check-unreifiable-type`, reported before emit. A
+  program that never writes the decorator emits no validation code, so erased
+  annotations stay erased.
+- An export contract. A build that exports anything writes one versioned JSON
+  file per resource into the directory the new `contracts` manifest field names,
+  default `.luam/contracts`, and reads the same directory for the contracts of
+  the resources listed in `dependencies`. A `call(getResourceFromName('core'),
+  'getBalance', ...)` or `exports.core:getBalance(...)` whose resource and export
+  names are literal is then checked like any other call — arguments, count,
+  return type and the side the export runs on
+  ([ADR-033](.claude/docs/adr/033-resource-export-abi.md)). The contract stays
+  outside the runnable resource, contracts are read as untrusted input, and a
+  dynamic name still compiles unchecked. New diagnostics:
+  `check-unknown-resource-export`, `check-resource-export-side` and
+  `build-invalid-contract`.
+- A class takes type parameters, the way a type alias already did. `class Box<T>`
+  declares them, `Box<string>` uses them, `extends Box<T>` forwards them and
+  `extends Box<string>` pins them, and `new Box('text')` infers them from the
+  constructor call. A parameter may carry a constraint. Two specializations of
+  one class no longer assign to each other, and everything erases: one class
+  emits one implementation whatever it was specialized to
+  ([ADR-032](.claude/docs/adr/032-erased-generic-classes.md)). New diagnostics:
+  `check-generic-constraint` and `check-generic-depth`.
+
+### Changed
+
+- The development logs are documented as a boundary rather than a gap. There is
+  no remote mode and none is planned: collecting logs from a server the CLI
+  cannot read from disk would mean opening a connection to it, and the
+  `transport` manifest field that once configured one was removed in favour of
+  `ensure` syncing files and `dev --start-server` restarting the server it owns.
+  `luam dev` reads the local server log, which is what makes structured records
+  and source positions work.
+- A narrowing fact now survives the block that established it when every path
+  into the code after it agrees. A field refined in both arms of an `if`, a
+  union an assignment narrowed to one member, a `while` that filled a missing
+  value — each used to go back to its declared type at the closing `end`.
+  Branches, guard clauses and loop invalidation are one mechanism now, a flow
+  state with an explicit join and an explicit reachability bit
+  ([ADR-031](.claude/docs/adr/031-flow-narrowing.md)). An `elseif` chain narrows
+  like the nested `if` it stands for, which it did not before. What still does
+  not carry is a condition stored in a variable, and an arbitrary call still
+  does not drop a fact — the aliasing boundary is unchanged.
+- A declaration edit now rechecks only the files that reach that declaration.
+  The project cache used to key every module on a fingerprint of every
+  declaration visible to its environment, so touching one shared class rebuilt
+  the whole side. Checking now reports the ambient names each file reaches, and
+  the cache keys a module on the transitive closure of the declarations behind
+  those names. On a 1200-file project a leaf declaration edit costs what a body
+  edit costs, instead of a near-full rebuild.
+- The language server reruns the reverse closure of a changed declaration
+  instead of every other open document, and reconciles files created or deleted
+  while it was running rather than rebuilding the index on each watched-file
+  event.
+
+### Fixed
+
+- The playground's no-JavaScript line had no text in either locale, because the
+  string the component reads was never declared.
+
+## 0.19.1 - 2026-08-27
+
+### Added
+
+- A class member declared `static` belongs to the class value instead of an
+  instance. State that belongs to a class had to live in a file-level local or
+  a global, outside the type that owns it, while MTA's own surface already drew
+  the line. `static` is a contextual modifier, recognized only when a member
+  name follows it on the same line, so a member or a local named `static` keeps
+  working. The two spaces never mix: reading across them is
+  `check-unknown-member` or `check-static-receiver`, and declaring one name in
+  both is `check-duplicate-class-member`. Statics emit into the same class table
+  in authored order and are reached through `getClass`, so they inherit and
+  share a slot with no new runtime helper
+  ([ADR-028](.claude/docs/adr/028-static-class-members.md)). The editor follows
+  the same split: completion on a class name offers its statics and refuses them
+  after a colon, signature help and the argument matcher resolve a static
+  through the class value, and a static method body no longer declares `self`.
+- Every MTA event carries its description on hover. Event pages the wiki wraps
+  in `{{Added feature/item}}` parsed as an empty intro, which left 16 events
+  showing only a signature and swallowed 97 function summaries; the template is
+  now on the describing list. The parameter bullets follow the handler signature
+  instead of the page — names match exactly, then case-insensitively, then by
+  position when the counts agree — so the parameters the wiki documents beyond
+  the signature no longer reach the hover, and a `Note` template no longer reads
+  as a parameter of its own.
+
+### Changed
+
+- Completion at an argument offers only the values that argument can accept. It
+  ranked candidates against the expected parameter type but still listed every
+  one of them, so an element argument buried the three elements in scope under
+  hundreds of unrelated globals. Values whose type cannot reach the expectation
+  are dropped, along with functions whose return type cannot and the keywords
+  that cannot open an expression; anything untyped, `any`, or `nil` stays, so
+  the filter only removes what is certainly wrong. The event-only globals stop
+  leaking too: `source`, `client` and `eventName` appear inside a handler body
+  and nowhere else, `sourceTimer` only inside a timer callback, and a named
+  function used as a handler counts as a handler body.
+
+### Fixed
+
+- Hovering a client-only class in a server file said its members were not
+  available and then listed a surface of them anyway, counting what the class
+  inherits from a shared ancestor. It became visible once `GuiElement` gained a
+  parent, which put `Element`'s shared members in reach of every GUI widget.
+- `guiCreateWindow`, `dxCreateFont`, `playSound` and 16 other constructors
+  return the class they create instead of a generic `Element`. The wiki types
+  every element-returning constructor as `Element`, so completion and hover
+  could not tell what a call produced. The override carries a return type
+  applied in the normalizer, after the wiki and upstream declarations merge,
+  which keeps eleven arity classifications intact. Ten element types also
+  carried no parent, `GuiElement` among them, so no GUI widget reached
+  `Element` and every one of them was rejected wherever an element was expected.
+
 ## 0.19.0 - 2026-08-27
 
 ### Added
+
+- Hovering an MTA class name explains the class. `Player`, `Element`, `Vehicle`
+  and the other 54 classes each carry a written description, the chain they
+  inherit, how many instance members and static methods they reach in that
+  file's environment, how many of those members are inherited, and whether the
+  class is callable as a constructor. It describes the class instead of dumping
+  its members, works on a type annotation as well as on a static receiver, says
+  when a client class is out of reach in a server file, and with `compiler.oop`
+  off it still explains the class and names the restriction. The same
+  descriptions ride along with the class in completion.
 
 - A type guard now refines a stable access path, not only a name. A path is a
   name followed by literal fields, so `if self.connection ~= nil then` refines
@@ -54,6 +212,16 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 - A deeper `self` path in a template is now read at the call site. A nil
   segment in the middle raises `attempt to index a nil value` where the runtime
   helper used to stop and return the fallback.
+
+### Fixed
+
+- Instantiating a class whose parent never arrives names the parent again. The
+  class helper cleared its own pending mark by removing the field, so the read
+  fell through the metatable to the parent still marked pending, and the error
+  blamed the child — `Class Child is not defined` instead of
+  `Class Child extends Ghost, which is not defined`. The helper now clears the
+  mark to `false`, which shadows the parent. The runtime helpers are covered by
+  a real Lua VM from now on, so the class helper is exercised as MTA runs it.
 
 ## 0.18.2 - 2026-08-27
 
@@ -93,7 +261,7 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   checker collects every class header before it checks a statement; the runtime
   helper links a child to a pending shell of the parent and fills that same
   table when the parent's declaration runs
-  ([ADR-006](docs/adr/006-two-phase-class-declaration.md)).
+  ([ADR-024](.claude/docs/adr/024-two-phase-class-declaration.md)).
   What did not move is the runtime: a class declaration is a statement, so
   instantiating a class before its line has run is the new
   `check-class-before-declaration`, reported only where the code is a top-level
@@ -131,11 +299,11 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   what is going to move from what is not. Three boundaries stop being implicit
   and are recorded as decisions: annotations are erased and no implicit runtime
   guard is ever generated for them
-  ([ADR-003](docs/adr/003-erased-type-annotations.md)), `config.lua` is never
+  ([ADR-021](.claude/docs/adr/021-erased-type-annotations.md)), `config.lua` is never
   parsed or executed by a build
-  ([ADR-004](docs/adr/004-opaque-native-configuration.md)), and the environment
+  ([ADR-022](.claude/docs/adr/022-opaque-native-configuration.md)), and the environment
   is a property of the file because MTA assigns a side to each `<script>` entry
-  ([ADR-005](docs/adr/005-file-level-environments.md)). Each records what a
+  ([ADR-023](.claude/docs/adr/023-file-level-environments.md)). Each records what a
   future opt-in feature may and may not change.
 
 ### Fixed

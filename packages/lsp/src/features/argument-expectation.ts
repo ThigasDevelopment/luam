@@ -25,6 +25,8 @@ const PROVIDING_RANK = '1';
 
 const UNRELATED_RANK = '2';
 
+const ELEMENT_ROOT = 'Element';
+
 export function localType(analysis: DocumentAnalysis, offset: number, name: string): Type | null {
     const scopeId = analysis.index.scopes.innermostAt(offset);
     const accept = (candidate: SymbolDeclaration): boolean => matchesReferenceKind(candidate, 'value');
@@ -49,6 +51,10 @@ function memberType(analysis: DocumentAnalysis, target: ReceiverTarget, member: 
 
     if (target.kind === 'static-class') {
         return mtaStaticMember(target.name, member)?.type ?? null;
+    }
+
+    if (target.kind === 'class-value') {
+        return analysis.declarations.lookupStaticMember(target.name, member)?.type ?? null;
     }
 
     if (target.kind !== 'class') {
@@ -88,8 +94,32 @@ function calleeType(analysis: DocumentAnalysis, offset: number, segments: readon
     return target === null ? null : memberType(analysis, target, member);
 }
 
-export function expectedArgument(analysis: DocumentAnalysis, offset: number, frame: CallFrame | null): ArgumentExpectation | null {
+const BLOCK_OPENERS: ReadonlySet<string> = new Set(['function', 'if', 'do']);
+
+function insideNestedFunction(analysis: DocumentAnalysis, frame: CallFrame, offset: number): boolean {
+    const stack: string[] = [];
+
+    for (const token of analysis.tokens) {
+        if (token.kind !== 'keyword' || token.position.offset < frame.open || token.position.offset >= offset) {
+            continue;
+        }
+
+        if (BLOCK_OPENERS.has(token.value)) {
+            stack.push(token.value);
+        } else if (token.value === 'end') {
+            stack.pop();
+        }
+    }
+
+    return stack.includes('function');
+}
+
+export function expectedArgument(analysis: DocumentAnalysis, offset: number, frame: CallFrame | null, allowNested = false): ArgumentExpectation | null {
     if (frame === null || !frame.isCall) {
+        return null;
+    }
+
+    if (!allowNested && insideNestedFunction(analysis, frame, offset)) {
         return null;
     }
 
@@ -147,21 +177,30 @@ function matchesNamed(analysis: DocumentAnalysis, source: Type, name: string): b
         return true;
     }
 
+    if (source.name === ELEMENT_ROOT) {
+        return true;
+    }
+
     const interfaces = analysis.declarations.lookupClass(source.name)?.interfaces ?? [];
 
-    return interfaces.includes(name) || elementAncestors(source.name).includes(name) || classAncestors(analysis, source.name).includes(name);
+    if (interfaces.includes(name) || elementAncestors(source.name).includes(name) || classAncestors(analysis, source.name).includes(name)) {
+        return true;
+    }
+
+    return elementAncestors(name).includes(source.name) || classAncestors(analysis, name).includes(source.name);
 }
 
-function matchesExpectation(expectation: ArgumentExpectation, value: Type | null): boolean {
-    if (value === null) {
+function matchesTarget(expectation: ArgumentExpectation, source: Type, target: Type): boolean {
+    if (source.kind === 'any' || source.kind === 'unknown' || source.kind === 'nil' || source.kind === 'function') {
         return false;
     }
 
-    const source = unwrap(value);
-    const target = unwrap(expectation.type);
+    if (target.kind === 'union') {
+        return target.options.some((option) => matchesTarget(expectation, source, unwrap(option)));
+    }
 
-    if (source.kind === 'any' || source.kind === 'unknown' || source.kind === 'nil' || source.kind === 'function') {
-        return false;
+    if (source.kind === 'union') {
+        return source.options.some((option) => matchesTarget(expectation, unwrap(option), target));
     }
 
     if (target.kind === 'named') {
@@ -169,6 +208,46 @@ function matchesExpectation(expectation: ArgumentExpectation, value: Type | null
     }
 
     return source.kind !== 'named' && isAssignable(source, target);
+}
+
+function matchesExpectation(expectation: ArgumentExpectation, value: Type | null): boolean {
+    return value === null ? false : matchesTarget(expectation, unwrap(value), unwrap(expectation.type));
+}
+
+function conflictsWith(expectation: ArgumentExpectation, source: Type, target: Type): boolean {
+    if (source.kind === 'any' || source.kind === 'unknown' || source.kind === 'nil') {
+        return false;
+    }
+
+    if (target.kind === 'function') {
+        return source.kind !== 'function';
+    }
+
+    if (source.kind === 'function') {
+        return !matchesExpectation(expectation, source.returnType);
+    }
+
+    if (target.kind === 'union') {
+        return target.options.every((option) => conflictsWith(expectation, source, unwrap(option)));
+    }
+
+    if (source.kind === 'union') {
+        return source.options.every((option) => conflictsWith(expectation, unwrap(option), target));
+    }
+
+    if (target.kind === 'named') {
+        return !matchesNamed(expectation.analysis, source, target.name);
+    }
+
+    return source.kind !== 'named' && !isAssignable(source, target);
+}
+
+export function conflictsWithExpectation(expectation: ArgumentExpectation | null, value: Type | null): boolean {
+    if (expectation === null || value === null) {
+        return false;
+    }
+
+    return conflictsWith(expectation, unwrap(value), unwrap(expectation.type));
 }
 
 function rankOf(expectation: ArgumentExpectation, value: Type | null): string {

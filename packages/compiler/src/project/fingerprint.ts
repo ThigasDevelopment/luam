@@ -1,4 +1,4 @@
-import type { AmbientDeclarations } from '@compiler/checker/ambient';
+import { EVENT_NAME_PREFIX, type AmbientDeclarations } from '@compiler/checker/ambient';
 import type { ClassInfo, EnumInfo, EventInfo, GlobalInfo, InterfaceInfo, MemberInfo } from '@compiler/checker/registry';
 import { typeToString } from '@compiler/checker/types';
 
@@ -74,4 +74,36 @@ export function fingerprintDeclarations(declarations: AmbientDeclarations): stri
     const events = declarations.events.map(eventText);
 
     return hashString([...classes, ...interfaces, ...enums, ...globals, ...events].sort(compareText).join(';'));
+}
+
+function appendText(entries: Map<string, string>, name: string, text: string): void {
+    const existing = entries.get(name);
+
+    entries.set(name, existing === undefined ? text : `${existing}|${text}`);
+}
+
+export function fingerprintByName(declarations: AmbientDeclarations): Map<string, string> {
+    const entries = new Map<string, string>();
+
+    for (const info of declarations.classes) {
+        appendText(entries, info.name, classText(info));
+    }
+
+    for (const info of declarations.interfaces) {
+        appendText(entries, info.name, interfaceText(info));
+    }
+
+    for (const info of declarations.enums) {
+        appendText(entries, info.name, enumText(info));
+    }
+
+    for (const info of declarations.globals) {
+        appendText(entries, info.name, globalText(info));
+    }
+
+    for (const info of declarations.events) {
+        appendText(entries, `${EVENT_NAME_PREFIX}${info.name}`, eventText(info));
+    }
+
+    return new Map([...entries].map(([name, text]) => [name, hashString(text)]));
 }

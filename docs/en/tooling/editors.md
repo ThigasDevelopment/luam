@@ -20,6 +20,7 @@ uses, so the editor and the build never disagree about a file.
 | Hover | Declared or inferred type, function signature, the environment of an MTA API, and the contract of an event. |
 | Documentation hover | The `#` comment lines directly above any declaration — function, method, class, interface, enum, type alias, declared event, field, local or global — appear under its signature, at the declaration and at every use. Decorators between the comment and the declaration do not break the pair. |
 | Keyword hover | `self` carries the class it is bound to and the shape of that class; `super(...)` carries how the parent implementation is selected. |
+| MTA class hover | A class name — `Player`, `Element`, `Vehicle` — carries what the class is, the chain it inherits, how much surface it has in that environment and whether it is callable. It describes the class instead of listing its members. |
 | Decorator hover | The exact members the decorator generates at that site, where it may sit, and the diagnostics it can raise. |
 | Navigation | Go to definition, find references, and rename — across files for globals. |
 
@@ -96,6 +97,7 @@ still reach the server.
 | --- | --- | --- |
 | **Luam: Ensure Resource** | `Ctrl+Alt+E` (`Cmd+Alt+E`) | Runs `luam ensure` in a terminal for the current project. |
 | **Luam: Restart Language Server** | — | Restarts the server when it gets confused. |
+| **Luam: Rescan Workspace** | — | Rebuilds the index from disk after files change outside the editor. |
 
 ## Settings
 
@@ -142,13 +144,17 @@ plugin is ever built.
 Editing a file republishes diagnostics for that file. The other files are
 re-analyzed only when the edit changes what the file **declares** — a class, an
 interface, an enum, or a global, including the type of any member. A body edit
-costs one file; a declaration edit costs every file that can see it.
+costs one file.
 
-That last part is wider than it needs to be: a declaration change re-checks the
-files it is visible to rather than the files that use it. Narrowing it is
-[planned](/en/reference/limitations).
+A declaration edit costs the files that reach that declaration, and only those.
+The server follows each name to the file that declares it, then through that
+file's own superclasses, interfaces and member types, so an indirect parent
+still invalidates. A file that never names what changed is left alone, however
+many files share its environment.
 
 Nothing here waits for a file to be opened. The server scans the workspace when
 it starts and the extension watches the file patterns above, so a file created,
-moved or deleted outside the editor reaches it without a restart. **Luam: Restart
-Language Server** is the way out if the server and the project still disagree.
+moved or deleted outside the editor reaches it without a restart. **Luam: Rescan
+Workspace** rebuilds the index from disk if a change slipped past the watcher,
+and **Luam: Restart Language Server** is the way out if the server and the
+project still disagree.

@@ -275,12 +275,12 @@ VSCodium and Windsurf. The language server itself is editor-agnostic and speaks
 
 ## Known limitations
 
-- **Narrowing reaches names, not fields.** `if value ~= nil then` refines a local;
-  `self.value` keeps its declared type however you test it.
+- **Narrowing follows a path, not an alias.** `if self.value ~= nil then` refines
+  the field inside the block; storing the test in a variable does not carry it.
 - **A class is a type everywhere, a value from its declaration** — `extends` may
   name a parent written further down, a top-level `new` may not.
 - **The MTA catalog can lag a release** — a newer function stays `any`.
-- **No static members, declared metamethods, or generic classes.**
+- **No declared metamethods or generic classes.**
 - **The editor re-checks by declaration** — a declaration change re-analyzes every
   file that can see it, an edit inside a function body only its own file.
 - **An export is named, never verified** against the side that calls it.

@@ -2,6 +2,22 @@ local classes = {}
 
 local constructors = {}
 
+local ALLOWED_METAMETHODS = {
+    ['__tostring'] = true,
+    ['__eq'] = true,
+    ['__lt'] = true,
+    ['__le'] = true,
+    ['__len'] = true,
+    ['__concat'] = true,
+    ['__unm'] = true,
+    ['__add'] = true,
+    ['__sub'] = true,
+    ['__mul'] = true,
+    ['__div'] = true,
+    ['__mod'] = true,
+    ['__pow'] = true,
+}
+
 local BLOCKED_METAMETHODS = {
     ['__call'] = true,
     ['__index'] = true,
@@ -73,7 +89,7 @@ local function create(name, struct, options)
 
     definition = definition or { __name = name }
 
-    definition.__pending = nil
+    definition.__pending = false
     definition.__super = options.super
     definition.__metamethods = options.metamethods
 
@@ -140,19 +156,41 @@ function class(name)
     })
 end
 
-local function instanceMetatable(definition)
-    local meta = { __index = definition }
-
-    if not definition.__metamethods then
-        return meta
-    end
-
-    for key, value in pairs(definition.__metamethods) do
+local function installMetamethods(meta, source)
+    for key, value in pairs(source) do
         if BLOCKED_METAMETHODS[key] then
             error('Cannot override metamethod ' .. tostring(key) .. '.')
         end
 
-        meta[key] = value
+        if ALLOWED_METAMETHODS[key] then
+            meta[key] = value
+        end
+    end
+end
+
+local function inheritedMetamethods(meta, definition)
+    local chain = {}
+    local current = definition.__super
+
+    while type(current) == 'table' do
+        table.insert(chain, current)
+
+        current = current.__super
+    end
+
+    for index = #chain, 1, -1 do
+        installMetamethods(meta, chain[index])
+    end
+end
+
+local function instanceMetatable(definition)
+    local meta = { __index = definition }
+
+    inheritedMetamethods(meta, definition)
+    installMetamethods(meta, definition)
+
+    if definition.__metamethods then
+        installMetamethods(meta, definition.__metamethods)
     end
 
     return meta

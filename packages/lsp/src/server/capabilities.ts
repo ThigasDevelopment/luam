@@ -6,6 +6,8 @@ export const LANGUAGE_ID = 'luam';
 
 export const SERVER_NAME = 'luam-lsp';
 
+export const RESCAN_COMMAND = 'luam.rescanWorkspace';
+
 export const SERVER_CAPABILITIES: ServerCapabilities = {
     textDocumentSync: TextDocumentSyncKind.Incremental,
     completionProvider: { triggerCharacters: ['.', ':', '"', "'", '@'], resolveProvider: false },
@@ -15,6 +17,7 @@ export const SERVER_CAPABILITIES: ServerCapabilities = {
     referencesProvider: true,
     renameProvider: true,
     documentSymbolProvider: true,
+    executeCommandProvider: { commands: [RESCAN_COMMAND] },
     workspace: { workspaceFolders: { supported: true, changeNotifications: true } },
 };
 

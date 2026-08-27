@@ -22,6 +22,8 @@ export class LanguageClient {
 
     restarted = 0;
 
+    readonly requests: Array<{ method: string; params: unknown }> = [];
+
     constructor(id: string, name: string, serverOptions: unknown, clientOptions: unknown) {
         this.record = { id, name, serverOptions, clientOptions };
         clients.push(this);
@@ -43,5 +45,11 @@ export class LanguageClient {
         this.restarted += 1;
 
         return Promise.resolve();
+    }
+
+    sendRequest(method: string, params: unknown): Promise<null> {
+        this.requests.push({ method, params });
+
+        return Promise.resolve(null);
     }
 }

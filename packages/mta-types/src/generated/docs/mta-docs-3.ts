@@ -153,7 +153,7 @@ export const MTA_DOCS_3: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ClearChatBox',
     },
     clearDebugBox: {
-        summary: '',
+        summary: 'This function clears the debug box.',
         parameters: [],
         returns: 'Always returns *true*.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ClearDebugBox',

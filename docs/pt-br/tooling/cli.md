@@ -25,6 +25,7 @@ luam help trace
 | [`ensure`](#luam-ensure) | Constrói, sincroniza no servidor MTA, reinicia e observa. |
 | [`dev`](#luam-dev) | O laço do `ensure` mais um fluxo ao vivo do log do servidor. |
 | [`server`](#luam-server) | Roda um servidor MTA local existente em primeiro plano. |
+| [`config`](#luam-config) | Deriva um arquivo de declaração a partir dos dados literais do `config.lua`. |
 | [`trace`](#luam-trace) | Resolve posições Lua geradas de volta para o código Luam. |
 | [`setup`](#luam-setup) | Detecta editores e instala a extensão, com consentimento. |
 | [`doctor`](#luam-doctor) | Informa a CLI, o Node.js, os editores e a extensão. |
@@ -151,6 +152,38 @@ depois `mta-server`. Defina `development.server.executable` para outro layout.
 `Ctrl+C` escreve o comando `shutdown` do MTA e usa um fallback de encerramento
 com tempo limitado. O comando encerra apenas o processo filho que iniciou.
 
+## `luam config`
+
+```bash
+luam config
+luam config --write
+luam config --source settings/config.lua --out settings/config.d.luam --write
+```
+
+Lê os dados literais de um `config.lua` nativo e escreve um
+[arquivo de declaração](/pt-br/language/declaration-files) para ele. Sem
+`--write` ele imprime o que escreveria e não muda nada.
+
+O arquivo é **lido, nunca executado e nunca importado**. O que ele entende é uma
+atribuição de topo de um literal ou de um construtor de tabela: strings, números,
+booleanos, `nil`, tabelas com chave, chaves entre colchetes em string, tabelas
+posicionais, e o aninhamento disso. Uma tabela com chaves vira um tipo de objeto,
+uma posicional vira um array, uma mista vira `table`, e uma posicional com
+elementos de tipos diferentes vira `any[]`. Ele para em 256 KB de fonte, oito
+níveis de aninhamento e 512 entradas por tabela.
+
+Qualquer outra coisa — uma chamada, uma concatenação, uma função, um laço — é
+reportada com linha e coluna e pulada; os nomes ao redor continuam declarados.
+Declare à mão o que ele pulou.
+
+O arquivo gerado carrega um marcador na primeira linha, e o comando se recusa a
+sobrescrever um arquivo que não o carrega, então uma declaração escrita à mão
+nunca se perde. `--source` e `--out` precisam ficar dentro do diretório do
+projeto.
+
+Nada muda no `check` nem no `build`: o `config.lua` continua sendo copiado para o
+resource como está e nunca é compilado.
+
 ## `luam trace`
 
 ```bash
@@ -214,6 +247,9 @@ retorna `2` e não executa nada.
 | `--watch` / `--no-watch` | `dev`, `ensure` | Mantém observando, ou roda uma vez. Ambos observam por padrão. |
 | `--no-map` | `build`, `dev`, `ensure` | Desliga a geração do mapa. Para `build`, também remove o mapa padrão existente depois do sucesso. |
 | `--offline` | `build`, `dev`, `ensure` | Pula a consulta de `min_mta_version`. `LUAM_OFFLINE` faz o mesmo. |
+| `--source <path>` | `config` | Arquivo Lua nativo a ler. Padrão `config.lua`. |
+| `--out <path>` | `config` | Arquivo de declaração a escrever. Padrão `config.d.luam`. |
+| `--write` | `config` | Escreve o arquivo de declaração em vez de imprimi-lo. |
 | `--map <path>` | `trace` | Mapa a ler. Caminhos relativos partem do diretório do projeto. |
 | `--name <name>` | `init` | Nome do resource. |
 | `--force` | `init` | Sobrescreve um arquivo existente. |

@@ -1,4 +1,5 @@
 import { runCompile } from '@cli/build/build-runner';
+import { writeResourceContract } from '@cli/build/contract-files';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
 import { writeResourceMap } from '@cli/build/resource-map-file';
 import { writeResource, type WriteResult } from '@cli/build/resource-writer';
@@ -70,6 +71,10 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
     }
 
     writeResourceMap(context.root, context.config, writtenMap(outcome.map, minify));
+
+    if (outcome.contract !== null && outcome.contract.exports.length > 0) {
+        writeResourceContract(context.root, context.config, outcome.contract);
+    }
 
     tracker.end();
     renderer.clear();

@@ -58,7 +58,7 @@ export const MTA_DOCS_45: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetPedArmor',
     },
     setPedBleeding: {
-        summary: '',
+        summary: 'This function allows you to set player\'s or ped\'s bleeding effect.',
         parameters: [
             { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped whose bleeding effect you want to set of.' },
             { name: 'bleeding', isOptional: false, isVariadic: false, summary: 'Boolean specifying whether the player or ped is bleeding or not.' },
@@ -113,7 +113,7 @@ export const MTA_DOCS_45: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetPedDoingGangDriveby',
     },
     setPedEnterVehicle: {
-        summary: '',
+        summary: 'This function makes a ped enter a vehicle, similar to the enter_exit control state.',
         parameters: [
             { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped to enter the vehicle.' },
             { name: 'theVehicle', isOptional: true, isVariadic: false, summary: '' },
@@ -123,7 +123,7 @@ export const MTA_DOCS_45: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetPedEnterVehicle',
     },
     setPedExitVehicle: {
-        summary: '',
+        summary: 'This function makes a ped exit a vehicle, similar to the enter_exit control state.',
         parameters: [
             { name: 'thePed', isOptional: false, isVariadic: false, summary: 'The player or ped to exit the vehicle.' },
         ],

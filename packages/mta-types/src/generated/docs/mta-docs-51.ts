@@ -142,7 +142,7 @@ export const MTA_DOCS_51: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/Sha256',
     },
     shakeCamera: {
-        summary: '',
+        summary: 'This function allows you to trigger camera shake effect (just like explosion does).',
         parameters: [
             { name: 'force', isOptional: false, isVariadic: false, summary: 'Intensity and time of the shake. The higher the value, the longer the camera shakes' },
             { name: 'x', isOptional: true, isVariadic: false, summary: 'Center X coordinate of the shake.' },
@@ -163,7 +163,7 @@ export const MTA_DOCS_51: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ShowChat',
     },
     showCol: {
-        summary: '',
+        summary: 'Shows collision previews for developers (colshapes in wireframe, useful when writing scripts).',
         parameters: [
             { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean indicating if the collision previews should be enabled or disabled.' },
         ],
@@ -181,7 +181,7 @@ export const MTA_DOCS_51: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ShowCursor',
     },
     showSound: {
-        summary: '',
+        summary: 'Prints world sound IDs in the debug output window to help when writing scripts with setWorldSoundEnabled.',
         parameters: [
             { name: 'state', isOptional: false, isVariadic: false, summary: 'A boolean indicating if the world sound IDs should be printed in the debug window or not.' },
         ],

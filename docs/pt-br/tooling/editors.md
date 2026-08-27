@@ -20,6 +20,7 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Hover | Tipo declarado ou inferido, assinatura da função, o ambiente de uma API do MTA e o contrato de um evento. |
 | Hover de documentação | As linhas de comentário `#` logo acima de qualquer declaração — função, método, classe, interface, enum, alias de tipo, evento declarado, campo, local ou global — aparecem sob a assinatura dela, na declaração e em cada uso. Decorators entre o comentário e a declaração não quebram o par. |
 | Hover de palavra-chave | `self` carrega a classe a que está vinculado e a forma dessa classe; `super(...)` carrega como a implementação do pai é escolhida. |
+| Hover de classe do MTA | Um nome de classe — `Player`, `Element`, `Vehicle` — carrega o que a classe é, a cadeia que ela herda, quanta superfície tem naquele ambiente e se é chamável. Ele descreve a classe em vez de listar os membros dela. |
 | Hover de decorator | Os membros exatos que o decorator gera naquele ponto, onde ele pode ficar e os diagnósticos que pode emitir. |
 | Navegação | Ir para definição, encontrar referências e renomear — entre arquivos para globais. |
 
@@ -96,6 +97,7 @@ também chegam ao servidor.
 | --- | --- | --- |
 | **Luam: Ensure Resource** | `Ctrl+Alt+E` (`Cmd+Alt+E`) | Roda `luam ensure` em um terminal para o projeto atual. |
 | **Luam: Restart Language Server** | — | Reinicia o servidor quando ele se perde. |
+| **Luam: Rescan Workspace** | — | Reconstrói o índice a partir do disco depois de mudanças feitas fora do editor. |
 
 ## Configurações
 
@@ -142,14 +144,17 @@ construído.
 Editar um arquivo republica diagnóstico daquele arquivo. Os outros só são
 reanalisados quando a edição muda o que o arquivo **declara** — uma classe, uma
 interface, um enum ou um global, incluindo o tipo de qualquer membro. Uma edição
-de corpo custa um arquivo; uma edição de declaração custa todo arquivo que
-enxerga aquela declaração.
+de corpo custa um arquivo.
 
-Essa última parte é mais larga do que precisa ser: uma mudança de declaração
-reverifica os arquivos que a enxergam, não os que a usam. Estreitar isso é
-[planejado](/pt-br/reference/limitations).
+Uma edição de declaração custa os arquivos que alcançam aquela declaração, e só
+eles. O servidor segue cada nome até o arquivo que o declara e depois pelas
+superclasses, interfaces e tipos de membro daquele arquivo, então um pai
+indireto ainda invalida. Um arquivo que nunca nomeia o que mudou fica intacto,
+por mais arquivos que dividam o ambiente dele.
 
 Nada disso espera um arquivo ser aberto. O servidor varre o workspace ao iniciar
 e a extensão observa os padrões de arquivo acima, então um arquivo criado, movido
-ou apagado fora do editor chega até ele sem reinício. **Luam: Restart Language
-Server** é a saída se o servidor e o projeto ainda discordarem.
+ou apagado fora do editor chega até ele sem reinício. **Luam: Rescan Workspace**
+reconstrói o índice a partir do disco se alguma mudança escapou do observador, e
+**Luam: Restart Language Server** é a saída se o servidor e o projeto ainda
+discordarem.

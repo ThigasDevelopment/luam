@@ -5,7 +5,7 @@ import { defineConfig } from 'vitepress';
 
 import { browserPath } from './browser-path';
 import { liveExamples } from './live-examples';
-import { localeSearchOptions, localeThemeConfig } from './locale-theme';
+import { SITE, localeSearchOptions, localeThemeConfig } from './locale-theme';
 import { en } from './locales/en';
 import { ptBR } from './locales/pt-br';
 import { wrapTables } from './table-wrapper';
@@ -18,8 +18,6 @@ const { version } = require('../../packages/cli/package.json') as { version: str
 const luamGrammar = require('../../packages/vscode/syntaxes/luam.tmLanguage.json') as Record<string, unknown>;
 
 const luamLanguage = { ...luamGrammar, name: 'luam', displayName: 'Luam' };
-
-const SITE = 'https://luam.dracon.dev/';
 
 const packageSource = (name: string): string => fileURLToPath(new URL(`../../packages/${name}/src`, import.meta.url));
 

@@ -23,6 +23,38 @@ export function oopClassesFor(environment: ApiEnvironment): OopClass[] {
     }));
 }
 
+export function oopClassEnvironment(name: string): ApiEnvironment | null {
+    const declaration = BY_NAME.get(name);
+
+    if (declaration === undefined) {
+        return null;
+    }
+
+    const constructor = declaration.constructor === null ? [] : [declaration.constructor.environment];
+    const environments = new Set([...declaration.members, ...declaration.staticMethods].map((member) => member.environment).concat(constructor));
+
+    if (environments.size === 1) {
+        const [only] = environments;
+
+        return only ?? 'shared';
+    }
+
+    return 'shared';
+}
+
+export function oopClassAncestors(name: string): string[] {
+    const ancestors: string[] = [];
+
+    let current = BY_NAME.get(name)?.parent ?? null;
+
+    while (current !== null && !ancestors.includes(current)) {
+        ancestors.push(current);
+        current = BY_NAME.get(current)?.parent ?? null;
+    }
+
+    return ancestors;
+}
+
 export function findOopMember(className: string, member: string): OopMember | null {
     const visited = new Set<string>();
 

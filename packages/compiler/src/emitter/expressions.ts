@@ -56,6 +56,12 @@ function emitTable(state: EmitState, expression: TableExpression): string {
 }
 
 function emitMember(state: EmitState, expression: MemberExpression): string {
+    if (state.staticAccess.has(expression) && expression.object.kind === 'identifier') {
+        requireHelper(state, 'class');
+
+        return `getClass(${emitString(expression.object.name)}).${expression.property}`;
+    }
+
     const extension = resolvePropertyExtension(typeOf(state, expression.object), expression.property);
     const object = emitExpression(state, expression.object, UNARY_PRECEDENCE);
 

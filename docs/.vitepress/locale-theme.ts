@@ -57,7 +57,14 @@ export interface LocaleStrings {
     footerCopyright: string;
     versionBanner: string;
     versionBannerLink: string;
+    feedbackQuestion: string;
+    feedbackAction: string;
+    feedbackNote: string;
 }
+
+const REPOSITORY = 'https://github.com/ThigasDevelopment/luam';
+
+export const SITE = 'https://luam.dracon.dev/';
 
 function localeRoot(locale: LocaleId): string {
     return `/${locale}/`;
@@ -122,9 +129,9 @@ export function localeThemeConfig(locale: LocaleId, strings: LocaleStrings, vers
         nav: localeNav(locale, strings),
         sidebar: localeSidebar(locale, strings),
         outline: { level: [2, 3], label: strings.outlineTitle },
-        socialLinks: [{ icon: 'github', link: 'https://github.com/ThigasDevelopment/luam' }],
+        socialLinks: [{ icon: 'github', link: REPOSITORY }],
         editLink: {
-            pattern: 'https://github.com/ThigasDevelopment/luam/edit/main/docs/:path',
+            pattern: `${REPOSITORY}/edit/main/docs/:path`,
             text: strings.editLinkText,
         },
         lastUpdatedText: strings.lastUpdatedText,
@@ -149,6 +156,13 @@ export function localeThemeConfig(locale: LocaleId, strings: LocaleStrings, vers
             bannerLink: `${localeRoot(locale)}changelog`,
             bannerLinkText: strings.versionBannerLink,
             playground: strings.playground,
+            feedback: {
+                question: strings.feedbackQuestion,
+                action: strings.feedbackAction,
+                note: strings.feedbackNote,
+                issues: `${REPOSITORY}/issues/new`,
+                site: SITE,
+            },
         },
     } as DefaultTheme.Config;
 }

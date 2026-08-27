@@ -195,8 +195,9 @@ export function emit(
     references: ReadonlySet<string>,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]> = new Map(),
     sourceLineOffset = 0,
+    staticAccess: ReadonlySet<Expression> = new Set(),
 ): EmitResult {
-    const state = createEmitState(types, references, generatedMembers);
+    const state = createEmitState(types, references, generatedMembers, staticAccess);
     const lines = emitBlock(state, program.body);
     const markedCode = lines.length === 0 ? '' : `${lines.join('\n')}\n`;
     const finalized = finalizeEmission(markedCode, state.markers, sourceLineOffset);

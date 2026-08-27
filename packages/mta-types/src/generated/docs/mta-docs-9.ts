@@ -43,7 +43,7 @@ export const MTA_DOCS_9: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineGetModelTXDID',
     },
     engineGetModelVisibleTime: {
-        summary: '',
+        summary: 'This function returns a model\'s visibility time, this is used for example for building lights being shown after 23:00.',
         parameters: [
             { name: 'modelId', isOptional: false, isVariadic: false, summary: 'The ID of the model.' },
         ],

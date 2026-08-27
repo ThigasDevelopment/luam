@@ -31,7 +31,7 @@ export const MTA_DOCS_38: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/RemoveEventHandler',
     },
     removeGameWorld: {
-        summary: '',
+        summary: 'This function removes the entire game world and also clears the dummies pool.',
         parameters: [],
         returns: 'This function does not return any value.',
         wiki: 'https://wiki.multitheftauto.com/wiki/RemoveGameWorld',
@@ -151,13 +151,13 @@ export const MTA_DOCS_38: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetBlurLevel',
     },
     resetColorFilter: {
-        summary: '',
+        summary: 'This function is used to reset the color filtering to its default values.',
         parameters: [],
         returns: 'Returns *true* if the color filtering was reset, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetColorFilter',
     },
     resetCoronaReflectionsEnabled: {
-        summary: '',
+        summary: 'This function resets visibility of corona reflections. Default value depends on client setting. If client has enabled *corona rain reflections* in video options, value will be reset to **1**, otherwise to **0**. You can check value of this option using dxGetStatus (*SettingCoronaReflections*).',
         parameters: [],
         returns: 'Returns *true*.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetCoronaReflectionsEnabled',
@@ -213,7 +213,7 @@ export const MTA_DOCS_38: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetPedsLODDistance',
     },
     resetPedVoice: {
-        summary: '',
+        summary: 'Resets the voice of a ped to a default one.',
         parameters: [
             { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the ped whose voice to reset.' },
         ],
@@ -236,7 +236,7 @@ export const MTA_DOCS_38: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetRainLevel',
     },
     resetShakeCamera: {
-        summary: '',
+        summary: 'This function cancels the shaking effect caused by **shakeCamera**',
         parameters: [],
         returns: 'Always returns *true*.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetShakeCamera',
