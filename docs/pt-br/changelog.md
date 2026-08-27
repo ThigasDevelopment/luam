@@ -11,6 +11,16 @@ da versão atual.
 
 ## Não lançado
 
+### Alterado
+
+- [Limitações](/pt-br/reference/limitations) troca "O estreitamento alcança
+  nomes, não campos" por duas entradas: o estreitamento segue um caminho mas não
+  um apelido, que é uma decisão de projeto, e o estreitamento não atravessa um
+  ramo nem um laço, que é planejado.
+  [Tipos](/pt-br/language/types#guardas-de-tipo) e
+  [Solução de problemas](/pt-br/guide/troubleshooting) descrevem uma guarda como
+  refinando um caminho, e largam a solução de copiar o campo para um local.
+
 ## 0.18.2 - 2026-08-27
 
 ### Alterado

@@ -79,28 +79,31 @@ Set `compiler = { oop = true }` in `.luam.manifest`. That also writes `<oop>true
 
 ## A value is `string?` and nothing narrows it
 
-A guard narrows a **name**, not a field. `if value ~= nil then` does refine a
-local or a parameter inside the branch, and `tonumber(amount) or 100` is
-`number`, because `or` drops the nil on its left:
+A guard narrows a **stable access path**: a name, or a name followed by literal
+fields. `if value ~= nil then` refines a local or a parameter inside the branch,
+`if self.connection ~= nil then` refines the field, and `tonumber(amount) or 100`
+is `number`, because `or` drops the nil on its left:
 
 ```luam
 local amount = '25'
 local requested: number = tonumber(amount) or 100
 ```
 
-What keeps its declared type is a field: `self.value` stays `string?` however you
-test it. Copy it into a local, and test the local:
+What keeps its declared type is a path the checker cannot name end to end. A
+call or a dynamic index is not a path, so test what you can name:
 
 ```luam static
-local connection = self.connection
+local handle = session.slots[key]
 
-if connection ~= nil then
-    local handle: userdata = connection
+if handle ~= nil then
+    local text: string = handle
 end
 ```
 
-The narrowing also ends where the block ends, and it is dropped as soon as the
-name is assigned again. See [Type guards](/en/language/types#type-guards) for
+A condition stored in a variable is not a fact either: test the path in the block
+that uses it, not `local ready = self.connection ~= nil`. The narrowing also ends
+where the block ends, and it is dropped as soon as the path, a prefix of it, or
+its root is assigned again. See [Type guards](/en/language/types#type-guards) for
 every form that narrows, and [Limitations](/en/reference/limitations) for what
 does not.
 

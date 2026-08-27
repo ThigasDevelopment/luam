@@ -1,5 +1,6 @@
 import type { Expression, Statement } from '@compiler/parser/ast';
 
+import { pathOf, pathType } from './access-path';
 import type { CheckContext } from './context';
 import { discriminantFact } from './discriminant';
 import {
@@ -30,49 +31,54 @@ const GUARD_TYPES: Readonly<Record<string, Type>> = {
     userdata: USERDATA_TYPE,
 };
 
-function declaredType(context: CheckContext, name: string): Type | null {
-    return context.binder.lookup(name)?.type ?? null;
-}
-
-function guardedName(expression: Expression): string | null {
+function guardedPath(expression: Expression): string | null {
     if (expression.kind !== 'call-expression' || expression.callee.kind !== 'identifier' || expression.callee.name !== GUARD_FUNCTION) {
         return null;
     }
 
     const [argument] = expression.args;
 
-    return argument !== undefined && argument.kind === 'identifier' ? argument.name : null;
+    return argument === undefined ? null : pathOf(argument);
 }
 
 function guardFact(left: Expression, right: Expression): [string, Type] | null {
-    const name = guardedName(left);
+    const path = guardedPath(left);
     const value = right.kind === 'string-literal' ? GUARD_TYPES[right.value] : undefined;
 
-    return name === null || value === undefined ? null : [name, value];
+    return path === null || value === undefined ? null : [path, value];
 }
 
-function nilComparison(left: Expression, right: Expression): string | null {
-    if (left.kind === 'identifier' && right.kind === 'nil-literal') {
-        return left.name;
+function nilComparison(left: Expression, right: Expression): Expression | null {
+    if (right.kind === 'nil-literal' && pathOf(left) !== null) {
+        return left;
     }
 
-    return right.kind === 'identifier' && left.kind === 'nil-literal' ? right.name : null;
+    return left.kind === 'nil-literal' && pathOf(right) !== null ? right : null;
 }
 
-function present(context: CheckContext, name: string, facts: Map<string, Type>): void {
-    const declared = declaredType(context, name);
+function present(context: CheckContext, expression: Expression, facts: Map<string, Type>): void {
+    const path = pathOf(expression);
+    const declared = path === null ? null : pathType(context, expression);
 
-    if (declared !== null) {
-        facts.set(name, withoutNil(declared));
+    if (path !== null && declared !== null) {
+        facts.set(path, withoutNil(declared));
+    }
+}
+
+function missing(expression: Expression, facts: Map<string, Type>): void {
+    const path = pathOf(expression);
+
+    if (path !== null) {
+        facts.set(path, NIL_TYPE);
     }
 }
 
 function mergeAlternatives(left: ReadonlyMap<string, Type>, right: ReadonlyMap<string, Type>, facts: Map<string, Type>): void {
-    for (const [name, type] of left) {
-        const other = right.get(name);
+    for (const [path, type] of left) {
+        const other = right.get(path);
 
         if (other !== undefined) {
-            facts.set(name, createUnion([type, other]));
+            facts.set(path, createUnion([type, other]));
         }
     }
 }
@@ -92,8 +98,8 @@ function collectFacts(context: CheckContext, expression: Expression, facts: Map<
         return;
     }
 
-    if (expression.kind === 'identifier') {
-        present(context, expression.name, facts);
+    if (expression.kind === 'identifier' || expression.kind === 'member-expression') {
+        present(context, expression, facts);
 
         return;
     }
@@ -117,12 +123,12 @@ function collectFacts(context: CheckContext, expression: Expression, facts: Map<
 
     if (expression.operator === '==') {
         const guard = guardFact(expression.left, expression.right) ?? guardFact(expression.right, expression.left);
-        const missing = nilComparison(expression.left, expression.right);
+        const absent = nilComparison(expression.left, expression.right);
 
         if (guard !== null) {
             facts.set(guard[0], guard[1]);
-        } else if (missing !== null) {
-            facts.set(missing, NIL_TYPE);
+        } else if (absent !== null) {
+            missing(absent, facts);
         } else {
             applyDiscriminant(context, expression.left, expression.right, true, facts);
         }
@@ -131,10 +137,10 @@ function collectFacts(context: CheckContext, expression: Expression, facts: Map<
     }
 
     if (expression.operator === '~=') {
-        const name = nilComparison(expression.left, expression.right);
+        const tested = nilComparison(expression.left, expression.right);
 
-        if (name !== null) {
-            present(context, name, facts);
+        if (tested !== null) {
+            present(context, tested, facts);
         } else {
             applyDiscriminant(context, expression.left, expression.right, false, facts);
         }
@@ -181,18 +187,18 @@ export function negatedFacts(context: CheckContext, condition: Expression): Map<
     const facts = new Map<string, Type>();
 
     if (condition.kind === 'binary-expression' && condition.operator === 'or') {
-        for (const [name, type] of [...negatedFacts(context, condition.left), ...negatedFacts(context, condition.right)]) {
-            facts.set(name, type);
+        for (const [path, type] of [...negatedFacts(context, condition.left), ...negatedFacts(context, condition.right)]) {
+            facts.set(path, type);
         }
 
         return facts;
     }
 
     if (condition.kind === 'binary-expression' && condition.operator === '==') {
-        const name = nilComparison(condition.left, condition.right);
+        const tested = nilComparison(condition.left, condition.right);
 
-        if (name !== null) {
-            present(context, name, facts);
+        if (tested !== null) {
+            present(context, tested, facts);
         } else {
             applyDiscriminant(context, condition.left, condition.right, false, facts);
         }
@@ -202,8 +208,8 @@ export function negatedFacts(context: CheckContext, condition: Expression): Map<
         applyDiscriminant(context, condition.left, condition.right, true, facts);
     }
 
-    if (condition.kind === 'unary-expression' && condition.operator === 'not' && condition.operand.kind === 'identifier') {
-        present(context, condition.operand.name, facts);
+    if (condition.kind === 'unary-expression' && condition.operator === 'not') {
+        present(context, condition.operand, facts);
     }
 
     return facts;

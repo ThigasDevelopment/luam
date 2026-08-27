@@ -14,6 +14,19 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- A type guard now refines a stable access path, not only a name. A path is a
+  name followed by literal fields, so `if self.connection ~= nil then` refines
+  the field inside the block, `self.socket.handle` refines a nested one, and
+  `self.state.kind == 'ready'` discriminates a union behind a path. Copying the
+  field into a local first is no longer required.
+- The refinement is dropped on every write the checker can name: to the path,
+  to a prefix of it, to a path below it, to its root, inside a loop body, or
+  inside a function declared in the same block. A call or a dynamic index in
+  the path produces no refinement at all. A field cleared through a second
+  reference to the same table is a recorded boundary, not a diagnostic.
+
 ## 0.18.2 - 2026-08-27
 
 ### Fixed

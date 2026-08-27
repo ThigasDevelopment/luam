@@ -103,4 +103,19 @@ describe('diagnostics', () => {
         expect(diagnostics[0]?.code).toBe('env-path-directive-conflict');
         expect(diagnostics[0]?.severity).toBe(2);
     });
+
+    it('narrows a guarded field the same way the compiler does', () => {
+        const service = new LanguageService();
+        const types = 'type Session = {\n    connection?: string\n}\n\n';
+        const guarded = `${types}function take(session: Session): void\n    if session.connection ~= nil then\n        local text: string = session.connection\n    end\nend\n`;
+        const written = `${types}function take(session: Session): void\n    if session.connection ~= nil then\n        session.connection = nil\n\n        local text: string = session.connection\n    end\nend\n`;
+
+        service.update(SERVER_FILE, 1, guarded);
+
+        expect(service.diagnostics(SERVER_FILE)).toHaveLength(0);
+
+        service.update(SERVER_FILE, 2, written);
+
+        expect(service.diagnostics(SERVER_FILE).map((diagnostic) => diagnostic.code)).toEqual(['check-type-mismatch']);
+    });
 });

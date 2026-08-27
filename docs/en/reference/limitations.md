@@ -13,31 +13,67 @@ will not:
 | **Upstream constraint** | Imposed by a source Luam reads instead of owning. |
 | **Platform constraint** | Imposed by MTA or Lua 5.1. It does not move. |
 
-## Narrowing reaches names, not fields
+## Narrowing follows a path, not an alias
 
-**Planned.** Path-sensitive flow analysis is what lifts it.
+**Design boundary.** Recorded in
+[ADR-025](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/025-access-path-narrowing.md).
 
-A [type guard](/en/language/types#type-guards) refines a **name** inside the
-block it guards. A field keeps its declared type, however you test it:
+A [type guard](/en/language/types#type-guards) refines a **stable access path**:
+a name, or a name followed by literal fields. `if self.connection ~= nil then`
+refines the field inside the block it guards, and so does a nested path such as
+`self.socket.handle`. A [discriminant](/en/language/types#discriminated-unions)
+works on a path too, so `self.state.kind == 'ready'` picks the union member.
 
-<<< @/snippets/errors/field-narrowing/src/server/adapter.luam{luam}
+The fact is dropped as soon as the checker sees a write that can reach it: an
+assignment to the path, to a prefix of it, to a path below it, to its root, one
+inside a loop body, or one inside a function declared in the same block. A path
+also has to be nameable end to end, so a call or a dynamic index produces no
+fact at all and `session.slots[key]` keeps its declared type.
 
-<<< @/snippets/output/errors/field-narrowing.txt{text}
-
-Copy the field into a local first:
+What the checker does not see is a second reference to the same table. A Lua
+table is a reference, so a field cleared through another name leaves the
+refinement standing:
 
 ```luam static
-local connection = self.connection
+local alias = self
 
-if connection ~= nil then
-    local handle: userdata = connection
+if self.connection ~= nil then
+    release(alias)
+
+    local handle: userdata = self.connection
+end
+```
+
+`release` may set `alias.connection` to `nil`, and `self.connection` is still
+`userdata` on the line below. Tracking that is a points-to analysis across
+function boundaries, and the alternative — dropping every field fact at every
+call — would erase the refinement whenever a single `outputDebugString` sits
+between the guard and the use. Neither is what Luam does.
+
+## Narrowing does not cross a branch or a loop
+
+**Planned.** A control-flow graph is what lifts it.
+
+A fact lives inside the block the condition guards. Storing the condition in a
+variable does not carry it, because the variable is not the test:
+
+<<< @/snippets/errors/flow-narrowing/src/server/adapter.luam{luam}
+
+<<< @/snippets/output/errors/flow-narrowing.txt{text}
+
+Test the path itself, in the block that uses it:
+
+```luam static
+if self.connection ~= nil then
+    local handle: userdata = self.connection
 end
 ```
 
 A guard clause does carry: when the block always exits with `return` or `break`,
-the negated condition narrows the rest of the enclosing block. What does not
-carry is anything subtler — a `while` that only sometimes breaks, a flag set in
-one branch and read in another. There is no flow analysis beyond the guard.
+the negated condition refines the rest of the enclosing block. What does not
+carry is anything subtler — a field refined in both branches of an `if` and read
+after it, a `while` that only sometimes breaks, a flag set in one branch and read
+in another.
 
 An operation must still be valid for the whole union: `key + 1` on
 `string | number` is `check-invalid-operand`, because one of the members cannot

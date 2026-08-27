@@ -1,11 +1,13 @@
 import type { Expression } from '@compiler/parser/ast';
 
+import { pathOf, pathType } from './access-path';
 import type { CheckContext } from './context';
 import { optionMemberType } from './union-members';
 import { createBooleanLiteral, createNumberLiteral, createStringLiteral, createUnion, isAssignable, withoutNil, type Type } from './types';
 
 interface DiscriminantTest {
-    name: string;
+    path: string;
+    subject: Expression;
     property: string;
     value: Type;
 }
@@ -23,23 +25,24 @@ function literalValue(expression: Expression): Type | null {
 }
 
 function discriminantTest(left: Expression, right: Expression): DiscriminantTest | null {
-    if (left.kind !== 'member-expression' || left.object.kind !== 'identifier') {
+    if (left.kind !== 'member-expression') {
         return null;
     }
 
+    const path = pathOf(left.object);
     const value = literalValue(right);
 
-    return value === null ? null : { name: left.object.name, property: left.property, value };
+    return path === null || value === null ? null : { path, subject: left.object, property: left.property, value };
 }
 
-function subjectType(context: CheckContext, name: string): Type | null {
-    const type = context.narrowedType(name) ?? context.binder.lookup(name)?.type ?? null;
+function subjectType(context: CheckContext, test: DiscriminantTest): Type | null {
+    const type = context.narrowedType(test.path) ?? pathType(context, test.subject);
 
     return type === null ? null : withoutNil(type);
 }
 
 function filterOptions(context: CheckContext, test: DiscriminantTest, keep: boolean): Type | null {
-    const subject = subjectType(context, test.name);
+    const subject = subjectType(context, test);
 
     if (subject === null || subject.kind !== 'union') {
         return null;
@@ -71,5 +74,5 @@ export function discriminantFact(context: CheckContext, left: Expression, right:
 
     const narrowed = filterOptions(context, test, keep);
 
-    return narrowed === null ? null : [test.name, narrowed];
+    return narrowed === null ? null : [test.path, narrowed];
 }

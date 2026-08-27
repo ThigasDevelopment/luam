@@ -13,32 +13,69 @@ vai:
 | **Restrição da fonte** | Imposta por uma fonte que o Luam lê em vez de possuir. |
 | **Restrição da plataforma** | Imposta pelo MTA ou pelo Lua 5.1. Ela não sai do lugar. |
 
-## O estreitamento alcança nomes, não campos
+## O estreitamento segue um caminho, não um apelido
 
-**Planejado.** Uma análise de fluxo sensível a caminho é o que resolve isso.
+**Decisão de projeto.** Registrada na
+[ADR-025](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/025-access-path-narrowing.md).
 
-Uma [guarda de tipo](/pt-br/language/types#guardas-de-tipo) refina um **nome**
-dentro do bloco que ela protege. Um campo mantém o tipo declarado, não importa
-como você testa:
+Uma [guarda de tipo](/pt-br/language/types#guardas-de-tipo) refina um **caminho
+de acesso estável**: um nome, ou um nome seguido de campos literais.
+`if self.connection ~= nil then` refina o campo dentro do bloco que a guarda
+protege, e o mesmo vale para um caminho aninhado como `self.socket.handle`. Um
+[discriminante](/pt-br/language/types#unioes-discriminadas) também trabalha
+sobre um caminho, então `self.state.kind == 'ready'` escolhe o membro da união.
 
-<<< @/snippets/errors/field-narrowing/src/server/adapter.luam{luam}
+O fato é descartado assim que o verificador vê uma escrita que pode alcançá-lo:
+uma atribuição ao caminho, a um prefixo dele, a um caminho abaixo dele, à sua
+raiz, uma dentro do corpo de um laço, ou uma dentro de uma função declarada no
+mesmo bloco. O caminho também precisa ser nomeável do começo ao fim, então uma
+chamada ou um índice dinâmico não produz fato nenhum e `session.slots[key]`
+mantém o tipo declarado.
 
-<<< @/snippets/output/errors/field-narrowing.txt{text}
-
-Copie o campo para um local antes:
+O que o verificador não enxerga é uma segunda referência à mesma tabela. Uma
+tabela Lua é uma referência, então um campo limpo por outro nome deixa o
+refinamento de pé:
 
 ```luam static
-local connection = self.connection
+local alias = self
 
-if connection ~= nil then
-    local handle: userdata = connection
+if self.connection ~= nil then
+    release(alias)
+
+    local handle: userdata = self.connection
+end
+```
+
+`release` pode colocar `nil` em `alias.connection`, e `self.connection` continua
+`userdata` na linha de baixo. Rastrear isso é uma análise de apontamentos que
+atravessa funções, e a alternativa — descartar todo fato de campo em qualquer
+chamada — apagaria o refinamento sempre que um único `outputDebugString`
+estivesse entre a guarda e o uso. O Luam não faz nem uma coisa nem outra.
+
+## O estreitamento não atravessa um ramo nem um laço
+
+**Planejado.** Um grafo de fluxo de controle é o que resolve isso.
+
+Um fato vive dentro do bloco que a condição protege. Guardar a condição em uma
+variável não leva o fato adiante, porque a variável não é o teste:
+
+<<< @/snippets/errors/flow-narrowing/src/server/adapter.luam{luam}
+
+<<< @/snippets/output/errors/flow-narrowing.txt{text}
+
+Teste o próprio caminho, no bloco que o usa:
+
+```luam static
+if self.connection ~= nil then
+    local handle: userdata = self.connection
 end
 ```
 
 Uma guarda com saída antecipada vale: quando o bloco sempre sai com `return` ou
-`break`, a condição negada estreita o resto do bloco que a contém. O que não vale
-é qualquer coisa mais sutil — um `while` que só às vezes dá `break`, uma flag
-definida em um ramo e lida em outro. Não há análise de fluxo além da guarda.
+`break`, a condição negada refina o resto do bloco que a contém. O que não vale
+é qualquer coisa mais sutil — um campo refinado nos dois ramos de um `if` e lido
+depois dele, um `while` que só às vezes dá `break`, uma flag definida em um ramo
+e lida em outro.
 
 Uma operação ainda precisa ser válida para a união inteira: `key + 1` em
 `string | number` é `check-invalid-operand`, porque um dos membros não soma. A

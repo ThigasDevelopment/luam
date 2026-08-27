@@ -164,19 +164,27 @@ export class CheckContext {
         this.narrowings.push(new Map(facts));
     }
 
+    get isNarrowed(): boolean {
+        return this.narrowings.length > 0;
+    }
+
     popNarrowing(): void {
         this.narrowings.pop();
     }
 
-    forgetNarrowing(name: string): void {
+    forgetNarrowing(path: string): void {
         for (const frame of this.narrowings) {
-            frame.delete(name);
+            for (const key of [...frame.keys()]) {
+                if (key === path || key.startsWith(`${path}.`) || path.startsWith(`${key}.`)) {
+                    frame.delete(key);
+                }
+            }
         }
     }
 
-    narrowedType(name: string): Type | null {
+    narrowedType(path: string): Type | null {
         for (let index = this.narrowings.length - 1; index >= 0; index -= 1) {
-            const found = this.narrowings[index]?.get(name);
+            const found = this.narrowings[index]?.get(path);
 
             if (found !== undefined) {
                 return found;

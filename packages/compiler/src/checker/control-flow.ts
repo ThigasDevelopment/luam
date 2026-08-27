@@ -1,5 +1,6 @@
 import type { Expression, GenericForStatement, IfClause, NumericForStatement, Statement } from '@compiler/parser/ast';
 
+import { forgetAssignedPaths } from './access-path';
 import type { CheckContext } from './context';
 import { checkExpression } from './expressions';
 import { conditionFacts, negatedFacts } from './narrowing';
@@ -46,6 +47,7 @@ export function checkNumericFor(context: CheckContext, statement: NumericForStat
         }
     }
 
+    forgetAssignedPaths(context, statement.body);
     context.binder.pushScope();
     context.binder.declare({ name: statement.variable.name, type: NUMBER_TYPE, isLocal: true, position: statement.variable.position, origin: 'local' });
     checkStatements(context, statement.body);
@@ -79,6 +81,7 @@ export function checkGenericFor(context: CheckContext, statement: GenericForStat
 
     const iterated = iteratedTypes(context, statement.iterators);
 
+    forgetAssignedPaths(context, statement.body);
     context.binder.pushScope();
 
     statement.variables.forEach((variable, index) => {
