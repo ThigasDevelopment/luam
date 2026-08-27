@@ -1,15 +1,19 @@
 ---
-id: <milestone>.<task>
+id: <MM>.<TT>
 title: <short title>
 agent: architecture-engineer | test-engineer | performance-engineer | security-engineer | github-engineer | documentation-engineer
-status: todo | doing | done
+status: todo | doing | done | superseded
 depends-on: []
+superseded-by: <MM>.<TT>
 ---
 
-# <id> — <title>
+# <MM>.<TT> - <title>
 
-> File: `.claude/plans/<milestone>.<task>-<slug>-<agent>.md`
-> Example: `.claude/plans/1.1-scaffold-workspace-architecture-engineer.md`
+> File: `.claude/plans/<MM>.<TT>-<slug>.md`
+> Both segments are zero-padded to two digits so the directory sorts in numeric
+> order instead of lexicographic order. The responsible agent is recorded in the
+> `agent` field above, never in the filename.
+> Drop `superseded-by` unless `status` is `superseded`.
 > Update `status` in the frontmatter as work advances and reflect it in the
 > [roadmap](../docs/roadmap.md).
 
