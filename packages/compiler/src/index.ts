@@ -118,7 +118,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
     }
 
     const references = reachedNames(checked.references, options.projectReferences);
-    const emitted = emit(parsed.program, checked.types, references, checked.generatedMembers);
+    const emitted = emit(parsed.program, checked.types, references, checked.generatedMembers, 0, checked.staticAccess);
     const preserved = emitPreservingSource({
         source,
         program: parsed.program,
@@ -128,6 +128,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         types: checked.types,
         references,
         generatedMembers: checked.generatedMembers,
+        staticAccess: checked.staticAccess,
         development: options.development === true,
     });
     const required = new Set<RuntimeHelper>(emitted.requiredHelpers);

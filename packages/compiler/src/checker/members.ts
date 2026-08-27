@@ -65,6 +65,39 @@ function checkInterfaceMember(context: CheckContext, name: string, members: Read
     return ANY_TYPE;
 }
 
+export function isUserClassReference(context: CheckContext, name: string): boolean {
+    const symbol = context.binder.lookup(name);
+
+    return symbol !== null && !symbol.isLocal && context.declarations.lookupClass(name) !== null;
+}
+
+export function resolveStaticMember(context: CheckContext, className: string, expression: MemberExpression): Type {
+    const member = context.declarations.lookupStaticMember(className, expression.property);
+
+    if (member !== null) {
+        if (member.deprecated === true) {
+            context.warn('check-deprecated-use', `Member "${expression.property}" is deprecated.`, expression.position);
+        }
+
+        context.staticAccess.add(expression);
+
+        return member.type;
+    }
+
+    if (context.awaitsDeclaration(className)) {
+        context.staticAccess.add(expression);
+
+        return ANY_TYPE;
+    }
+
+    const instance = context.declarations.lookupMember(className, expression.property);
+    const hint = instance === null ? '' : ` It is an instance member, so read it from a value of "${className}".`;
+
+    context.report('check-unknown-member', `Class "${className}" has no static member "${expression.property}".${hint}`, expression.position);
+
+    return ANY_TYPE;
+}
+
 export function resolveNamedMember(context: CheckContext, name: string, expression: MemberExpression): Type | null {
     const enumeration = context.declarations.lookupEnum(name);
 
@@ -84,6 +117,16 @@ export function resolveNamedMember(context: CheckContext, name: string, expressi
 
     if (isMtaElement(context, name)) {
         return resolveMtaMember(context, name, expression.property, expression.position)?.type ?? ANY_TYPE;
+    }
+
+    const staticMember = context.declarations.lookupStaticMember(name, expression.property);
+
+    if (staticMember !== null) {
+        const message = `"${expression.property}" is a static member of class "${name}". Read it as "${name}.${expression.property}".`;
+
+        context.report('check-static-receiver', message, expression.position);
+
+        return staticMember.type;
     }
 
     if (context.awaitsDeclaration(name)) {
@@ -134,10 +177,12 @@ export function checkNewExpression(context: CheckContext, expression: NewExpress
         return ANY_TYPE;
     }
 
-    if (context.isPredeclaredClass(expression.className) && !context.insideFunction()) {
-        const message = `Class "${expression.className}" is declared further down this file, so it does not exist yet at this point.`;
+    const pending = context.insideFunction() ? null : context.pendingDeclarationOf(expression.className);
 
-        context.report('check-class-before-declaration', message, expression.position);
+    if (pending !== null) {
+        const subject = pending === expression.className ? `Class "${pending}"` : `Class "${expression.className}" extends "${pending}", which`;
+
+        context.report('check-class-before-declaration', `${subject} is declared further down this file, so it does not exist yet at this point.`, expression.position);
     }
 
     const constructor = context.declarations.lookupMember(expression.className, 'constructor');

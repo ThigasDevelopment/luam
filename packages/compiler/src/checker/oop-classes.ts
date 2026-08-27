@@ -36,7 +36,7 @@ function buildRegistry(): DeclarationRegistry {
             });
         }
 
-        registry.declareClass({ name: declaration.name, superClass: declaration.parent, interfaces: [], members, position: MTA_POSITION });
+        registry.declareClass({ name: declaration.name, superClass: declaration.parent, interfaces: [], members, statics: new Map(), position: MTA_POSITION });
     }
 
     return registry;

@@ -74,6 +74,47 @@ class PremiumAccount extends Account {
   that does not exist is `check-unknown-super-method`.
 - `self:super(...)` is not valid; call `super(...)` directly.
 
+## Static members
+
+`static` puts a field or a method on the **class** instead of on its instances:
+
+```luam
+class Counter {
+    static total: number = 0
+
+    static bump = function (amount: number): number
+        Counter.total = Counter.total + amount
+
+        return Counter.total
+    end
+
+    label: string = 'counter'
+}
+```
+
+Reach a static by naming the class, an instance member through a value:
+
+| Written | Resolves to | Wrong form |
+| --- | --- | --- |
+| `Counter.total` | the static field | `counter.total` is `check-static-receiver` |
+| `Counter.bump(1)` | the static method | `Counter:bump(1)` is `check-static-receiver` |
+| `counter.label` | the instance field | `Counter.label` is `check-unknown-member` |
+
+The rules that follow from that split:
+
+- A static method has no `self` — writing one is `check-invalid-self` — and no
+  `super(...)`, which is `check-invalid-super`.
+- One name cannot be both static and instance in the same class; that is
+  `check-duplicate-class-member`.
+- Statics are **inherited and shared**: `Child.origin` reads the slot
+  `Base.origin` holds, and writing through either name is visible through both.
+  A static that shadows an inherited one must carry the same type, or it is
+  `check-invalid-override`.
+- A static field initializer runs once, when the class declaration runs.
+
+`static` is only a modifier when a member name follows it on the same line, so a
+field named `static` and a local named `static` both keep working.
+
 ## Declaration order
 
 A class is a **type everywhere in its file** and a **value from the line its

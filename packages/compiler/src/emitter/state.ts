@@ -10,6 +10,7 @@ export type RuntimeHelper = RuntimeHelperName;
 export interface EmitState {
     types: Map<Expression, Type>;
     references: ReadonlySet<string>;
+    staticAccess: ReadonlySet<Expression>;
     helpers: Set<RuntimeHelper>;
     indent: number;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
@@ -24,8 +25,9 @@ export function createEmitState(
     types: Map<Expression, Type>,
     references: ReadonlySet<string>,
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>,
+    staticAccess: ReadonlySet<Expression> = new Set(),
 ): EmitState {
-    return { types, references, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0, markers: [], symbol: undefined, loopWrap: false };
+    return { types, references, staticAccess, generatedMembers, helpers: new Set<RuntimeHelper>(), indent: 0, markers: [], symbol: undefined, loopWrap: false };
 }
 
 export function requireHelper(state: EmitState, helper: RuntimeHelper | null): void {

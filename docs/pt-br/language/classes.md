@@ -74,6 +74,51 @@ class PremiumAccount extends Account {
   inexistente na classe pai é `check-unknown-super-method`.
 - `self:super(...)` não é válido; chame `super(...)` diretamente.
 
+## Membros estáticos
+
+O `static` coloca um campo ou um método na **classe** em vez de nas instâncias
+dela:
+
+```luam
+class Counter {
+    static total: number = 0
+
+    static bump = function (amount: number): number
+        Counter.total = Counter.total + amount
+
+        return Counter.total
+    end
+
+    label: string = 'counter'
+}
+```
+
+Alcance um estático nomeando a classe, e um membro de instância através de um
+valor:
+
+| Escrito | Resolve para | Forma errada |
+| --- | --- | --- |
+| `Counter.total` | o campo estático | `counter.total` é `check-static-receiver` |
+| `Counter.bump(1)` | o método estático | `Counter:bump(1)` é `check-static-receiver` |
+| `counter.label` | o campo de instância | `Counter.label` é `check-unknown-member` |
+
+As regras que saem dessa separação:
+
+- Um método estático não tem `self` — escrever um é `check-invalid-self` — nem
+  `super(...)`, que é `check-invalid-super`.
+- Um nome não pode ser estático e de instância na mesma classe; isso é
+  `check-duplicate-class-member`.
+- Estáticos são **herdados e compartilhados**: `Child.origin` lê o espaço que
+  `Base.origin` guarda, e escrever por qualquer um dos nomes aparece nos dois.
+  Um estático que sombreia um herdado precisa carregar o mesmo tipo, ou é
+  `check-invalid-override`.
+- O valor inicial de um campo estático roda uma vez, quando a declaração da
+  classe roda.
+
+O `static` só é modificador quando um nome de membro vem depois dele na mesma
+linha, então um campo chamado `static` e um local chamado `static` continuam
+funcionando.
+
 ## Ordem de declaração
 
 Uma classe é um **tipo em todo o arquivo** e um **valor a partir da linha em que

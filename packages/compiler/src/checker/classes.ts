@@ -6,7 +6,7 @@ import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
 import { buildFunctionType, checkFunctionBody } from './statements';
-import { ANY_TYPE, createFunction, createNamed, typeToString, VOID_TYPE, widenInferred, type Type } from './types';
+import { ANY_TYPE, createFunction, createNamed, isAssignable, typeToString, VOID_TYPE, widenInferred, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
     const valueType = member.value === null ? null : checkExpression(context, member.value);
@@ -48,6 +48,33 @@ function syntheticMethodType(context: CheckContext, member: ClassMethodDeclarati
     return buildFunctionType(context, member.parameters, member.returnAnnotation);
 }
 
+function checkMemberSpaces(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
+    for (const member of statement.members) {
+        if (member.isStatic && info.members.has(member.name)) {
+            context.report('check-duplicate-class-member', `Class "${info.name}" declares "${member.name}" as both a static and an instance member.`, member.position);
+        }
+
+        if (!member.isStatic || info.superClass === null) {
+            continue;
+        }
+
+        const inherited = context.declarations.lookupStaticMember(info.superClass, member.name);
+        const declared = info.statics.get(member.name);
+
+        if (inherited === undefined || inherited === null || declared === undefined) {
+            continue;
+        }
+
+        const options = { allowNil: context.allowNil };
+
+        if (!isAssignable(declared.type, inherited.type, options) || !isAssignable(inherited.type, declared.type, options)) {
+            const message = `Static member "${member.name}" must match "${typeToString(inherited.type)}" declared by class "${info.superClass}".`;
+
+            context.report('check-invalid-override', message, member.position);
+        }
+    }
+}
+
 export function registerMembers(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): ClassMethodDeclaration[] {
     const fieldTypes = new Map<ClassFieldDeclaration, Type>();
 
@@ -68,7 +95,9 @@ export function registerMembers(context: CheckContext, info: ClassInfo, statemen
                : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
         const decorators = member.decorators.map((decorator) => decorator.name);
-        info.members.set(member.name, {
+        const space = member.isStatic ? info.statics : info.members;
+
+        space.set(member.name, {
             name: member.name,
             type,
             isMethod: member.kind === 'class-method',
@@ -77,6 +106,8 @@ export function registerMembers(context: CheckContext, info: ClassInfo, statemen
             deprecated: decorators.includes('Deprecated'),
         });
     }
+
+    checkMemberSpaces(context, info, statement);
 
     return generated;
 }
@@ -98,7 +129,7 @@ export function declareBuilder(context: CheckContext, info: ClassInfo, statement
     }
 
     members.set('build', { name: 'build', type: { kind: 'function', parameters: [], minimumArguments: 0, isVariadic: false, returnType: createNamed(statement.name) }, isMethod: true, position: statement.position });
-    context.declarations.declareClass({ name, superClass: null, interfaces: [], members, position: statement.position });
+    context.declarations.declareClass({ name, superClass: null, interfaces: [], members, statics: new Map(), position: statement.position });
     context.declareModuleGlobal({ name, type: createNamed(name), isLocal: false, position: statement.position });
 }
 
@@ -109,9 +140,15 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
         context.report('check-explicit-self-parameter', 'Class methods receive "self" automatically; remove it from the parameter list.', explicitSelf.position);
     }
 
-    const signature = info.members.get(member.name)?.type;
+    const signature = (member.isStatic ? info.statics : info.members).get(member.name)?.type;
 
     if (signature?.kind !== 'function') {
+        return;
+    }
+
+    if (member.isStatic) {
+        checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, null);
+
         return;
     }
 
@@ -167,6 +204,7 @@ export function declareClassInfo(context: CheckContext, statement: ClassDeclarat
         superClass: null,
         interfaces: statement.interfaces,
         members: new Map(),
+        statics: new Map(),
         position: statement.position,
     };
 

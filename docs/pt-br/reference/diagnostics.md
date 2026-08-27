@@ -89,6 +89,8 @@ erro não escreve nada.
 | `check-duplicate-class` | Duas classes com o mesmo nome em um arquivo. |
 | `check-class-cycle` | Uma classe estende a si mesma, direta ou indiretamente. |
 | `check-class-before-declaration` | Um efeito de topo instancia uma classe declarada mais abaixo no arquivo. |
+| `check-duplicate-class-member` | Um nome é declarado como membro estático e de instância. |
+| `check-static-receiver` | Um estático lido por uma instância, ou chamado com dois-pontos. |
 | `check-unknown-interface` | `implements` ou `extends` de interface nomeia uma interface não declarada. |
 | `check-duplicate-interface` | Duas interfaces com o mesmo nome em um arquivo. |
 | `check-duplicate-interface-parent` | Uma interface estende a mesma interface pai mais de uma vez. |

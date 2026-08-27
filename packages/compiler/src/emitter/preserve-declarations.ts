@@ -168,7 +168,7 @@ export function classEdits(input: PreserveInput, statement: ClassDeclaration, sp
             continue;
         }
 
-        if (member.kind === 'class-method') {
+        if (member.kind === 'class-method' && !member.isStatic) {
             const self = selfEdit(source, member, span);
 
             if (self === null) {

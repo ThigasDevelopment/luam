@@ -94,6 +94,13 @@ print(pool.new, pool.type, pool.class)
 construtor, então precisa ser um método. Declará-lo como campo é
 `check-invalid-constructor`.
 
+## `static` é contextual
+
+O `static` é modificador só dentro do corpo de uma classe, e só quando um nome de
+membro vem depois dele na mesma linha. Em qualquer outro lugar é um nome comum,
+então um local chamado `static` e um campo de classe chamado `static` continuam
+funcionando. Veja [Membros estáticos](/pt-br/language/classes#membros-estaticos).
+
 ## `self` e `super` são contextuais
 
 Nenhum dos dois é reservado pelo lexer, então ambos continuam sendo nomes comuns

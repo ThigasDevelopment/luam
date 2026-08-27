@@ -21,6 +21,7 @@ export interface CheckResult {
     diagnostics: Diagnostic[];
     types: Map<Expression, Type>;
     references: ReadonlySet<string>;
+    staticAccess: ReadonlySet<Expression>;
     declarations: DeclarationRegistry;
     aliases: ReadonlyMap<string, Type>;
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
@@ -72,6 +73,7 @@ export function check(program: Program, mode: StrictMode, environment: Environme
         diagnostics: sortDiagnostics([...structure, ...directives.diagnostics, ...context.diagnostics]),
         types: context.types,
         references: context.references,
+        staticAccess: context.staticAccess,
         declarations: context.declarations,
         aliases: context.binder.resolvedAliases(),
         declaredGlobals: context.declaredGlobals,

@@ -44,7 +44,7 @@ function surgery(collector: Collector, statement: Statement): Surgery | null {
         return edits === null ? null : { edits, wrapsBody: false };
     }
 
-    if (loopBody(statement) === null || !isPreservableStatement(statement, input.types)) {
+    if (loopBody(statement) === null || !isPreservableStatement(statement, input.types, input.staticAccess)) {
         return null;
     }
 
@@ -85,7 +85,7 @@ function visit(collector: Collector, statement: Statement, wrapped: boolean): vo
         return;
     }
 
-    if (isPreservableStatement(statement, collector.input.types) && keepsScaffolding(statement)) {
+    if (isPreservableStatement(statement, collector.input.types, collector.input.staticAccess) && keepsScaffolding(statement)) {
         const inherited = statement.kind === 'do-statement' || statement.kind === 'if-statement' ? wrapped : false;
 
         descend(collector, statement, inherited, false);

@@ -11,6 +11,7 @@ export interface ClassFieldDeclaration extends NodeBase {
     annotation: TypeAnnotation | null;
     value: Expression | null;
     decorators: Decorator[];
+    isStatic: boolean;
 }
 
 export interface ClassMethodDeclaration extends NodeBase {
@@ -18,6 +19,7 @@ export interface ClassMethodDeclaration extends NodeBase {
     name: string;
     isConstructor: boolean;
     isSynthetic: boolean;
+    isStatic: boolean;
     parameters: Parameter[];
     returnAnnotation: TypeAnnotation | null;
     body: Statement[];

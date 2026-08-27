@@ -11,6 +11,8 @@ import { specializeEventCall } from './event-calls';
 import {
     checkNewExpression,
     checkSuperCall,
+    isUserClassReference,
+    resolveStaticMember,
     NATIVE_CONSTRUCTOR,
     nativeConstructor,
     resolveLibraryMember,
@@ -79,6 +81,12 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
         checkExpression(context, expression.object);
 
         return context.record(expression, narrowed);
+    }
+
+    if (expression.object.kind === 'identifier' && isUserClassReference(context, expression.object.name)) {
+        context.references.add(expression.object.name);
+
+        return context.record(expression, resolveStaticMember(context, expression.object.name, expression));
     }
 
     if (expression.object.kind === 'identifier' && isMtaClassReference(context, expression.object.name)) {
@@ -259,6 +267,16 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
         }
 
         return context.record(expression, checkSignature(context, expression.args, constructor, expression.position));
+    }
+
+    if (expression.method !== null && expression.callee.kind === 'identifier' && isUserClassReference(context, expression.callee.name)) {
+        const name = expression.callee.name;
+        const message = `Call the static member "${expression.method}" as "${name}.${expression.method}(...)". A class value has no "self" to pass.`;
+
+        context.report('check-static-receiver', message, expression.position);
+        checkValueList(context, expression.args);
+
+        return context.record(expression, ANY_TYPE);
     }
 
     if (expression.method === null) {

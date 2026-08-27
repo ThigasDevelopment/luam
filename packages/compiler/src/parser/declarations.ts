@@ -108,7 +108,7 @@ export function parseDecorators(stream: TokenStream): Decorator[] {
     return decorators;
 }
 
-function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorator[]): ClassMethodDeclaration {
+function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorator[], isStatic: boolean): ClassMethodDeclaration {
     stream.expect('operator', '=');
 
     const expression = parseFunctionExpression(stream);
@@ -118,6 +118,7 @@ function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorat
         name: token.value,
         isConstructor: token.value === 'constructor',
         isSynthetic: false,
+        isStatic,
         parameters: expression.parameters,
         returnAnnotation: expression.returnAnnotation,
         body: expression.body,
@@ -126,7 +127,7 @@ function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorat
     };
 }
 
-function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: Decorator[]): ClassMethodDeclaration {
+function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: Decorator[], isStatic: boolean): ClassMethodDeclaration {
     const parameters = parseParameters(stream);
     const returnAnnotation = parseOptionalAnnotation(stream);
     const body = parseBraceBlock(stream);
@@ -136,6 +137,7 @@ function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: De
         name: token.value,
         isConstructor: token.value === 'constructor',
         isSynthetic: false,
+        isStatic,
         parameters,
         returnAnnotation,
         body,
@@ -159,18 +161,40 @@ function expectClassFieldBoundary(stream: TokenStream, token: Token): void {
     throw stream.error(`Expected a line break or separator after class member "${token.value}".`, 'parse-unexpected-token');
 }
 
+const STATIC_MODIFIER = 'static';
+
+function parseStaticModifier(stream: TokenStream): boolean {
+    if (!stream.check('identifier', STATIC_MODIFIER)) {
+        return false;
+    }
+
+    const modifier = stream.current();
+
+    if (!stream.checkName(1) || stream.peek(1).position.line !== modifier.position.line) {
+        return false;
+    }
+
+    const checkpoint = stream.checkpoint();
+
+    stream.next();
+    stream.eraseToCurrent(checkpoint);
+
+    return true;
+}
+
 function parseClassMember(stream: TokenStream): ClassMember {
     const decorators = parseDecorators(stream);
+    const isStatic = parseStaticModifier(stream);
     const token = stream.expectName();
 
     if (stream.check('punctuation', '(')) {
         stream.report('parse-class-method-form', `Write class member "${token.value}" as "${token.value} = function (...) ... end".`, token.position);
 
-        return parseBraceClassMethod(stream, token, decorators);
+        return parseBraceClassMethod(stream, token, decorators, isStatic);
     }
 
     if (stream.check('operator', '=') && stream.checkAhead(1, 'keyword', 'function')) {
-        return parseClassMethod(stream, token, decorators);
+        return parseClassMethod(stream, token, decorators, isStatic);
     }
 
     const annotation = parseFieldAnnotation(stream);
@@ -178,7 +202,7 @@ function parseClassMember(stream: TokenStream): ClassMember {
 
     expectClassFieldBoundary(stream, token);
 
-    return { kind: 'class-field', name: token.value, annotation, value, decorators, position: token.position };
+    return { kind: 'class-field', name: token.value, annotation, value, decorators, isStatic, position: token.position };
 }
 
 function parseClassModifiers(stream: TokenStream, declaration: ClassDeclaration): void {

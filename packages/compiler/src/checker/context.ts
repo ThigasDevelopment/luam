@@ -105,6 +105,8 @@ export class CheckContext {
 
     readonly calledMembers = new Set<Expression>();
 
+    readonly staticAccess = new Set<Expression>();
+
     private readonly typeParameters = new Set<string>();
 
     readonly generatedMembers = new Map<ClassDeclaration, ClassMethodDeclaration[]>();
@@ -210,21 +212,25 @@ export class CheckContext {
         return this.predeclared.has(name);
     }
 
-    awaitsDeclaration(name: string): boolean {
+    pendingDeclarationOf(name: string): string | null {
         const seen = new Set<string>();
 
         let current: ClassInfo | null = this.declarations.lookupClass(name);
 
         while (current !== null && !seen.has(current.name)) {
             if (this.predeclared.has(current.name)) {
-                return true;
+                return current.name;
             }
 
             seen.add(current.name);
             current = current.superClass === null ? null : this.declarations.lookupClass(current.superClass);
         }
 
-        return false;
+        return null;
+    }
+
+    awaitsDeclaration(name: string): boolean {
+        return this.pendingDeclarationOf(name) !== null;
     }
 
     insideFunction(): boolean {

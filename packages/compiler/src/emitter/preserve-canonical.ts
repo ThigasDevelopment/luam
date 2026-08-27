@@ -43,7 +43,7 @@ function erasedEdit(source: string, span: SourceSpan): HybridSourceEdit {
 
 export function canonicalEdit(input: PreserveInput, statement: Statement, span: SourceSpan): HybridSourceEdit | null {
     const { source } = input;
-    const emitted = emit({ ...input.program, body: [statement] }, input.types, input.references, input.generatedMembers, statement.position.line - 1);
+    const emitted = emit({ ...input.program, body: [statement] }, input.types, input.references, input.generatedMembers, statement.position.line - 1, input.staticAccess);
     const trimmed = span.end < source.length && emitted.code.endsWith('\n') ? emitted.code.slice(0, -1) : emitted.code;
 
     if (trimmed.length === 0) {
