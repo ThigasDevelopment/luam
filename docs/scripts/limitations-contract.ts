@@ -18,16 +18,17 @@ export interface StaleClaim {
 export const LIMITATIONS_PAGE = 'reference/limitations.md';
 
 export const LIMITATIONS: readonly Limitation[] = [
-    { id: 'field-narrowing', label: 'planned', owners: ['26.4'], decision: null },
-    { id: 'class-runtime-visibility', label: 'platform-constraint', owners: [], decision: 'docs/adr/006-two-phase-class-declaration.md' },
+    { id: 'path-narrowing-aliasing', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/025-access-path-narrowing.md' },
+    { id: 'flow-narrowing', label: 'planned', owners: ['26.13'], decision: null },
+    { id: 'class-runtime-visibility', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/024-two-phase-class-declaration.md' },
     { id: 'class-members', label: 'planned', owners: ['26.6', '26.7', '26.10'], decision: null },
     { id: 'catalog-lag', label: 'upstream-constraint', owners: [], decision: '.github/workflows/catalog-refresh.yml' },
     { id: 'unverified-exports', label: 'planned', owners: ['26.8'], decision: null },
     { id: 'declaration-recheck', label: 'planned', owners: ['26.3'], decision: null },
-    { id: 'opaque-configuration', label: 'design-boundary', owners: [], decision: 'docs/adr/004-opaque-native-configuration.md' },
+    { id: 'opaque-configuration', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/022-opaque-native-configuration.md' },
     { id: 'source-faithful-output', label: 'design-boundary', owners: [], decision: 'docs/en/reference/output-layouts.md' },
-    { id: 'erased-annotations', label: 'design-boundary', owners: [], decision: 'docs/adr/003-erased-type-annotations.md' },
-    { id: 'file-environment', label: 'platform-constraint', owners: [], decision: 'docs/adr/005-file-level-environments.md' },
+    { id: 'erased-annotations', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/021-erased-type-annotations.md' },
+    { id: 'file-environment', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/023-file-level-environments.md' },
     { id: 'development-log-scope', label: 'planned', owners: ['26.12'], decision: null },
 ];
 

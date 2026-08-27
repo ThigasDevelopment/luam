@@ -1,4 +1,4 @@
-# ADR-004: Keep a native `config.lua` opaque to compilation
+# ADR-022: Keep a native `config.lua` opaque to compilation
 
 **Status:** Accepted
 

@@ -35,7 +35,7 @@ export default defineConfig({
     cleanUrls: true,
     lastUpdated: true,
     metaChunk: true,
-    srcExclude: ['adr/**', 'generated/**', 'snippets/**'],
+    srcExclude: ['generated/**', 'snippets/**'],
     sitemap: { hostname: SITE },
     head: [
         ['link', { rel: 'icon', type: 'image/svg+xml', href: '/luam-mark.svg' }],

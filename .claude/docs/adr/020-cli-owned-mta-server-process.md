@@ -1,4 +1,4 @@
-# ADR-002: Let the CLI own an opt-in local MTA server process
+# ADR-020: Let the CLI own an opt-in local MTA server process
 
 **Status:** Accepted
 

@@ -1,4 +1,4 @@
-# ADR-003: Erase type annotations by default
+# ADR-021: Erase type annotations by default
 
 **Status:** Accepted
 
