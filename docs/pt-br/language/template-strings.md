@@ -13,11 +13,15 @@ então o Lua gerado continua legível e compatível com o MTA.
 
 `${name:fallback}` usa o padrão quando o valor é `nil`:
 
-```luam expect-error
+```luam
 local caption: string = `HUD ${title:untitled}`
 ```
 
 O padrão é texto literal até a chave de fechamento. Ele não é uma expressão.
+
+Um padrão também flexibiliza a regra de escopo abaixo. `${title:untitled}`
+compila mesmo onde `title` não está declarado, porque o padrão já afirma que o
+valor pode faltar. Sem ele, o nome precisa estar no escopo.
 
 ## Caminhos de membro
 
@@ -32,7 +36,7 @@ local line: string = `Player ${session.player}`
 ::: warning Uma interpolação aceita um nome, não uma expressão
 `${getPlayerName(player)}` é `check-unknown-template-root`. O compilador resolve
 a raiz do caminho no escopo atual, então uma chamada, um operador ou um literal
-dentro de `${...}` é rejeitado.
+dentro de `${...}` é rejeitado, com padrão ou sem.
 :::
 
 Calcule o valor antes:
@@ -45,8 +49,8 @@ outputChatBox(`${name} has been here ${uptime} ms`, root)
 ```
 
 É isso que torna o recurso seguro: todo nome interpolado é um nome que o checker
-já viu, então um erro de digitação dentro de uma string vira erro de build em vez
-de um `nil` no chat.
+já viu ou um que você marcou como opcional com um padrão, então um erro de
+digitação dentro de uma string vira erro de build em vez de um `nil` no chat.
 
 ## Um exemplo completo
 

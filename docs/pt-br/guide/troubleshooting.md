@@ -111,7 +111,7 @@ para o que não estreita.
 ## A interpolação diz que um nome não está no escopo
 
 ```
-check-unknown-template-root: Template interpolation "getPlayerName(player)" refers to "getPlayerName(player)", which is not in scope.
+check-unknown-template-root: Template interpolation "getPlayerName(player)" is not a name or a member path. Compute the value first, then interpolate the name.
 ```
 
 Uma interpolação aceita um **nome ou um caminho de membro**, não uma expressão.

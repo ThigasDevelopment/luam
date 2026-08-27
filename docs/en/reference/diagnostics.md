@@ -146,7 +146,7 @@ writes nothing.
 
 | Code | Meaning |
 | --- | --- |
-| `check-unknown-template-root` | An interpolation refers to a name that is not in scope. It takes a name or a member path, never an expression. |
+| `check-unknown-template-root` | An interpolation is not a name or a member path, or it refers to a name that is not in scope and carries no fallback. |
 | `check-empty-interpolation` | `${}` with nothing inside. |
 | `check-export-not-top-level` | `export` on a function that is not top level. |
 | `check-export-member` | `export` on a function declared on a table. |

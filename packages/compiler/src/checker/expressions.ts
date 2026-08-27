@@ -49,6 +49,8 @@ import {
     type Type,
 } from './types';
 
+const NAME_PATH_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$/;
+
 const EXTENSION_RESULTS: Readonly<Record<ExtensionResult, Type>> = {
     boolean: BOOLEAN_TYPE,
     number: NUMBER_TYPE,
@@ -316,7 +318,7 @@ function checkTable(context: CheckContext, expression: TableExpression): Type {
 
 function checkTemplate(context: CheckContext, expression: TemplateLiteral): Type {
     for (const interpolation of collectInterpolations(expression.segments)) {
-        if (interpolation.root.length === 0) {
+        if (interpolation.path.length === 0) {
             const message = 'Template interpolation is empty. Write "${name}", "${object.field}", or "${name:fallback}".';
 
             context.report('check-empty-interpolation', message, interpolation.position);
@@ -324,8 +326,16 @@ function checkTemplate(context: CheckContext, expression: TemplateLiteral): Type
             continue;
         }
 
-        if (context.binder.lookup(interpolation.root) === null) {
-            const message = `Template interpolation "${interpolation.path}" refers to "${interpolation.root}", which is not in scope.`;
+        if (!NAME_PATH_PATTERN.test(interpolation.path)) {
+            const message = `Template interpolation "${interpolation.path}" is not a name or a member path. Compute the value first, then interpolate the name.`;
+
+            context.report('check-unknown-template-root', message, interpolation.position);
+
+            continue;
+        }
+
+        if (interpolation.fallback === null && context.binder.lookup(interpolation.root) === null) {
+            const message = `Template interpolation "${interpolation.path}" refers to "${interpolation.root}", which is not in scope. Write "\${${interpolation.path}:fallback}" to accept a value that may be missing.`;
 
             context.report('check-unknown-template-root', message, interpolation.position);
         }

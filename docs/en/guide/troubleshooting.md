@@ -110,7 +110,7 @@ does not.
 ## Template interpolation says a name is not in scope
 
 ```
-check-unknown-template-root: Template interpolation "getPlayerName(player)" refers to "getPlayerName(player)", which is not in scope.
+check-unknown-template-root: Template interpolation "getPlayerName(player)" is not a name or a member path. Compute the value first, then interpolate the name.
 ```
 
 An interpolation takes a **name or a member path**, not an expression. Compute the
