@@ -103,7 +103,7 @@ function emitTemplate(state: EmitState, segments: readonly TemplateSegment[]): s
 
     requireHelper(state, 'string');
 
-    return `string.template(${emitString(lowered.literal)}, ${templateContext(lowered.roots)})`;
+    return `string.template(${emitString(lowered.literal)}, ${templateContext(lowered.bindings)})`;
 }
 
 function emitBinary(state: EmitState, expression: BinaryExpression, limit: number): string {
