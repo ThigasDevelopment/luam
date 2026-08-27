@@ -2022,6 +2022,7 @@ Status: todo
 | 36.05 | Add the community pull request pipeline | plans/36.05-fork-pull-request-pipeline.md | github-engineer | todo |
 | 36.06 | Add the contributor entry documents and templates | plans/36.06-contributor-entry-documents.md | documentation-engineer | todo |
 | 36.07 | Verify the reorganized pipelines | plans/36.07-pipeline-verification.md | test-engineer | todo |
+| 36.08 | Protect the permanent branches and the release tags | plans/36.08-branch-and-tag-protection.md | github-engineer | todo |
 
 Sequencing:
 
@@ -2040,6 +2041,11 @@ Sequencing:
   pipeline actually does.
 - 36.07 runs against the whole milestone and enforces the invariants 36.04
   established.
+- 36.08 turns the rules into rules GitHub enforces. Its first step, blocking
+  force-push and deletion, has no dependency and should land ahead of the
+  milestone: it carries the whole history-safety benefit at no workflow cost.
+  The pull request and check requirements wait for 36.03, because a required
+  check that fails for a reason the change did not cause would block `main`.
 
 Acceptance:
 
@@ -2058,6 +2064,10 @@ Acceptance:
   `CONTRIBUTING.md`, and a vulnerability has a private channel in `SECURITY.md`.
 - The invariants above are asserted by a suite that blocks a merge, each proven
   by a deliberate regression.
+- Neither permanent branch accepts a force-push or a deletion, and a `v*` tag
+  cannot be moved to another commit after it is published.
+- A merge into `main` requires a pull request whose required checks passed, and
+  the single maintainer can merge it without an administrator bypass.
 
 Deliberately retained boundaries:
 
