@@ -89,7 +89,18 @@ function tableKeyItems(analysis: DocumentAnalysis, offset: number): CompletionIt
         }));
 }
 
+function staticItems(analysis: DocumentAnalysis, name: string, isMethod: boolean): CompletionItem[] {
+    return analysis.declarations
+        .collectStatics(name)
+        .filter((member) => member.isMethod === isMethod)
+        .map((member) => memberItem(member.name, member.type, member.isMethod, name));
+}
+
 function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger: '.' | ':'): CompletionItem[] {
+    if (target.kind === 'class-value') {
+        return trigger === ':' ? [] : [...staticItems(analysis, target.name, false), ...staticItems(analysis, target.name, true)];
+    }
+
     if (target.kind === 'static-class') {
         return trigger === ':' ? [] : mtaStaticMembersFor(target.name, analysis.environment).map((member) => mtaMemberItem(member, target.name));
     }

@@ -237,6 +237,18 @@ function memberSignature(analysis: DocumentAnalysis, offset: number, segments: r
         return fromMtaStaticMember(analysis, target.name, member);
     }
 
+    if (target.kind === 'class-value') {
+        const declared = analysis.declarations.lookupStaticMember(target.name, member);
+
+        if (declared === null || declared.type.kind !== 'function') {
+            return null;
+        }
+
+        const staticShape = typeParameters(declared.type);
+
+        return { name: `${target.name}.${member}`, parameters: staticShape.parameters, returnText: staticShape.returnText, documentation: [], parameterDocs: [] };
+    }
+
     if (target.kind !== 'class') {
         return null;
     }

@@ -53,6 +53,10 @@ function memberType(analysis: DocumentAnalysis, target: ReceiverTarget, member: 
         return mtaStaticMember(target.name, member)?.type ?? null;
     }
 
+    if (target.kind === 'class-value') {
+        return analysis.declarations.lookupStaticMember(target.name, member)?.type ?? null;
+    }
+
     if (target.kind !== 'class') {
         return null;
     }
