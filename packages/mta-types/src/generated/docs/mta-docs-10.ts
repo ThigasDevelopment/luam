@@ -128,7 +128,7 @@ export const MTA_DOCS_10: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineRestoreTXDImage',
     },
     engineRestreamWorld: {
-        summary: '',
+        summary: 'This function re-streams everything in the GTA world. Read [https://github.com/multitheftauto/mtasa-blue/pull/1735 this pull request] to understand what it is for.',
         parameters: [],
         returns: 'Returns *true* if the world was restreamed successfully, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineRestreamWorld',
@@ -191,7 +191,7 @@ export const MTA_DOCS_10: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineSetModelTXDID',
     },
     engineSetModelVisibleTime: {
-        summary: '',
+        summary: 'This function changes model visibility time, this is used for example for building lights being shown after 23:00.',
         parameters: [
             { name: 'modelID', isOptional: false, isVariadic: false, summary: 'The ID of the model.' },
             { name: 'timeOn', isOptional: false, isVariadic: false, summary: 'Value between 0 and 24 that states when the model should appear.' },
@@ -230,7 +230,7 @@ export const MTA_DOCS_10: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/EngineSetSurfaceProperties',
     },
     engineStreamingFreeUpMemory: {
-        summary: '',
+        summary: 'This function frees up the streaming RAM memory.',
         parameters: [
             { name: 'bytes', isOptional: false, isVariadic: false, summary: 'The amount of RAM to be freed up in bytes.' },
         ],

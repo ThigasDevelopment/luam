@@ -77,7 +77,7 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/StopSound',
     },
     svgCreate: {
-        summary: '*Check the list of supported [https://github.com/sammycage/lunasvg?tab=readme-ov-file#features features].*\'',
+        summary: 'Creates an svg from size (blank document), filepath or raw data.\n\n*Check the list of supported [https://github.com/sammycage/lunasvg?tab=readme-ov-file#features features].*\'',
         parameters: [
             { name: 'width', isOptional: false, isVariadic: false, summary: 'Desired width, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
             { name: 'height', isOptional: false, isVariadic: false, summary: 'Desired height, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
@@ -88,7 +88,7 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SvgCreate',
     },
     svgGetDocumentXML: {
-        summary: '',
+        summary: 'Gets the underlying XML document from an SVG element.',
         parameters: [
             { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg element you want to get the XML document of.' },
         ],
@@ -96,7 +96,7 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SvgGetDocumentXML',
     },
     svgGetSize: {
-        summary: '',
+        summary: 'Gets the underlying XML document from an SVG element.',
         parameters: [
             { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg you want to get the size of.' },
         ],
@@ -104,7 +104,7 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SvgGetSize',
     },
     svgSetDocumentXML: {
-        summary: '',
+        summary: 'Sets the underlying XML document of an SVG element.',
         parameters: [
             { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg element you want to set the XML document of' },
             { name: 'xmlDocument', isOptional: false, isVariadic: false, summary: 'An xmlnode containing the data to be set on the SVG document' },
@@ -114,7 +114,7 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SvgSetDocumentXML',
     },
     svgSetSize: {
-        summary: '',
+        summary: 'Sets the underlying XML document from an SVG element.',
         parameters: [
             { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg element you want to set the size of.' },
             { name: 'width', isOptional: false, isVariadic: false, summary: 'Desired width, preferably power of two (16, 32, 64 etc.), maximum is 4096' },
@@ -125,7 +125,7 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SvgSetSize',
     },
     svgSetUpdateCallback: {
-        summary: '',
+        summary: 'Sets the update callback of an svg element',
         parameters: [
             { name: 'svgElement', isOptional: false, isVariadic: false, summary: 'The svg you want to set the callback function of.' },
             { name: 'callback', isOptional: false, isVariadic: false, summary: 'The callback function to store on the SVG. If **false** is provided, any existing callback function will be removed from the SVG.' },

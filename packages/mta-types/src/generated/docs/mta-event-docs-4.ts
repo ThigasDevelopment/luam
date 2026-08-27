@@ -221,8 +221,6 @@ export const MTA_EVENT_DOCS_4: EventDocumentationCatalog = {
             { name: 'weapon', isOptional: false, isVariadic: false, summary: 'An integer representing the killer weapon or the damage types.' },
             { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'An integer representing the bodypart the player was damaged.' },
             { name: 'stealth', isOptional: false, isVariadic: false, summary: 'A boolean representing whether or not this was a stealth kill.' },
-            { name: 'animGroup', isOptional: false, isVariadic: false, summary: 'an integer representing the player\'s current animation group.' },
-            { name: 'animID', isOptional: false, isVariadic: false, summary: 'an integer representing the player\'s current animation ID.' },
         ],
         source: 'The source of this event is the player that died.',
         cancel: '',

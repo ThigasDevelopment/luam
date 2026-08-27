@@ -42,19 +42,19 @@ export const MTA_DOCS_35: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsResourceProtected',
     },
     isShowCollisionsEnabled: {
-        summary: '',
+        summary: 'This function gets the collision previews state.',
         parameters: [],
         returns: '* Returns *true* if the collision previews are enabled, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsShowCollisionsEnabled',
     },
     isShowSoundEnabled: {
-        summary: '',
+        summary: 'This function indicates if world sound IDs should be printed in the debug window or not.',
         parameters: [],
         returns: '* Returns *true* if world sound IDs should be printed in the debug window, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsShowSoundEnabled',
     },
     isSoundLooped: {
-        summary: '',
+        summary: 'This function is used to return the current loop state of the sound element.',
         parameters: [
             { name: 'theSound', isOptional: false, isVariadic: false, summary: 'The sound element which you want to get the loop state.' },
         ],
@@ -78,7 +78,7 @@ export const MTA_DOCS_35: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsSoundPaused',
     },
     isTimeFrozen: {
-        summary: '',
+        summary: 'This function allows you to check whether time has been frozen using setTimeFrozen.',
         parameters: [],
         returns: 'Returns true if time is frozen, false otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsTimeFrozen',
@@ -130,13 +130,13 @@ export const MTA_DOCS_35: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsTransferBoxActive',
     },
     isTransferBoxAlwaysVisible: {
-        summary: '',
+        summary: 'Determines if the transfer box should be always visible during downloads. Players can forcefully show the transfer box through a user setting, even if disabled by scripts.',
         parameters: [],
         returns: 'Returns a boolean, whether the transfer box should be always visible or not.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsTransferBoxAlwaysVisible',
     },
     isTransferBoxVisible: {
-        summary: '',
+        summary: 'Determines if the transfer box is visible.',
         parameters: [],
         returns: 'On **server** this returns a boolean, whether the transfer box should be visible during downloads or not. On **client** this returns a boolean, whether the transfer box should be visible or not at the time of invocation.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsTransferBoxVisible',
@@ -204,7 +204,7 @@ export const MTA_DOCS_35: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleOnGround',
     },
     isVehicleRespawnable: {
-        summary: '',
+        summary: 'This function check if the vehicle is respawnable.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle which you\'d like to get respawn state of.' },
         ],
@@ -212,7 +212,7 @@ export const MTA_DOCS_35: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsVehicleRespawnable',
     },
     isVehicleSmokeTrailEnabled: {
-        summary: '',
+        summary: 'This function is used to check planes smoke trail enabled or disabled.',
         parameters: [
             { name: 'veh', isOptional: false, isVariadic: false, summary: '' },
         ],

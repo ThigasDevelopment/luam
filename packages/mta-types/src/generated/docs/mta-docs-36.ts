@@ -17,7 +17,7 @@ export const MTA_DOCS_36: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/IsVoiceEnabled',
     },
     isVolumetricShadowsEnabled: {
-        summary: '',
+        summary: 'This function is used to check whether the shadow enabled or not.',
         parameters: [],
         returns: 'Returns *true* if enabled, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/IsVolumetricShadowsEnabled',

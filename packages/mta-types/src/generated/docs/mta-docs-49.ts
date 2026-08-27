@@ -32,7 +32,7 @@ export const MTA_DOCS_49: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDoorsUndamageable',
     },
     setVehicleDummyPosition: {
-        summary: '',
+        summary: 'This function sets the position of the dummy for the given vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you want to set the dummy position for.' },
             { name: 'dummy', isOptional: false, isVariadic: false, summary: 'The dummy whose position you want to set.' },

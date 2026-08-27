@@ -31,7 +31,7 @@ export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPedDamage',
     },
     onPedVehicleEnter: {
-        summary: '',
+        summary: 'This event is triggered when a ped enters a vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A vehicle element representing the vehicle that was entered.' },
             { name: 'seat', isOptional: false, isVariadic: false, summary: 'An int representing the seat in which the ped is entering.' },
@@ -42,7 +42,7 @@ export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPedVehicleEnter',
     },
     onPedVehicleExit: {
-        summary: '',
+        summary: 'This event is triggered when a ped leaves a vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'A vehicle element representing the vehicle in which the ped exited from.' },
             { name: 'seat', isOptional: false, isVariadic: false, summary: 'An int representing the seat in which the ped was before exiting.' },
@@ -61,8 +61,6 @@ export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
             { name: 'killerWeapon', isOptional: false, isVariadic: false, summary: 'an int representing the killer weapon or the damage types.' },
             { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'an int representing the bodypart ID the victim was hit on when he died.' },
             { name: 'stealth', isOptional: false, isVariadic: false, summary: 'a boolean representing whether or not this was a stealth kill.' },
-            { name: 'animGroup', isOptional: false, isVariadic: false, summary: 'an integer representing the ped\'s current animation group.' },
-            { name: 'animID', isOptional: false, isVariadic: false, summary: 'an integer representing the ped\'s current animation ID.' },
         ],
         source: 'The source of this event is the ped that died or got killed.',
         cancel: '',
@@ -232,5 +230,15 @@ export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
         source: 'The source of this event is the player element that just logged in.',
         cancel: 'If this event is canceled the player will not be logged in.',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerLogin',
+    },
+    onPlayerLogout: {
+        summary: 'This event is triggered when a user logs out of their account in-game.',
+        parameters: [
+            { name: 'thePreviousAccount', isOptional: false, isVariadic: false, summary: 'the account the client was logged in as.' },
+            { name: 'theCurrentAccount', isOptional: false, isVariadic: false, summary: 'the account the client is a part of now (usually a guest account).' },
+        ],
+        source: 'The source of this event is the player that logged out.',
+        cancel: 'If you cancel this event the player will not be logged out.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerLogout',
     },
 };

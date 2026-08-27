@@ -155,7 +155,7 @@ export const MTA_DOCS_20: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerMapBoundingBox',
     },
     getPlayerMapOpacity: {
-        summary: '',
+        summary: 'This function allows to get the opacity of the player map (F11).',
         parameters: [],
         returns: 'Returns an integer with a value from 0 to 255, where 0 is fully transparent and 255 is fully opaque.',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetPlayerMapOpacity',

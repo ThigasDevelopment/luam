@@ -1,34 +1,8 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_9: EventDocumentationCatalog = {
-    onPlayerWeaponFire: {
-        summary: 'This event is called when a player fires a weapon.  This does not trigger for projectiles, melee weapons, or camera. For projectiles use onPlayerProjectileCreation.',
-        parameters: [
-            { name: 'weaponID', isOptional: false, isVariadic: false, summary: 'an int representing weapon used for making a shot.' },
-            { name: 'endX', isOptional: false, isVariadic: false, summary: 'float world X coordinate representing the end point.' },
-            { name: 'endY', isOptional: false, isVariadic: false, summary: 'float world Y coordinate representing the end point.' },
-            { name: 'endZ', isOptional: false, isVariadic: false, summary: 'float world Z coordinate representing the end point.' },
-            { name: 'hitElement', isOptional: false, isVariadic: false, summary: 'an element which was hit by a shot. Currently this can be only another player. **Note: hitElement could be incorrect and should not be relied upon.**' },
-            { name: 'startX', isOptional: false, isVariadic: false, summary: 'float world X coordinate representing the start of the bullet. **Note: This is not the gun muzzle.**' },
-            { name: 'startY', isOptional: false, isVariadic: false, summary: 'float world Y coordinate representing the start of the bullet.' },
-            { name: 'startZ', isOptional: false, isVariadic: false, summary: 'float world Z coordinate representing the start of the bullet.' },
-        ],
-        source: 'The source of this event is the player who fired the weapon.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerWeaponFire',
-    },
-    onPlayerWeaponSwitch: {
-        summary: 'This event is triggered whenever a player\'s equipped weapon **slot** changes. This means giveWeapon and takeWeapon will trigger this event if the equipped slot is forced to change.',
-        parameters: [
-            { name: 'previousWeaponID', isOptional: false, isVariadic: false, summary: 'An integer representing the weapon that was switched from.' },
-            { name: 'currentWeaponID', isOptional: false, isVariadic: false, summary: 'An integer representing the weapon that was switched to.' },
-        ],
-        source: 'The source of this event is the player that switched his weapon.',
-        cancel: 'If this event is canceled, then the player\'s weapon won\'t be switched.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerWeaponSwitch',
-    },
     onResourceLoadStateChange: {
-        summary: '',
+        summary: 'This event is triggered when a resource load state is changed.',
         parameters: [
             { name: 'changedResource', isOptional: false, isVariadic: false, summary: 'The resource that was either loaded, reloaded or is unloading.' },
             { name: 'oldState', isOptional: false, isVariadic: false, summary: 'The state the resource was in before it changed.' },
@@ -139,10 +113,7 @@ export const MTA_EVENT_DOCS_9: EventDocumentationCatalog = {
     },
     onVehicleExplode: {
         summary: 'This event is triggered when a vehicle explodes.',
-        parameters: [
-            { name: 'withExplosion', isOptional: false, isVariadic: false, summary: 'Determines whether the vehicle was blown with or without an explosion.' },
-            { name: 'player', isOptional: false, isVariadic: false, summary: 'The player who sent the explosion packet.' },
-        ],
+        parameters: [],
         source: 'The source of this event is the vehicle that exploded.',
         cancel: 'If this event is cancelled, the vehicle won\'t explode.',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnVehicleExplode',
@@ -162,7 +133,6 @@ export const MTA_EVENT_DOCS_9: EventDocumentationCatalog = {
             { name: 'enteringPed', isOptional: false, isVariadic: false, summary: 'a player or ped element who is starting to enter a vehicle.' },
             { name: 'seat', isOptional: false, isVariadic: false, summary: 'an int representing the seat in which the ped is entering.' },
             { name: 'jacked', isOptional: false, isVariadic: false, summary: 'a player or ped element representing who is going to be jacked.' },
-            { name: 'door', isOptional: false, isVariadic: false, summary: 'an int of which door is being used (0-3). 0 is driver side door, 1 is front passenger, 2 is back left, 3 is back right.' },
         ],
         source: 'The source of this event is the vehicle in which a ped began to enter.',
         cancel: 'If this event is canceled, the ped will not enter the vehicle.',

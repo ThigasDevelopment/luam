@@ -24,7 +24,7 @@ export const MTA_DOCS_21: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetPostFXValue',
     },
     getProcessMemoryStats: {
-        summary: '',
+        summary: 'This function returns a breakdown of the process memory usage. The reported numbers are always byte units and these numbers can be **inaccurate**.',
         parameters: [],
         returns: 'Returns a table if successful, otherwise returns **nil** {| class="wikitable" style="cellpadding: 10px;" |- ! Property || Description |- | virtual || total program size |- | resident || resident set size (memory in physical space/ram, also known as *working set*) |- | shared || size of resident shared memory (shared with other processes) |- | private || size of resident private memory (only for this process) |} **Note:** Resident set size should be roughly shared + private from the table.',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetProcessMemoryStats',

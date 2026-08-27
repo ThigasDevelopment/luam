@@ -50,7 +50,7 @@ export const MTA_DOCS_16: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetElementAttachedTo',
     },
     getElementBoneMatrix: {
-        summary: '',
+        summary: 'This function returns the transformation matrix of a specific bone. Currently the Player and Ped element types are accepted.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to get the bone matrix on.' },
             { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone to get the matrix of. See Bone IDs.' },
@@ -59,7 +59,7 @@ export const MTA_DOCS_16: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBoneMatrix',
     },
     getElementBonePosition: {
-        summary: '',
+        summary: 'Returns the 3D world coordinates of a specific bone of a given element. Currently the Player and Ped element types are accepted.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to get the bone position on.' },
             { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone to get the position of. See Bone IDs.' },
@@ -77,7 +77,7 @@ export const MTA_DOCS_16: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetElementBoneQuaternion',
     },
     getElementBoneRotation: {
-        summary: '',
+        summary: 'Returns the orientation of a specific bone relative to the element. Currently the Player and Ped element types are accepted.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to get the bone rotation on.' },
             { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone to get the rotation of. See Bone IDs.' },
@@ -204,7 +204,7 @@ export const MTA_DOCS_16: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetElementInterior',
     },
     getElementLighting: {
-        summary: '',
+        summary: 'This function returns the lighting value for the specified element. This can be a player, ped, vehicle, object, weapon.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element whose lighting you want to retrieve.' },
         ],

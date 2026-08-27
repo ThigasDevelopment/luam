@@ -20,7 +20,7 @@ export const MTA_DOCS_39: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetSunSize',
     },
     resetTimeFrozen: {
-        summary: '',
+        summary: 'This function unfreezes time frozen using setTimeFrozen. This is equivalent to using setTimeFrozen to false.',
         parameters: [],
         returns: 'Always returns *true*.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetTimeFrozen',
@@ -61,7 +61,7 @@ export const MTA_DOCS_39: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehicleComponentScale',
     },
     resetVehicleDummyPositions: {
-        summary: '',
+        summary: 'This function resets the vehicle dependent dummy positions to the vehicle\'s current model dummy positions.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle to reset the dummy positions.' },
         ],
@@ -91,7 +91,7 @@ export const MTA_DOCS_39: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetVehiclesLODDistance',
     },
     resetVolumetricShadows: {
-        summary: '',
+        summary: 'This function is used to reset the volumetric shadows to the game video setting.',
         parameters: [],
         returns: 'Always returns *true*.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ResetVolumetricShadows',
@@ -211,7 +211,7 @@ export const MTA_DOCS_39: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/RestoreAllWorldModels',
     },
     restoreGameWorld: {
-        summary: '',
+        summary: 'This function restores the entire game world.',
         parameters: [],
         returns: 'This function does not return any value.',
         wiki: 'https://wiki.multitheftauto.com/wiki/RestoreGameWorld',

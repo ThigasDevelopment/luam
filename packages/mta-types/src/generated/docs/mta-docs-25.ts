@@ -60,7 +60,7 @@ export const MTA_DOCS_25: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetVehiclePlateText',
     },
     getVehicleRespawnDelay: {
-        summary: '',
+        summary: 'This function gets the time delay (in milliseconds)\nthe vehicle will remain wrecked before respawning.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to get the respawn delay of.' },
         ],
@@ -211,7 +211,7 @@ export const MTA_DOCS_25: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleVariant',
     },
     getVehicleWheelFrictionState: {
-        summary: '',
+        summary: 'This function returns the current wheel friction state of the vehicle.',
         parameters: [
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the wheel friction state.' },
             { name: 'wheel', isOptional: false, isVariadic: false, summary: 'The wheel you want to check. (0: front left, 1: rear left, 2: front right, 3: rear right)' },

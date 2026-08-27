@@ -40,7 +40,7 @@ export const MTA_DOCS_48: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetTime',
     },
     setTimeFrozen: {
-        summary: '',
+        summary: 'This function will freeze the game time. It will affect the sky as well prevent it from changes.',
         parameters: [
             { name: 'state', isOptional: false, isVariadic: false, summary: 'if set to true it will freeze the time, false otherwise.' },
         ],
@@ -129,7 +129,7 @@ export const MTA_DOCS_48: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetTrainSpeed',
     },
     setTransferBoxVisible: {
-        summary: '',
+        summary: 'Determines whether or not the transfer box should appear to players.',
         parameters: [
             { name: 'visible', isOptional: false, isVariadic: false, summary: 'The new transfer box visibility state.' },
         ],

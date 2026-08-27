@@ -114,10 +114,10 @@ export function generate(): GenerationResult {
     auditCallbacks(server, client, catalog);
     const serverEvents = parseEvents(eventFiles('server'), serverContext);
     const clientEvents = parseEvents(eventFiles('client'), clientContext);
-    const eventNames = new Set([...serverEvents, ...clientEvents].map((event) => event.name));
+    const handlerParameters = new Map([...serverEvents, ...clientEvents].map((event) => [event.name, event.type.parameterNames ?? []]));
     const eventDocumentation: EventDocumentationEntry[] = source.eventPages
-        .filter((page) => eventNames.has(page.name))
-        .map((page) => ({ name: page.name, documentation: wikiEventDocumentation(page.title, page.text) }));
+        .filter((page) => handlerParameters.has(page.name))
+        .map((page) => ({ name: page.name, documentation: wikiEventDocumentation(page.title, page.text, handlerParameters.get(page.name) ?? []) }));
     const oop = buildOopSurface(
         [
             ...upstream.classes.server.flatMap((file) => parseOopClasses(file, serverContext, 'server')),

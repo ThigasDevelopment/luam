@@ -96,7 +96,7 @@ export const MTA_DOCS_42: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetElementAttachedOffsets',
     },
     setElementBoneMatrix: {
-        summary: '',
+        summary: 'This function sets the transformation matrix of a specific bone. Currently the Player and Ped element types are accepted.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to set the bone matrix on.' },
             { name: 'boneId', isOptional: false, isVariadic: false, summary: 'the ID of the bone. See Bone IDs.' },
@@ -106,7 +106,7 @@ export const MTA_DOCS_42: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetElementBoneMatrix',
     },
     setElementBonePosition: {
-        summary: '',
+        summary: 'This function sets the position of a bone to the specified coordinates. Currently the Player and Ped element types are accepted.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the element to set the bone position on.' },
             { name: 'bone', isOptional: false, isVariadic: false, summary: 'the ID of the bone to set the position of. See Bone IDs.' },
@@ -131,7 +131,7 @@ export const MTA_DOCS_42: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetElementBoneQuaternion',
     },
     setElementBoneRotation: {
-        summary: '',
+        summary: 'This function sets the rotation of a specific bone relative to the element. Currently the Player and Ped element types are accepted.',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element to set the bone rotation on.' },
             { name: 'boneId', isOptional: false, isVariadic: false, summary: 'The ID of the bone to set the rotation of. See Bone IDs.' },
@@ -152,7 +152,7 @@ export const MTA_DOCS_42: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetElementCallPropagationEnabled',
     },
     setElementCollidableWith: {
-        summary: 'This function can be used to set an element to collide with another element. An element with collisions disabled does not interact physically with the other element.\n\n**Note:** You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object',
+        summary: 'This function can be used to set an element to collide with another element. An element with collisions disabled does not interact physically with the other element.\n\n**Note:** You can only use this function with the element types listed below.\n*Player\n*Ped\n*Vehicle\n*Object\n\n* Weapon',
         parameters: [
             { name: 'theElement', isOptional: false, isVariadic: false, summary: 'The element which colliding you want to change' },
             { name: 'withElement', isOptional: false, isVariadic: false, summary: 'The other element you wish the first entity to collide with' },

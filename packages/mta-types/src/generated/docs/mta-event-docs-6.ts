@@ -127,11 +127,7 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
             { name: 'message', isOptional: false, isVariadic: false, summary: 'the message which was outputted in the server console, without details like file, line etc.' },
             { name: 'level', isOptional: false, isVariadic: false, summary: 'the type of debug message which was outputted.' },
             { name: 'file', isOptional: false, isVariadic: false, summary: 'the file from which the debug message was outputted.' },
-            { name: 'Note', isOptional: false, isVariadic: false, summary: 'may return nil when the source could not be found.' },
             { name: 'line', isOptional: false, isVariadic: false, summary: 'the line in file **file** where the debug message was outputted.' },
-            { name: 'r', isOptional: false, isVariadic: false, summary: 'an int representing the amount of red color (0-255).' },
-            { name: 'g', isOptional: false, isVariadic: false, summary: 'an int representing the amount of green color (0-255).' },
-            { name: 'b', isOptional: false, isVariadic: false, summary: 'an int representing the amount of blue color (0-255).' },
         ],
         source: 'The source of this event is the root element.',
         cancel: 'If this event is canceled, the debug message won\'t appear.',
@@ -190,7 +186,7 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDestroy',
     },
     onElementDimensionChange: {
-        summary: '',
+        summary: 'This event is triggered when the dimension of an element is changed using setElementDimension.',
         parameters: [
             { name: 'oldDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element was in before.' },
             { name: 'newDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element is in now.' },
@@ -200,7 +196,7 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDimensionChange',
     },
     onElementInteriorChange: {
-        summary: '',
+        summary: 'This event is triggered when the interior of an element is changed using setElementInterior.',
         parameters: [
             { name: 'oldInterior', isOptional: false, isVariadic: false, summary: 'an int representing the interior the element was in before.' },
             { name: 'newInterior', isOptional: false, isVariadic: false, summary: 'an int representing the interior the element is in now.' },

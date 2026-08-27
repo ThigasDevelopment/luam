@@ -81,7 +81,7 @@ export const MTA_DOCS_50: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetVehiclesLODDistance',
     },
     setVehicleSmokeTrailEnabled: {
-        summary: '',
+        summary: 'This function used to set planes smoke trail enabled or disabled.',
         parameters: [
             { name: 'veh', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the smoke trail.' },
             { name: 'enable', isOptional: false, isVariadic: false, summary: 'A boolean if set to true it will enabled the smoke trail.' },
@@ -170,7 +170,7 @@ export const MTA_DOCS_50: ApiDocumentationCatalog = {
         wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleWindowOpen',
     },
     setVolumetricShadowsEnabled: {
-        summary: '',
+        summary: 'This function used to enable or disable volumetric shadows.',
         parameters: [
             { name: 'state', isOptional: false, isVariadic: false, summary: 'if set true it will enable the volumetric shadows, false otherwise.' },
         ],

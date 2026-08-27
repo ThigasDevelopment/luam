@@ -80,6 +80,7 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         summary: 'The event is triggered when a webbrowser starts loading a page.',
         parameters: [
             { name: 'URL', isOptional: false, isVariadic: false, summary: 'string containing the URL that will be loaded.' },
+            { name: 'isMain', isOptional: false, isVariadic: false, summary: 'a boolean representing whether the entire page (main frame) was loaded or an \'** inside the page was loaded. **true**: If the URL is loaded in the main frame. **false**: If the URL is loaded in a **\'.' },
         ],
         source: 'The webbrowser element.',
         cancel: '',
@@ -100,6 +101,7 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         summary: 'TODO',
         parameters: [
             { name: 'targetURL', isOptional: false, isVariadic: false, summary: '***openerURL:**' },
+            { name: 'openerURL', isOptional: false, isVariadic: false, summary: '' },
             { name: 'isPopup', isOptional: false, isVariadic: false, summary: '' },
         ],
         source: 'TODO',
@@ -223,7 +225,6 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
             { name: 'message', isOptional: false, isVariadic: false, summary: 'The message which was outputted in the server console, without details like file, line etc' },
             { name: 'level', isOptional: false, isVariadic: false, summary: 'The type of debug message which was outputted' },
             { name: 'file', isOptional: false, isVariadic: false, summary: 'The file from which the debug message was outputted' },
-            { name: 'Note', isOptional: false, isVariadic: false, summary: 'May return nil when the source could not be found' },
             { name: 'line', isOptional: false, isVariadic: false, summary: 'The line in file **file** where the debug message was outputted' },
             { name: 'r', isOptional: false, isVariadic: false, summary: 'Amount of red color (0-255)' },
             { name: 'g', isOptional: false, isVariadic: false, summary: 'Amount of green color (0-255)' },
