@@ -9,12 +9,26 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.1 - 2026-08-27
+
 ### Added
 
 - [OOP API](/en/mta/oop) and [Editors](/en/tooling/editors) record the MTA class
   hover: a class name explains the class, the chain it inherits, the surface it
   reaches in that environment and whether it is callable, instead of listing its
   members.
+- [Classes](/en/language/classes#static-members) documents `static`: what
+  belongs to the class value rather than an instance, how the two spaces stay
+  apart, and the diagnostics that report a read across them.
+  [Keywords](/en/reference/keywords) records `static` as contextual, and
+  [Diagnostics](/en/reference/diagnostics) lists
+  `check-duplicate-class-member` and `check-static-receiver`.
+
+### Changed
+
+- [Limitations](/en/reference/limitations) no longer claims a class has no
+  static fields or methods. The entry is now "No metamethods or generic
+  classes", and it points at [Classes](/en/language/classes) for `static`.
 
 ## 0.19.0 - 2026-08-27
 

@@ -14,6 +14,61 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.1 - 2026-08-27
+
+### Added
+
+- A class member declared `static` belongs to the class value instead of an
+  instance. State that belongs to a class had to live in a file-level local or
+  a global, outside the type that owns it, while MTA's own surface already drew
+  the line. `static` is a contextual modifier, recognized only when a member
+  name follows it on the same line, so a member or a local named `static` keeps
+  working. The two spaces never mix: reading across them is
+  `check-unknown-member` or `check-static-receiver`, and declaring one name in
+  both is `check-duplicate-class-member`. Statics emit into the same class table
+  in authored order and are reached through `getClass`, so they inherit and
+  share a slot with no new runtime helper
+  ([ADR-028](.claude/docs/adr/028-static-class-members.md)). The editor follows
+  the same split: completion on a class name offers its statics and refuses them
+  after a colon, signature help and the argument matcher resolve a static
+  through the class value, and a static method body no longer declares `self`.
+- Every MTA event carries its description on hover. Event pages the wiki wraps
+  in `{{Added feature/item}}` parsed as an empty intro, which left 16 events
+  showing only a signature and swallowed 97 function summaries; the template is
+  now on the describing list. The parameter bullets follow the handler signature
+  instead of the page — names match exactly, then case-insensitively, then by
+  position when the counts agree — so the parameters the wiki documents beyond
+  the signature no longer reach the hover, and a `Note` template no longer reads
+  as a parameter of its own.
+
+### Changed
+
+- Completion at an argument offers only the values that argument can accept. It
+  ranked candidates against the expected parameter type but still listed every
+  one of them, so an element argument buried the three elements in scope under
+  hundreds of unrelated globals. Values whose type cannot reach the expectation
+  are dropped, along with functions whose return type cannot and the keywords
+  that cannot open an expression; anything untyped, `any`, or `nil` stays, so
+  the filter only removes what is certainly wrong. The event-only globals stop
+  leaking too: `source`, `client` and `eventName` appear inside a handler body
+  and nowhere else, `sourceTimer` only inside a timer callback, and a named
+  function used as a handler counts as a handler body.
+
+### Fixed
+
+- Hovering a client-only class in a server file said its members were not
+  available and then listed a surface of them anyway, counting what the class
+  inherits from a shared ancestor. It became visible once `GuiElement` gained a
+  parent, which put `Element`'s shared members in reach of every GUI widget.
+- `guiCreateWindow`, `dxCreateFont`, `playSound` and 16 other constructors
+  return the class they create instead of a generic `Element`. The wiki types
+  every element-returning constructor as `Element`, so completion and hover
+  could not tell what a call produced. The override carries a return type
+  applied in the normalizer, after the wiki and upstream declarations merge,
+  which keeps eleven arity classifications intact. Ten element types also
+  carried no parent, `GuiElement` among them, so no GUI widget reached
+  `Element` and every one of them was rejected wherever an element was expected.
+
 ## 0.19.0 - 2026-08-27
 
 ### Added

@@ -11,12 +11,27 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.1 - 2026-08-27
+
 ### Adicionado
 
 - [API OOP](/pt-br/mta/oop) e [Editores](/pt-br/tooling/editors) registram o
   hover de classe do MTA: um nome de classe explica a classe, a cadeia que ela
   herda, a superfície que alcança naquele ambiente e se é chamável, em vez de
   listar os membros dela.
+- [Classes](/pt-br/language/classes#membros-estaticos) documenta `static`: o que
+  pertence ao valor da classe em vez de uma instância, como os dois espaços
+  ficam separados e os diagnósticos que relatam uma leitura entre eles.
+  [Palavras-chave](/pt-br/reference/keywords) registra `static` como contextual,
+  e [Diagnósticos](/pt-br/reference/diagnostics) lista
+  `check-duplicate-class-member` e `check-static-receiver`.
+
+### Alterado
+
+- [Limitações](/pt-br/reference/limitations) não afirma mais que uma classe não
+  tem campos nem métodos estáticos. A entrada agora é "Sem metamétodos nem
+  classes genéricas", e aponta para [Classes](/pt-br/language/classes) quanto a
+  `static`.
 
 ## 0.19.0 - 2026-08-27
 

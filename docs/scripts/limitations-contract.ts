@@ -19,12 +19,12 @@ export const LIMITATIONS_PAGE = 'reference/limitations.md';
 
 export const LIMITATIONS: readonly Limitation[] = [
     { id: 'path-narrowing-aliasing', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/025-access-path-narrowing.md' },
-    { id: 'flow-narrowing', label: 'planned', owners: ['26.4'], decision: null },
+    { id: 'flow-narrowing', label: 'planned', owners: ['26.04'], decision: null },
     { id: 'class-runtime-visibility', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/024-two-phase-class-declaration.md' },
-    { id: 'class-members', label: 'planned', owners: ['26.7', '26.10'], decision: null },
+    { id: 'class-members', label: 'planned', owners: ['26.07', '26.10'], decision: null },
     { id: 'catalog-lag', label: 'upstream-constraint', owners: [], decision: '.github/workflows/catalog-refresh.yml' },
-    { id: 'unverified-exports', label: 'planned', owners: ['26.8'], decision: null },
-    { id: 'declaration-recheck', label: 'planned', owners: ['26.3'], decision: null },
+    { id: 'unverified-exports', label: 'planned', owners: ['26.08'], decision: null },
+    { id: 'declaration-recheck', label: 'planned', owners: ['26.03'], decision: null },
     { id: 'opaque-configuration', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/022-opaque-native-configuration.md' },
     { id: 'source-faithful-output', label: 'design-boundary', owners: [], decision: 'docs/en/reference/output-layouts.md' },
     { id: 'erased-annotations', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/021-erased-type-annotations.md' },
