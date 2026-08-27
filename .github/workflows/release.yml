@@ -22,7 +22,7 @@ jobs:
         name: Verify
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
 
             - name: Version contract
@@ -44,7 +44,7 @@ jobs:
         outputs:
             version: ${{ steps.version.outputs.value }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
 
             - name: Resolve the version
@@ -78,7 +78,7 @@ jobs:
                   node -e "const v = require('./packages/cli/dist/package.json').version; if (v !== process.env.EXPECTED) { console.error('The bundled CLI is ' + v + ', not ' + process.env.EXPECTED + '.'); process.exit(1); }"
                   test -f "$GITHUB_WORKSPACE/artifacts/luam-$EXPECTED.vsix"
 
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: luam-${{ steps.version.outputs.value }}
                   path: artifacts/
@@ -94,7 +94,7 @@ jobs:
             contents: read
             id-token: write
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
               with:
                   registry-url: https://registry.npmjs.org
@@ -114,7 +114,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: pipeline
         steps:
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v8
               with:
                   name: luam-${{ needs.package.outputs.version }}
                   path: artifacts
@@ -138,10 +138,10 @@ jobs:
         permissions:
             contents: write
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
 
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v8
               with:
                   name: luam-${{ needs.package.outputs.version }}
                   path: artifacts
