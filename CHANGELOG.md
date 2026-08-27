@@ -14,6 +14,18 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.18.2 - 2026-08-27
+
+### Fixed
+
+- A class field declared with a type and no default now generates
+  `name = nil` on the line it was written on. It used to generate nothing,
+  which left a blank line inside the class and hid the declared shape from the
+  Lua a reader opens.
+- The example resource no longer carries a `transport` table in
+  `.luam.manifest`. The field was removed with the `ensure` rework and reports
+  `config-removed-field`.
+
 ## 0.18.1 - 2026-08-27
 
 ### Changed

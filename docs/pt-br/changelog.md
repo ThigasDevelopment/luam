@@ -11,6 +11,14 @@ da versão atual.
 
 ## Não lançado
 
+## 0.18.2 - 2026-08-27
+
+### Alterado
+
+- [Formatos de saída](/pt-br/reference/output-layouts) nomeia a forma gerada de
+  um campo de classe sem padrão: `name = nil`, na linha em que o campo foi
+  escrito.
+
 ## 0.18.1 - 2026-08-27
 
 ### Alterado
