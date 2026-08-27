@@ -6,6 +6,10 @@ dist/
 *.vsix
 .DS_Store
 .env.local
-.claude/
+.claude/*
+!.claude/docs/
+.claude/docs/*
+!.claude/docs/adr/
+!.claude/plans/
 docs/.vitepress/cache/
 tmp/
