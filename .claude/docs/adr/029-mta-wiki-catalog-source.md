@@ -1,4 +1,4 @@
-# ADR-027: Generate the MTA catalog from a committed wiki snapshot
+# ADR-029: Generate the MTA catalog from a committed wiki snapshot
 
 **Status:** Accepted
 

@@ -22,18 +22,6 @@ export function collectInterpolations(segments: readonly TemplateSegment[]): Tem
     return segments.filter((segment) => segment.kind === 'interpolation').map(parseInterpolation);
 }
 
-export function collectTemplateRoots(segments: readonly TemplateSegment[]): string[] {
-    const roots: string[] = [];
-
-    for (const interpolation of collectInterpolations(segments)) {
-        if (interpolation.root.length > 0 && !roots.includes(interpolation.root)) {
-            roots.push(interpolation.root);
-        }
-    }
-
-    return roots;
-}
-
 export function templateLiteralText(segments: readonly TemplateSegment[]): string {
     return segments.map((segment) => (segment.kind === 'text' ? segment.value : `\${${segment.value}}`)).join('');
 }

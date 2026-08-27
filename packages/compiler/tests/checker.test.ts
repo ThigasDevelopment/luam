@@ -184,6 +184,20 @@ describe('checker', () => {
         expect(codes("local name: string = 'Thigas'\nlocal greeting = `Ola ${name:Guest}`\n")).toEqual([]);
     });
 
+    it('accepts an unknown interpolation root that carries a fallback', () => {
+        expect(codes('local greeting = `Ola ${missing:Guest}`')).toEqual([]);
+        expect(codes('local greeting = `Ola ${missing.field:Guest}`')).toEqual([]);
+    });
+
+    it('points at the fallback when an interpolation root is unknown', () => {
+        expect(messages('local greeting = `Ola ${missing}`')[0]).toContain('Write "${missing:fallback}" to accept a value that may be missing.');
+    });
+
+    it('rejects an interpolation that is not a name or a member path even with a fallback', () => {
+        expect(codes('local greeting = `Ola ${getName(p):Guest}`')).toEqual(['check-unknown-template-root']);
+        expect(messages('local greeting = `Ola ${getName(p):Guest}`')[0]).toContain('is not a name or a member path');
+    });
+
     it('shows the accepted interpolation forms when one is empty', () => {
         expect(codes('local greeting = `Ola ${}`')).toEqual(['check-empty-interpolation']);
         expect(messages('local greeting = `Ola ${}`')[0]).toContain('Write "${name}", "${object.field}", or "${name:fallback}".');

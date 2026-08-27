@@ -34,6 +34,8 @@ Each row links the record; the record itself carries the full status note.
 | 023 | [Assign one environment per file](023-file-level-environments.md) | Accepted |
 | 024 | [Separate when a class is a type from when it is a value](024-two-phase-class-declaration.md) | Accepted |
 | 025 | [Key narrowing facts on stable access paths](025-access-path-narrowing.md) | Accepted |
-| 026 | [Give a class one value with its own member space](026-static-class-members.md) | Accepted |
-| 027 | [Generate the MTA catalog from a committed wiki snapshot](027-mta-wiki-catalog-source.md) | Accepted |
-| 028 | [One role table generates every Luam editor theme](028-editor-theme-contract.md) | Accepted |
+| 026 | [Bind self paths directly in template context tables](026-self-field-template-bindings.md) | Accepted |
+| 027 | [A template fallback marks an interpolated name optional](027-template-fallback-scope-rule.md) | Accepted |
+| 028 | [Give a class one value with its own member space](028-static-class-members.md) | Accepted |
+| 029 | [Generate the MTA catalog from a committed wiki snapshot](029-mta-wiki-catalog-source.md) | Accepted |
+| 030 | [One role table generates every Luam editor theme](030-editor-theme-contract.md) | Accepted |

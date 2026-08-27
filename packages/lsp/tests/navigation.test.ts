@@ -54,6 +54,13 @@ describe('definition', () => {
         expect(locations[0]?.range.start.line).toBe(1);
     });
 
+    it('resolves a class member interpolated inside a template', () => {
+        const text = 'class Player {\n    name: string\n}\n\nlocal one = new Player()\nlocal value: string = `Ola ${ one.name }`\n';
+        const locations = serviceWith(text).definition(SERVER_FILE, positionOf(text, 'one.', 'name'));
+
+        expect(locations[0]?.range.start.line).toBe(1);
+    });
+
     it('resolves a generated accessor to its field', () => {
         const text = 'class Player {\n    @Getter\n    name: string\n}\nlocal player = new Player()\nlocal name = player:getName()\n';
         const locations = serviceWith(text).definition(SERVER_FILE, positionOf(text, 'player:', 'getName'));

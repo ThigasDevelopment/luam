@@ -20,8 +20,9 @@ import {
 } from './collector-state';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { fieldText, inferredFieldText, parameterText, signatureText, variableText } from './signature-text';
+import { assignedText, fieldText, inferredFieldText, parameterText, signatureText, variableText } from './signature-text';
 import { collectFunctionScope } from './statement-collector';
+import { valueBytes, valueText } from './value-text';
 
 const KEYWORD_LENGTHS: Readonly<Record<DeclarationStatement['kind'], number>> = {
     'class-declaration': 5,
@@ -59,10 +60,12 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
         }
 
         const checked = member.annotation === null ? (state.checkerDeclarations.lookupMember(owner, member.name)?.type ?? null) : null;
-        const detail = member.annotation === null ? inferredFieldText(member.name, checked) : fieldText(member.name, member.annotation);
+        const shape = member.annotation === null ? inferredFieldText(member.name, checked) : fieldText(member.name, member.annotation);
+        const value = member.value ?? undefined;
+        const detail = assignedText(shape, valueText(state.text, value, true), valueBytes(value));
         const type = member.annotation === null ? checked : annotationType(member.annotation);
 
-        declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, container: owner, type });
+        declareSymbol(state, ROOT_SCOPE, { name: member.name, kind: 'field', position: member.position, detail, shape, container: owner, type });
 
         return;
     }

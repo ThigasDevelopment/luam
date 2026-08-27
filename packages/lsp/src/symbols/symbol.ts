@@ -24,6 +24,7 @@ export interface SymbolDeclaration {
     scopeId: number;
     container: string | null;
     detail: string;
+    shape: string | null;
     type: Type | null;
     parameters: readonly string[];
     isSynthetic: boolean;

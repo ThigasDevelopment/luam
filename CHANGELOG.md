@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.0 - 2026-08-27
+
 ### Added
 
 - Hovering an MTA class name explains the class. `Player`, `Element`, `Vehicle`
@@ -36,6 +38,32 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   inside a function declared in the same block. A call or a dynamic index in
   the path produces no refinement at all. A field cleared through a second
   reference to the same table is a recorded boundary, not a diagnostic.
+- A template interpolation rooted at `self` now binds the value it reads
+  instead of the receiver. `${self.version}` emits
+  `{ version = self.version }` and `${self.person.data.name}` emits
+  `{ person_data_name = self.person.data.name }`, so the context table carries
+  only what the template uses and the runtime resolves one key instead of
+  walking the path. A joined name that collides with another root in the same
+  template keeps `{ self = self }`.
+- A fallback now marks an interpolated name optional. `${missing:Guest}`
+  compiles where `missing` is not declared, because the fallback already states
+  that the value may be missing. Without one the name still has to be in scope.
+- The editor resolves every field of an interpolated path, not only its root.
+  Hover, go to definition, and the semantic colour of `version` inside
+  `${self.version}` now match the same field written outside the string.
+- Hover on a declaration with a literal value names the value and its size,
+  as in `field version: string = '0.18.3' # 6 bytes`. The count is in UTF-8
+  bytes, which is what a Lua string holds, so `'Assunção'` reads 10 rather
+  than 8.
+
+### Changed
+
+- An interpolation that is not a name or a member path is reported on its own
+  terms rather than as a name that is not in scope, and it stays an error with
+  or without a fallback.
+- A deeper `self` path in a template is now read at the call site. A nil
+  segment in the middle raises `attempt to index a nil value` where the runtime
+  helper used to stop and return the fallback.
 
 ### Fixed
 

@@ -59,6 +59,55 @@ describe('emitter', () => {
         expect(emit(source)).toContain("string.template('Bem-vindo ${user.name}', { user = user })");
     });
 
+
+    it('binds the field instead of self for a self interpolation in a class method', () => {
+        const source = ["class Example {", "    version: string = '0.18.2'", '', '    describe = function (): string', '        return `Current version: ${ self.version }`', '    end', '}', ''].join('\n');
+
+        expect(emit(source)).toContain("string.template('Current version: ${version}', { version = self.version })");
+    });
+
+    it('keeps the fallback when it binds a self field', () => {
+        const source = ['class Example {', '    label: string', '', '    describe = function (): string', '        return `Name: ${ self.label:none }`', '    end', '}', ''].join('\n');
+
+        expect(emit(source)).toContain("string.template('Name: ${label:none}', { label = self.label })");
+    });
+
+    it('joins the fields of a deeper self path into a single binding', () => {
+        const source = ['class Example {', '    person: table = {}', '', '    describe = function (): string', '        return `Owner: ${ self.person.data.name }`', '    end', '}', ''].join('\n');
+
+        expect(emit(source)).toContain("string.template('Owner: ${person_data_name}', { person_data_name = self.person.data.name })");
+    });
+
+    it('keeps self in the context when two self paths claim the same joined name', () => {
+        const source = [
+            'class Example {',
+            '    owner: table = {}',
+            '',
+            '    describe = function (): string',
+            '        return `${ self.owner.name } and ${ self.owner_name }`',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+
+        expect(emit(source)).toContain("string.template('${self.owner.name} and ${self.owner_name}', { self = self })");
+    });
+
+    it('keeps self in the context when the field name collides with another root', () => {
+        const source = [
+            'class Example {',
+            '    version: string',
+            '',
+            '    describe = function (version: string): string',
+            '        return `${ self.version } vs ${ version }`',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+
+        expect(emit(source)).toContain("string.template('${self.version} vs ${version}', { self = self, version = version })");
+    });
+
     it('keeps a template without interpolation as a plain string', () => {
         expect(emit('local text = `plain text`')).toBe("local text = 'plain text'\n");
         expect(helpers('local text = `plain text`')).toEqual([]);

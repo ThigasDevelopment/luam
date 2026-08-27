@@ -1,4 +1,4 @@
-# ADR-026: Give a class one value with its own member space
+# ADR-028: Give a class one value with its own member space
 
 **Status:** Accepted
 

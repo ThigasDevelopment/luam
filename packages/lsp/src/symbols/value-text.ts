@@ -1,3 +1,4 @@
+import { escapeStringLiteral } from '@compiler/emitter/escape';
 import type { Expression } from '@compiler/parser/ast';
 
 const INLINE_LIMIT = 48;
@@ -10,7 +11,7 @@ function literalText(expression: Expression): string | null {
     }
 
     if (expression.kind === 'string-literal') {
-        return JSON.stringify(expression.value);
+        return `'${escapeStringLiteral(expression.value)}'`;
     }
 
     if (expression.kind === 'boolean-literal') {
@@ -57,4 +58,8 @@ export function valueText(text: string, expression: Expression | undefined, allo
     }
 
     return allowSource && NAMED_KINDS.has(expression.kind) ? lineSlice(text, startOffset(expression)) : null;
+}
+
+export function valueBytes(expression: Expression | undefined): number | null {
+    return expression?.kind === 'string-literal' ? new TextEncoder().encode(expression.value).length : null;
 }

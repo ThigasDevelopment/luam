@@ -31,7 +31,7 @@ import { collectDeclaration, collectEvent } from './declaration-collector';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
 import { annotationText, assignedText, parameterText, signatureText, variableText } from './signature-text';
-import { valueText } from './value-text';
+import { valueBytes, valueText } from './value-text';
 
 export interface FunctionScopeInput {
     start: number;
@@ -97,7 +97,7 @@ function collectLocal(state: CollectorState, block: BlockContext, statement: Loc
         const inferred = inferredType === null ? null : widenInferred(inferredType);
         const type = declarator.annotation === null ? inferred : annotationType(declarator.annotation);
         const declared = variableText('local', declarator.name, declarator.annotation, inferred === null ? null : typeToString(inferred));
-        const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1));
+        const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1), valueBytes(value));
 
         declareSymbol(state, block.scopeId, { name: declarator.name, kind: 'local', position: declarator.position, detail, type });
     });

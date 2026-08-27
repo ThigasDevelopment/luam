@@ -132,6 +132,29 @@ describe('semantic tokens', () => {
         expect(style(at("'onPlayerJoin'"))).toBe('event');
     });
 
+    it('gives an interpolated field the same style as the same field outside the template', () => {
+        const path = 'src/shared/badge.luam';
+        const source = [
+            'class Badge {',
+            "    version: string = 'x'",
+            '',
+            '    describe = function (): string',
+            '        local current: string = self.version',
+            '',
+            '        return `Current ${ self.version } / ${ current }`',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+        const lines = source.split('\n');
+        const produced = decodeTokens(openService({ [path]: source }).semanticTokens(`file:///${path}`).data);
+        const styles = produced
+            .filter((token) => (lines[token.line] ?? '').slice(token.character, token.character + token.length) === 'version')
+            .map(style);
+
+        expect(styles).toEqual(['property.declaration', 'property', 'property']);
+    });
+
     it('serves a range without re-reading the whole document', () => {
         const service = openService({ [PATH]: SOURCE });
         const full = service.semanticTokens(URI).data;

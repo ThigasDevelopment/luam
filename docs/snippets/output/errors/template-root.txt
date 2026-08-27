@@ -1,5 +1,5 @@
 Discovery: done in 2 ms.
 Compile: 1 file in 6 ms.
 Assembly: failed in 0 ms.
-src/server/join.luam:2:20 error check-unknown-template-root: Template interpolation "getPlayerName(source)" refers to "getPlayerName(source)", which is not in scope.
+src/server/join.luam:2:20 error check-unknown-template-root: Template interpolation "getPlayerName(source)" is not a name or a member path. Compute the value first, then interpolate the name.
 Check failed: 1 error, 0 warnings in 9 ms.

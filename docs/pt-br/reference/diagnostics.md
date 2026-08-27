@@ -148,7 +148,7 @@ erro não escreve nada.
 
 | Código | Significado |
 | --- | --- |
-| `check-unknown-template-root` | Uma interpolação se refere a um nome fora do escopo. Ela aceita um nome ou um caminho de membro, nunca uma expressão. |
+| `check-unknown-template-root` | Uma interpolação não é um nome nem um caminho de membro, ou se refere a um nome fora do escopo e sem padrão. |
 | `check-empty-interpolation` | `${}` sem nada dentro. |
 | `check-export-not-top-level` | `export` em uma função que não é de nível superior. |
 | `check-export-member` | `export` em uma função declarada em uma tabela. |

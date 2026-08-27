@@ -16,6 +16,8 @@ Every heading below is a released version and the date it shipped, newest first.
   reaches in that environment and whether it is callable, instead of listing its
   members.
 
+## 0.19.0 - 2026-08-27
+
 ### Changed
 
 - [Limitations](/en/reference/limitations) replaces "Narrowing reaches names,
@@ -24,6 +26,14 @@ Every heading below is a released version and the date it shipped, newest first.
   planned. [Types](/en/language/types#type-guards) and
   [Troubleshooting](/en/guide/troubleshooting) describe a guard as refining a
   path, and drop the copy-the-field-into-a-local workaround.
+- [Template strings](/en/language/template-strings) documents the fallback as
+  the way to mark an interpolated name optional, and states that a call or an
+  operator inside `${...}` stays an error with or without one. The scope rule
+  is worded to cover both.
+- [Diagnostics](/en/reference/diagnostics) and
+  [Troubleshooting](/en/guide/troubleshooting) describe
+  `check-unknown-template-root` as two cases: an interpolation that is not a
+  name or a member path, and an unbound name with no fallback.
 
 ## 0.18.2 - 2026-08-27
 

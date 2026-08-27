@@ -1,4 +1,4 @@
-# ADR-028: One role table generates every Luam editor theme
+# ADR-030: One role table generates every Luam editor theme
 
 **Status:** Accepted
 

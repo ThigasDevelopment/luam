@@ -18,6 +18,8 @@ da versão atual.
   herda, a superfície que alcança naquele ambiente e se é chamável, em vez de
   listar os membros dela.
 
+## 0.19.0 - 2026-08-27
+
 ### Alterado
 
 - [Limitações](/pt-br/reference/limitations) troca "O estreitamento alcança
@@ -27,6 +29,14 @@ da versão atual.
   [Tipos](/pt-br/language/types#guardas-de-tipo) e
   [Solução de problemas](/pt-br/guide/troubleshooting) descrevem uma guarda como
   refinando um caminho, e largam a solução de copiar o campo para um local.
+- [Strings de template](/pt-br/language/template-strings) documenta o padrão
+  como a forma de marcar um nome interpolado como opcional, e afirma que uma
+  chamada ou um operador dentro de `${...}` continua erro com padrão ou sem. A
+  regra de escopo foi reescrita para cobrir os dois casos.
+- [Diagnósticos](/pt-br/reference/diagnostics) e
+  [Solução de problemas](/pt-br/guide/troubleshooting) descrevem
+  `check-unknown-template-root` como dois casos: uma interpolação que não é um
+  nome nem um caminho de membro, e um nome fora do escopo e sem padrão.
 
 ## 0.18.2 - 2026-08-27
 
