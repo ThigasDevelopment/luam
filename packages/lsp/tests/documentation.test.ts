@@ -70,10 +70,35 @@ describe('variable hover', () => {
         expect(hoverText(text, 'copy', 'maxPlayers')).toContain('local maxPlayers: number = 32');
     });
 
-    it('shows a string value quoted', () => {
+    it('shows a string value quoted the way the language writes it, with its size', () => {
         const text = 'local title = "ready"\nlocal copy = title\n';
 
-        expect(hoverText(text, 'copy', 'title')).toContain('local title: string = "ready"');
+        expect(hoverText(text, 'copy', 'title')).toContain("local title: string = 'ready' # 5 bytes");
+    });
+
+    it('counts the bytes of a value rather than its characters', () => {
+        const text = "local city = 'Assunção'\nlocal copy = city\n";
+
+        expect(hoverText(text, 'copy', 'city')).toContain("local city: string = 'Assunção' # 10 bytes");
+    });
+
+    it('says byte in the singular for a value of one', () => {
+        const text = "local tag = 'x'\nlocal copy = tag\n";
+
+        expect(hoverText(text, 'copy', 'tag')).toContain("local tag: string = 'x' # 1 byte");
+    });
+
+    it('measures a field value on hover and leaves it out of the class shape', () => {
+        const text = ['class Round {', "    version: string = '0.18.3'", '}', '', 'local round: Round = new Round()', 'local value = round.version', ''].join('\n');
+
+        expect(hoverText(text, 'round.', 'version')).toContain("field version: string = '0.18.3' # 6 bytes");
+        expect(hoverText(text, 'local round', 'Round')).toContain('version: string\n');
+    });
+
+    it('leaves a value that is not a literal unmeasured', () => {
+        const text = ['class Round {', '    label: string = tostring(1)', '}', '', 'local round: Round = new Round()', 'local value = round.label', ''].join('\n');
+
+        expect(hoverText(text, 'round.', 'label')).not.toContain('bytes');
     });
 
     it('shows the annotated type together with the value', () => {

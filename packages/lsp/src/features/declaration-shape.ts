@@ -27,7 +27,7 @@ function withoutPrefix(detail: string, prefix: string): string {
 
 export function memberText(member: SymbolDeclaration): string {
     if (member.kind === 'field') {
-        return withoutPrefix(member.detail, FIELD_PREFIX);
+        return withoutPrefix(member.shape ?? member.detail, FIELD_PREFIX);
     }
 
     if (member.kind === 'enum-member' && member.container !== null) {

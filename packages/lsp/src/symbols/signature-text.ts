@@ -98,6 +98,12 @@ export function inferredFieldText(name: string, type: Type | null): string {
     return `field ${name}: ${typeToString(type)}`;
 }
 
-export function assignedText(declaration: string, value: string | null): string {
-    return value === null ? declaration : `${declaration} = ${value}`;
+export function assignedText(declaration: string, value: string | null, bytes: number | null = null): string {
+    if (value === null) {
+        return declaration;
+    }
+
+    const measure = bytes === null ? '' : ` # ${bytes} ${bytes === 1 ? 'byte' : 'bytes'}`;
+
+    return `${declaration} = ${value}${measure}`;
 }

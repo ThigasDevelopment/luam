@@ -34,6 +34,7 @@ export interface DeclarationInput {
     kind: SymbolKind;
     position: SourcePosition;
     detail: string;
+    shape?: string | null;
     container?: string | null;
     type?: Type | null;
     parameters?: readonly string[];
@@ -59,6 +60,7 @@ export function declareSymbol(state: CollectorState, scopeId: number, input: Dec
         scopeId,
         container: input.container ?? null,
         detail: input.detail,
+        shape: input.shape ?? null,
         type: input.type ?? null,
         parameters: input.parameters ?? [],
         isSynthetic: input.isSynthetic ?? false,
