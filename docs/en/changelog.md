@@ -9,6 +9,15 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Changed
+
+- [Limitations](/en/reference/limitations) replaces "Narrowing reaches names,
+  not fields" with two entries: narrowing follows a path but not an alias, which
+  is a boundary, and narrowing does not cross a branch or a loop, which is
+  planned. [Types](/en/language/types#type-guards) and
+  [Troubleshooting](/en/guide/troubleshooting) describe a guard as refining a
+  path, and drop the copy-the-field-into-a-local workaround.
+
 ## 0.18.2 - 2026-08-27
 
 ### Changed

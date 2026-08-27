@@ -78,28 +78,33 @@ Defina `compiler = { oop = true }` no `.luam.manifest`. Isso também escreve `<o
 
 ## Um valor é `string?` e nada o estreita
 
-Uma guarda estreita um **nome**, não um campo. `if value ~= nil then` refina sim
-um local ou um parâmetro dentro do bloco, e `tonumber(amount) or 100` é `number`,
-porque o `or` descarta o nil do lado esquerdo:
+Uma guarda estreita um **caminho de acesso estável**: um nome, ou um nome
+seguido de campos literais. `if value ~= nil then` refina um local ou um
+parâmetro dentro do bloco, `if self.connection ~= nil then` refina o campo, e
+`tonumber(amount) or 100` é `number`, porque o `or` descarta o nil do lado
+esquerdo:
 
 ```luam
 local amount = '25'
 local requested: number = tonumber(amount) or 100
 ```
 
-O que mantém o tipo declarado é um campo: `self.value` continua `string?` não
-importa como você teste. Copie para um local e teste o local:
+O que mantém o tipo declarado é um caminho que o verificador não consegue nomear
+do começo ao fim. Uma chamada ou um índice dinâmico não é um caminho, então teste
+o que você consegue nomear:
 
 ```luam static
-local connection = self.connection
+local handle = session.slots[key]
 
-if connection ~= nil then
-    local handle: userdata = connection
+if handle ~= nil then
+    local text: string = handle
 end
 ```
 
-O estreitamento também termina onde o bloco termina, e cai assim que o nome
-recebe outro valor. Veja [Guardas de tipo](/pt-br/language/types#guardas-de-tipo)
+Uma condição guardada em uma variável também não é um fato: teste o caminho no
+bloco que o usa, e não `local ready = self.connection ~= nil`. O estreitamento
+também termina onde o bloco termina, e cai assim que o caminho, um prefixo dele
+ou a raiz dele recebe outro valor. Veja [Guardas de tipo](/pt-br/language/types#guardas-de-tipo)
 para todas as formas que estreitam, e [Limitações](/pt-br/reference/limitations)
 para o que não estreita.
 

@@ -11,6 +11,7 @@ import type {
     TypeAnnotation,
 } from '@compiler/parser/ast';
 
+import { assignedPath, forgetAssignedPaths } from './access-path';
 import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration } from './classes';
 import type { CheckContext } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor } from './control-flow';
@@ -65,6 +66,7 @@ export function checkFunctionBody(
     signature: FunctionType,
     selfType: Type | null,
 ): void {
+    forgetAssignedPaths(context, body);
     context.binder.pushScope();
     context.pushReturnType(returnAnnotation === null ? null : context.resolveAnnotation(returnAnnotation));
 
@@ -147,6 +149,12 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
     const valueTypes = checkValueList(context, statement.values);
 
     statement.targets.forEach((target, index) => {
+        const assigned = assignedPath(target);
+
+        if (assigned !== null) {
+            context.forgetNarrowing(assigned);
+        }
+
         const targetType = checkExpression(context, target);
         const valueType = valueTypes[index] ?? NIL_TYPE;
         const value = valueAt(statement.values, valueTypes, index);
@@ -184,10 +192,6 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
 
         if (value !== undefined) {
             context.expectAssignable(valueType, declared, value.position, 'Assignment');
-        }
-
-        if (target.kind === 'identifier') {
-            context.forgetNarrowing(target.name);
         }
     });
 }
@@ -302,9 +306,11 @@ function checkStatement(context: CheckContext, statement: Statement): void {
             return checkBlock(context, statement.body);
         case 'while-statement':
             checkExpression(context, statement.condition);
+            forgetAssignedPaths(context, statement.body);
 
             return checkBlock(context, statement.body);
         case 'repeat-statement':
+            forgetAssignedPaths(context, statement.body);
             checkBlock(context, statement.body);
             checkExpression(context, statement.condition);
 

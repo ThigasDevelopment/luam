@@ -244,9 +244,10 @@ function connect(config: Config): void
 end
 ```
 
-The receiver must be a plain name — `config.kind` narrows `config`, but
-`state.config.kind` narrows nothing. Narrowing ends with the block that
-established it.
+The receiver must be a stable access path — a name, or a name followed by
+literal fields — so `config.kind` narrows `config` and `state.config.kind`
+narrows `state.config`. A call or a dynamic index in the receiver narrows
+nothing. Narrowing ends with the block that established it.
 
 A string is the usual discriminant, but any [literal type](#literal-types) works,
 which makes the two-case result a natural shape:
@@ -412,7 +413,8 @@ Parameter names inside `fun(...)` are optional and documentary. See
 
 ## Type guards
 
-A condition narrows a name inside the block it guards:
+A condition narrows a stable access path inside the block it guards. A path is
+a name, or a name followed by literal fields:
 
 ```luam
 function announce(name?: string, handler?: fun(text: string): void): void
@@ -427,6 +429,8 @@ end
 ```
 
 - `type(value) == '...'` narrows to that type, for every name `type` returns.
+- A field is a path, so `self.connection ~= nil` refines `self.connection`, and
+  so does a nested `self.socket.handle`.
 - `value ~= nil` and a plain `if value then` drop `nil`.
 - `value == nil` narrows to `nil`, and the `else` branch of that test drops it.
 - `value.key == '...'` picks the members of a union that declare `key` with that
@@ -434,9 +438,13 @@ end
   [discriminated unions](#discriminated-unions).
 - `and` chains apply every fact they carry.
 
-The narrowing ends with the block, and it is dropped as soon as the name is
-assigned or shadowed. An assignment is always checked against the declared type,
-so reassigning a narrowed name to its original type is accepted.
+The narrowing ends with the block, and it is dropped as soon as the path, a
+prefix of it, or its root is assigned or shadowed — including a write inside a
+loop body or inside a function declared in the same block. A call or a dynamic
+index in the path produces no narrowing at all. An assignment is always checked
+against the declared type, so reassigning a narrowed path to its original type
+is accepted. What a guard cannot follow is a second reference to the same table;
+see [Limitations](/en/reference/limitations).
 
 A guard clause narrows the rest of the block when it always exits:
 

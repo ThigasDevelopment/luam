@@ -2,6 +2,7 @@ import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { ExtensionResult } from '@compiler/extensions/native-extensions';
 import type { CallExpression, Expression, MemberExpression, TableExpression, TemplateLiteral } from '@compiler/parser/ast';
 
+import { pathOf } from './access-path';
 import { extensionFor, reportExtensionForm, reportNotCallable } from './callable';
 import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
@@ -65,7 +66,21 @@ function isNativeConstruction(context: CheckContext, expression: MemberExpressio
     return nativeConstructor(context, object.name) !== null;
 }
 
+function narrowedMember(context: CheckContext, expression: MemberExpression): Type | null {
+    const path = pathOf(expression);
+
+    return path === null ? null : context.narrowedType(path);
+}
+
 function checkMember(context: CheckContext, expression: MemberExpression): Type {
+    const narrowed = narrowedMember(context, expression);
+
+    if (narrowed !== null) {
+        checkExpression(context, expression.object);
+
+        return context.record(expression, narrowed);
+    }
+
     if (expression.object.kind === 'identifier' && isMtaClassReference(context, expression.object.name)) {
         context.references.add(expression.object.name);
 

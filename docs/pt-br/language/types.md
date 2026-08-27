@@ -248,8 +248,10 @@ function connect(config: Config): void
 end
 ```
 
-O receptor precisa ser um nome simples — `config.kind` estreita `config`, mas
-`state.config.kind` não estreita nada. O estreitamento termina com o bloco que o
+O receptor precisa ser um caminho de acesso estável — um nome, ou um nome
+seguido de campos literais — então `config.kind` estreita `config` e
+`state.config.kind` estreita `state.config`. Uma chamada ou um índice dinâmico
+no receptor não estreita nada. O estreitamento termina com o bloco que o
 estabeleceu.
 
 Uma string é o discriminante usual, mas qualquer [tipo literal](#tipos-literais)
@@ -419,7 +421,8 @@ Nomes de parâmetro dentro de `fun(...)` são opcionais e documentais. Veja
 
 ## Guardas de tipo
 
-Uma condição estreita um nome dentro do bloco que ela protege:
+Uma condição estreita um caminho de acesso estável dentro do bloco que ela
+protege. Um caminho é um nome, ou um nome seguido de campos literais:
 
 ```luam
 function announce(name?: string, handler?: fun(text: string): void): void
@@ -435,6 +438,8 @@ end
 
 - `type(value) == '...'` estreita para aquele tipo, para todo nome que `type`
   devolve.
+- Um campo é um caminho, então `self.connection ~= nil` refina
+  `self.connection`, e um `self.socket.handle` aninhado também.
 - `value ~= nil` e um `if value then` simples descartam o `nil`.
 - `value == nil` estreita para `nil`, e o `else` desse teste descarta o `nil`.
 - `value.key == '...'` escolhe os membros da união que declaram `key` com aquele
@@ -442,9 +447,13 @@ end
   [uniões discriminadas](#unioes-discriminadas).
 - Cadeias com `and` aplicam todos os fatos que carregam.
 
-O estreitamento termina com o bloco e cai assim que o nome é atribuído ou
-sombreado. Uma atribuição sempre é checada contra o tipo declarado, então
-reatribuir um nome estreitado ao tipo original é aceito.
+O estreitamento termina com o bloco e cai assim que o caminho, um prefixo dele
+ou a raiz dele é atribuído ou sombreado — incluindo uma escrita dentro do corpo
+de um laço ou dentro de uma função declarada no mesmo bloco. Uma chamada ou um
+índice dinâmico no caminho não produz estreitamento nenhum. Uma atribuição
+sempre é checada contra o tipo declarado, então reatribuir um caminho estreitado
+ao tipo original é aceito. O que uma guarda não consegue seguir é uma segunda
+referência à mesma tabela; veja [Limitações](/pt-br/reference/limitations).
 
 Uma guarda com saída antecipada estreita o resto do bloco:
 
