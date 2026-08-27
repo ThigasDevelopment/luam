@@ -1584,6 +1584,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "offset": 74,
       },
       "superClass": null,
+      "superClassArguments": [],
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "decorators": [],
@@ -1864,6 +1867,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "offset": 367,
       },
       "superClass": "Player",
+      "superClassArguments": [],
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "decorators": [],
@@ -2002,6 +2008,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "offset": 622,
       },
       "superClass": null,
+      "superClassArguments": [],
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "declarations": [
@@ -2051,6 +2060,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "line": 44,
             "offset": 784,
           },
+          "typeArguments": [],
         },
       ],
     },
@@ -3569,6 +3579,9 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
         "offset": 29,
       },
       "superClass": null,
+      "superClassArguments": [],
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "declarations": [
@@ -3598,6 +3611,7 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
             "line": 13,
             "offset": 149,
           },
+          "typeArguments": [],
         },
       ],
     },

@@ -11,10 +11,16 @@ export const ENSURE_COMMAND = 'luam.ensure';
 
 export const RESTART_COMMAND = 'luam.restartServer';
 
+export const RESCAN_COMMAND = 'luam.rescanWorkspace';
+
 let client: LanguageClient | null = null;
 
 async function restartServer(): Promise<void> {
     await client?.restart();
+}
+
+async function rescanWorkspace(): Promise<void> {
+    await client?.sendRequest('workspace/executeCommand', { command: RESCAN_COMMAND });
 }
 
 export function activate(context: ExtensionContext): void {
@@ -23,6 +29,7 @@ export function activate(context: ExtensionContext): void {
     context.subscriptions.push(commands.registerCommand(BUILD_COMMAND, runBuildCommand));
     context.subscriptions.push(commands.registerCommand(ENSURE_COMMAND, runEnsureCommand));
     context.subscriptions.push(commands.registerCommand(RESTART_COMMAND, restartServer));
+    context.subscriptions.push(commands.registerCommand(RESCAN_COMMAND, rescanWorkspace));
 
     void client.start();
 }

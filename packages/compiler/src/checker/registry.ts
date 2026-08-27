@@ -17,7 +17,10 @@ export interface MemberInfo {
 
 export interface ClassInfo {
     name: string;
+    typeParameters: readonly string[];
+    typeConstraints: readonly (Type | null)[];
     superClass: string | null;
+    superArguments: readonly Type[];
     interfaces: string[];
     members: Map<string, MemberInfo>;
     statics: Map<string, MemberInfo>;
@@ -198,6 +201,24 @@ export class DeclarationRegistry {
 
             if (found !== undefined) {
                 return found;
+            }
+
+            visited.add(current.name);
+
+            current = current.superClass === null ? null : this.lookupClass(current.superClass);
+        }
+
+        return null;
+    }
+
+    lookupMemberOwner(name: string, member: string): string | null {
+        const visited = new Set<string>();
+
+        let current = this.lookupClass(name);
+
+        while (current !== null && !visited.has(current.name)) {
+            if (current.members.has(member)) {
+                return current.name;
             }
 
             visited.add(current.name);

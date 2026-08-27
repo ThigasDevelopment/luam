@@ -102,11 +102,13 @@ end
 ```
 
 Uma condição guardada em uma variável também não é um fato: teste o caminho no
-bloco que o usa, e não `local ready = self.connection ~= nil`. O estreitamento
-também termina onde o bloco termina, e cai assim que o caminho, um prefixo dele
-ou a raiz dele recebe outro valor. Veja [Guardas de tipo](/pt-br/language/types#guardas-de-tipo)
-para todas as formas que estreitam, e [Limitações](/pt-br/reference/limitations)
-para o que não estreita.
+bloco que o usa, e não `local ready = self.connection ~= nil`. Um fato cai assim
+que o caminho, um prefixo dele ou a raiz dele recebe outro valor, e tudo que o
+corpo de um laço escreve perde o fato no laço inteiro. Veja
+[Guardas de tipo](/pt-br/language/types#guardas-de-tipo) para todas as formas que
+estreitam, [o que um fato sobrevive](/pt-br/language/types#o-que-um-fato-sobrevive)
+para até onde ele vai, e [Limitações](/pt-br/reference/limitations) para o que não
+estreita.
 
 ## A interpolação diz que um nome não está no escopo
 

@@ -43,6 +43,7 @@ export interface DocumentAnalysis {
     aliases: ReadonlyMap<string, Type>;
     own: AmbientDeclarations;
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
+    referencedNames: ReadonlySet<string>;
     directives: SourceDirectives;
     project: ProjectDeclarations;
     env: Readonly<Record<string, string>>;
@@ -108,6 +109,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
         aliases: checked.aliases,
         own: ownDeclarations(checked.declarations, ambient),
         declaredGlobals: checked.declaredGlobals,
+        referencedNames: checked.referencedNames,
         directives: checked.directives,
         project,
         env: input.env ?? {},
@@ -141,6 +143,7 @@ function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
         aliases: new Map(),
         own: EMPTY_AMBIENT,
         declaredGlobals: new Map(),
+        referencedNames: new Set(),
         directives: EMPTY_DIRECTIVES,
         project: input.project ?? EMPTY_PROJECT_DECLARATIONS,
         env: input.env ?? {},

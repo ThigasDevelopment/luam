@@ -1,9 +1,10 @@
 import { CALLABLE_KEYWORDS, type Token } from '@compiler/lexer/token';
 
-import type { Expression, TableField } from './ast';
+import type { Expression, TableField, TypeAnnotation } from './ast';
 import { parseFunctionExpression } from './function-expression';
 import { binaryPrecedence, isRightAssociative, UNARY_OPERATORS, UNARY_PRECEDENCE } from './precedence';
 import type { TokenStream } from './token-stream';
+import { parseTypeAnnotation } from './type-annotation';
 
 const LITERAL_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
 
@@ -82,8 +83,9 @@ function parsePrimary(stream: TokenStream): Expression {
         stream.next();
 
         const className = stream.next().value;
+        const typeArguments = parseNewTypeArguments(stream);
 
-        return { kind: 'new-expression', className, args: parseArguments(stream), position: token.position };
+        return { kind: 'new-expression', className, typeArguments, args: parseArguments(stream), position: token.position };
     }
 
     if (token.kind === 'keyword' && CALLABLE_KEYWORDS.has(token.value) && stream.checkAhead(1, 'punctuation', '(')) {
@@ -129,6 +131,27 @@ function parsePrimary(stream: TokenStream): Expression {
     }
 
     throw stream.error(`Unexpected "${stream.describeCurrent()}" in expression.`, 'parse-unexpected-token');
+}
+
+function parseNewTypeArguments(stream: TokenStream): TypeAnnotation[] {
+    const args: TypeAnnotation[] = [];
+
+    if (!stream.check('operator', '<')) {
+        return args;
+    }
+
+    const checkpoint = stream.checkpoint();
+
+    stream.next();
+
+    do {
+        args.push(parseTypeAnnotation(stream));
+    } while (stream.match('punctuation', ','));
+
+    stream.expect('operator', '>');
+    stream.eraseFrom(checkpoint);
+
+    return args;
 }
 
 function parseArguments(stream: TokenStream): Expression[] {

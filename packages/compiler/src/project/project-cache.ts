@@ -1,24 +1,16 @@
-import { EMPTY_AMBIENT, mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
+import type { AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
-import { ALL_ENVIRONMENTS, canReference, type Environment } from '@compiler/environment/environment';
 import { compile } from '@compiler/index';
 import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 
-import { fingerprintDeclarations, hashString } from './fingerprint';
+import { createAmbientScope, optionsKey, sharedEnums, type AmbientScope, type DeclarationEntry } from './ambient-scope';
+import type { ResourceAbi } from './export-abi';
+import { fingerprintByName, fingerprintDeclarations, hashString } from './fingerprint';
 import { toContributions } from './manifest';
 import { sortFileDiagnostics, type CompiledModule, type FileDiagnostic, type ProjectFile, type ProjectResult } from './module';
 import { validateContributions, validateModuleReferences } from './module-graph';
 import type { ProgressReporter } from './progress';
 import { isDeclarationPath } from './source-kind';
-
-interface DeclarationEntry {
-    path: string;
-    hash: string;
-    environment: Environment;
-    declarations: AmbientDeclarations;
-    externalReferences: readonly string[];
-    fingerprint: string;
-}
 
 interface ModuleEntry {
     hash: string;
@@ -33,6 +25,7 @@ interface CompilationPair {
 
 export interface CompileProjectOptions {
     project?: ProjectDeclarations;
+    contracts?: readonly ResourceAbi[];
     compilerOptions?: CompilerOptions;
     development?: boolean;
     onProgress?: ProgressReporter;
@@ -43,20 +36,9 @@ export interface ProjectCache {
     clear(): void;
 }
 
-type AmbientKeys = Readonly<Record<Environment, string>>;
-
-type AmbientResolver = (entry: DeclarationEntry) => AmbientDeclarations;
-
-interface FingerprintContext {
-    project: ProjectDeclarations;
-    references: ReadonlySet<string>;
-    options: CompilerOptions;
-    development: boolean;
-}
-
 interface ModuleContext {
-    keys: AmbientKeys;
-    resolve: AmbientResolver;
+    scope: AmbientScope;
+    contracts: readonly ResourceAbi[];
     project: ProjectDeclarations;
     projectReferences: ReadonlySet<string>;
     compilerOptions: CompilerOptions;
@@ -67,68 +49,12 @@ function flattenDiagnostics(modules: readonly CompiledModule[]): FileDiagnostic[
     return modules.flatMap((module) => module.diagnostics.map((diagnostic) => ({ path: module.path, diagnostic })));
 }
 
-function optionsKey(options: CompilerOptions): string {
-    return `${options.strict ? 'strict' : ''}|${options.oop ? 'oop' : ''}|${options.noUnusedLocals ? 'nul' : ''}|${options.noUnusedParameters ? 'nup' : ''}`;
-}
-
-function sharedEnums(collected: readonly DeclarationEntry[]): ReadonlySet<string> {
-    const declared = new Set(collected.flatMap((entry) => entry.declarations.enums.map((enumeration) => enumeration.name)));
-
-    if (declared.size === 0) {
-        return declared;
-    }
-
-    return new Set(collected.flatMap((entry) => entry.externalReferences.filter((name) => declared.has(name))));
-}
-
-function ambientKeys(collected: readonly DeclarationEntry[], context: FingerprintContext): AmbientKeys {
-    const keys: Partial<Record<Environment, string>> = {};
-    const { project, references, options } = context;
-    const mode = context.development ? 'development' : 'release';
-    const projectKey = `${optionsKey(options)}|${mode}|${JSON.stringify(project.globals)}|${[...references].sort().join(',')}`;
-
-    for (const environment of ALL_ENVIRONMENTS) {
-        const visible = collected.filter((entry) => canReference(environment, entry.environment));
-
-        keys[environment] = hashString(`${projectKey}|${visible.map((entry) => `${entry.path}=${entry.fingerprint}`).join(';')}`);
-    }
-
-    return keys as AmbientKeys;
-}
-
-function declaresNothing(declarations: AmbientDeclarations): boolean {
-    const { classes, interfaces, enums, globals, events } = declarations;
-
-    return classes.length === 0 && interfaces.length === 0 && enums.length === 0 && globals.length === 0 && events.length === 0;
-}
-
-function createAmbientResolver(collected: readonly DeclarationEntry[]): AmbientResolver {
-    const visible = new Map<Environment, DeclarationEntry[]>();
-    const merged = new Map<Environment, AmbientDeclarations>();
-
-    for (const environment of ALL_ENVIRONMENTS) {
-        const entries = collected.filter((entry) => canReference(environment, entry.environment) && !declaresNothing(entry.declarations));
-
-        visible.set(environment, entries);
-        merged.set(environment, mergeAmbient(entries.map((entry) => entry.declarations)));
-    }
-
-    return (entry: DeclarationEntry): AmbientDeclarations => {
-        if (declaresNothing(entry.declarations)) {
-            return merged.get(entry.environment) ?? EMPTY_AMBIENT;
-        }
-
-        const entries = visible.get(entry.environment) ?? [];
-
-        return mergeAmbient(entries.filter((candidate) => candidate.path !== entry.path).map((candidate) => candidate.declarations));
-    };
-}
-
 function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context: ModuleContext): CompiledModule {
     const result = compile(file.source, {
         filePath: file.path,
         ...(file.environment === undefined ? {} : { environment: file.environment }),
         ambient,
+        contracts: context.contracts,
         project: context.project,
         projectReferences: context.projectReferences,
         compilerOptions: context.compilerOptions,
@@ -143,7 +69,7 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
         requiredHelpers: result.requiredHelpers,
         declaredGlobals: result.declaredGlobals,
         externalReferences: result.externalReferences,
-        contributions: toContributions(result.directives, result.environment),
+        contributions: toContributions(result.directives, result.environment, result.moduleGlobals),
         diagnostics: result.diagnostics,
         lines: result.lines,
         topLevelReturn: result.topLevelReturn,
@@ -192,6 +118,8 @@ export function createProjectCache(): ProjectCache {
             declarations: result.declarations,
             externalReferences: [...result.externalReferences.keys()],
             fingerprint: fingerprintDeclarations(result.declarations),
+            provides: fingerprintByName(result.declarations),
+            requires: result.referencedNames,
         };
 
         declarationCache.set(file.path, entry);
@@ -201,7 +129,7 @@ export function createProjectCache(): ProjectCache {
 
     function moduleFor(pair: CompilationPair, context: ModuleContext, reused: { count: number }): CompiledModule {
         const { file, entry } = pair;
-        const ambientKey = context.keys[entry.environment];
+        const ambientKey = context.scope.keyFor(entry);
         const cached = moduleCache.get(file.path);
 
         if (cached !== undefined && cached.hash === entry.hash && cached.ambientKey === ambientKey) {
@@ -210,7 +138,7 @@ export function createProjectCache(): ProjectCache {
             return cached.module;
         }
 
-        const module = compileModule(file, context.resolve(entry), context);
+        const module = compileModule(file, context.scope.resolve(entry), context);
 
         moduleCache.set(file.path, { hash: entry.hash, ambientKey, module });
 
@@ -227,9 +155,10 @@ export function createProjectCache(): ProjectCache {
             const collected = pairs.map((pair) => pair.entry);
             const projectReferences = sharedEnums(collected);
             const development = options.development === true;
-            const context = {
-                keys: ambientKeys(collected, { project, references: projectReferences, options: compilerOptions, development }),
-                resolve: createAmbientResolver(collected),
+            const contracts = options.contracts ?? [];
+            const context: ModuleContext = {
+                scope: createAmbientScope(collected, { project, references: projectReferences, options: compilerOptions, development, contracts }),
+                contracts,
                 project,
                 projectReferences,
                 compilerOptions,

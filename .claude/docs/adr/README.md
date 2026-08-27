@@ -39,3 +39,9 @@ Each row links the record; the record itself carries the full status note.
 | 028 | [Give a class one value with its own member space](028-static-class-members.md) | Accepted |
 | 029 | [Generate the MTA catalog from a committed wiki snapshot](029-mta-wiki-catalog-source.md) | Accepted |
 | 030 | [One role table generates every Luam editor theme](030-editor-theme-contract.md) | Accepted |
+| 031 | [Carry narrowing facts through a syntax-directed flow state](031-flow-narrowing.md) | Accepted |
+| 032 | [Erase class type parameters at the point of use](032-erased-generic-classes.md) | Accepted |
+| 033 | [Publish resource exports as a versioned JSON contract](033-resource-export-abi.md) | Accepted |
+| 034 | [Validate a shape at runtime only where a class is marked](034-opt-in-boundary-validation.md) | Accepted |
+| 035 | [Expose Lua metamethods by reserved member name](035-safe-class-metamethods.md) | Accepted |
+| 036 | [Read a native `config.lua` for literal data, never execute it](036-config-declaration-extraction.md) | Accepted |

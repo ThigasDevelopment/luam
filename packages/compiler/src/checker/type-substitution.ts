@@ -2,6 +2,7 @@ import {
     createArray,
     createFunction,
     createMap,
+    createNamed,
     createOptional,
     createRecord,
     createTuple,
@@ -11,6 +12,12 @@ import {
 
 export function substituteType(type: Type, substitutions: ReadonlyMap<string, Type>): Type {
     if (type.kind === 'named') {
+        const args = type.typeArguments ?? [];
+
+        if (args.length > 0) {
+            return createNamed(type.name, args.map((argument) => substituteType(argument, substitutions)));
+        }
+
         return substitutions.get(type.name) ?? type;
     }
 

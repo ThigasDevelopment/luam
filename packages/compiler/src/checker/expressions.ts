@@ -8,6 +8,8 @@ import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
 import { specializeEventCall } from './event-calls';
+import { memberOf } from './generic-class';
+import { checkResourceCall } from './resource-exports';
 import {
     checkNewExpression,
     checkSuperCall,
@@ -130,7 +132,7 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
         return context.record(expression, objectType.value);
     }
 
-    const named = objectType.kind === 'named' ? resolveNamedMember(context, objectType.name, expression) : null;
+    const named = objectType.kind === 'named' ? resolveNamedMember(context, objectType, expression) : null;
 
     if (named !== null) {
         return context.record(expression, named);
@@ -218,7 +220,7 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
         return ANY_TYPE;
     }
 
-    const declared = context.declarations.lookupMember(receiver.name, method);
+    const declared = memberOf(context, receiver, method);
 
     if (declared?.type.kind === 'function') {
         if (declared.deprecated === true) {
@@ -246,6 +248,12 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
 }
 
 function checkCall(context: CheckContext, expression: CallExpression): Type {
+    const contracted = checkResourceCall(context, expression);
+
+    if (contracted !== null) {
+        return context.record(expression, contracted);
+    }
+
     if (isLegacySuperCall(expression)) {
         checkValueList(context, expression.args);
         context.report('check-invalid-super', 'Call "super(...)" directly instead of "self:super(...)".', expression.position);
@@ -383,6 +391,10 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
 
             if (symbol === null) {
                 checkGlobalReference(context, expression.name, expression.position);
+            }
+
+            if (symbol === null || symbol.isLocal !== true) {
+                context.noteGlobalReference(expression.name);
             }
 
             return context.record(expression, context.narrowedType(expression.name) ?? symbol?.type ?? ANY_TYPE);

@@ -44,6 +44,7 @@ getter para cada campo e um setter para `nickname` e `banned`.
 | `@Clone` | classe | `clone()` superficial |
 | `@Serializable` | classe | `toTable()` com valores superficiais dos campos |
 | `@Deserialize` | classe | `fromTable(values)` atribuindo valores superficiais |
+| `@Validated` | classe | `validate(value)` e `matches(value)` estáticos, checando os tipos declarados dos campos em execução |
 | `@Builder` | classe | `ClassNameBuilder`, `withField(value)` e `build()` |
 
 Um decorador em qualquer outra coisa — um método, um comando, uma função — é
@@ -188,6 +189,47 @@ Usar `player:oldName()` produz o aviso `check-deprecated-use`. Atribuir
 `player.id = 2` fora de um método de `Player` é `check-readonly-assignment`. Um
 método `@Override` ausente na superclasse ou com assinatura diferente é
 `check-invalid-override`.
+
+## Validação em execução numa fronteira
+
+Anotações de tipo são apagadas, então um payload que atravessou a rede é o que
+quem enviou colocou lá. O `@Validated` é o único decorador que pede ao
+compilador para checar um formato em execução, e só onde você escreve:
+
+```luam env=server
+@Validated
+class JoinPayload {
+    id: string
+    score: number
+    tag?: string
+}
+
+function handleJoin(payload: table): void
+    local checked: JoinPayload = JoinPayload.validate(payload)
+
+    outputChatBox(checked.id, root)
+end
+```
+
+Os dois membros gerados são **estáticos**, então são chamados na classe:
+
+- `ClassName.validate(value)` devolve o valor, ou levanta um erro Lua nomeando o
+  caminho e o tipo esperado — `luam-validate: "score" expected "number"`. O
+  valor em si nunca entra na mensagem, então um payload recusado não vaza um
+  token para um log.
+- `ClassName.matches(value)` roda a mesma checagem e responde `true` ou `false`.
+
+A checagem percorre os tipos declarados dos campos: primitivos, literais,
+opcionais, uniões, arrays, mapas, tipos de objeto, interfaces expandidas nos
+membros delas, e um campo de classe como verificação de instância. Ela para em
+limites fixos — 16 níveis de aninhamento, 4096 entradas em uma tabela, 65536
+caracteres em uma string — então um payload feito para exaurir o servidor é
+recusado em vez de percorrido.
+
+Um campo cujo tipo não tem forma em execução, como `any` ou `unknown`, é
+`check-unreifiable-type`, reportado antes de qualquer emissão. Nada é gerado
+para uma classe sem o decorador, e um projeto que nunca escreve `@Validated` não
+publica código de validação nenhum.
 
 ## Um exemplo completo
 

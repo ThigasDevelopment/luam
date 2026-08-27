@@ -101,11 +101,12 @@ end
 ```
 
 A condition stored in a variable is not a fact either: test the path in the block
-that uses it, not `local ready = self.connection ~= nil`. The narrowing also ends
-where the block ends, and it is dropped as soon as the path, a prefix of it, or
-its root is assigned again. See [Type guards](/en/language/types#type-guards) for
-every form that narrows, and [Limitations](/en/reference/limitations) for what
-does not.
+that uses it, not `local ready = self.connection ~= nil`. A fact is dropped as
+soon as the path, a prefix of it, or its root is assigned again, and anything a
+loop body writes loses its fact for the whole loop. See
+[Type guards](/en/language/types#type-guards) for every form that narrows,
+[what a fact survives](/en/language/types#what-a-fact-survives) for how far one
+carries, and [Limitations](/en/reference/limitations) for what does not.
 
 ## Template interpolation says a name is not in scope
 

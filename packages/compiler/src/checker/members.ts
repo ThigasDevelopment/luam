@@ -4,10 +4,12 @@ import { findLibraryMember, isLibrary } from '@mta-types/library-members';
 
 import { descriptorToType } from './api-types';
 import type { CheckContext } from './context';
+import { checkTypeConstraints, classSubstitutions, inferTypeArguments, memberOf } from './generic-class';
 import { isMtaElement, resolveMtaMember } from './oop-members';
 import type { MemberInfo } from './registry';
 import { checkExpression, checkSignature } from './expressions';
-import { ANY_TYPE, createNamed, NUMBER_TYPE, type FunctionType, type RecordType, type Type } from './types';
+import { substituteType } from './type-substitution';
+import { ANY_TYPE, createNamed, NUMBER_TYPE, type FunctionType, type NamedType, type RecordType, type Type } from './types';
 
 function checkEnumMember(context: CheckContext, name: string, members: readonly string[], expression: MemberExpression): Type {
     if (members.includes(expression.property)) {
@@ -98,14 +100,15 @@ export function resolveStaticMember(context: CheckContext, className: string, ex
     return ANY_TYPE;
 }
 
-export function resolveNamedMember(context: CheckContext, name: string, expression: MemberExpression): Type | null {
+export function resolveNamedMember(context: CheckContext, receiver: NamedType, expression: MemberExpression): Type | null {
+    const name = receiver.name;
     const enumeration = context.declarations.lookupEnum(name);
 
     if (enumeration !== null) {
         return checkEnumMember(context, name, enumeration.members, expression);
     }
 
-    const member = context.declarations.lookupMember(name, expression.property);
+    const member = memberOf(context, receiver, expression.property);
 
     if (member !== null) {
         if (member.deprecated === true) {
@@ -158,6 +161,40 @@ export function nativeConstructor(context: CheckContext, name: string): Function
     return constructor === undefined || constructor.kind !== 'function' ? null : constructor;
 }
 
+function constructorParameters(context: CheckContext, className: string): readonly Type[] {
+    const constructor = context.declarations.lookupMember(className, 'constructor');
+
+    return constructor?.type.kind === 'function' ? constructor.type.parameters : [];
+}
+
+function resolveConstructorArguments(context: CheckContext, expression: NewExpression, typeParameters: readonly string[]): Type[] {
+    const explicit = expression.typeArguments.map((argument) => context.resolveAnnotation(argument));
+
+    if (typeParameters.length === 0) {
+        if (explicit.length > 0) {
+            context.report('check-generic-arity', `Class "${expression.className}" does not accept type arguments.`, expression.position);
+        }
+
+        return [];
+    }
+
+    if (explicit.length === typeParameters.length) {
+        return explicit;
+    }
+
+    if (explicit.length > 0) {
+        const expected = typeParameters.length === 1 ? '1 type argument' : `${typeParameters.length} type arguments`;
+
+        context.report('check-generic-arity', `Class "${expression.className}" expects ${expected} but received ${explicit.length}.`, expression.position);
+
+        return typeParameters.map((unused, index) => explicit[index] ?? ANY_TYPE);
+    }
+
+    const argumentTypes = expression.args.map((argument) => checkExpression(context, argument));
+
+    return inferTypeArguments(typeParameters, constructorParameters(context, expression.className), argumentTypes);
+}
+
 export function checkNewExpression(context: CheckContext, expression: NewExpression): Type {
     if (context.declarations.lookupClass(expression.className) === null) {
         const constructor = nativeConstructor(context, expression.className);
@@ -185,15 +222,24 @@ export function checkNewExpression(context: CheckContext, expression: NewExpress
         context.report('check-class-before-declaration', `${subject} is declared further down this file, so it does not exist yet at this point.`, expression.position);
     }
 
+    const info = context.declarations.lookupClass(expression.className);
+    const typeArguments = resolveConstructorArguments(context, expression, info?.typeParameters ?? []);
+
+    checkTypeConstraints(context, expression.className, typeArguments, expression.position);
     const constructor = context.declarations.lookupMember(expression.className, 'constructor');
 
     if (constructor !== null && constructor.type.kind === 'function') {
-        checkSignature(context, expression.args, constructor.type, expression.position);
+        const substitutions = info === null ? new Map<string, Type>() : classSubstitutions(info, typeArguments);
+        const signature = substituteType(constructor.type, substitutions);
+
+        if (signature.kind === 'function') {
+            checkSignature(context, expression.args, signature, expression.position);
+        }
     } else {
         expression.args.forEach((argument) => checkExpression(context, argument));
     }
 
-    return createNamed(expression.className);
+    return createNamed(expression.className, typeArguments);
 }
 
 function resolveSuperMethod(context: CheckContext, expression: CallExpression): Type | null {

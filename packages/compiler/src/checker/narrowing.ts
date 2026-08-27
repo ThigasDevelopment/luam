@@ -1,4 +1,4 @@
-import type { Expression, Statement } from '@compiler/parser/ast';
+import type { Expression } from '@compiler/parser/ast';
 
 import { pathOf, pathType } from './access-path';
 import type { CheckContext } from './context';
@@ -153,34 +153,6 @@ export function conditionFacts(context: CheckContext, condition: Expression): Ma
     collectFacts(context, condition, facts);
 
     return facts;
-}
-
-function alwaysExits(body: readonly Statement[]): boolean {
-    const last = body[body.length - 1];
-
-    if (last === undefined) {
-        return false;
-    }
-
-    if (last.kind === 'return-statement' || last.kind === 'break-statement') {
-        return true;
-    }
-
-    if (last.kind !== 'if-statement' || last.alternate === null) {
-        return false;
-    }
-
-    return last.clauses.every((clause) => alwaysExits(clause.body)) && alwaysExits(last.alternate);
-}
-
-export function guardFacts(context: CheckContext, statement: Statement): Map<string, Type> {
-    const [clause] = statement.kind === 'if-statement' ? statement.clauses : [];
-
-    if (statement.kind !== 'if-statement' || statement.alternate !== null || statement.clauses.length !== 1 || clause === undefined) {
-        return new Map();
-    }
-
-    return alwaysExits(clause.body) ? negatedFacts(context, clause.condition) : new Map();
 }
 
 export function negatedFacts(context: CheckContext, condition: Expression): Map<string, Type> {

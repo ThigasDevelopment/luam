@@ -2,6 +2,7 @@ import type { ClassDeclaration, ClassFieldDeclaration, ClassMethodDeclaration, E
 
 import type { CheckContext } from './context';
 import { checkInterfaces, checkOverrides } from './class-contracts';
+import { checkMetamethod, isMetamethodMember, reportRejectedMetamethod } from './metamethods';
 import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
@@ -95,6 +96,15 @@ export function registerMembers(context: CheckContext, info: ClassInfo, statemen
                : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
         const decorators = member.decorators.map((decorator) => decorator.name);
+
+        if (member.kind === 'class-method' && isMetamethodMember(member)) {
+            checkMetamethod(context, info.name, member, type);
+
+            continue;
+        }
+
+        reportRejectedMetamethod(context, info.name, member);
+
         const space = member.isStatic ? info.statics : info.members;
 
         space.set(member.name, {
@@ -129,8 +139,22 @@ export function declareBuilder(context: CheckContext, info: ClassInfo, statement
     }
 
     members.set('build', { name: 'build', type: { kind: 'function', parameters: [], minimumArguments: 0, isVariadic: false, returnType: createNamed(statement.name) }, isMethod: true, position: statement.position });
-    context.declarations.declareClass({ name, superClass: null, interfaces: [], members, statics: new Map(), position: statement.position });
+    context.declarations.declareClass({
+        name,
+        typeParameters: [],
+        typeConstraints: [],
+        superClass: null,
+        superArguments: [],
+        interfaces: [],
+        members,
+        statics: new Map(),
+        position: statement.position,
+    });
     context.declareModuleGlobal({ name, type: createNamed(name), isLocal: false, position: statement.position });
+}
+
+function selfType(info: ClassInfo): Type {
+    return createNamed(info.name, info.typeParameters.map((parameter) => createNamed(parameter)));
 }
 
 function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMethodDeclaration): void {
@@ -153,7 +177,7 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
     }
 
     context.pushClassMethod({ className: info.name, methodName: member.name });
-    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, createNamed(info.name));
+    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, selfType(info));
     context.popClassMethod();
 }
 
@@ -186,6 +210,11 @@ export function resolveSuperClass(context: CheckContext, statement: ClassDeclara
     return null;
 }
 
+export function resolveClassHeader(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
+    info.superArguments = statement.superClassArguments.map((argument) => context.resolveAnnotation(argument));
+    info.typeConstraints = statement.typeConstraints.map((constraint) => (constraint === null ? null : context.resolveAnnotation(constraint)));
+}
+
 export function declareClassInfo(context: CheckContext, statement: ClassDeclaration): ClassInfo | null {
     if (context.declarations.lookupClass(statement.name) !== null) {
         context.report('check-duplicate-class', `Class "${statement.name}" is already defined.`, statement.position);
@@ -201,13 +230,17 @@ export function declareClassInfo(context: CheckContext, statement: ClassDeclarat
 
     const info: ClassInfo = {
         name: statement.name,
+        typeParameters: statement.typeParameters,
+        typeConstraints: [],
         superClass: null,
+        superArguments: [],
         interfaces: statement.interfaces,
         members: new Map(),
         statics: new Map(),
         position: statement.position,
     };
 
+    context.noteTypeParameters(statement.typeParameters);
     context.declarations.declareClass(info);
     context.declareModuleGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: statement.position });
 
@@ -222,6 +255,7 @@ function declareLocalClass(context: CheckContext, statement: ClassDeclaration): 
     }
 
     info.superClass = resolveSuperClass(context, statement);
+    resolveClassHeader(context, info, statement);
 
     return info;
 }

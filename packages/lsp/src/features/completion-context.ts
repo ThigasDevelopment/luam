@@ -14,7 +14,7 @@ import { aliasType, sharedRecord } from './type-shape';
 
 export type ReceiverTarget =
     | { kind: 'library'; library: LibraryName }
-    | { kind: 'class'; name: string }
+    | { kind: 'class'; name: string; typeArguments: readonly Type[] }
     | { kind: 'static-class'; name: string }
     | { kind: 'class-value'; name: string }
     | { kind: 'enum'; name: string }
@@ -103,7 +103,7 @@ function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<strin
             return fromType(analysis, alias, seen);
         }
 
-        return { kind: 'class', name: type.name };
+        return { kind: 'class', name: type.name, typeArguments: type.typeArguments ?? [] };
     }
 
     if (type.kind === 'table' || type.kind === 'array') {

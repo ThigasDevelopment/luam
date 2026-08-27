@@ -10,6 +10,7 @@ import { accessorNames } from './accessor-names';
 import type { CheckContext } from './context';
 import { KNOWN_DECORATORS, type DecoratorTarget } from './decorator-catalog';
 import { isBooleanType, type Type } from './types';
+import { classDescriptor } from './validation-descriptor';
 
 function memberExpression(field: ClassFieldDeclaration) {
     return {
@@ -102,6 +103,70 @@ function decoratorFor(name: string, classDecorators: readonly Decorator[], field
     return fieldDecorators.find((decorator) => decorator.name === name) ?? classDecorators.find((decorator) => decorator.name === name) ?? null;
 }
 
+function staticMethod(
+    statement: ClassDeclaration,
+    name: string,
+    returnAnnotation: TypeAnnotation,
+    kind: 'validate' | 'matches',
+    descriptor: string,
+): ClassMethodDeclaration {
+    const value: Parameter = { name: 'value', annotation: typeName('table', statement), isVararg: false, position: statement.position };
+
+    return {
+        kind: 'class-method',
+        name,
+        isConstructor: false,
+        isSynthetic: true,
+        isStatic: true,
+        parameters: [value],
+        returnAnnotation,
+        body: [],
+        decorators: [],
+        generated: { kind, fields: [], descriptor },
+        position: statement.position,
+    };
+}
+
+function expandValidated(
+    context: CheckContext,
+    statement: ClassDeclaration,
+    classDecorators: readonly Decorator[],
+    fieldTypes: ReadonlyMap<ClassFieldDeclaration, Type>,
+    occupied: Map<string, string>,
+    generated: ClassMethodDeclaration[],
+): void {
+    const found = classDecorators.find((decorator) => decorator.name === 'Validated');
+
+    if (found === undefined) {
+        return;
+    }
+
+    const fields = [...fieldTypes].map(([field, type]) => ({ name: field.name, type, position: field.position }));
+    const described = classDescriptor(context, statement.name, fields);
+
+    if (described.lua === null) {
+        const message = `Decorator "@Validated" cannot check type "${described.unreifiable}", which has no runtime shape. Remove the field, or narrow it to a checkable type.`;
+
+        context.report('check-unreifiable-type', message, found.position);
+
+        return;
+    }
+
+    for (const [name, kind, annotation] of [
+        ['validate', 'validate', typeName(statement.name, statement)],
+        ['matches', 'matches', typeName('boolean', statement)],
+    ] as const) {
+        if (occupied.has(name)) {
+            context.report('check-decorator-conflict', `Decorator "@Validated" would generate "${name}", which is already declared by "${occupied.get(name)}".`, found.position);
+
+            continue;
+        }
+
+        occupied.set(name, statement.name);
+        generated.push(staticMethod(statement, name, annotation, kind, described.lua));
+    }
+}
+
 export function expandClassDecorators(
     context: CheckContext,
     statement: ClassDeclaration,
@@ -185,6 +250,8 @@ export function expandClassDecorators(
         Serializable: ['toTable', typeName('table', statement), 'serializable'],
         Deserialize: ['fromTable', typeName('void', statement), 'deserialize'],
     };
+
+    expandValidated(context, statement, classDecorators, fieldTypes, occupied, generated);
 
     for (const [decorator, [name, returnAnnotation, kind]] of Object.entries(classMethods)) {
         const found = classDecorators.find((value) => value.name === decorator);

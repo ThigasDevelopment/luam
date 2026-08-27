@@ -1,4 +1,4 @@
-export type RuntimeHelperName = 'async' | 'class' | 'env' | 'math' | 'string' | 'table' | 'threads';
+export type RuntimeHelperName = 'async' | 'class' | 'env' | 'math' | 'string' | 'table' | 'threads' | 'validate';
 
 export type DevelopmentRuntimeHelperName = 'development-logs-client' | 'development-logs-server';
 
@@ -16,7 +16,8 @@ export type RuntimeFeature =
     | 'string-extension'
     | 'table-extension'
     | 'template-string'
-    | 'thread';
+    | 'thread'
+    | 'boundary-validation';
 
 export interface RuntimeHelperModule {
     name: RuntimeHelperName;
@@ -54,6 +55,7 @@ export const RUNTIME_HELPERS: Readonly<Record<RuntimeHelperName, RuntimeHelperMo
     string: { name: 'string', file: 'string.lua', injection: 'automatic', features: ['string-extension', 'template-string'] },
     table: { name: 'table', file: 'table.lua', injection: 'automatic', features: ['table-extension'] },
     threads: { name: 'threads', file: 'threads.lua', injection: 'reference', features: ['thread'], globals: ['sleep', 'Threads'] },
+    validate: { name: 'validate', file: 'validate.lua', injection: 'automatic', features: ['boundary-validation'] },
 };
 
 export const DEVELOPMENT_RUNTIME_HELPERS: Readonly<Record<DevelopmentRuntimeHelperName, DevelopmentRuntimeHelperModule>> = {
@@ -80,6 +82,7 @@ export const FEATURE_HELPERS: Readonly<Record<RuntimeFeature, RuntimeHelperName>
     'table-extension': 'table',
     'template-string': 'string',
     thread: 'threads',
+    'boundary-validation': 'validate',
 };
 
 export function isRuntimeHelperName(value: string): value is RuntimeHelperName {

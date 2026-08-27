@@ -49,6 +49,10 @@ export class Binder {
         return [...this.discarded, ...this.scopes.flatMap((scope) => [...scope.values()])];
     }
 
+    currentScopeNames(): string[] {
+        return [...(this.scopes[this.scopes.length - 1]?.keys() ?? [])];
+    }
+
     declare(symbol: SymbolInfo): void {
         const scope = this.scopes[this.scopes.length - 1];
 

@@ -72,9 +72,57 @@ print(settings.export)
 
 See [Keywords](/en/reference/keywords).
 
+## The export contract
+
+A build that exports anything writes a contract beside the resource — one JSON
+file per resource, in the directory
+[`contracts`](/en/reference/configuration-fields) names, defaulting to
+`.luam/contracts`. It records each export's name, side, HTTP flag, parameter
+names and types, minimum argument count and return type. It is not part of the
+runnable resource; nothing is copied into `build/<name>`.
+
+```json
+{
+    "abi": 1,
+    "resource": "core",
+    "exports": [
+        {
+            "name": "getBalance",
+            "side": "server",
+            "http": false,
+            "parameters": [{ "name": "id", "type": "string" }],
+            "minimumArguments": 1,
+            "variadic": false,
+            "returns": "number"
+        }
+    ]
+}
+```
+
+A project that declares `core` in `dependencies` and finds `core.abi.json` in
+that directory gets its calls checked — arguments, argument count, return type
+and the side the export runs on:
+
+```luam static
+local balance: number = call(getResourceFromName('core'), 'getBalance', 'thigas')
+local same: number = exports.core:getBalance('thigas')
+```
+
+Passing a `number` where the contract says `string` is `check-type-mismatch`,
+naming an export the contract does not declare is
+`check-unknown-resource-export`, and calling a client-only export from a server
+file is `check-resource-export-side`.
+
+Point several projects at one shared directory and the whole workspace checks
+across resources. A contract that is missing, unreadable, or names another
+resource is skipped with `build-invalid-contract`; the build carries on and
+those calls stay unchecked.
+
 ## What is not verified
 
-An export is **named, never verified** against the calling side. See
+A call whose resource name or export name is computed at runtime is never
+checked, with or without a contract — there is nothing to resolve. Neither is a
+call into a resource with no contract on disk. See
 [Limitations](/en/reference/limitations).
 
 ## A complete example

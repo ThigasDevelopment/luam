@@ -97,6 +97,7 @@ também chegam ao servidor.
 | --- | --- | --- |
 | **Luam: Ensure Resource** | `Ctrl+Alt+E` (`Cmd+Alt+E`) | Roda `luam ensure` em um terminal para o projeto atual. |
 | **Luam: Restart Language Server** | — | Reinicia o servidor quando ele se perde. |
+| **Luam: Rescan Workspace** | — | Reconstrói o índice a partir do disco depois de mudanças feitas fora do editor. |
 
 ## Configurações
 
@@ -143,14 +144,17 @@ construído.
 Editar um arquivo republica diagnóstico daquele arquivo. Os outros só são
 reanalisados quando a edição muda o que o arquivo **declara** — uma classe, uma
 interface, um enum ou um global, incluindo o tipo de qualquer membro. Uma edição
-de corpo custa um arquivo; uma edição de declaração custa todo arquivo que
-enxerga aquela declaração.
+de corpo custa um arquivo.
 
-Essa última parte é mais larga do que precisa ser: uma mudança de declaração
-reverifica os arquivos que a enxergam, não os que a usam. Estreitar isso é
-[planejado](/pt-br/reference/limitations).
+Uma edição de declaração custa os arquivos que alcançam aquela declaração, e só
+eles. O servidor segue cada nome até o arquivo que o declara e depois pelas
+superclasses, interfaces e tipos de membro daquele arquivo, então um pai
+indireto ainda invalida. Um arquivo que nunca nomeia o que mudou fica intacto,
+por mais arquivos que dividam o ambiente dele.
 
 Nada disso espera um arquivo ser aberto. O servidor varre o workspace ao iniciar
 e a extensão observa os padrões de arquivo acima, então um arquivo criado, movido
-ou apagado fora do editor chega até ele sem reinício. **Luam: Restart Language
-Server** é a saída se o servidor e o projeto ainda discordarem.
+ou apagado fora do editor chega até ele sem reinício. **Luam: Rescan Workspace**
+reconstrói o índice a partir do disco se alguma mudança escapou do observador, e
+**Luam: Restart Language Server** é a saída se o servidor e o projeto ainda
+discordarem.

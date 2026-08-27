@@ -38,6 +38,14 @@ function emitGeneratedMethod(state: EmitState, className: string, member: ClassM
             : `${member.name} = function(self, value)\n        self.${field.name} = value\n        for _, listener in ipairs(self.${key} or {}) do\n            listener(value)\n        end\n    end`;
     }
 
+    if (member.generated?.kind === 'validate' || member.generated?.kind === 'matches') {
+        const helper = member.generated.kind === 'validate' ? '__luam_validate' : '__luam_matches';
+
+        requireHelper(state, 'validate');
+
+        return `${member.name} = function(value)\n        return ${helper}(value, ${member.generated.descriptor ?? '{ kind = \'table\' }'})\n    end`;
+    }
+
     if (member.generated?.kind === 'to-string') {
         const values = names.map((name) => `'${name}=' .. tostring(self.${name})`).join(" .. ', ' .. ");
         const body = values.length === 0 ? "''" : values;

@@ -103,7 +103,7 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
         return createTuple(annotation.elements.map((element) => annotationType(element)));
     }
 
-    return PRIMITIVE_TYPES[annotation.name] ?? createNamed(annotation.name);
+    return PRIMITIVE_TYPES[annotation.name] ?? createNamed(annotation.name, annotation.typeArguments.map((argument) => annotationType(argument)));
 }
 
 export function signatureType(parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): Type {

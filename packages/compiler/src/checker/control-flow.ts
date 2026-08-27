@@ -1,8 +1,9 @@
-import type { Expression, GenericForStatement, IfClause, NumericForStatement, Statement } from '@compiler/parser/ast';
+import type { Expression, GenericForStatement, IfClause, NumericForStatement, RepeatStatement, Statement, WhileStatement } from '@compiler/parser/ast';
 
 import { forgetAssignedPaths } from './access-path';
 import type { CheckContext } from './context';
 import { checkExpression } from './expressions';
+import { applyFacts, cloneFlow, joinFlows, type FlowState } from './flow';
 import { conditionFacts, negatedFacts } from './narrowing';
 import { checkStatements } from './statements';
 import { ANY_TYPE, isNumeric, NUMBER_TYPE, typeToString, type Type } from './types';
@@ -12,28 +13,76 @@ const ITERATOR_FUNCTIONS: ReadonlySet<string> = new Set(['pairs', 'ipairs']);
 export function checkBlock(context: CheckContext, body: readonly Statement[]): void {
     context.binder.pushScope();
     checkStatements(context, body);
+
+    const declared = context.binder.currentScopeNames();
+
     context.binder.popScope();
+
+    for (const name of declared) {
+        context.forgetNarrowing(name);
+    }
 }
 
-function checkNarrowedBlock(context: CheckContext, facts: ReadonlyMap<string, Type>, body: readonly Statement[]): void {
-    context.pushNarrowing(facts);
+function branch(context: CheckContext, entry: FlowState, facts: ReadonlyMap<string, Type>, body: readonly Statement[]): FlowState {
+    const state = cloneFlow(entry);
+
+    applyFacts(state, facts);
+    context.setFlow(state);
     checkBlock(context, body);
-    context.popNarrowing();
+
+    return context.flowState;
 }
 
 export function checkIf(context: CheckContext, clauses: readonly IfClause[], alternate: Statement[] | null): void {
+    const exits: FlowState[] = [];
+
+    let current = context.flowState;
+
     for (const clause of clauses) {
+        context.setFlow(current);
         checkExpression(context, clause.condition);
-        checkNarrowedBlock(context, conditionFacts(context, clause.condition), clause.body);
+
+        const taken = conditionFacts(context, clause.condition);
+        const skipped = cloneFlow(current);
+
+        applyFacts(skipped, negatedFacts(context, clause.condition));
+        exits.push(branch(context, current, taken, clause.body));
+        current = skipped;
     }
 
     if (alternate === null) {
-        return;
+        exits.push(current);
+    } else {
+        context.setFlow(current);
+        checkBlock(context, alternate);
+        exits.push(context.flowState);
     }
 
-    const [only] = clauses;
+    context.setFlow(joinFlows(exits));
+}
 
-    checkNarrowedBlock(context, clauses.length === 1 && only !== undefined ? negatedFacts(context, only.condition) : new Map(), alternate);
+function checkLoopBody(context: CheckContext, body: readonly Statement[], facts: ReadonlyMap<string, Type>): void {
+    forgetAssignedPaths(context, body);
+
+    const entry = context.flowState;
+    const state = cloneFlow(entry);
+
+    applyFacts(state, facts);
+    context.setFlow(state);
+    checkBlock(context, body);
+    context.setFlow(entry);
+}
+
+export function checkWhile(context: CheckContext, statement: WhileStatement): void {
+    forgetAssignedPaths(context, statement.body);
+    checkExpression(context, statement.condition);
+    checkLoopBody(context, statement.body, conditionFacts(context, statement.condition));
+    context.applyFlowFacts(negatedFacts(context, statement.condition));
+}
+
+export function checkRepeat(context: CheckContext, statement: RepeatStatement): void {
+    checkLoopBody(context, statement.body, new Map());
+    checkExpression(context, statement.condition);
 }
 
 export function checkNumericFor(context: CheckContext, statement: NumericForStatement): void {
@@ -48,10 +97,15 @@ export function checkNumericFor(context: CheckContext, statement: NumericForStat
     }
 
     forgetAssignedPaths(context, statement.body);
+
+    const entry = context.flowState;
+
+    context.setFlow(cloneFlow(entry));
     context.binder.pushScope();
     context.binder.declare({ name: statement.variable.name, type: NUMBER_TYPE, isLocal: true, position: statement.variable.position, origin: 'local' });
     checkStatements(context, statement.body);
     context.binder.popScope();
+    context.setFlow(entry);
 }
 
 function iteratedTypes(context: CheckContext, iterators: readonly Expression[]): Type[] {
@@ -82,6 +136,10 @@ export function checkGenericFor(context: CheckContext, statement: GenericForStat
     const iterated = iteratedTypes(context, statement.iterators);
 
     forgetAssignedPaths(context, statement.body);
+
+    const entry = context.flowState;
+
+    context.setFlow(cloneFlow(entry));
     context.binder.pushScope();
 
     statement.variables.forEach((variable, index) => {
@@ -93,4 +151,5 @@ export function checkGenericFor(context: CheckContext, statement: GenericForStat
 
     checkStatements(context, statement.body);
     context.binder.popScope();
+    context.setFlow(entry);
 }

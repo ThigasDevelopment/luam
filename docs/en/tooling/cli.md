@@ -25,6 +25,7 @@ luam help trace
 | [`ensure`](#luam-ensure) | Builds, syncs into the MTA server, restarts, and watches. |
 | [`dev`](#luam-dev) | The `ensure` loop plus a live server log stream. |
 | [`server`](#luam-server) | Runs an existing local MTA server in the foreground. |
+| [`config`](#luam-config) | Derives a declaration file from the literal data in `config.lua`. |
 | [`trace`](#luam-trace) | Resolves generated Lua positions back to Luam source. |
 | [`setup`](#luam-setup) | Detects editors and installs the extension, with consent. |
 | [`doctor`](#luam-doctor) | Reports the CLI, Node.js, editors, and the extension. |
@@ -147,6 +148,37 @@ then `mta-server`. Set `development.server.executable` for another layout.
 `Ctrl+C` writes MTA's `shutdown` command and uses a bounded kill fallback. The
 command owns and stops only the child it launched.
 
+## `luam config`
+
+```bash
+luam config
+luam config --write
+luam config --source settings/config.lua --out settings/config.d.luam --write
+```
+
+Reads the literal data in a native `config.lua` and writes a
+[declaration file](/en/language/declaration-files) for it. Without `--write` it
+prints what it would write and changes nothing.
+
+The file is **read, never executed and never imported**. What it understands is
+a top-level assignment of a literal or a table constructor: strings, numbers,
+booleans, `nil`, keyed tables, bracketed string keys, positional tables, and
+nesting of those. A keyed table becomes an object type, a positional one an
+array, a mixed one `table`, and a positional table of different element types
+`any[]`. It stops at 256 KB of source, eight levels of nesting and 512 entries
+per table.
+
+Anything else — a call, a concatenation, a function, a loop — is reported with
+its line and column and skipped; the names around it are still declared. Declare
+what it skipped by hand.
+
+The generated file carries a marker on its first line, and the command refuses
+to overwrite a file that does not carry it, so a hand-written declaration is
+never lost. `--source` and `--out` must stay inside the project directory.
+
+Nothing about `check` or `build` changes: `config.lua` is still copied into the
+resource verbatim and is never compiled.
+
 ## `luam trace`
 
 ```bash
@@ -208,6 +240,9 @@ returns `2` and runs nothing.
 | `--watch` / `--no-watch` | `dev`, `ensure` | Keep watching, or run once. Both watch by default. |
 | `--no-map` | `build`, `dev`, `ensure` | Disable map generation. For `build`, also remove the existing default map after success. |
 | `--offline` | `build`, `dev`, `ensure` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same. |
+| `--source <path>` | `config` | Native Lua file to read. Defaults to `config.lua`. |
+| `--out <path>` | `config` | Declaration file to write. Defaults to `config.d.luam`. |
+| `--write` | `config` | Write the declaration file instead of printing it. |
 | `--map <path>` | `trace` | Resource map to read. Relative paths resolve from the project directory. |
 | `--name <name>` | `init` | Resource name. |
 | `--force` | `init` | Overwrite a file that exists. |

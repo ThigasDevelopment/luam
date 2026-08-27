@@ -1,12 +1,16 @@
 import type { SourceDirectives } from '@compiler/checker/build-directives';
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { Environment } from '@compiler/environment/environment';
+import { typeToString, type Type } from '@compiler/checker/types';
+
+import type { ExportSignature } from './export-abi';
 
 export interface ExportContribution {
     kind: 'export';
     name: string;
     http: boolean;
     side: Environment;
+    signature: ExportSignature | null;
     position: SourcePosition;
 }
 
@@ -22,9 +26,26 @@ export function occupiedSides(contribution: ExportContribution): readonly Enviro
     return OCCUPIED_SIDES[contribution.side];
 }
 
-export function toContributions(directives: SourceDirectives, environment: Environment): ManifestContribution[] {
+export function exportSignature(type: Type | undefined): ExportSignature | null {
+    if (type === undefined || type.kind !== 'function') {
+        return null;
+    }
+
+    const parameters = type.parameters.map((parameter, index) => ({ name: type.parameterNames?.[index] ?? `arg${index + 1}`, type: typeToString(parameter) }));
+
+    return { parameters, minimumArguments: type.minimumArguments, variadic: type.isVariadic, returns: typeToString(type.returnType) };
+}
+
+export function toContributions(directives: SourceDirectives, environment: Environment, globals: ReadonlyMap<string, Type>): ManifestContribution[] {
     return directives.exports.map(
-        (entry): ManifestContribution => ({ kind: 'export', name: entry.name, http: entry.http, side: environment, position: entry.position }),
+        (entry): ManifestContribution => ({
+            kind: 'export',
+            name: entry.name,
+            http: entry.http,
+            side: environment,
+            signature: exportSignature(globals.get(entry.name)),
+            position: entry.position,
+        }),
     );
 }
 

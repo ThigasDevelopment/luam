@@ -8,7 +8,11 @@ import { EMPTY_AMBIENT, type AmbientDeclarations } from './ambient';
 import { descriptorToType } from './api-types';
 import { Binder, type SymbolInfo } from './binder';
 import type { StrictMode } from './directives';
+import { applyFacts, createFlow, forgetPath, type FlowState } from './flow';
+import { checkTypeConstraints } from './generic-class';
 import { builtinSymbols } from './globals';
+import type { ResourceAbi } from '@compiler/project/export-abi';
+
 import { mtaClassRegistry } from './oop-classes';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import { DeclarationRegistry, type ClassInfo } from './registry';
@@ -31,6 +35,7 @@ import {
     createUnion,
     isAssignable,
     isLiteralType,
+    namedNesting,
     NIL_TYPE,
     NUMBER_TYPE,
     STRING_TYPE,
@@ -62,6 +67,8 @@ const TABLE_ANNOTATION = 'table';
 
 const MAP_ARGUMENTS = 2;
 
+const MAX_GENERIC_DEPTH = 8;
+
 const PROJECT_POSITION: SourcePosition = { line: 0, column: 0, offset: 0 };
 
 export interface ClassMethodFrame {
@@ -91,7 +98,7 @@ export class CheckContext {
 
     private readonly reported = new Set<string>();
 
-    private readonly narrowings: Map<string, Type>[] = [];
+    private flow: FlowState = createFlow();
 
     readonly types = new Map<Expression, Type>();
 
@@ -99,9 +106,15 @@ export class CheckContext {
 
     readonly declaredGlobals = new Map<string, SourcePosition>();
 
+    readonly moduleGlobals = new Map<string, Type>();
+
     readonly externalReferences = new Map<string, SourcePosition>();
 
     readonly unknownTypes = new Map<string, SourcePosition>();
+
+    readonly eventReferences = new Set<string>();
+
+    readonly globalReferences = new Set<string>();
 
     readonly calledMembers = new Set<Expression>();
 
@@ -116,6 +129,8 @@ export class CheckContext {
     readonly environment: Environment;
 
     readonly mtaClasses: DeclarationRegistry | null;
+
+    contracts: readonly ResourceAbi[] = [];
 
     isDeclarationFile = false;
 
@@ -160,40 +175,35 @@ export class CheckContext {
     declareModuleGlobal(symbol: SymbolInfo): void {
         this.binder.declareGlobal(symbol);
         this.declaredGlobals.set(symbol.name, symbol.position);
+        this.moduleGlobals.set(symbol.name, symbol.type);
     }
 
-    pushNarrowing(facts: ReadonlyMap<string, Type>): void {
-        this.narrowings.push(new Map(facts));
+    get flowState(): FlowState {
+        return this.flow;
+    }
+
+    setFlow(state: FlowState): void {
+        this.flow = state;
+    }
+
+    applyFlowFacts(facts: ReadonlyMap<string, Type>): void {
+        applyFacts(this.flow, facts);
+    }
+
+    markUnreachable(): void {
+        this.flow.reachable = false;
     }
 
     get isNarrowed(): boolean {
-        return this.narrowings.length > 0;
-    }
-
-    popNarrowing(): void {
-        this.narrowings.pop();
+        return this.flow.facts.size > 0;
     }
 
     forgetNarrowing(path: string): void {
-        for (const frame of this.narrowings) {
-            for (const key of [...frame.keys()]) {
-                if (key === path || key.startsWith(`${path}.`) || path.startsWith(`${key}.`)) {
-                    frame.delete(key);
-                }
-            }
-        }
+        forgetPath(this.flow, path);
     }
 
     narrowedType(path: string): Type | null {
-        for (let index = this.narrowings.length - 1; index >= 0; index -= 1) {
-            const found = this.narrowings[index]?.get(path);
-
-            if (found !== undefined) {
-                return found;
-            }
-        }
-
-        return null;
+        return this.flow.facts.get(path) ?? null;
     }
 
     predeclareClass(info: ClassInfo): void {
@@ -282,6 +292,14 @@ export class CheckContext {
 
     isTypeParameter(name: string): boolean {
         return this.typeParameters.has(name);
+    }
+
+    noteGlobalReference(name: string): void {
+        this.globalReferences.add(name);
+    }
+
+    noteEventReference(name: string): void {
+        this.eventReferences.add(name);
     }
 
     noteUnknownType(name: string, position: SourcePosition): void {
@@ -481,6 +499,35 @@ export class CheckContext {
         return createMap(this.resolveAnnotation(key), this.resolveAnnotation(value));
     }
 
+    private resolveClassAnnotation(name: string, typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {
+        const declared = this.declarations.lookupClass(name)?.typeParameters ?? [];
+        const resolved = typeArguments.map((argument) => this.resolveAnnotation(argument));
+
+        if (declared.length === 0) {
+            return createNamed(name);
+        }
+
+        if (resolved.length !== declared.length) {
+            const expected = declared.length === 1 ? '1 type argument' : `${declared.length} type arguments`;
+
+            this.report('check-generic-arity', `Class "${name}" expects ${expected} but received ${resolved.length}.`, position);
+        }
+
+        const specialized = createNamed(name, declared.map((unused, index) => resolved[index] ?? ANY_TYPE));
+
+        if (namedNesting(specialized) > MAX_GENERIC_DEPTH) {
+            const message = `Class "${name}" is nested more than ${MAX_GENERIC_DEPTH} levels deep here. Name the inner type with a "type" alias.`;
+
+            this.report('check-generic-depth', message, position);
+
+            return createNamed(name);
+        }
+
+        checkTypeConstraints(this, name, specialized.typeArguments ?? [], position);
+
+        return specialized;
+    }
+
     private resolveNamedAnnotation(name: string, typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {
         const builtin = BUILTIN_TYPES[name];
 
@@ -501,7 +548,7 @@ export class CheckContext {
         if (alias === null) {
             this.noteUnknownType(name, position);
 
-            return createNamed(name);
+            return this.resolveClassAnnotation(name, typeArguments, position);
         }
 
         if (typeArguments.length !== alias.parameters.length) {

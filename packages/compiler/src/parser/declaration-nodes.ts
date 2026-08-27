@@ -25,8 +25,9 @@ export interface ClassMethodDeclaration extends NodeBase {
     body: Statement[];
     decorators: Decorator[];
     generated?: {
-        kind: 'fluent-setter' | 'to-string' | 'equals' | 'clone' | 'serializable' | 'deserialize' | 'lazy' | 'observable';
+        kind: 'fluent-setter' | 'to-string' | 'equals' | 'clone' | 'serializable' | 'deserialize' | 'lazy' | 'observable' | 'validate' | 'matches';
         fields: ClassFieldDeclaration[];
+        descriptor?: string;
     };
 }
 
@@ -35,7 +36,10 @@ export type ClassMember = ClassFieldDeclaration | ClassMethodDeclaration;
 export interface ClassDeclaration extends NodeBase {
     kind: 'class-declaration';
     name: string;
+    typeParameters: string[];
+    typeConstraints: (TypeAnnotation | null)[];
     superClass: string | null;
+    superClassArguments: TypeAnnotation[];
     interfaces: string[];
     members: ClassMember[];
     decorators: Decorator[];
@@ -84,6 +88,7 @@ export interface EventDeclaration extends NodeBase {
 export interface NewExpression extends NodeBase {
     kind: 'new-expression';
     className: string;
+    typeArguments: TypeAnnotation[];
     args: Expression[];
 }
 

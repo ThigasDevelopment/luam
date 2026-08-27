@@ -72,6 +72,9 @@ writes nothing.
 | `check-unknown-union-key` | error | The key is missing from at least one member of the union. |
 | `check-invalid-intersection` | error | A part of an intersection is not an object type, an interface, or a class. |
 | `check-conflicting-intersection-member` | error | Two parts of an intersection declare the same key with different types. |
+| `check-generic-arity` | error | A type alias or a class received the wrong number of type arguments. |
+| `check-generic-constraint` | error | A type argument does not satisfy the constraint its parameter declares. |
+| `check-generic-depth` | error | A specialization is nested past the depth the checker expands. |
 | `check-unknown-type` | warning | The type name is not declared anywhere the file can reach. |
 
 ## Checker — control flow
@@ -85,6 +88,8 @@ writes nothing.
 
 | Code | Meaning |
 | --- | --- |
+| `check-unknown-resource-export` | A literal call names an export the dependency contract does not declare. |
+| `check-resource-export-side` | An export is called from a side it does not run on. |
 | `check-unknown-class` | `new` or `extends` names a class that is not declared. |
 | `check-duplicate-class` | Two classes with the same name in one file. |
 | `check-class-cycle` | A class extends itself, directly or through its parents. |
@@ -114,6 +119,9 @@ writes nothing.
 
 | Code | Meaning |
 | --- | --- |
+| `check-blocked-metamethod` | A class method names a metamethod Luam does not expose. |
+| `check-invalid-metamethod` | A metamethod declares the wrong parameter count or return type. |
+| `check-unreifiable-type` | `@Validated` names a field type that has no runtime shape. |
 | `check-unknown-decorator` | The name is not one of the known decorators. |
 | `check-decorator-target` | A decorator on something that cannot carry one. |
 | `check-duplicate-decorator` | The same decorator twice on one target. |
@@ -173,6 +181,7 @@ writes nothing.
 | `build-asset-unreadable` | An asset could not be read. |
 | `build-env-malformed` | `.env` could not be parsed. |
 | `build-empty-configuration` | The configuration produced nothing to build. |
+| `build-invalid-contract` | A dependency export contract was unreadable or named another resource, and was ignored. |
 
 ## Configuration
 

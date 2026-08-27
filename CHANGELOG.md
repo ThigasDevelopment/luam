@@ -24,6 +24,83 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   its language and the documented version. It requires an explicit submission,
   and no page sends anything in the background — there is no voting endpoint and
   no third-party analytics.
+- `Luam: Rescan Workspace`, a command that rebuilds the language server index
+  from disk without restarting the server.
+- `luam config`, a command that derives a declaration file from the literal data
+  in a native `config.lua`. It reads the file and never executes it, accepts
+  top-level assignments of literals and table constructors, reports anything
+  else with its position, and refuses to overwrite a declaration it did not
+  generate ([ADR-036](.claude/docs/adr/036-config-declaration-extraction.md)).
+  `check` and `build` are unchanged: `config.lua` is still copied verbatim and
+  never compiled.
+- A class declares a metamethod under its Lua name. `__tostring`, `__eq`,
+  `__lt`, `__le`, `__len`, `__concat`, `__unm` and the arithmetic operators are
+  exposed with a checked signature, inherited like any other member, and
+  installed on the instance metatable by the class helper
+  ([ADR-035](.claude/docs/adr/035-safe-class-metamethods.md)). `__index`,
+  `__newindex`, `__call`, `__gc`, `__metatable` and `__mode` stay blocked, in
+  the checker and in the helper. New diagnostics: `check-blocked-metamethod`
+  and `check-invalid-metamethod`.
+- `@Validated`, the one decorator that adds a runtime check. On a class it
+  generates static `validate(value)` and `matches(value)` members that walk a
+  value against the declared field types, with a fixed depth, entry-count and
+  string-length limit, and a failure that names the path and the expected type
+  but never the value
+  ([ADR-034](.claude/docs/adr/034-opt-in-boundary-validation.md)). A field type
+  with no runtime shape is `check-unreifiable-type`, reported before emit. A
+  program that never writes the decorator emits no validation code, so erased
+  annotations stay erased.
+- An export contract. A build that exports anything writes one versioned JSON
+  file per resource into the directory the new `contracts` manifest field names,
+  default `.luam/contracts`, and reads the same directory for the contracts of
+  the resources listed in `dependencies`. A `call(getResourceFromName('core'),
+  'getBalance', ...)` or `exports.core:getBalance(...)` whose resource and export
+  names are literal is then checked like any other call — arguments, count,
+  return type and the side the export runs on
+  ([ADR-033](.claude/docs/adr/033-resource-export-abi.md)). The contract stays
+  outside the runnable resource, contracts are read as untrusted input, and a
+  dynamic name still compiles unchecked. New diagnostics:
+  `check-unknown-resource-export`, `check-resource-export-side` and
+  `build-invalid-contract`.
+- A class takes type parameters, the way a type alias already did. `class Box<T>`
+  declares them, `Box<string>` uses them, `extends Box<T>` forwards them and
+  `extends Box<string>` pins them, and `new Box('text')` infers them from the
+  constructor call. A parameter may carry a constraint. Two specializations of
+  one class no longer assign to each other, and everything erases: one class
+  emits one implementation whatever it was specialized to
+  ([ADR-032](.claude/docs/adr/032-erased-generic-classes.md)). New diagnostics:
+  `check-generic-constraint` and `check-generic-depth`.
+
+### Changed
+
+- The development logs are documented as a boundary rather than a gap. There is
+  no remote mode and none is planned: collecting logs from a server the CLI
+  cannot read from disk would mean opening a connection to it, and the
+  `transport` manifest field that once configured one was removed in favour of
+  `ensure` syncing files and `dev --start-server` restarting the server it owns.
+  `luam dev` reads the local server log, which is what makes structured records
+  and source positions work.
+- A narrowing fact now survives the block that established it when every path
+  into the code after it agrees. A field refined in both arms of an `if`, a
+  union an assignment narrowed to one member, a `while` that filled a missing
+  value — each used to go back to its declared type at the closing `end`.
+  Branches, guard clauses and loop invalidation are one mechanism now, a flow
+  state with an explicit join and an explicit reachability bit
+  ([ADR-031](.claude/docs/adr/031-flow-narrowing.md)). An `elseif` chain narrows
+  like the nested `if` it stands for, which it did not before. What still does
+  not carry is a condition stored in a variable, and an arbitrary call still
+  does not drop a fact — the aliasing boundary is unchanged.
+- A declaration edit now rechecks only the files that reach that declaration.
+  The project cache used to key every module on a fingerprint of every
+  declaration visible to its environment, so touching one shared class rebuilt
+  the whole side. Checking now reports the ambient names each file reaches, and
+  the cache keys a module on the transitive closure of the declarations behind
+  those names. On a 1200-file project a leaf declaration edit costs what a body
+  edit costs, instead of a near-full rebuild.
+- The language server reruns the reverse closure of a changed declaration
+  instead of every other open document, and reconciles files created or deleted
+  while it was running rather than rebuilding the index on each watched-file
+  event.
 
 ### Fixed
 

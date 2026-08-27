@@ -59,6 +59,7 @@ Duas entradas que caem no mesmo destino, ou um destino que sobrescreveria o
 | Campo | Tipo | Obrigatório | Padrão | Significado |
 | --- | --- | --- | --- | --- |
 | `dependencies` | `string[]` | não | `{ }` | Resources escritos como `<include resource="..." />`. Deduplicados e ordenados. Um nome inválido ou que aponta para este resource é `config-invalid-dependency`. |
+| `contracts` | `string` | não | `'.luam/contracts'` | Diretório onde o contrato de export é escrito e de onde os contratos das dependências são lidos. Precisa ficar dentro do diretório do projeto. |
 | `engine.minVersion` | `string` | não | `'latest'` | Vira `min_mta_version`. `'latest'` consulta a versão no momento do build; uma versão explícita mantém o build sem rede. Um valor malformado é `config-invalid-engine-version`. |
 
 Dependências opcionais não são suportadas. `mta.minVersion` não é aceito.

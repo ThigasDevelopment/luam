@@ -83,6 +83,25 @@ export const KNOWN_DECORATORS: ReadonlyMap<string, DecoratorDefinition> = new Ma
         },
     ],
     [
+        'Validated',
+        {
+            name: 'Validated',
+            documentation: 'Generates runtime checks for the declared field types.',
+            targets: ['class'],
+            generates: [
+                '`ClassName.validate(value: table): ClassName`, returning the value or raising a Lua error naming the path and the expected type.',
+                '`ClassName.matches(value: table): boolean`, the same check without raising.',
+            ],
+            rules: [
+                'Both are static, so they are called on the class and never on an instance.',
+                'The check walks the declared field types with a depth, entry-count and string-length limit, and a failure names the path and the expected type but never the value.',
+                'A field whose type has no runtime shape is `check-unreifiable-type`, reported before anything is emitted.',
+                'It is the only decorator that adds runtime code beyond the class helper; a class without it emits nothing extra.',
+            ],
+            diagnostics: [CONFLICT, '`check-unreifiable-type` when a field type cannot be checked at runtime.'],
+        },
+    ],
+    [
         'Serializable',
         {
             name: 'Serializable',

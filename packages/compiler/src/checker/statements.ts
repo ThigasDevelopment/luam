@@ -11,13 +11,13 @@ import type {
     TypeAnnotation,
 } from '@compiler/parser/ast';
 
-import { assignedPath, forgetAssignedPaths } from './access-path';
+import { assignedPath, forgetAssignedPaths, pathOf } from './access-path';
 import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration } from './classes';
 import type { CheckContext } from './context';
-import { checkBlock, checkGenericFor, checkIf, checkNumericFor } from './control-flow';
+import { checkBlock, checkGenericFor, checkIf, checkNumericFor, checkRepeat, checkWhile } from './control-flow';
 import { checkExpression, checkValueList } from './expressions';
 import { checkEventDeclaration } from './events';
-import { guardFacts } from './narrowing';
+import { assignmentFact, cloneFlow } from './flow';
 import {
     ANY_TYPE,
     createFunction,
@@ -51,11 +51,11 @@ export function buildFunctionType(
     contextual: FunctionType | null = null,
 ): FunctionType {
     const isVariadic = parameters.some((parameter) => parameter.isVararg);
-    const types = parameters
-        .filter((parameter) => !parameter.isVararg)
-        .map((parameter, index) => parameter.annotation === null ? (contextual?.parameters[index] ?? ANY_TYPE) : context.resolveAnnotation(parameter.annotation));
+    const named = parameters.filter((parameter) => !parameter.isVararg);
+    const types = named.map((parameter, index) => parameter.annotation === null ? (contextual?.parameters[index] ?? ANY_TYPE) : context.resolveAnnotation(parameter.annotation));
+    const names = named.map((parameter) => parameter.name);
 
-    return createFunction(types, context.resolveAnnotation(returnAnnotation), minimumArguments(context, parameters), isVariadic);
+    return createFunction(types, context.resolveAnnotation(returnAnnotation), minimumArguments(context, parameters), isVariadic, names);
 }
 
 export function checkFunctionBody(
@@ -67,6 +67,10 @@ export function checkFunctionBody(
     selfType: Type | null,
 ): void {
     forgetAssignedPaths(context, body);
+
+    const entry = context.flowState;
+
+    context.setFlow(cloneFlow(entry));
     context.binder.pushScope();
     context.pushReturnType(returnAnnotation === null ? null : context.resolveAnnotation(returnAnnotation));
 
@@ -94,6 +98,7 @@ export function checkFunctionBody(
     }
 
     context.binder.popScope();
+    context.setFlow(entry);
 }
 
 function valueAt(values: readonly Expression[], valueTypes: readonly Type[], index: number): Expression | undefined {
@@ -128,6 +133,10 @@ function checkLocal(context: CheckContext, statement: LocalStatement): void {
         }
 
         context.binder.declare({ name: declaration.name, type: declared, isLocal: true, position: declaration.position, origin: 'local' });
+
+        if (value !== undefined) {
+            recordAssignedFact(context, declaration.name, valueType, declared);
+        }
     });
 }
 
@@ -142,6 +151,18 @@ function checkCompoundOperand(context: CheckContext, operator: string, type: Typ
 
     if (!isNumeric(type)) {
         context.report('check-invalid-operand', `Operator "${operator}" cannot be applied to "${typeToString(type)}".`, position);
+    }
+}
+
+function recordAssignedFact(context: CheckContext, path: string | null, valueType: Type, declared: Type): void {
+    if (path === null || valueType.kind === 'any') {
+        return;
+    }
+
+    const fact = assignmentFact(widenInferred(valueType), declared);
+
+    if (fact !== null) {
+        context.applyFlowFacts(new Map([[path, fact]]));
     }
 }
 
@@ -193,6 +214,8 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
         if (value !== undefined) {
             context.expectAssignable(valueType, declared, value.position, 'Assignment');
         }
+
+        recordAssignedFact(context, pathOf(target), valueType, declared);
     });
 }
 
@@ -301,20 +324,21 @@ function checkStatement(context: CheckContext, statement: Statement): void {
         case 'function-declaration':
             return checkFunctionDeclaration(context, statement);
         case 'return-statement':
-            return checkReturn(context, statement);
+            checkReturn(context, statement);
+            context.markUnreachable();
+
+            return;
+        case 'break-statement':
+        case 'continue-statement':
+            context.markUnreachable();
+
+            return;
         case 'do-statement':
             return checkBlock(context, statement.body);
         case 'while-statement':
-            checkExpression(context, statement.condition);
-            forgetAssignedPaths(context, statement.body);
-
-            return checkBlock(context, statement.body);
+            return checkWhile(context, statement);
         case 'repeat-statement':
-            forgetAssignedPaths(context, statement.body);
-            checkBlock(context, statement.body);
-            checkExpression(context, statement.condition);
-
-            return;
+            return checkRepeat(context, statement);
         case 'if-statement':
             return checkIf(context, statement.clauses, statement.alternate);
         case 'numeric-for-statement':
@@ -347,21 +371,7 @@ function checkStatement(context: CheckContext, statement: Statement): void {
 }
 
 export function checkStatements(context: CheckContext, statements: readonly Statement[]): void {
-    let guards = 0;
-
     for (const statement of statements) {
         checkStatement(context, statement);
-
-        const facts = guardFacts(context, statement);
-
-        if (facts.size > 0) {
-            context.pushNarrowing(facts);
-            guards += 1;
-        }
-    }
-
-    while (guards > 0) {
-        context.popNarrowing();
-        guards -= 1;
     }
 }

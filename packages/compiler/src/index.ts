@@ -4,6 +4,8 @@ import { check } from '@compiler/checker/checker';
 import { resolveStrictMode, type StrictMode } from '@compiler/checker/directives';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import type { EventInfo } from '@compiler/checker/registry';
+import type { Type } from '@compiler/checker/types';
+import type { ResourceAbi } from '@compiler/project/export-abi';
 import { hasErrors, sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import { emit } from '@compiler/emitter/emitter';
@@ -25,6 +27,7 @@ export interface CompileOptions {
     project?: ProjectDeclarations;
     compilerOptions?: CompilerOptions;
     projectReferences?: ReadonlySet<string>;
+    contracts?: readonly ResourceAbi[];
     emitCode?: boolean;
     development?: boolean;
 }
@@ -37,7 +40,9 @@ export interface CompileResult {
     environment: Environment;
     declarations: AmbientDeclarations;
     declaredGlobals: ReadonlyMap<string, SourcePosition>;
+    moduleGlobals: ReadonlyMap<string, Type>;
     externalReferences: ReadonlyMap<string, SourcePosition>;
+    referencedNames: ReadonlySet<string>;
     directives: SourceDirectives;
     lines: SourceLineMapping[];
     topLevelReturn: SourcePosition | null;
@@ -94,6 +99,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
     const isDeclarationFile = options.filePath !== undefined && isDeclarationPath(options.filePath);
     const checked = check(parsed.program, mode, environment, {
         ambient: options.ambient ?? EMPTY_AMBIENT,
+        contracts: options.contracts ?? [],
         project: options.project ?? EMPTY_PROJECT_DECLARATIONS,
         isDeclarationFile,
         oop: settings.oop,
@@ -107,7 +113,9 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         environment,
         declarations: ownDeclarations(checked.declarations, options.ambient),
         declaredGlobals: checked.declaredGlobals,
+        moduleGlobals: checked.moduleGlobals,
         externalReferences: checked.externalReferences,
+        referencedNames: checked.referencedNames,
         directives: checked.directives,
         topLevelReturn: findTopLevelReturn(parsed.program.body),
         events: checked.events,

@@ -55,6 +55,11 @@ export function checkEventUsage(context: CheckContext, expression: CallExpressio
     }
 
     const name = eventName(expression);
+
+    if (name !== null) {
+        context.noteEventReference(name);
+    }
+
     const custom = name === null ? null : context.declarations.lookupEvent(name);
     const declared = name === null ? null : eventEnvironment(name);
 

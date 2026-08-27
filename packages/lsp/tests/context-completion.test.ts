@@ -146,6 +146,7 @@ describe('decorator completion', () => {
         'ToString',
         'Equals',
         'Clone',
+        'Validated',
         'Serializable',
         'Deserialize',
         'Lazy',

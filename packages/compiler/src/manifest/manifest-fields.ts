@@ -5,6 +5,7 @@ import { elementField, field, findField, recordType, table, type ManifestField }
 import {
     DEFAULT_ASSET_DESTINATION,
     DEFAULT_COMPILER_OPTIONS,
+    DEFAULT_CONTRACTS_DIR,
     DEFAULT_ENGINE,
     DEFAULT_ENVIRONMENT_FILES,
     DEFAULT_OUT_DIR,
@@ -119,6 +120,11 @@ export const MANIFEST_FIELDS: readonly ManifestField[] = [
         rule: 'dependency-name',
         owner: 'dependencies',
         allowEmpty: true,
+    }),
+    field('contracts', STRING_TYPE, 'Directory the export contract is written to and dependency contracts are read from.', {
+        defaultValue: DEFAULT_CONTRACTS_DIR,
+        rule: 'contained-path',
+        owner: 'dependencies',
     }),
     table('engine', 'Requirements the MTA server and client must meet.', ENGINE_FIELDS, { defaultValue: {}, owner: 'engine' }),
     table('environment', 'Files that declare and override the project environment.', ENVIRONMENT_FIELDS, { defaultValue: {}, owner: 'environment' }),

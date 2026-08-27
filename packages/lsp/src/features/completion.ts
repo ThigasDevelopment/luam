@@ -1,7 +1,8 @@
 import { descriptorToType } from '@compiler/checker/api-types';
 import { mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classes';
+import { specializedMembers } from '@compiler/checker/generic-class';
 import { isMtaElementName } from '@compiler/checker/oop-members';
-import { typeToString, type RecordType } from '@compiler/checker/types';
+import { createNamed, typeToString, type RecordType, type Type } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
 import { isAvailableIn } from '@mta-types/api-declaration';
 import { globalsFor } from '@mta-types/catalog';
@@ -47,15 +48,14 @@ import { scanContext, type SourceContext } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
 
-function classItems(analysis: DocumentAnalysis, name: string, isMethod: boolean): CompletionItem[] {
+function classItems(analysis: DocumentAnalysis, name: string, typeArguments: readonly Type[], isMethod: boolean): CompletionItem[] {
     if (analysis.compilerOptions.oop && isMtaElementName(analysis.declarations, name)) {
         return mtaMembersFor(name, analysis.environment)
             .filter((member) => member.isMethod === isMethod)
             .map((member) => mtaMemberItem(member, name));
     }
 
-    return analysis.declarations
-        .collectMembers(name)
+    return specializedMembers(analysis.declarations, createNamed(name, typeArguments))
         .filter((member) => member.isMethod === isMethod)
         .map((member) => memberItem(member.name, member.type, member.isMethod, name));
 }
@@ -117,7 +117,7 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
         return recordItems(analysis, target.record);
     }
 
-    return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, trigger === ':');
+    return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, target.typeArguments, trigger === ':');
 }
 
 function superItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {

@@ -98,6 +98,11 @@
                 "command": "luam.restartServer",
                 "title": "Luam: Restart Language Server",
                 "category": "Luam"
+            },
+            {
+                "command": "luam.rescanWorkspace",
+                "title": "Luam: Rescan Workspace",
+                "category": "Luam"
             }
         ],
         "menus": {

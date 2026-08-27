@@ -66,6 +66,7 @@ export function validateConfig(value: ManifestObject, positions: PositionLookup)
         sources: readSourceMapping(value),
         assets: readAssetMappings(value),
         dependencies,
+        contracts: readString(value, 'contracts') ?? '',
         engine: readEngine(value),
         environment: readEnvironmentFiles(value),
         outDir: readString(value, 'outDir') ?? '',

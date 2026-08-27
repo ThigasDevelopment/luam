@@ -81,7 +81,7 @@ describe('project cache', () => {
         expect(edited.stats).toEqual({ files: 3, declarationsReused: 2, modulesReused: 2 });
     });
 
-    it('invalidates dependents when an upstream declaration changes', () => {
+    it('invalidates only the dependents of a changed declaration', () => {
         const cache = createProjectCache();
 
         cache.compile(baseProject());
@@ -89,8 +89,8 @@ describe('project cache', () => {
         const shared = SHARED_CLASS.replace("name: string = ''", "name: string = ''\n    level: number = 1");
         const edited = cache.compile(project(shared, SERVER_USE, CLIENT_USE));
 
-        expect(edited.stats.declarationsReused).toBe(2);
-        expect(edited.stats.modulesReused).toBe(0);
+        expect(edited.stats).toEqual({ files: 3, declarationsReused: 2, modulesReused: 1 });
+        expect(edited.modules.find((module) => module.path === 'src/server/main.luam')?.diagnostics).toEqual([]);
     });
 
     it('reports the same diagnostics as a cold compile after an edit', () => {

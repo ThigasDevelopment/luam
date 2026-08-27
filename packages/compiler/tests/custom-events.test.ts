@@ -109,18 +109,19 @@ describe('custom event declarations', () => {
         ]);
     });
 
-    it('invalidates project modules when an event contract changes', () => {
+    it('invalidates the handlers of an event whose contract changes', () => {
         const cache = createProjectCache();
         const files = (type: string) => [
             { path: 'src/shared/events.d.luam', source: `declare event 'onMatchStart'(round: ${type})\n` },
-            { path: 'src/server/main.luam', source: 'print(1)\n' },
+            { path: 'src/server/main.luam', source: "addEventHandler('onMatchStart', root, function()\nend)\n" },
+            { path: 'src/server/other.luam', source: 'print(1)\n' },
         ];
 
         cache.compile(files('number'));
 
         const changed = cache.compile(files('string'));
 
-        expect(changed.stats).toEqual({ files: 2, declarationsReused: 1, modulesReused: 0 });
+        expect(changed.stats).toEqual({ files: 3, declarationsReused: 2, modulesReused: 1 });
         expect(typeToString(changed.events[0]?.parameters[0]?.type ?? { kind: 'unknown' })).toBe('string');
     });
 });

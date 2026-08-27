@@ -59,6 +59,7 @@ mapping names is copied.
 | Field | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `dependencies` | `string[]` | no | `{ }` | Resources written as `<include resource="..." />`. Deduplicated and sorted. An invalid or self-referencing name is `config-invalid-dependency`. |
+| `contracts` | `string` | no | `'.luam/contracts'` | Directory the export contract is written to and dependency contracts are read from. Must stay inside the project directory. |
 | `engine.minVersion` | `string` | no | `'latest'` | Becomes `min_mta_version`. `'latest'` looks the version up at build time; an explicit version keeps the build network-free. A malformed value is `config-invalid-engine-version`. |
 
 Optional dependencies are not supported. `mta.minVersion` is not accepted.

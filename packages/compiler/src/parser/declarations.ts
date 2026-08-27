@@ -1,4 +1,5 @@
 import type { Token } from '@compiler/lexer/token';
+import type { TypeAnnotation } from '@compiler/parser/ast';
 
 import type {
     ClassDeclaration,
@@ -16,18 +17,35 @@ import { parseFunctionExpression, parseParameters } from './function-expression'
 import { recoverInBlock } from './recovery';
 import { parseBraceBlock } from './statement';
 import { ParserError, type TokenStream } from './token-stream';
-import { parseNamedAnnotation, parseOptionalAnnotation } from './type-annotation';
+import { parseNamedAnnotation, parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
 
 const DECLARATION_NAMES: ReadonlySet<string> = new Set(['class', 'interface', 'enum']);
 
 const CLASS_MODIFIERS: ReadonlySet<string> = new Set(['extends', 'implements']);
 
+function skipTypeParameters(stream: TokenStream, offset: number): number {
+    if (!stream.checkAhead(offset, 'operator', '<')) {
+        return offset;
+    }
+
+    let depth = 0;
+    let index = offset;
+
+    do {
+        const token = stream.peek(index);
+
+        depth += token.kind === 'operator' && token.value === '<' ? 1 : 0;
+        depth -= token.kind === 'operator' && token.value === '>' ? 1 : 0;
+        index += 1;
+    } while (depth > 0 && stream.peek(index).kind !== 'eof');
+
+    return index;
+}
+
 function isClassHeader(stream: TokenStream, offset = 0): boolean {
-    return (
-        stream.checkAhead(offset + 2, 'punctuation', '{') ||
-        stream.checkAhead(offset + 2, 'keyword', 'extends') ||
-        stream.checkAhead(offset + 2, 'keyword', 'implements')
-    );
+    const after = skipTypeParameters(stream, offset + 2);
+
+    return stream.checkAhead(after, 'punctuation', '{') || stream.checkAhead(after, 'keyword', 'extends') || stream.checkAhead(after, 'keyword', 'implements');
 }
 
 export function isDeclarationStart(stream: TokenStream): boolean {
@@ -205,10 +223,59 @@ function parseClassMember(stream: TokenStream): ClassMember {
     return { kind: 'class-field', name: token.value, annotation, value, decorators, isStatic, position: token.position };
 }
 
+interface TypeParameterList {
+    names: string[];
+    constraints: (TypeAnnotation | null)[];
+}
+
+function parseTypeParameters(stream: TokenStream): TypeParameterList {
+    const list: TypeParameterList = { names: [], constraints: [] };
+
+    if (!stream.check('operator', '<')) {
+        return list;
+    }
+
+    const checkpoint = stream.checkpoint();
+
+    stream.next();
+
+    do {
+        list.names.push(stream.expect('identifier').value);
+        list.constraints.push(stream.match('keyword', 'extends') ? parseTypeAnnotation(stream) : null);
+    } while (stream.match('punctuation', ','));
+
+    stream.expect('operator', '>');
+    stream.eraseFrom(checkpoint);
+
+    return list;
+}
+
+function parseTypeArguments(stream: TokenStream): TypeAnnotation[] {
+    const args: TypeAnnotation[] = [];
+
+    if (!stream.check('operator', '<')) {
+        return args;
+    }
+
+    const checkpoint = stream.checkpoint();
+
+    stream.next();
+
+    do {
+        args.push(parseTypeAnnotation(stream));
+    } while (stream.match('punctuation', ','));
+
+    stream.expect('operator', '>');
+    stream.eraseFrom(checkpoint);
+
+    return args;
+}
+
 function parseClassModifiers(stream: TokenStream, declaration: ClassDeclaration): void {
     while (stream.check('keyword') && CLASS_MODIFIERS.has(stream.current().value)) {
         if (stream.next().value === 'extends') {
             declaration.superClass = stream.expect('identifier').value;
+            declaration.superClassArguments = parseTypeArguments(stream);
 
             continue;
         }
@@ -222,7 +289,19 @@ function parseClassModifiers(stream: TokenStream, declaration: ClassDeclaration)
 function parseClassDeclaration(stream: TokenStream, decorators: Decorator[]): ClassDeclaration {
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
-    const declaration: ClassDeclaration = { kind: 'class-declaration', name, superClass: null, interfaces: [], members: [], decorators, position };
+    const typeParameters = parseTypeParameters(stream);
+    const declaration: ClassDeclaration = {
+        kind: 'class-declaration',
+        name,
+        typeParameters: typeParameters.names,
+        typeConstraints: typeParameters.constraints,
+        superClass: null,
+        superClassArguments: [],
+        interfaces: [],
+        members: [],
+        decorators,
+        position,
+    };
 
     parseClassModifiers(stream, declaration);
     stream.expect('punctuation', '{');
