@@ -47,6 +47,11 @@ end
 Inheritance works as MTA defines it: an instance method declared on `Element` is
 available on a `Vehicle`, and completion after `:` lists inherited members too.
 
+Hovering a class name explains the class rather than listing it: what a `Player`
+or a `Vehicle` is, the chain it inherits, how many members and static methods it
+reaches in that environment, and whether it is callable as a constructor. It
+works with `compiler.oop` off too, where the hover says the name is a type only.
+
 ## Static methods and constructors
 
 ```luam env=server oop

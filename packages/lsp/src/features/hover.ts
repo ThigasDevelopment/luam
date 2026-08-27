@@ -15,6 +15,7 @@ import { eventHover } from '@lsp/features/event-hover';
 import { keywordHover } from '@lsp/features/keyword-hover';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
+import { mtaClassHover } from '@lsp/features/mta-class-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
 import { declarationsIn } from '@lsp/features/symbol-lookup';
 import { toWordRange } from '@lsp/support/lsp-position';
@@ -134,7 +135,7 @@ function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
     const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null) {
-        return mtaMemberHover(analysis, name, offset) ?? projectHover(analysis, name) ?? recordMemberHover(analysis, name);
+        return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? recordMemberHover(analysis, name);
     }
 
     return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };

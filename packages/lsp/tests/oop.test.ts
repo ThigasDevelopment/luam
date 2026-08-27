@@ -182,6 +182,59 @@ describe('oop hover', () => {
     });
 });
 
+describe('mta class hover', () => {
+    function classHover(workspace: Workspace, path: string, text: string, anchor: string, word: string): string {
+        const uri = workspace.uri(path);
+
+        workspace.service.update(uri, 2, text);
+
+        const hover = workspace.service.hover(uri, positionOf(text, anchor, word));
+
+        return typeof hover?.contents === 'object' && 'value' in hover.contents ? hover.contents.value : '';
+    }
+
+    it('explains the class behind a type annotation', () => {
+        const text = 'function describe(player: Player): string\n    return player:getName()\nend\n';
+        const value = classHover(openProject(true, { [SERVER_PATH]: text }), SERVER_PATH, text, 'player: ', 'Player');
+
+        expect(value).toContain('class Player extends Ped');
+        expect(value).toContain('A player connected to the server');
+        expect(value).toContain('**Inherits** — `Ped` → `Element`');
+        expect(value).toContain('mta oop class (shared)');
+    });
+
+    it('counts the surface reachable from the file environment', () => {
+        const text = 'local player = Player.getRandom()\n';
+        const value = classHover(openProject(true, { [SERVER_PATH]: text }), SERVER_PATH, text, 'local player = ', 'Player');
+
+        expect(value).toMatch(/\*\*Surface\*\* — \d+ instance members \(\d+ inherited\) · \d+ static methods · callable as `Player\(\.\.\.\)`/);
+    });
+
+    it('says a client class is out of reach in a server file', () => {
+        const text = 'local window: GuiWindow = nil\n';
+        const value = classHover(openProject(true, { [SERVER_PATH]: text }), SERVER_PATH, text, 'window: ', 'GuiWindow');
+
+        expect(value).toContain('class GuiWindow extends GuiElement');
+        expect(value).toContain('`GuiWindow` is client-only and its members are not available in a `server` file.');
+        expect(value).not.toContain('**Surface**');
+    });
+
+    it('explains the class with the flag off and names the restriction', () => {
+        const text = 'function describe(player: Player): string\n    return getPlayerName(player)\nend\n';
+        const value = classHover(openProject(false, { [SERVER_PATH]: text }), SERVER_PATH, text, 'player: ', 'Player');
+
+        expect(value).toContain('class Player extends Ped');
+        expect(value).toContain('check-oop-disabled');
+    });
+
+    it('leaves a member named after a class to the member hover', () => {
+        const text = 'local element = getRootElement()\nlocal parent = element.parent\n';
+        const value = classHover(openProject(true, { [SERVER_PATH]: text }), SERVER_PATH, text, 'element.', 'parent');
+
+        expect(value).not.toContain('class Element');
+    });
+});
+
 describe('oop signature help', () => {
     it('describes callable MTA classes', () => {
         const source = 'local file = File(\n';

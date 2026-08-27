@@ -9,6 +9,13 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Added
+
+- [OOP API](/en/mta/oop) and [Editors](/en/tooling/editors) record the MTA class
+  hover: a class name explains the class, the chain it inherits, the surface it
+  reaches in that environment and whether it is callable, instead of listing its
+  members.
+
 ### Changed
 
 - [Limitations](/en/reference/limitations) replaces "Narrowing reaches names,

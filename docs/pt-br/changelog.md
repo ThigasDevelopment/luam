@@ -11,6 +11,13 @@ da versão atual.
 
 ## Não lançado
 
+### Adicionado
+
+- [API OOP](/pt-br/mta/oop) e [Editores](/pt-br/tooling/editors) registram o
+  hover de classe do MTA: um nome de classe explica a classe, a cadeia que ela
+  herda, a superfície que alcança naquele ambiente e se é chamável, em vez de
+  listar os membros dela.
+
 ### Alterado
 
 - [Limitações](/pt-br/reference/limitations) troca "O estreitamento alcança

@@ -16,6 +16,16 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ### Added
 
+- Hovering an MTA class name explains the class. `Player`, `Element`, `Vehicle`
+  and the other 54 classes each carry a written description, the chain they
+  inherit, how many instance members and static methods they reach in that
+  file's environment, how many of those members are inherited, and whether the
+  class is callable as a constructor. It describes the class instead of dumping
+  its members, works on a type annotation as well as on a static receiver, says
+  when a client class is out of reach in a server file, and with `compiler.oop`
+  off it still explains the class and names the restriction. The same
+  descriptions ride along with the class in completion.
+
 - A type guard now refines a stable access path, not only a name. A path is a
   name followed by literal fields, so `if self.connection ~= nil then` refines
   the field inside the block, `self.socket.handle` refines a nested one, and

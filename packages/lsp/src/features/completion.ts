@@ -5,8 +5,9 @@ import { typeToString, type RecordType } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
 import { isAvailableIn } from '@mta-types/api-declaration';
 import { globalsFor } from '@mta-types/catalog';
+import { oopClassDocumentation } from '@mta-types/oop-documentation';
 import { oopClassesFor } from '@mta-types/oop-surface';
-import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
+import { CompletionItemKind, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
@@ -160,7 +161,12 @@ function mtaClassItems(analysis: DocumentAnalysis): CompletionItem[] {
 
     return oopClassesFor(analysis.environment)
         .filter((declaration) => declaration.constructor !== null || declaration.staticMethods.length > 0)
-        .map((declaration) => ({ label: declaration.name, kind: CompletionItemKind.Class, detail: `MTA OOP class ${declaration.name}` }));
+        .map((declaration) => ({
+            label: declaration.name,
+            kind: CompletionItemKind.Class,
+            detail: `MTA OOP class ${declaration.name}`,
+            documentation: { kind: MarkupKind.Markdown, value: oopClassDocumentation(declaration.name) },
+        }));
 }
 
 function workspaceItems(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[]): CompletionItem[] {

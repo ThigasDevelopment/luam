@@ -1,6 +1,7 @@
 import { FUNCTION_TYPE } from '@compiler/parser/type-annotation';
 import { ELEMENT_TYPES } from '@mta-types/generated/element-types';
-import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
+import { oopClassDocumentation } from '@mta-types/oop-documentation';
+import { CompletionItemKind, MarkupKind, type CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { scanContext, type CallFrame } from '@lsp/features/source-context';
@@ -150,13 +151,15 @@ export function typeItems(analysis: DocumentAnalysis, offset: number): Completio
     items.push({ label: FUNCTION_TYPE, kind: CompletionItemKind.Keyword, detail: 'function type — fun(string, number): void' });
     seen.add(FUNCTION_TYPE);
 
-    const push = (label: string, kind: CompletionItemKind, detail: string): void => {
+    const push = (label: string, kind: CompletionItemKind, detail: string, summary = ''): void => {
         if (seen.has(label)) {
             return;
         }
 
+        const documentation = { kind: MarkupKind.Markdown, value: summary };
+
         seen.add(label);
-        items.push({ label, kind, detail });
+        items.push(summary.length === 0 ? { label, kind, detail } : { label, kind, detail, documentation });
     };
 
     for (const declaration of analysis.index.visibleAt(offset)) {
@@ -178,7 +181,9 @@ export function typeItems(analysis: DocumentAnalysis, offset: number): Completio
     }
 
     for (const element of ELEMENT_TYPES) {
-        push(element.name, CompletionItemKind.Class, element.parent === null ? 'mta element type' : `mta element type extending ${element.parent}`);
+        const detail = element.parent === null ? 'mta element type' : `mta element type extending ${element.parent}`;
+
+        push(element.name, CompletionItemKind.Class, detail, oopClassDocumentation(element.name));
     }
 
     return items;

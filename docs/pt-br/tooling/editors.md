@@ -20,6 +20,7 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Hover | Tipo declarado ou inferido, assinatura da função, o ambiente de uma API do MTA e o contrato de um evento. |
 | Hover de documentação | As linhas de comentário `#` logo acima de qualquer declaração — função, método, classe, interface, enum, alias de tipo, evento declarado, campo, local ou global — aparecem sob a assinatura dela, na declaração e em cada uso. Decorators entre o comentário e a declaração não quebram o par. |
 | Hover de palavra-chave | `self` carrega a classe a que está vinculado e a forma dessa classe; `super(...)` carrega como a implementação do pai é escolhida. |
+| Hover de classe do MTA | Um nome de classe — `Player`, `Element`, `Vehicle` — carrega o que a classe é, a cadeia que ela herda, quanta superfície tem naquele ambiente e se é chamável. Ele descreve a classe em vez de listar os membros dela. |
 | Hover de decorator | Os membros exatos que o decorator gera naquele ponto, onde ele pode ficar e os diagnósticos que pode emitir. |
 | Navegação | Ir para definição, encontrar referências e renomear — entre arquivos para globais. |
 
