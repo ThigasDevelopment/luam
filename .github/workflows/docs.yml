@@ -39,7 +39,7 @@ jobs:
         name: Validate
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
 
             - name: Locale parity
@@ -75,7 +75,7 @@ jobs:
             - name: Build the site
               run: pnpm docs:build
 
-            - uses: actions/upload-pages-artifact@v3
+            - uses: actions/upload-pages-artifact@v5
               if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
               with:
                   path: docs/.vitepress/dist
@@ -93,4 +93,4 @@ jobs:
             id-token: write
         steps:
             - id: deployment
-              uses: actions/deploy-pages@v4
+              uses: actions/deploy-pages@v5

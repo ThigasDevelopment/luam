@@ -18,7 +18,7 @@ jobs:
         name: Typecheck
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
             - run: pnpm -r typecheck
 
@@ -39,7 +39,7 @@ jobs:
             matrix:
                 node-version: ['22', '24']
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
               with:
                   node-version: ${{ matrix.node-version }}
@@ -67,7 +67,7 @@ jobs:
         needs: test
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
             - run: pnpm -r build
 
@@ -109,7 +109,7 @@ jobs:
                   grep -q '"minified": true' build/luam-smoke.luam-map.json
 
             - name: Switch to the minimum supported Node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v7
               with:
                   node-version: '20'
 
@@ -126,7 +126,7 @@ jobs:
         needs: test
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
             - run: pnpm --filter @luam/compiler test:bench
 
@@ -134,7 +134,7 @@ jobs:
         name: Audit
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
 
             - name: Production dependencies
