@@ -12,7 +12,7 @@ here. This directory holds no second index, so the two never disagree.
 
 `MM` is the milestone and `TT` is the task, **both zero-padded to two digits**.
 The padding is not cosmetic: without it a directory listing sorts `10.01` before
-`02.01` and `26.10` before `26.02`, because GitHub and most tools sort file
+`02.01` and `24.10` before `24.02`, because GitHub and most tools sort file
 names as text rather than as numbers.
 
 The responsible agent belongs in the `agent` field of the frontmatter, never in
@@ -22,11 +22,11 @@ the file name. It changes; the file name should not.
 
 | Field | Required | Notes |
 |---|---|---|
-| `id` | yes | Matches the file name, e.g. `26.06`. |
+| `id` | yes | Matches the file name, e.g. `24.06`. |
 | `title` | yes | Same wording as the roadmap row. |
 | `agent` | yes | Who executes the task. |
 | `status` | yes | `todo`, `doing`, `done`, or `superseded`. |
-| `depends-on` | yes | Padded ids, e.g. `[26.05]`. Empty list when none. |
+| `depends-on` | yes | Padded ids, e.g. `[24.05]`. Empty list when none. |
 | `superseded-by` | only when superseded | The padded id that replaced this task. |
 
 Start from [TEMPLATE.md](TEMPLATE.md).
