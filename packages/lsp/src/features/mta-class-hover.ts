@@ -78,12 +78,13 @@ export function mtaClassHover(analysis: DocumentAnalysis, offset: number): Hover
     const environment = oopClassEnvironment(name) ?? 'shared';
     const parent = findOopClass(name)?.parent ?? null;
     const heading = markdown(parent === null ? `class ${name}` : `class ${name} extends ${parent}`);
+    const reachable = isAvailableIn(environment, analysis.environment);
     const sections = [
         heading,
         findOopClassDocumentation(name) ?? '',
         inheritanceText(name),
         availabilityText(analysis, name, environment),
-        surfaceText(analysis, name),
+        reachable ? surfaceText(analysis, name) : '',
         analysis.compilerOptions.oop ? '' : OOP_OFF,
         `mta oop class (${environment})`,
     ].filter((section) => section.length > 0);
