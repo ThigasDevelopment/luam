@@ -115,6 +115,7 @@ What is rewritten:
 | `interface`, `type`, `declare`, `declare event` | A Lua block comment over the same lines, trailing semicolon included |
 | `enum Name { A, B }` | `Name = enum { 'A', 'B' }` on the lines it was written on |
 | `class Name extends Base` | `class 'Name' :extends 'Base'`, with the implicit `self` parameter and the member separators added in place |
+| A class field with no default | `name = nil`, on the line the field was written on, so the declared shape reads from the generated class |
 | `implements` | Erased, because it is a compile-time contract |
 | A compound assignment, `new`, a template string, a native extension | Canonical Lua for that statement alone, not for the statement enclosing it |
 | `continue` | `break` inside a `repeat ... until true` whose keywords ride the first and last lines of the loop body |

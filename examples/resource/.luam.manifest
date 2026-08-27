@@ -18,7 +18,3 @@ assets = {
 }
 
 outDir = 'build'
-
-transport = {
-    kind = 'none',
-}

@@ -78,10 +78,13 @@ function emitMembers(state: EmitState, statement: ClassDeclaration): string[] {
             continue;
         }
 
-        if (member.value !== null && !member.decorators.some((decorator) => decorator.name === 'Lazy')) {
-            entries.push(indentLine(state, `${markSource(state, member.position.line, statement.name)}${member.name} = ${emitExpression(state, member.value)}`));
+        if (member.decorators.some((decorator) => decorator.name === 'Lazy')) {
+            continue;
         }
 
+        const value = member.value === null ? 'nil' : emitExpression(state, member.value);
+
+        entries.push(indentLine(state, `${markSource(state, member.position.line, statement.name)}${member.name} = ${value}`));
     }
 
     for (const generated of state.generatedMembers.get(statement) ?? []) {
