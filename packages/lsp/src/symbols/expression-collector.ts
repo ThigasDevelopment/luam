@@ -1,10 +1,12 @@
-import { collectInterpolations } from '@compiler/checker/template';
+import { collectInterpolations, type TemplateInterpolation } from '@compiler/checker/template';
+import type { Type } from '@compiler/checker/types';
 import type { CallExpression, Expression, MemberExpression, TypeAnnotation } from '@compiler/parser/ast';
 import type { NewExpression } from '@compiler/parser/declaration-nodes';
 
 import { positionAt } from '@lsp/support/source-text';
 
 import { addReference, locatePosition, receiverName, type BlockContext, type CollectorState } from './collector-state';
+import { matchesReferenceKind } from './symbol';
 
 export function collectAnnotation(state: CollectorState, block: BlockContext, annotation: TypeAnnotation | null): void {
     if (annotation === null) {
@@ -104,6 +106,38 @@ function collectNew(state: CollectorState, block: BlockContext, expression: NewE
     }
 }
 
+function namedTypeName(type: Type | null): string | null {
+    return type !== null && type.kind === 'named' ? type.name : null;
+}
+
+function interpolationContainer(state: CollectorState, block: BlockContext, root: string, offset: number): string | null {
+    if (root === 'self') {
+        return block.container;
+    }
+
+    const declaration = state.scopes.resolve(block.scopeId, root, offset, (candidate) => matchesReferenceKind(candidate, 'value'));
+
+    return namedTypeName(declaration?.type ?? null);
+}
+
+function collectInterpolationPath(state: CollectorState, block: BlockContext, interpolation: TemplateInterpolation, rootOffset: number): void {
+    let container = interpolationContainer(state, block, interpolation.root, rootOffset);
+    let offset = rootOffset + interpolation.root.length;
+
+    for (const field of interpolation.path.split('.').slice(1)) {
+        const position = container === null ? null : locatePosition(state, offset, field);
+
+        if (container === null || position === null) {
+            return;
+        }
+
+        addReference(state, field, 'member', position, block.scopeId, container);
+
+        container = namedTypeName(state.checkerDeclarations.lookupMember(container, field)?.type ?? null);
+        offset = position.offset + field.length;
+    }
+}
+
 function collectTemplate(state: CollectorState, block: BlockContext, expression: Expression): void {
     if (expression.kind !== 'template-literal') {
         return;
@@ -112,9 +146,12 @@ function collectTemplate(state: CollectorState, block: BlockContext, expression:
     for (const interpolation of collectInterpolations(expression.segments)) {
         const position = locatePosition(state, interpolation.position.offset, interpolation.root);
 
-        if (interpolation.root.length > 0 && position !== null) {
-            addReference(state, interpolation.root, 'value', position, block.scopeId);
+        if (interpolation.root.length === 0 || position === null) {
+            continue;
         }
+
+        addReference(state, interpolation.root, 'value', position, block.scopeId);
+        collectInterpolationPath(state, block, interpolation, position.offset);
     }
 }
 

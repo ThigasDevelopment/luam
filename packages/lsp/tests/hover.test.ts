@@ -429,6 +429,44 @@ describe('project environment hover', () => {
         );
     });
 
+    it('shows a local interpolated inside a template', () => {
+        const text = "local name: string = 'Thigas'\nlocal greeting: string = `Ola ${ name:Guest }`\n";
+
+        expect(hoverText(text, 'greeting', 'name')).toContain('local name: string');
+    });
+
+    it('shows the field of a self path interpolated inside a template', () => {
+        const text = ['class Round {', "    label: string = 'round'", '', '    describe = function (): string', '        return `Round ${ self.label }`', '    end', '}', ''].join('\n');
+
+        expect(hoverText(text, 'return', 'label')).toContain('field label: string');
+    });
+
+    it('walks a deeper interpolated path to the field it ends on', () => {
+        const text = [
+            'class Owner {',
+            '    name: string',
+            '}',
+            '',
+            'class Round {',
+            '    owner: Owner',
+            '',
+            '    describe = function (): string',
+            '        return `Round ${ self.owner.name }`',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+
+        expect(hoverText(text, 'return', 'owner')).toContain('field owner: Owner');
+        expect(hoverText(text, 'self.owner.', 'name')).toContain('field name: string');
+    });
+
+    it('says nothing for a member of an untyped interpolated table', () => {
+        const text = 'local slot: table = {}\nlocal caption: string = `Slot ${ slot.label }`\n';
+
+        expect(hoverText(text, 'caption', 'label')).toBe('');
+    });
+
     it('names the file the keys come from and the environment that may read them', () => {
         expect(environmentHover('local name = env.SERVER_NAME\n', 'local name', 'env')).toContain('declared in ".env" (server)');
     });
