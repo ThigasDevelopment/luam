@@ -85,7 +85,7 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   checker collects every class header before it checks a statement; the runtime
   helper links a child to a pending shell of the parent and fills that same
   table when the parent's declaration runs
-  ([ADR-006](docs/adr/006-two-phase-class-declaration.md)).
+  ([ADR-024](.claude/docs/adr/024-two-phase-class-declaration.md)).
   What did not move is the runtime: a class declaration is a statement, so
   instantiating a class before its line has run is the new
   `check-class-before-declaration`, reported only where the code is a top-level
@@ -123,11 +123,11 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   what is going to move from what is not. Three boundaries stop being implicit
   and are recorded as decisions: annotations are erased and no implicit runtime
   guard is ever generated for them
-  ([ADR-003](docs/adr/003-erased-type-annotations.md)), `config.lua` is never
+  ([ADR-021](.claude/docs/adr/021-erased-type-annotations.md)), `config.lua` is never
   parsed or executed by a build
-  ([ADR-004](docs/adr/004-opaque-native-configuration.md)), and the environment
+  ([ADR-022](.claude/docs/adr/022-opaque-native-configuration.md)), and the environment
   is a property of the file because MTA assigns a side to each `<script>` entry
-  ([ADR-005](docs/adr/005-file-level-environments.md)). Each records what a
+  ([ADR-023](.claude/docs/adr/023-file-level-environments.md)). Each records what a
   future opt-in feature may and may not change.
 
 ### Fixed
