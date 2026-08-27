@@ -1,4 +1,4 @@
-# ADR-005: Assign one environment per file
+# ADR-023: Assign one environment per file
 
 **Status:** Accepted
 

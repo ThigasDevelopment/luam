@@ -9,6 +9,23 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.18.2 - 2026-08-27
+
+### Changed
+
+- [Output layouts](/en/reference/output-layouts) names the generated form of a
+  class field with no default: `name = nil`, on the line the field was written
+  on.
+
+## 0.18.1 - 2026-08-27
+
+### Changed
+
+- [The Luam theme](/en/tooling/theme) moves MTA natives from the violet row to
+  the blue row: a native now reads as code that runs, in italic because you did
+  not write it, and violet keeps only keywords and the Lua standard library.
+  The generated element and contrast tables follow the role table.
+
 ## 0.18.0 - 2026-08-25
 
 ### Changed

@@ -2163,7 +2163,7 @@ exports[`fixture classes.luam > locks the generated Lua 5.1 output 1`] = `
 
 
 class 'Player' {
-
+    name = nil,
     health = 100,
 
     constructor = function(self, name)

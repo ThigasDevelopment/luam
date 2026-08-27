@@ -11,6 +11,24 @@ da versão atual.
 
 ## Não lançado
 
+## 0.18.2 - 2026-08-27
+
+### Alterado
+
+- [Formatos de saída](/pt-br/reference/output-layouts) nomeia a forma gerada de
+  um campo de classe sem padrão: `name = nil`, na linha em que o campo foi
+  escrito.
+
+## 0.18.1 - 2026-08-27
+
+### Alterado
+
+- [O tema Luam](/pt-br/tooling/theme) move as nativas do MTA da linha violeta
+  para a linha azul: uma nativa agora lê como código que roda, em itálico
+  porque você não a escreveu, e o violeta fica só com as palavras-chave e a
+  stdlib do Lua. As tabelas geradas de elementos e contraste seguem a tabela
+  de papéis.
+
 ## 0.18.0 - 2026-08-25
 
 ### Alterado

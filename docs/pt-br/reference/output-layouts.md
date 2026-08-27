@@ -113,6 +113,7 @@ O que é reescrito:
 | `interface`, `type`, `declare`, `declare event` | Um comentário de bloco Lua sobre as mesmas linhas, ponto e vírgula final incluído |
 | `enum Name { A, B }` | `Name = enum { 'A', 'B' }` nas linhas em que foi escrito |
 | `class Name extends Base` | `class 'Name' :extends 'Base'`, com o parâmetro `self` implícito e os separadores de membro acrescentados no lugar |
+| Um campo de classe sem padrão | `name = nil`, na linha em que o campo foi escrito, para a forma declarada ler a partir da classe gerada |
 | `implements` | Apagado, porque é um contrato de compilação |
 | Uma atribuição composta, `new`, um template, uma extension nativa | Lua canônico apenas para aquele statement, não para o statement que o contém |
 | `continue` | `break` dentro de um `repeat ... until true` cujas palavras-chave viajam na primeira e na última linha do corpo do laço |

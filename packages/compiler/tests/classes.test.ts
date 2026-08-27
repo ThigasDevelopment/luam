@@ -47,8 +47,8 @@ describe('classes', () => {
         expect(codes(source)).toEqual(['check-explicit-self-parameter']);
     });
 
-    it('emits a field without a default as nothing', () => {
-        expect(emit('class Player {\n    name: string\n}\n')).toBe("class 'Player' {}\n");
+    it('emits a field without a default as nil', () => {
+        expect(emit('class Player {\n    name: string\n}\n')).toBe("class 'Player' {\n    name = nil\n}\n");
     });
 
     it('emits inheritance as an extends modifier and lowers super calls', () => {

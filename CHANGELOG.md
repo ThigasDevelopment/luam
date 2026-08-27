@@ -14,6 +14,34 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.18.2 - 2026-08-27
+
+### Fixed
+
+- A class field declared with a type and no default now generates
+  `name = nil` on the line it was written on. It used to generate nothing,
+  which left a blank line inside the class and hid the declared shape from the
+  Lua a reader opens.
+- The example resource no longer carries a `transport` table in
+  `.luam.manifest`. The field was removed with the `ensure` rework and reports
+  `config-removed-field`.
+
+## 0.18.1 - 2026-08-27
+
+### Changed
+
+- The theme paints an MTA native blue and italic — the same blue as a call to
+  one of your own functions, italic because you did not write it — instead of
+  the violet it shared with the Lua standard library. Violet now marks only
+  keywords and the stdlib. Every generated target follows: VS Code, Zed,
+  Neovim, and the two `.tmTheme` files.
+
+### Added
+
+- The README renders the introductory example through `Luam Dark` and
+  `Luam Light`, generated from the committed grammar and theme files rather
+  than screenshotted by hand.
+
 ## 0.18.0 - 2026-08-25
 
 ### Added

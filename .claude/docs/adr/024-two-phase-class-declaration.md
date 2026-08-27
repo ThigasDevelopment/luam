@@ -1,4 +1,4 @@
-# ADR-006: Separate when a class is a type from when it is a value
+# ADR-024: Separate when a class is a type from when it is a value
 
 **Status:** Accepted
 
