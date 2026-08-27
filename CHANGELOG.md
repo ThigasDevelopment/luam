@@ -37,6 +37,16 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   the path produces no refinement at all. A field cleared through a second
   reference to the same table is a recorded boundary, not a diagnostic.
 
+### Fixed
+
+- Instantiating a class whose parent never arrives names the parent again. The
+  class helper cleared its own pending mark by removing the field, so the read
+  fell through the metatable to the parent still marked pending, and the error
+  blamed the child — `Class Child is not defined` instead of
+  `Class Child extends Ghost, which is not defined`. The helper now clears the
+  mark to `false`, which shadows the parent. The runtime helpers are covered by
+  a real Lua VM from now on, so the class helper is exercised as MTA runs it.
+
 ## 0.18.2 - 2026-08-27
 
 ### Fixed

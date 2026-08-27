@@ -73,7 +73,7 @@ local function create(name, struct, options)
 
     definition = definition or { __name = name }
 
-    definition.__pending = nil
+    definition.__pending = false
     definition.__super = options.super
     definition.__metamethods = options.metamethods
 
