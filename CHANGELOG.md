@@ -14,6 +14,22 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.18.1 - 2026-08-27
+
+### Changed
+
+- The theme paints an MTA native blue and italic — the same blue as a call to
+  one of your own functions, italic because you did not write it — instead of
+  the violet it shared with the Lua standard library. Violet now marks only
+  keywords and the stdlib. Every generated target follows: VS Code, Zed,
+  Neovim, and the two `.tmTheme` files.
+
+### Added
+
+- The README renders the introductory example through `Luam Dark` and
+  `Luam Light`, generated from the committed grammar and theme files rather
+  than screenshotted by hand.
+
 ## 0.18.0 - 2026-08-25
 
 ### Added
