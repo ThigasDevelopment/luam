@@ -2296,11 +2296,21 @@ Decided:
   pull request with zero approvals and the five reported gate checks, and a `v*`
   tag can be neither deleted nor moved. No bypass actor, for anyone.
 
+- **The reorganized gate ran green on `develop`, and the names match.** Run
+  33206816933 reported exactly `typecheck / Typecheck`,
+  `test / Test on Node 22`, `test / Test on Node 24`, `docs / Docs` and
+  `build / Build` — the five names `@luam/pipeline` computes from the workflow
+  files and the five `.github/rulesets/main.json` requires. The benchmark ran as
+  its own workflow and the audit did not run at all, which is where 36.03 put
+  them. Wall-clock fell from 3m00s to 2m15s, because typecheck, the matrix and
+  the docs no longer wait on each other.
+
 Remaining:
 
 - Applying the three rulesets, raising fork run approval from first-time
   contributors to all outside contributors, and enabling private vulnerability
   reporting. Each is a repository setting rather than a file, and each waits on
-  the workflows being pushed so the required-check names exist.
-- The behavioural comparison and the fork rehearsal in 36.07, which need a real
-  run and a real fork.
+  the workflows being pushed so the required-check names exist, which they now
+  do.
+- A deliberate break in a type, a test and the smoke build, to prove the gate
+  still fails on one, and the fork rehearsal in 36.07, which needs a real fork.
