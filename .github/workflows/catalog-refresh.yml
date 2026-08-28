@@ -20,19 +20,11 @@ jobs:
             contents: write
             pull-requests: write
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
               with:
                   ref: develop
 
-            - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
-
-            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
-              with:
-                  node-version: '22'
-                  cache: pnpm
-
-            - name: Install dependencies
-              run: pnpm install --frozen-lockfile
+            - uses: ./.github/actions/setup
 
             - name: Fetch the wiki snapshot
               run: pnpm --filter @luam/mta-types fetch-wiki
@@ -50,14 +42,6 @@ jobs:
             - name: Regenerate the catalog
               if: steps.snapshot.outputs.changed == 'true'
               run: pnpm --filter @luam/mta-types refresh-catalog "$RUNNER_TEMP/catalog-refresh.md"
-
-            - name: Typecheck
-              if: steps.snapshot.outputs.changed == 'true'
-              run: pnpm -r typecheck
-
-            - name: Test
-              if: steps.snapshot.outputs.changed == 'true'
-              run: pnpm -r test
 
             - name: Open the proposal
               if: steps.snapshot.outputs.changed == 'true'

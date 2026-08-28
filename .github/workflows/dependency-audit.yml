@@ -1,0 +1,76 @@
+name: Dependency audit
+
+on:
+    schedule:
+        - cron: '41 5 * * 1'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: dependency-audit
+    cancel-in-progress: false
+
+jobs:
+    audit:
+        name: Audit
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        outputs:
+            found: ${{ steps.summary.outputs.found }}
+            report: ${{ steps.summary.outputs.report }}
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+
+            - name: Audit the production dependencies
+              run: pnpm audit --audit-level moderate --prod --json > "$RUNNER_TEMP/audit.json" || true
+
+            - name: Summarize the findings
+              id: summary
+              run: |
+                  node .github/scripts/summarize-audit.mjs "$RUNNER_TEMP/audit.json" > "$RUNNER_TEMP/audit.md"
+
+                  if [ "$(cat "$RUNNER_TEMP/audit.md")" = 'none' ]; then
+                      echo 'found=false' >> "$GITHUB_OUTPUT"
+                      echo 'No advisory affects the production dependency tree.'
+                      exit 0
+                  fi
+
+                  echo 'found=true' >> "$GITHUB_OUTPUT"
+                  cat "$RUNNER_TEMP/audit.md" >> "$GITHUB_STEP_SUMMARY"
+                  {
+                      echo 'report<<AUDIT_REPORT_EOF'
+                      cat "$RUNNER_TEMP/audit.md"
+                      echo 'AUDIT_REPORT_EOF'
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Audit the development dependencies
+              run: pnpm audit --audit-level moderate || true
+
+    report:
+        name: Report
+        needs: audit
+        if: needs.audit.outputs.found == 'true'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            issues: write
+        steps:
+            - name: File or update the advisory issue
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  REPOSITORY: ${{ github.repository }}
+                  TITLE: Production dependency advisories
+                  REPORT: ${{ needs.audit.outputs.report }}
+              run: |
+                  printf '%s\n' "$REPORT" > "$RUNNER_TEMP/audit.md"
+                  existing=$(gh issue list --repo "$REPOSITORY" --state open --label dependencies --search "$TITLE in:title" --json number --jq '.[0].number')
+
+                  if [ -n "$existing" ]; then
+                      gh issue comment "$existing" --repo "$REPOSITORY" --body-file "$RUNNER_TEMP/audit.md"
+                  else
+                      gh issue create --repo "$REPOSITORY" --title "$TITLE" --label dependencies --body-file "$RUNNER_TEMP/audit.md"
+                  fi

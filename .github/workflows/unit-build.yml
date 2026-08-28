@@ -1,0 +1,79 @@
+name: Unit build
+
+on:
+    workflow_call:
+        inputs:
+            node-version:
+                description: Node version to build and smoke-test on.
+                required: false
+                type: string
+                default: '22'
+            minimum-node-version:
+                description: Oldest supported Node version the built resource is rebuilt on.
+                required: false
+                type: string
+                default: '20'
+
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+              with:
+                  node-version: ${{ inputs.node-version }}
+
+            - run: pnpm -r build
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Install Lua 5.1 for the production smoke test
+              run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+            - name: Check the command contract of the bundled CLI
+              run: |
+                  LUAM="node $GITHUB_WORKSPACE/packages/cli/dist/luam.mjs"
+                  $LUAM --help | grep -q 'Exit codes:'
+                  $LUAM --help | grep -q 'trace'
+                  $LUAM build --help | grep -q -- '--bundle'
+                  $LUAM dev --help | grep -q -- '--watch'
+                  $LUAM --version
+                  set +e
+                  $LUAM dev --bundle > /dev/null 2>&1
+                  test $? -eq 2
+                  $LUAM deploy > /dev/null 2>&1
+                  test $? -eq 2
+
+            - name: Build a resource with the bundled CLI
+              run: |
+                  mkdir -p "$RUNNER_TEMP/smoke/src/server"
+                  cd "$RUNNER_TEMP/smoke"
+                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" init --name luam-smoke
+                  printf 'local greeting: string = "luam"\nprint(greeting)\n' > src/server/main.luam
+                  printf 'TOKEN=secret\n' > .env
+                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" check
+                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" build
+                  test -f build/luam-smoke/meta.xml
+                  test -f build/luam-smoke/src/server.lua
+                  test -f build/luam-smoke/.env
+                  ! grep -q '<file src=".env"' build/luam-smoke/meta.xml
+                  test "$(wc -l < build/luam-smoke/src/server.lua)" -eq 0
+                  lua5.1 -e 'assert(loadfile("build/luam-smoke/src/server.lua"))'
+                  grep -q '"minified": true' build/luam-smoke.luam-map.json
+
+            - name: Switch to the minimum supported Node
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+              with:
+                  node-version: ${{ inputs.minimum-node-version }}
+
+            - name: Rebuild the resource on the minimum supported Node
+              run: |
+                  cd "$RUNNER_TEMP/smoke"
+                  rm -rf build
+                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" build
+                  test -f build/luam-smoke/meta.xml
+                  test -f build/luam-smoke/src/server.lua

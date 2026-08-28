@@ -1,0 +1,38 @@
+name: Unit docs
+
+on:
+    workflow_call:
+        inputs:
+            node-version:
+                description: Node version to verify the manual on.
+                required: false
+                type: string
+                default: '22'
+            upload-pages:
+                description: Upload the built site as a Pages artifact for a later deployment.
+                required: false
+                type: boolean
+                default: false
+
+jobs:
+    docs:
+        name: Docs
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+              with:
+                  node-version: ${{ inputs.node-version }}
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Verify the manual
+              run: pnpm docs:verify
+
+            - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+              if: inputs.upload-pages
+              with:
+                  path: docs/.vitepress/dist

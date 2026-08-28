@@ -18,41 +18,50 @@ concurrency:
     cancel-in-progress: false
 
 jobs:
+    typecheck:
+        uses: ./.github/workflows/unit-typecheck.yml
+        permissions:
+            contents: read
+
+    test:
+        uses: ./.github/workflows/unit-test.yml
+        permissions:
+            contents: read
+
+    docs:
+        uses: ./.github/workflows/unit-docs.yml
+        permissions:
+            contents: read
+
     verify:
         name: Verify
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
             - uses: ./.github/actions/setup
 
             - name: Version contract
-              run: pnpm docs:versions "${{ inputs.version || github.ref_name }}"
-
-            - run: pnpm -r typecheck
-            - run: pnpm -r test
-
-            - name: Bundle the CLI
-              run: pnpm --filter @luam/cli bundle
-
-            - name: Verify the manual
-              run: pnpm docs:verify
+              env:
+                  RELEASE_VERSION: ${{ inputs.version || github.ref_name }}
+              run: pnpm docs:versions "$RELEASE_VERSION"
 
     package:
         name: Package
-        needs: verify
+        needs: [verify, typecheck, test, docs]
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         outputs:
             version: ${{ steps.version.outputs.value }}
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
             - uses: ./.github/actions/setup
 
             - name: Resolve the version
               id: version
               run: node -p "'value=' + require('./packages/cli/package.json').version" >> "$GITHUB_OUTPUT"
-
-            - name: Version contract
-              run: pnpm docs:versions "${{ inputs.version || github.ref_name }}"
 
             - name: Bundle the CLI
               run: pnpm --filter @luam/cli bundle
@@ -67,9 +76,11 @@ jobs:
               run: npm pack --pack-destination "$GITHUB_WORKSPACE/artifacts" ./packages/cli/dist
 
             - name: Package the extension
+              env:
+                  EXPECTED: ${{ steps.version.outputs.value }}
               run: |
                   cd packages/vscode
-                  npx --yes @vscode/vsce package --no-dependencies --skip-license --out "$GITHUB_WORKSPACE/artifacts/luam-${{ steps.version.outputs.value }}.vsix"
+                  npx --yes @vscode/vsce package --no-dependencies --skip-license --out "$GITHUB_WORKSPACE/artifacts/luam-$EXPECTED.vsix"
 
             - name: Verify the packaged versions
               env:
@@ -78,7 +89,7 @@ jobs:
                   node -e "const v = require('./packages/cli/dist/package.json').version; if (v !== process.env.EXPECTED) { console.error('The bundled CLI is ' + v + ', not ' + process.env.EXPECTED + '.'); process.exit(1); }"
                   test -f "$GITHUB_WORKSPACE/artifacts/luam-$EXPECTED.vsix"
 
-            - uses: actions/upload-artifact@v7
+            - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
               with:
                   name: luam-${{ steps.version.outputs.value }}
                   path: artifacts/
@@ -94,7 +105,7 @@ jobs:
             contents: read
             id-token: write
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
             - uses: ./.github/actions/setup
               with:
                   registry-url: https://registry.npmjs.org
@@ -113,8 +124,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') && vars.PUBLISH_MARKETPLACE == 'true'
         runs-on: ubuntu-latest
         environment: pipeline
+        permissions:
+            contents: read
         steps:
-            - uses: actions/download-artifact@v8
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
               with:
                   name: luam-${{ needs.package.outputs.version }}
                   path: artifacts
@@ -122,13 +135,14 @@ jobs:
             - name: Publish the extension
               env:
                   VSCE_PAT: ${{ secrets.VSCE_PAT }}
+                  VERSION: ${{ needs.package.outputs.version }}
               run: |
                   if [ -z "$VSCE_PAT" ]; then
                       echo "VSCE_PAT is not configured. Skipping the Marketplace publish."
                       exit 0
                   fi
 
-                  npx --yes @vscode/vsce publish --packagePath "artifacts/luam-${{ needs.package.outputs.version }}.vsix"
+                  npx --yes @vscode/vsce publish --packagePath "artifacts/luam-$VERSION.vsix"
 
     publish:
         name: Publish
@@ -138,10 +152,10 @@ jobs:
         permissions:
             contents: write
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
             - uses: ./.github/actions/setup
 
-            - uses: actions/download-artifact@v8
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
               with:
                   name: luam-${{ needs.package.outputs.version }}
                   path: artifacts
@@ -152,9 +166,11 @@ jobs:
             - name: Create the release
               env:
                   GH_TOKEN: ${{ github.token }}
+                  TAG: ${{ github.ref_name }}
+                  REPOSITORY: ${{ github.repository }}
               run: |
-                  gh release create "${{ github.ref_name }}" artifacts/* \
-                      --repo "${{ github.repository }}" \
+                  gh release create "$TAG" artifacts/* \
+                      --repo "$REPOSITORY" \
                       --notes-file "$RUNNER_TEMP/notes.md" \
                       --generate-notes \
                       --verify-tag

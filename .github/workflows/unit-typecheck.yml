@@ -1,0 +1,32 @@
+name: Unit typecheck
+
+on:
+    workflow_call:
+        inputs:
+            node-version:
+                description: Node version to typecheck on.
+                required: false
+                type: string
+                default: '22'
+
+jobs:
+    typecheck:
+        name: Typecheck
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+              with:
+                  node-version: ${{ inputs.node-version }}
+
+            - run: pnpm -r typecheck
+
+            - name: Regenerate the MTA catalog offline and check it is committed
+              run: |
+                  pnpm --filter @luam/mta-types generate
+                  git diff --exit-code -- packages/mta-types/src/generated packages/mta-types/data/catalog-index.json
+
+            - name: Check every generated theme matches the role table
+              run: pnpm --filter @luam/theme themes:check

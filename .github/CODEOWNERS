@@ -1,0 +1,17 @@
+* @ThigasDevelopment
+
+/packages/compiler/ @ThigasDevelopment
+/packages/runtime/ @ThigasDevelopment
+/packages/cli/ @ThigasDevelopment
+/packages/lsp/ @ThigasDevelopment
+/packages/vscode/ @ThigasDevelopment
+/packages/theme/ @ThigasDevelopment
+/packages/mta-types/ @ThigasDevelopment
+/packages/template/ @ThigasDevelopment
+/tools/release/ @ThigasDevelopment
+
+/docs/ @ThigasDevelopment
+/examples/ @ThigasDevelopment
+
+/.github/ @ThigasDevelopment
+/.claude/ @ThigasDevelopment
