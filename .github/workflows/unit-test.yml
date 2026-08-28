@@ -1,0 +1,47 @@
+name: Unit test
+
+on:
+    workflow_call:
+        inputs:
+            node-versions:
+                description: JSON array of Node versions to run the suites on.
+                required: false
+                type: string
+                default: '["22", "24"]'
+
+jobs:
+    test:
+        name: Test on Node ${{ matrix.node-version }}
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: true
+            matrix:
+                node-version: ${{ fromJSON(inputs.node-versions) }}
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Compiler, runtime, and mta-types
+              run: pnpm --filter @luam/compiler --filter @luam/runtime --filter @luam/mta-types --filter @luam/template test
+
+            - name: Install Lua 5.1 for minifier validation
+              run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+            - name: CLI
+              run: pnpm --filter @luam/cli test
+
+            - name: LSP and VS Code extension
+              run: pnpm --filter @luam/lsp --filter luam test
+
+            - name: Theme contract
+              run: pnpm --filter @luam/theme test
+
+            - name: Release tooling
+              run: pnpm --filter @luam/release test
+
+            - name: Pipeline contract
+              run: pnpm --filter @luam/pipeline test

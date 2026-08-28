@@ -13,18 +13,6 @@ on:
             - 'package.json'
             - 'pnpm-workspace.yaml'
             - '.github/workflows/docs.yml'
-    pull_request:
-        branches: [main, develop]
-        paths:
-            - 'docs/**'
-            - 'examples/**'
-            - 'tools/release/**'
-            - 'packages/*/package.json'
-            - 'CHANGELOG.md'
-            - 'README.md'
-            - 'package.json'
-            - 'pnpm-workspace.yaml'
-            - '.github/workflows/docs.yml'
     workflow_dispatch:
 
 permissions:
@@ -36,61 +24,23 @@ concurrency:
 
 jobs:
     validate:
-        name: Validate
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-            - uses: ./.github/actions/setup
-
-            - name: Locale parity
-              run: pnpm docs:parity
-
-            - name: Limitation contract
-              run: pnpm docs:limitations
-
-            - name: Version contract
-              run: pnpm docs:versions
-
-            - name: Obsolete content
-              run: pnpm docs:obsolete
-
-            - name: Release tooling
-              run: pnpm --filter @luam/release test
-
-            - name: Playground contract and browser bundle
-              run: pnpm docs:playground
-
-            - name: Documented examples
-              run: pnpm docs:examples
-
-            - name: Bundle the CLI
-              run: pnpm --filter @luam/cli bundle
-
-            - name: Check the documented snippets
-              run: pnpm docs:snippets
-
-            - name: Check the captured compiler output
-              run: pnpm docs:outputs
-
-            - name: Build the site
-              run: pnpm docs:build
-
-            - uses: actions/upload-pages-artifact@v5
-              if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-              with:
-                  path: docs/.vitepress/dist
+        uses: ./.github/workflows/unit-docs.yml
+        permissions:
+            contents: read
+        with:
+            upload-pages: true
 
     deploy:
         name: Deploy
         needs: validate
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         runs-on: ubuntu-latest
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         permissions:
+            contents: read
             pages: write
             id-token: write
         steps:
             - id: deployment
-              uses: actions/deploy-pages@v5
+              uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5

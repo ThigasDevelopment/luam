@@ -1,0 +1,36 @@
+name: Benchmark
+
+on:
+    push:
+        branches: [develop]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: benchmark-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    benchmark:
+        name: Benchmark
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+
+            - name: Measure the compiler
+              run: pnpm --filter @luam/compiler test:bench | tee "$RUNNER_TEMP/benchmark.txt"
+
+            - name: Record the measurement
+              run: |
+                  {
+                      echo '## Compiler benchmark'
+                      echo
+                      echo '```'
+                      cat "$RUNNER_TEMP/benchmark.txt"
+                      echo '```'
+                  } >> "$GITHUB_STEP_SUMMARY"
