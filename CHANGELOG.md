@@ -14,6 +14,66 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.5 - 2026-08-28
+
+### Changed
+
+- The pipelines are reorganized around a written contract, and the merge gate is
+  separated from the advisory signal: typecheck, test, build and docs decide
+  whether a change may merge, while benchmark and audit report without blocking.
+  Each unit is its own reusable workflow, every action is pinned, and a suite in
+  `@luam/pipeline` asserts the contract so a workflow cannot drift from it
+  silently. Contributions from forks are bounded by a recorded threat model
+  rather than by convention.
+- The project gains its contributor entry documents: `CONTRIBUTING.md`,
+  `SECURITY.md` with a private channel for a vulnerability, `CODEOWNERS`, a pull
+  request template, and issue forms for a bug, a proposal and a documentation
+  problem. The manual gains a contributing page in both locales.
+
+## 0.19.4 - 2026-08-28
+
+### Changed
+
+- Luam ships no debugger, and the CLI stays out of a running server. Debugging
+  was never addressed in its own right: the only place the product said anything
+  was the closing line of an entry about development logs, carrying none of the
+  four labels the limitations page uses to separate what will change from what
+  will not, so a reader could not tell whether a debugger was coming. It is
+  answered now, and recorded as a design boundary rather than pending work. What
+  a developer already has is unchanged: `luam dev` follows the local log and
+  prints server records and relayed client output as one stream, with authored
+  positions.
+- How a third-party Luam library is distributed is settled: a library is an npm
+  package, vendored into the resource that consumes it. Three constraints
+  decided it. Fetching may not happen inside a build, because the compiler
+  packages make no network calls and a build with no network still succeeds.
+  MTA has no module system, so a library is either vendored or deployed as its
+  own resource, and only the first is a distribution model. The manifest is a
+  closed set of typed domains, so that is where a dependency is declared.
+  Nothing is implemented yet: this release records the decision and changes no
+  package behaviour.
+
+## 0.19.3 - 2026-08-28
+
+### Added
+
+- `luam test` runs the tests a developer writes for their own resource. A file
+  ending in `.test.luam` is compiled with the project and executed on a Lua 5.1
+  interpreter found on `PATH` — `lua5.1`, `lua51`, `lua`, then `luajit` — pinned
+  with `--lua <path>` or `LUAM_LUA`, and reported by `luam doctor`. The published
+  CLI gained no dependency. Inside a test file, `describe`, `test`, `beforeEach`,
+  `afterEach`, `expect` and `mta` are declared to the checker, so the editor
+  understands a test the way it understands any other module, and a non-test file
+  that calls `test` still reports an unknown global. Every MTA function is
+  replaced by a stub that records its arguments and returns `nil`; `mta.returns`,
+  `mta.stub` and `mta.calls` configure and read them. A stub records a call, it
+  does not simulate MTA. A failing assertion reports `path:line:column` in the
+  `.luam` source, and the command exits non-zero so CI can gate on it. Test files
+  are excluded from `sources`, so `luam build` output is unchanged whether or not
+  they exist, and `build`, `check` and `ensure` still execute no project code.
+
+## 0.19.2 - 2026-08-28
+
 ### Added
 
 - `luam test` runs the tests a developer writes for their own resource. A file

@@ -9,6 +9,35 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.5 - 2026-08-28
+
+### Added
+
+- [Contributing](/en/guide/contributing) is new: what the merge gate checks and
+  what only advises, how a change from a fork is treated, and where a
+  vulnerability goes instead of an issue.
+
+## 0.19.4 - 2026-08-28
+
+### Changed
+
+- [Limitations](/en/reference/limitations) records that Luam ships no debugger
+  as a design boundary of its own, instead of leaving it as the closing aside of
+  the development-logs entry. The page now says the decision is settled rather
+  than pending, and points at what `luam dev` already gives a developer.
+
+## 0.19.3 - 2026-08-28
+
+### Added
+
+- [CLI commands](/en/tooling/cli) documents `luam test`: the interpreter it looks
+  for, the six globals a test file gets, every matcher, the MTA stubs and what
+  they cannot prove. [Testing a module](/en/recipes/testing-a-module) is a new
+  recipe with a complete project, and [CI and deployment](/en/tooling/ci-and-deployment)
+  shows the job that installs Lua and gates on the result.
+
+## 0.19.2 - 2026-08-28
+
 ### Added
 
 - [CLI commands](/en/tooling/cli) documents `luam test`: the interpreter it looks

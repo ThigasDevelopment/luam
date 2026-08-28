@@ -11,6 +11,37 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.5 - 2026-08-28
+
+### Adicionado
+
+- [Contribuindo](/pt-br/guide/contributing) é nova: o que o portão de merge
+  verifica e o que apenas aconselha, como uma mudança vinda de um fork é
+  tratada, e para onde vai uma vulnerabilidade em vez de uma issue.
+
+## 0.19.4 - 2026-08-28
+
+### Alterado
+
+- [Limitações](/pt-br/reference/limitations) registra que o Luam não entrega um
+  depurador como uma fronteira de projeto própria, em vez de deixar isso como o
+  comentário final da entrada sobre logs de desenvolvimento. A página agora diz
+  que a decisão está tomada, não pendente, e aponta o que o `luam dev` já
+  oferece.
+
+## 0.19.3 - 2026-08-28
+
+### Adicionado
+
+- [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam test`: o interpretador
+  que ele procura, as seis globais que um arquivo de teste ganha, cada matcher, os
+  stubs do MTA e o que eles não conseguem provar.
+  [Testando um módulo](/pt-br/recipes/testing-a-module) é uma receita nova com um
+  projeto completo, e [CI e implantação](/pt-br/tooling/ci-and-deployment) mostra o
+  job que instala o Lua e barra no resultado.
+
+## 0.19.2 - 2026-08-28
+
 ### Adicionado
 
 - [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam test`: o interpretador
