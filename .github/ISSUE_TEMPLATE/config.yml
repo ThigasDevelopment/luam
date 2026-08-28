@@ -1,0 +1,12 @@
+blank_issues_enabled: false
+
+contact_links:
+    - name: Report a vulnerability
+      url: https://github.com/ThigasDevelopment/luam/security/advisories/new
+      about: Security problems are reported privately, never as an issue.
+    - name: Read the manual
+      url: https://thigasdevelopment.github.io/luam/
+      about: The language reference, the CLI reference, and the known limitations.
+    - name: Contributing guide
+      url: https://github.com/ThigasDevelopment/luam/blob/main/CONTRIBUTING.md
+      about: How to set the workspace up and reproduce every check the pipeline runs.

@@ -1,0 +1,92 @@
+name: Bug report
+description: Something the compiler, CLI, language server, or generated Lua gets wrong.
+labels: [bug]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              A vulnerability is not a bug report. Report it privately through the Security tab.
+
+    - type: textarea
+      id: summary
+      attributes:
+          label: What happens
+          description: What you expected, and what happened instead.
+      validations:
+          required: true
+
+    - type: textarea
+      id: reproduction
+      attributes:
+          label: The smallest source that reproduces it
+          description: The `.luam` source, the manifest, or the command. Paste it here rather than linking a repository.
+          render: lua
+      validations:
+          required: true
+
+    - type: input
+      id: command
+      attributes:
+          label: The command you ran
+          placeholder: luam build
+      validations:
+          required: true
+
+    - type: textarea
+      id: output
+      attributes:
+          label: What the command printed
+          description: The full output, including the diagnostic code if there is one.
+          render: text
+      validations:
+          required: true
+
+    - type: input
+      id: luam-version
+      attributes:
+          label: Luam version
+          description: The output of `luam --version`.
+      validations:
+          required: true
+
+    - type: input
+      id: node-version
+      attributes:
+          label: Node version
+          description: The output of `node --version`.
+      validations:
+          required: true
+
+    - type: dropdown
+      id: environment
+      attributes:
+          label: MTA side
+          description: The environment of the file the problem is in.
+          options:
+              - server
+              - client
+              - shared
+              - not specific to one side
+      validations:
+          required: true
+
+    - type: dropdown
+      id: platform
+      attributes:
+          label: Operating system
+          options:
+              - Windows
+              - Linux
+              - macOS
+      validations:
+          required: true
+
+    - type: checkboxes
+      id: checks
+      attributes:
+          label: Before you send it
+          options:
+              - label: I checked the known limitations in the manual, and this is not one of them.
+                required: true
+              - label: I am on the latest published release, or I said above which release I am on and why.
+                required: true
