@@ -11,6 +11,16 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.4 - 2026-08-28
+
+### Alterado
+
+- [Limitações](/pt-br/reference/limitations) registra que o Luam não entrega um
+  depurador como uma fronteira de projeto própria, em vez de deixar isso como o
+  comentário final da entrada sobre logs de desenvolvimento. A página agora diz
+  que a decisão está tomada, não pendente, e aponta o que o `luam dev` já
+  oferece.
+
 ## 0.19.3 - 2026-08-28
 
 ### Adicionado

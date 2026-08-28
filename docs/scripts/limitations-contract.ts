@@ -30,6 +30,7 @@ export const LIMITATIONS: readonly Limitation[] = [
     { id: 'erased-annotations', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/021-erased-type-annotations.md' },
     { id: 'file-environment', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/023-file-level-environments.md' },
     { id: 'development-log-scope', label: 'design-boundary', owners: [], decision: '.claude/plans/24.12-remote-development-bridge.md' },
+    { id: 'no-debugger', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/039-no-debugger.md' },
 ];
 
 export const LABEL_TEXT: Readonly<Record<LocaleId, Readonly<Record<LimitationLabel, string>>>> = {

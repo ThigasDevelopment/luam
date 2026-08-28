@@ -2064,11 +2064,11 @@ Decided during implementation:
 Decide how a developer consumes Luam code someone else wrote. Today they copy
 files.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 34.01 | Design a distribution model for third-party Luam libraries | ../plans/34.01-library-distribution.md | architecture-engineer | todo |
+| 34.01 | Design a distribution model for third-party Luam libraries | ../plans/34.01-library-distribution.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -2084,15 +2084,54 @@ Acceptance:
 This milestone produces a decision, not an implementation. The milestone that
 builds it follows.
 
+Decided:
+
+- **A library is an npm package, and Luam runs no infrastructure.**
+  [ADR-038](adr/038-library-distribution.md) weighs npm, git URLs behind a
+  `luam add`, a vendored `libs/` with a lockfile, a registry the project
+  operates, and doing nothing. npm wins on a fact rather than a preference:
+  every Luam developer already installs the CLI with `npm install --global`, so
+  the version solver, the lockfile, the integrity checking and the registry
+  arrive at no machine cost, and none of them is the project's to run.
+- **Fetching is the package manager's, never a build's.** `npm install` is the
+  only step that touches the network. `build`, `check`, `ensure`, `dev` and
+  `test` read `node_modules` from disk, an offline build with a populated
+  `node_modules` is byte-identical, and the CLI's two allowed outbound calls are
+  unchanged. A named package that is missing is a configuration error naming the
+  install command, not a fetch.
+- **Types come from source, not from a published summary.** A library ships
+  `.luam` that the consumer compiles and checks, with `.d.luam` for the verbatim
+  Lua half. Unlike the export contract, the source is on disk, so there is no
+  artifact to serialize and nothing to drift.
+- **The library owns its environment; the consumer does not reassign it.** A
+  library declares its per-environment sources in its own `package.json`, and a
+  library file is then an ordinary file of that environment under the existing
+  rules.
+- **There are no transitive dependencies, deliberately.** Lua 5.1 has one flat
+  global namespace, so two versions of a library cannot coexist and a resolver
+  would only manufacture conflicts it could not resolve. A library declares what
+  it requires and the compiler names anything missing; the developer lists it.
+  Global collisions are likewise reported at compile time rather than resolved
+  by last write.
+- **Vendored, with explicit `meta.xml` entries.** Library scripts are enumerated
+  rather than wildcarded, in a section after the runtime library and before
+  `config.lua`, ordered by the manifest's `libraries` array. A helper a library
+  needs feeds the same requirement set the reference trigger already computes,
+  so helpers stay first and are emitted once.
+- **Orthogonal to [ADR-033](adr/033-resource-export-abi.md), which stays.**
+  Exports are a runtime boundary between two deployed resources; this is a
+  compile-time source boundary that ships the code inside one. A stateful
+  service is still a resource with exports; a pure module is a library.
+
 ## Milestone 35 — Debugging Decision
 
 Promote an aside inside a limitations entry into a recorded decision.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 35.01 | Decide whether Luam ships a debugger | ../plans/35.01-debugging-decision.md | documentation-engineer | todo |
+| 35.01 | Decide whether Luam ships a debugger | ../plans/35.01-debugging-decision.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -2104,6 +2143,40 @@ Acceptance:
 - If the decision is to build, the security model is scoped in the ADR rather
   than deferred.
 
+Decided:
+
+- **Luam ships no debugger, and the decision reaffirms the boundary.**
+  [ADR-039](adr/039-no-debugger.md) weighs reaffirming, a Debug Adapter Protocol
+  server attached to a live MTA server, an eval-only channel, a debugger over the
+  test host, and improving print debugging instead. The live options were
+  rejected on two independent grounds, either fatal alone: the CLI never opens a
+  connection to an MTA server — the third time the product has decided this,
+  after removing `transport` and shelving 24.12 — and pausing on a breakpoint
+  stops the thread the whole server runs on, so the debug session is a frozen
+  game.
+- **The security model is refusing the channel.** A live debug channel evaluates
+  expressions inside a process with players connected to it, so an exposed port
+  is a server takeover rather than a leaked stack frame. Nothing is deferred to
+  an implementing milestone, because there is no channel to authenticate, scope
+  or rate-limit.
+- **The gap is narrower than "there is no debugger".** `luam dev` gives
+  structured logs with source positions, `luam trace` and the resource map turn a
+  runtime position back into an authored one, `luam test` executes project code
+  off the server, and the checker reports most of what a step debugger is used to
+  find in untyped Lua. All of it already ships.
+- **A test runner and a debugger constrain each other, and the answer is
+  already recorded.** 33.01 and [ADR-037](adr/037-test-execution-host.md) decided
+  that project code runs in a process the CLI starts, on a discovered Lua 5.1
+  interpreter, with MTA stubbed. A debugger wanting a live server with real
+  elements and real players asks to reverse that boundary too.
+- **`limitations.md` gained a labelled section of its own.** The closing aside of
+  the development-logs entry now points at "Luam ships no debugger", a **Design
+  boundary** in both `en` and `pt-br`, registered in the limitation contract so
+  the labels and the recorded decision are enforced.
+- **Reopening it has a stated order.** MTA would first have to offer a way to
+  suspend a resource without suspending the server; shipping any live channel
+  would then require amending the CLI-never-connects rule in `.claude/CLAUDE.md`
+  explicitly. The offline test-host debugger is the one shape that needs neither.
 
 ## Milestone 36 — Pipeline Consolidation and Community Contribution
 

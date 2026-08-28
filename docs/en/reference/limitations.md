@@ -263,4 +263,42 @@ unattributed engine lines can appear as plain server output because their origin
 cannot be classified reliably.
 
 Evaluating an expression on a running server is not part of any of this. That is
-a debugger, and it needs its own protocol and its own security decision.
+a debugger, and Luam does not ship one — see
+[Luam ships no debugger](/en/reference/limitations#luam-ships-no-debugger).
+
+## Luam ships no debugger
+
+**Design boundary.** Recorded in
+[ADR-039](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/039-no-debugger.md).
+
+There are no breakpoints, no stepping, no variables pane, and no way to pause a
+resource or evaluate an expression inside a running MTA server. This is decided,
+not pending: nothing on the roadmap adds it.
+
+What covers the same ground:
+
+- [`luam dev`](/en/tooling/cli#luam-dev) follows the local `server.log` and
+  prints server records and relayed client `outputDebugString` calls as one
+  stream, with source positions.
+- [`luam trace`](/en/tooling/cli#luam-trace) and the resource map turn a
+  generated position — or a whole error log — back into the `.luam` line you
+  wrote. See
+  [Resolving an MTA runtime position](/en/guide/troubleshooting#resolving-an-mta-runtime-position).
+- [`luam test`](/en/tooling/cli#luam-test) runs your code on a local Lua 5.1
+  interpreter with MTA calls stubbed and recorded, so you can execute a function
+  and assert on what it did without a server.
+- The checker reports most of what a step debugger is used to find in untyped
+  Lua — a nil field, a misspelled member, a wrong argument — before anything
+  runs.
+
+Two things rule out the live half. A debugger attaches to a running server, and
+the CLI opens no connection to one: the `transport` manifest field that
+configured a server connection was removed, and `ensure` syncing files with
+`dev --start-server` driving the server it owns is what replaced it. And a
+channel that evaluates expressions inside a live server is remote code execution
+against a machine with players connected to it, which is a security surface the
+project declines to introduce rather than one it plans to secure.
+
+MTA itself has no part to interoperate with here: it publishes no debug
+protocol, and a Lua debug hook that stops on a line stops the thread the whole
+server runs on, which freezes the game for everyone on it.

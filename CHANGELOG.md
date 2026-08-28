@@ -14,6 +14,29 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.4 - 2026-08-28
+
+### Changed
+
+- Luam ships no debugger, and the CLI stays out of a running server. Debugging
+  was never addressed in its own right: the only place the product said anything
+  was the closing line of an entry about development logs, carrying none of the
+  four labels the limitations page uses to separate what will change from what
+  will not, so a reader could not tell whether a debugger was coming. It is
+  answered now, and recorded as a design boundary rather than pending work. What
+  a developer already has is unchanged: `luam dev` follows the local log and
+  prints server records and relayed client output as one stream, with authored
+  positions.
+- How a third-party Luam library is distributed is settled: a library is an npm
+  package, vendored into the resource that consumes it. Three constraints
+  decided it. Fetching may not happen inside a build, because the compiler
+  packages make no network calls and a build with no network still succeeds.
+  MTA has no module system, so a library is either vendored or deployed as its
+  own resource, and only the first is a distribution model. The manifest is a
+  closed set of typed domains, so that is where a dependency is declared.
+  Nothing is implemented yet: this release records the decision and changes no
+  package behaviour.
+
 ## 0.19.3 - 2026-08-28
 
 ### Added
