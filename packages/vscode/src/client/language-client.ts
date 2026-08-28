@@ -40,9 +40,17 @@ function semanticTokensMiddleware(): Middleware {
     };
 }
 
+function formattingMiddleware(): Middleware {
+    return {
+        provideDocumentFormattingEdits: (document, options, token, next) => (readSettings().formatting ? next(document, options, token) : []),
+        provideDocumentRangeFormattingEdits: (document, range, options, token, next) =>
+            readSettings().formatting ? next(document, range, options, token) : [],
+    };
+}
+
 export function createClientOptions(): LanguageClientOptions {
     return {
-        middleware: semanticTokensMiddleware(),
+        middleware: { ...semanticTokensMiddleware(), ...formattingMiddleware() },
         documentSelector: [
             { scheme: 'file', language: LANGUAGE_ID },
             { scheme: 'file', language: MANIFEST_LANGUAGE_ID },

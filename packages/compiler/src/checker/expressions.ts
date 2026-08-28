@@ -9,6 +9,7 @@ import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
 import { specializeEventCall } from './event-calls';
 import { memberOf } from './generic-class';
+import { resolveNonNominalMethod, withoutSelfParameter } from './method-receiver';
 import { checkResourceCall } from './resource-exports';
 import {
     checkNewExpression,
@@ -215,9 +216,15 @@ function isLegacySuperCall(expression: CallExpression): boolean {
 
 function checkMethodCall(context: CheckContext, expression: CallExpression, method: string, receiver: Type): Type {
     if (receiver.kind !== 'named') {
-        checkValueList(context, expression.args);
+        const signature = resolveNonNominalMethod(receiver, method);
 
-        return ANY_TYPE;
+        if (signature === null) {
+            checkValueList(context, expression.args);
+
+            return ANY_TYPE;
+        }
+
+        return checkSignature(context, expression.args, withoutSelfParameter(signature), expression.position);
     }
 
     const declared = memberOf(context, receiver, method);

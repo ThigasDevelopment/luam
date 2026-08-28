@@ -123,6 +123,10 @@ function registerFeatures(connection: Connection, service: LanguageService): voi
     connection.onReferences((params) => service.references(params.textDocument.uri, params.position));
     connection.onRenameRequest((params) => service.rename(params.textDocument.uri, params.position, params.newName));
     connection.onDocumentSymbol((params) => service.documentSymbols(params.textDocument.uri));
+    connection.onCodeAction((params) => service.codeActions(params.textDocument.uri, params.range));
+    connection.onWorkspaceSymbol((params) => service.workspaceSymbols(params.query));
+    connection.onDocumentFormatting((params) => service.formatting(params.textDocument.uri));
+    connection.onDocumentRangeFormatting((params) => service.rangeFormatting(params.textDocument.uri, params.range));
 }
 
 export function startServer(connection: Connection): LanguageService {

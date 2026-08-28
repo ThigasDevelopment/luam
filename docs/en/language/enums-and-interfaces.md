@@ -146,6 +146,40 @@ An interface is also usable as a type:
 local target: Describable = new Round()
 ```
 
+### An interface is structural, a class is nominal
+
+The two behave differently when a value is checked against them, and the
+difference is deliberate.
+
+An **interface** is satisfied by shape. Any value carrying the members it
+declares fits, whether it is a table literal or another interface, and a value
+that does not is `check-type-mismatch` — the same diagnostic a
+[`type` alias](/en/language/types#aliases) reports, with the same wording:
+
+```luam expect-error
+interface Contract {
+    name: string
+}
+
+local ok: Contract = { name = 'a' }
+local wrong: Contract = { other = 1 }
+```
+
+```
+error  check-type-mismatch  Variable "wrong" expects "Contract" but received
+                            "{ other: 1 }". Key "name" is missing from "Contract".
+```
+
+A **class** is satisfied by identity. A class value fits where its own class or
+any parent in its `extends` chain is expected, and where an interface it
+`implements` is expected. It does not fit an unrelated class that happens to
+declare the same members, and a table literal never fits a class — a class
+carries behaviour a shape cannot promise.
+
+A name the checker never resolved stays permissive in both directions, which is
+what keeps the MTA element types and every ambient declaration working. See
+[Names that are not declared](/en/language/types#names-that-are-not-declared).
+
 ## Which one do I want?
 
 | You want | Use |

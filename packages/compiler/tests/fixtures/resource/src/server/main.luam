@@ -17,6 +17,6 @@ function announceJoin(player: Player): void
     outputChatBox(RESOURCE_NAME, root)
 end
 
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     announceJoin(source)
 end)

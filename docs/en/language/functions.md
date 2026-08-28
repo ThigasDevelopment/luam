@@ -15,7 +15,7 @@ local function double(value: number): number
     return value * 2
 end
 
-local anonymous = function(...)
+local anonymous = function (...)
     print(...)
 end
 ```
@@ -71,7 +71,7 @@ end
 
 ```luam
 local log: fun(string): void = print
-local reduce: fun(total: number, value: number): number = function(total: number, value: number): number
+local reduce: fun(total: number, value: number): number = function (total: number, value: number): number
     return total + value
 end
 local variadic: fun(...): void = print

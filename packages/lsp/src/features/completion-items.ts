@@ -51,6 +51,15 @@ export function constructorItem(): CompletionItem {
     };
 }
 
+export function staticItem(): CompletionItem {
+    return {
+        label: 'static',
+        kind: CompletionItemKind.Keyword,
+        detail: 'Put the member on the class value',
+        documentation: 'A static field is one slot the class owns; a static method is called on the class. Reach both by naming the class.',
+    };
+}
+
 export function superItem(superClass: string): CompletionItem {
     return {
         label: 'super',

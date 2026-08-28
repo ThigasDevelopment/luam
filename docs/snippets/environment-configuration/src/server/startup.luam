@@ -1,4 +1,4 @@
-addEventHandler('onResourceStart', resourceRoot, function()
+addEventHandler('onResourceStart', resourceRoot, function ()
     local name: string = env.SERVER_NAME
     local maxPlayers: number = env.MAX_PLAYERS
     local debug: boolean = env.DEBUG

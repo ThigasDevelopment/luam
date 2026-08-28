@@ -9,7 +9,7 @@ local optional?: string = nil
 local names: string[] = { 'a', 'b' }
 local matrix: number[][] = {}
 local callback: fun(string): void = print
-local reducer: fun(total: number, value: number): number = function(total: number, value: number): number
+local reducer: fun(total: number, value: number): number = function (total: number, value: number): number
     return total + value
 end
 local logger: fun(...): void = print

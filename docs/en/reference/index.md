@@ -12,6 +12,7 @@ actually accepts.
 | [Configuration fields](/en/reference/configuration-fields) | Every `.luam.manifest` field, its default, and its validation. |
 | [Output layouts and source maps](/en/reference/output-layouts) | Production bundles, development trees, map files, and trace resolution. |
 | [Diagnostics](/en/reference/diagnostics) | Every diagnostic code, grouped by the stage that produces it. |
+| [Formatting](/en/reference/formatting) | The style the language server writes, and what it never touches. |
 | [Limitations](/en/reference/limitations) | What the compiler deliberately does not do. |
 | [Compatibility](/en/reference/compatibility) | Lua 5.1, MTA, Node.js, and editor support. |
 

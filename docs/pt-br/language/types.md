@@ -377,6 +377,28 @@ tipa `config.name` e reporta `config.tag`. A exceção é `{}`, que alarga para
 `table` — é isso que mantém `local items = {}` funcionando com as
 [extensões de objeto](/pt-br/language/extensions).
 
+Uma chave cujo tipo é uma função é um método quando é chamada com `:`. A chamada
+é verificada contra a assinatura declarada — quantidade e tipo dos argumentos — e
+produz o tipo de retorno declarado:
+
+```luam
+type Counter = { bump: fun(step: number): number }
+
+local counter: Counter = { bump = function (step: number): number return step end }
+
+local total: number = counter:bump(1)
+```
+
+```
+error  check-argument-count  This call expects at most 1 argument but received 2.
+error  check-type-mismatch   Argument 1 expects "number" but received "string".
+```
+
+Um primeiro parâmetro chamado `self` é o receptor, então ele não conta como
+argumento de uma chamada com `:`. `bump: fun(self: Counter, step: number): number`
+e `bump: fun(step: number): number` reportam a mesma aridade para
+`counter:bump(1)`. Uma chamada com `.` passa todos os parâmetros, `self` incluso.
+
 Um tipo de objeto é uma forma, não um contrato que uma classe possa implementar.
 Para isso, use uma [interface](/pt-br/language/enums-and-interfaces).
 
@@ -408,7 +430,7 @@ ser declarado antes do código que o usa.
 
 ```luam
 local log: fun(string): void = print
-local reduce: fun(total: number, value: number): number = function(total: number, value: number): number
+local reduce: fun(total: number, value: number): number = function (total: number, value: number): number
     return total + value
 end
 local variadic: fun(...): void = print

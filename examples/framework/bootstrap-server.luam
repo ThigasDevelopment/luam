@@ -2,10 +2,10 @@
 
 local core: Core = new Core('server')
 
-addEventHandler('onResourceStart', resourceRoot, function()
+addEventHandler('onResourceStart', resourceRoot, function ()
     core:start()
 end)
 
-addEventHandler('onResourceStop', resourceRoot, function()
+addEventHandler('onResourceStop', resourceRoot, function ()
     core:stop()
 end)

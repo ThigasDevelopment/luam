@@ -7,7 +7,7 @@ import { CLIENT_ID, ENVIRONMENT_PATTERN, MANIFEST_PATTERN, SERVER_MODULE, SOURCE
 import { BUILD_NO_FOLDER_MESSAGE, BUILD_TERMINAL_NAME } from '@vscode-extension/commands/build-command';
 import { ensureCommandLine, NO_FOLDER_MESSAGE, TERMINAL_NAME } from '@vscode-extension/commands/ensure-command';
 import { DEFAULT_SETTINGS, readSettings } from '@vscode-extension/config/settings';
-import { activate, BUILD_COMMAND, deactivate, ENSURE_COMMAND, RESCAN_COMMAND, RESTART_COMMAND } from '@vscode-extension/extension';
+import { activate, BUILD_COMMAND, deactivate, ENSURE_COMMAND, RESCAN_COMMAND, RESCAN_REQUEST, RESTART_COMMAND } from '@vscode-extension/extension';
 
 import { clients, resetClients, type LanguageClient } from './support/language-client-mock';
 import { resetMock, state } from './support/vscode-mock';
@@ -95,7 +95,7 @@ describe('activation', () => {
 
         await state.registered.get(RESCAN_COMMAND)?.();
 
-        expect(client.requests).toEqual([{ method: 'workspace/executeCommand', params: { command: RESCAN_COMMAND } }]);
+        expect(client.requests).toEqual([{ method: 'workspace/executeCommand', params: { command: RESCAN_REQUEST } }]);
     });
 });
 
@@ -138,14 +138,14 @@ describe('ensure command', () => {
     });
 
     it('builds a single run command line when watch is off', () => {
-        expect(ensureCommandLine({ cliPath: 'pnpm luam', ensureWatch: false, semanticHighlighting: true })).toBe('pnpm luam ensure');
+        expect(ensureCommandLine({ cliPath: 'pnpm luam', ensureWatch: false, formatting: true, semanticHighlighting: true })).toBe('pnpm luam ensure');
     });
 
     it('reads the configured cli path', () => {
         state.settings.set('luam.cliPath', 'node ./bin/luam.mjs');
         state.settings.set('luam.ensureWatch', false);
 
-        expect(readSettings()).toEqual({ cliPath: 'node ./bin/luam.mjs', ensureWatch: false, semanticHighlighting: true });
+        expect(readSettings()).toEqual({ cliPath: 'node ./bin/luam.mjs', ensureWatch: false, formatting: true, semanticHighlighting: true });
     });
 
     it('runs the cli in a dedicated terminal', () => {

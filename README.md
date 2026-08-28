@@ -280,7 +280,10 @@ VSCodium and Windsurf. The language server itself is editor-agnostic and speaks
 - **A class is a type everywhere, a value from its declaration** — `extends` may
   name a parent written further down, a top-level `new` may not.
 - **The MTA catalog can lag a release** — a newer function stays `any`.
-- **No declared metamethods or generic classes.**
+- **Three metamethods stay blocked** — `__index`, `__newindex` and `__call`.
+  Generic classes are supported.
+- **A method the receiver does not declare is not reported** — `counter:missing()`
+  keeps returning `any`; annotate the receiver to have the call checked.
 - **The editor re-checks by declaration** — a declaration change re-analyzes every
   file that can see it, an edit inside a function body only its own file.
 - **An export is named, never verified** against the side that calls it.

@@ -17,8 +17,22 @@ const KEYWORD_TEXT: ReadonlyMap<string, string> = new Map([
 
 const EXPORT_HEAD = /\bexport\s+$/;
 
+const STATIC_MODIFIER = 'static';
+
 function isKeywordTokenAt(analysis: DocumentAnalysis, start: number, word: string): boolean {
     return analysis.tokens.some((token) => token.kind === 'keyword' && token.position.offset === start && token.value === word);
+}
+
+function isStaticModifierAt(analysis: DocumentAnalysis, start: number): boolean {
+    const index = analysis.tokens.findIndex((token) => token.position.offset === start);
+    const modifier = analysis.tokens[index];
+    const name = analysis.tokens[index + 1];
+
+    if (modifier?.kind !== 'identifier' || modifier.value !== STATIC_MODIFIER || name === undefined) {
+        return false;
+    }
+
+    return name.kind === 'identifier' && name.position.line === modifier.position.line;
 }
 
 function keywordMarkdown(analysis: DocumentAnalysis, start: number, word: string): string | null {
@@ -28,7 +42,15 @@ function keywordMarkdown(analysis: DocumentAnalysis, start: number, word: string
 
     const value = KEYWORD_TEXT.get(word);
 
-    return value !== undefined && isKeywordTokenAt(analysis, start, word) ? value : null;
+    if (value === undefined) {
+        return null;
+    }
+
+    if (word === STATIC_MODIFIER) {
+        return isStaticModifierAt(analysis, start) ? value : null;
+    }
+
+    return isKeywordTokenAt(analysis, start, word) ? value : null;
 }
 
 export function keywordHover(analysis: DocumentAnalysis, offset: number): Hover | null {

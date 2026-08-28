@@ -14,12 +14,12 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 01.01 | Scaffold pnpm workspace and compiler package | plans/01.01-scaffold-workspace.md | architecture-engineer | done |
-| 01.02 | Implement lexer with tokens and positions | plans/01.02-lexer.md | architecture-engineer | done |
-| 01.03 | Implement parser with Lua blocks | plans/01.03-parser.md | architecture-engineer | done |
-| 01.04 | Implement type checker and diagnostics | plans/01.04-type-checker.md | architecture-engineer | done |
-| 01.05 | Implement Lua 5.1 emitter and extensions | plans/01.05-emitter.md | architecture-engineer | done |
-| 01.06 | Cover milestone 1 with fixtures and snapshot tests | plans/01.06-language-tests.md | test-engineer | done |
+| 01.01 | Scaffold pnpm workspace and compiler package | ../plans/01.01-scaffold-workspace.md | architecture-engineer | done |
+| 01.02 | Implement lexer with tokens and positions | ../plans/01.02-lexer.md | architecture-engineer | done |
+| 01.03 | Implement parser with Lua blocks | ../plans/01.03-parser.md | architecture-engineer | done |
+| 01.04 | Implement type checker and diagnostics | ../plans/01.04-type-checker.md | architecture-engineer | done |
+| 01.05 | Implement Lua 5.1 emitter and extensions | ../plans/01.05-emitter.md | architecture-engineer | done |
+| 01.06 | Cover milestone 1 with fixtures and snapshot tests | ../plans/01.06-language-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -45,10 +45,10 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 02.01 | Add class model and semantics | plans/02.01-class-model.md | architecture-engineer | done |
-| 02.02 | Add runtime helper modules | plans/02.02-runtime-helpers.md | architecture-engineer | done |
-| 02.03 | Emit classes and enums to Lua runtime calls | plans/02.03-class-emitter.md | architecture-engineer | done |
-| 02.04 | Cover milestone 2 with class and runtime tests | plans/02.04-oop-tests.md | test-engineer | done |
+| 02.01 | Add class model and semantics | ../plans/02.01-class-model.md | architecture-engineer | done |
+| 02.02 | Add runtime helper modules | ../plans/02.02-runtime-helpers.md | architecture-engineer | done |
+| 02.03 | Emit classes and enums to Lua runtime calls | ../plans/02.03-class-emitter.md | architecture-engineer | done |
+| 02.04 | Cover milestone 2 with class and runtime tests | ../plans/02.04-oop-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -75,11 +75,11 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 03.01 | Add environment resolution model | plans/03.01-environment-model.md | architecture-engineer | done |
-| 03.02 | Add MTA API type catalogs | plans/03.02-mta-types.md | architecture-engineer | done |
-| 03.03 | Validate environments for APIs and imports | plans/03.03-environment-validation.md | architecture-engineer | done |
-| 03.04 | Generate resource manifest and assembly | plans/03.04-manifest-resource-assembly.md | architecture-engineer | done |
-| 03.05 | Cover milestone 3 with environment and manifest tests | plans/03.05-environment-tests.md | test-engineer | done |
+| 03.01 | Add environment resolution model | ../plans/03.01-environment-model.md | architecture-engineer | done |
+| 03.02 | Add MTA API type catalogs | ../plans/03.02-mta-types.md | architecture-engineer | done |
+| 03.03 | Validate environments for APIs and imports | ../plans/03.03-environment-validation.md | architecture-engineer | done |
+| 03.04 | Generate resource manifest and assembly | ../plans/03.04-manifest-resource-assembly.md | architecture-engineer | done |
+| 03.05 | Cover milestone 3 with environment and manifest tests | ../plans/03.05-environment-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -116,10 +116,10 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 04.01 | Scaffold CLI package and configuration | plans/04.01-cli-scaffold.md | architecture-engineer | done |
-| 04.02 | Implement build and check commands | plans/04.02-build-check-commands.md | architecture-engineer | done |
-| 04.03 | Implement ensure watch loop and MTA sync | plans/04.03-ensure-watch.md | architecture-engineer | done |
-| 04.04 | Cover milestone 4 with CLI tests | plans/04.04-cli-tests.md | test-engineer | done |
+| 04.01 | Scaffold CLI package and configuration | ../plans/04.01-cli-scaffold.md | architecture-engineer | done |
+| 04.02 | Implement build and check commands | ../plans/04.02-build-check-commands.md | architecture-engineer | done |
+| 04.03 | Implement ensure watch loop and MTA sync | ../plans/04.03-ensure-watch.md | architecture-engineer | done |
+| 04.04 | Cover milestone 4 with CLI tests | ../plans/04.04-cli-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -158,10 +158,10 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 05.01 | Scaffold LSP server on compiler APIs | plans/05.01-lsp-server.md | architecture-engineer | done |
-| 05.02 | Implement LSP capabilities | plans/05.02-lsp-capabilities.md | architecture-engineer | done |
-| 05.03 | Build VS Code extension and syntax highlighting | plans/05.03-vscode-extension.md | architecture-engineer | done |
-| 05.04 | Cover milestone 5 with LSP and extension tests | plans/05.04-lsp-tests.md | test-engineer | done |
+| 05.01 | Scaffold LSP server on compiler APIs | ../plans/05.01-lsp-server.md | architecture-engineer | done |
+| 05.02 | Implement LSP capabilities | ../plans/05.02-lsp-capabilities.md | architecture-engineer | done |
+| 05.03 | Build VS Code extension and syntax highlighting | ../plans/05.03-vscode-extension.md | architecture-engineer | done |
+| 05.04 | Cover milestone 5 with LSP and extension tests | ../plans/05.04-lsp-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -205,10 +205,10 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 06.01 | Port mta-project-base framework to the language | plans/06.01-framework-port.md | architecture-engineer | done |
-| 06.02 | Add automatic listener and command loading | plans/06.02-auto-loading.md | architecture-engineer | done |
-| 06.03 | Add resource scaffold command | plans/06.03-scaffold-resource.md | architecture-engineer | done |
-| 06.04 | Cover milestone 6 with framework tests | plans/06.04-framework-tests.md | test-engineer | done |
+| 06.01 | Port mta-project-base framework to the language | ../plans/06.01-framework-port.md | architecture-engineer | done |
+| 06.02 | Add automatic listener and command loading | ../plans/06.02-auto-loading.md | architecture-engineer | done |
+| 06.03 | Add resource scaffold command | ../plans/06.03-scaffold-resource.md | architecture-engineer | done |
+| 06.04 | Cover milestone 6 with framework tests | ../plans/06.04-framework-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -264,11 +264,11 @@ Scope:
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 07.01 | Add incremental compilation and cache | plans/07.01-incremental-cache.md | architecture-engineer | done |
-| 07.02 | Profile build and runtime helper performance | plans/07.02-performance-profiling.md | performance-engineer | done |
-| 07.03 | Review generated code and runtime security | plans/07.03-security-review.md | security-engineer | done |
-| 07.04 | Polish diagnostics, strictness, and docs | plans/07.04-docs-and-changelog.md | documentation-engineer | done |
-| 07.05 | Set up CI for build, tests, and release | plans/07.05-ci-workflows.md | github-engineer | done |
+| 07.01 | Add incremental compilation and cache | ../plans/07.01-incremental-cache.md | architecture-engineer | done |
+| 07.02 | Profile build and runtime helper performance | ../plans/07.02-performance-profiling.md | performance-engineer | done |
+| 07.03 | Review generated code and runtime security | ../plans/07.03-security-review.md | security-engineer | done |
+| 07.04 | Polish diagnostics, strictness, and docs | ../plans/07.04-docs-and-changelog.md | documentation-engineer | done |
+| 07.05 | Set up CI for build, tests, and release | ../plans/07.05-ci-workflows.md | github-engineer | done |
 
 Acceptance:
 
@@ -360,11 +360,11 @@ performance work of its own.
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 08.01 | Choose the upstream MTA declaration source | plans/08.01-catalog-source-adr.md | architecture-engineer | done |
-| 08.02 | Build the MTA catalog generator | plans/08.02-catalog-generator.md | architecture-engineer | done |
-| 08.03 | Define signature normalization and overrides | plans/08.03-signature-normalization.md | architecture-engineer | done |
-| 08.04 | Import the full MTA catalog | plans/08.04-full-catalog-import.md | architecture-engineer | done |
-| 08.05 | Cover the full catalog with tests | plans/08.05-catalog-tests.md | test-engineer | done |
+| 08.01 | Choose the upstream MTA declaration source | ../plans/08.01-catalog-source-adr.md | architecture-engineer | done |
+| 08.02 | Build the MTA catalog generator | ../plans/08.02-catalog-generator.md | architecture-engineer | done |
+| 08.03 | Define signature normalization and overrides | ../plans/08.03-signature-normalization.md | architecture-engineer | done |
+| 08.04 | Import the full MTA catalog | ../plans/08.04-full-catalog-import.md | architecture-engineer | done |
+| 08.05 | Cover the full catalog with tests | ../plans/08.05-catalog-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -429,12 +429,12 @@ Decisions are recorded in
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 09.01 | Mirror the source tree in the generated resource | plans/09.01-mirror-source-tree.md | architecture-engineer | done |
-| 09.02 | Copy assets and non-source files into the resource | plans/09.02-copy-assets.md | architecture-engineer | done |
-| 09.03 | Add resource configuration and environment files | plans/09.03-config-and-env-files.md | architecture-engineer | done |
-| 09.04 | Type `process.env` in the checker | plans/09.04-type-process-env.md | architecture-engineer | done |
-| 09.05 | Design and implement `.d.luam` declaration files | plans/09.05-declaration-files.md | architecture-engineer | done |
-| 09.06 | Cover milestone 9 with layout and configuration tests | plans/09.06-layout-and-config-tests.md | test-engineer | done |
+| 09.01 | Mirror the source tree in the generated resource | ../plans/09.01-mirror-source-tree.md | architecture-engineer | done |
+| 09.02 | Copy assets and non-source files into the resource | ../plans/09.02-copy-assets.md | architecture-engineer | done |
+| 09.03 | Add resource configuration and environment files | ../plans/09.03-config-and-env-files.md | architecture-engineer | done |
+| 09.04 | Type `process.env` in the checker | ../plans/09.04-type-process-env.md | architecture-engineer | done |
+| 09.05 | Design and implement `.d.luam` declaration files | ../plans/09.05-declaration-files.md | architecture-engineer | done |
+| 09.06 | Cover milestone 9 with layout and configuration tests | ../plans/09.06-layout-and-config-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -531,11 +531,11 @@ reserved word now, and the ADR records the change.
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 10.01 | Parse, check, and erase the `export` directive | plans/10.01-export-directive-front-end.md | architecture-engineer | done |
-| 10.02 | Carry manifest contributions through the pipeline and emit `<export>` | plans/10.02-manifest-contributions.md | architecture-engineer | done |
-| 10.03 | Add the `setting` and `depends` directives on the same mechanism | plans/10.03-setting-and-depends-directives.md | architecture-engineer | done |
-| 10.04 | Editor support for build directives | plans/10.04-directive-editor-support.md | architecture-engineer | done |
-| 10.05 | Cover build directives with parser, checker, manifest, and CLI tests | plans/10.05-build-directive-tests.md | test-engineer | done |
+| 10.01 | Parse, check, and erase the `export` directive | ../plans/10.01-export-directive-front-end.md | architecture-engineer | done |
+| 10.02 | Carry manifest contributions through the pipeline and emit `<export>` | ../plans/10.02-manifest-contributions.md | architecture-engineer | done |
+| 10.03 | Add the `setting` and `depends` directives on the same mechanism | ../plans/10.03-setting-and-depends-directives.md | architecture-engineer | done |
+| 10.04 | Editor support for build directives | ../plans/10.04-directive-editor-support.md | architecture-engineer | done |
+| 10.05 | Cover build directives with parser, checker, manifest, and CLI tests | ../plans/10.05-build-directive-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -628,11 +628,11 @@ alongside 11.3.
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 11.01 | Generate the MTA OOP surface from the upstream catalog | plans/11.01-oop-catalog-source.md | architecture-engineer | done |
-| 11.02 | Model MTA element types as classes in the checker | plans/11.02-element-types-in-checker.md | architecture-engineer | done |
-| 11.03 | Gate the OOP API on the `oop` setting and emit the manifest tag | plans/11.03-oop-gate-and-manifest.md | architecture-engineer | done |
-| 11.04 | Editor support for the MTA OOP API | plans/11.04-oop-editor-support.md | architecture-engineer | done |
-| 11.05 | Cover the OOP API with catalog, checker, manifest, and editor tests | plans/11.05-oop-tests.md | test-engineer | done |
+| 11.01 | Generate the MTA OOP surface from the upstream catalog | ../plans/11.01-oop-catalog-source.md | architecture-engineer | done |
+| 11.02 | Model MTA element types as classes in the checker | ../plans/11.02-element-types-in-checker.md | architecture-engineer | done |
+| 11.03 | Gate the OOP API on the `oop` setting and emit the manifest tag | ../plans/11.03-oop-gate-and-manifest.md | architecture-engineer | done |
+| 11.04 | Editor support for the MTA OOP API | ../plans/11.04-oop-editor-support.md | architecture-engineer | done |
+| 11.05 | Cover the OOP API with catalog, checker, manifest, and editor tests | ../plans/11.05-oop-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -736,11 +736,11 @@ invents a denominator is worse than none.
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 12.01 | Unify CLI output with a colour and symbol vocabulary | plans/12.01-output-style.md | architecture-engineer | done |
-| 12.02 | Instrument the build with named phases and progress events | plans/12.02-build-phases.md | architecture-engineer | done |
-| 12.03 | Render build phases with a progress bar and a final report | plans/12.03-progress-renderer.md | architecture-engineer | done |
-| 12.04 | Group diagnostics by file and show the offending source line | plans/12.04-diagnostic-layout.md | architecture-engineer | done |
-| 12.05 | Cover CLI output with style, phase, progress, and diagnostic tests | plans/12.05-cli-output-tests.md | test-engineer | done |
+| 12.01 | Unify CLI output with a colour and symbol vocabulary | ../plans/12.01-output-style.md | architecture-engineer | done |
+| 12.02 | Instrument the build with named phases and progress events | ../plans/12.02-build-phases.md | architecture-engineer | done |
+| 12.03 | Render build phases with a progress bar and a final report | ../plans/12.03-progress-renderer.md | architecture-engineer | done |
+| 12.04 | Group diagnostics by file and show the offending source line | ../plans/12.04-diagnostic-layout.md | architecture-engineer | done |
+| 12.05 | Cover CLI output with style, phase, progress, and diagnostic tests | ../plans/12.05-cli-output-tests.md | test-engineer | done |
 
 Acceptance:
 
@@ -855,13 +855,13 @@ nothing and can run alongside them. 13.05 needs the element order 13.03 fixes.
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 13.01 | Move runtime helpers out of `src` into `lib/<environment>` | plans/13.01-helper-library-directory.md | architecture-engineer | done |
-| 13.02 | Emit wildcard script entries with a declared load order | plans/13.02-wildcard-scripts-and-load-order.md | architecture-engineer | done |
-| 13.03 | Bring the manifest emitter to the authored standard | plans/13.03-manifest-standard-emitter.md | architecture-engineer | done |
-| 13.04 | Remove the `setting` and `depends` directives from the language | plans/13.04-remove-setting-and-depends.md | architecture-engineer | done |
-| 13.05 | Resolve `min_mta_version` from the MTA release feed | plans/13.05-min-mta-version-lookup.md | architecture-engineer | done |
-| 13.06 | Cover the manifest standard with layout, order, and offline tests | plans/13.06-manifest-standard-tests.md | test-engineer | done |
-| 13.07 | Document the manifest standard and the directive removal | plans/13.07-manifest-docs.md | documentation-engineer | done |
+| 13.01 | Move runtime helpers out of `src` into `lib/<environment>` | ../plans/13.01-helper-library-directory.md | architecture-engineer | done |
+| 13.02 | Emit wildcard script entries with a declared load order | ../plans/13.02-wildcard-scripts-and-load-order.md | architecture-engineer | done |
+| 13.03 | Bring the manifest emitter to the authored standard | ../plans/13.03-manifest-standard-emitter.md | architecture-engineer | done |
+| 13.04 | Remove the `setting` and `depends` directives from the language | ../plans/13.04-remove-setting-and-depends.md | architecture-engineer | done |
+| 13.05 | Resolve `min_mta_version` from the MTA release feed | ../plans/13.05-min-mta-version-lookup.md | architecture-engineer | done |
+| 13.06 | Cover the manifest standard with layout, order, and offline tests | ../plans/13.06-manifest-standard-tests.md | test-engineer | done |
+| 13.07 | Document the manifest standard and the directive removal | ../plans/13.07-manifest-docs.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -971,11 +971,11 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 14.01 | Decorator syntax, AST, and ADR-009 | plans/14.01-decorator-syntax.md | architecture-engineer | done |
-| 14.02 | Expand `@Getter` and `@Setter` into class methods | plans/14.02-getter-setter-accessors.md | architecture-engineer | done |
-| 14.03 | Complete, highlight, and explain decorators in the editor | plans/14.03-decorator-editor-support.md | architecture-engineer | done |
-| 14.04 | Cover decorators with fixtures, unit, and editor tests | plans/14.04-decorator-tests.md | test-engineer | done |
-| 14.05 | Document decorators in the language reference | plans/14.05-decorator-docs.md | documentation-engineer | done |
+| 14.01 | Decorator syntax, AST, and ADR-009 | ../plans/14.01-decorator-syntax.md | architecture-engineer | done |
+| 14.02 | Expand `@Getter` and `@Setter` into class methods | ../plans/14.02-getter-setter-accessors.md | architecture-engineer | done |
+| 14.03 | Complete, highlight, and explain decorators in the editor | ../plans/14.03-decorator-editor-support.md | architecture-engineer | done |
+| 14.04 | Cover decorators with fixtures, unit, and editor tests | ../plans/14.04-decorator-tests.md | test-engineer | done |
+| 14.05 | Document decorators in the language reference | ../plans/14.05-decorator-docs.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -1009,7 +1009,7 @@ Design constraints:
   the parse tree. The parse tree stays what the author typed, and re-checking a
   program cannot generate an accessor twice.
 - Adding a decorator is a data entry in one map, the way a native library is
-  ([milestone 31](#milestone-15--native-libraries)).
+  ([milestone 31](#milestone-31--native-libraries)).
 
 Deferred to a later milestone:
 
@@ -1035,7 +1035,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 15.01 | Write ensure output only to the MTA server | plans/15.01-ensure-server-only.md | architecture-engineer | done |
+| 15.01 | Write ensure output only to the MTA server | ../plans/15.01-ensure-server-only.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1069,7 +1069,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 16.01 | Stream MTA development logs to the Luam terminal | plans/16.01-mta-development-logs.md | architecture-engineer | done |
+| 16.01 | Stream MTA development logs to the Luam terminal | ../plans/16.01-mta-development-logs.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1101,7 +1101,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 17.01 | Publish a bilingual GitHub Pages manual | plans/17.01-bilingual-github-pages-manual.md | documentation-engineer | done |
+| 17.01 | Publish a bilingual GitHub Pages manual | ../plans/17.01-bilingual-github-pages-manual.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -1139,11 +1139,11 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 18.01 | Bundle the production resource into one script per environment | plans/18.01-bundled-production-output.md | architecture-engineer | done |
-| 18.02 | Emit a source line map for every module | plans/18.02-emitter-line-map.md | architecture-engineer | done |
-| 18.03 | Resolve runtime positions back to Luam source | plans/18.03-position-resolution.md | architecture-engineer | done |
-| 18.04 | Cover both output layouts and position resolution with tests | plans/18.04-bundle-and-mapping-tests.md | test-engineer | done |
-| 18.05 | Document the two output layouts and position resolution | plans/18.05-output-layout-docs.md | documentation-engineer | done |
+| 18.01 | Bundle the production resource into one script per environment | ../plans/18.01-bundled-production-output.md | architecture-engineer | done |
+| 18.02 | Emit a source line map for every module | ../plans/18.02-emitter-line-map.md | architecture-engineer | done |
+| 18.03 | Resolve runtime positions back to Luam source | ../plans/18.03-position-resolution.md | architecture-engineer | done |
+| 18.04 | Cover both output layouts and position resolution with tests | ../plans/18.04-bundle-and-mapping-tests.md | test-engineer | done |
+| 18.05 | Document the two output layouts and position resolution | ../plans/18.05-output-layout-docs.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -1180,11 +1180,11 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 19.01 | Define the CLI command contract and migration boundary | plans/19.01-cli-command-contract.md | architecture-engineer | done |
-| 19.02 | Rebuild CLI registration and command boundaries | plans/19.02-cli-command-registry.md | architecture-engineer | done |
-| 19.03 | Emit one-line Lua 5.1 production scripts | plans/19.03-production-lua-minifier.md | architecture-engineer | done |
-| 19.04 | Verify CLI compatibility and Lua minification | plans/19.04-cli-minifier-tests.md | test-engineer | done |
-| 19.05 | Document the rebuilt CLI and production output | plans/19.05-cli-production-docs.md | documentation-engineer | done |
+| 19.01 | Define the CLI command contract and migration boundary | ../plans/19.01-cli-command-contract.md | architecture-engineer | done |
+| 19.02 | Rebuild CLI registration and command boundaries | ../plans/19.02-cli-command-registry.md | architecture-engineer | done |
+| 19.03 | Emit one-line Lua 5.1 production scripts | ../plans/19.03-production-lua-minifier.md | architecture-engineer | done |
+| 19.04 | Verify CLI compatibility and Lua minification | ../plans/19.04-cli-minifier-tests.md | test-engineer | done |
+| 19.05 | Document the rebuilt CLI and production output | ../plans/19.05-cli-production-docs.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -1218,7 +1218,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 20.01 | Replace `luam.json` with `.luam.manifest` environment modules | plans/20.01-luam-manifest-env.md | architecture-engineer | done |
+| 20.01 | Replace `luam.json` with `.luam.manifest` environment modules | ../plans/20.01-luam-manifest-env.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1258,7 +1258,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 21.01 | Make `.luam.manifest` a restricted Luam dialect with first-class editor support | plans/21.01-luam-manifest-language.md | architecture-engineer | done |
+| 21.01 | Make `.luam.manifest` a restricted Luam dialect with first-class editor support | ../plans/21.01-luam-manifest-language.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1298,8 +1298,8 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 22.01 | Turn the manual into an interactive product experience | plans/22.01-documentation-experience.md | documentation-engineer | done |
-| 22.02 | Keep documentation versioning synchronized with releases | plans/22.02-documentation-versioning.md | github-engineer | done |
+| 22.01 | Turn the manual into an interactive product experience | ../plans/22.01-documentation-experience.md | documentation-engineer | done |
+| 22.02 | Keep documentation versioning synchronized with releases | ../plans/22.02-documentation-versioning.md | github-engineer | done |
 
 Acceptance:
 
@@ -1333,7 +1333,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 23.01 | Evolve `.luam.manifest` into the complete project contract | plans/23.01-compiler-options.md | architecture-engineer | done |
+| 23.01 | Evolve `.luam.manifest` into the complete project contract | ../plans/23.01-compiler-options.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1382,18 +1382,18 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 24.01 | Classify and align Luam limitation contracts | plans/24.01-limitations-contract.md | documentation-engineer | done |
-| 24.02 | Automate safe MTA catalog refreshes | plans/24.02-catalog-refresh.md | github-engineer | superseded by 28.06 |
-| 24.03 | Build a per-reference dependency graph | plans/24.03-lsp-dependency-graph.md | performance-engineer | done |
-| 24.04 | Add path-sensitive control-flow analysis | plans/24.04-flow-analysis.md | architecture-engineer | done |
-| 24.05 | Predeclare classes without changing runtime effects | plans/24.05-class-predeclaration.md | architecture-engineer | done |
-| 24.06 | Add static members to user classes | plans/24.06-static-class-members.md | architecture-engineer | done |
-| 24.07 | Add erased generic user classes | plans/24.07-generic-classes.md | architecture-engineer | done |
-| 24.08 | Define and verify a typed resource export ABI | plans/24.08-resource-export-abi.md | architecture-engineer | done |
-| 24.09 | Generate opt-in runtime boundary validators | plans/24.09-runtime-boundary-validation.md | security-engineer | done |
-| 24.10 | Expose a safe class metamethod subset | plans/24.10-safe-class-metamethods.md | security-engineer | done |
-| 24.11 | Derive declarations from static `config.lua` data | plans/24.11-config-declarations.md | architecture-engineer | done |
-| 24.12 | Add an authenticated remote development bridge | plans/24.12-remote-development-bridge.md | security-engineer | not planned |
+| 24.01 | Classify and align Luam limitation contracts | ../plans/24.01-limitations-contract.md | documentation-engineer | done |
+| 24.02 | Automate safe MTA catalog refreshes | ../plans/24.02-catalog-refresh.md | github-engineer | superseded by 28.06 |
+| 24.03 | Build a per-reference dependency graph | ../plans/24.03-lsp-dependency-graph.md | performance-engineer | done |
+| 24.04 | Add path-sensitive control-flow analysis | ../plans/24.04-flow-analysis.md | architecture-engineer | done |
+| 24.05 | Predeclare classes without changing runtime effects | ../plans/24.05-class-predeclaration.md | architecture-engineer | done |
+| 24.06 | Add static members to user classes | ../plans/24.06-static-class-members.md | architecture-engineer | done |
+| 24.07 | Add erased generic user classes | ../plans/24.07-generic-classes.md | architecture-engineer | done |
+| 24.08 | Define and verify a typed resource export ABI | ../plans/24.08-resource-export-abi.md | architecture-engineer | done |
+| 24.09 | Generate opt-in runtime boundary validators | ../plans/24.09-runtime-boundary-validation.md | security-engineer | done |
+| 24.10 | Expose a safe class metamethod subset | ../plans/24.10-safe-class-metamethods.md | security-engineer | done |
+| 24.11 | Derive declarations from static `config.lua` data | ../plans/24.11-config-declarations.md | architecture-engineer | done |
+| 24.12 | Add an authenticated remote development bridge | ../plans/24.12-remote-development-bridge.md | security-engineer | not planned |
 
 Sequencing:
 
@@ -1460,7 +1460,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 25.01 | Run a local MTA server through the CLI | plans/25.01-mta-server-lifecycle.md | architecture-engineer | done |
+| 25.01 | Run a local MTA server through the CLI | ../plans/25.01-mta-server-lifecycle.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1500,7 +1500,7 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 26.01 | Add contextual typing for callback parameters | plans/26.01-contextual-callback-typing.md | architecture-engineer | done |
+| 26.01 | Add contextual typing for callback parameters | ../plans/26.01-contextual-callback-typing.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -1542,14 +1542,14 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 27.01 | Repair the orphan semicolon left by an erased declaration | plans/27.01-orphan-semicolon.md | architecture-engineer | done |
-| 27.02 | Add a development output mode to the compiler and CLI | plans/27.02-development-output-mode.md | architecture-engineer | done |
-| 27.03 | Keep erased declarations visible as Lua comments | plans/27.03-erased-declaration-comments.md | architecture-engineer | done |
-| 27.04 | Preserve authored class and enum layout | plans/27.04-class-and-enum-layout.md | architecture-engineer | done |
-| 27.05 | Fold loop scaffolding so `continue` adds no line | plans/27.05-continue-scaffolding.md | architecture-engineer | done |
-| 27.06 | Narrow canonical replacement to the lowered statement | plans/27.06-lowering-granularity.md | architecture-engineer | done |
-| 27.07 | Cover development output with line-fidelity tests | plans/27.07-line-fidelity-tests.md | test-engineer | done |
-| 27.08 | Document the development output contract | plans/27.08-development-output-docs.md | documentation-engineer | done |
+| 27.01 | Repair the orphan semicolon left by an erased declaration | ../plans/27.01-orphan-semicolon.md | architecture-engineer | done |
+| 27.02 | Add a development output mode to the compiler and CLI | ../plans/27.02-development-output-mode.md | architecture-engineer | done |
+| 27.03 | Keep erased declarations visible as Lua comments | ../plans/27.03-erased-declaration-comments.md | architecture-engineer | done |
+| 27.04 | Preserve authored class and enum layout | ../plans/27.04-class-and-enum-layout.md | architecture-engineer | done |
+| 27.05 | Fold loop scaffolding so `continue` adds no line | ../plans/27.05-continue-scaffolding.md | architecture-engineer | done |
+| 27.06 | Narrow canonical replacement to the lowered statement | ../plans/27.06-lowering-granularity.md | architecture-engineer | done |
+| 27.07 | Cover development output with line-fidelity tests | ../plans/27.07-line-fidelity-tests.md | test-engineer | done |
+| 27.08 | Document the development output contract | ../plans/27.08-development-output-docs.md | documentation-engineer | done |
 
 Mode selection, decided during execution: the manifest gains no field. The
 readable form is what a build without minification asks for, so `luam build`
@@ -1616,13 +1616,13 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 28.01 | Replace the dead upstream with a committed wiki snapshot | plans/28.01-wiki-snapshot-source.md | architecture-engineer | done |
-| 28.02 | Fail the suite on MTA catalog drift | plans/28.02-catalog-drift-detection.md | test-engineer | done |
-| 28.03 | Parse wiki signatures into the generator model | plans/28.03-wiki-signature-parser.md | architecture-engineer | done |
-| 28.04 | Make the wiki snapshot the primary catalog source | plans/28.04-wiki-primary-source.md | architecture-engineer | done |
-| 28.05 | Correct the environments and arities the frozen catalog gets wrong | plans/28.05-environment-and-arity-corrections.md | architecture-engineer | done |
-| 28.06 | Automate refresh proposals without trusting the wiki | plans/28.06-scheduled-refresh-workflow.md | github-engineer | done |
-| 28.07 | Record the catalog source change | plans/28.07-catalog-source-documentation.md | documentation-engineer | done |
+| 28.01 | Replace the dead upstream with a committed wiki snapshot | ../plans/28.01-wiki-snapshot-source.md | architecture-engineer | done |
+| 28.02 | Fail the suite on MTA catalog drift | ../plans/28.02-catalog-drift-detection.md | test-engineer | done |
+| 28.03 | Parse wiki signatures into the generator model | ../plans/28.03-wiki-signature-parser.md | architecture-engineer | done |
+| 28.04 | Make the wiki snapshot the primary catalog source | ../plans/28.04-wiki-primary-source.md | architecture-engineer | done |
+| 28.05 | Correct the environments and arities the frozen catalog gets wrong | ../plans/28.05-environment-and-arity-corrections.md | architecture-engineer | done |
+| 28.06 | Automate refresh proposals without trusting the wiki | ../plans/28.06-scheduled-refresh-workflow.md | github-engineer | done |
+| 28.07 | Record the catalog source change | ../plans/28.07-catalog-source-documentation.md | documentation-engineer | done |
 
 What was measured, on 2026-08-25, against the full wiki:
 
@@ -1705,13 +1705,13 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 29.01 | Define the theme token contract and palette | plans/29.01-theme-token-contract.md | architecture-engineer | done |
-| 29.02 | Close the grammar scopes the theme cannot reach | plans/29.02-grammar-scope-completeness.md | architecture-engineer | done |
-| 29.03 | Serve semantic tokens from the LSP | plans/29.03-semantic-tokens-provider.md | architecture-engineer | done |
-| 29.04 | Generate and contribute the VS Code themes | plans/29.04-vscode-theme-contribution.md | architecture-engineer | done |
-| 29.05 | Export the theme to the other editors | plans/29.05-cross-editor-theme-exports.md | architecture-engineer | done |
-| 29.06 | Prove the theme differentiates and stays readable | plans/29.06-theme-tests.md | test-engineer | done |
-| 29.07 | Document the theme and its contract | plans/29.07-theme-documentation.md | documentation-engineer | done |
+| 29.01 | Define the theme token contract and palette | ../plans/29.01-theme-token-contract.md | architecture-engineer | done |
+| 29.02 | Close the grammar scopes the theme cannot reach | ../plans/29.02-grammar-scope-completeness.md | architecture-engineer | done |
+| 29.03 | Serve semantic tokens from the LSP | ../plans/29.03-semantic-tokens-provider.md | architecture-engineer | done |
+| 29.04 | Generate and contribute the VS Code themes | ../plans/29.04-vscode-theme-contribution.md | architecture-engineer | done |
+| 29.05 | Export the theme to the other editors | ../plans/29.05-cross-editor-theme-exports.md | architecture-engineer | done |
+| 29.06 | Prove the theme differentiates and stays readable | ../plans/29.06-theme-tests.md | test-engineer | done |
+| 29.07 | Document the theme and its contract | ../plans/29.07-theme-documentation.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -1753,8 +1753,8 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 30.01 | Type multi-return functions with tuples | plans/30.01-multi-return-tuples.md | architecture-engineer | done |
-| 30.02 | Reduce `luam init` to the manifest and retire the framework | plans/30.02-bare-scaffold.md | architecture-engineer | done |
+| 30.01 | Type multi-return functions with tuples | ../plans/30.01-multi-return-tuples.md | architecture-engineer | done |
+| 30.02 | Reduce `luam init` to the manifest and retire the framework | ../plans/30.02-bare-scaffold.md | architecture-engineer | done |
 
 Acceptance for 30.01:
 
@@ -1829,9 +1829,9 @@ Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 31.01 | Add reference-driven injection and make threads and async native | plans/31.01-native-libraries.md | architecture-engineer | done |
-| 31.02 | Install the luam command onto PATH | plans/31.02-install-cli-on-path.md | architecture-engineer | done |
-| 31.03 | Split mta-types into handwritten and generated | plans/31.03-split-mta-types.md | architecture-engineer | done |
+| 31.01 | Add reference-driven injection and make threads and async native | ../plans/31.01-native-libraries.md | architecture-engineer | done |
+| 31.02 | Install the luam command onto PATH | ../plans/31.02-install-cli-on-path.md | architecture-engineer | done |
+| 31.03 | Split mta-types into handwritten and generated | ../plans/31.03-split-mta-types.md | architecture-engineer | done |
 
 Acceptance for 31.01:
 
@@ -1858,13 +1858,13 @@ Decided during implementation:
 - **`RuntimeHelper` in the compiler is now `RuntimeHelperName`.** The two unions
   had drifted, and the compiler's copy silently excluded `env`.
 
-Still open:
+Closed since:
 
-- **A method call on a library instance is unchecked.** `task:getInterval()`
-  returns `any`, because `obj:method()` on a non-element receiver has been
-  unchecked since milestone 2. Member *access* is typed; the call is not. This is
-  what task 32.01 closes, and until then it limits how much the library type
-  surface is worth.
+- **A method call on a library instance is checked.** `task:getInterval()`
+  returned `any`, because `obj:method()` on a non-element receiver had been
+  unchecked since milestone 2. Task 32.01 closed it — see
+  [32.01](../plans/32.01-method-call-checking.md).
+
 Acceptance for 31.02:
 
 - `pnpm install:cli` bundles the CLI, writes a publishable manifest into `dist`,
@@ -1911,22 +1911,29 @@ Status: planned
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 32.01 | Type-check method calls on non-nominal receivers | plans/32.01-method-call-checking.md | architecture-engineer | todo |
-| 32.02 | Add a document formatting provider to the LSP | plans/32.02-formatting-provider.md | architecture-engineer | todo |
-| 32.03 | Add code actions, quick fixes and workspace symbols to the LSP | plans/32.03-code-actions.md | architecture-engineer | todo |
-| 32.04 | Correct the generic-classes claim and the stale project memory | plans/32.04-documentation-drift.md | documentation-engineer | todo |
-| 32.05 | Cover milestone 32 with checker and LSP tests | plans/32.05-checker-and-lsp-tests.md | test-engineer | todo |
+| 32.01 | Type-check method calls on non-nominal receivers | ../plans/32.01-method-call-checking.md | architecture-engineer | done |
+| 32.02 | Add a document formatting provider to the LSP | ../plans/32.02-formatting-provider.md | architecture-engineer | done |
+| 32.03 | Add code actions, quick fixes and workspace symbols to the LSP | ../plans/32.03-code-actions.md | architecture-engineer | done |
+| 32.04 | Correct the generic-classes claim and the stale project memory | ../plans/32.04-documentation-drift.md | documentation-engineer | done |
+| 32.05 | Cover milestone 32 with checker and LSP tests | ../plans/32.05-checker-and-lsp-tests.md | test-engineer | done |
+| 32.06 | Check assignability against interfaces and classes | ../plans/32.06-nominal-assignability.md | architecture-engineer | done |
+| 32.07 | Report the redundant optional marker on a name that already carries one | ../plans/32.07-redundant-optional-marker.md | architecture-engineer | done |
 
 Acceptance:
 
 - `obj:method(...)` on an object type or a native library instance checks its
   arguments, and the class, interface and MTA element paths are unchanged.
 - Milestone 31 no longer carries a "Still open" note for that behaviour.
+- A value checked against an `interface` or a `class` reports the same
+  diagnostic a `type` alias reports, in return, assignment and argument
+  position, and a `named` type with no declaration stays permissive.
 - Formatting is idempotent, preserves comments, and compiles to byte-identical
   Lua across `docs/snippets` and the compiler fixtures.
 - A file that fails to parse yields no formatting edits.
 - Every diagnostic marked fixable offers a quick fix whose result compiles, and
   no other diagnostic offers one.
+- `name?: Type?` reports a diagnostic and offers a quick fix, and the annotation
+  it parses to is a single optional node.
 - Workspace symbols answer from the existing index without recompiling.
 - No page in either language tree claims generic classes are unsupported, and
   `.claude/CLAUDE.md` names `.luam.manifest` and both of the CLI's network calls.
@@ -1938,6 +1945,53 @@ Deliberately excluded:
 - A `luam format` CLI command. The editor is the surface here; what CI enforces
   is a later question.
 
+Decided during implementation:
+
+- **The formatter rewrites whitespace, never structure.** It reprints the token
+  stream with the comments merged back in, so no construct can be dropped and no
+  string, template or block comment interior can be touched. Line breaks are the
+  author's; indentation, spacing and blank-line runs are the formatter's. The
+  style is recorded in `docs/*/reference/formatting.md`.
+- **A function type annotation carries its parameter names.** 32.01 needed to
+  know whether a method's first parameter is `self`, and the parser had been
+  discarding the names it already consumed. `FunctionType.parameterNames` widened
+  to `(string | null)[]`, which changed two AST snapshots and nothing else.
+- **`function (` over `function(`.** The corpus was split — 60 to 37 — and no
+  rule makes both valid. A keyword takes a space before `(`, a name binds tight,
+  which is the majority form and also explains `draw()` beside `function (x)`.
+  The 25 `.luam` files that disagreed were reformatted, along with the 18
+  documented examples, so the corpus is a fixed point of the formatter.
+- **Meaning preservation is asserted modulo leading indentation.** The emitter is
+  source-faithful by design — a recorded limitation — so re-indenting a file
+  re-indents its generated Lua. The corpus test compares the compiled Lua with
+  leading whitespace stripped, which pins every token, string and comment, and
+  separately asserts the corpus is already formatted.
+- **The registry reaches assignability through an optional resolver.**
+  `AssignabilityOptions` gained `resolveNominal` and a `visited` set, both
+  optional, so the call sites that never had a registry keep the permissive
+  answer rather than a wrong one. A module-level resolver was rejected: the
+  language server holds several documents at once.
+- **An interface is structural, a class is nominal.** An interface expands
+  through `collectInterfaceContract` and compares as a record; a class fits only
+  its own chain and the interfaces it declares. Making classes structural would
+  have widened `check-unimplemented-interface`, which is reported on the strength
+  of that declaration.
+- **A name with no registry entry stays permissive.** MTA element types, ambient
+  declarations and enums all arrive as `named` with no entry. This is what kept
+  the blast radius at zero — the plan predicted four failures from a primitive
+  probe, and the full suite, the 242 documented examples and the 11 snippet
+  projects all pass untouched.
+- **A class value is rejected where a scalar is expected.** A class instance is
+  never a string, a number, a boolean, a thread, userdata or a function, so those
+  targets report. Table-like targets stay permissive, because comparing a class
+  structurally is what the plan decided against.
+- **Six diagnostics are fixable.** `parse-optional-position`, `parse-redundant-optional`,
+  `check-invalid-super`, `check-static-receiver`, `check-native-constructor` and
+  `check-explicit-self-parameter` each have exactly one correct repair named in
+  their own message. A near-match rename for `check-unknown-record-key` and a
+  `#!` directive for the environment codes were left out: both pick among
+  candidates, and a plausible wrong edit that compiles is worse than no action.
+
 ## Milestone 33 — Testing Luam Code
 
 Give a developer a way to test the resource they wrote.
@@ -1946,7 +2000,7 @@ Status: planned
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 33.01 | Add a `luam test` command for user resources | plans/33.01-luam-test-command.md | architecture-engineer | todo |
+| 33.01 | Add a `luam test` command for user resources | ../plans/33.01-luam-test-command.md | architecture-engineer | todo |
 
 Acceptance:
 
@@ -1968,7 +2022,7 @@ Status: planned
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 34.01 | Design a distribution model for third-party Luam libraries | plans/34.01-library-distribution.md | architecture-engineer | todo |
+| 34.01 | Design a distribution model for third-party Luam libraries | ../plans/34.01-library-distribution.md | architecture-engineer | todo |
 
 Acceptance:
 
@@ -1992,7 +2046,7 @@ Status: planned
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 35.01 | Decide whether Luam ships a debugger | plans/35.01-debugging-decision.md | documentation-engineer | todo |
+| 35.01 | Decide whether Luam ships a debugger | ../plans/35.01-debugging-decision.md | documentation-engineer | todo |
 
 Acceptance:
 
@@ -2015,14 +2069,14 @@ Status: todo
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 36.01 | Inventory the pipelines and define their contract | plans/36.01-pipeline-contract.md | github-engineer | todo |
-| 36.02 | Extract reusable workflows and pin every action | plans/36.02-reusable-workflows.md | github-engineer | todo |
-| 36.03 | Separate the merge gate from the advisory signal | plans/36.03-merge-gate-and-signal.md | github-engineer | todo |
-| 36.04 | Threat-model contributions from forks | plans/36.04-fork-threat-model.md | security-engineer | todo |
-| 36.05 | Add the community pull request pipeline | plans/36.05-fork-pull-request-pipeline.md | github-engineer | todo |
-| 36.06 | Add the contributor entry documents and templates | plans/36.06-contributor-entry-documents.md | documentation-engineer | todo |
-| 36.07 | Verify the reorganized pipelines | plans/36.07-pipeline-verification.md | test-engineer | todo |
-| 36.08 | Protect the permanent branches and the release tags | plans/36.08-branch-and-tag-protection.md | github-engineer | todo |
+| 36.01 | Inventory the pipelines and define their contract | ../plans/36.01-pipeline-contract.md | github-engineer | todo |
+| 36.02 | Extract reusable workflows and pin every action | ../plans/36.02-reusable-workflows.md | github-engineer | todo |
+| 36.03 | Separate the merge gate from the advisory signal | ../plans/36.03-merge-gate-and-signal.md | github-engineer | todo |
+| 36.04 | Threat-model contributions from forks | ../plans/36.04-fork-threat-model.md | security-engineer | todo |
+| 36.05 | Add the community pull request pipeline | ../plans/36.05-fork-pull-request-pipeline.md | github-engineer | todo |
+| 36.06 | Add the contributor entry documents and templates | ../plans/36.06-contributor-entry-documents.md | documentation-engineer | todo |
+| 36.07 | Verify the reorganized pipelines | ../plans/36.07-pipeline-verification.md | test-engineer | todo |
+| 36.08 | Protect the permanent branches and the release tags | ../plans/36.08-branch-and-tag-protection.md | github-engineer | todo |
 
 Sequencing:
 

@@ -5,10 +5,11 @@ export const CONFIGURATION_SECTION = 'luam';
 export interface LuamSettings {
     cliPath: string;
     ensureWatch: boolean;
+    formatting: boolean;
     semanticHighlighting: boolean;
 }
 
-export const DEFAULT_SETTINGS: LuamSettings = { cliPath: 'luam', ensureWatch: true, semanticHighlighting: true };
+export const DEFAULT_SETTINGS: LuamSettings = { cliPath: 'luam', ensureWatch: true, formatting: true, semanticHighlighting: true };
 
 export function readSettings(): LuamSettings {
     const configuration = workspace.getConfiguration(CONFIGURATION_SECTION);
@@ -16,6 +17,7 @@ export function readSettings(): LuamSettings {
     return {
         cliPath: configuration.get<string>('cliPath') ?? DEFAULT_SETTINGS.cliPath,
         ensureWatch: configuration.get<boolean>('ensureWatch') ?? DEFAULT_SETTINGS.ensureWatch,
+        formatting: configuration.get<boolean>('formatting') ?? DEFAULT_SETTINGS.formatting,
         semanticHighlighting: configuration.get<boolean>('semanticHighlighting') ?? DEFAULT_SETTINGS.semanticHighlighting,
     };
 }

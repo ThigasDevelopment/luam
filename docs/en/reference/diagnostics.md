@@ -6,7 +6,9 @@ Every diagnostic carries a location, a severity and a code:
 src/client/hud.luam:1:1 error check-environment-api: API "kickPlayer" is server-only and is not available in a "client" file.
 ```
 
-The prefix names the stage that produced it.
+The prefix names the stage that produced it. Six codes have exactly one correct
+repair, and the editor offers it as a quick fix — see
+[Quick fixes](/en/tooling/editors#quick-fixes).
 
 | Prefix | Stage |
 | --- | --- |
@@ -45,6 +47,7 @@ writes nothing.
 | `parse-export-local` | `export` applied to a `local function`. |
 | `parse-invalid-optional` | A `?` on a name with no type annotation after it. |
 | `parse-optional-position` | The `?` was written on the type. It attaches to the name. |
+| `parse-redundant-optional` | The name and the type both carry a `?`. One marker is enough. |
 | `parse-duplicate-key` | An object type declares the same key more than once. |
 | `parse-unexpected-decorator` | A decorator where none may appear. |
 | `parse-decorator-arguments` | A decorator was given arguments. It takes none. |

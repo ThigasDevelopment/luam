@@ -6,7 +6,9 @@ Todo diagnóstico traz uma localização, uma severidade e um código:
 src/client/hud.luam:1:1 error check-environment-api: API "kickPlayer" is server-only and is not available in a "client" file.
 ```
 
-O prefixo nomeia o estágio que o produziu.
+O prefixo nomeia o estágio que o produziu. Seis códigos têm exatamente um reparo
+correto, e o editor oferece esse reparo como quick fix — veja
+[Quick fixes](/pt-br/tooling/editors#quick-fixes).
 
 | Prefixo | Estágio |
 | --- | --- |
@@ -45,6 +47,7 @@ erro não escreve nada.
 | `parse-export-local` | `export` aplicado a uma `local function`. |
 | `parse-invalid-optional` | Um `?` em um nome sem anotação de tipo depois. |
 | `parse-optional-position` | O `?` foi escrito no tipo. Ele gruda no nome. |
+| `parse-redundant-optional` | O nome e o tipo carregam um `?` cada. Um marcador basta. |
 | `parse-duplicate-key` | Um tipo de objeto declara a mesma chave mais de uma vez. |
 | `parse-unexpected-decorator` | Um decorador onde nenhum pode aparecer. |
 | `parse-decorator-arguments` | Um decorador recebeu argumentos. Ele não aceita nenhum. |

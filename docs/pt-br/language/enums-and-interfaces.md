@@ -153,6 +153,42 @@ Uma interface também é utilizável como tipo:
 local target: Describable = new Round()
 ```
 
+### Uma interface é estrutural, uma classe é nominal
+
+As duas se comportam de formas diferentes quando um valor é conferido contra
+elas, e a diferença é proposital.
+
+Uma **interface** é satisfeita pelo formato. Qualquer valor que carregue os
+membros que ela declara serve, seja uma tabela literal ou outra interface, e um
+valor que não serve é `check-type-mismatch` — o mesmo diagnóstico que um
+[alias `type`](/pt-br/language/types#aliases) reporta, com a mesma mensagem:
+
+```luam expect-error
+interface Contract {
+    name: string
+}
+
+local ok: Contract = { name = 'a' }
+local wrong: Contract = { other = 1 }
+```
+
+```
+error  check-type-mismatch  Variable "wrong" expects "Contract" but received
+                            "{ other: 1 }". Key "name" is missing from "Contract".
+```
+
+Uma **classe** é satisfeita pela identidade. Um valor de classe serve onde a
+própria classe ou qualquer pai da cadeia `extends` é esperado, e onde uma
+interface que ela `implements` é esperada. Ele não serve para uma classe sem
+parentesco que por acaso declare os mesmos membros, e uma tabela literal nunca
+serve para uma classe — uma classe carrega comportamento que um formato não
+consegue prometer.
+
+Um nome que o verificador nunca resolveu continua permissivo nos dois sentidos, e
+é isso que mantém os tipos de elemento do MTA e toda declaração ambiente
+funcionando. Veja
+[Nomes que não estão declarados](/pt-br/language/types#nomes-que-nao-estao-declarados).
+
 ## Qual dos dois eu quero?
 
 | Você quer | Use |

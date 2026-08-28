@@ -370,6 +370,28 @@ types `config.name` and reports `config.tag`. The exception is `{}`, which
 widens to `table` — that is what keeps `local items = {}` working with the
 [object extensions](/en/language/extensions).
 
+A key whose type is a function is a method when it is called with `:`. The call
+is checked against the declared signature — argument count and argument types —
+and it produces the declared return type:
+
+```luam
+type Counter = { bump: fun(step: number): number }
+
+local counter: Counter = { bump = function (step: number): number return step end }
+
+local total: number = counter:bump(1)
+```
+
+```
+error  check-argument-count  This call expects at most 1 argument but received 2.
+error  check-type-mismatch   Argument 1 expects "number" but received "string".
+```
+
+A first parameter named `self` is the receiver, so it is not counted as an
+argument of a `:` call. `bump: fun(self: Counter, step: number): number` and
+`bump: fun(step: number): number` report the same arity for `counter:bump(1)`.
+A `.` call passes every parameter, `self` included.
+
 An object type is a shape, not a contract a class can implement. Use an
 [interface](/en/language/enums-and-interfaces) for that.
 
@@ -400,7 +422,7 @@ declared before the code that uses it.
 
 ```luam
 local log: fun(string): void = print
-local reduce: fun(total: number, value: number): number = function(total: number, value: number): number
+local reduce: fun(total: number, value: number): number = function (total: number, value: number): number
     return total + value
 end
 local variadic: fun(...): void = print

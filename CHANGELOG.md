@@ -16,6 +16,49 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ### Added
 
+- A value checked against an `interface` or a `class` now reports what a `type`
+  alias already reported. An interface is satisfied structurally, so a record
+  missing a member or carrying one at the wrong type is `check-type-mismatch`,
+  and the message names the missing member. A class stays nominal: it fits its
+  own class, any parent in its `extends` chain, and every interface it
+  `implements`, and nothing else. A name the checker never resolved stays
+  permissive in every position, which is what keeps the MTA element types and
+  ambient declarations working.
+- A formatter, served by the language server as document and range formatting,
+  so format-on-save works in every editor the extension supports. It rewrites
+  whitespace only — indentation, spacing and blank-line runs — and never moves a
+  construct or re-wraps a line. A file that does not parse yields no edits, and
+  the formatter re-reads what it produced and returns nothing rather than a
+  result whose tokens or comments differ from the source. The style is recorded
+  in the manual.
+- `luam.formatting`, a setting that turns the formatter off. It gates the client
+  the way `luam.semanticHighlighting` already gates semantic tokens: the language
+  server stops being asked, so `Shift+Alt+F` and format-on-save both go quiet and
+  another tool can own the layout.
+- A keyword hover for `static`, and `static` in the completion offered inside a
+  class body beside the `constructor` snippet. Neither appears at the top level
+  or inside a method body, and the hover stays quiet for a field or a local named
+  `static`, because the modifier is contextual. The `class` hover stopped saying
+  static members and generic classes are unsupported — both shipped.
+- Quick fixes for the six diagnostics that have exactly one correct repair:
+  `parse-optional-position`, `parse-redundant-optional`, `check-invalid-super`,
+  `check-static-receiver`, `check-native-constructor` and
+  `check-explicit-self-parameter`. No other diagnostic offers an action, because
+  a plausible wrong edit is worse than none.
+- `name?: Type?` is `parse-redundant-optional`. The marker attaches to the name,
+  and writing it in both places was the one spelling that slipped through
+  silently — the parser reported only when the marker was on the type alone. The
+  annotation now carries a single optional node, so hover and signature help stop
+  echoing the form the rule exists to remove.
+- Workspace symbols, answered from the language server's existing index without
+  recompiling. A result carries the environment of the file it came from, so a
+  `server` and a `client` declaration of the same name stay distinguishable.
+- `receiver:method(...)` is checked when the receiver is an object type or a
+  native library instance. Argument count and argument types are reported against
+  the declared signature, and the call produces the declared return type instead
+  of `any`. A first parameter named `self` is the receiver, so a method declared
+  with one and a method declared without report the same arity. A receiver typed
+  `any`, and a member the receiver's type does not declare, are unchanged.
 - Three paired manual pages, in English and Portuguese: how a build works end to
   end, Luam beside Lua 5.1, Luau and TypeScript, and a migration guide covering
   every release since `0.2.0` that asks an author to change something. The

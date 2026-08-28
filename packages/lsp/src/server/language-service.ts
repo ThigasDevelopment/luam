@@ -1,5 +1,6 @@
 import type { Environment } from '@compiler/environment/environment';
 import type {
+    CodeAction,
     CompletionItem,
     Diagnostic,
     DocumentSymbol,
@@ -9,17 +10,22 @@ import type {
     Range,
     SemanticTokens,
     SignatureHelp,
+    TextEdit,
     WorkspaceEdit,
+    WorkspaceSymbol,
 } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { completionAt } from '@lsp/features/completion';
+import { codeActionsAt } from '@lsp/features/code-actions';
 import { collectDiagnostics } from '@lsp/features/diagnostics';
 import { documentSymbols } from '@lsp/features/document-symbols';
+import { formatDocument, formatDocumentRange } from '@lsp/features/formatting';
 import { hoverAt } from '@lsp/features/hover';
 import { definitionAt, referencesAt, renameAt } from '@lsp/features/navigation';
 import { semanticTokens } from '@lsp/features/semantic-tokens';
 import { signatureHelpAt } from '@lsp/features/signature-help';
+import { workspaceSymbols } from '@lsp/features/workspace-symbols';
 import { offsetAt } from '@lsp/support/source-text';
 import { WorkspaceIndex, type RescanResult } from '@lsp/workspace/workspace-index';
 
@@ -84,6 +90,28 @@ export class LanguageService {
         const analysis = this.workspace.get(uri);
 
         return analysis === null ? [] : documentSymbols(analysis);
+    }
+
+    codeActions(uri: string, range: Range): CodeAction[] {
+        const analysis = this.workspace.get(uri);
+
+        return analysis === null ? [] : codeActionsAt(analysis, range);
+    }
+
+    workspaceSymbols(query: string): WorkspaceSymbol[] {
+        return workspaceSymbols(this.workspace.all(), query);
+    }
+
+    formatting(uri: string): TextEdit[] {
+        const analysis = this.workspace.get(uri);
+
+        return analysis === null ? [] : formatDocument(analysis);
+    }
+
+    rangeFormatting(uri: string, range: Range): TextEdit[] {
+        const analysis = this.workspace.get(uri);
+
+        return analysis === null ? [] : formatDocumentRange(analysis, range);
     }
 
     completion(uri: string, position: Position): CompletionItem[] {

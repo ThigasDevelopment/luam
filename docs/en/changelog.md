@@ -11,6 +11,26 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ### Added
 
+- [Editors](/en/tooling/editors) and [Formatting](/en/reference/formatting) record
+  `luam.formatting`, the setting that turns the formatter off.
+- [Editors](/en/tooling/editors) records the `static` keyword hover and the
+  class-body completion that offers `static` beside the `constructor` snippet.
+- [Diagnostics](/en/reference/diagnostics) and [Editors](/en/tooling/editors)
+  list `parse-redundant-optional`, reported when a name and its type both carry
+  a `?`, and the quick fix that deletes the one on the type.
+- [Enums and interfaces](/en/language/enums-and-interfaces) records the rule
+  behind the checker: an interface is satisfied by shape, a class by identity,
+  and a name the checker never resolved stays permissive.
+- [Formatting](/en/reference/formatting) is a new reference page: the style the
+  language server writes, what it never touches, and what happens to a file that
+  does not parse. [Editors](/en/tooling/editors) records format-on-save, the five
+  quick fixes and workspace symbols, and [Diagnostics](/en/reference/diagnostics)
+  points at the quick-fix list.
+- [Object types](/en/language/types#object-types) records that a key typed as a
+  function is checked when it is called with `:`, and how a first parameter named
+  `self` is counted.
+  [Limitations](/en/reference/limitations) records what stays unreported: a
+  method the receiver's type does not declare.
 - [How Luam works](/en/guide/how-luam-works) follows a build through its five
   stages, with a diagram and the same stages in words, and explains why the CLI,
   the editor and the playground agree: there is one parser, one checker and one
@@ -28,6 +48,10 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ### Fixed
 
+- [Luam compared](/en/guide/comparison) said generic classes are not supported
+  and linked to a page that does not discuss them. Classes take type parameters;
+  the page now points at [Type parameters](/en/language/classes#type-parameters).
+  The README carried the same claim.
 - The playground names what to do when JavaScript is unavailable, in both
   locales, instead of leaving that line blank.
 
