@@ -14,6 +14,18 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Changed
+
+- How a third-party Luam library is distributed is settled: a library is an npm
+  package, vendored into the resource that consumes it. Three constraints
+  decided it. Fetching may not happen inside a build, because the compiler
+  packages make no network calls and a build with no network still succeeds.
+  MTA has no module system, so a library is either vendored or deployed as its
+  own resource, and only the first is a distribution model. The manifest is a
+  closed set of typed domains, so that is where a dependency is declared.
+  Nothing is implemented yet: this release records the decision and changes no
+  package behaviour.
+
 ## 0.19.3 - 2026-08-28
 
 ### Added

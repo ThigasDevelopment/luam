@@ -2064,11 +2064,11 @@ Decided during implementation:
 Decide how a developer consumes Luam code someone else wrote. Today they copy
 files.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 34.01 | Design a distribution model for third-party Luam libraries | ../plans/34.01-library-distribution.md | architecture-engineer | todo |
+| 34.01 | Design a distribution model for third-party Luam libraries | ../plans/34.01-library-distribution.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -2083,6 +2083,45 @@ Acceptance:
 
 This milestone produces a decision, not an implementation. The milestone that
 builds it follows.
+
+Decided:
+
+- **A library is an npm package, and Luam runs no infrastructure.**
+  [ADR-038](adr/038-library-distribution.md) weighs npm, git URLs behind a
+  `luam add`, a vendored `libs/` with a lockfile, a registry the project
+  operates, and doing nothing. npm wins on a fact rather than a preference:
+  every Luam developer already installs the CLI with `npm install --global`, so
+  the version solver, the lockfile, the integrity checking and the registry
+  arrive at no machine cost, and none of them is the project's to run.
+- **Fetching is the package manager's, never a build's.** `npm install` is the
+  only step that touches the network. `build`, `check`, `ensure`, `dev` and
+  `test` read `node_modules` from disk, an offline build with a populated
+  `node_modules` is byte-identical, and the CLI's two allowed outbound calls are
+  unchanged. A named package that is missing is a configuration error naming the
+  install command, not a fetch.
+- **Types come from source, not from a published summary.** A library ships
+  `.luam` that the consumer compiles and checks, with `.d.luam` for the verbatim
+  Lua half. Unlike the export contract, the source is on disk, so there is no
+  artifact to serialize and nothing to drift.
+- **The library owns its environment; the consumer does not reassign it.** A
+  library declares its per-environment sources in its own `package.json`, and a
+  library file is then an ordinary file of that environment under the existing
+  rules.
+- **There are no transitive dependencies, deliberately.** Lua 5.1 has one flat
+  global namespace, so two versions of a library cannot coexist and a resolver
+  would only manufacture conflicts it could not resolve. A library declares what
+  it requires and the compiler names anything missing; the developer lists it.
+  Global collisions are likewise reported at compile time rather than resolved
+  by last write.
+- **Vendored, with explicit `meta.xml` entries.** Library scripts are enumerated
+  rather than wildcarded, in a section after the runtime library and before
+  `config.lua`, ordered by the manifest's `libraries` array. A helper a library
+  needs feeds the same requirement set the reference trigger already computes,
+  so helpers stay first and are emitted once.
+- **Orthogonal to [ADR-033](adr/033-resource-export-abi.md), which stays.**
+  Exports are a runtime boundary between two deployed resources; this is a
+  compile-time source boundary that ships the code inside one. A stateful
+  service is still a resource with exports; a pure module is a library.
 
 ## Milestone 35 — Debugging Decision
 
