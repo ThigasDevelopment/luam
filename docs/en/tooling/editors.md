@@ -15,14 +15,18 @@ uses, so the editor and the build never disagree about a file.
 | Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members. |
 | Directives | After `#!`, completes the environment and strictness directives, each with what it does. |
 | Class headers | After `class Name `, completes `extends` and `implements`, then the declared classes or interfaces that can follow. |
+| Class bodies | Inside a class body, completes `static` and — while the class has none — a `constructor` snippet. Neither is offered at the top level or inside a method body. |
 | Argument ranking | Inside a call, candidates matching the expected parameter type sort first, then functions returning it. |
 | Events | Inside the quotes, completes the events reachable from the call; the handler and the payload of a known event carry its typed parameters. |
 | Hover | Declared or inferred type, function signature, the environment of an MTA API, and the contract of an event. |
 | Documentation hover | The `#` comment lines directly above any declaration — function, method, class, interface, enum, type alias, declared event, field, local or global — appear under its signature, at the declaration and at every use. Decorators between the comment and the declaration do not break the pair. |
-| Keyword hover | `self` carries the class it is bound to and the shape of that class; `super(...)` carries how the parent implementation is selected. |
+| Keyword hover | `self` carries the class it is bound to and the shape of that class; `super(...)` carries how the parent implementation is selected; `static` carries what it puts on the class value and the diagnostics that report reading across the split. |
 | MTA class hover | A class name — `Player`, `Element`, `Vehicle` — carries what the class is, the chain it inherits, how much surface it has in that environment and whether it is callable. It describes the class instead of listing its members. |
 | Decorator hover | The exact members the decorator generates at that site, where it may sit, and the diagnostics it can raise. |
 | Navigation | Go to definition, find references, and rename — across files for globals. |
+| Workspace symbols | `Ctrl+T` finds a class, an interface, an enum, a type alias, a function or a declared event anywhere in the project, including files you never opened. Each result carries the environment of the file it lives in. |
+| Quick fixes | A diagnostic with exactly one correct repair offers it on the lightbulb. See [the list](#quick-fixes). |
+| Formatting | Format the document or the selection, with format-on-save. The style is [Formatting](/en/reference/formatting). |
 
 Completion is scoped exactly like the checker: `dxDrawText` never appears in a
 server file, `kickPlayer` never appears in a client file.
@@ -105,8 +109,42 @@ still reach the server.
 | --- | --- | --- |
 | `luam.cliPath` | `"luam"` | Command used to run the CLI. Point it at a bundle to test an unreleased build. |
 | `luam.ensureWatch` | `true` | Pass `--watch` when the ensure command runs. |
+| `luam.formatting` | `true` | Format `.luam` with the language server. Turn it off to leave formatting to another tool, or to none — the server stops being asked, so `Shift+Alt+F` and format-on-save both go quiet. |
 | `luam.semanticHighlighting` | `true` | Colour Luam with the semantic tokens the server serves. Turn it off to keep only the grammar layer. |
 | `luam.trace.server` | `"off"` | Trace LSP traffic. Set to `"verbose"` when reporting a bug. |
+
+## Formatting
+
+The server formats a whole document and a selection. The extension already makes
+itself the default formatter for `.luam`, so turning format-on-save on is one
+setting:
+
+```json
+{
+    "[luam]": {
+        "editor.formatOnSave": true
+    }
+}
+```
+
+A file that does not parse yields no edits, so saving mid-edit never mangles it.
+[Formatting](/en/reference/formatting) is the style it writes.
+
+## Quick fixes
+
+A quick fix is offered only where exactly one repair is correct. A repair that
+would be a guess — which declared key you meant, which environment a file
+belongs to — is left to you, because accepting a plausible wrong edit is worse
+than typing the right one.
+
+| Diagnostic | The fix |
+| --- | --- |
+| `parse-optional-position` | Moves the `?` from the type onto the name. |
+| `parse-redundant-optional` | Deletes the `?` after the type, keeping the one on the name. |
+| `check-invalid-super` | Rewrites `self:super(...)` as `super(...)`. |
+| `check-static-receiver` | Reads the static member with a dot instead of a colon. |
+| `check-native-constructor` | Rewrites `Name.new(...)` as `new Name(...)`. |
+| `check-explicit-self-parameter` | Removes the `self` parameter from the method. |
 
 ## Colours
 

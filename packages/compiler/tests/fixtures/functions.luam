@@ -11,7 +11,7 @@ local function double(value: number): number
     return value * 2
 end
 
-local anonymous = function(...)
+local anonymous = function (...)
     print(...)
 end
 

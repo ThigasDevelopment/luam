@@ -53,7 +53,7 @@ export interface NamedType {
 export interface FunctionType {
     kind: 'function';
     parameters: Type[];
-    parameterNames?: string[];
+    parameterNames?: (string | null)[];
     variadicType?: Type;
     minimumArguments: number;
     isVariadic: boolean;
@@ -88,8 +88,16 @@ export type Type =
     | TupleType
     | RecordType;
 
+export interface NominalShape {
+    kind: 'interface' | 'class';
+    members: ReadonlyMap<string, Type>;
+    ancestors: ReadonlySet<string>;
+}
+
 export interface AssignabilityOptions {
     allowNil: boolean;
+    resolveNominal?: (name: string) => NominalShape | null;
+    visited?: ReadonlySet<string>;
 }
 
 export const ANY_TYPE: Type = { kind: 'any' };
@@ -182,7 +190,7 @@ export function createFunction(
     returnType: Type,
     minimumArguments?: number,
     isVariadic = false,
-    parameterNames?: string[],
+    parameterNames?: (string | null)[],
     variadicType?: Type,
 ): FunctionType {
     return {
@@ -438,6 +446,69 @@ function isNamedAssignable(source: NamedType, target: NamedType, options: Assign
     return sourceArguments.every((argument, index) => isAssignable(argument, targetArguments[index] ?? ANY_TYPE, options));
 }
 
+function asRecord(name: string, members: ReadonlyMap<string, Type>): RecordType {
+    return { kind: 'record', name, origin: null, members };
+}
+
+function shapeOf(name: string, options: AssignabilityOptions): NominalShape | null {
+    return options.resolveNominal?.(name) ?? null;
+}
+
+function withVisit(options: AssignabilityOptions, pair: string): AssignabilityOptions {
+    return { ...options, visited: new Set([...(options.visited ?? []), pair]) };
+}
+
+function isNominalAssignable(source: NamedType, target: NamedType, options: AssignabilityOptions): boolean {
+    const pair = `${source.name}>${target.name}`;
+
+    if (options.visited?.has(pair) === true) {
+        return true;
+    }
+
+    const declared = shapeOf(target.name, options);
+    const actual = shapeOf(source.name, options);
+
+    if (declared === null || actual === null) {
+        return true;
+    }
+
+    if (declared.kind === 'class' || actual.kind === 'class') {
+        return actual.kind === 'class' && actual.ancestors.has(target.name);
+    }
+
+    return isRecordAssignable(asRecord(source.name, actual.members), asRecord(target.name, declared.members), withVisit(options, pair));
+}
+
+const SCALAR_KINDS: ReadonlySet<string> = new Set(['string', 'number', 'boolean', 'thread', 'userdata', 'void', 'nil', 'function']);
+
+function isNamedSourceAssignable(source: NamedType, target: Type, options: AssignabilityOptions): boolean {
+    const actual = shapeOf(source.name, options);
+
+    if (actual === null) {
+        return true;
+    }
+
+    if (actual.kind === 'class') {
+        return !SCALAR_KINDS.has(target.kind) && !isLiteralType(target);
+    }
+
+    return isAssignable(asRecord(source.name, actual.members), target, options);
+}
+
+function isNamedTargetAssignable(source: Type, target: NamedType, options: AssignabilityOptions): boolean {
+    const declared = shapeOf(target.name, options);
+
+    if (declared === null) {
+        return true;
+    }
+
+    if (declared.kind === 'class') {
+        return false;
+    }
+
+    return isAssignable(source, asRecord(target.name, declared.members), options);
+}
+
 export function isAssignable(source: Type, target: Type, options: AssignabilityOptions = { allowNil: false }): boolean {
     if (source.kind === 'any' || target.kind === 'any' || target.kind === 'unknown') {
         return true;
@@ -445,14 +516,6 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
 
     if (source.kind === 'tuple' || target.kind === 'tuple') {
         return isAssignable(firstValueOf(source), firstValueOf(target), options);
-    }
-
-    if (source.kind === 'named' && target.kind === 'named') {
-        return isNamedAssignable(source, target, options);
-    }
-
-    if (source.kind === 'named' || target.kind === 'named') {
-        return true;
     }
 
     if (source.kind === 'nil' && (options.allowNil || target.kind === 'optional' || target.kind === 'nil')) {
@@ -477,6 +540,18 @@ export function isAssignable(source: Type, target: Type, options: AssignabilityO
 
     if (target.kind === 'optional') {
         return isAssignable(source, target.element, options);
+    }
+
+    if (source.kind === 'named' && target.kind === 'named') {
+        return source.name === target.name ? isNamedAssignable(source, target, options) : isNominalAssignable(source, target, options);
+    }
+
+    if (source.kind === 'named') {
+        return isNamedSourceAssignable(source, target, options);
+    }
+
+    if (target.kind === 'named') {
+        return isNamedTargetAssignable(source, target, options);
     }
 
     if (target.kind === 'table') {

@@ -47,10 +47,16 @@ function classEnd(analysis: DocumentAnalysis, open: number): number {
     return analysis.text.length;
 }
 
-export function classBodyNeedsConstructor(analysis: DocumentAnalysis, frame: CallFrame | null, offset: number): boolean {
-    const isClassBody = frame !== null && analysis.text[frame.open] === '{' && CLASS_HEADER.test(analysis.text.slice(0, frame.open));
+export function isClassBody(analysis: DocumentAnalysis, frame: CallFrame | null, offset: number): boolean {
+    if (frame === null || analysis.text[frame.open] !== '{' || !CLASS_HEADER.test(analysis.text.slice(0, frame.open))) {
+        return false;
+    }
 
-    if (!isClassBody || !isDirectBody(analysis, frame, offset)) {
+    return isDirectBody(analysis, frame, offset);
+}
+
+export function classBodyNeedsConstructor(analysis: DocumentAnalysis, frame: CallFrame | null, offset: number): boolean {
+    if (frame === null || !isClassBody(analysis, frame, offset)) {
         return false;
     }
 

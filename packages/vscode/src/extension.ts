@@ -13,6 +13,8 @@ export const RESTART_COMMAND = 'luam.restartServer';
 
 export const RESCAN_COMMAND = 'luam.rescanWorkspace';
 
+export const RESCAN_REQUEST = 'luam/rescanWorkspace';
+
 let client: LanguageClient | null = null;
 
 async function restartServer(): Promise<void> {
@@ -20,7 +22,7 @@ async function restartServer(): Promise<void> {
 }
 
 async function rescanWorkspace(): Promise<void> {
-    await client?.sendRequest('workspace/executeCommand', { command: RESCAN_COMMAND });
+    await client?.sendRequest('workspace/executeCommand', { command: RESCAN_REQUEST });
 }
 
 export function activate(context: ExtensionContext): void {

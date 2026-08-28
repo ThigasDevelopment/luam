@@ -1,12 +1,12 @@
 local startedAt: number = 0
 
-addEventHandler('onResourceStart', resourceRoot, function()
+addEventHandler('onResourceStart', resourceRoot, function ()
     startedAt = getTickCount()
 
     outputServerLog(`luam-docs-first-resource started at ${startedAt}`)
 end)
 
-addEventHandler('onResourceStop', resourceRoot, function()
+addEventHandler('onResourceStop', resourceRoot, function ()
     local uptime: number = getTickCount() - startedAt
 
     outputServerLog(`luam-docs-first-resource ran for ${uptime} ms`)

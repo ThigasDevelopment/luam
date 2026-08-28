@@ -88,6 +88,7 @@ export const en: LocaleStrings = {
         'reference/configuration-fields': 'Configuration fields',
         'reference/output-layouts': 'Output layouts',
         'reference/diagnostics': 'Diagnostics',
+        'reference/formatting': 'Formatting',
         'reference/limitations': 'Limitations',
         'reference/compatibility': 'Compatibility',
     },

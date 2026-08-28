@@ -28,11 +28,11 @@ function toggleCursor(visible: boolean): boolean
     return isCursorShowing()
 end
 
-addEventHandler('onClientRender', root, function()
+addEventHandler('onClientRender', root, function ()
     drawPanel(readLocalState())
 end)
 
-addEventHandler('onClientPlayerWasted', localPlayer, function()
+addEventHandler('onClientPlayerWasted', localPlayer, function ()
     outputChatBox('You died.')
     setCameraTarget(localPlayer)
 end)

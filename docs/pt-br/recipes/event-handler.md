@@ -71,7 +71,7 @@ Um evento que o catálogo não conhece não é erro, então `addEvent` mais
 ```luam
 addEvent('onMatchStarted', true)
 
-addEventHandler('onMatchStarted', root, function(round: number)
+addEventHandler('onMatchStarted', root, function (round: number)
     outputChatBox(`round ${round}`, root)
 end)
 ```

@@ -71,7 +71,7 @@ An event the catalog does not know is not an error, so `addEvent` plus
 ```luam
 addEvent('onMatchStarted', true)
 
-addEventHandler('onMatchStarted', root, function(round: number)
+addEventHandler('onMatchStarted', root, function (round: number)
     outputChatBox(`round ${round}`, root)
 end)
 ```

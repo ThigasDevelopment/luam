@@ -15,10 +15,10 @@ end
 
 addEventHandler('onClientRender', root, draw)
 
-addEventHandler('onClientResourceStop', resourceRoot, function()
+addEventHandler('onClientResourceStop', resourceRoot, function ()
     removeEventHandler('onClientRender', root, draw)
 end)
 
-bindKey('F7', 'down', function()
+bindKey('F7', 'down', function ()
     visible = not visible
 end)

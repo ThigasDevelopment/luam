@@ -1,4 +1,4 @@
-import { TextDocumentSyncKind, type ServerCapabilities } from 'vscode-languageserver';
+import { CodeActionKind, TextDocumentSyncKind, type ServerCapabilities } from 'vscode-languageserver';
 
 import { SEMANTIC_LEGEND } from '@lsp/features/semantic-legend';
 
@@ -6,7 +6,7 @@ export const LANGUAGE_ID = 'luam';
 
 export const SERVER_NAME = 'luam-lsp';
 
-export const RESCAN_COMMAND = 'luam.rescanWorkspace';
+export const RESCAN_COMMAND = 'luam/rescanWorkspace';
 
 export const SERVER_CAPABILITIES: ServerCapabilities = {
     textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -17,6 +17,10 @@ export const SERVER_CAPABILITIES: ServerCapabilities = {
     referencesProvider: true,
     renameProvider: true,
     documentSymbolProvider: true,
+    codeActionProvider: { codeActionKinds: [CodeActionKind.QuickFix] },
+    workspaceSymbolProvider: true,
+    documentFormattingProvider: true,
+    documentRangeFormattingProvider: true,
     executeCommandProvider: { commands: [RESCAN_COMMAND] },
     workspace: { workspaceFolders: { supported: true, changeNotifications: true } },
 };

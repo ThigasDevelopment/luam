@@ -60,7 +60,7 @@ highlight(vehicle)   # um Vehicle é um Element
 a API do elemento:
 
 ```luam env=server
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     local player: Player = source
 
     outputChatBox(getPlayerName(player) .. ' joined.', root)
@@ -73,8 +73,8 @@ Um nome de evento é verificado contra o catálogo e contra o ambiente do arquiv
 
 ```luam expect-error
 # src/server/join.luam
-addEventHandler('onPlayerJoin', root, function() end)      # ok
-addEventHandler('onClientRender', root, function() end)    # check-environment-event
+addEventHandler('onPlayerJoin', root, function () end)      # ok
+addEventHandler('onClientRender', root, function () end)    # check-environment-event
 ```
 
 | Ambiente | Eventos típicos |
@@ -91,7 +91,7 @@ Todo evento do catálogo carrega a assinatura do seu handler, então um callback
 escrito para um nome conhecido recebe os parâmetros tipados sem anotação:
 
 ```luam env=server
-addEventHandler('onPlayerQuit', root, function(quitType, reason, responsibleElement)
+addEventHandler('onPlayerQuit', root, function (quitType, reason, responsibleElement)
     # quitType: string, reason: string, responsibleElement: Element
     outputChatBox(quitType .. ': ' .. reason, responsibleElement)
 end)
@@ -128,7 +128,7 @@ declare event 'onMatchStart'(player: Player, round: number, ...tags: string)
 
 addEvent('onMatchStart', true)
 
-addEventHandler('onMatchStart', root, function(player, round)
+addEventHandler('onMatchStart', root, function (player, round)
     outputChatBox(getPlayerName(player) .. ' started round ' .. round, root)
 end)
 

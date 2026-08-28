@@ -20,6 +20,7 @@ export const LIMITATIONS_PAGE = 'reference/limitations.md';
 export const LIMITATIONS: readonly Limitation[] = [
     { id: 'path-narrowing-aliasing', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/025-access-path-narrowing.md' },
     { id: 'flow-narrowing', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/031-flow-narrowing.md' },
+    { id: 'undeclared-method-call', label: 'design-boundary', owners: [], decision: '.claude/plans/32.01-method-call-checking.md' },
     { id: 'class-runtime-visibility', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/024-two-phase-class-declaration.md' },
     { id: 'class-members', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/035-safe-class-metamethods.md' },
     { id: 'catalog-lag', label: 'upstream-constraint', owners: [], decision: '.github/workflows/catalog-refresh.yml' },

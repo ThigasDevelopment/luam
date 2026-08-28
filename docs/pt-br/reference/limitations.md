@@ -87,6 +87,23 @@ Uma operação ainda precisa ser válida para a união inteira: `key + 1` em
 `string | number` é `check-invalid-operand`, porque um dos membros não soma. A
 concatenação é a exceção, já que todo membro de `string | number` concatena.
 
+## Um método que o receptor não declara não é reportado
+
+**Decisão de projeto.** Registrada na
+[32.01](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/32.01-method-call-checking.md).
+
+`counter:bump(1)` é verificada contra a assinatura que o tipo do receptor declara
+para `bump` — quantidade de argumentos, tipo de cada um e o retorno que ela
+produz. `counter:missing(1)` não é. O receptor não resolve membro nenhum, a
+chamada continua devolvendo `any` e nada é reportado. Ler o mesmo nome com ponto
+é `check-unknown-record-key`.
+
+A assimetria é proposital. Uma chamada com `:` é como o Lua alcança um método que
+uma metatable ou uma biblioteca anexou em tempo de execução, e um receptor que o
+verificador nunca viu anotado não tem lista de membros contra a qual reportar.
+Anote o receptor e a chamada passa a ser verificada; a verificação segue a
+anotação, nunca a sintaxe da chamada.
+
 ## Uma classe é um tipo em todo lugar, e um valor a partir da declaração
 
 **Restrição da plataforma.** Uma declaração passa a valer quando ela roda, que é

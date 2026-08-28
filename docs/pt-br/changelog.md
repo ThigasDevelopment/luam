@@ -11,8 +11,31 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.2 - 2026-08-28
+
 ### Adicionado
 
+- [Editores](/pt-br/tooling/editors) e [Formatação](/pt-br/reference/formatting)
+  registram o `luam.formatting`, a configuração que desliga o formatador.
+- [Editores](/pt-br/tooling/editors) registra o hover da palavra-chave `static` e
+  a completação no corpo da classe, que oferece `static` ao lado do snippet de
+  `constructor`.
+- [Diagnósticos](/pt-br/reference/diagnostics) e [Editores](/pt-br/tooling/editors)
+  listam `parse-redundant-optional`, reportado quando o nome e o tipo carregam um
+  `?` cada, e o quick fix que apaga o do tipo.
+- [Enums e interfaces](/pt-br/language/enums-and-interfaces) registra a regra por
+  trás do verificador: uma interface é satisfeita pelo formato, uma classe pela
+  identidade, e um nome que o verificador nunca resolveu continua permissivo.
+- [Formatação](/pt-br/reference/formatting) é uma página de referência nova: o
+  estilo que o language server escreve, o que ele nunca toca e o que acontece com
+  um arquivo que não parseia. [Editores](/pt-br/tooling/editors) registra formatar
+  ao salvar, os cinco quick fixes e os símbolos do workspace, e
+  [Diagnósticos](/pt-br/reference/diagnostics) aponta para a lista de quick fixes.
+- [Tipos de objeto](/pt-br/language/types#tipos-de-objeto) registra que uma chave
+  tipada como função é verificada quando é chamada com `:`, e como um primeiro
+  parâmetro chamado `self` é contado.
+  [Limitações](/pt-br/reference/limitations) registra o que continua sem ser
+  reportado: um método que o tipo do receptor não declara.
 - [Como o Luam funciona](/pt-br/guide/how-luam-works) segue um build pelos cinco
   estágios dele, com um diagrama e os mesmos estágios em palavras, e explica por
   que a CLI, o editor e o playground concordam: existe um parser, um checador e
@@ -30,6 +53,10 @@ da versão atual.
 
 ### Corrigido
 
+- [Luam em comparação](/pt-br/guide/comparison) dizia que classes genéricas não
+  são suportadas e apontava para uma página que não fala disso. Classes recebem
+  parâmetros de tipo; a página agora aponta para
+  [Parâmetros de tipo](/pt-br/language/classes#parametros-de-tipo).
 - O playground diz o que fazer quando o JavaScript não está disponível, nos dois
   idiomas, em vez de deixar essa linha em branco.
 

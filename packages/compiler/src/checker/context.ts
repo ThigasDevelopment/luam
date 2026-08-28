@@ -47,6 +47,8 @@ import {
     VOID_TYPE,
     widenInferred,
     widenLiteral,
+    type AssignabilityOptions,
+    type NominalShape,
     type Type,
 } from './types';
 
@@ -423,21 +425,75 @@ export class CheckContext {
             const optional = parameters.findIndex((parameter) => parameter.kind === 'optional');
             const minimum = optional === -1 ? parameters.length : optional;
 
-            return createFunction(parameters, this.resolveAnnotation(annotation.returnType), minimum, annotation.isVariadic);
+            return createFunction(parameters, this.resolveAnnotation(annotation.returnType), minimum, annotation.isVariadic, [...annotation.parameterNames]);
         }
 
         return this.resolveNamedAnnotation(annotation.name, annotation.typeArguments, annotation.position);
     }
 
+    private nominalShape(name: string): NominalShape | null {
+        const declaredInterface = this.declarations.lookupInterface(name);
+
+        if (declaredInterface !== null) {
+            const ancestors = this.declarations.allInterfaces().filter((other) => this.declarations.interfaceExtends(name, other.name));
+
+            return {
+                kind: 'interface',
+                members: new Map(this.declarations.collectInterfaceContract(name).map((member) => [member.name, member.type])),
+                ancestors: new Set(ancestors.map((other) => other.name)),
+            };
+        }
+
+        const declaredClass = this.declarations.lookupClass(name);
+
+        if (declaredClass === null) {
+            return null;
+        }
+
+        return {
+            kind: 'class',
+            members: new Map(this.declarations.collectMembers(name).map((member) => [member.name, member.type])),
+            ancestors: this.classAncestors(name),
+        };
+    }
+
+    private classAncestors(name: string): Set<string> {
+        const ancestors = new Set<string>();
+
+        let current = this.declarations.lookupClass(name);
+
+        while (current !== null && !ancestors.has(current.name)) {
+            ancestors.add(current.name);
+
+            for (const contract of current.interfaces) {
+                ancestors.add(contract);
+
+                for (const other of this.declarations.allInterfaces()) {
+                    if (this.declarations.interfaceExtends(contract, other.name)) {
+                        ancestors.add(other.name);
+                    }
+                }
+            }
+
+            current = current.superClass === null ? null : this.declarations.lookupClass(current.superClass);
+        }
+
+        return ancestors;
+    }
+
+    assignability(): AssignabilityOptions {
+        return { allowNil: this.allowNil, resolveNominal: (name) => this.nominalShape(name) };
+    }
+
     expectAssignable(source: Type, target: Type, position: SourcePosition, subject: string): void {
-        if (isAssignable(source, target, { allowNil: this.allowNil })) {
+        if (isAssignable(source, target, this.assignability())) {
             return;
         }
 
         const received = isLiteralType(target) || target.kind === 'union' ? source : widenLiteral(source);
         const message = `${subject} expects "${typeToString(target)}" but received "${typeToString(received)}".`;
 
-        const hint = `${nilHint(source, target, this.mode)}${missingKeyHint(source, target)}`;
+        const hint = `${nilHint(source, target, this.mode)}${missingKeyHint(source, target, (name) => this.nominalShape(name))}`;
 
         this.report('check-type-mismatch', `${message}${hint}`, position);
     }

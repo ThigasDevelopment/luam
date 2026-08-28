@@ -86,6 +86,22 @@ An operation must still be valid for the whole union: `key + 1` on
 be added. Concatenation is the exception, since every member of
 `string | number` concatenates.
 
+## A method the receiver does not declare is not reported
+
+**Design boundary.** Recorded in
+[32.01](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/32.01-method-call-checking.md).
+
+`counter:bump(1)` is checked against the signature the receiver's type declares
+for `bump` — argument count, argument types, and the return type it produces.
+`counter:missing(1)` is not. The receiver resolves no member, the call keeps
+returning `any`, and nothing is reported. Reading the same name with a dot is
+`check-unknown-record-key`.
+
+The asymmetry is deliberate. A `:` call is how Lua reaches a method a metatable
+or a library attached at runtime, and a receiver the checker never saw annotated
+has no member list to report against. Annotate the receiver and the call is
+checked; the check follows the annotation, never the call syntax.
+
 ## A class is a type everywhere, a value from its declaration
 
 **Platform constraint.** A declaration takes effect when it runs, which is what

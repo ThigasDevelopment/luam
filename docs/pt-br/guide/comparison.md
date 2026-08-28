@@ -66,9 +66,10 @@ template](/pt-br/language/template-strings).
 
 O sistema de tipos vai parecer familiar: anotações, uniões, interseções, tipos
 literais, interfaces, aliases com parâmetros de tipo, narrowing e apagamento no
-build. Classes genéricas não são suportadas — veja
-[Limitações](/pt-br/reference/limitations). A sintaxe por baixo é Lua, não
-JavaScript:
+build. Classes também recebem parâmetros de tipo, inferidos a partir do argumento
+do construtor e apagados na emissão — veja
+[Parâmetros de tipo](/pt-br/language/classes#parametros-de-tipo). A sintaxe por
+baixo é Lua, não JavaScript:
 
 - Blocos fecham com `end`, não com `}`, e a desigualdade é `~=`, não `!==`.
 - Não existe `import` nem `export` de nomes entre arquivos. `export` no Luam

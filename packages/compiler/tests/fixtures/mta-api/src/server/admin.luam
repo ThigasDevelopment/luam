@@ -31,11 +31,11 @@ function announce(message: string): boolean
     return true
 end
 
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     announce(describeElement(source))
     preparePlayer(source, 0)
 end)
 
-addEventHandler('onVehicleExplode', root, function()
+addEventHandler('onVehicleExplode', root, function ()
     configureVehicle(source)
 end)

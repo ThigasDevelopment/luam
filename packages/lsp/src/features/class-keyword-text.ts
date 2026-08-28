@@ -1,3 +1,25 @@
+const STATIC_HOVER = [
+    '```luam',
+    'static total: number = 0',
+    'static bump = function (step: number): number ... end',
+    '```',
+    '',
+    '`static` puts a member on the class value instead of on an instance. A static field is one slot the class owns; a static method is called on the class.',
+    '',
+    '**Reaching one**',
+    '',
+    '- `Counter.total` and `Counter.bump(1)` read the statics; `counter.total` on an instance is `check-static-receiver`.',
+    '- `Counter:bump(1)` is `check-static-receiver` too: a class value has no `self` to pass.',
+    '',
+    '**Rules**',
+    '',
+    '- A static method has no `self` — writing one is `check-invalid-self` — and no `super(...)`, which is `check-invalid-super`.',
+    '- One name cannot be both static and instance in the same class; that is `check-duplicate-class-member`.',
+    '- Statics are inherited and shared: `Child.origin` reads the slot `Base.origin` holds. A static that shadows an inherited one must carry the same type, or it is `check-invalid-override`.',
+    '- A static field initializer runs once, when the class declaration runs.',
+    '- It is a modifier only when a member name follows it on the same line, so a field named `static` and a local named `static` keep working.',
+].join('\n');
+
 const CLASS_HOVER = [
     '```luam',
     'class Name { ... }',
@@ -19,7 +41,8 @@ const CLASS_HOVER = [
     '',
     '- A class is a type everywhere in its file and a value from the line its declaration runs; instantiating it earlier in top-level code is `check-class-before-declaration`.',
     '- Two classes with one name in a file is `check-duplicate-class`; an inheritance cycle is `check-class-cycle`.',
-    '- Static members, declared metamethods, and generic classes are not supported.',
+    '- Members may be `static`, which puts them on the class value; type parameters are written `class Name<T>`.',
+    '- Declared metamethods are not supported.',
 ].join('\n');
 
 const CONSTRUCTOR_HOVER = [
@@ -109,4 +132,5 @@ export const CLASS_KEYWORD_TEXT: ReadonlyMap<string, string> = new Map([
     ['new', NEW_HOVER],
     ['extends', EXTENDS_HOVER],
     ['implements', IMPLEMENTS_HOVER],
+    ['static', STATIC_HOVER],
 ]);

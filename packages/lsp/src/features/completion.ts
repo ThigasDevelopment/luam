@@ -14,7 +14,7 @@ import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { conflictsWithExpectation, expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
 import { contextGlobalFilter, EVENT_CONTEXT_GLOBALS } from '@lsp/features/context-globals';
 import { callbackParameterItems } from '@lsp/features/callback-parameter-completion';
-import { classBodyNeedsConstructor } from '@lsp/features/class-body';
+import { classBodyNeedsConstructor, isClassBody } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
 import { directiveItems, isDirectivePosition } from '@lsp/features/directive-completion';
 import { tableLiteralMembers, writtenKeys } from '@lsp/features/table-literal';
@@ -29,6 +29,7 @@ import {
 import {
     apiItem,
     constructorItem,
+    staticItem,
     DIRECTIVE_ITEMS,
     decoratorItems,
     enumMemberItems,
@@ -303,6 +304,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
 
     const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
     const constructor = classBodyNeedsConstructor(analysis, lexical.frame, offset) ? [constructorItem()] : [];
+    const modifiers = isClassBody(analysis, lexical.frame, offset) ? [staticItem()] : [];
     const expectation = expectedArgument(analysis, offset, lexical.frame);
     const inHandler = insideEventHandler(analysis.text, lexical.frames);
     const expected = expectation === null ? [] : quotedLiteralItems(stringLiteralValues(expectation.type));
@@ -322,6 +324,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...apiItems(analysis, offset, expectation, inHandler),
         ...plainItems(directives, expectation),
         ...plainItems(constructor, expectation),
+        ...plainItems(modifiers, expectation),
         ...plainItems(keywordItems(expectation), expectation),
     ]);
 }

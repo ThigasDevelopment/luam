@@ -279,6 +279,9 @@ exports[`parser > parses function type annotations 1`] = `
         "annotation": {
           "isVariadic": false,
           "kind": "type-function",
+          "parameterNames": [
+            null,
+          ],
           "parameters": [
             {
               "kind": "type-name",

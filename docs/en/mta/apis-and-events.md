@@ -60,7 +60,7 @@ highlight(vehicle)   # a Vehicle is an Element
 element's API:
 
 ```luam env=server
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     local player: Player = source
 
     outputChatBox(getPlayerName(player) .. ' joined.', root)
@@ -73,8 +73,8 @@ An event name is checked against the catalog and against the file's environment:
 
 ```luam expect-error
 # src/server/join.luam
-addEventHandler('onPlayerJoin', root, function() end)      # ok
-addEventHandler('onClientRender', root, function() end)    # check-environment-event
+addEventHandler('onPlayerJoin', root, function () end)      # ok
+addEventHandler('onClientRender', root, function () end)    # check-environment-event
 ```
 
 | Environment | Typical events |
@@ -91,7 +91,7 @@ Every event in the catalog carries the signature of its handler, so a callback
 written against a known name gets its parameters typed with no annotation:
 
 ```luam env=server
-addEventHandler('onPlayerQuit', root, function(quitType, reason, responsibleElement)
+addEventHandler('onPlayerQuit', root, function (quitType, reason, responsibleElement)
     # quitType: string, reason: string, responsibleElement: Element
     outputChatBox(quitType .. ': ' .. reason, responsibleElement)
 end)
@@ -126,7 +126,7 @@ declare event 'onMatchStart'(player: Player, round: number, ...tags: string)
 
 addEvent('onMatchStart', true)
 
-addEventHandler('onMatchStart', root, function(player, round)
+addEventHandler('onMatchStart', root, function (player, round)
     outputChatBox(getPlayerName(player) .. ' started round ' .. round, root)
 end)
 

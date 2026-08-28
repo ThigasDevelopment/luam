@@ -51,6 +51,7 @@ export interface TypeNumberLiteralAnnotation extends NodeBase {
 export interface TypeFunctionAnnotation extends NodeBase {
     kind: 'type-function';
     parameters: TypeAnnotation[];
+    parameterNames: (string | null)[];
     isVariadic: boolean;
     returnType: TypeAnnotation | null;
 }

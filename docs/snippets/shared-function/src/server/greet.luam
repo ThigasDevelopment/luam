@@ -1,4 +1,4 @@
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     local player: Player = source
 
     outputChatBox(formatPlayerLabel(getPlayerName(player)) .. ' joined.', root)

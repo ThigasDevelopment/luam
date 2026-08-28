@@ -64,9 +64,10 @@ strings](/en/language/template-strings).
 
 The type system will feel familiar: annotations, unions, intersections, literal
 types, interfaces, aliases that take type parameters, narrowing, and erasure at
-build time. Generic classes are not supported — see
-[Limitations](/en/reference/limitations). The syntax underneath is Lua, not
-JavaScript:
+build time. Classes take type parameters too, inferred from the constructor
+argument and erased at emit — see
+[Type parameters](/en/language/classes#type-parameters). The syntax underneath
+is Lua, not JavaScript:
 
 - Blocks close with `end`, not `}`, and inequality is `~=`, not `!==`.
 - There is no `import` or `export` of names between files. `export` in Luam

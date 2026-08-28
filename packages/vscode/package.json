@@ -3,7 +3,7 @@
     "displayName": "Luam",
     "icon": "icon.png",
     "description": "Language support for Luam, a typed Lua that compiles to Multi Theft Auto resources.",
-    "version": "0.19.1",
+    "version": "0.19.2",
     "private": true,
     "type": "module",
     "main": "./dist/extension.cjs",
@@ -135,6 +135,11 @@
                     "default": true,
                     "description": "Pass --watch when the ensure command runs."
                 },
+                "luam.formatting": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Format .luam files with the Luam language server. Turn it off to leave formatting to another tool, or to none."
+                },
                 "luam.trace.server": {
                     "type": "string",
                     "enum": [
@@ -257,7 +262,14 @@
                     ]
                 }
             }
-        ]
+        ],
+        "configurationDefaults": {
+            "[luam]": {
+                "editor.defaultFormatter": "luam.luam",
+                "editor.insertSpaces": true,
+                "editor.tabSize": 4
+            }
+        }
     },
     "scripts": {
         "build": "tsc -p tsconfig.build.json",

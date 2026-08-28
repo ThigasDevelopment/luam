@@ -13,7 +13,7 @@ function punish(player: Player, reason: string): boolean
     return player:kick(nil, reason)
 end
 
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     local player: Player = source
 
     outputChatBox(describePlayer(player), root)

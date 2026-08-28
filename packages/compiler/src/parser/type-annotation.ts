@@ -29,25 +29,33 @@ function parseTypeName(stream: TokenStream): TypeAnnotation {
     return { kind: 'type-name', name: token.value, typeArguments, position: token.position };
 }
 
-function parseParameterType(stream: TokenStream): TypeAnnotation {
+interface ParameterType {
+    name: string | null;
+    annotation: TypeAnnotation;
+}
+
+function parseParameterType(stream: TokenStream): ParameterType {
+    let name: string | null = null;
+
     if (stream.check('identifier') && stream.checkAhead(1, 'punctuation', ':')) {
-        stream.next();
+        name = stream.next().value;
         stream.next();
     }
 
-    return parseTypeAnnotation(stream);
+    return { name, annotation: parseTypeAnnotation(stream) };
 }
 
 function parseFunctionType(stream: TokenStream): TypeAnnotation {
     const position = stream.expect('identifier', FUNCTION_TYPE).position;
 
     if (!stream.check('punctuation', '(')) {
-        return { kind: 'type-function', parameters: [], isVariadic: true, returnType: null, position };
+        return { kind: 'type-function', parameters: [], parameterNames: [], isVariadic: true, returnType: null, position };
     }
 
     stream.next();
 
     const parameters: TypeAnnotation[] = [];
+    const parameterNames: (string | null)[] = [];
 
     let isVariadic = false;
 
@@ -59,7 +67,10 @@ function parseFunctionType(stream: TokenStream): TypeAnnotation {
                 parseTypeAnnotation(stream);
             }
         } else {
-            parameters.push(parseParameterType(stream));
+            const parameter = parseParameterType(stream);
+
+            parameters.push(parameter.annotation);
+            parameterNames.push(parameter.name);
         }
 
         if (!stream.match('punctuation', ',')) {
@@ -71,7 +82,7 @@ function parseFunctionType(stream: TokenStream): TypeAnnotation {
 
     const returnType = stream.match('punctuation', ':') ? parseTypeAnnotation(stream) : null;
 
-    return { kind: 'type-function', parameters, isVariadic, returnType, position };
+    return { kind: 'type-function', parameters, parameterNames, isVariadic, returnType, position };
 }
 
 function parseGroupedType(stream: TokenStream): TypeAnnotation {
@@ -267,9 +278,21 @@ export function parseNamedAnnotation(stream: TokenStream, declaration: NamedDecl
         stream.report('parse-optional-position', `Write optional ${label} as "name?: Type", not "name: Type?".`, annotation.position);
     }
 
+    if (optional !== null && annotation?.kind === 'type-optional') {
+        const message = `The marker on the name already allows "nil". Remove the "?" after the type.`;
+
+        stream.report('parse-redundant-optional', message, annotation.position);
+    }
+
     if (optional !== null && annotation !== null) {
         stream.eraseFrom(checkpoint);
     }
 
-    return optional === null || annotation === null ? annotation : { kind: 'type-optional', element: annotation, position: optional.position };
+    if (optional === null || annotation === null) {
+        return annotation;
+    }
+
+    const element = annotation.kind === 'type-optional' ? annotation.element : annotation;
+
+    return { kind: 'type-optional', element, position: optional.position };
 }

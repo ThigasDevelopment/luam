@@ -15,14 +15,18 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Completação de membros | `.` completa campos e métodos estáticos; `:` completa métodos de instância, incluindo membros herdados do MTA. |
 | Diretivas | Depois de `#!`, completa as diretivas de ambiente e de rigor, cada uma com o que faz. |
 | Cabeçalho de classe | Depois de `class Nome `, completa `extends` e `implements`, e então as classes ou interfaces declaradas que podem vir a seguir. |
+| Corpo de classe | Dentro do corpo de uma classe, completa `static` e — enquanto a classe não tiver um — um snippet de `constructor`. Nenhum dos dois aparece no topo do arquivo nem dentro de um método. |
 | Ordenação de argumentos | Dentro de uma chamada, candidatos do tipo esperado do parâmetro vêm primeiro, depois funções que o retornam. |
 | Eventos | Dentro das aspas, completa os eventos alcançáveis da chamada; o handler e o payload de um evento conhecido carregam os parâmetros tipados. |
 | Hover | Tipo declarado ou inferido, assinatura da função, o ambiente de uma API do MTA e o contrato de um evento. |
 | Hover de documentação | As linhas de comentário `#` logo acima de qualquer declaração — função, método, classe, interface, enum, alias de tipo, evento declarado, campo, local ou global — aparecem sob a assinatura dela, na declaração e em cada uso. Decorators entre o comentário e a declaração não quebram o par. |
-| Hover de palavra-chave | `self` carrega a classe a que está vinculado e a forma dessa classe; `super(...)` carrega como a implementação do pai é escolhida. |
+| Hover de palavra-chave | `self` carrega a classe a que está vinculado e a forma dessa classe; `super(...)` carrega como a implementação do pai é escolhida; `static` carrega o que ele coloca no valor da classe e os diagnósticos que relatam uma leitura entre os dois espaços. |
 | Hover de classe do MTA | Um nome de classe — `Player`, `Element`, `Vehicle` — carrega o que a classe é, a cadeia que ela herda, quanta superfície tem naquele ambiente e se é chamável. Ele descreve a classe em vez de listar os membros dela. |
 | Hover de decorator | Os membros exatos que o decorator gera naquele ponto, onde ele pode ficar e os diagnósticos que pode emitir. |
 | Navegação | Ir para definição, encontrar referências e renomear — entre arquivos para globais. |
+| Símbolos do workspace | `Ctrl+T` encontra uma classe, uma interface, um enum, um alias de tipo, uma função ou um evento declarado em qualquer lugar do projeto, inclusive em arquivos que você nunca abriu. Cada resultado carrega o ambiente do arquivo em que vive. |
+| Quick fixes | Um diagnóstico com exatamente um reparo correto oferece ele na lâmpada. Veja [a lista](#quick-fixes). |
+| Formatação | Formata o documento ou a seleção, com formatar ao salvar. O estilo é [Formatação](/pt-br/reference/formatting). |
 
 A completação tem exatamente o mesmo escopo do checker: `dxDrawText` nunca aparece
 em um arquivo de servidor, `kickPlayer` nunca aparece em um de cliente.
@@ -105,8 +109,43 @@ também chegam ao servidor.
 | --- | --- | --- |
 | `luam.cliPath` | `"luam"` | Comando usado para rodar a CLI. Aponte para um bundle para testar uma build não publicada. |
 | `luam.ensureWatch` | `true` | Passa `--watch` quando o comando ensure roda. |
+| `luam.formatting` | `true` | Formata `.luam` com o language server. Desligue para deixar a formatação com outra ferramenta, ou com nenhuma — o servidor deixa de ser consultado, então `Shift+Alt+F` e formatar ao salvar ficam os dois quietos. |
 | `luam.semanticHighlighting` | `true` | Colore Luam com os tokens semânticos do servidor. Desligue para manter só a camada da gramática. |
 | `luam.trace.server` | `"off"` | Registra o tráfego LSP. Use `"verbose"` ao relatar um bug. |
+
+## Formatação
+
+O servidor formata um documento inteiro e uma seleção. A extensão já se declara
+o formatador padrão de `.luam`, então ligar formatar ao salvar é uma
+configuração só:
+
+```json
+{
+    "[luam]": {
+        "editor.formatOnSave": true
+    }
+}
+```
+
+Um arquivo que não parseia devolve nenhuma edição, então salvar no meio da edição
+nunca estraga o arquivo. [Formatação](/pt-br/reference/formatting) é o estilo que
+ele escreve.
+
+## Quick fixes
+
+Um quick fix só é oferecido onde exatamente um reparo está certo. Um reparo que
+seria um chute — qual chave declarada você quis dizer, a qual ambiente um arquivo
+pertence — fica com você, porque aceitar uma edição plausível e errada é pior do
+que digitar a certa.
+
+| Diagnóstico | O reparo |
+| --- | --- |
+| `parse-optional-position` | Move o `?` do tipo para o nome. |
+| `parse-redundant-optional` | Apaga o `?` depois do tipo, mantendo o do nome. |
+| `check-invalid-super` | Reescreve `self:super(...)` como `super(...)`. |
+| `check-static-receiver` | Lê o membro estático com ponto em vez de dois-pontos. |
+| `check-native-constructor` | Reescreve `Name.new(...)` como `new Name(...)`. |
+| `check-explicit-self-parameter` | Remove o parâmetro `self` do método. |
 
 ## Cores
 

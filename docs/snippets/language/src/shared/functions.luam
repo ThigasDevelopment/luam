@@ -10,7 +10,7 @@ local function double(value: number): number
     return value * 2
 end
 
-local reduce: fun(total: number, value: number): number = function(total: number, value: number): number
+local reduce: fun(total: number, value: number): number = function (total: number, value: number): number
     return total + value
 end
 

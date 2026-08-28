@@ -46,7 +46,7 @@ function relocate(player, model)
     return player:setInterior(0)
 end
 
-addEventHandler('onPlayerJoin', root, function()
+addEventHandler('onPlayerJoin', root, function ()
     outputChatBox(describePlayer(source), root)
 end)
 ",

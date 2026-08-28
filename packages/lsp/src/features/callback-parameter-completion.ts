@@ -55,12 +55,12 @@ function validName(name: string): boolean {
     return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name) && !KEYWORDS.has(name);
 }
 
-function uniqueNames(types: readonly Type[], authored: readonly string[] | undefined): string[] {
+function uniqueNames(types: readonly Type[], authored: readonly (string | null)[] | undefined): string[] {
     const used = new Set<string>();
 
     return types.map((type, index) => {
         const preferred = authored?.[index];
-        const base = preferred !== undefined && validName(preferred) ? preferred : inferredName(type, index);
+        const base = preferred !== undefined && preferred !== null && validName(preferred) ? preferred : inferredName(type, index);
         let name = validName(base) ? base : `argument${index + 1}`;
         let suffix = 2;
 
