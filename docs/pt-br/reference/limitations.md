@@ -269,4 +269,44 @@ linhas da engine sem atribuição podem aparecer como saída simples do servidor
 porque a origem delas não pode ser classificada com segurança.
 
 Avaliar uma expressão em um servidor rodando não faz parte de nada disso. Isso é
-um depurador, e precisa do próprio protocolo e da própria decisão de segurança.
+um depurador, e o Luam não traz um — veja
+[O Luam não traz depurador](/pt-br/reference/limitations#o-luam-nao-traz-depurador).
+
+## O Luam não traz depurador
+
+**Decisão de projeto.** Registrada na
+[ADR-039](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/039-no-debugger.md).
+
+Não há breakpoints, não há execução passo a passo, não há painel de variáveis, e
+não há como pausar um resource nem avaliar uma expressão dentro de um servidor
+MTA em execução. Isso está decidido, não pendente: nada no roadmap adiciona isso.
+
+O que cobre o mesmo terreno:
+
+- O [`luam dev`](/pt-br/tooling/cli#luam-dev) acompanha o `server.log` local e
+  imprime os registros do servidor e as chamadas `outputDebugString` do cliente
+  repassadas em um único fluxo, com posições no código-fonte.
+- O [`luam trace`](/pt-br/tooling/cli#luam-trace) e o mapa do resource devolvem
+  uma posição gerada — ou um log de erro inteiro — para a linha `.luam` que você
+  escreveu. Veja
+  [Resolvendo uma posição de execução do MTA](/pt-br/guide/troubleshooting#resolvendo-uma-posicao-de-execucao-do-mta).
+- O [`luam test`](/pt-br/tooling/cli#luam-test) roda o seu código em um
+  interpretador Lua 5.1 local, com as chamadas do MTA substituídas por stubs que
+  gravam o que foi chamado, então você executa uma função e afirma o que ela fez
+  sem precisar de servidor.
+- O verificador aponta a maior parte do que um depurador é usado para descobrir
+  em Lua sem tipos — um campo nulo, um membro escrito errado, um argumento
+  trocado — antes de qualquer coisa rodar.
+
+Duas coisas descartam a metade viva. Um depurador se conecta a um servidor em
+execução, e a CLI não abre conexão com nenhum: o campo `transport` do manifest,
+que configurava uma conexão com o servidor, foi removido, e o `ensure`
+sincronizando arquivos com o `dev --start-server` conduzindo o servidor que ele
+mesmo sobe é o que ficou no lugar. E um canal que avalia expressões dentro de um
+servidor vivo é execução remota de código contra uma máquina com jogadores
+conectados, uma superfície de segurança que o projeto recusa em vez de planejar
+proteger.
+
+O próprio MTA não tem nada com que interoperar aqui: ele não publica protocolo de
+depuração, e um hook de debug do Lua que para em uma linha para a thread em que o
+servidor inteiro roda, o que congela o jogo para todo mundo nele.
