@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.3 - 2026-08-28
+
 ### Adicionado
 
 - [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam test`: o interpretador

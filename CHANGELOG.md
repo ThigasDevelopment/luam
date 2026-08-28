@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.3 - 2026-08-28
+
 ### Added
 
 - `luam test` runs the tests a developer writes for their own resource. A file

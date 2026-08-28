@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.3 - 2026-08-28
+
 ### Added
 
 - [CLI commands](/en/tooling/cli) documents `luam test`: the interpreter it looks
