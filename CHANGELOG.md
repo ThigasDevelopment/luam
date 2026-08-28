@@ -14,6 +14,25 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.3 - 2026-08-28
+
+### Added
+
+- `luam test` runs the tests a developer writes for their own resource. A file
+  ending in `.test.luam` is compiled with the project and executed on a Lua 5.1
+  interpreter found on `PATH` — `lua5.1`, `lua51`, `lua`, then `luajit` — pinned
+  with `--lua <path>` or `LUAM_LUA`, and reported by `luam doctor`. The published
+  CLI gained no dependency. Inside a test file, `describe`, `test`, `beforeEach`,
+  `afterEach`, `expect` and `mta` are declared to the checker, so the editor
+  understands a test the way it understands any other module, and a non-test file
+  that calls `test` still reports an unknown global. Every MTA function is
+  replaced by a stub that records its arguments and returns `nil`; `mta.returns`,
+  `mta.stub` and `mta.calls` configure and read them. A stub records a call, it
+  does not simulate MTA. A failing assertion reports `path:line:column` in the
+  `.luam` source, and the command exits non-zero so CI can gate on it. Test files
+  are excluded from `sources`, so `luam build` output is unchanged whether or not
+  they exist, and `build`, `check` and `ensure` still execute no project code.
+
 ## 0.19.2 - 2026-08-28
 
 ### Added

@@ -1,5 +1,6 @@
 import type { AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
+import { TEST_DECLARATIONS } from '@compiler/checker/test-declarations';
 import { compile } from '@compiler/index';
 import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 
@@ -10,7 +11,7 @@ import { toContributions } from './manifest';
 import { sortFileDiagnostics, type CompiledModule, type FileDiagnostic, type ProjectFile, type ProjectResult } from './module';
 import { validateContributions, validateModuleReferences } from './module-graph';
 import type { ProgressReporter } from './progress';
-import { isDeclarationPath } from './source-kind';
+import { isDeclarationPath, isTestPath } from './source-kind';
 
 interface ModuleEntry {
     hash: string;
@@ -40,6 +41,7 @@ interface ModuleContext {
     scope: AmbientScope;
     contracts: readonly ResourceAbi[];
     project: ProjectDeclarations;
+    testProject: ProjectDeclarations;
     projectReferences: ReadonlySet<string>;
     compilerOptions: CompilerOptions;
     development: boolean;
@@ -55,7 +57,7 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
         ...(file.environment === undefined ? {} : { environment: file.environment }),
         ambient,
         contracts: context.contracts,
-        project: context.project,
+        project: isTestPath(file.path) ? context.testProject : context.project,
         projectReferences: context.projectReferences,
         compilerOptions: context.compilerOptions,
         development: context.development,
@@ -160,6 +162,7 @@ export function createProjectCache(): ProjectCache {
                 scope: createAmbientScope(collected, { project, references: projectReferences, options: compilerOptions, development, contracts }),
                 contracts,
                 project,
+                testProject: { globals: [...project.globals, ...TEST_DECLARATIONS] },
                 projectReferences,
                 compilerOptions,
                 development,

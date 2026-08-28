@@ -34,6 +34,33 @@ still succeeds, but skipping the lookup deliberately keeps the log clean.
 Output drops every escape sequence when the stream is not a terminal, so the CI
 transcript carries no control characters. `--no-color` forces that anywhere.
 
+## Running tests in CI
+
+`luam test` runs every `*.test.luam` file and exits `1` when one fails, so a job
+gates on it the same way it gates on `check`. It needs a **Lua 5.1** interpreter,
+which the CLI does not ship and the runner has to install:
+
+```yaml
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+            - run: sudo apt-get update && sudo apt-get install -y lua5.1
+            - run: npx --yes @thigasdevelopment/luam test
+```
+
+Exit `2` means no interpreter was found — the install step is missing, or the
+binary is under a name the command does not try. `--lua <path>` or `LUAM_LUA`
+points at it.
+
+`test` is the only command that executes project code. `check` and `build` do
+not, so a pipeline that only builds needs no interpreter at all. See
+[Testing a module](/en/recipes/testing-a-module) for what a test can and cannot
+prove.
+
 ## Exit codes
 
 | Code | Meaning | In a pipeline |

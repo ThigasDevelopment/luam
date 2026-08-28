@@ -1,0 +1,5 @@
+test('sends one chat message for one score', function ()
+    announceScore('Ana', 12)
+
+    expect(#mta.calls('outputChatBox')).toBe(1)
+end)

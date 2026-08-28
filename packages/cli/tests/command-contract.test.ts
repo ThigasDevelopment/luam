@@ -9,7 +9,7 @@ import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from '
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
-const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'init', 'server', 'setup', 'trace'];
+const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'init', 'server', 'setup', 'test', 'trace'];
 
 const ACCEPTED: readonly [string, readonly string[]][] = [
     ['build', ['--manifest', '.luam.manifest', '--bundle', '--no-map', '--offline', '--no-color']],
@@ -24,6 +24,7 @@ const ACCEPTED: readonly [string, readonly string[]][] = [
     ['init', ['-y']],
     ['setup', ['--yes']],
     ['doctor', ['--no-color']],
+    ['test', ['--lua', 'definitely-not-lua', '--manifest', '.luam.manifest', '--no-color']],
 ];
 
 const STUB_EDITORS = { detect: (): [] => [], hasExtension: (): boolean => false, install: async (): Promise<never> => Promise.reject(new Error('unused')) };
@@ -50,6 +51,8 @@ const REJECTED: readonly [string, readonly string[]][] = [
     ['build', ['--manifest']],
     ['trace', ['--map']],
     ['init', ['--name']],
+    ['test', ['--bundle']],
+    ['test', ['--lua']],
     ['build', ['check']],
 ];
 
@@ -109,6 +112,8 @@ describe('command help and version', () => {
         expect(help.trace).toContain('--map <path>');
         expect(help.init).toContain('--name <name>');
         expect(help.setup).toContain('--yes');
+        expect(help.test).toContain('--lua <path>');
+        expect(help.test).not.toContain('--bundle');
     });
 
     it('prints the version once from the root', async () => {

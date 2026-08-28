@@ -61,6 +61,7 @@ export const SECTIONS: readonly Section[] = [
             'exported-function',
             'environment-configuration',
             'local-development',
+            'testing-a-module',
         ],
     },
     {

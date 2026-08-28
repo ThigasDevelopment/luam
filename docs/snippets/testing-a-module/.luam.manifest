@@ -1,0 +1,2 @@
+name = 'luam-docs-testing-a-module'
+description = 'A shared module with a test file that luam test runs and luam build ignores.'
