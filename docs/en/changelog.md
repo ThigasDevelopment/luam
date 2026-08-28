@@ -9,6 +9,14 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.5 - 2026-08-28
+
+### Added
+
+- [Contributing](/en/guide/contributing) is new: what the merge gate checks and
+  what only advises, how a change from a fork is treated, and where a
+  vulnerability goes instead of an issue.
+
 ## 0.19.4 - 2026-08-28
 
 ### Changed
