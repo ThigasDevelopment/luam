@@ -44,6 +44,7 @@ export const ptBR: LocaleStrings = {
         'guide/how-luam-works': 'Como o Luam funciona',
         'guide/migration': 'Migração',
         'guide/troubleshooting': 'Solução de problemas',
+        'guide/contributing': 'Contribuindo',
         'language/index': 'Visão geral',
         'language/syntax': 'Fundamentos de Lua',
         'language/types': 'Tipos',
