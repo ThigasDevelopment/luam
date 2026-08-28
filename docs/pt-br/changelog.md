@@ -11,6 +11,15 @@ da versão atual.
 
 ## Não lançado
 
+### Adicionado
+
+- [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam test`: o interpretador
+  que ele procura, as seis globais que um arquivo de teste ganha, cada matcher, os
+  stubs do MTA e o que eles não conseguem provar.
+  [Testando um módulo](/pt-br/recipes/testing-a-module) é uma receita nova com um
+  projeto completo, e [CI e implantação](/pt-br/tooling/ci-and-deployment) mostra o
+  job que instala o Lua e barra no resultado.
+
 ## 0.19.2 - 2026-08-28
 
 ### Adicionado

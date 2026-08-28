@@ -21,6 +21,7 @@ luam help trace
 | --- | --- |
 | [`init`](#luam-init) | Scaffolds `.luam.manifest`. |
 | [`check`](#luam-check) | Compiles and reports diagnostics. Writes nothing. |
+| [`test`](#luam-test) | Runs the project's `.test.luam` files on a local Lua 5.1 interpreter. |
 | [`build`](#luam-build) | Compiles and writes the resource into `<outDir>/<name>`. |
 | [`ensure`](#luam-ensure) | Builds, syncs into the MTA server, restarts, and watches. |
 | [`dev`](#luam-dev) | The `ensure` loop plus a live server log stream. |
@@ -28,7 +29,7 @@ luam help trace
 | [`config`](#luam-config) | Derives a declaration file from the literal data in `config.lua`. |
 | [`trace`](#luam-trace) | Resolves generated Lua positions back to Luam source. |
 | [`setup`](#luam-setup) | Detects editors and installs the extension, with consent. |
-| [`doctor`](#luam-doctor) | Reports the CLI, Node.js, editors, and the extension. |
+| [`doctor`](#luam-doctor) | Reports the CLI, Node.js, the Lua interpreter, editors, and the extension. |
 
 ## `luam init`
 
@@ -57,6 +58,83 @@ command for CI and for a pre-commit hook.
 src/server/main.luam:11:23 error check-type-mismatch: Variable "total" expects "number" but received "string".
 Build failed: 1 error, 0 warnings in 4 ms.
 ```
+
+## `luam test`
+
+```bash
+luam test
+luam test --lua /usr/bin/lua5.1
+```
+
+Compiles the project together with every `*.test.luam` file and runs them on a
+**Lua 5.1 interpreter found on `PATH`** — `lua5.1`, `lua51`, `lua`, then `luajit`,
+each accepted only when it reports `Lua 5.1`. `--lua <path>` or the `LUAM_LUA`
+variable pins a specific one, and [`luam doctor`](#luam-doctor) says whether the
+command can run at all. The CLI ships no interpreter of its own.
+
+`test` is the only command that runs your code. `build`, `check`, `ensure` and
+`dev` never do. No test file reaches the assembled resource or `meta.xml`: a
+`*.test.luam` file is excluded from `sources`, and listing one there is an error
+rather than a silent inclusion.
+
+A test file resolves to an environment the way every other file does — from its
+`sources` pattern, overridden by a file directive, falling back to `shared`.
+Shared tests run once on their own, and server and client tests run after the
+shared bundle has loaded.
+
+Six globals exist inside a test file and nowhere else:
+
+| Global | What it does |
+| --- | --- |
+| `describe(name, body)` | Groups tests. Names nest with ` > `. |
+| `test(name, body)` | Registers one test. |
+| `beforeEach(body)` | Runs before every test in scope. |
+| `afterEach(body)` | Runs after every test in scope. |
+| `expect(value)` | Returns the matchers below. |
+| `mta` | Reads and configures the MTA stubs. |
+
+| Matcher | Passes when |
+| --- | --- |
+| `.toBe(expected)` | `value == expected`. |
+| `.toNotBe(expected)` | `value ~= expected`. |
+| `.toEqual(expected)` | The two values are deeply equal. |
+| `.toNotEqual(expected)` | They are not. |
+| `.toBeNil()` | The value is `nil`. |
+| `.toBeTruthy()` | Lua treats the value as true. |
+| `.toBeFalsy()` | The value is `false` or `nil`. |
+| `.toContain(entry)` | A string contains the substring, or a table contains the value. |
+| `.toThrow(message)` | Calling the value raises, and the error contains `message`. `message` is optional. |
+
+**MTA APIs are stubbed, not simulated.** Every MTA function the catalog declares
+for the file's environment records the arguments it was called with and returns
+`nil`. Configure and read them through `mta`:
+
+| Call | What it does |
+| --- | --- |
+| `mta.returns(name, value)` | The stub returns `value`. |
+| `mta.stub(name, implementation)` | The stub calls `implementation` and returns what it returns. |
+| `mta.calls(name)` | The recorded calls, each one a table of arguments. |
+| `mta.reset()` | Forgets both. It also runs on its own before each test. |
+
+Non-function MTA globals such as `root` are absent rather than stubbed, so
+reaching for one fails instead of yielding a value that means nothing. A test can
+prove which calls your code made. It cannot prove what MTA does in response —
+that needs a running server, and this command never opens one.
+
+`luam check` compiles the resource, not the tests, so a type error inside a test
+file surfaces in the editor and in `luam test`, not in `check`.
+
+A failure reports a position in the `.luam` source, never in the generated Lua:
+
+```
+  x shared · rankOf > returns gold at one hundred points
+      src/shared/scoreboard.test.luam:9:9 expected "silver", got "gold"
+Tests failed: 2 tests passed, 1 failed in 63 ms.
+```
+
+The command exits `1` when a test fails, so CI can gate on it, and `2` when no
+Lua 5.1 interpreter is available. [Testing a module](/en/recipes/testing-a-module)
+walks through a complete project.
 
 ## `luam build`
 
@@ -220,8 +298,9 @@ terminal, pass `--yes` explicitly.
 luam doctor
 ```
 
-Reports the running CLI and Node.js versions, every supported editor detected on
-`PATH`, and whether that editor has the Luam extension. Attach its output when
+Reports the running CLI and Node.js versions, whether a Lua 5.1 interpreter is on
+`PATH` for [`luam test`](#luam-test), every supported editor detected on `PATH`,
+and whether that editor has the Luam extension. Attach its output when
 reporting a problem.
 
 ## Options
@@ -235,7 +314,7 @@ returns `2` and runs nothing.
 | `--no-color` | every command | Plain output, no colour or emoji. `NO_COLOR` does the same. |
 | `-h`, `--help` | every command | Print the help text for that command. |
 | `-v`, `--version` | root only | Print the CLI version, as `luam --version`. |
-| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Load this file instead of `.luam.manifest`. |
+| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `test`, `trace` | Load this file instead of `.luam.manifest`. |
 | `--bundle` / `--no-bundle` | `build`, `ensure` | Select bundle or tree output. `dev` owns neither. |
 | `--watch` / `--no-watch` | `dev`, `ensure` | Keep watching, or run once. Both watch by default. |
 | `--no-map` | `build`, `dev`, `ensure` | Disable map generation. For `build`, also remove the existing default map after success. |
@@ -243,6 +322,7 @@ returns `2` and runs nothing.
 | `--source <path>` | `config` | Native Lua file to read. Defaults to `config.lua`. |
 | `--out <path>` | `config` | Declaration file to write. Defaults to `config.d.luam`. |
 | `--write` | `config` | Write the declaration file instead of printing it. |
+| `--lua <path>` | `test` | Lua 5.1 interpreter that runs the tests. `LUAM_LUA` does the same. |
 | `--map <path>` | `trace` | Resource map to read. Relative paths resolve from the project directory. |
 | `--name <name>` | `init` | Resource name. |
 | `--force` | `init` | Overwrite a file that exists. |

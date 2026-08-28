@@ -1,0 +1,15 @@
+describe('formatScore', function ()
+    test('joins the name and the points', function ()
+        expect(formatScore('Ana', 12)).toBe('Ana: 12')
+    end)
+end)
+
+describe('rankOf', function ()
+    test('returns gold at one hundred points', function ()
+        expect(rankOf(100)).toBe('gold')
+    end)
+
+    test('returns bronze below fifty points', function ()
+        expect(rankOf(49)).toBe('bronze')
+    end)
+end)

@@ -1996,11 +1996,11 @@ Decided during implementation:
 
 Give a developer a way to test the resource they wrote.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 33.01 | Add a `luam test` command for user resources | ../plans/33.01-luam-test-command.md | architecture-engineer | todo |
+| 33.01 | Add a `luam test` command for user resources | ../plans/33.01-luam-test-command.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -2012,6 +2012,52 @@ Acceptance:
   file reaches the assembled resource or `meta.xml`.
 - The published CLI's dependency count is unchanged, or the ADR records why it
   had to grow.
+
+Deliberately excluded:
+
+- Testing against a live MTA server. That is an integration surface with its own
+  protocol and its own security decision, and it overlaps milestone 35.
+- A `--watch` mode and coverage. The command runs once and reports; both are
+  separate decisions once the surface has users.
+
+Decided during implementation:
+
+- **The interpreter is discovered, not shipped.** [ADR-037](adr/037-test-execution-host.md)
+  weighs a bundled Lua, a headless MTA server and a Lua already on the machine,
+  and takes the third. The published CLI's dependency count is unchanged, tests
+  run on the exact language version the compiler targets, and the cost is a
+  machine requirement paid in a diagnostic — `luam doctor` now reports whether
+  `luam test` can run at all.
+- **MTA APIs are stubbed, and the stub is honest about it.** Every `mta`-sourced
+  catalog function for the file's environment becomes a recording stub that
+  returns `nil` unless `mta.returns` or `mta.stub` says otherwise, and `mta.calls`
+  reads back what was recorded. Non-function MTA globals such as `root` are
+  absent rather than stubbed, because a stub function standing in for an element
+  is a value that means nothing. A test proves which calls the code made; it
+  cannot prove what MTA does in response.
+- **A test file is invisible to a build by construction.** `.test.luam` is
+  excluded from `sources` discovery, so `luam build` reads no test file and its
+  output is byte-identical whether or not one exists. Listing one in `sources` is
+  `config-test-source`, not a silent inclusion.
+- **The assertion surface is per-file, not project-wide.** `describe`, `test`,
+  `beforeEach`, `afterEach`, `expect` and `mta` are injected into the checker's
+  project declarations only for test paths, in the project cache and in the
+  language server alike. The editor understands a test the way it understands any
+  other module, and a non-test file that calls `test` still reports an unknown
+  global. Declarations a test file makes are kept out of every other file's
+  ambient scope, so a test can never widen what the resource compiles against.
+- **The runner reuses the bundle and the resource map.** `luam test` compiles in
+  bundle layout with the map on, writes the bundles and a harness to a temporary
+  directory, and runs one Lua process per environment that has tests — shared
+  alone, server and client after the shared bundle. Positions come back through
+  `resolveResourcePosition` from milestone 18.
+- **The column is the statement's, not the expression's.** The line map records
+  lines. The reported column points at the mapped symbol on the resolved line
+  when the map names one, and at the first character of the statement otherwise.
+  Carrying columns through the map would force one mapping per statement and grow
+  every resource map for a test-only feature.
+- **`luam check` does not compile test files.** `check` answers for the resource.
+  A type error inside a test surfaces in the editor and in `luam test`.
 
 ## Milestone 34 — Library Distribution
 

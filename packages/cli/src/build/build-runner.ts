@@ -37,6 +37,7 @@ export interface BuildOutcome {
 }
 
 export interface CompileOptions {
+    additionalFiles?: readonly ProjectFile[];
     cache?: ProjectCache;
     tracker?: PhaseTracker;
     minMtaVersion?: string | null;
@@ -128,6 +129,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
     const excluded = [config.outDir, config.contracts];
     const sources = discoverSources(root, config.sources, excluded);
     const inputs = readProjectInputs(root, { assets: config.assets, environment: config.environment, excluded });
+    const files = [...sources.files, ...(options.additionalFiles ?? [])].sort((left, right) => left.path.localeCompare(right.path));
     const contracts = readDependencyContracts(root, config);
     const diagnostics = [...sources.diagnostics, ...inputs.diagnostics, ...contracts.diagnostics];
 
@@ -149,10 +151,10 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
         };
     }
 
-    tracker.begin('compile', sources.files.length);
+    tracker.begin('compile', files.length);
 
     const declarations = projectDeclarations(inputs.declared?.entries ?? null, config.environment.file);
-    const project = cache.compile(sources.files, {
+    const project = cache.compile(files, {
         project: declarations,
         contracts: contracts.contracts,
         compilerOptions: config.compilerOptions,
@@ -180,12 +182,12 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
         build,
         diagnostics,
         fileDiagnostics: assembly.diagnostics,
-        fileCount: sources.files.length,
+        fileCount: files.length,
         durationMs: performance.now() - started,
         stats: project.stats,
         environmentTemplate: inputs.deployed === null ? null : renderEnvironmentTemplate(inputs.deployed),
         phases: tracker.durations(),
-        sources: diagnosticSources(sources.files, assembly.diagnostics),
+        sources: diagnosticSources(files, assembly.diagnostics),
         map: build?.map ?? null,
         contract: build === null ? null : buildResourceAbi(config.name, project.modules.flatMap((module) => module.contributions)),
     };

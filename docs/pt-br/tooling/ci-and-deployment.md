@@ -35,6 +35,33 @@ A saída descarta todas as sequências de escape quando o fluxo não é um termi
 então a transcrição de CI não carrega caracteres de controle. `--no-color` força
 isso em qualquer lugar.
 
+## Rodando os testes em CI
+
+O `luam test` roda cada arquivo `*.test.luam` e sai com `1` quando um falha, então
+um job barra nele do mesmo jeito que barra no `check`. Ele precisa de um
+interpretador **Lua 5.1**, que a CLI não embarca e o runner precisa instalar:
+
+```yaml
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+            - run: sudo apt-get update && sudo apt-get install -y lua5.1
+            - run: npx --yes @thigasdevelopment/luam test
+```
+
+Sair com `2` significa que nenhum interpretador foi encontrado — o passo de
+instalação está faltando, ou o binário está sob um nome que o comando não tenta.
+`--lua <path>` ou `LUAM_LUA` aponta para ele.
+
+O `test` é o único comando que executa o código do projeto. O `check` e o `build`
+não executam, então um pipeline que só constrói não precisa de interpretador
+nenhum. Veja [Testando um módulo](/pt-br/recipes/testing-a-module) para o que um
+teste consegue e o que não consegue provar.
+
 ## Códigos de saída
 
 | Código | Significado | No pipeline |
