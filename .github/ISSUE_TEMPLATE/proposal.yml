@@ -1,0 +1,68 @@
+name: Language or compiler proposal
+description: New syntax, new semantics, or a change to what the compiler emits.
+labels: [proposal]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              A proposal is decided in writing before it is written in code. Expect the answer to be a recorded decision, and expect "not planned" to be one of the possible answers.
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: The problem
+          description: What is hard or impossible today. Describe the situation, not the feature.
+      validations:
+          required: true
+
+    - type: textarea
+      id: proposal
+      attributes:
+          label: What you propose
+          description: The syntax or behaviour you want, written as you would write it in a `.luam` file.
+          render: lua
+      validations:
+          required: true
+
+    - type: textarea
+      id: emitted
+      attributes:
+          label: What the compiler should emit
+          description: The Lua 5.1 you expect it to produce. Everything Luam adds has to become plain Lua that runs inside MTA.
+          render: lua
+      validations:
+          required: false
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: What you can do instead today
+          description: The workaround you use now, and why it is not enough.
+      validations:
+          required: true
+
+    - type: dropdown
+      id: kind
+      attributes:
+          label: What this touches
+          options:
+              - Syntax the parser accepts
+              - Types the checker enforces
+              - The Lua the compiler emits
+              - The CLI or the manifest
+              - The language server or the editor experience
+              - The MTA catalog
+      validations:
+          required: true
+
+    - type: checkboxes
+      id: constraints
+      attributes:
+          label: Constraints you have checked
+          options:
+              - label: It compiles to Lua 5.1 and runs inside MTA.
+                required: true
+              - label: It needs no network call from the compiler.
+                required: true
+              - label: It does not require a runtime the project would have to ship and support.
+                required: false

@@ -8,7 +8,7 @@ const WORKFLOWS = fileURLToPath(new URL('../../../.github/workflows', import.met
 
 const REFRESH = readFileSync(join(WORKFLOWS, 'catalog-refresh.yml'), 'utf8');
 
-const USES = /^\s*-?\s*uses:\s*(\S+)\s*$/gm;
+const USES = /^\s*-?\s*uses:\s*(\S+)(?:\s+#.*)?\s*$/gm;
 
 function externalActions(workflow: string): string[] {
     const actions: string[] = [];
@@ -56,6 +56,7 @@ describe('catalog refresh workflow', () => {
     });
 
     it('regenerates and proves the committed catalog matches in CI', () => {
-        expect(readFileSync(join(WORKFLOWS, 'ci.yml'), 'utf8')).toContain('git diff --exit-code -- packages/mta-types/src/generated');
+        expect(readFileSync(join(WORKFLOWS, 'unit-typecheck.yml'), 'utf8')).toContain('git diff --exit-code -- packages/mta-types/src/generated');
+        expect(readFileSync(join(WORKFLOWS, 'ci.yml'), 'utf8')).toContain('uses: ./.github/workflows/unit-typecheck.yml');
     });
 });

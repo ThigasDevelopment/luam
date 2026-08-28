@@ -11,6 +11,14 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.5 - 2026-08-28
+
+### Adicionado
+
+- [Contribuindo](/pt-br/guide/contributing) é nova: o que o portão de merge
+  verifica e o que apenas aconselha, como uma mudança vinda de um fork é
+  tratada, e para onde vai uma vulnerabilidade em vez de uma issue.
+
 ## 0.19.4 - 2026-08-28
 
 ### Alterado

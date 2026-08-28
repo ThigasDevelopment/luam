@@ -19,8 +19,14 @@ updates:
                   - 'vitest'
 
     - package-ecosystem: github-actions
-      directory: '/'
+      directories:
+          - '/'
+          - '/.github/actions/setup'
       schedule:
           interval: weekly
       labels:
           - dependencies
+      groups:
+          actions:
+              patterns:
+                  - '*'

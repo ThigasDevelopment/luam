@@ -1,0 +1,44 @@
+name: Documentation problem
+description: A page that is wrong, missing, out of date, or untranslated.
+labels: [documentation]
+body:
+    - type: input
+      id: page
+      attributes:
+          label: The page
+          description: The URL, or the path under `docs/`.
+          placeholder: docs/en/guide/quick-start.md
+      validations:
+          required: true
+
+    - type: dropdown
+      id: locale
+      attributes:
+          label: Locale
+          options:
+              - English
+              - Português (Brasil)
+              - Both
+      validations:
+          required: true
+
+    - type: dropdown
+      id: kind
+      attributes:
+          label: What is wrong with it
+          options:
+              - It states something that is not true
+              - It describes behaviour that has changed
+              - It is missing something a reader needs
+              - The two locales disagree
+              - An example does not compile or does not run
+      validations:
+          required: true
+
+    - type: textarea
+      id: detail
+      attributes:
+          label: What it says, and what it should say
+          description: Quote the passage. If an example fails, paste the command and the output.
+      validations:
+          required: true

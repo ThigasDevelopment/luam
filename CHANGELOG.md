@@ -14,6 +14,22 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.5 - 2026-08-28
+
+### Changed
+
+- The pipelines are reorganized around a written contract, and the merge gate is
+  separated from the advisory signal: typecheck, test, build and docs decide
+  whether a change may merge, while benchmark and audit report without blocking.
+  Each unit is its own reusable workflow, every action is pinned, and a suite in
+  `@luam/pipeline` asserts the contract so a workflow cannot drift from it
+  silently. Contributions from forks are bounded by a recorded threat model
+  rather than by convention.
+- The project gains its contributor entry documents: `CONTRIBUTING.md`,
+  `SECURITY.md` with a private channel for a vulnerability, `CODEOWNERS`, a pull
+  request template, and issue forms for a bug, a proposal and a documentation
+  problem. The manual gains a contributing page in both locales.
+
 ## 0.19.4 - 2026-08-28
 
 ### Changed

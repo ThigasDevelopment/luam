@@ -1,4 +1,4 @@
-# Roadmap
+doing |doing |doing |doing |done |done |done |# Roadmap
 
 Incremental milestones. Each milestone produces a usable artifact and is
 verifiable through tests. Each task has a plan file in `plans/` following
@@ -2178,24 +2178,24 @@ Decided:
   would then require amending the CLI-never-connects rule in `.claude/CLAUDE.md`
   explicitly. The offline test-host debugger is the one shape that needs neither.
 
-## Milestone 36 — Pipeline Consolidation and Community Contribution
+doing |doing |doing |doing |done |done |done |## Milestone 36 — Pipeline Consolidation and Community Contribution
 
 Reorganize every workflow around one written contract, and open the project to
 outside contributors with a pipeline designed for code the project does not
 trust.
 
-Status: todo
+Status: doing
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 36.01 | Inventory the pipelines and define their contract | ../plans/36.01-pipeline-contract.md | github-engineer | todo |
-| 36.02 | Extract reusable workflows and pin every action | ../plans/36.02-reusable-workflows.md | github-engineer | todo |
-| 36.03 | Separate the merge gate from the advisory signal | ../plans/36.03-merge-gate-and-signal.md | github-engineer | todo |
-| 36.04 | Threat-model contributions from forks | ../plans/36.04-fork-threat-model.md | security-engineer | todo |
-| 36.05 | Add the community pull request pipeline | ../plans/36.05-fork-pull-request-pipeline.md | github-engineer | todo |
-| 36.06 | Add the contributor entry documents and templates | ../plans/36.06-contributor-entry-documents.md | documentation-engineer | todo |
-| 36.07 | Verify the reorganized pipelines | ../plans/36.07-pipeline-verification.md | test-engineer | todo |
-| 36.08 | Protect the permanent branches and the release tags | ../plans/36.08-branch-and-tag-protection.md | github-engineer | todo |
+| 36.01 | Inventory the pipelines and define their contract | ../plans/36.01-pipeline-contract.md | github-engineer | done |
+| 36.02 | Extract reusable workflows and pin every action | ../plans/36.02-reusable-workflows.md | github-engineer | done |
+| 36.03 | Separate the merge gate from the advisory signal | ../plans/36.03-merge-gate-and-signal.md | github-engineer | doing |
+| 36.04 | Threat-model contributions from forks | ../plans/36.04-fork-threat-model.md | security-engineer | done |
+| 36.05 | Add the community pull request pipeline | ../plans/36.05-fork-pull-request-pipeline.md | github-engineer | doing |
+| 36.06 | Add the contributor entry documents and templates | ../plans/36.06-contributor-entry-documents.md | documentation-engineer | done |
+| 36.07 | Verify the reorganized pipelines | ../plans/36.07-pipeline-verification.md | test-engineer | doing |
+| 36.08 | Protect the permanent branches and the release tags | ../plans/36.08-branch-and-tag-protection.md | github-engineer | doing |
 
 Sequencing:
 
@@ -2258,3 +2258,59 @@ Deferred to a later milestone:
 - Auto-merge for Dependabot. It opens up to ten pull requests a week with no
   automated path to landing them, but the trust model for that path depends on
   the required-check set this milestone defines.
+
+Decided:
+
+- **One role per workflow, one gate, and a pinned supply chain.**
+  [ADR-040](adr/040-pipeline-contract.md) inventories every workflow, job,
+  trigger, permission and secret, marks the duplicated steps and the unpinned
+  actions, and assigns each workflow exactly one role — merge gate, publication,
+  scheduled maintenance, or advisory signal. The verifications are extracted into
+  `workflow_call` units the gate, the release path and a fork run all compose, so
+  a maintainer and a contributor cannot silently verify different things.
+- **A required check must report on every pull request.** This is why docs
+  validation moved into the gate rather than being required where it lived: a
+  path-filtered check is held pending by GitHub when its workflow does not run,
+  which would block every pull request that touches none of its paths. `docs.yml`
+  keeps its filter and becomes publication only.
+- **The two jobs that could fail for reasons a change did not cause are off the
+  gate.** The production audit runs on a schedule and files an issue, with a
+  read-only re-run on a pull request that changes a dependency manifest; the
+  benchmark measures after a merge to `develop` and records the number instead of
+  failing on it. `typecheck` and the test matrix now start together.
+- **A fork pull request runs verification only.**
+  [ADR-041](adr/041-untrusted-contribution-boundary.md) lists every pipeline
+  asset with a reachability verdict, forbids `pull_request_target` outright, and
+  writes six invariants as assertions rather than intentions. The one elevated
+  path is `workflow_run`, which starts after the gate, checks out the default
+  branch, and never executes contributed code — `triage.yml` labels by path and
+  size that way.
+- **The invariants are enforced by a suite that blocks a merge.**
+  `@luam/pipeline` parses the workflow files and the committed rulesets and
+  asserts the permission budget, the SHA pins, one definition per verification,
+  the untrusted boundary, and that every required check name resolves to a job
+  that actually reports. Losing a `permissions` block, unpinning an action, and
+  giving a fork-reachable job a secret were each proven to fail it.
+- **`.github/rulesets` is the source of truth for what GitHub enforces.** `main`
+  and `develop` block a force-push and a deletion, `main` additionally requires a
+  pull request with zero approvals and the five reported gate checks, and a `v*`
+  tag can be neither deleted nor moved. No bypass actor, for anyone.
+
+- **The reorganized gate ran green on `develop`, and the names match.** Run
+  33206816933 reported exactly `typecheck / Typecheck`,
+  `test / Test on Node 22`, `test / Test on Node 24`, `docs / Docs` and
+  `build / Build` — the five names `@luam/pipeline` computes from the workflow
+  files and the five `.github/rulesets/main.json` requires. The benchmark ran as
+  its own workflow and the audit did not run at all, which is where 36.03 put
+  them. Wall-clock fell from 3m00s to 2m15s, because typecheck, the matrix and
+  the docs no longer wait on each other.
+
+Remaining:
+
+- Applying the three rulesets, raising fork run approval from first-time
+  contributors to all outside contributors, and enabling private vulnerability
+  reporting. Each is a repository setting rather than a file, and each waits on
+  the workflows being pushed so the required-check names exist, which they now
+  do.
+- A deliberate break in a type, a test and the smoke build, to prove the gate
+  still fails on one, and the fork rehearsal in 36.07, which needs a real fork.

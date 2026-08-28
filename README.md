@@ -309,11 +309,17 @@ pnpm test
 pnpm build
 ```
 
-Branch from `develop`, add a fixture and a snapshot for new language behaviour,
-and run `pnpm typecheck && pnpm test` before opening a pull request. House style:
-TypeScript only, strict, no `any`, no comments inside code, 4-space indentation,
-single quotes, kebab-case file names, path aliases instead of `../` imports, no
-barrel files, everything in English.
+Fork, open the pull request against `develop`, add a fixture and a snapshot for
+new language behaviour, and run `pnpm typecheck && pnpm test` before sending it.
+House style: TypeScript only, strict, no `any`, no comments inside code, 4-space
+indentation, single quotes, kebab-case file names, path aliases instead of `../`
+imports, no barrel files, everything in English.
+
+[CONTRIBUTING.md](CONTRIBUTING.md) is the full contract — the Node and Lua 5.1
+requirements, the command that reproduces each required check, and what happens
+to a pull request from a fork. Conduct is in
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). A vulnerability is reported privately
+through [SECURITY.md](SECURITY.md), never as an issue.
 
 The manual lives in [`docs/`](docs/) — `pnpm docs:dev` to preview,
 `pnpm docs:verify` before pushing. English is the source locale and pt-BR is

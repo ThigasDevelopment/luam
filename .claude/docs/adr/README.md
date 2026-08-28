@@ -48,3 +48,5 @@ Each row links the record; the record itself carries the full status note.
 | 037 | [Run tests on a discovered Lua 5.1 interpreter with recorded MTA stubs](037-test-execution-host.md) | Accepted |
 | 038 | [Distribute Luam libraries as npm packages vendored into the resource](038-library-distribution.md) | Accepted |
 | 039 | [Ship no debugger, and keep the CLI out of a running server](039-no-debugger.md) | Accepted |
+| 040 | [One role per workflow, one gate, and a pinned supply chain](040-pipeline-contract.md) | Accepted |
+| 041 | [A fork pull request runs verification only, with no secret and no write](041-untrusted-contribution-boundary.md) | Accepted |

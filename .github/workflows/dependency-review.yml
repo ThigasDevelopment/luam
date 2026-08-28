@@ -1,0 +1,40 @@
+name: Dependency review
+
+on:
+    pull_request:
+        branches: [main, develop]
+        paths:
+            - 'package.json'
+            - 'packages/*/package.json'
+            - 'tools/*/package.json'
+            - 'pnpm-lock.yaml'
+
+permissions:
+    contents: read
+
+concurrency:
+    group: dependency-review-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    review:
+        name: Dependencies
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+
+            - name: Audit the production dependencies
+              run: pnpm audit --audit-level moderate --prod --json > "$RUNNER_TEMP/audit.json" || true
+
+            - name: Summarize the findings
+              run: |
+                  node .github/scripts/summarize-audit.mjs "$RUNNER_TEMP/audit.json" > "$RUNNER_TEMP/audit.md"
+
+                  if [ "$(cat "$RUNNER_TEMP/audit.md")" = 'none' ]; then
+                      echo 'No advisory affects the production dependency tree.' >> "$GITHUB_STEP_SUMMARY"
+                  else
+                      cat "$RUNNER_TEMP/audit.md" >> "$GITHUB_STEP_SUMMARY"
+                  fi

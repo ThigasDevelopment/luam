@@ -15,130 +15,22 @@ concurrency:
 
 jobs:
     typecheck:
-        name: Typecheck
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-            - uses: ./.github/actions/setup
-            - run: pnpm -r typecheck
-
-            - name: Regenerate the MTA catalog offline and check it is committed
-              run: |
-                  pnpm --filter @luam/mta-types generate
-                  git diff --exit-code -- packages/mta-types/src/generated packages/mta-types/data/catalog-index.json
-
-            - name: Check every generated theme matches the role table
-              run: pnpm --filter @luam/theme themes:check
+        uses: ./.github/workflows/unit-typecheck.yml
+        permissions:
+            contents: read
 
     test:
-        name: Test on Node ${{ matrix.node-version }}
-        needs: typecheck
-        runs-on: ubuntu-latest
-        strategy:
-            fail-fast: true
-            matrix:
-                node-version: ['22', '24']
-        steps:
-            - uses: actions/checkout@v7
-            - uses: ./.github/actions/setup
-              with:
-                  node-version: ${{ matrix.node-version }}
+        uses: ./.github/workflows/unit-test.yml
+        permissions:
+            contents: read
 
-            - name: Compiler, runtime, and mta-types
-              run: pnpm --filter @luam/compiler --filter @luam/runtime --filter @luam/mta-types --filter @luam/template test
-
-            - name: Install Lua 5.1 for minifier validation
-              run: sudo apt-get update && sudo apt-get install -y lua5.1
-
-            - name: CLI
-              run: pnpm --filter @luam/cli test
-
-            - name: LSP and VS Code extension
-              run: pnpm --filter @luam/lsp --filter luam test
-
-            - name: Theme contract
-              run: pnpm --filter @luam/theme test
-
-            - name: Release tooling
-              run: pnpm --filter @luam/release test
+    docs:
+        uses: ./.github/workflows/unit-docs.yml
+        permissions:
+            contents: read
 
     build:
-        name: Build
         needs: test
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-            - uses: ./.github/actions/setup
-            - run: pnpm -r build
-
-            - name: Bundle the CLI
-              run: pnpm --filter @luam/cli bundle
-
-            - name: Install Lua 5.1 for the production smoke test
-              run: sudo apt-get update && sudo apt-get install -y lua5.1
-
-            - name: Check the command contract of the bundled CLI
-              run: |
-                  LUAM="node $GITHUB_WORKSPACE/packages/cli/dist/luam.mjs"
-                  $LUAM --help | grep -q 'Exit codes:'
-                  $LUAM --help | grep -q 'trace'
-                  $LUAM build --help | grep -q -- '--bundle'
-                  $LUAM dev --help | grep -q -- '--watch'
-                  $LUAM --version
-                  set +e
-                  $LUAM dev --bundle > /dev/null 2>&1
-                  test $? -eq 2
-                  $LUAM deploy > /dev/null 2>&1
-                  test $? -eq 2
-
-            - name: Build a resource with the bundled CLI
-              run: |
-                  mkdir -p "$RUNNER_TEMP/smoke/src/server"
-                  cd "$RUNNER_TEMP/smoke"
-                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" init --name luam-smoke
-                  printf 'local greeting: string = "luam"\nprint(greeting)\n' > src/server/main.luam
-                  printf 'TOKEN=secret\n' > .env
-                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" check
-                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" build
-                  test -f build/luam-smoke/meta.xml
-                  test -f build/luam-smoke/src/server.lua
-                  test -f build/luam-smoke/.env
-                  ! grep -q '<file src=".env"' build/luam-smoke/meta.xml
-                  test "$(wc -l < build/luam-smoke/src/server.lua)" -eq 0
-                  lua5.1 -e 'assert(loadfile("build/luam-smoke/src/server.lua"))'
-                  grep -q '"minified": true' build/luam-smoke.luam-map.json
-
-            - name: Switch to the minimum supported Node
-              uses: actions/setup-node@v7
-              with:
-                  node-version: '20'
-
-            - name: Rebuild the resource on the minimum supported Node
-              run: |
-                  cd "$RUNNER_TEMP/smoke"
-                  rm -rf build
-                  node "$GITHUB_WORKSPACE/packages/cli/dist/luam.mjs" build
-                  test -f build/luam-smoke/meta.xml
-                  test -f build/luam-smoke/src/server.lua
-
-    benchmark:
-        name: Benchmark
-        needs: test
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-            - uses: ./.github/actions/setup
-            - run: pnpm --filter @luam/compiler test:bench
-
-    audit:
-        name: Audit
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-            - uses: ./.github/actions/setup
-
-            - name: Production dependencies
-              run: pnpm audit --audit-level moderate --prod
-
-            - name: Development dependencies
-              run: pnpm audit --audit-level moderate || true
+        uses: ./.github/workflows/unit-build.yml
+        permissions:
+            contents: read
