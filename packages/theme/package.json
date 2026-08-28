@@ -1,6 +1,6 @@
 {
     "name": "@luam/theme",
-    "version": "0.19.3",
+    "version": "0.19.4",
     "private": true,
     "type": "module",
     "main": "./src/resolve.ts",

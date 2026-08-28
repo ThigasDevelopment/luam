@@ -9,6 +9,15 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.4 - 2026-08-28
+
+### Changed
+
+- [Limitations](/en/reference/limitations) records that Luam ships no debugger
+  as a design boundary of its own, instead of leaving it as the closing aside of
+  the development-logs entry. The page now says the decision is settled rather
+  than pending, and points at what `luam dev` already gives a developer.
+
 ## 0.19.3 - 2026-08-28
 
 ### Added
