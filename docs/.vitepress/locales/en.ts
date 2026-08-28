@@ -81,6 +81,7 @@ export const en: LocaleStrings = {
         'recipes/exported-function': 'Exported function',
         'recipes/environment-configuration': 'Environment configuration',
         'recipes/local-development': 'Local development',
+        'recipes/testing-a-module': 'Testing a module',
         'reference/index': 'Overview',
         'reference/keywords': 'Keywords',
         'reference/operators': 'Operators',

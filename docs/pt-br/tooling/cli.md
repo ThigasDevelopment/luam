@@ -21,6 +21,7 @@ luam help trace
 | --- | --- |
 | [`init`](#luam-init) | Cria o `.luam.manifest`. |
 | [`check`](#luam-check) | Compila e reporta diagnósticos. Não escreve nada. |
+| [`test`](#luam-test) | Roda os arquivos `.test.luam` do projeto em um Lua 5.1 local. |
 | [`build`](#luam-build) | Compila e escreve o resource em `<outDir>/<name>`. |
 | [`ensure`](#luam-ensure) | Constrói, sincroniza no servidor MTA, reinicia e observa. |
 | [`dev`](#luam-dev) | O laço do `ensure` mais um fluxo ao vivo do log do servidor. |
@@ -28,7 +29,7 @@ luam help trace
 | [`config`](#luam-config) | Deriva um arquivo de declaração a partir dos dados literais do `config.lua`. |
 | [`trace`](#luam-trace) | Resolve posições Lua geradas de volta para o código Luam. |
 | [`setup`](#luam-setup) | Detecta editores e instala a extensão, com consentimento. |
-| [`doctor`](#luam-doctor) | Informa a CLI, o Node.js, os editores e a extensão. |
+| [`doctor`](#luam-doctor) | Informa a CLI, o Node.js, o interpretador Lua, os editores e a extensão. |
 
 ## `luam init`
 
@@ -57,6 +58,84 @@ e para um hook de pre-commit.
 src/server/main.luam:11:23 error check-type-mismatch: Variable "total" expects "number" but received "string".
 Build failed: 1 error, 0 warnings in 4 ms.
 ```
+
+## `luam test`
+
+```bash
+luam test
+luam test --lua /usr/bin/lua5.1
+```
+
+Compila o projeto junto com cada arquivo `*.test.luam` e os executa em um
+**interpretador Lua 5.1 encontrado no `PATH`** — `lua5.1`, `lua51`, `lua` e então
+`luajit`, cada um aceito apenas quando informa `Lua 5.1`. `--lua <path>` ou a
+variável `LUAM_LUA` fixa um específico, e o [`luam doctor`](#luam-doctor) diz se o
+comando consegue rodar. A CLI não embarca interpretador nenhum.
+
+`test` é o único comando que executa o seu código. `build`, `check`, `ensure` e
+`dev` nunca executam. Nenhum arquivo de teste chega ao resource montado nem ao
+`meta.xml`: um arquivo `*.test.luam` fica fora de `sources`, e listar um ali é um
+erro, não uma inclusão silenciosa.
+
+Um arquivo de teste resolve para um ambiente como qualquer outro arquivo — pelo
+padrão de `sources`, sobrescrito por uma diretiva de arquivo, com `shared` como
+último recurso. Testes `shared` rodam uma vez sozinhos, e testes de servidor e de
+cliente rodam depois que o bundle `shared` carrega.
+
+Seis globais existem dentro de um arquivo de teste e em nenhum outro lugar:
+
+| Global | O que faz |
+| --- | --- |
+| `describe(name, body)` | Agrupa testes. Os nomes aninham com ` > `. |
+| `test(name, body)` | Registra um teste. |
+| `beforeEach(body)` | Roda antes de cada teste do escopo. |
+| `afterEach(body)` | Roda depois de cada teste do escopo. |
+| `expect(value)` | Devolve os matchers abaixo. |
+| `mta` | Lê e configura os stubs do MTA. |
+
+| Matcher | Passa quando |
+| --- | --- |
+| `.toBe(expected)` | `value == expected`. |
+| `.toNotBe(expected)` | `value ~= expected`. |
+| `.toEqual(expected)` | Os dois valores são profundamente iguais. |
+| `.toNotEqual(expected)` | Não são. |
+| `.toBeNil()` | O valor é `nil`. |
+| `.toBeTruthy()` | Lua trata o valor como verdadeiro. |
+| `.toBeFalsy()` | O valor é `false` ou `nil`. |
+| `.toContain(entry)` | Uma string contém o trecho, ou uma tabela contém o valor. |
+| `.toThrow(message)` | Chamar o valor levanta erro, e o erro contém `message`. `message` é opcional. |
+
+**As APIs do MTA são stubs, não simulações.** Cada função do MTA que o catálogo
+declara para o ambiente do arquivo registra os argumentos com que foi chamada e
+devolve `nil`. Configure e leia através de `mta`:
+
+| Chamada | O que faz |
+| --- | --- |
+| `mta.returns(name, value)` | O stub devolve `value`. |
+| `mta.stub(name, implementation)` | O stub chama `implementation` e devolve o que ela devolver. |
+| `mta.calls(name)` | As chamadas registradas, cada uma uma tabela de argumentos. |
+| `mta.reset()` | Esquece as duas coisas. Também roda sozinho antes de cada teste. |
+
+Globais do MTA que não são funções, como `root`, estão ausentes em vez de virarem
+stub, então buscar uma falha em vez de entregar um valor que não significa nada.
+Um teste consegue provar quais chamadas o seu código fez. Não consegue provar o
+que o MTA faz em resposta — isso exige um servidor rodando, e este comando nunca
+abre um.
+
+O `luam check` compila o resource, não os testes, então um erro de tipo dentro de
+um arquivo de teste aparece no editor e no `luam test`, não no `check`.
+
+Uma falha informa uma posição no código `.luam`, nunca no Lua gerado:
+
+```
+  x shared · rankOf > returns gold at one hundred points
+      src/shared/scoreboard.test.luam:9:9 expected "silver", got "gold"
+Tests failed: 2 tests passed, 1 failed in 63 ms.
+```
+
+O comando sai com `1` quando um teste falha, para que a CI possa barrar, e com `2`
+quando não há interpretador Lua 5.1 disponível.
+[Testando um módulo](/pt-br/recipes/testing-a-module) percorre um projeto completo.
 
 ## `luam build`
 
@@ -227,8 +306,9 @@ interativo, passe `--yes` explicitamente.
 luam doctor
 ```
 
-Informa as versões da CLI e do Node.js em uso, cada editor suportado detectado no
-`PATH` e se aquele editor tem a extensão do Luam. Anexe a saída dele ao relatar um
+Informa as versões da CLI e do Node.js em uso, se há um interpretador Lua 5.1 no
+`PATH` para o [`luam test`](#luam-test), cada editor suportado detectado no `PATH`
+e se aquele editor tem a extensão do Luam. Anexe a saída dele ao relatar um
 problema.
 
 ## Opções
@@ -242,7 +322,7 @@ retorna `2` e não executa nada.
 | `--no-color` | todos os comandos | Saída simples, sem cor nem emoji. `NO_COLOR` faz o mesmo. |
 | `-h`, `--help` | todos os comandos | Imprime o texto de ajuda daquele comando. |
 | `-v`, `--version` | apenas a raiz | Imprime a versão da CLI, como `luam --version`. |
-| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `trace` | Carrega este arquivo em vez do `.luam.manifest`. |
+| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `test`, `trace` | Carrega este arquivo em vez do `.luam.manifest`. |
 | `--bundle` / `--no-bundle` | `build`, `ensure` | Seleciona bundle ou árvore. `dev` não possui nenhuma das duas. |
 | `--watch` / `--no-watch` | `dev`, `ensure` | Mantém observando, ou roda uma vez. Ambos observam por padrão. |
 | `--no-map` | `build`, `dev`, `ensure` | Desliga a geração do mapa. Para `build`, também remove o mapa padrão existente depois do sucesso. |
@@ -250,6 +330,7 @@ retorna `2` e não executa nada.
 | `--source <path>` | `config` | Arquivo Lua nativo a ler. Padrão `config.lua`. |
 | `--out <path>` | `config` | Arquivo de declaração a escrever. Padrão `config.d.luam`. |
 | `--write` | `config` | Escreve o arquivo de declaração em vez de imprimi-lo. |
+| `--lua <path>` | `test` | Interpretador Lua 5.1 que roda os testes. `LUAM_LUA` faz o mesmo. |
 | `--map <path>` | `trace` | Mapa a ler. Caminhos relativos partem do diretório do projeto. |
 | `--name <name>` | `init` | Nome do resource. |
 | `--force` | `init` | Sobrescreve um arquivo existente. |

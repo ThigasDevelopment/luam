@@ -11,6 +11,11 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ### Added
 
+- [CLI commands](/en/tooling/cli) documents `luam test`: the interpreter it looks
+  for, the six globals a test file gets, every matcher, the MTA stubs and what
+  they cannot prove. [Testing a module](/en/recipes/testing-a-module) is a new
+  recipe with a complete project, and [CI and deployment](/en/tooling/ci-and-deployment)
+  shows the job that installs Lua and gates on the result.
 - [Editors](/en/tooling/editors) and [Formatting](/en/reference/formatting) record
   `luam.formatting`, the setting that turns the formatter off.
 - [Editors](/en/tooling/editors) records the `static` keyword hover and the

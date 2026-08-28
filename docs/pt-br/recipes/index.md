@@ -16,6 +16,7 @@ cada build da documentação — então nada aqui pode se afastar do compilador.
 | [Função exportada](/pt-br/recipes/exported-function) | Uma função que outro resource pode chamar. |
 | [Configuração de ambiente](/pt-br/recipes/environment-configuration) | Valores do `.env` tipados e lidos no servidor. |
 | [Desenvolvimento local](/pt-br/recipes/local-development) | O laço de build, sincronização, restart e logs. |
+| [Testando um módulo](/pt-br/recipes/testing-a-module) | Arquivos de teste que rodam no `luam test` e nunca são publicados. |
 
 ## Como usar uma receita
 

@@ -16,6 +16,7 @@ documentation build — so nothing here can drift away from the compiler.
 | [Exported function](/en/recipes/exported-function) | A function another resource can call. |
 | [Environment configuration](/en/recipes/environment-configuration) | `.env` values typed and read on the server. |
 | [Local development](/en/recipes/local-development) | The build, sync, restart and log loop. |
+| [Testing a module](/en/recipes/testing-a-module) | Test files that run under `luam test` and never ship. |
 
 ## How to use a recipe
 

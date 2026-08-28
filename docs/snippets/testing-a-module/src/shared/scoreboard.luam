@@ -1,0 +1,15 @@
+function formatScore(name: string, points: number): string
+    return `${name}: ${points}`
+end
+
+function rankOf(points: number): string
+    if points >= 100 then
+        return 'gold'
+    end
+
+    if points >= 50 then
+        return 'silver'
+    end
+
+    return 'bronze'
+end

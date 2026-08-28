@@ -45,3 +45,4 @@ Each row links the record; the record itself carries the full status note.
 | 034 | [Validate a shape at runtime only where a class is marked](034-opt-in-boundary-validation.md) | Accepted |
 | 035 | [Expose Lua metamethods by reserved member name](035-safe-class-metamethods.md) | Accepted |
 | 036 | [Read a native `config.lua` for literal data, never execute it](036-config-declaration-extraction.md) | Accepted |
+| 037 | [Run tests on a discovered Lua 5.1 interpreter with recorded MTA stubs](037-test-execution-host.md) | Accepted |

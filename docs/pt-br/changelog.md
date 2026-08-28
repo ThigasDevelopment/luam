@@ -13,6 +13,12 @@ da versão atual.
 
 ### Adicionado
 
+- [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam test`: o interpretador
+  que ele procura, as seis globais que um arquivo de teste ganha, cada matcher, os
+  stubs do MTA e o que eles não conseguem provar.
+  [Testando um módulo](/pt-br/recipes/testing-a-module) é uma receita nova com um
+  projeto completo, e [CI e implantação](/pt-br/tooling/ci-and-deployment) mostra o
+  job que instala o Lua e barra no resultado.
 - [Editores](/pt-br/tooling/editors) e [Formatação](/pt-br/reference/formatting)
   registram o `luam.formatting`, a configuração que desliga o formatador.
 - [Editores](/pt-br/tooling/editors) registra o hover da palavra-chave `static` e

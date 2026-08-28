@@ -7,7 +7,7 @@ import type { SourceMapping } from '@compiler/manifest/manifest-contract';
 import type { ProjectFile } from '@compiler/project/module';
 import { isLiteralPattern, normalizePattern } from '@compiler/project/path-pattern';
 import { createSourceResolver, describeMatches, type SourceResolver } from '@compiler/project/source-mapping';
-import { SOURCE_EXTENSION } from '@compiler/project/source-kind';
+import { isTestPath, SOURCE_EXTENSION, TEST_EXTENSION } from '@compiler/project/source-kind';
 
 export interface DiscoveredSources {
     files: ProjectFile[];
@@ -21,10 +21,20 @@ const NO_SOURCES = 'config-no-sources';
 
 const SIDE_CONFLICT = 'config-source-side-conflict';
 
+const TEST_SOURCE = 'config-test-source';
+
 const UNREADABLE_SOURCE = 'build-source-unreadable';
 
 function checkLiterals(root: string, resolver: SourceResolver, found: ReadonlySet<string>, diagnostics: CliDiagnostic[]): void {
     for (const pattern of resolver.patterns.filter(isLiteralPattern)) {
+        if (isTestPath(pattern)) {
+            diagnostics.push(
+                cliError(TEST_SOURCE, `"${pattern}" is listed in "sources" but "${TEST_EXTENSION}" files are run by "luam test" and never built into the resource.`),
+            );
+
+            continue;
+        }
+
         if (!pattern.endsWith(SOURCE_EXTENSION)) {
             diagnostics.push(cliError(MISSING_SOURCE, `"${pattern}" is listed in "sources" but does not end in "${SOURCE_EXTENSION}".`));
 
@@ -54,7 +64,7 @@ export function discoverSources(root: string, sources: SourceMapping, excluded: 
     const files: ProjectFile[] = [];
     const matched = new Set<string>();
 
-    for (const path of tree.files.filter((entry) => entry.endsWith(SOURCE_EXTENSION))) {
+    for (const path of tree.files.filter((entry) => entry.endsWith(SOURCE_EXTENSION) && !isTestPath(entry))) {
         const resolution = resolver.resolve(path);
 
         if (resolution.matches.length === 0) {

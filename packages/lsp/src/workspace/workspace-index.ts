@@ -2,8 +2,10 @@ import { dirname } from 'node:path';
 
 import { mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
+import { TEST_DECLARATIONS } from '@compiler/checker/test-declarations';
 import { canReference, type Environment } from '@compiler/environment/environment';
 import { fingerprintDeclarations } from '@compiler/project/fingerprint';
+import { isTestPath } from '@compiler/project/source-kind';
 
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
@@ -32,7 +34,7 @@ export class WorkspaceIndex {
     private key = '';
 
     private ambientFor(uri: string, environment: Environment): AmbientDeclarations {
-        const visible = this.others(uri).filter((analysis) => canReference(environment, analysis.environment));
+        const visible = this.others(uri).filter((analysis) => canReference(environment, analysis.environment) && !isTestPath(analysis.relative));
 
         return mergeAmbient(visible.map((analysis) => analysis.own));
     }
@@ -46,7 +48,7 @@ export class WorkspaceIndex {
             relative,
             version,
             text,
-            project: this.project,
+            project: isTestPath(relative) ? { globals: [...this.project.globals, ...TEST_DECLARATIONS] } : this.project,
             env: this.env,
             compilerOptions: this.settings.compilerOptions,
             environment: this.settings.resolver.side(relative),

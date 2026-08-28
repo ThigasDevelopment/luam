@@ -81,6 +81,7 @@ export const ptBR: LocaleStrings = {
         'recipes/exported-function': 'Função exportada',
         'recipes/environment-configuration': 'Configuração de ambiente',
         'recipes/local-development': 'Desenvolvimento local',
+        'recipes/testing-a-module': 'Testando um módulo',
         'reference/index': 'Visão geral',
         'reference/keywords': 'Palavras-chave',
         'reference/operators': 'Operadores',
