@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.2 - 2026-08-28
+
 ### Added
 
 - A value checked against an `interface` or a `class` now reports what a `type`

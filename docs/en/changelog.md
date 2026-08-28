@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.2 - 2026-08-28
+
 ### Added
 
 - [Editors](/en/tooling/editors) and [Formatting](/en/reference/formatting) record

@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.2 - 2026-08-28
+
 ### Adicionado
 
 - [Editores](/pt-br/tooling/editors) e [Formatação](/pt-br/reference/formatting)
