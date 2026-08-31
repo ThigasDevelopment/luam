@@ -15,6 +15,8 @@ const MANIFEST_FILE = '.luam.manifest';
 
 const RESOURCE_NAME = /^name\s*=\s*'([^']+)'/m;
 
+const LOCAL_STATE: readonly string[] = ['.luam', 'build'];
+
 const write = process.argv.includes('--write');
 
 interface Capture {
@@ -68,13 +70,19 @@ function fileTree(root: string): string {
     return walk(root).sort().join('\n');
 }
 
+function isCaptured(source: string, entry: string): boolean {
+    const inside = relative(source, entry).split('\\').join('/');
+
+    return inside.length === 0 || !LOCAL_STATE.includes(inside.split('/')[0] ?? '');
+}
+
 function captureProject(cli: string, project: string): Capture[] {
     const name = resourceName(project);
     const source = join(snippetsRoot, project);
     const workspace = mkdtempSync(join(tmpdir(), 'luam-docs-'));
 
     try {
-        cpSync(source, workspace, { recursive: true });
+        cpSync(source, workspace, { recursive: true, dereference: true, filter: (entry) => isCaptured(source, entry) });
 
         const check = run(cli, 'check', workspace);
 
