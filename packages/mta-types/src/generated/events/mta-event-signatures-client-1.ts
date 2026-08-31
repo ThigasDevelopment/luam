@@ -70,7 +70,7 @@ export const MTA_EVENT_SIGNATURES_CLIENT_1: Readonly<Record<string, FunctionDesc
         false,
         [
             'URL',
-            'isMain',
+            'isMainFrame',
         ],
     ),
     onClientBrowserNavigate: fn(

@@ -1,6 +1,38 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
+    onClientGUIMove: {
+        summary: 'This event is triggered each time the user moves a GUI element.',
+        parameters: [],
+        source: 'The source of this event is the GUI element which was moved.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMove',
+    },
+    onClientGUIScroll: {
+        summary: 'This event is fired when a GUI scrollbar is scrolled.',
+        parameters: [
+            { name: 'scrolled', isOptional: false, isVariadic: false, summary: 'the scrollbar element that was scrolled.' },
+        ],
+        source: 'The source of this event is the scrollbar element that got scrolled.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIScroll',
+    },
+    onClientGUISize: {
+        summary: 'This event is triggered when the local client resizes a GUI element.',
+        parameters: [],
+        source: 'The source of this event is the GUI element that was resized.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUISize',
+    },
+    onClientGUITabSwitched: {
+        summary: 'This event is triggered each time the user switch from GUI tab.\n\nWhen adding the event handler on the tab panel, propagate must be true.',
+        parameters: [
+            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the tab which was selected.' },
+        ],
+        source: 'The source of this event is the tab.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUITabSwitched',
+    },
     onClientHUDRender: {
         summary: 'This event is triggered before GTA renders the HUD. This is particularly useful if you want to use dxUpdateScreenSource to capture the screen onto a texture without capturing the HUD, or to alter HUD textures using shaders before they are drawn onto the screen.',
         parameters: [],
@@ -137,6 +169,16 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPaste',
     },
+    onClientPedChoke: {
+        summary: 'This event is fired when a ped chokes due to the effect of a weapon such as tear gas grenades, fire extinguishers and spray cans.',
+        parameters: [
+            { name: 'weaponID', isOptional: false, isVariadic: false, summary: 'an int representing the ID of the weapon which caused the choking.' },
+            { name: 'responsiblePed', isOptional: false, isVariadic: false, summary: 'the ped responsible for causing the choking, possiblly nil.' },
+        ],
+        source: 'The source of this event is the ped who is choking.',
+        cancel: 'If this event is canceled, the ped will not be choked.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedChoke',
+    },
     onClientPedDamage: {
         summary: 'This event is triggered whenever a ped is damaged.',
         parameters: [
@@ -192,52 +234,5 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         source: 'The source of this event is the ped that entered the vehicle.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedVehicleEnter',
-    },
-    onClientPedVehicleExit: {
-        summary: 'This event is fired when a ped has exited a vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that the ped exited.' },
-            { name: 'seat', isOptional: false, isVariadic: false, summary: 'The number of the seat that the ped was sitting on.' },
-        ],
-        source: 'The source of this event is the ped that exited the vehicle.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedVehicleExit',
-    },
-    onClientPedWasted: {
-        summary: 'This event is triggered whenever a ped dies.',
-        parameters: [
-            { name: 'killer', isOptional: false, isVariadic: false, summary: 'A player, ped or vehicle element representing the killer.' },
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'An integer representing the killer weapon or the damage types.' },
-            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'An integer representing the bodypart the player was damaged.' },
-            { name: 'loss', isOptional: false, isVariadic: false, summary: 'A float representing the percentage of health the ped lost in the final "hit" (*only for client-side created peds.*) or a boolean representing whether or not this was a stealth kill' },
-        ],
-        source: 'The source of this event is the ped that died.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedWasted',
-    },
-    onClientPedWeaponFire: {
-        summary: 'This event is called when ped shoots a weapon.  This does not trigger for projectiles based, or melee weapons.',
-        parameters: [
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'an int representing weapon used for making a shot.' },
-            { name: 'ammo', isOptional: false, isVariadic: false, summary: 'an int ammount of ammo left for this weapon type.' },
-            { name: 'ammoInClip', isOptional: false, isVariadic: false, summary: 'an int ammount of ammo left for this weapon type in clip.' },
-            { name: 'hitX', isOptional: false, isVariadic: false, summary: 'float world X coordinate representing the hit point.' },
-            { name: 'hitY', isOptional: false, isVariadic: false, summary: 'float world Y coordinate representing the hit point.' },
-            { name: 'hitZ', isOptional: false, isVariadic: false, summary: 'float world Z coordinate representing the hit point.' },
-            { name: 'hitElement', isOptional: false, isVariadic: false, summary: 'an element which was hit by a shot.' },
-        ],
-        source: 'The source of this event is the ped who fired the weapon.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedWeaponFire',
-    },
-    onClientPickupHit: {
-        summary: 'This event triggers whenever a pickup is hit clientside.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player that hit the pickup' },
-            { name: 'matchingDimension', isOptional: false, isVariadic: false, summary: '*true* if thePlayer is in the same dimension as the pickup, *false* otherwise.' },
-        ],
-        source: 'The source of this event is the pickup that was hit.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPickupHit',
     },
 };

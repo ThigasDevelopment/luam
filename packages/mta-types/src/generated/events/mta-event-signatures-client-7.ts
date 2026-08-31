@@ -3,6 +3,39 @@ import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descri
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_7: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientSoundBeat: fn(
+        [
+            NUMBER,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'theTime',
+        ],
+    ),
+    onClientSoundChangedMeta: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'streamTitle',
+        ],
+    ),
+    onClientSoundFinishedDownload: fn(
+        [
+            NUMBER,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'length',
+        ],
+    ),
     onClientSoundStarted: fn(
         [
             STRING,
@@ -108,7 +141,7 @@ export const MTA_EVENT_SIGNATURES_CLIENT_7: Readonly<Record<string, FunctionDesc
         [
             'theHitElement',
             'damageImpulseMag',
-            'bodypart',
+            'bodyPart',
             'collisionX',
             'collisionY',
             'collisionZ',
@@ -195,36 +228,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_7: Readonly<Record<string, FunctionDesc
         0,
         false,
         [
-        ],
-    ),
-    onClientVehicleStartEnter: fn(
-        [
-            named('Ped'),
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'thePed',
-            'seat',
-            'door',
-        ],
-    ),
-    onClientVehicleStartExit: fn(
-        [
-            named('Ped'),
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'thePed',
-            'seat',
-            'door',
         ],
     ),
 };

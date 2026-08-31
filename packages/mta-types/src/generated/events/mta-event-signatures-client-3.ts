@@ -3,6 +3,15 @@ import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descri
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_3: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientGUIBlur: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
     onClientGUIChanged: fn(
         [
             named('Element'),
@@ -208,21 +217,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_3: Readonly<Record<string, FunctionDesc
             'absoluteX',
             'absoluteY',
             'leftGUI',
-        ],
-    ),
-    onClientMouseLeave: fn(
-        [
-            NUMBER,
-            NUMBER,
-            named('Element'),
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'absoluteX',
-            'absoluteY',
-            'enteredGUI',
         ],
     ),
 };

@@ -51,3 +51,4 @@ Each row links the record; the record itself carries the full status note.
 | 040 | [One role per workflow, one gate, and a pinned supply chain](040-pipeline-contract.md) | Accepted |
 | 041 | [A fork pull request runs verification only, with no secret and no write](041-untrusted-contribution-boundary.md) | Accepted |
 | 042 | [The formatter is configured by `.luam.formatter`, not by the manifest](042-formatter-configuration-file.md) | Accepted |
+| 043 | [Generate the MTA event handler signatures from the wiki snapshot](043-mta-wiki-event-source.md) | Accepted |

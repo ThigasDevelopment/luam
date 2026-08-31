@@ -1,6 +1,36 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
+    onClientCursorMove: {
+        summary: 'This event is called by the root element whenever the cursor is moved over the screen, by the player. It returns information about the world coordinates as well as the screen coordinates of where the player moved the cursor.\n\nThe difference between this event and onClientMouseMove, is that the latter is actually called by GUI elements. This is to prevent double calling of onClientCursorMove, as onClientCursorMove is always called.',
+        parameters: [
+            { name: 'cursorX', isOptional: false, isVariadic: false, summary: 'the relative X coordinate of the mouse cursor. 0 = left side of the screen, 1 = right side.' },
+            { name: 'cursorY', isOptional: false, isVariadic: false, summary: 'the relative Y coordinate of the mouse cursor. 0 = top of the screen, 1 = bottom.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the mouse cursor, in pixels, measured from the top of the screen.' },
+            { name: 'worldX', isOptional: false, isVariadic: false, summary: 'the 3D in-game world X coordinate that the cursor is pointing at.' },
+            { name: 'worldY', isOptional: false, isVariadic: false, summary: 'the 3D in-game world Y coordinate that the cursor is pointing at.' },
+            { name: 'worldZ', isOptional: false, isVariadic: false, summary: 'the 3D in-game world Z coordinate that the cursor is pointing at.' },
+        ],
+        source: 'The source of this event is the root element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientCursorMove',
+    },
+    onClientDebugMessage: {
+        summary: 'This event is triggered when client-side debug messages (for instance errors or warnings) would appear in the debug window. This event doesn\'t require the debug window to be enabled to trigger, however.\n\n**Note:** To prevent infinite loops, debug messages that occur inside the function that handles this event won\'t trigger this event, so you won\'t be able to rely on debug info to fix faulty code that is inside this function. Since build [https://buildinfo.mtasa.com/index.php?Revision=14683 r14683] debug messages from outputDebugString and iprint will show up.',
+        parameters: [
+            { name: 'message', isOptional: false, isVariadic: false, summary: 'The message which was outputted in the server console, without details like file, line etc' },
+            { name: 'level', isOptional: false, isVariadic: false, summary: 'The type of debug message which was outputted' },
+            { name: 'file', isOptional: false, isVariadic: false, summary: 'The file from which the debug message was outputted' },
+            { name: 'line', isOptional: false, isVariadic: false, summary: 'The line in file **file** where the debug message was outputted' },
+            { name: 'r', isOptional: false, isVariadic: false, summary: 'Amount of red color (0-255)' },
+            { name: 'g', isOptional: false, isVariadic: false, summary: 'Amount of green color (0-255)' },
+            { name: 'b', isOptional: false, isVariadic: false, summary: 'Amount of blue color (0-255)' },
+        ],
+        source: 'The source of this event is the root element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientDebugMessage',
+    },
     onClientDoubleClick: {
         summary: 'This event triggers whenever the user double-clicks his mouse.  This is linked to the GTA world, as appose to GUI for which onClientGUIDoubleClick is to be used.  This event allows detection of click positions of the 3D world.',
         parameters: [
@@ -207,37 +237,5 @@ export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
         source: 'The source of this event is the GUI element on top of which the mouse button was released.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseUp',
-    },
-    onClientGUIMove: {
-        summary: 'This event is triggered each time the user moves a GUI element.',
-        parameters: [],
-        source: 'The source of this event is the GUI element which was moved.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMove',
-    },
-    onClientGUIScroll: {
-        summary: 'This event is fired when a GUI scrollbar is scrolled.',
-        parameters: [
-            { name: 'scrolled', isOptional: false, isVariadic: false, summary: 'the scrollbar element that was scrolled.' },
-        ],
-        source: 'The source of this event is the scrollbar element that got scrolled.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIScroll',
-    },
-    onClientGUISize: {
-        summary: 'This event is triggered when the local client resizes a GUI element.',
-        parameters: [],
-        source: 'The source of this event is the GUI element that was resized.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUISize',
-    },
-    onClientGUITabSwitched: {
-        summary: 'This event is triggered each time the user switch from GUI tab.\n\nWhen adding the event handler on the tab panel, propagate must be true.',
-        parameters: [
-            { name: 'theElement', isOptional: false, isVariadic: false, summary: 'the tab which was selected.' },
-        ],
-        source: 'The source of this event is the tab.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUITabSwitched',
     },
 };

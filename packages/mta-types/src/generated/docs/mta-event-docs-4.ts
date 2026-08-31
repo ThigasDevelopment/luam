@@ -1,6 +1,53 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_4: EventDocumentationCatalog = {
+    onClientPedVehicleExit: {
+        summary: 'This event is fired when a ped has exited a vehicle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that the ped exited.' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'The number of the seat that the ped was sitting on.' },
+        ],
+        source: 'The source of this event is the ped that exited the vehicle.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedVehicleExit',
+    },
+    onClientPedWasted: {
+        summary: 'This event is triggered whenever a ped dies.',
+        parameters: [
+            { name: 'killer', isOptional: false, isVariadic: false, summary: 'A player, ped or vehicle element representing the killer.' },
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'An integer representing the killer weapon or the damage types.' },
+            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'An integer representing the bodypart the player was damaged.' },
+            { name: 'lossOrStealth', isOptional: false, isVariadic: false, summary: 'A float representing the percentage of health the ped lost in the final "hit" (*only for client-side created peds.*) or a boolean representing whether or not this was a stealth kill' },
+        ],
+        source: 'The source of this event is the ped that died.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedWasted',
+    },
+    onClientPedWeaponFire: {
+        summary: 'This event is called when ped shoots a weapon.  This does not trigger for projectiles based, or melee weapons.',
+        parameters: [
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'an int representing weapon used for making a shot.' },
+            { name: 'ammo', isOptional: false, isVariadic: false, summary: 'an int ammount of ammo left for this weapon type.' },
+            { name: 'ammoInClip', isOptional: false, isVariadic: false, summary: 'an int ammount of ammo left for this weapon type in clip.' },
+            { name: 'hitX', isOptional: false, isVariadic: false, summary: 'float world X coordinate representing the hit point.' },
+            { name: 'hitY', isOptional: false, isVariadic: false, summary: 'float world Y coordinate representing the hit point.' },
+            { name: 'hitZ', isOptional: false, isVariadic: false, summary: 'float world Z coordinate representing the hit point.' },
+            { name: 'hitElement', isOptional: false, isVariadic: false, summary: 'an element which was hit by a shot.' },
+        ],
+        source: 'The source of this event is the ped who fired the weapon.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedWeaponFire',
+    },
+    onClientPickupHit: {
+        summary: 'This event triggers whenever a pickup is hit clientside.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'the player that hit the pickup' },
+            { name: 'matchingDimension', isOptional: false, isVariadic: false, summary: '*true* if thePlayer is in the same dimension as the pickup, *false* otherwise.' },
+        ],
+        source: 'The source of this event is the pickup that was hit.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPickupHit',
+    },
     onClientPickupLeave: {
         summary: 'This event triggers whenever a pickup is left clientside.',
         parameters: [
@@ -190,40 +237,5 @@ export const MTA_EVENT_DOCS_4: EventDocumentationCatalog = {
         source: 'The source of this event is the player whose voice got paused.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoicePause',
-    },
-    onClientPlayerVoiceResumed: {
-        summary: 'This event is triggered when a player\'s voice sound is resumed using setSoundPaused.',
-        parameters: [
-            { name: 'reason', isOptional: false, isVariadic: false, summary: 'the reason for the pause, this can be only "resumed".' },
-        ],
-        source: 'The source of this event is the player whose voice got resumed.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoiceResumed',
-    },
-    onClientPlayerVoiceStart: {
-        summary: '**Note**:  This event should only be used as a low-level function for advanced users.  For typical Voice scripting, please see the Voice Resource\nThis event is triggered when a player starts talking through voice chat.',
-        parameters: [],
-        source: 'The source of this event is the player element that just started talking through voice chat.',
-        cancel: '* If the source is the local player, the local player will not broadcast his voice chat to the server * If the source is a remote player, the player who started talking will not be heard.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoiceStart',
-    },
-    onClientPlayerVoiceStop: {
-        summary: 'This event is triggered when a player stops talking through voice chat.',
-        parameters: [],
-        source: 'The source of this event is the player element that just stopped talking through voice chat.',
-        cancel: '* If the source is the local player, the local player will not broadcast his voice chat to the server * If the source is a remote player, the player who started talking will not be heard.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoiceStop',
-    },
-    onClientPlayerWasted: {
-        summary: 'This event is triggered whenever a player, including those remote, dies.',
-        parameters: [
-            { name: 'killer', isOptional: false, isVariadic: false, summary: 'A player, ped or vehicle element representing the killer.' },
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'An integer representing the killer weapon or the damage types.' },
-            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'An integer representing the bodypart the player was damaged.' },
-            { name: 'stealth', isOptional: false, isVariadic: false, summary: 'A boolean representing whether or not this was a stealth kill.' },
-        ],
-        source: 'The source of this event is the player that died.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerWasted',
     },
 };

@@ -3,6 +3,21 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-d
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_4: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientMouseLeave: fn(
+        [
+            NUMBER,
+            NUMBER,
+            named('Element'),
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'absoluteX',
+            'absoluteY',
+            'enteredGUI',
+        ],
+    ),
     onClientMouseMove: fn(
         [
             NUMBER,
@@ -89,6 +104,19 @@ export const MTA_EVENT_SIGNATURES_CLIENT_4: Readonly<Record<string, FunctionDesc
         false,
         [
             'clipboardText',
+        ],
+    ),
+    onClientPedChoke: fn(
+        [
+            NUMBER,
+            named('Ped'),
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'weaponID',
+            'responsiblePed',
         ],
     ),
     onClientPedDamage: fn(
@@ -190,43 +218,7 @@ export const MTA_EVENT_SIGNATURES_CLIENT_4: Readonly<Record<string, FunctionDesc
             'killer',
             'weapon',
             'bodypart',
-            'loss',
-        ],
-    ),
-    onClientPedWeaponFire: fn(
-        [
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            named('Element'),
-        ],
-        VOID,
-        7,
-        false,
-        [
-            'weapon',
-            'ammo',
-            'ammoInClip',
-            'hitX',
-            'hitY',
-            'hitZ',
-            'hitElement',
-        ],
-    ),
-    onClientPickupHit: fn(
-        [
-            named('Player'),
-            BOOLEAN,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'thePlayer',
-            'matchingDimension',
+            'lossOrStealth',
         ],
     ),
 };

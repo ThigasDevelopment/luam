@@ -3,6 +3,17 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-d
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDescriptor>> = {
+    onAccountCreate: fn(
+        [
+            named('Account'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'theAccount',
+        ],
+    ),
     onAccountDataChange: fn(
         [
             named('Account'),
@@ -16,6 +27,17 @@ export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDesc
             'theAccount',
             'theKey',
             'theValue',
+        ],
+    ),
+    onAccountRemove: fn(
+        [
+            named('Account'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'theAccount',
         ],
     ),
     onBan: fn(
@@ -32,7 +54,7 @@ export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDesc
     onChatMessage: fn(
         [
             STRING,
-            ANY,
+            named('Element'),
         ],
         VOID,
         2,
@@ -85,15 +107,21 @@ export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDesc
             NUMBER,
             STRING,
             NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
         ],
         VOID,
-        4,
+        7,
         false,
         [
             'message',
             'level',
             'file',
             'line',
+            'r',
+            'g',
+            'b',
         ],
     ),
     onElementClicked: fn(
@@ -191,41 +219,6 @@ export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDesc
         [
             'oldInterior',
             'newInterior',
-        ],
-    ),
-    onElementModelChange: fn(
-        [
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'oldModel',
-            'newModel',
-        ],
-    ),
-    onElementStartSync: fn(
-        [
-            named('Player'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'newSyncer',
-        ],
-    ),
-    onElementStopSync: fn(
-        [
-            named('Player'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'oldSyncer',
         ],
     ),
 };

@@ -1,5 +1,5 @@
 import type { ApiEnvironment } from './api-declaration';
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, tupleOf, type TypeDescriptor, unionOf } from './type-descriptor';
+import { ANY, BOOLEAN, fn, type FunctionDescriptor, named, NUMBER, STRING, TABLE, tupleOf, type TypeDescriptor, unionOf, VOID } from './type-descriptor';
 
 export interface CatalogOverride {
     environment?: ApiEnvironment;
@@ -54,6 +54,25 @@ export const CALLBACK_TYPE_GAPS: Readonly<Record<string, CallbackTypeGap>> = {
     dbPoll: { kind: 'opaque', parameter: 0, reason: 'The upstream HandleFunction alias incorrectly represents an opaque database query handle.' },
     dbQuery: { kind: 'callback', parameter: 0, reason: 'The upstream overloads reuse HandleFunction for both a callback and an opaque query handle.' },
     removeEventHandler: { kind: 'callback', parameter: 2, reason: 'The upstream indexed GenericEventHandler callback requires event-name-dependent signatures.' },
+};
+
+export interface EventSignatureOverride {
+    environment: ApiEnvironment;
+    type: FunctionDescriptor;
+    reason: string;
+}
+
+export const EVENT_SIGNATURE_OVERRIDES: Readonly<Record<string, EventSignatureOverride>> = {
+    onPlayerChangesProtectedData: {
+        environment: 'server',
+        type: fn([named('Element'), STRING, ANY], VOID, 3, false, ['element', 'key', 'value']),
+        reason: 'The wiki page lists the parameters as description bullets and carries no Lua parameter block.',
+    },
+    onPlayerTriggerEventThreshold: {
+        environment: 'server',
+        type: fn([STRING], VOID, 1, false, ['eventName']),
+        reason: 'The wiki page documents eventName inside a release template and carries no Lua parameter block.',
+    },
 };
 
 const GENERIC_CALLBACK: TypeDescriptor = fn([], ANY, 0, true);

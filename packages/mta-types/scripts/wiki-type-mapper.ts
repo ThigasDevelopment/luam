@@ -6,6 +6,7 @@ const SCALARS: Readonly<Record<string, TypeDescriptor>> = {
     bool: BOOLEAN,
     boolean: BOOLEAN,
     callback: GENERIC_CALLBACK,
+    double: NUMBER,
     float: NUMBER,
     func: GENERIC_CALLBACK,
     function: GENERIC_CALLBACK,

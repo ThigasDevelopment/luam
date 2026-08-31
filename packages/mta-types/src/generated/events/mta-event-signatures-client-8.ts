@@ -3,6 +3,36 @@ import { fn, named, NUMBER, VOID } from '@mta-types/type-descriptor';
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_8: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientVehicleStartEnter: fn(
+        [
+            named('Ped'),
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'thePed',
+            'seat',
+            'door',
+        ],
+    ),
+    onClientVehicleStartExit: fn(
+        [
+            named('Ped'),
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'thePed',
+            'seat',
+            'door',
+        ],
+    ),
     onClientVehicleWeaponHit: fn(
         [
             NUMBER,
