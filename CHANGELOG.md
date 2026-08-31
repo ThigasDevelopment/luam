@@ -14,6 +14,19 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.10 - 2026-08-31
+
+### Added
+
+- Completion inside a table literal with a declared type offers only the keys
+  that type still allows, dropping the ones already written. It offered every
+  symbol in scope, so the editor knew the shape and would not say it, and the
+  writer had to read the type declaration in another file to learn which keys
+  were left. A key shared by more than one member of a union is typed as the
+  union of what those members declare, and while more than one member still
+  matches, every discriminant value is offered rather than the first one
+  guessed.
+
 ## 0.19.9 - 2026-08-31
 
 ### Added

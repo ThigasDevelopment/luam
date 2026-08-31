@@ -11,6 +11,15 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.10 - 2026-08-31
+
+### Adicionado
+
+- [Editores](/pt-br/tooling/editors) registra que um literal de tabela tipado
+  completa pelas chaves que o tipo ainda permite, incluindo como uma chave
+  compartilhada numa união é tipada e quando todos os valores discriminantes são
+  oferecidos.
+
 ## 0.19.9 - 2026-08-31
 
 ### Adicionado
