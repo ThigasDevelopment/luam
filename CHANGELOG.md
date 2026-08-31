@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.6 - 2026-08-31
+
 ### Added
 
 - A function takes its own type parameters. `function identity<T>(value: T): T`

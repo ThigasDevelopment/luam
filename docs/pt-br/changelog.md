@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.6 - 2026-08-31
+
 ### Adicionado
 
 - [Funções](/pt-br/language/functions#funcoes-genericas) descreve funções
