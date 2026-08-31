@@ -66,6 +66,7 @@ erro não escreve nada.
 | --- | --- | --- |
 | `check-type-mismatch` | error | Um valor não corresponde ao tipo declarado. |
 | `check-return-mismatch` | error | Um `return` não corresponde ao tipo de retorno declarado. |
+| `check-missing-return` | error | Uma função que declara um tipo de retorno pode terminar sem retornar um valor. |
 | `check-argument-count` | error | Argumentos de menos ou de mais. |
 | `check-invalid-operand` | error | Um operador não pode ser aplicado a esse tipo. |
 | `check-unknown-member` | error | O membro não existe no receptor. |

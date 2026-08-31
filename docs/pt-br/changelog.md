@@ -11,6 +11,26 @@ da versão atual.
 
 ## Não lançado
 
+### Adicionado
+
+- [Funções](/pt-br/language/functions#funcoes-genericas) descreve funções
+  genéricas: a sintaxe, a inferência na chamada, os argumentos explícitos e as
+  restrições. [Tipos](/pt-br/language/types#aliases) e
+  [Classes](/pt-br/language/classes#parametros-de-tipo) agora fazem referência
+  cruzada, então as três formas se leem como um recurso só.
+- [Limitações](/pt-br/reference/limitations) ganha duas entradas: `error(...)`
+  não encerra um caminho, e um parâmetro de tipo que só aparece na posição de
+  retorno é `any`.
+
+### Alterado
+
+- [Funções](/pt-br/language/functions#tipos-de-retorno) afirma que um tipo de
+  retorno declarado precisa ser produzido em todo caminho, e que uma anotação
+  opcional é como uma função pode terminar sem valor.
+  [Diagnósticos](/pt-br/reference/diagnostics) lista `check-missing-return`.
+- [Tipos](/pt-br/language/types#aliases) não diz mais que classes genéricas não
+  são suportadas. Elas são suportadas desde a 0.13.0.
+
 ## 0.19.5 - 2026-08-28
 
 ### Adicionado

@@ -140,11 +140,14 @@ export interface CallExpression extends NodeBase {
     kind: 'call-expression';
     callee: Expression;
     method: string | null;
+    typeArguments: TypeAnnotation[];
     args: Expression[];
 }
 
 export interface FunctionExpression extends NodeBase {
     kind: 'function-expression';
+    typeParameters: string[];
+    typeConstraints: (TypeAnnotation | null)[];
     parameters: Parameter[];
     returnAnnotation: TypeAnnotation | null;
     body: Statement[];
@@ -227,6 +230,8 @@ export interface FunctionDeclaration extends NodeBase {
     isExported: boolean;
     isHttpExport: boolean;
     isMethod: boolean;
+    typeParameters: string[];
+    typeConstraints: (TypeAnnotation | null)[];
     parameters: Parameter[];
     returnAnnotation: TypeAnnotation | null;
     body: Statement[];

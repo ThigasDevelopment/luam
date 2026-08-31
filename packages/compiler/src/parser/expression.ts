@@ -5,6 +5,7 @@ import { parseFunctionExpression } from './function-expression';
 import { binaryPrecedence, isRightAssociative, UNARY_OPERATORS, UNARY_PRECEDENCE } from './precedence';
 import type { TokenStream } from './token-stream';
 import { parseTypeAnnotation } from './type-annotation';
+import { parseCallTypeArguments, parseTypeArguments } from './type-parameters';
 
 const LITERAL_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
 
@@ -83,7 +84,7 @@ function parsePrimary(stream: TokenStream): Expression {
         stream.next();
 
         const className = stream.next().value;
-        const typeArguments = parseNewTypeArguments(stream);
+        const typeArguments = parseTypeArguments(stream);
 
         return { kind: 'new-expression', className, typeArguments, args: parseArguments(stream), position: token.position };
     }
@@ -131,27 +132,6 @@ function parsePrimary(stream: TokenStream): Expression {
     }
 
     throw stream.error(`Unexpected "${stream.describeCurrent()}" in expression.`, 'parse-unexpected-token');
-}
-
-function parseNewTypeArguments(stream: TokenStream): TypeAnnotation[] {
-    const args: TypeAnnotation[] = [];
-
-    if (!stream.check('operator', '<')) {
-        return args;
-    }
-
-    const checkpoint = stream.checkpoint();
-
-    stream.next();
-
-    do {
-        args.push(parseTypeAnnotation(stream));
-    } while (stream.match('punctuation', ','));
-
-    stream.expect('operator', '>');
-    stream.eraseFrom(checkpoint);
-
-    return args;
 }
 
 function parseArguments(stream: TokenStream): Expression[] {
@@ -213,13 +193,17 @@ export function parseSuffixed(stream: TokenStream): Expression {
 
             const method = stream.next().value;
 
-            expression = { kind: 'call-expression', callee: expression, method, args: parseArguments(stream), position: token.position };
+            const typeArguments = parseCallTypeArguments(stream);
+
+            expression = { kind: 'call-expression', callee: expression, method, typeArguments, args: parseArguments(stream), position: token.position };
 
             continue;
         }
 
-        if (isCallStart(stream)) {
-            expression = { kind: 'call-expression', callee: expression, method: null, args: parseArguments(stream), position: token.position };
+        const typeArguments = parseCallTypeArguments(stream);
+
+        if (typeArguments.length > 0 || isCallStart(stream)) {
+            expression = { kind: 'call-expression', callee: expression, method: null, typeArguments, args: parseArguments(stream), position: token.position };
 
             continue;
         }

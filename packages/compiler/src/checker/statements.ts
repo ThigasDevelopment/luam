@@ -58,6 +58,45 @@ export function buildFunctionType(
     return createFunction(types, context.resolveAnnotation(returnAnnotation), minimumArguments(context, parameters), isVariadic, names);
 }
 
+export function applyTypeParameters(
+    context: CheckContext,
+    type: FunctionType,
+    names: readonly string[],
+    constraints: readonly (TypeAnnotation | null)[],
+): FunctionType {
+    if (names.length === 0) {
+        return type;
+    }
+
+    context.noteTypeParameters(names);
+
+    type.typeParameters = [...names];
+    type.typeConstraints = names.map((unused, index) => {
+        const constraint = constraints[index];
+
+        return constraint === undefined || constraint === null ? null : context.resolveAnnotation(constraint);
+    });
+
+    return type;
+}
+
+const FALLTHROUGH_KINDS: ReadonlySet<Type['kind']> = new Set(['any', 'void', 'nil', 'optional', 'unknown']);
+
+function toleratesFallthrough(declared: Type): boolean {
+    if (FALLTHROUGH_KINDS.has(declared.kind)) {
+        return true;
+    }
+
+    return declared.kind === 'union' && declared.options.some((option) => option.kind === 'nil');
+}
+
+function reportMissingReturn(context: CheckContext, declared: Type, position: SourcePosition): void {
+    const name = typeToString(declared);
+    const repair = declared.kind === 'tuple' ? 'Add a return on every path.' : `Add a return on every path, or declare "${name}?".`;
+
+    context.report('check-missing-return', `This function declares "${name}" but can end without returning a value. ${repair}`, position);
+}
+
 export function checkFunctionBody(
     context: CheckContext,
     parameters: readonly Parameter[],
@@ -65,6 +104,7 @@ export function checkFunctionBody(
     body: readonly Statement[],
     signature: FunctionType,
     selfType: Type | null,
+    position: SourcePosition = ORIGIN,
 ): void {
     forgetAssignedPaths(context, body);
 
@@ -91,6 +131,13 @@ export function checkFunctionBody(
     }
 
     checkStatements(context, body);
+
+    const declared = context.currentReturnType();
+
+    if (declared !== null && context.flowState.reachable && !toleratesFallthrough(declared)) {
+        reportMissingReturn(context, declared, position);
+    }
+
     const inferred = context.popReturnType();
 
     if (returnAnnotation === null) {
@@ -220,7 +267,8 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
 }
 
 function checkFunctionDeclaration(context: CheckContext, statement: FunctionDeclaration): void {
-    const type = buildFunctionType(context, statement.parameters, statement.returnAnnotation);
+    const built = buildFunctionType(context, statement.parameters, statement.returnAnnotation);
+    const type = applyTypeParameters(context, built, statement.typeParameters, statement.typeConstraints);
 
     if (statement.name.kind === 'identifier') {
         const symbol = { name: statement.name.name, type, isLocal: statement.isLocal, position: statement.position };
@@ -233,7 +281,7 @@ function checkFunctionDeclaration(context: CheckContext, statement: FunctionDecl
     }
 
     context.record(statement.name, type);
-    checkFunctionBody(context, statement.parameters, statement.returnAnnotation, statement.body, type, statement.isMethod ? ANY_TYPE : null);
+    checkFunctionBody(context, statement.parameters, statement.returnAnnotation, statement.body, type, statement.isMethod ? ANY_TYPE : null, statement.position);
 }
 
 function checkReturn(context: CheckContext, statement: ReturnStatement): void {

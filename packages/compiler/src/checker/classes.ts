@@ -6,7 +6,7 @@ import { checkMetamethod, isMetamethodMember, reportRejectedMetamethod } from '.
 import { expandClassDecorators } from './decorators';
 import { checkExpression } from './expressions';
 import type { ClassInfo, MemberInfo } from './registry';
-import { buildFunctionType, checkFunctionBody } from './statements';
+import { applyTypeParameters, buildFunctionType, checkFunctionBody } from './statements';
 import { ANY_TYPE, createFunction, createNamed, isAssignable, typeToString, VOID_TYPE, widenInferred, type Type } from './types';
 
 function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
@@ -93,7 +93,7 @@ export function registerMembers(context: CheckContext, info: ClassInfo, statemen
             ? fieldTypes.get(member) ?? ANY_TYPE
             : member.isSynthetic
                ? syntheticMethodType(context, member, fieldTypes)
-               : buildFunctionType(context, member.parameters, member.returnAnnotation);
+               : applyTypeParameters(context, buildFunctionType(context, member.parameters, member.returnAnnotation), member.typeParameters, member.typeConstraints);
 
         const decorators = member.decorators.map((decorator) => decorator.name);
 
@@ -171,13 +171,13 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
     }
 
     if (member.isStatic) {
-        checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, null);
+        checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, null, member.position);
 
         return;
     }
 
     context.pushClassMethod({ className: info.name, methodName: member.name });
-    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, selfType(info));
+    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, selfType(info), member.position);
     context.popClassMethod();
 }
 

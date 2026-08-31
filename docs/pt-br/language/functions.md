@@ -39,6 +39,28 @@ end
 Um `return` que não bate é `check-return-mismatch`. Uma função sem tipo de retorno
 declarado não é verificada contra nenhum.
 
+Um tipo de retorno declarado precisa ser produzido em **todo** caminho. Um corpo
+que consegue alcançar o `end` final sem retornar é `check-missing-return`, porque
+quem chamou receberia `nil` onde a anotação prometeu um valor:
+
+```luam static
+function pick(flag: boolean): string
+    if flag then
+        return 'sim'
+    end
+end
+```
+
+Há dois reparos, e a mensagem nomeia os dois. Retornar em todo caminho, ou
+declarar a anotação opcional — `: string?` — o que torna verdadeiro terminar sem
+valor. `void`, `nil`, `any` e qualquer união que contenha `nil` já toleram isso e
+nunca são reportados.
+
+Um laço que não consegue cair fora não é reportado: `while true do` e
+`repeat ... until false` sem `break` encerram o caminho. Um corpo que termina em
+`error(...)` **é** reportado, porque uma chamada não é um terminador — veja
+[Limitações](/pt-br/reference/limitations).
+
 ## Parâmetros opcionais
 
 Um `?` no tipo do parâmetro permite omitir o argumento:
@@ -81,6 +103,67 @@ local loose: fun = print
 
 Nomes de parâmetro dentro de `fun(...)` são documentais — `fun(string): void` e
 `fun(message: string): void` são o mesmo tipo.
+
+## Funções genéricas
+
+Uma função recebe os seus próprios parâmetros de tipo entre o nome e a lista de
+parâmetros, como um [alias de tipo](/pt-br/language/types#aliases) e uma
+[classe](/pt-br/language/classes#parametros-de-tipo) fazem:
+
+```luam
+function identity<T>(value: T): T
+    return value
+end
+
+local text: string = identity('pronto')
+local total: number = identity(1)
+```
+
+O argumento liga o parâmetro, então `identity('pronto')` é `string` e
+`identity(1)` é `number`. Uma declaração, verificada nas duas chamadas.
+
+Escreva os argumentos explicitamente quando a inferência não tiver de onde
+partir, ou para fixar um tipo mais largo do que o argumento daria:
+
+```luam static
+local text = identity<string>('pronto')
+```
+
+A quantidade errada é `check-generic-arity`, e um argumento que não bate com o
+tipo explícito é `check-type-mismatch`. Um parâmetro que nenhum argumento liga
+vira `any` em vez de um erro — inclusive um que só aparece no tipo de retorno,
+que a inferência de passada única não alcança. Veja
+[Limitações](/pt-br/reference/limitations).
+
+Um parâmetro pode carregar uma restrição, que todo argumento precisa satisfazer.
+Qualquer outra coisa é `check-generic-constraint`, o mesmo diagnóstico que uma
+restrição de classe produz:
+
+```luam static
+function label<T extends Named>(value: T): string
+    return value.name
+end
+```
+
+Uma função anônima recebe os parâmetros depois da palavra `function`, que é
+também como um método de classe declara os seus:
+
+```luam static
+class Box<T> {
+    value: T
+
+    convert = function <U>(change: fun(T): U): U
+        return change(self.value)
+    end
+}
+```
+
+Os dois conjuntos estão em escopo dentro de `convert`, e um parâmetro do método
+com o mesmo nome de um parâmetro da classe o sombreia.
+
+Nada disso chega à saída. Os parâmetros e os argumentos são apagados junto com
+todas as outras anotações, nos dois layouts de saída, então o Lua gerado é o
+mesmo da forma não genérica.
 
 ## Múltiplos retornos
 
@@ -126,4 +209,6 @@ end
 | --- | --- |
 | `greet()` para `greet(name: string)` | `check-argument-count` |
 | `return 1` em uma função `: string` | `check-return-mismatch` |
+| uma função `: string` que pode terminar sem retornar | `check-missing-return` |
+| `identity<string, number>(x)` para `identity<T>` | `check-generic-arity` |
 | `greet(1)` para `greet(name: string)` | `check-type-mismatch` |

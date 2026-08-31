@@ -224,6 +224,8 @@ exports[`parser > parses a function declaration with parameter and return annota
     },
     "typeArguments": [],
   },
+  "typeConstraints": [],
+  "typeParameters": [],
 }
 `;
 

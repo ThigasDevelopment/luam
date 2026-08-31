@@ -1,0 +1,55 @@
+#!strict
+interface Named {
+    name: string
+}
+
+class Tag implements Named {
+    name: string = 'tag'
+}
+
+class Box<T> {
+    value: T
+
+    constructor = function (value: T)
+        self.value = value
+    end
+
+    read = function (): T
+        return self.value
+    end
+
+    convert = function <U>(change: fun(T): U): U
+        return change(self.value)
+    end
+}
+
+function identity<T>(value: T): T
+    return value
+end
+
+function first<T>(list: T[]): T?
+    return list[1]
+end
+
+function label<T extends Named>(value: T): string
+    return value.name
+end
+
+local pick = function <T>(left: T, right: T, takeLeft: boolean): T
+    if takeLeft then
+        return left
+    end
+
+    return right
+end
+
+local text: string = identity('Thigas')
+local total: number = identity<number>(2)
+local head?: number = first({ 1, 2, 3 })
+local tagName: string = label(new Tag())
+local chosen: string = pick('left', 'right', true)
+local box = new Box<number>(1)
+local held: number = box:read()
+local shown: string = box:convert(tostring)
+
+print(text, total, head, tagName, chosen, held, shown)

@@ -167,7 +167,8 @@ Veja [Enums e interfaces](/pt-br/language/enums-and-interfaces).
 ## Parâmetros de tipo
 
 Uma classe recebe parâmetros de tipo como um
-[alias de tipo](/pt-br/language/types#aliases) recebe. Todo uso do parâmetro
+[alias de tipo](/pt-br/language/types#aliases) e uma
+[função](/pt-br/language/functions#funcoes-genericas) recebem. Todo uso do parâmetro
 dentro da classe — um campo, um parâmetro, um tipo de retorno — é trocado pelo
 argumento no ponto de uso:
 

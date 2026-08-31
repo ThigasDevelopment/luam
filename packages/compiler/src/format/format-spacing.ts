@@ -29,7 +29,7 @@ function isName(piece: Piece): boolean {
 }
 
 function bindsTight(piece: Piece): boolean {
-    return isName(piece) || CALL_PREFIX.has(piece.value);
+    return isName(piece) || CALL_PREFIX.has(piece.value) || (piece.isType && piece.value === '>');
 }
 
 function isUnary(pieces: readonly Piece[], index: number): boolean {
@@ -77,6 +77,10 @@ function spaceBefore(pieces: readonly Piece[], index: number): boolean {
 
     if (piece.value === '}') {
         return previous.value !== '{';
+    }
+
+    if (piece.isType && piece.value === '<' && previous.kind === 'keyword' && previous.value === 'function') {
+        return true;
     }
 
     if (TIGHT_BEFORE.has(piece.value) || (piece.isType && TYPE_BRACKETS.has(piece.value))) {

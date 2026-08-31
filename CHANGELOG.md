@@ -14,6 +14,25 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- A function takes its own type parameters. `function identity<T>(value: T): T`
+  parses, checks, infers the argument at the call site, accepts an explicit
+  `identity<string>(...)`, enforces an `extends` constraint with the same
+  diagnostic a class constraint produces, and leaves no trace in the generated
+  Lua. A function expression and a class method take them the same way, and a
+  method parameter shadows a class parameter of the same name.
+
+### Fixed
+
+- A declared return type is enforced on every path. A function annotated with a
+  concrete type that can reach its closing `end` without returning is now
+  `check-missing-return` instead of silently handing the caller `nil`. An
+  optional, `nil`, `void`, `any` or a union containing `nil` still tolerates it,
+  and a loop that cannot fall through — `while true do` or
+  `repeat ... until false` with no `break` — is not reported. Nothing in the
+  repository was rejected by the new rule.
+
 ## 0.19.5 - 2026-08-28
 
 ### Changed

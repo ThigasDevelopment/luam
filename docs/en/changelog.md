@@ -9,6 +9,26 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Added
+
+- [Functions](/en/language/functions#generic-functions) describes generic
+  functions: the syntax, inference at the call site, explicit arguments and
+  constraints. [Types](/en/language/types#aliases) and
+  [Classes](/en/language/classes#type-parameters) now cross-link it, so the
+  three forms read as one feature.
+- [Limitations](/en/reference/limitations) gains two entries: `error(...)` does
+  not end a path, and a type parameter that appears only in the return position
+  is `any`.
+
+### Changed
+
+- [Functions](/en/language/functions#return-types) states that a declared return
+  type has to be produced on every path, and that an optional annotation is how
+  a function is allowed to end without a value.
+  [Diagnostics](/en/reference/diagnostics) lists `check-missing-return`.
+- [Types](/en/language/types#aliases) no longer says generic classes are
+  unsupported. They have been supported since 0.13.0.
+
 ## 0.19.5 - 2026-08-28
 
 ### Added

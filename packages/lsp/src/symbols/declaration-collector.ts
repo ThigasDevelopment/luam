@@ -73,7 +73,7 @@ function collectClassMember(state: CollectorState, block: BlockContext, owner: s
     const lookup = member.isStatic ? state.checkerDeclarations.lookupStaticMember(owner, member.name) : state.checkerDeclarations.lookupMember(owner, member.name);
     const checked = lookup?.type;
     const inferredReturn = checked?.kind === 'function' ? checked.returnType : null;
-    const detail = signatureText(member.name, member.parameters, member.returnAnnotation, inferredReturn);
+    const detail = signatureText(member.name, member.parameters, member.returnAnnotation, inferredReturn, member.typeParameters);
 
     const parameters = member.parameters.map(parameterText);
 

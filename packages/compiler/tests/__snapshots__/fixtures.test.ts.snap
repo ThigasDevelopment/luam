@@ -620,6 +620,8 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "typeConstraints": [],
+          "typeParameters": [],
         },
       ],
     },
@@ -856,6 +858,8 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
         },
         "typeArguments": [],
       },
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "expression": {
@@ -988,6 +992,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               "line": 23,
               "offset": 705,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -1006,6 +1011,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           "line": 23,
           "offset": 610,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -1447,6 +1453,8 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "offset": 136,
           },
           "returnAnnotation": null,
+          "typeConstraints": [],
+          "typeParameters": [],
         },
         {
           "body": [
@@ -1533,6 +1541,8 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "typeConstraints": [],
+          "typeParameters": [],
         },
         {
           "body": [
@@ -1587,6 +1597,8 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "typeConstraints": [],
+          "typeParameters": [],
         },
       ],
       "name": "Player",
@@ -1667,6 +1679,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                   "line": 27,
                   "offset": 493,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -1768,6 +1781,8 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             "offset": 427,
           },
           "returnAnnotation": null,
+          "typeConstraints": [],
+          "typeParameters": [],
         },
         {
           "body": [
@@ -1819,6 +1834,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                   "line": 32,
                   "offset": 598,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -1870,6 +1886,8 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "typeConstraints": [],
+          "typeParameters": [],
         },
       ],
       "name": "VIPPlayer",
@@ -1960,6 +1978,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
                   "line": 40,
                   "offset": 747,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -2011,6 +2030,8 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
             "typeArguments": [],
           },
+          "typeConstraints": [],
+          "typeParameters": [],
         },
       ],
       "name": "KickCommand",
@@ -2106,6 +2127,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "line": 46,
           "offset": 815,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -2170,6 +2192,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
           "line": 48,
           "offset": 837,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -2667,6 +2690,7 @@ exports[`fixture control-flow.luam > locks the abstract syntax tree 1`] = `
               "line": 13,
               "offset": 173,
             },
+            "typeArguments": [],
           },
           "kind": "call-statement",
           "position": {
@@ -2725,6 +2749,7 @@ exports[`fixture control-flow.luam > locks the abstract syntax tree 1`] = `
             "line": 12,
             "offset": 149,
           },
+          "typeArguments": [],
         },
       ],
       "kind": "generic-for-statement",
@@ -2964,6 +2989,7 @@ exports[`fixture control-flow.luam > locks the abstract syntax tree 1`] = `
               "line": 27,
               "offset": 319,
             },
+            "typeArguments": [],
           },
           "kind": "call-statement",
           "position": {
@@ -3011,6 +3037,7 @@ exports[`fixture control-flow.luam > locks the abstract syntax tree 1`] = `
               "line": 35,
               "offset": 425,
             },
+            "typeArguments": [],
           },
           "kind": "call-statement",
           "position": {
@@ -3052,6 +3079,7 @@ exports[`fixture control-flow.luam > locks the abstract syntax tree 1`] = `
                   "line": 31,
                   "offset": 360,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -3126,6 +3154,7 @@ exports[`fixture control-flow.luam > locks the abstract syntax tree 1`] = `
                   "line": 33,
                   "offset": 400,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -3656,6 +3685,7 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
           "line": 14,
           "offset": 168,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -3710,6 +3740,7 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
             "line": 15,
             "offset": 216,
           },
+          "typeArguments": [],
         },
       ],
     },
@@ -3759,6 +3790,7 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
             "line": 16,
             "offset": 253,
           },
+          "typeArguments": [],
         },
       ],
     },
@@ -3800,6 +3832,7 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
           "line": 17,
           "offset": 269,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -4010,6 +4043,8 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
         },
         "typeArguments": [],
       },
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "declarations": [
@@ -4107,6 +4142,7 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
           "line": 7,
           "offset": 123,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -4391,6 +4427,7 @@ exports[`fixture enums.luam > locks the abstract syntax tree 1`] = `
                   "line": 20,
                   "offset": 249,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -4801,6 +4838,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 7,
           "offset": 137,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -4847,6 +4885,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 8,
           "offset": 156,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -4893,6 +4932,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 9,
           "offset": 177,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -4939,6 +4979,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 10,
           "offset": 196,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -4987,6 +5028,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
               "line": 11,
               "offset": 232,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -5005,6 +5047,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 11,
           "offset": 217,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5051,6 +5094,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 12,
           "offset": 244,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5099,6 +5143,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
               "line": 13,
               "offset": 279,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -5117,6 +5162,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 13,
           "offset": 262,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5165,6 +5211,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
               "line": 14,
               "offset": 307,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -5183,6 +5230,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 14,
           "offset": 292,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5229,6 +5277,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 15,
           "offset": 320,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5275,6 +5324,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 16,
           "offset": 340,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5321,6 +5371,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 17,
           "offset": 359,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5367,6 +5418,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 18,
           "offset": 378,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5413,6 +5465,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 19,
           "offset": 395,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5459,6 +5512,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 20,
           "offset": 414,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5508,6 +5562,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
               "line": 21,
               "offset": 442,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -5526,6 +5581,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 21,
           "offset": 432,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5575,6 +5631,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
               "line": 22,
               "offset": 462,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -5593,6 +5650,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 22,
           "offset": 452,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5652,6 +5710,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
               "line": 23,
               "offset": 484,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -5670,6 +5729,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 23,
           "offset": 472,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -5724,6 +5784,7 @@ exports[`fixture extensions.luam > locks the abstract syntax tree 1`] = `
           "line": 24,
           "offset": 497,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -6026,6 +6087,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
                               "line": 4,
                               "offset": 122,
                             },
+                            "typeArguments": [],
                           },
                           "operator": "..",
                           "position": {
@@ -6185,6 +6247,8 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
         },
         "typeArguments": [],
       },
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "body": [
@@ -6277,6 +6341,8 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
         },
         "typeArguments": [],
       },
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "declarations": [
@@ -6327,6 +6393,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
                   "line": 15,
                   "offset": 278,
                 },
+                "typeArguments": [],
               },
               "kind": "call-statement",
               "position": {
@@ -6355,6 +6422,8 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
             "offset": 254,
           },
           "returnAnnotation": null,
+          "typeConstraints": [],
+          "typeParameters": [],
         },
       ],
     },
@@ -6428,6 +6497,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
               "line": 21,
               "offset": 357,
             },
+            "typeArguments": [],
           },
           "kind": "call-statement",
           "position": {
@@ -6476,6 +6546,8 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
         },
         "typeArguments": [],
       },
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "body": [
@@ -6508,6 +6580,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
               "line": 25,
               "offset": 425,
             },
+            "typeArguments": [],
           },
           "kind": "call-statement",
           "position": {
@@ -6576,6 +6649,8 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
         },
         "typeArguments": [],
       },
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "expression": {
@@ -6608,6 +6683,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
               "line": 28,
               "offset": 452,
             },
+            "typeArguments": [],
           },
           {
             "args": [
@@ -6638,6 +6714,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
               "line": 28,
               "offset": 470,
             },
+            "typeArguments": [],
           },
         ],
         "callee": {
@@ -6656,6 +6733,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
           "line": 28,
           "offset": 446,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -6693,6 +6771,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
           "line": 29,
           "offset": 481,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -6863,6 +6942,1864 @@ exports[`fixture functions.luam > locks the token stream 1`] = `
   "punctuation "(" 29:14",
   "string "Thigas" 29:15",
   "punctuation ")" 29:23",
+]
+`;
+
+exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
+{
+  "body": [
+    {
+      "kind": "interface-declaration",
+      "members": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 11,
+              "line": 3,
+              "offset": 37,
+            },
+            "typeArguments": [],
+          },
+          "kind": "interface-field",
+          "name": "name",
+          "position": {
+            "column": 5,
+            "line": 3,
+            "offset": 31,
+          },
+        },
+      ],
+      "name": "Named",
+      "position": {
+        "column": 1,
+        "line": 2,
+        "offset": 9,
+      },
+      "superInterfaces": [],
+    },
+    {
+      "decorators": [],
+      "interfaces": [
+        "Named",
+      ],
+      "kind": "class-declaration",
+      "members": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 11,
+              "line": 7,
+              "offset": 86,
+            },
+            "typeArguments": [],
+          },
+          "decorators": [],
+          "isStatic": false,
+          "kind": "class-field",
+          "name": "name",
+          "position": {
+            "column": 5,
+            "line": 7,
+            "offset": 80,
+          },
+          "value": {
+            "kind": "string-literal",
+            "position": {
+              "column": 20,
+              "line": 7,
+              "offset": 95,
+            },
+            "value": "tag",
+          },
+        },
+      ],
+      "name": "Tag",
+      "position": {
+        "column": 1,
+        "line": 6,
+        "offset": 47,
+      },
+      "superClass": null,
+      "superClassArguments": [],
+      "typeConstraints": [],
+      "typeParameters": [],
+    },
+    {
+      "decorators": [],
+      "interfaces": [],
+      "kind": "class-declaration",
+      "members": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "T",
+            "position": {
+              "column": 12,
+              "line": 11,
+              "offset": 130,
+            },
+            "typeArguments": [],
+          },
+          "decorators": [],
+          "isStatic": false,
+          "kind": "class-field",
+          "name": "value",
+          "position": {
+            "column": 5,
+            "line": 11,
+            "offset": 123,
+          },
+          "value": null,
+        },
+        {
+          "body": [
+            {
+              "kind": "assignment-statement",
+              "operator": "=",
+              "position": {
+                "column": 9,
+                "line": 14,
+                "offset": 179,
+              },
+              "targets": [
+                {
+                  "kind": "member-expression",
+                  "object": {
+                    "kind": "identifier",
+                    "name": "self",
+                    "position": {
+                      "column": 9,
+                      "line": 14,
+                      "offset": 179,
+                    },
+                  },
+                  "position": {
+                    "column": 13,
+                    "line": 14,
+                    "offset": 183,
+                  },
+                  "property": "value",
+                },
+              ],
+              "values": [
+                {
+                  "kind": "identifier",
+                  "name": "value",
+                  "position": {
+                    "column": 22,
+                    "line": 14,
+                    "offset": 192,
+                  },
+                },
+              ],
+            },
+          ],
+          "decorators": [],
+          "isConstructor": true,
+          "isStatic": false,
+          "isSynthetic": false,
+          "kind": "class-method",
+          "name": "constructor",
+          "parameters": [
+            {
+              "annotation": {
+                "kind": "type-name",
+                "name": "T",
+                "position": {
+                  "column": 36,
+                  "line": 13,
+                  "offset": 168,
+                },
+                "typeArguments": [],
+              },
+              "isVararg": false,
+              "name": "value",
+              "position": {
+                "column": 29,
+                "line": 13,
+                "offset": 161,
+              },
+            },
+          ],
+          "position": {
+            "column": 5,
+            "line": 13,
+            "offset": 137,
+          },
+          "returnAnnotation": null,
+          "typeConstraints": [],
+          "typeParameters": [],
+        },
+        {
+          "body": [
+            {
+              "kind": "return-statement",
+              "position": {
+                "column": 9,
+                "line": 18,
+                "offset": 241,
+              },
+              "values": [
+                {
+                  "kind": "member-expression",
+                  "object": {
+                    "kind": "identifier",
+                    "name": "self",
+                    "position": {
+                      "column": 16,
+                      "line": 18,
+                      "offset": 248,
+                    },
+                  },
+                  "position": {
+                    "column": 20,
+                    "line": 18,
+                    "offset": 252,
+                  },
+                  "property": "value",
+                },
+              ],
+            },
+          ],
+          "decorators": [],
+          "isConstructor": false,
+          "isStatic": false,
+          "isSynthetic": false,
+          "kind": "class-method",
+          "name": "read",
+          "parameters": [],
+          "position": {
+            "column": 5,
+            "line": 17,
+            "offset": 211,
+          },
+          "returnAnnotation": {
+            "kind": "type-name",
+            "name": "T",
+            "position": {
+              "column": 25,
+              "line": 17,
+              "offset": 231,
+            },
+            "typeArguments": [],
+          },
+          "typeConstraints": [],
+          "typeParameters": [],
+        },
+        {
+          "body": [
+            {
+              "kind": "return-statement",
+              "position": {
+                "column": 9,
+                "line": 22,
+                "offset": 325,
+              },
+              "values": [
+                {
+                  "args": [
+                    {
+                      "kind": "member-expression",
+                      "object": {
+                        "kind": "identifier",
+                        "name": "self",
+                        "position": {
+                          "column": 23,
+                          "line": 22,
+                          "offset": 339,
+                        },
+                      },
+                      "position": {
+                        "column": 27,
+                        "line": 22,
+                        "offset": 343,
+                      },
+                      "property": "value",
+                    },
+                  ],
+                  "callee": {
+                    "kind": "identifier",
+                    "name": "change",
+                    "position": {
+                      "column": 16,
+                      "line": 22,
+                      "offset": 332,
+                    },
+                  },
+                  "kind": "call-expression",
+                  "method": null,
+                  "position": {
+                    "column": 22,
+                    "line": 22,
+                    "offset": 338,
+                  },
+                  "typeArguments": [],
+                },
+              ],
+            },
+          ],
+          "decorators": [],
+          "isConstructor": false,
+          "isStatic": false,
+          "isSynthetic": false,
+          "kind": "class-method",
+          "name": "convert",
+          "parameters": [
+            {
+              "annotation": {
+                "isVariadic": false,
+                "kind": "type-function",
+                "parameterNames": [
+                  null,
+                ],
+                "parameters": [
+                  {
+                    "kind": "type-name",
+                    "name": "T",
+                    "position": {
+                      "column": 40,
+                      "line": 21,
+                      "offset": 307,
+                    },
+                    "typeArguments": [],
+                  },
+                ],
+                "position": {
+                  "column": 36,
+                  "line": 21,
+                  "offset": 303,
+                },
+                "returnType": {
+                  "kind": "type-name",
+                  "name": "U",
+                  "position": {
+                    "column": 44,
+                    "line": 21,
+                    "offset": 311,
+                  },
+                  "typeArguments": [],
+                },
+              },
+              "isVararg": false,
+              "name": "change",
+              "position": {
+                "column": 28,
+                "line": 21,
+                "offset": 295,
+              },
+            },
+          ],
+          "position": {
+            "column": 5,
+            "line": 21,
+            "offset": 272,
+          },
+          "returnAnnotation": {
+            "kind": "type-name",
+            "name": "U",
+            "position": {
+              "column": 48,
+              "line": 21,
+              "offset": 315,
+            },
+            "typeArguments": [],
+          },
+          "typeConstraints": [
+            null,
+          ],
+          "typeParameters": [
+            "U",
+          ],
+        },
+      ],
+      "name": "Box",
+      "position": {
+        "column": 1,
+        "line": 10,
+        "offset": 104,
+      },
+      "superClass": null,
+      "superClassArguments": [],
+      "typeConstraints": [
+        null,
+      ],
+      "typeParameters": [
+        "T",
+      ],
+    },
+    {
+      "body": [
+        {
+          "kind": "return-statement",
+          "position": {
+            "column": 5,
+            "line": 27,
+            "offset": 400,
+          },
+          "values": [
+            {
+              "kind": "identifier",
+              "name": "value",
+              "position": {
+                "column": 12,
+                "line": 27,
+                "offset": 407,
+              },
+            },
+          ],
+        },
+      ],
+      "isExported": false,
+      "isHttpExport": false,
+      "isLocal": false,
+      "isMethod": false,
+      "kind": "function-declaration",
+      "name": {
+        "kind": "identifier",
+        "name": "identity",
+        "position": {
+          "column": 10,
+          "line": 26,
+          "offset": 371,
+        },
+      },
+      "parameters": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "T",
+            "position": {
+              "column": 29,
+              "line": 26,
+              "offset": 390,
+            },
+            "typeArguments": [],
+          },
+          "isVararg": false,
+          "name": "value",
+          "position": {
+            "column": 22,
+            "line": 26,
+            "offset": 383,
+          },
+        },
+      ],
+      "position": {
+        "column": 1,
+        "line": 26,
+        "offset": 362,
+      },
+      "returnAnnotation": {
+        "kind": "type-name",
+        "name": "T",
+        "position": {
+          "column": 33,
+          "line": 26,
+          "offset": 394,
+        },
+        "typeArguments": [],
+      },
+      "typeConstraints": [
+        null,
+      ],
+      "typeParameters": [
+        "T",
+      ],
+    },
+    {
+      "body": [
+        {
+          "kind": "return-statement",
+          "position": {
+            "column": 5,
+            "line": 31,
+            "offset": 455,
+          },
+          "values": [
+            {
+              "index": {
+                "kind": "number-literal",
+                "position": {
+                  "column": 17,
+                  "line": 31,
+                  "offset": 467,
+                },
+                "raw": "1",
+                "value": 1,
+              },
+              "kind": "index-expression",
+              "object": {
+                "kind": "identifier",
+                "name": "list",
+                "position": {
+                  "column": 12,
+                  "line": 31,
+                  "offset": 462,
+                },
+              },
+              "position": {
+                "column": 16,
+                "line": 31,
+                "offset": 466,
+              },
+            },
+          ],
+        },
+      ],
+      "isExported": false,
+      "isHttpExport": false,
+      "isLocal": false,
+      "isMethod": false,
+      "kind": "function-declaration",
+      "name": {
+        "kind": "identifier",
+        "name": "first",
+        "position": {
+          "column": 10,
+          "line": 30,
+          "offset": 427,
+        },
+      },
+      "parameters": [
+        {
+          "annotation": {
+            "element": {
+              "kind": "type-name",
+              "name": "T",
+              "position": {
+                "column": 25,
+                "line": 30,
+                "offset": 442,
+              },
+              "typeArguments": [],
+            },
+            "kind": "type-array",
+            "position": {
+              "column": 26,
+              "line": 30,
+              "offset": 443,
+            },
+          },
+          "isVararg": false,
+          "name": "list",
+          "position": {
+            "column": 19,
+            "line": 30,
+            "offset": 436,
+          },
+        },
+      ],
+      "position": {
+        "column": 1,
+        "line": 30,
+        "offset": 418,
+      },
+      "returnAnnotation": {
+        "element": {
+          "kind": "type-name",
+          "name": "T",
+          "position": {
+            "column": 31,
+            "line": 30,
+            "offset": 448,
+          },
+          "typeArguments": [],
+        },
+        "kind": "type-optional",
+        "position": {
+          "column": 32,
+          "line": 30,
+          "offset": 449,
+        },
+      },
+      "typeConstraints": [
+        null,
+      ],
+      "typeParameters": [
+        "T",
+      ],
+    },
+    {
+      "body": [
+        {
+          "kind": "return-statement",
+          "position": {
+            "column": 5,
+            "line": 35,
+            "offset": 529,
+          },
+          "values": [
+            {
+              "kind": "member-expression",
+              "object": {
+                "kind": "identifier",
+                "name": "value",
+                "position": {
+                  "column": 12,
+                  "line": 35,
+                  "offset": 536,
+                },
+              },
+              "position": {
+                "column": 17,
+                "line": 35,
+                "offset": 541,
+              },
+              "property": "name",
+            },
+          ],
+        },
+      ],
+      "isExported": false,
+      "isHttpExport": false,
+      "isLocal": false,
+      "isMethod": false,
+      "kind": "function-declaration",
+      "name": {
+        "kind": "identifier",
+        "name": "label",
+        "position": {
+          "column": 10,
+          "line": 34,
+          "offset": 484,
+        },
+      },
+      "parameters": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "T",
+            "position": {
+              "column": 40,
+              "line": 34,
+              "offset": 514,
+            },
+            "typeArguments": [],
+          },
+          "isVararg": false,
+          "name": "value",
+          "position": {
+            "column": 33,
+            "line": 34,
+            "offset": 507,
+          },
+        },
+      ],
+      "position": {
+        "column": 1,
+        "line": 34,
+        "offset": 475,
+      },
+      "returnAnnotation": {
+        "kind": "type-name",
+        "name": "string",
+        "position": {
+          "column": 44,
+          "line": 34,
+          "offset": 518,
+        },
+        "typeArguments": [],
+      },
+      "typeConstraints": [
+        {
+          "kind": "type-name",
+          "name": "Named",
+          "position": {
+            "column": 26,
+            "line": 34,
+            "offset": 500,
+          },
+          "typeArguments": [],
+        },
+      ],
+      "typeParameters": [
+        "T",
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": null,
+          "name": "pick",
+          "position": {
+            "column": 7,
+            "line": 38,
+            "offset": 558,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 38,
+        "offset": 552,
+      },
+      "values": [
+        {
+          "body": [
+            {
+              "alternate": null,
+              "clauses": [
+                {
+                  "body": [
+                    {
+                      "kind": "return-statement",
+                      "position": {
+                        "column": 9,
+                        "line": 40,
+                        "offset": 648,
+                      },
+                      "values": [
+                        {
+                          "kind": "identifier",
+                          "name": "left",
+                          "position": {
+                            "column": 16,
+                            "line": 40,
+                            "offset": 655,
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                  "condition": {
+                    "kind": "identifier",
+                    "name": "takeLeft",
+                    "position": {
+                      "column": 8,
+                      "line": 39,
+                      "offset": 626,
+                    },
+                  },
+                  "position": {
+                    "column": 5,
+                    "line": 39,
+                    "offset": 623,
+                  },
+                },
+              ],
+              "kind": "if-statement",
+              "position": {
+                "column": 5,
+                "line": 39,
+                "offset": 623,
+              },
+            },
+            {
+              "kind": "return-statement",
+              "position": {
+                "column": 5,
+                "line": 43,
+                "offset": 673,
+              },
+              "values": [
+                {
+                  "kind": "identifier",
+                  "name": "right",
+                  "position": {
+                    "column": 12,
+                    "line": 43,
+                    "offset": 680,
+                  },
+                },
+              ],
+            },
+          ],
+          "kind": "function-expression",
+          "parameters": [
+            {
+              "annotation": {
+                "kind": "type-name",
+                "name": "T",
+                "position": {
+                  "column": 33,
+                  "line": 38,
+                  "offset": 584,
+                },
+                "typeArguments": [],
+              },
+              "isVararg": false,
+              "name": "left",
+              "position": {
+                "column": 27,
+                "line": 38,
+                "offset": 578,
+              },
+            },
+            {
+              "annotation": {
+                "kind": "type-name",
+                "name": "T",
+                "position": {
+                  "column": 43,
+                  "line": 38,
+                  "offset": 594,
+                },
+                "typeArguments": [],
+              },
+              "isVararg": false,
+              "name": "right",
+              "position": {
+                "column": 36,
+                "line": 38,
+                "offset": 587,
+              },
+            },
+            {
+              "annotation": {
+                "kind": "type-name",
+                "name": "boolean",
+                "position": {
+                  "column": 56,
+                  "line": 38,
+                  "offset": 607,
+                },
+                "typeArguments": [],
+              },
+              "isVararg": false,
+              "name": "takeLeft",
+              "position": {
+                "column": 46,
+                "line": 38,
+                "offset": 597,
+              },
+            },
+          ],
+          "position": {
+            "column": 14,
+            "line": 38,
+            "offset": 565,
+          },
+          "returnAnnotation": {
+            "kind": "type-name",
+            "name": "T",
+            "position": {
+              "column": 66,
+              "line": 38,
+              "offset": 617,
+            },
+            "typeArguments": [],
+          },
+          "typeConstraints": [
+            null,
+          ],
+          "typeParameters": [
+            "T",
+          ],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 13,
+              "line": 46,
+              "offset": 703,
+            },
+            "typeArguments": [],
+          },
+          "name": "text",
+          "position": {
+            "column": 7,
+            "line": 46,
+            "offset": 697,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 46,
+        "offset": 691,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "kind": "string-literal",
+              "position": {
+                "column": 31,
+                "line": 46,
+                "offset": 721,
+              },
+              "value": "Thigas",
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "identity",
+            "position": {
+              "column": 22,
+              "line": 46,
+              "offset": 712,
+            },
+          },
+          "kind": "call-expression",
+          "method": null,
+          "position": {
+            "column": 30,
+            "line": 46,
+            "offset": 720,
+          },
+          "typeArguments": [],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "number",
+            "position": {
+              "column": 14,
+              "line": 47,
+              "offset": 744,
+            },
+            "typeArguments": [],
+          },
+          "name": "total",
+          "position": {
+            "column": 7,
+            "line": 47,
+            "offset": 737,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 47,
+        "offset": 731,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "kind": "number-literal",
+              "position": {
+                "column": 40,
+                "line": 47,
+                "offset": 770,
+              },
+              "raw": "2",
+              "value": 2,
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "identity",
+            "position": {
+              "column": 23,
+              "line": 47,
+              "offset": 753,
+            },
+          },
+          "kind": "call-expression",
+          "method": null,
+          "position": {
+            "column": 31,
+            "line": 47,
+            "offset": 761,
+          },
+          "typeArguments": [
+            {
+              "kind": "type-name",
+              "name": "number",
+              "position": {
+                "column": 32,
+                "line": 47,
+                "offset": 762,
+              },
+              "typeArguments": [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "element": {
+              "kind": "type-name",
+              "name": "number",
+              "position": {
+                "column": 14,
+                "line": 48,
+                "offset": 786,
+              },
+              "typeArguments": [],
+            },
+            "kind": "type-optional",
+            "position": {
+              "column": 11,
+              "line": 48,
+              "offset": 783,
+            },
+          },
+          "name": "head",
+          "position": {
+            "column": 7,
+            "line": 48,
+            "offset": 779,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 48,
+        "offset": 773,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "fields": [
+                {
+                  "key": null,
+                  "name": null,
+                  "position": {
+                    "column": 31,
+                    "line": 48,
+                    "offset": 803,
+                  },
+                  "value": {
+                    "kind": "number-literal",
+                    "position": {
+                      "column": 31,
+                      "line": 48,
+                      "offset": 803,
+                    },
+                    "raw": "1",
+                    "value": 1,
+                  },
+                },
+                {
+                  "key": null,
+                  "name": null,
+                  "position": {
+                    "column": 34,
+                    "line": 48,
+                    "offset": 806,
+                  },
+                  "value": {
+                    "kind": "number-literal",
+                    "position": {
+                      "column": 34,
+                      "line": 48,
+                      "offset": 806,
+                    },
+                    "raw": "2",
+                    "value": 2,
+                  },
+                },
+                {
+                  "key": null,
+                  "name": null,
+                  "position": {
+                    "column": 37,
+                    "line": 48,
+                    "offset": 809,
+                  },
+                  "value": {
+                    "kind": "number-literal",
+                    "position": {
+                      "column": 37,
+                      "line": 48,
+                      "offset": 809,
+                    },
+                    "raw": "3",
+                    "value": 3,
+                  },
+                },
+              ],
+              "kind": "table-expression",
+              "position": {
+                "column": 29,
+                "line": 48,
+                "offset": 801,
+              },
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "first",
+            "position": {
+              "column": 23,
+              "line": 48,
+              "offset": 795,
+            },
+          },
+          "kind": "call-expression",
+          "method": null,
+          "position": {
+            "column": 28,
+            "line": 48,
+            "offset": 800,
+          },
+          "typeArguments": [],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 16,
+              "line": 49,
+              "offset": 829,
+            },
+            "typeArguments": [],
+          },
+          "name": "tagName",
+          "position": {
+            "column": 7,
+            "line": 49,
+            "offset": 820,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 49,
+        "offset": 814,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "args": [],
+              "className": "Tag",
+              "kind": "new-expression",
+              "position": {
+                "column": 31,
+                "line": 49,
+                "offset": 844,
+              },
+              "typeArguments": [],
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "label",
+            "position": {
+              "column": 25,
+              "line": 49,
+              "offset": 838,
+            },
+          },
+          "kind": "call-expression",
+          "method": null,
+          "position": {
+            "column": 30,
+            "line": 49,
+            "offset": 843,
+          },
+          "typeArguments": [],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 15,
+              "line": 50,
+              "offset": 869,
+            },
+            "typeArguments": [],
+          },
+          "name": "chosen",
+          "position": {
+            "column": 7,
+            "line": 50,
+            "offset": 861,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 50,
+        "offset": 855,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "kind": "string-literal",
+              "position": {
+                "column": 29,
+                "line": 50,
+                "offset": 883,
+              },
+              "value": "left",
+            },
+            {
+              "kind": "string-literal",
+              "position": {
+                "column": 37,
+                "line": 50,
+                "offset": 891,
+              },
+              "value": "right",
+            },
+            {
+              "kind": "boolean-literal",
+              "position": {
+                "column": 46,
+                "line": 50,
+                "offset": 900,
+              },
+              "value": true,
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "pick",
+            "position": {
+              "column": 24,
+              "line": 50,
+              "offset": 878,
+            },
+          },
+          "kind": "call-expression",
+          "method": null,
+          "position": {
+            "column": 28,
+            "line": 50,
+            "offset": 882,
+          },
+          "typeArguments": [],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": null,
+          "name": "box",
+          "position": {
+            "column": 7,
+            "line": 51,
+            "offset": 912,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 51,
+        "offset": 906,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "kind": "number-literal",
+              "position": {
+                "column": 29,
+                "line": 51,
+                "offset": 934,
+              },
+              "raw": "1",
+              "value": 1,
+            },
+          ],
+          "className": "Box",
+          "kind": "new-expression",
+          "position": {
+            "column": 13,
+            "line": 51,
+            "offset": 918,
+          },
+          "typeArguments": [
+            {
+              "kind": "type-name",
+              "name": "number",
+              "position": {
+                "column": 21,
+                "line": 51,
+                "offset": 926,
+              },
+              "typeArguments": [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "number",
+            "position": {
+              "column": 13,
+              "line": 52,
+              "offset": 949,
+            },
+            "typeArguments": [],
+          },
+          "name": "held",
+          "position": {
+            "column": 7,
+            "line": 52,
+            "offset": 943,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 52,
+        "offset": 937,
+      },
+      "values": [
+        {
+          "args": [],
+          "callee": {
+            "kind": "identifier",
+            "name": "box",
+            "position": {
+              "column": 22,
+              "line": 52,
+              "offset": 958,
+            },
+          },
+          "kind": "call-expression",
+          "method": "read",
+          "position": {
+            "column": 25,
+            "line": 52,
+            "offset": 961,
+          },
+          "typeArguments": [],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 14,
+              "line": 53,
+              "offset": 982,
+            },
+            "typeArguments": [],
+          },
+          "name": "shown",
+          "position": {
+            "column": 7,
+            "line": 53,
+            "offset": 975,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 53,
+        "offset": 969,
+      },
+      "values": [
+        {
+          "args": [
+            {
+              "kind": "identifier",
+              "name": "tostring",
+              "position": {
+                "column": 35,
+                "line": 53,
+                "offset": 1003,
+              },
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "box",
+            "position": {
+              "column": 23,
+              "line": 53,
+              "offset": 991,
+            },
+          },
+          "kind": "call-expression",
+          "method": "convert",
+          "position": {
+            "column": 26,
+            "line": 53,
+            "offset": 994,
+          },
+          "typeArguments": [],
+        },
+      ],
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "identifier",
+            "name": "text",
+            "position": {
+              "column": 7,
+              "line": 55,
+              "offset": 1020,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "total",
+            "position": {
+              "column": 13,
+              "line": 55,
+              "offset": 1026,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "head",
+            "position": {
+              "column": 20,
+              "line": 55,
+              "offset": 1033,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "tagName",
+            "position": {
+              "column": 26,
+              "line": 55,
+              "offset": 1039,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "chosen",
+            "position": {
+              "column": 35,
+              "line": 55,
+              "offset": 1048,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "held",
+            "position": {
+              "column": 43,
+              "line": 55,
+              "offset": 1056,
+            },
+          },
+          {
+            "kind": "identifier",
+            "name": "shown",
+            "position": {
+              "column": 49,
+              "line": 55,
+              "offset": 1062,
+            },
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "print",
+          "position": {
+            "column": 1,
+            "line": 55,
+            "offset": 1014,
+          },
+        },
+        "kind": "call-expression",
+        "method": null,
+        "position": {
+          "column": 6,
+          "line": 55,
+          "offset": 1019,
+        },
+        "typeArguments": [],
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 55,
+        "offset": 1014,
+      },
+    },
+  ],
+  "kind": "program",
+  "position": {
+    "column": 1,
+    "line": 1,
+    "offset": 0,
+  },
+}
+`;
+
+exports[`fixture generics.luam > locks the generated Lua 5.1 output 1`] = `
+"--!strict
+
+
+
+
+class 'Tag' {
+    name = 'tag'
+}
+
+class 'Box' {
+    value = nil,
+
+    constructor = function(self, value)
+        self.value = value
+    end,
+
+    read = function(self)
+        return self.value
+    end,
+
+    convert = function(self, change)
+        return change(self.value)
+    end
+}
+
+function identity(value)
+    return value
+end
+
+function first(list)
+    return list[1]
+end
+
+function label(value)
+    return value.name
+end
+
+local pick = function (left, right, takeLeft)
+    if takeLeft then
+        return left
+    end
+
+    return right
+end
+
+local text = identity('Thigas')
+local total = identity(2)
+local head = first({ 1, 2, 3 })
+local tagName = label(new 'Tag' ())
+local chosen = pick('left', 'right', true)
+local box = new 'Box' (1)
+local held = box:read()
+local shown = box:convert(tostring)
+
+print(text, total, head, tagName, chosen, held, shown)
+"
+`;
+
+exports[`fixture generics.luam > locks the generated Lua 5.1 output 2`] = `
+[
+  "class",
+]
+`;
+
+exports[`fixture generics.luam > locks the token stream 1`] = `
+[
+  "keyword "interface" 2:1",
+  "identifier "Named" 2:11",
+  "punctuation "{" 2:17",
+  "identifier "name" 3:5",
+  "punctuation ":" 3:9",
+  "identifier "string" 3:11",
+  "punctuation "}" 4:1",
+  "keyword "class" 6:1",
+  "identifier "Tag" 6:7",
+  "keyword "implements" 6:11",
+  "identifier "Named" 6:22",
+  "punctuation "{" 6:28",
+  "identifier "name" 7:5",
+  "punctuation ":" 7:9",
+  "identifier "string" 7:11",
+  "operator "=" 7:18",
+  "string "tag" 7:20",
+  "punctuation "}" 8:1",
+  "keyword "class" 10:1",
+  "identifier "Box" 10:7",
+  "operator "<" 10:10",
+  "identifier "T" 10:11",
+  "operator ">" 10:12",
+  "punctuation "{" 10:14",
+  "identifier "value" 11:5",
+  "punctuation ":" 11:10",
+  "identifier "T" 11:12",
+  "keyword "constructor" 13:5",
+  "operator "=" 13:17",
+  "keyword "function" 13:19",
+  "punctuation "(" 13:28",
+  "identifier "value" 13:29",
+  "punctuation ":" 13:34",
+  "identifier "T" 13:36",
+  "punctuation ")" 13:37",
+  "identifier "self" 14:9",
+  "punctuation "." 14:13",
+  "identifier "value" 14:14",
+  "operator "=" 14:20",
+  "identifier "value" 14:22",
+  "keyword "end" 15:5",
+  "identifier "read" 17:5",
+  "operator "=" 17:10",
+  "keyword "function" 17:12",
+  "punctuation "(" 17:21",
+  "punctuation ")" 17:22",
+  "punctuation ":" 17:23",
+  "identifier "T" 17:25",
+  "keyword "return" 18:9",
+  "identifier "self" 18:16",
+  "punctuation "." 18:20",
+  "identifier "value" 18:21",
+  "keyword "end" 19:5",
+  "identifier "convert" 21:5",
+  "operator "=" 21:13",
+  "keyword "function" 21:15",
+  "operator "<" 21:24",
+  "identifier "U" 21:25",
+  "operator ">" 21:26",
+  "punctuation "(" 21:27",
+  "identifier "change" 21:28",
+  "punctuation ":" 21:34",
+  "identifier "fun" 21:36",
+  "punctuation "(" 21:39",
+  "identifier "T" 21:40",
+  "punctuation ")" 21:41",
+  "punctuation ":" 21:42",
+  "identifier "U" 21:44",
+  "punctuation ")" 21:45",
+  "punctuation ":" 21:46",
+  "identifier "U" 21:48",
+  "keyword "return" 22:9",
+  "identifier "change" 22:16",
+  "punctuation "(" 22:22",
+  "identifier "self" 22:23",
+  "punctuation "." 22:27",
+  "identifier "value" 22:28",
+  "punctuation ")" 22:33",
+  "keyword "end" 23:5",
+  "punctuation "}" 24:1",
+  "keyword "function" 26:1",
+  "identifier "identity" 26:10",
+  "operator "<" 26:18",
+  "identifier "T" 26:19",
+  "operator ">" 26:20",
+  "punctuation "(" 26:21",
+  "identifier "value" 26:22",
+  "punctuation ":" 26:27",
+  "identifier "T" 26:29",
+  "punctuation ")" 26:30",
+  "punctuation ":" 26:31",
+  "identifier "T" 26:33",
+  "keyword "return" 27:5",
+  "identifier "value" 27:12",
+  "keyword "end" 28:1",
+  "keyword "function" 30:1",
+  "identifier "first" 30:10",
+  "operator "<" 30:15",
+  "identifier "T" 30:16",
+  "operator ">" 30:17",
+  "punctuation "(" 30:18",
+  "identifier "list" 30:19",
+  "punctuation ":" 30:23",
+  "identifier "T" 30:25",
+  "punctuation "[" 30:26",
+  "punctuation "]" 30:27",
+  "punctuation ")" 30:28",
+  "punctuation ":" 30:29",
+  "identifier "T" 30:31",
+  "operator "?" 30:32",
+  "keyword "return" 31:5",
+  "identifier "list" 31:12",
+  "punctuation "[" 31:16",
+  "number "1" 31:17",
+  "punctuation "]" 31:18",
+  "keyword "end" 32:1",
+  "keyword "function" 34:1",
+  "identifier "label" 34:10",
+  "operator "<" 34:15",
+  "identifier "T" 34:16",
+  "keyword "extends" 34:18",
+  "identifier "Named" 34:26",
+  "operator ">" 34:31",
+  "punctuation "(" 34:32",
+  "identifier "value" 34:33",
+  "punctuation ":" 34:38",
+  "identifier "T" 34:40",
+  "punctuation ")" 34:41",
+  "punctuation ":" 34:42",
+  "identifier "string" 34:44",
+  "keyword "return" 35:5",
+  "identifier "value" 35:12",
+  "punctuation "." 35:17",
+  "identifier "name" 35:18",
+  "keyword "end" 36:1",
+  "keyword "local" 38:1",
+  "identifier "pick" 38:7",
+  "operator "=" 38:12",
+  "keyword "function" 38:14",
+  "operator "<" 38:23",
+  "identifier "T" 38:24",
+  "operator ">" 38:25",
+  "punctuation "(" 38:26",
+  "identifier "left" 38:27",
+  "punctuation ":" 38:31",
+  "identifier "T" 38:33",
+  "punctuation "," 38:34",
+  "identifier "right" 38:36",
+  "punctuation ":" 38:41",
+  "identifier "T" 38:43",
+  "punctuation "," 38:44",
+  "identifier "takeLeft" 38:46",
+  "punctuation ":" 38:54",
+  "identifier "boolean" 38:56",
+  "punctuation ")" 38:63",
+  "punctuation ":" 38:64",
+  "identifier "T" 38:66",
+  "keyword "if" 39:5",
+  "identifier "takeLeft" 39:8",
+  "keyword "then" 39:17",
+  "keyword "return" 40:9",
+  "identifier "left" 40:16",
+  "keyword "end" 41:5",
+  "keyword "return" 43:5",
+  "identifier "right" 43:12",
+  "keyword "end" 44:1",
+  "keyword "local" 46:1",
+  "identifier "text" 46:7",
+  "punctuation ":" 46:11",
+  "identifier "string" 46:13",
+  "operator "=" 46:20",
+  "identifier "identity" 46:22",
+  "punctuation "(" 46:30",
+  "string "Thigas" 46:31",
+  "punctuation ")" 46:39",
+  "keyword "local" 47:1",
+  "identifier "total" 47:7",
+  "punctuation ":" 47:12",
+  "identifier "number" 47:14",
+  "operator "=" 47:21",
+  "identifier "identity" 47:23",
+  "operator "<" 47:31",
+  "identifier "number" 47:32",
+  "operator ">" 47:38",
+  "punctuation "(" 47:39",
+  "number "2" 47:40",
+  "punctuation ")" 47:41",
+  "keyword "local" 48:1",
+  "identifier "head" 48:7",
+  "operator "?" 48:11",
+  "punctuation ":" 48:12",
+  "identifier "number" 48:14",
+  "operator "=" 48:21",
+  "identifier "first" 48:23",
+  "punctuation "(" 48:28",
+  "punctuation "{" 48:29",
+  "number "1" 48:31",
+  "punctuation "," 48:32",
+  "number "2" 48:34",
+  "punctuation "," 48:35",
+  "number "3" 48:37",
+  "punctuation "}" 48:39",
+  "punctuation ")" 48:40",
+  "keyword "local" 49:1",
+  "identifier "tagName" 49:7",
+  "punctuation ":" 49:14",
+  "identifier "string" 49:16",
+  "operator "=" 49:23",
+  "identifier "label" 49:25",
+  "punctuation "(" 49:30",
+  "keyword "new" 49:31",
+  "identifier "Tag" 49:35",
+  "punctuation "(" 49:38",
+  "punctuation ")" 49:39",
+  "punctuation ")" 49:40",
+  "keyword "local" 50:1",
+  "identifier "chosen" 50:7",
+  "punctuation ":" 50:13",
+  "identifier "string" 50:15",
+  "operator "=" 50:22",
+  "identifier "pick" 50:24",
+  "punctuation "(" 50:28",
+  "string "left" 50:29",
+  "punctuation "," 50:35",
+  "string "right" 50:37",
+  "punctuation "," 50:44",
+  "keyword "true" 50:46",
+  "punctuation ")" 50:50",
+  "keyword "local" 51:1",
+  "identifier "box" 51:7",
+  "operator "=" 51:11",
+  "keyword "new" 51:13",
+  "identifier "Box" 51:17",
+  "operator "<" 51:20",
+  "identifier "number" 51:21",
+  "operator ">" 51:27",
+  "punctuation "(" 51:28",
+  "number "1" 51:29",
+  "punctuation ")" 51:30",
+  "keyword "local" 52:1",
+  "identifier "held" 52:7",
+  "punctuation ":" 52:11",
+  "identifier "number" 52:13",
+  "operator "=" 52:20",
+  "identifier "box" 52:22",
+  "punctuation ":" 52:25",
+  "identifier "read" 52:26",
+  "punctuation "(" 52:30",
+  "punctuation ")" 52:31",
+  "keyword "local" 53:1",
+  "identifier "shown" 53:7",
+  "punctuation ":" 53:12",
+  "identifier "string" 53:14",
+  "operator "=" 53:21",
+  "identifier "box" 53:23",
+  "punctuation ":" 53:26",
+  "identifier "convert" 53:27",
+  "punctuation "(" 53:34",
+  "identifier "tostring" 53:35",
+  "punctuation ")" 53:43",
+  "identifier "print" 55:1",
+  "punctuation "(" 55:6",
+  "identifier "text" 55:7",
+  "punctuation "," 55:11",
+  "identifier "total" 55:13",
+  "punctuation "," 55:18",
+  "identifier "head" 55:20",
+  "punctuation "," 55:24",
+  "identifier "tagName" 55:26",
+  "punctuation "," 55:33",
+  "identifier "chosen" 55:35",
+  "punctuation "," 55:41",
+  "identifier "held" 55:43",
+  "punctuation "," 55:47",
+  "identifier "shown" 55:49",
+  "punctuation ")" 55:54",
 ]
 `;
 
@@ -7584,6 +9521,7 @@ break",
           "line": 16,
           "offset": 429,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -7657,6 +9595,7 @@ break",
           "line": 17,
           "offset": 494,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -8942,6 +10881,7 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
           "line": 21,
           "offset": 550,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -9024,6 +10964,7 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
           "line": 22,
           "offset": 572,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -9097,6 +11038,7 @@ exports[`fixture operators.luam > locks the abstract syntax tree 1`] = `
           "line": 23,
           "offset": 627,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {
@@ -9682,6 +11624,7 @@ exports[`fixture templates.luam > locks the abstract syntax tree 1`] = `
           "line": 10,
           "offset": 258,
         },
+        "typeArguments": [],
       },
       "kind": "call-statement",
       "position": {

@@ -2327,14 +2327,14 @@ Remaining:
 Close a hole where a declared return type is not enforced, and give functions the
 type parameters aliases and classes already have.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 37.01 | Report a function that can end without returning | ../plans/37.01-missing-return.md | architecture-engineer | todo |
-| 37.02 | Take type parameters on functions and methods | ../plans/37.02-generic-functions.md | architecture-engineer | todo |
-| 37.03 | Cover milestone 37 with checker tests | ../plans/37.03-checker-soundness-tests.md | test-engineer | todo |
-| 37.04 | Document the return rule and generic functions | ../plans/37.04-checker-soundness-documentation.md | documentation-engineer | todo |
+| 37.01 | Report a function that can end without returning | ../plans/37.01-missing-return.md | architecture-engineer | done |
+| 37.02 | Take type parameters on functions and methods | ../plans/37.02-generic-functions.md | architecture-engineer | done |
+| 37.03 | Cover milestone 37 with checker tests | ../plans/37.03-checker-soundness-tests.md | test-engineer | done |
+| 37.04 | Document the return rule and generic functions | ../plans/37.04-checker-soundness-documentation.md | documentation-engineer | done |
 
 Sequencing:
 
@@ -2380,6 +2380,53 @@ Deliberately excluded:
 - Variance, higher-kinded parameters, and inference from a return position.
 - A strictness flag. A second checking mode is a permanent cost paid to avoid a
   one-time fix.
+
+What it decided:
+
+- **`check-missing-return` lands as an error, not a staged warning.** 37.01 T-02
+  ran the diagnostic against every corpus before deciding: the compiler suite,
+  all 85 tracked `.luam` files, `docs/snippets`, the documented examples, the
+  captured outputs, and the LSP and CLI suites. Zero hits. With nothing to
+  migrate, the argument for a softer landing had no case to answer, and the
+  defect sits at the same severity as `check-return-mismatch` — which is the
+  point of reporting it at all.
+- **Two loops needed a reachability fix before the diagnostic could be written.**
+  `checkLoopBody` restores the entry flow after a body, so `while true do` and
+  `repeat ... until false` left the state reachable and would have been reported.
+  Both now end the path when the condition is a literal and the body carries no
+  `break` of its own.
+- **`error(...)` is a recorded false positive, not a bug to fix later.** A call
+  cannot end a path without a never-returning return type, and guessing from the
+  name would be a rule about one identifier rather than about types. It is a
+  **Design boundary** on the limitations page, and the repair is the annotation.
+- **No quick fix for `check-missing-return`.** Every one of the six fixable
+  diagnostics is a meaning-preserving rewrite — the same type spelled
+  canonically, the same call, the same construction. This one has two ordinary
+  repairs, and the machine-applicable one, widening the annotation, is the first
+  candidate that would change what the program means, for every caller rather
+  than at the site the diagnostic points to.
+- **Generic functions added no diagnostic code and no new analysis.** The call
+  site reuses `inferTypeArguments`, `substituteType` and the class constraint
+  reporter, which was generalized out of `checkTypeConstraints` rather than
+  duplicated. `check-generic-arity`, `check-generic-constraint` and
+  `check-type-mismatch` carry their existing meanings.
+- **The `<` ambiguity is resolved by speculation, not by lookahead.** A type
+  argument list at a call site is kept only when a `(` follows it immediately;
+  anything else rewinds the index, the erasure spans and the diagnostics
+  together. `a < b > (c)` is the one form that resolves to the generic reading,
+  and a chained comparison is not valid Lua anyway.
+- **The formatter was not a fixed point on a generic call, and had not been for
+  generic classes either.** `new Box<number>(1)` was already being reformatted to
+  `new Box<number> (1)`; no corpus file had exercised it. A type `>` now binds
+  tight to a following `(`, and a type `<` keeps its space after `function`.
+- **`docs/*/language/types.md` still said generic classes were unsupported.**
+  That stopped being true in 0.13.0. The page now names classes and functions as
+  the other two forms of the same feature.
+- **Signature help does not specialize a generic call's parameter labels.** It
+  resolves through the symbol index's rendered text, and the call frame exposes
+  argument source rather than argument types; doing it properly means giving that
+  path the declared type and the checked arguments, which is its own task. Hover
+  does show the type parameters and the specialized result type.
 
 ## Milestone 38 — Library Distribution
 
