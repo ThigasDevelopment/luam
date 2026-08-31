@@ -1,6 +1,6 @@
 {
     "name": "@luam/runtime",
-    "version": "0.19.10",
+    "version": "0.19.11",
     "private": true,
     "type": "module",
     "main": "./src/helpers.ts",
