@@ -13,6 +13,7 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Diagnósticos | Ao abrir e a cada tecla, limpos quando você corrige o arquivo. |
 | Completação | Símbolos do escopo, globais do workspace, APIs do MTA no ambiente do arquivo, palavras-chave. |
 | Completação de membros | `.` completa campos e métodos estáticos; `:` completa métodos de instância, incluindo membros herdados do MTA. |
+| Completação de tabela literal | Onde cabe uma chave dentro de um literal anotado com um tipo de registro, a lista são as chaves que aquele tipo ainda permite e nada mais: as chaves já escritas saem da lista, e um discriminante escrito estreita uma união para os membros que ainda combinam. Onde cabe um valor, o escopo aparece inteiro. |
 | Diretivas | Depois de `#!`, completa as diretivas de ambiente e de rigor, cada uma com o que faz. |
 | Cabeçalho de classe | Depois de `class Nome `, completa `extends` e `implements`, e então as classes ou interfaces declaradas que podem vir a seguir. |
 | Corpo de classe | Dentro do corpo de uma classe, completa `static` e — enquanto a classe não tiver um — um snippet de `constructor`. Nenhum dos dois aparece no topo do arquivo nem dentro de um método. |

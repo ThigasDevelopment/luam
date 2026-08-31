@@ -9,6 +9,14 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.10 - 2026-08-31
+
+### Added
+
+- [Editors](/en/tooling/editors) records that a typed table literal completes by
+  the keys its type still allows, including how a key shared across a union is
+  typed and when every discriminant value is offered.
+
 ## 0.19.9 - 2026-08-31
 
 ### Added

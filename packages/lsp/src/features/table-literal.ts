@@ -59,6 +59,48 @@ function annotationBefore(text: string, brace: number): string | null {
     return text[start] === ':' ? text.slice(start + 1, end + 1).trim() : null;
 }
 
+const ASSIGN_GUARDS: ReadonlySet<string> = new Set(['=', '~', '<', '>']);
+
+function isValuePosition(text: string, brace: number, offset: number): boolean {
+    let depth = 0;
+
+    for (let index = offset - 1; index > brace; index -= 1) {
+        const char = text[index];
+
+        if (char === '}' || char === ')' || char === ']') {
+            depth += 1;
+
+            continue;
+        }
+
+        if (char === '{' || char === '(' || char === '[') {
+            depth -= 1;
+
+            continue;
+        }
+
+        if (depth > 0) {
+            continue;
+        }
+
+        if (char === ',' || char === '\n') {
+            return false;
+        }
+
+        if (char === '=' && text[index + 1] !== '=' && !ASSIGN_GUARDS.has(text[index - 1] ?? '')) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function isTableKeyPosition(text: string, offset: number): boolean {
+    const brace = openingBrace(text, offset);
+
+    return brace !== -1 && !isValuePosition(text, brace, offset);
+}
+
 export function tableLiteralMembers(analysis: DocumentAnalysis, offset: number): ReadonlyMap<string, Type> | null {
     const brace = openingBrace(analysis.text, offset);
 

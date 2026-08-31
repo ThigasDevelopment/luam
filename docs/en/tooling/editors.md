@@ -13,6 +13,7 @@ uses, so the editor and the build never disagree about a file.
 | Diagnostics | On open and on every keystroke, cleared when you fix the file. |
 | Completion | Scope symbols, workspace globals, MTA APIs scoped to the file's environment, keywords. |
 | Member completion | `.` completes fields and static methods; `:` completes instance methods, including inherited MTA members. |
+| Table literal completion | Where a key belongs inside a literal annotated with a record type, the list is the keys that type still allows and nothing else: the keys already written are removed, and a written discriminant narrows a union to the members that still match. Where a value belongs, the scope is offered in full. |
 | Directives | After `#!`, completes the environment and strictness directives, each with what it does. |
 | Class headers | After `class Name `, completes `extends` and `implements`, then the declared classes or interfaces that can follow. |
 | Class bodies | Inside a class body, completes `static` and — while the class has none — a `constructor` snippet. Neither is offered at the top level or inside a method body. |
