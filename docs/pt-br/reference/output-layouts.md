@@ -122,7 +122,8 @@ O que é reescrito:
 | `class Name extends Base` | `class 'Name' :extends 'Base'`, com o parâmetro `self` implícito e os separadores de membro acrescentados no lugar |
 | Um campo de classe sem padrão | `name = nil`, na linha em que o campo foi escrito, para a forma declarada ler a partir da classe gerada |
 | `implements` | Apagado, porque é um contrato de compilação |
-| Uma atribuição composta, `new`, um template, uma extension nativa | Lua canônico apenas para aquele statement, não para o statement que o contém |
+| `new`, um template, uma extension nativa | Lua canônico apenas para aquela expressão, na linha em que foi escrita, sem tocar no layout ao redor |
+| Uma atribuição composta | Lua canônico apenas para aquele statement, não para o statement que o contém, mantendo o ponto e vírgula final na linha gerada |
 | `continue` | `break` dentro de um `repeat ... until true` cujas palavras-chave viajam na primeira e na última linha do corpo do laço |
 | Um comentário Luam | O comentário Lua equivalente |
 | Uma diretiva de build como `#!client` | `--!client`, um comentário na mesma linha, porque ela orienta o compilador e não a execução |

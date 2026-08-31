@@ -1,4 +1,4 @@
-import type { Statement } from './ast';
+import type { Expression, Statement } from './ast';
 import type { ClassMember } from './declaration-nodes';
 
 export interface SourceSpan {
@@ -6,7 +6,7 @@ export interface SourceSpan {
     end: number;
 }
 
-export type SpannedNode = Statement | ClassMember;
+export type SpannedNode = Statement | ClassMember | Expression;
 
 export type ErasureKind = 'annotation' | 'declaration';
 

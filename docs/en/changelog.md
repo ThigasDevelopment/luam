@@ -41,6 +41,14 @@ Every heading below is a released version and the date it shipped, newest first.
   [Diagnostics](/en/reference/diagnostics) lists `check-missing-return`.
 - [Types](/en/language/types#aliases) no longer says generic classes are
   unsupported. They have been supported since 0.13.0.
+- [Output layouts](/en/reference/output-layouts) separates the two lowering
+  granularities: `new`, a template string and a native extension are lowered as
+  expressions, leaving the layout written around them, while a compound
+  assignment still lowers its whole statement and keeps its trailing semicolon.
+  The row for a class field with no default already described `name = nil`, and
+  the development build now produces it.
+- [Language server](/en/tooling/language-server) records that hover answers over
+  a member expression, reading the property under the cursor.
 
 ## 0.19.5 - 2026-08-28
 

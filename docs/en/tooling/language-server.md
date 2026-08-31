@@ -9,7 +9,7 @@ that speaks the Language Server Protocol can launch it the same way.
 | --- | --- |
 | Diagnostics | Published on open and on every change, cleared when the file is fixed. |
 | Completion | Scope symbols, workspace globals, environment-scoped MTA APIs, keywords. |
-| Hover | Declared or inferred type, function signature, MTA API environment. |
+| Hover | Declared or inferred type, function signature, MTA API environment, and the type of the property a member expression reads. |
 | Definition | Locals, parameters, class members, and globals declared in another file. |
 | References | Every use of a symbol, across files for globals. |
 | Rename | Edits every occurrence, across files for globals. |
@@ -19,6 +19,11 @@ Completion triggers on `.` and `:` for members: class fields and methods
 (including inherited ones), enum members, `math` / `string` / `table` library
 members, and the [object extensions](/en/language/extensions) that apply to the
 receiver's type.
+
+Hover answers over a member too. The property of a class instance, of a table
+typed inline, of an `interface` or of a project global reports the type the
+checker gave that property, read from the expression under the cursor rather
+than from the first member in the file that shares its name.
 
 ### Reserved words
 

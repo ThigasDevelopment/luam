@@ -43,6 +43,14 @@ da versão atual.
   [Diagnósticos](/pt-br/reference/diagnostics) lista `check-missing-return`.
 - [Tipos](/pt-br/language/types#aliases) não diz mais que classes genéricas não
   são suportadas. Elas são suportadas desde a 0.13.0.
+- [Layouts de saída](/pt-br/reference/output-layouts) separa as duas
+  granularidades de lowering: `new`, template e extension nativa são rebaixados
+  como expressão, preservando o layout escrito ao redor, enquanto uma atribuição
+  composta ainda rebaixa o statement inteiro e mantém o ponto e vírgula final. A
+  linha do campo de classe sem padrão já descrevia `name = nil`, e o build de
+  desenvolvimento agora o produz.
+- [Language server](/pt-br/tooling/language-server) registra que o hover responde
+  sobre uma expressão de membro, lendo a propriedade sob o cursor.
 
 ## 0.19.5 - 2026-08-28
 

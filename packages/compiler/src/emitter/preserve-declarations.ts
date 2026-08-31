@@ -85,7 +85,13 @@ function selfEdit(source: string, member: ClassMethodDeclaration, span: SourceSp
 }
 
 function isKept(member: ClassMember): boolean {
-    return !isLazyField(member) && (member.kind === 'class-method' || member.value !== null);
+    return !isLazyField(member);
+}
+
+function declaredFieldEdit(source: string, member: ClassMember, end: number, separator: string): HybridSourceEdit {
+    const start = member.position.offset;
+
+    return { start, end, replacement: `${member.name} = nil${separator}${blankSpan(source.slice(start, end))}` };
 }
 
 function isLazyField(member: ClassMember): boolean {
@@ -168,6 +174,17 @@ export function classEdits(input: PreserveInput, statement: ClassDeclaration, sp
             continue;
         }
 
+        const needsSeparator = separator === null && (member !== kept[kept.length - 1] || injected !== null);
+
+        if (member.kind === 'class-field' && member.value === null) {
+            const end = separator === null ? span.end : separator + 1;
+            const written = separator === null ? (needsSeparator ? ',' : '') : source.slice(separator, separator + 1);
+
+            edits.push(declaredFieldEdit(source, member, end, written));
+
+            continue;
+        }
+
         if (member.kind === 'class-method' && !member.isStatic) {
             const self = selfEdit(source, member, span);
 
@@ -178,7 +195,7 @@ export function classEdits(input: PreserveInput, statement: ClassDeclaration, sp
             edits.push(self);
         }
 
-        if (separator === null && (member !== kept[kept.length - 1] || injected !== null)) {
+        if (needsSeparator) {
             edits.push({ start: span.end, end: span.end, replacement: ',' });
         }
     }

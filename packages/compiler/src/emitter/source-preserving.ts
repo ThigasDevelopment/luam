@@ -4,6 +4,7 @@ import { loopBody, nestedBlocks } from './preserve-blocks';
 import { canonicalEdit } from './preserve-canonical';
 import { blankSpan, commentReplacement, longComment } from './preserve-comments';
 import { classEdits, enumEdits } from './preserve-declarations';
+import { expressionEdits } from './preserve-expressions';
 import { isPreservableStatement } from './preserve-guards';
 import type { PreserveInput } from './preserve-input';
 import { loopEdits } from './preserve-loops';
@@ -85,9 +86,13 @@ function visit(collector: Collector, statement: Statement, wrapped: boolean): vo
         return;
     }
 
-    if (isPreservableStatement(statement, collector.input.types, collector.input.staticAccess) && keepsScaffolding(statement)) {
+    const preservable = isPreservableStatement(statement, collector.input.types, collector.input.staticAccess);
+    const narrowed = preservable ? null : expressionEdits(collector.input, statement);
+
+    if ((preservable || narrowed !== null) && keepsScaffolding(statement)) {
         const inherited = statement.kind === 'do-statement' || statement.kind === 'if-statement' ? wrapped : false;
 
+        collector.edits.push(...(narrowed ?? []));
         descend(collector, statement, inherited, false);
 
         return;
