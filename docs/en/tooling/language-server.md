@@ -13,6 +13,7 @@ that speaks the Language Server Protocol can launch it the same way.
 | Definition | Locals, parameters, class members, and globals declared in another file. |
 | References | Every use of a symbol, across files for globals. |
 | Rename | Edits every occurrence, across files for globals. |
+| Inlay hints | The inferred type of a local, of a function return and of a contextually typed callback parameter, plus parameter names at a call site. |
 
 Completion triggers on `.` and `:` for members: class fields and methods
 (including inherited ones), enum members, `math` / `string` / `table` library
@@ -123,6 +124,31 @@ The dialect has no calls and no function values, so the server evaluates a
 manifest itself. Opening a folder never runs project code, and `oop` takes effect
 on save rather than after the next CLI run.
 
+## Inlay hints
+
+The server answers `textDocument/inlayHint` for a visible range from the analysis
+it already holds. A range request never recompiles: over the largest fixture in
+the repository a full-document request takes about **0.12 ms**, and about
+**1.7 ms** over a synthetic 2000-line document.
+
+Four kinds are served, described with their editor-facing behaviour under
+[Editors](/en/tooling/editors#inlay-hints). Each one has its own switch, sent in
+the **initialization options** so a client that is not VS Code can set them too:
+
+```json
+{
+    "inlayHints": {
+        "localTypes": true,
+        "returnTypes": true,
+        "callbackParameterTypes": true,
+        "parameterNames": false
+    }
+}
+```
+
+Every field is optional and every unknown value falls back to the default above.
+Sending no options at all gets the three type kinds and no parameter names.
+
 ## Running it
 
 ```bash
@@ -147,8 +173,10 @@ Any LSP client needs three things:
 4. **File watchers** — optional, over `**/*.luam`, `.luam.manifest` and `.env*`,
    so a change made outside the editor reaches the server.
 
-There is no configuration section the server requires; the settings listed under
-[Editors](/en/tooling/editors) belong to the VS Code extension, not to the
+The server requires no configuration section. The only options it reads are the
+[inlay hint switches](#inlay-hints) in the initialization options, and it runs
+with their defaults when a client sends none. Everything else listed under
+[Editors](/en/tooling/editors) belongs to the VS Code extension, not to the
 protocol.
 
 ## Reporting a problem

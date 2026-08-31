@@ -1,9 +1,10 @@
-import { commands, type ExtensionContext } from 'vscode';
+import { commands, workspace, type ConfigurationChangeEvent, type ExtensionContext } from 'vscode';
 import type { LanguageClient } from 'vscode-languageclient/node';
 
 import { createLanguageClient } from '@vscode-extension/client/language-client';
 import { runBuildCommand } from '@vscode-extension/commands/build-command';
 import { runEnsureCommand } from '@vscode-extension/commands/ensure-command';
+import { INLAY_HINTS_SECTION } from '@vscode-extension/config/settings';
 
 export const BUILD_COMMAND = 'luam.build';
 
@@ -25,6 +26,12 @@ async function rescanWorkspace(): Promise<void> {
     await client?.sendRequest('workspace/executeCommand', { command: RESCAN_REQUEST });
 }
 
+function restartOnInlayHintChange(event: ConfigurationChangeEvent): void {
+    if (event.affectsConfiguration(INLAY_HINTS_SECTION)) {
+        void restartServer();
+    }
+}
+
 export function activate(context: ExtensionContext): void {
     client = createLanguageClient(context);
 
@@ -32,6 +39,7 @@ export function activate(context: ExtensionContext): void {
     context.subscriptions.push(commands.registerCommand(ENSURE_COMMAND, runEnsureCommand));
     context.subscriptions.push(commands.registerCommand(RESTART_COMMAND, restartServer));
     context.subscriptions.push(commands.registerCommand(RESCAN_COMMAND, rescanWorkspace));
+    context.subscriptions.push(workspace.onDidChangeConfiguration(restartOnInlayHintChange));
 
     void client.start();
 }

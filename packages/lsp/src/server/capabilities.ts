@@ -21,6 +21,7 @@ export const SERVER_CAPABILITIES: ServerCapabilities = {
     workspaceSymbolProvider: true,
     documentFormattingProvider: true,
     documentRangeFormattingProvider: true,
+    inlayHintProvider: { resolveProvider: false },
     executeCommandProvider: { commands: [RESCAN_COMMAND] },
     workspace: { workspaceFolders: { supported: true, changeNotifications: true } },
 };

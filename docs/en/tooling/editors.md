@@ -27,6 +27,7 @@ uses, so the editor and the build never disagree about a file.
 | Workspace symbols | `Ctrl+T` finds a class, an interface, an enum, a type alias, a function or a declared event anywhere in the project, including files you never opened. Each result carries the environment of the file it lives in. |
 | Quick fixes | A diagnostic with exactly one correct repair offers it on the lightbulb. See [the list](#quick-fixes). |
 | Formatting | Format the document or the selection, with format-on-save. The style is [Formatting](/en/reference/formatting). |
+| Inlay hints | What the checker inferred, shown inline: the type of a local, the return type of a function, and the type a callback parameter was given by the call it was passed to. See [the kinds](#inlay-hints). |
 
 Completion is scoped exactly like the checker: `dxDrawText` never appears in a
 server file, `kickPlayer` never appears in a client file.
@@ -116,8 +117,16 @@ file tree tells them apart at a glance.
 | `luam.cliPath` | `"luam"` | Command used to run the CLI. Point it at a bundle to test an unreleased build. |
 | `luam.ensureWatch` | `true` | Pass `--watch` when the ensure command runs. |
 | `luam.formatting` | `true` | Format `.luam` with the language server. Turn it off to leave formatting to another tool, or to none — the server stops being asked, so `Shift+Alt+F` and format-on-save both go quiet. |
+| `luam.inlayHints.localTypes` | `true` | Show the inferred type of a local declared without an annotation. |
+| `luam.inlayHints.returnTypes` | `true` | Show the inferred return type of a function declared without a return annotation. |
+| `luam.inlayHints.callbackParameterTypes` | `true` | Show the type a callback parameter was given by the call it was passed to. |
+| `luam.inlayHints.parameterNames` | `false` | Show the parameter name in front of a literal argument at a call site. |
 | `luam.semanticHighlighting` | `true` | Colour Luam with the semantic tokens the server serves. Turn it off to keep only the grammar layer. |
 | `luam.trace.server` | `"off"` | Trace LSP traffic. Set to `"verbose"` when reporting a bug. |
+
+Changing any `luam.inlayHints.*` switch restarts the language server, because the
+server reads them once when the client connects. The restart is the same one
+**Luam: Restart Language Server** performs, and it costs one workspace scan.
 
 ## Formatting
 
@@ -135,6 +144,33 @@ setting:
 
 A file that does not parse yields no edits, so saving mid-edit never mangles it.
 [Formatting](/en/reference/formatting) is the style it writes.
+
+## Inlay hints
+
+Luam erases every annotation, so nothing the checker inferred survives into the
+output. Inlay hints put it back on screen: the type is shown where it would have
+been written, greyed out, and it is not part of the file.
+
+| Kind | Shown where | You see |
+| --- | --- | --- |
+| Local type | A `local` with an initializer and no annotation | `local count` becomes `local count: number` |
+| Return type | A function, method or callback with no return annotation | `function total()` becomes `function total(): number` |
+| Callback parameter | A parameter typed by the call the callback was passed to | `function (player)` becomes `function (player: Player)` |
+| Parameter name | A **literal** argument at a call site | `setTimer(tick, 1000, 0)` becomes `setTimer(tick, timeInterval: 1000, timesToExecute: 0)` |
+
+Three rules keep them out of the way:
+
+- An annotated declaration shows nothing. The hint only ever fills a gap.
+- A hint never reads `any`. Taking space to report that the checker knows
+  nothing is worse than staying quiet.
+- A file that does not parse yields no hints, the same rule formatting follows.
+
+A hint and a hover on the same name always render the same type: both go through
+the checker's own renderer.
+
+Parameter names are the one kind that is **off by default**. The other three show
+what was inferred; this one restates what you can already look up, and on dense
+code it costs more than it gives.
 
 ## Quick fixes
 

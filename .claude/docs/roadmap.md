@@ -1941,7 +1941,7 @@ Acceptance:
 Deliberately excluded:
 
 - Inlay hints. The editor gains formatting and actions in this milestone; hints
-  are a separate decision.
+  were decided separately, in milestone 40.
 - A `luam format` CLI command. The editor is the surface here; what CI enforces
   is a later question.
 
@@ -2683,11 +2683,11 @@ Deliberately excluded:
 Show what the checker inferred, inline. Milestone 32 built the formatter and the
 quick fixes and left this as a separate decision.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 40.01 | Add inlay hints to the language server | ../plans/40.01-inlay-hints.md | architecture-engineer | todo |
+| 40.01 | Add inlay hints to the language server | ../plans/40.01-inlay-hints.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -2719,6 +2719,28 @@ Deliberately excluded:
   the quick fixes.
 - Hints in `.luam.manifest`, where a field's type is already declared.
 - Any change to inference itself.
+
+Decided during implementation:
+
+- **The switches live in the LSP initialization options**, one boolean per kind
+  under an `inlayHints` object, so a client that is not VS Code sets them the same
+  way. Every field is optional and a non-boolean falls back to the default. The
+  extension maps `luam.inlayHints.*` onto that object and restarts the server when
+  one changes, because the options are read once on connect.
+- **The three type kinds are on and parameter names are off**, as the plan
+  recommended: the first three show what was inferred, the fourth restates what a
+  reader can already look up.
+- **A parameter-name hint needs a literal argument and a non-method call.** A
+  template literal does not count, and `a:b(x)` gets none, because its callee type
+  is the receiver rather than the function.
+- **Names for a catalog call come from the MTA documentation** when the checker
+  carries none, so `setTimer(tick, 1000, 0)` reads `timeInterval:` and
+  `timesToExecute:` rather than positional placeholders.
+- **A constructor shows no return type.** It is the class, and saying so adds
+  nothing.
+- **Measured**: a whole-document request over the largest fixture takes 0.118 ms,
+  and 1.681 ms over a synthetic 2000-line document, from the analysis the server
+  already holds.
 
 ## Milestone 41 — Table Literal Completion
 

@@ -5,6 +5,7 @@ import type {
     Diagnostic,
     DocumentSymbol,
     Hover,
+    InlayHint,
     Location,
     Position,
     Range,
@@ -22,6 +23,8 @@ import { collectDiagnostics } from '@lsp/features/diagnostics';
 import { documentSymbols } from '@lsp/features/document-symbols';
 import { formatDocument, formatDocumentRange } from '@lsp/features/formatting';
 import { hoverAt } from '@lsp/features/hover';
+import { DEFAULT_INLAY_HINT_SETTINGS, type InlayHintSettings } from '@lsp/features/inlay-hint-settings';
+import { inlayHintsAt } from '@lsp/features/inlay-hints';
 import { definitionAt, referencesAt, renameAt } from '@lsp/features/navigation';
 import { semanticTokens } from '@lsp/features/semantic-tokens';
 import { signatureHelpAt } from '@lsp/features/signature-help';
@@ -33,6 +36,8 @@ export class LanguageService {
     private readonly workspace = new WorkspaceIndex();
 
     private snippets = true;
+
+    private inlayHintSettings: InlayHintSettings = DEFAULT_INLAY_HINT_SETTINGS;
 
     loadWorkspace(roots: readonly string[]): void {
         this.workspace.load(roots);
@@ -112,6 +117,16 @@ export class LanguageService {
         const analysis = this.workspace.get(uri);
 
         return analysis === null ? [] : formatDocumentRange(analysis, range);
+    }
+
+    useInlayHints(settings: InlayHintSettings): void {
+        this.inlayHintSettings = settings;
+    }
+
+    inlayHints(uri: string, range: Range): InlayHint[] {
+        const analysis = this.workspace.get(uri);
+
+        return analysis === null ? [] : inlayHintsAt(analysis, range, this.inlayHintSettings);
     }
 
     completion(uri: string, position: Position): CompletionItem[] {
