@@ -14,7 +14,7 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
-## 0.19.6 - 2026-08-31
+## 0.19.7 - 2026-08-31
 
 ### Added
 
@@ -32,6 +32,11 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   library claiming an MTA name is the warning `project-library-shadows-api`, and
   a library that reads a project global is `project-library-project-reference`.
   The editor resolves libraries the same way, so the CLI and the LSP agree.
+
+## 0.19.6 - 2026-08-31
+
+### Added
+
 - A function takes its own type parameters. `function identity<T>(value: T): T`
   parses, checks, infers the argument at the call site, accepts an explicit
   `identity<string>(...)`, enforces an `extends` constraint with the same

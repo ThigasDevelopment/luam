@@ -11,7 +11,7 @@ da versão atual.
 
 ## Não lançado
 
-## 0.19.6 - 2026-08-31
+## 0.19.7 - 2026-08-31
 
 ### Adicionado
 
@@ -28,6 +28,11 @@ da versão atual.
   [Limitações](/pt-br/reference/limitations) registra três fronteiras: requisitos
   são nomeados e não resolvidos, colisões são reportadas e não resolvidas, e uma
   biblioteca publica código e não assets.
+
+## 0.19.6 - 2026-08-31
+
+### Adicionado
+
 - [Funções](/pt-br/language/functions#funcoes-genericas) descreve funções
   genéricas: a sintaxe, a inferência na chamada, os argumentos explícitos e as
   restrições. [Tipos](/pt-br/language/types#aliases) e
