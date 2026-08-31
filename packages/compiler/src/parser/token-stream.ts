@@ -14,6 +14,12 @@ export class ParserError extends Error {
     }
 }
 
+export interface Speculation {
+    index: number;
+    erasures: number;
+    diagnostics: number;
+}
+
 export class TokenStream {
     readonly diagnostics: Diagnostic[] = [];
 
@@ -55,6 +61,16 @@ export class TokenStream {
 
     checkpoint(): number {
         return this.index;
+    }
+
+    speculate(): Speculation {
+        return { index: this.index, erasures: this.erased.length, diagnostics: this.diagnostics.length };
+    }
+
+    rewind(point: Speculation): void {
+        this.index = point.index;
+        this.erased.length = point.erasures;
+        this.diagnostics.length = point.diagnostics;
     }
 
     eraseFrom(checkpoint: number, kind: ErasureKind = 'annotation'): void {

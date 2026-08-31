@@ -18,6 +18,7 @@ import { recoverInBlock } from './recovery';
 import { parseBraceBlock } from './statement';
 import { ParserError, type TokenStream } from './token-stream';
 import { parseNamedAnnotation, parseOptionalAnnotation, parseTypeAnnotation } from './type-annotation';
+import { parseTypeArguments, parseTypeParameters } from './type-parameters';
 
 const DECLARATION_NAMES: ReadonlySet<string> = new Set(['class', 'interface', 'enum']);
 
@@ -137,6 +138,8 @@ function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorat
         isConstructor: token.value === 'constructor',
         isSynthetic: false,
         isStatic,
+        typeParameters: expression.typeParameters,
+        typeConstraints: expression.typeConstraints,
         parameters: expression.parameters,
         returnAnnotation: expression.returnAnnotation,
         body: expression.body,
@@ -156,6 +159,8 @@ function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: De
         isConstructor: token.value === 'constructor',
         isSynthetic: false,
         isStatic,
+        typeParameters: [],
+        typeConstraints: [],
         parameters,
         returnAnnotation,
         body,
@@ -221,54 +226,6 @@ function parseClassMember(stream: TokenStream): ClassMember {
     expectClassFieldBoundary(stream, token);
 
     return { kind: 'class-field', name: token.value, annotation, value, decorators, isStatic, position: token.position };
-}
-
-interface TypeParameterList {
-    names: string[];
-    constraints: (TypeAnnotation | null)[];
-}
-
-function parseTypeParameters(stream: TokenStream): TypeParameterList {
-    const list: TypeParameterList = { names: [], constraints: [] };
-
-    if (!stream.check('operator', '<')) {
-        return list;
-    }
-
-    const checkpoint = stream.checkpoint();
-
-    stream.next();
-
-    do {
-        list.names.push(stream.expect('identifier').value);
-        list.constraints.push(stream.match('keyword', 'extends') ? parseTypeAnnotation(stream) : null);
-    } while (stream.match('punctuation', ','));
-
-    stream.expect('operator', '>');
-    stream.eraseFrom(checkpoint);
-
-    return list;
-}
-
-function parseTypeArguments(stream: TokenStream): TypeAnnotation[] {
-    const args: TypeAnnotation[] = [];
-
-    if (!stream.check('operator', '<')) {
-        return args;
-    }
-
-    const checkpoint = stream.checkpoint();
-
-    stream.next();
-
-    do {
-        args.push(parseTypeAnnotation(stream));
-    } while (stream.match('punctuation', ','));
-
-    stream.expect('operator', '>');
-    stream.eraseFrom(checkpoint);
-
-    return args;
 }
 
 function parseClassModifiers(stream: TokenStream, declaration: ClassDeclaration): void {

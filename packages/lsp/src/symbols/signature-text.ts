@@ -71,11 +71,21 @@ export function parameterText(parameter: Parameter): string {
     return `${prefix}${namedAnnotationText(parameter.name, parameter.annotation)}`;
 }
 
-export function signatureText(name: string, parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null, inferredReturn: Type | null = null): string {
+export function typeParameterText(names: readonly string[]): string {
+    return names.length === 0 ? '' : `<${names.join(', ')}>`;
+}
+
+export function signatureText(
+    name: string,
+    parameters: readonly Parameter[],
+    returnAnnotation: TypeAnnotation | null,
+    inferredReturn: Type | null = null,
+    typeParameters: readonly string[] = [],
+): string {
     const rendered = parameters.map(parameterText).join(', ');
     const returnType = returnAnnotation === null && inferredReturn !== null ? typeToString(inferredReturn) : annotationText(returnAnnotation);
 
-    return `${name}(${rendered}): ${returnType}`;
+    return `${name}${typeParameterText(typeParameters)}(${rendered}): ${returnType}`;
 }
 
 export function variableText(keyword: string, name: string, annotation: TypeAnnotation | null, fallback: string | null): string {

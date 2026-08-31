@@ -38,6 +38,28 @@ end
 A `return` that does not match is `check-return-mismatch`. A function with no
 declared return type is not checked against one.
 
+A declared return type has to be produced on **every** path. A body that can
+reach its closing `end` without returning is `check-missing-return`, because the
+caller would receive `nil` where the annotation promised a value:
+
+```luam static
+function pick(flag: boolean): string
+    if flag then
+        return 'yes'
+    end
+end
+```
+
+There are two repairs, and the message names both. Return on every path, or
+declare the annotation optional — `: string?` — which makes ending without a
+value the truth. `void`, `nil`, `any` and any union containing `nil` already
+tolerate it and are never reported.
+
+A loop that cannot fall through is not reported: `while true do` and
+`repeat ... until false` with no `break` end the path. A body that ends in
+`error(...)` **is** reported, because a call is not a terminator — see
+[Limitations](/en/reference/limitations).
+
 ## Optional parameters
 
 A `?` on the parameter type allows the argument to be omitted:
@@ -80,6 +102,67 @@ local loose: fun = print
 
 Parameter names inside `fun(...)` are documentary — `fun(string): void` and
 `fun(message: string): void` are the same type.
+
+## Generic functions
+
+A function takes its own type parameters between the name and the parameter
+list, the way a [type alias](/en/language/types#aliases) and a
+[class](/en/language/classes#type-parameters) do:
+
+```luam
+function identity<T>(value: T): T
+    return value
+end
+
+local text: string = identity('ready')
+local total: number = identity(1)
+```
+
+The argument binds the parameter, so `identity('ready')` is `string` and
+`identity(1)` is `number`. One declaration, checked at both call sites.
+
+Write the arguments explicitly when inference has nothing to work from, or to
+pin a wider type than the argument would give:
+
+```luam static
+local text = identity<string>('ready')
+```
+
+The wrong count is `check-generic-arity`, and an argument that does not match
+the explicit type is `check-type-mismatch`. A parameter that no argument binds
+becomes `any` rather than an error — including one that appears only in the
+return type, which single-pass inference cannot reach. See
+[Limitations](/en/reference/limitations).
+
+A parameter can carry a constraint, which every argument must satisfy. Anything
+else is `check-generic-constraint`, the same diagnostic a class constraint
+produces:
+
+```luam static
+function label<T extends Named>(value: T): string
+    return value.name
+end
+```
+
+A function expression takes them after the `function` keyword, which is also how
+a class method declares its own:
+
+```luam static
+class Box<T> {
+    value: T
+
+    convert = function <U>(change: fun(T): U): U
+        return change(self.value)
+    end
+}
+```
+
+Both sets are in scope inside `convert`, and a method parameter named the same
+as a class parameter shadows it.
+
+None of it reaches the output. The parameters and the arguments are erased with
+every other annotation, in both output layouts, so the generated Lua is the same
+as the non-generic form.
 
 ## Multi-return
 
@@ -125,4 +208,6 @@ end
 | --- | --- |
 | `greet()` for `greet(name: string)` | `check-argument-count` |
 | `return 1` from a `: string` function | `check-return-mismatch` |
+| a `: string` function that can end without returning | `check-missing-return` |
+| `identity<string, number>(x)` for `identity<T>` | `check-generic-arity` |
 | `greet(1)` for `greet(name: string)` | `check-type-mismatch` |

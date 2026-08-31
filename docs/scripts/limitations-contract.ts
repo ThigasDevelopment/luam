@@ -31,6 +31,8 @@ export const LIMITATIONS: readonly Limitation[] = [
     { id: 'file-environment', label: 'platform-constraint', owners: [], decision: '.claude/docs/adr/023-file-level-environments.md' },
     { id: 'development-log-scope', label: 'design-boundary', owners: [], decision: '.claude/plans/24.12-remote-development-bridge.md' },
     { id: 'no-debugger', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/039-no-debugger.md' },
+    { id: 'error-is-not-a-terminator', label: 'design-boundary', owners: [], decision: '.claude/plans/37.01-missing-return.md' },
+    { id: 'return-position-inference', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/032-erased-generic-classes.md' },
 ];
 
 export const LABEL_TEXT: Readonly<Record<LocaleId, Readonly<Record<LimitationLabel, string>>>> = {

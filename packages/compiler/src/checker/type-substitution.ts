@@ -10,6 +10,16 @@ import {
     type Type,
 } from './types';
 
+function shadowed(substitutions: ReadonlyMap<string, Type>, names: readonly string[]): ReadonlyMap<string, Type> {
+    const remaining = new Map(substitutions);
+
+    for (const name of names) {
+        remaining.delete(name);
+    }
+
+    return remaining;
+}
+
 export function substituteType(type: Type, substitutions: ReadonlyMap<string, Type>): Type {
     if (type.kind === 'named') {
         const args = type.typeArguments ?? [];
@@ -38,12 +48,20 @@ export function substituteType(type: Type, substitutions: ReadonlyMap<string, Ty
     }
 
     if (type.kind === 'function') {
-        const parameters = type.parameters.map((parameter) => substituteType(parameter, substitutions));
-        const returnType = substituteType(type.returnType, substitutions);
+        const own = type.typeParameters ?? [];
+        const outer = own.length === 0 ? substitutions : shadowed(substitutions, own);
+        const parameters = type.parameters.map((parameter) => substituteType(parameter, outer));
+        const returnType = substituteType(type.returnType, outer);
 
-        const variadicType = type.variadicType === undefined ? undefined : substituteType(type.variadicType, substitutions);
+        const variadicType = type.variadicType === undefined ? undefined : substituteType(type.variadicType, outer);
+        const substituted = createFunction(parameters, returnType, type.minimumArguments, type.isVariadic, type.parameterNames, variadicType);
 
-        return createFunction(parameters, returnType, type.minimumArguments, type.isVariadic, type.parameterNames, variadicType);
+        if (own.length > 0) {
+            substituted.typeParameters = [...own];
+            substituted.typeConstraints = (type.typeConstraints ?? []).map((constraint) => (constraint === null ? null : substituteType(constraint, outer)));
+        }
+
+        return substituted;
     }
 
     if (type.kind === 'tuple') {

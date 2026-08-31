@@ -14,6 +14,27 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.6 - 2026-08-31
+
+### Added
+
+- A function takes its own type parameters. `function identity<T>(value: T): T`
+  parses, checks, infers the argument at the call site, accepts an explicit
+  `identity<string>(...)`, enforces an `extends` constraint with the same
+  diagnostic a class constraint produces, and leaves no trace in the generated
+  Lua. A function expression and a class method take them the same way, and a
+  method parameter shadows a class parameter of the same name.
+
+### Fixed
+
+- A declared return type is enforced on every path. A function annotated with a
+  concrete type that can reach its closing `end` without returning is now
+  `check-missing-return` instead of silently handing the caller `nil`. An
+  optional, `nil`, `void`, `any` or a union containing `nil` still tolerates it,
+  and a loop that cannot fall through — `while true do` or
+  `repeat ... until false` with no `break` — is not reported. Nothing in the
+  repository was rejected by the new rule.
+
 ## 0.19.5 - 2026-08-28
 
 ### Changed
@@ -76,6 +97,20 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ### Added
 
+- `luam test` runs the tests a developer writes for their own resource. A file
+  ending in `.test.luam` is compiled with the project and executed on a Lua 5.1
+  interpreter found on `PATH` — `lua5.1`, `lua51`, `lua`, then `luajit` — pinned
+  with `--lua <path>` or `LUAM_LUA`, and reported by `luam doctor`. The published
+  CLI gained no dependency. Inside a test file, `describe`, `test`, `beforeEach`,
+  `afterEach`, `expect` and `mta` are declared to the checker, so the editor
+  understands a test the way it understands any other module, and a non-test file
+  that calls `test` still reports an unknown global. Every MTA function is
+  replaced by a stub that records its arguments and returns `nil`; `mta.returns`,
+  `mta.stub` and `mta.calls` configure and read them. A stub records a call, it
+  does not simulate MTA. A failing assertion reports `path:line:column` in the
+  `.luam` source, and the command exits non-zero so CI can gate on it. Test files
+  are excluded from `sources`, so `luam build` output is unchanged whether or not
+  they exist, and `build`, `check` and `ensure` still execute no project code.
 - A value checked against an `interface` or a `class` now reports what a `type`
   alias already reported. An interface is satisfied structurally, so a record
   missing a member or carrying one at the wrong type is `check-type-mismatch`,

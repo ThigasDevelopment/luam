@@ -20,6 +20,8 @@ export interface ClassMethodDeclaration extends NodeBase {
     isConstructor: boolean;
     isSynthetic: boolean;
     isStatic: boolean;
+    typeParameters: string[];
+    typeConstraints: (TypeAnnotation | null)[];
     parameters: Parameter[];
     returnAnnotation: TypeAnnotation | null;
     body: Statement[];

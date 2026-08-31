@@ -66,6 +66,7 @@ writes nothing.
 | --- | --- | --- |
 | `check-type-mismatch` | error | A value does not match the declared type. |
 | `check-return-mismatch` | error | A `return` does not match the declared return type. |
+| `check-missing-return` | error | A function that declares a return type can end without returning a value. |
 | `check-argument-count` | error | Too few or too many arguments. |
 | `check-invalid-operand` | error | An operator cannot be applied to that type. |
 | `check-unknown-member` | error | The member does not exist on the receiver. |

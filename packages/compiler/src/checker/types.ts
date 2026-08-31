@@ -58,6 +58,8 @@ export interface FunctionType {
     minimumArguments: number;
     isVariadic: boolean;
     returnType: Type;
+    typeParameters?: string[];
+    typeConstraints?: (Type | null)[];
 }
 
 export interface TupleType {
@@ -323,12 +325,15 @@ export function typeToString(type: Type): string {
 
     if (type.kind === 'function') {
         const parameters = type.parameters.map(typeToString);
+        const names = type.typeParameters ?? [];
 
         if (type.isVariadic) {
             parameters.push(type.variadicType === undefined ? '...' : `...: ${typeToString(type.variadicType)}`);
         }
 
-        return `fun(${parameters.join(', ')}): ${typeToString(type.returnType)}`;
+        const generic = names.length === 0 ? '' : `<${names.join(', ')}>`;
+
+        return `fun${generic}(${parameters.join(', ')}): ${typeToString(type.returnType)}`;
     }
 
     return type.kind;

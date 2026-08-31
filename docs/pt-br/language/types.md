@@ -416,9 +416,10 @@ local pending: Nullable<string> = nil
 local args: SpawnArgs = { name = 'Thigas' }
 ```
 
-Aliases podem receber parâmetros de tipo, como `Nullable<T>` mostra. **Classes**
-genéricas não são suportadas — veja
-[Limitações](/pt-br/reference/limitations).
+Aliases podem receber parâmetros de tipo, como `Nullable<T>` mostra. As
+[classes](/pt-br/language/classes#parametros-de-tipo) e as
+[funções](/pt-br/language/functions#funcoes-genericas) também recebem — as três
+formas são um recurso só, escrito do mesmo jeito.
 
 Um alias de um tipo de objeto leva o nome dele para os diagnósticos: ler
 `args.nmae` acima reporta `"nmae" is not a key of "SpawnArgs"`. Um alias precisa

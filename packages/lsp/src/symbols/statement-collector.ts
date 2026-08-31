@@ -123,7 +123,7 @@ function collectFunctionName(state: CollectorState, block: BlockContext, stateme
     if (name.kind === 'identifier') {
         const checked = typeOf(state, name);
         const inferredReturn = checked?.kind === 'function' ? checked.returnType : null;
-        const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation, inferredReturn);
+        const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation, inferredReturn, statement.typeParameters);
         const scopeId = statement.isLocal ? block.scopeId : ROOT_SCOPE;
 
         const parameters = statement.parameters.map(parameterText);

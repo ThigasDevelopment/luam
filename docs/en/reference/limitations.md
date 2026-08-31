@@ -302,3 +302,66 @@ project declines to introduce rather than one it plans to secure.
 MTA itself has no part to interoperate with here: it publishes no debug
 protocol, and a Lua debug hook that stops on a line stops the thread the whole
 server runs on, which freezes the game for everyone on it.
+
+## `error(...)` does not end a path
+
+**Design boundary.** Recorded in
+[37.01](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/37.01-missing-return.md).
+
+A function that declares a concrete return type must produce one on every path,
+and a body that can reach its closing `end` without returning is
+[`check-missing-return`](/en/language/functions#return-types). The checker reads
+one thing to decide that: whether control can still reach the end. A `return`,
+a `break` and a `continue` all end a path, and so does a loop that cannot fall
+through.
+
+A call does not, even when the call never comes back:
+
+```luam static
+function mustFind(id: number): string
+    local found = lookup(id)
+
+    if found ~= nil then
+        return found
+    end
+
+    error('no entry for ' .. tostring(id))
+end
+```
+
+`error` raises, so the last line is unreachable in fact — but nothing in the
+type system says so. Marking a call as a terminator needs a never-returning
+return type, which Luam does not have, and guessing from the name `error` would
+be a rule about one identifier rather than about types.
+
+The repair is the annotation. Declare `: string?` and the signature tells the
+truth about a function that may not produce a value, or return a fallback
+instead of raising.
+
+## A type parameter only in the return position is `any`
+
+**Design boundary.** Recorded in
+[ADR-032](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/032-erased-generic-classes.md).
+
+Type arguments are inferred in a single pass over the arguments a call actually
+passes. Each parameter is matched against the argument in the same position,
+and whatever that leaves unbound becomes `any`:
+
+```luam static
+function make<T>(): T
+    return decode()
+end
+
+local value = make()
+```
+
+`T` appears nowhere in the parameter list, so nothing binds it and `value` is
+`any` rather than an error. The same applies to a parameter that only a later
+argument could have decided; inference does not revisit an earlier position once
+it has moved past it.
+
+Write the argument when you need the type: `make<string>()` binds `T` and the
+result is `string`. This is the same inference the
+[generic classes](/en/language/classes#type-parameters) and the
+[generic functions](/en/language/functions#generic-functions) share, and it is
+the rule ADR-032 recorded rather than one this adds.

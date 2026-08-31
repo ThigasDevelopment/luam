@@ -1,6 +1,6 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { ExtensionResult } from '@compiler/extensions/native-extensions';
-import type { CallExpression, Expression, MemberExpression, TableExpression, TemplateLiteral } from '@compiler/parser/ast';
+import type { CallExpression, Expression, MemberExpression, TableExpression, TemplateLiteral, TypeAnnotation } from '@compiler/parser/ast';
 
 import { pathOf } from './access-path';
 import { extensionFor, reportExtensionForm, reportNotCallable } from './callable';
@@ -8,6 +8,7 @@ import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
 import { checkEventUsage, checkGlobalReference } from './environment-checks';
 import { specializeEventCall } from './event-calls';
+import { specializeCall } from './generic-call';
 import { memberOf } from './generic-class';
 import { resolveNonNominalMethod, withoutSelfParameter } from './method-receiver';
 import { checkResourceCall } from './resource-exports';
@@ -30,7 +31,7 @@ import {
     resolveMtaStaticMember,
 } from './oop-members';
 import { checkBinary, checkUnary } from './operators';
-import { buildFunctionType, checkFunctionBody } from './statements';
+import { applyTypeParameters, buildFunctionType, checkFunctionBody } from './statements';
 import { collectInterpolations } from './template';
 import { resolveUnionMember } from './union-members';
 import {
@@ -155,10 +156,13 @@ function countArguments(total: number): string {
 export function checkSignature(
     context: CheckContext,
     args: readonly Expression[],
-    signature: FunctionType,
+    declared: FunctionType,
     position: SourcePosition,
+    owner = 'This call',
+    typeArguments: readonly TypeAnnotation[] = [],
 ): Type {
-    const argumentTypes = checkValueList(context, args, signature.parameters);
+    const argumentTypes = checkValueList(context, args, declared.parameters);
+    const signature = specializeCall(context, owner, declared, argumentTypes, typeArguments, position);
 
     if (argumentTypes.length < signature.minimumArguments) {
         const message = `This call expects at least ${countArguments(signature.minimumArguments)} but received ${argumentTypes.length}.`;
@@ -195,6 +199,12 @@ export function checkSignature(
     return signature.returnType;
 }
 
+function callOwner(expression: CallExpression): string {
+    const name = expression.method ?? (expression.callee.kind === 'identifier' ? expression.callee.name : null);
+
+    return name === null ? 'This call' : `Function "${name}"`;
+}
+
 function checkArguments(context: CheckContext, expression: CallExpression, calleeType: Type): Type {
     if (calleeType.kind !== 'function') {
         checkValueList(context, expression.args);
@@ -203,7 +213,7 @@ function checkArguments(context: CheckContext, expression: CallExpression, calle
         return ANY_TYPE;
     }
 
-    return checkSignature(context, expression.args, calleeType, expression.position);
+    return checkSignature(context, expression.args, calleeType, expression.position, callOwner(expression), expression.typeArguments);
 }
 
 function isSuperCall(expression: CallExpression): boolean {
@@ -224,7 +234,7 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
             return ANY_TYPE;
         }
 
-        return checkSignature(context, expression.args, withoutSelfParameter(signature), expression.position);
+        return checkSignature(context, expression.args, withoutSelfParameter(signature), expression.position, callOwner(expression), expression.typeArguments);
     }
 
     const declared = memberOf(context, receiver, method);
@@ -234,7 +244,7 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
             context.warn('check-deprecated-use', `Member "${method}" is deprecated.`, expression.position);
         }
 
-        return checkSignature(context, expression.args, declared.type, expression.position);
+        return checkSignature(context, expression.args, declared.type, expression.position, callOwner(expression), expression.typeArguments);
     }
 
     if (!isMtaElement(context, receiver.name)) {
@@ -427,9 +437,10 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'table-expression':
             return checkTable(context, expression);
         case 'function-expression': {
-            const type = buildFunctionType(context, expression.parameters, expression.returnAnnotation, contextualFunction(expected));
+            const built = buildFunctionType(context, expression.parameters, expression.returnAnnotation, contextualFunction(expected));
+            const type = applyTypeParameters(context, built, expression.typeParameters, expression.typeConstraints);
 
-            checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, type, null);
+            checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, type, null, expression.position);
 
             return context.record(expression, type);
         }

@@ -73,16 +73,60 @@ function checkLoopBody(context: CheckContext, body: readonly Statement[], facts:
     context.setFlow(entry);
 }
 
+function isTruthyLiteral(condition: Expression): boolean {
+    if (condition.kind === 'group-expression') {
+        return isTruthyLiteral(condition.expression);
+    }
+
+    const literal = condition.kind === 'number-literal' || condition.kind === 'string-literal' || condition.kind === 'template-literal';
+
+    return literal || (condition.kind === 'boolean-literal' && condition.value);
+}
+
+function isFalsyLiteral(condition: Expression): boolean {
+    if (condition.kind === 'group-expression') {
+        return isFalsyLiteral(condition.expression);
+    }
+
+    return condition.kind === 'nil-literal' || (condition.kind === 'boolean-literal' && !condition.value);
+}
+
+function hasBreak(body: readonly Statement[]): boolean {
+    return body.some((statement) => {
+        if (statement.kind === 'break-statement') {
+            return true;
+        }
+
+        if (statement.kind === 'do-statement') {
+            return hasBreak(statement.body);
+        }
+
+        if (statement.kind === 'if-statement') {
+            return statement.clauses.some((clause) => hasBreak(clause.body)) || (statement.alternate !== null && hasBreak(statement.alternate));
+        }
+
+        return false;
+    });
+}
+
 export function checkWhile(context: CheckContext, statement: WhileStatement): void {
     forgetAssignedPaths(context, statement.body);
     checkExpression(context, statement.condition);
     checkLoopBody(context, statement.body, conditionFacts(context, statement.condition));
     context.applyFlowFacts(negatedFacts(context, statement.condition));
+
+    if (isTruthyLiteral(statement.condition) && !hasBreak(statement.body)) {
+        context.markUnreachable();
+    }
 }
 
 export function checkRepeat(context: CheckContext, statement: RepeatStatement): void {
     checkLoopBody(context, statement.body, new Map());
     checkExpression(context, statement.condition);
+
+    if (isFalsyLiteral(statement.condition) && !hasBreak(statement.body)) {
+        context.markUnreachable();
+    }
 }
 
 export function checkNumericFor(context: CheckContext, statement: NumericForStatement): void {

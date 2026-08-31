@@ -1,4 +1,4 @@
-doing |doing |doing |doing |done |done |done |# Roadmap
+# Roadmap
 
 Incremental milestones. Each milestone produces a usable artifact and is
 verifiable through tests. Each task has a plan file in `plans/` following
@@ -1907,7 +1907,7 @@ Close the last unchecked call in the type system and give the editor the two
 providers a developer expects before they trust a language: a formatter and a
 quick fix.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
@@ -2178,7 +2178,7 @@ Decided:
   would then require amending the CLI-never-connects rule in `.claude/CLAUDE.md`
   explicitly. The offline test-host debugger is the one shape that needs neither.
 
-doing |doing |doing |doing |done |done |done |## Milestone 36 — Pipeline Consolidation and Community Contribution
+## Milestone 36 — Pipeline Consolidation and Community Contribution
 
 Reorganize every workflow around one written contract, and open the project to
 outside contributors with a pipeline designed for code the project does not
@@ -2305,12 +2305,306 @@ Decided:
   them. Wall-clock fell from 3m00s to 2m15s, because typecheck, the matrix and
   the docs no longer wait on each other.
 
+- **The three rulesets are live, and private vulnerability reporting is on.**
+  `develop` (21931640), `main` (21931663) and `release tags` (21931665) were
+  created from `.github/rulesets` verbatim, so the committed JSON and what
+  GitHub enforces are the same text. `main` requires zero approvals and exactly
+  the five gate checks, and no ruleset has a bypass actor. `main` no longer
+  accepts a direct push, which is what the two-branch model already described.
+
 Remaining:
 
-- Applying the three rulesets, raising fork run approval from first-time
-  contributors to all outside contributors, and enabling private vulnerability
-  reporting. Each is a repository setting rather than a file, and each waits on
-  the workflows being pushed so the required-check names exist, which they now
-  do.
+- Raising fork run approval from first-time contributors to all outside
+  contributors. It is a repository setting with no file behind it.
+- Proving the rules rather than reading them back: a refused force-push, a
+  refused deletion, a merge into `main` under the requirement, and a `v*` tag
+  that cannot be moved. Each needs an attempt against the live repository.
 - A deliberate break in a type, a test and the smoke build, to prove the gate
   still fails on one, and the fork rehearsal in 36.07, which needs a real fork.
+
+## Milestone 37 — Checker Soundness and Generic Functions
+
+Close a hole where a declared return type is not enforced, and give functions the
+type parameters aliases and classes already have.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 37.01 | Report a function that can end without returning | ../plans/37.01-missing-return.md | architecture-engineer | done |
+| 37.02 | Take type parameters on functions and methods | ../plans/37.02-generic-functions.md | architecture-engineer | done |
+| 37.03 | Cover milestone 37 with checker tests | ../plans/37.03-checker-soundness-tests.md | test-engineer | done |
+| 37.04 | Document the return rule and generic functions | ../plans/37.04-checker-soundness-documentation.md | documentation-engineer | done |
+
+Sequencing:
+
+- 37.01 and 37.02 are independent and run in parallel. One changes what the
+  checker reports at the end of a body, the other changes what the parser accepts
+  before a parameter list; they share no code.
+- 37.03 and 37.04 both wait on the two, because each records decisions the tests
+  and the pages have to state.
+
+Acceptance:
+
+- A function annotated with a concrete return type that can reach its closing
+  `end` reports `check-missing-return`; the same body annotated optional, `nil`,
+  `void`, `any`, or not at all, reports nothing.
+- A loop that never falls through is not reported.
+- `function identity<T>(value: T): T` parses, checks, infers at the call site,
+  accepts explicit arguments, enforces constraints, and leaves no trace in the
+  generated Lua in either layout.
+- A generic method inside a generic class resolves both sets of parameters.
+- The formatter is a fixed point on a file declaring a generic function.
+- Both manual trees describe the return rule and generic functions, and
+  `pnpm docs:verify` passes.
+
+Why now:
+
+- Both were found by compiling a probe, not by reading code. `function pick(flag:
+  boolean): string` with a `return` only inside an `if` passes `luam check` with
+  zero diagnostics today, and `function identity<T>` is
+  `parse-unexpected-token`.
+- Both reuse machinery that already exists. The return check reads the
+  reachability flag `FlowState` already carries and `markUnreachable` already
+  clears; generic functions compose `parseTypeParameters`, `inferTypeArguments`,
+  `substituteType` and `checkTypeConstraints`, all exported and all already used
+  by the class path.
+- Milestone 38 needs 37.02. A library of utilities without generic functions
+  ships an untyped surface.
+
+Deliberately excluded:
+
+- Exhaustiveness over a discriminated union.
+- Treating `error(...)` as a terminator, which needs a never-returning type and
+  is recorded as a known false positive instead.
+- Variance, higher-kinded parameters, and inference from a return position.
+- A strictness flag. A second checking mode is a permanent cost paid to avoid a
+  one-time fix.
+
+What it decided:
+
+- **`check-missing-return` lands as an error, not a staged warning.** 37.01 T-02
+  ran the diagnostic against every corpus before deciding: the compiler suite,
+  all 85 tracked `.luam` files, `docs/snippets`, the documented examples, the
+  captured outputs, and the LSP and CLI suites. Zero hits. With nothing to
+  migrate, the argument for a softer landing had no case to answer, and the
+  defect sits at the same severity as `check-return-mismatch` — which is the
+  point of reporting it at all.
+- **Two loops needed a reachability fix before the diagnostic could be written.**
+  `checkLoopBody` restores the entry flow after a body, so `while true do` and
+  `repeat ... until false` left the state reachable and would have been reported.
+  Both now end the path when the condition is a literal and the body carries no
+  `break` of its own.
+- **`error(...)` is a recorded false positive, not a bug to fix later.** A call
+  cannot end a path without a never-returning return type, and guessing from the
+  name would be a rule about one identifier rather than about types. It is a
+  **Design boundary** on the limitations page, and the repair is the annotation.
+- **No quick fix for `check-missing-return`.** Every one of the six fixable
+  diagnostics is a meaning-preserving rewrite — the same type spelled
+  canonically, the same call, the same construction. This one has two ordinary
+  repairs, and the machine-applicable one, widening the annotation, is the first
+  candidate that would change what the program means, for every caller rather
+  than at the site the diagnostic points to.
+- **Generic functions added no diagnostic code and no new analysis.** The call
+  site reuses `inferTypeArguments`, `substituteType` and the class constraint
+  reporter, which was generalized out of `checkTypeConstraints` rather than
+  duplicated. `check-generic-arity`, `check-generic-constraint` and
+  `check-type-mismatch` carry their existing meanings.
+- **The `<` ambiguity is resolved by speculation, not by lookahead.** A type
+  argument list at a call site is kept only when a `(` follows it immediately;
+  anything else rewinds the index, the erasure spans and the diagnostics
+  together. `a < b > (c)` is the one form that resolves to the generic reading,
+  and a chained comparison is not valid Lua anyway.
+- **The formatter was not a fixed point on a generic call, and had not been for
+  generic classes either.** `new Box<number>(1)` was already being reformatted to
+  `new Box<number> (1)`; no corpus file had exercised it. A type `>` now binds
+  tight to a following `(`, and a type `<` keeps its space after `function`.
+- **`docs/*/language/types.md` still said generic classes were unsupported.**
+  That stopped being true in 0.13.0. The page now names classes and functions as
+  the other two forms of the same feature.
+- **Signature help does not specialize a generic call's parameter labels.** It
+  resolves through the symbol index's rendered text, and the call frame exposes
+  argument source rather than argument types; doing it properly means giving that
+  path the declared type and the checked arguments, which is its own task. Hover
+  does show the type parameters and the specialized result type.
+
+## Milestone 38 — Library Distribution
+
+Build what milestone 34 decided. A developer consuming third-party Luam code
+still copies files.
+
+Status: planned
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 38.01 | Add the libraries manifest domain and resolve packages from disk | ../plans/38.01-libraries-manifest-domain.md | architecture-engineer | todo |
+| 38.02 | Compile library sources as part of the consuming project | ../plans/38.02-library-compilation.md | architecture-engineer | todo |
+| 38.03 | Report global collisions and missing library requirements | ../plans/38.03-library-collisions.md | architecture-engineer | todo |
+| 38.04 | Vendor library output and order it in meta.xml | ../plans/38.04-library-vendoring.md | architecture-engineer | todo |
+| 38.05 | Cover milestone 38 with a real library fixture | ../plans/38.05-library-tests.md | test-engineer | todo |
+| 38.06 | Document authoring and consuming a Luam library | ../plans/38.06-library-documentation.md | documentation-engineer | todo |
+
+Sequencing:
+
+- 38.01 resolves packages before anything reads them, and its T-01 decides the
+  workspace-link question the fixture in 38.05 depends on.
+- 38.02 puts library files into the same module list the project uses, which is
+  what lets 38.03 and 38.04 reuse the passes that already walk it rather than
+  growing a second path.
+- 38.03 and 38.04 are independent of each other and run in parallel.
+- 38.05 runs against the whole milestone, because the failure modes are
+  structural — an invisible symbol, an order that disagrees with the compile,
+  output that ships after a library is removed — and none of them appear in a
+  unit test over one function.
+
+Acceptance:
+
+- A `libraries` entry naming an installed package resolves, compiles, checks and
+  is vendored into the resource; one naming a missing package is a configuration
+  error naming the install command, and the build writes nothing.
+- A package in `node_modules` that the manifest does not name is not compiled.
+- A library's types come from its source. A library that does not type-check
+  fails the consumer's build, with a path naming the package.
+- The library owns its environment, and the existing environment diagnostics
+  apply to its symbols with no new rule.
+- Two libraries claiming one name on one side is a compile error naming both;
+  a declared requirement the manifest omits is a compile error naming both
+  repairs.
+- Tree output lands in `libs/<package>/<environment>/`, bundle output is
+  concatenated ahead of the project's own modules, and `meta.xml` lists library
+  scripts as enumerated entries after the runtime helpers and before
+  `config.lua`, the pinned `loadOrder` entries and the source wildcards.
+- The emission order equals the compile order, asserted rather than assumed.
+- Removing a library from the manifest removes its output.
+- A build with a populated `node_modules` and no network succeeds and is
+  byte-identical to a networked one.
+- A project with an empty `libraries` list produces byte-identical output to the
+  pre-milestone build.
+
+Why now:
+
+- Milestone 34's own acceptance says it "produces a decision, not an
+  implementation" and that "the milestone that builds it follows". No milestone
+  followed, and `grep -rln "libraries" packages/*/src` returns nothing.
+- It is the difference between a language and an ecosystem. Until it exists,
+  every Luam project starts from zero and `examples/framework` is copied by hand
+  rather than installed.
+
+Deliberately retained boundaries:
+
+- The compiler packages make no network calls, and a build with no network still
+  succeeds. `npm install` is the developer's step; `build`, `check`, `ensure`,
+  `dev` and `test` read `node_modules` from disk.
+- Luam operates no registry, no index and no directory.
+- There are no transitive dependencies. Lua 5.1 has one flat global namespace, so
+  two versions of a library cannot coexist and a resolver would only manufacture
+  conflicts it could not resolve.
+- Collisions are reported, never resolved. No namespacing, aliasing or renaming.
+
+Deferred to a later milestone:
+
+- Library assets. A library ships code; one that wants to ship an image is a
+  question this milestone does not answer.
+- Anything that would require Luam to run infrastructure.
+
+## Milestone 39 — Toolchain Surfaces
+
+Give the toolchain the three surfaces it lacks outside the editor, and close the
+conventions gap milestone 36 deferred.
+
+Status: planned
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 39.01 | Add luam format with a check mode | ../plans/39.01-format-command.md | architecture-engineer | todo |
+| 39.02 | Emit diagnostics in a machine-readable form | ../plans/39.02-machine-readable-diagnostics.md | architecture-engineer | todo |
+| 39.03 | Add a watch mode to luam check | ../plans/39.03-check-watch.md | architecture-engineer | todo |
+| 39.04 | Enforce the source conventions in the pipeline | ../plans/39.04-conventions-gate.md | github-engineer | todo |
+
+Sequencing:
+
+- 39.01, 39.02 and 39.03 are independent and run in parallel. Each adds one
+  surface over an engine that already exists.
+- 39.04 waits on 39.01, because `luam format --check` is the half of the
+  conventions gate that stops being a question once the command exists.
+
+Acceptance:
+
+- `luam format` rewrites a project's `.luam` files to the recorded style, is a
+  fixed point on a second run, and agrees byte for byte with the editor's
+  formatting provider across the whole corpus.
+- `luam format --check` writes nothing, lists what differs, and exits `1` when
+  anything does.
+- `luam check --json` writes one parseable document to stdout carrying every
+  diagnostic the human output reports, with unchanged exit codes; without the
+  flag, output is byte-identical to today.
+- The machine schema is versioned from its first release, and what a consumer may
+  rely on is written down.
+- `luam check --watch` re-runs on change, writes nothing in any layout, and needs
+  no network.
+- A pull request violating a mechanical convention fails the merge gate, proven
+  by a deliberate violation; the check reports on every pull request, a fork run
+  can satisfy it, and `CONTRIBUTING.md` names the command that reproduces it.
+
+Why now:
+
+- The formatter is idempotent, style-fixed and corpus-verified, and reaches a
+  developer only through VS Code. A contributor on another setup cannot satisfy a
+  style the project asks for.
+- Nothing can consume a Luam build except a human. The CLI writes prose by
+  design, so a pipeline, a hook or a non-LSP editor has to match a regular
+  expression against output the project reserves the right to improve.
+- The tightest loop the toolchain offers writes to disk. `--watch` is owned by
+  `dev` and `ensure`, and both produce a resource.
+- Milestone 36 deferred conventions enforcement because "the workspace has no
+  linter or formatter". Half of that stops being true with 39.01.
+
+Deliberately excluded:
+
+- New or configurable formatting rules. The style is fixed and this renders it.
+- A second machine-readable format.
+- Auto-fixing in CI. The gate reports; the developer fixes.
+- Broader static analysis than the conventions the project has already written
+  down.
+
+## Milestone 40 — Inference Feedback in the Editor
+
+Show what the checker inferred, inline. Milestone 32 built the formatter and the
+quick fixes and left this as a separate decision.
+
+Status: planned
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 40.01 | Add inlay hints to the language server | ../plans/40.01-inlay-hints.md | architecture-engineer | todo |
+
+Acceptance:
+
+- An inferred local type, an inferred return type and a contextually typed
+  callback parameter each show a hint; an annotated one shows nothing.
+- A parameter-name hint appears on a literal argument and nowhere else.
+- No hint ever reads `any`.
+- Each kind can be turned off, through settings a client that is not VS Code can
+  set.
+- A file that fails to parse yields no hints.
+- A hint and a hover on the same position render the same type.
+- A range request is answered from the analysis the server already holds, with no
+  recompile, and the measurement is recorded.
+
+Why now:
+
+- Luam erases everything. A type annotation exists only for the checker, so a
+  reader who wants to know what a local holds has no runtime artifact and no
+  generated declaration to look at — hover answers one name at a time.
+- Contextual callback typing gives an event handler's parameters types the
+  developer never wrote, and there is currently no way to see them at all except
+  by hovering each one.
+- The server already computes every type a hint would show, and renders it
+  through the same `typeToString` a hint needs.
+
+Deliberately excluded:
+
+- Inserting an annotation from a hint. That is a code action, and belongs with
+  the quick fixes.
+- Hints in `.luam.manifest`, where a field's type is already declared.
+- Any change to inference itself.

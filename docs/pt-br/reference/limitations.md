@@ -310,3 +310,66 @@ proteger.
 O próprio MTA não tem nada com que interoperar aqui: ele não publica protocolo de
 depuração, e um hook de debug do Lua que para em uma linha para a thread em que o
 servidor inteiro roda, o que congela o jogo para todo mundo nele.
+
+## `error(...)` não encerra um caminho
+
+**Decisão de projeto.** Registrada em
+[37.01](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/37.01-missing-return.md).
+
+Uma função que declara um tipo de retorno concreto precisa produzir um em todo
+caminho, e um corpo que consegue alcançar o `end` final sem retornar é
+[`check-missing-return`](/pt-br/language/functions#tipos-de-retorno). O
+verificador lê uma coisa só para decidir isso: se o controle ainda consegue
+chegar ao fim. Um `return`, um `break` e um `continue` encerram um caminho, e um
+laço que não consegue cair fora também.
+
+Uma chamada não encerra, mesmo quando ela nunca volta:
+
+```luam static
+function mustFind(id: number): string
+    local found = lookup(id)
+
+    if found ~= nil then
+        return found
+    end
+
+    error('sem entrada para ' .. tostring(id))
+end
+```
+
+O `error` levanta um erro, então a última linha é inalcançável de fato — mas nada
+no sistema de tipos diz isso. Marcar uma chamada como terminadora exige um tipo
+de retorno que nunca retorna, que o Luam não tem, e adivinhar pelo nome `error`
+seria uma regra sobre um identificador, não sobre tipos.
+
+O reparo é a anotação. Declare `: string?` e a assinatura passa a dizer a verdade
+sobre uma função que pode não produzir valor, ou retorne um valor de reserva em
+vez de levantar o erro.
+
+## Um parâmetro de tipo só na posição de retorno é `any`
+
+**Decisão de projeto.** Registrada na
+[ADR-032](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/032-erased-generic-classes.md).
+
+Os argumentos de tipo são inferidos em uma passada única sobre os argumentos que
+a chamada de fato passa. Cada parâmetro é casado com o argumento na mesma
+posição, e o que sobrar sem ligação vira `any`:
+
+```luam static
+function make<T>(): T
+    return decode()
+end
+
+local value = make()
+```
+
+`T` não aparece na lista de parâmetros, então nada o liga e `value` é `any` em
+vez de um erro. O mesmo vale para um parâmetro que só um argumento posterior
+poderia ter decidido; a inferência não volta a uma posição anterior depois de
+passar dela.
+
+Escreva o argumento quando precisar do tipo: `make<string>()` liga `T` e o
+resultado é `string`. É a mesma inferência que as
+[classes genéricas](/pt-br/language/classes#parametros-de-tipo) e as
+[funções genéricas](/pt-br/language/functions#funcoes-genericas) compartilham, e
+é a regra que a ADR-032 registrou, não uma que isto acrescenta.

@@ -162,7 +162,7 @@ See [Enums and interfaces](/en/language/enums-and-interfaces).
 ## Type parameters
 
 A class takes type parameters the way a [type alias](/en/language/types#aliases)
-does. Every use of the parameter inside the class — a field, a parameter, a
+and a [function](/en/language/functions#generic-functions) do. Every use of the parameter inside the class — a field, a parameter, a
 return type — is replaced by the argument at the point of use:
 
 ```luam

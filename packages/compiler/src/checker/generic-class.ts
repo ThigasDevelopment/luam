@@ -151,6 +151,28 @@ function satisfies(context: CheckContext, argument: Type, constraint: Type): boo
     return isAssignable(argument, constraint, { allowNil: false });
 }
 
+export function reportConstraintViolations(
+    context: CheckContext,
+    owner: string,
+    typeParameters: readonly string[],
+    typeConstraints: readonly (Type | null)[],
+    typeArguments: readonly Type[],
+    position: SourcePosition,
+): void {
+    typeConstraints.forEach((constraint, index) => {
+        const argument = typeArguments[index];
+
+        if (constraint === null || argument === undefined || argument.kind === 'any' || satisfies(context, argument, constraint)) {
+            return;
+        }
+
+        const parameter = typeParameters[index] ?? 'T';
+        const message = `Type argument "${typeToString(argument)}" does not satisfy "${parameter} extends ${typeToString(constraint)}" on ${owner}.`;
+
+        context.report('check-generic-constraint', message, position);
+    });
+}
+
 export function checkTypeConstraints(context: CheckContext, name: string, typeArguments: readonly Type[], position: SourcePosition): void {
     const info = context.declarations.lookupClass(name);
 
@@ -158,18 +180,7 @@ export function checkTypeConstraints(context: CheckContext, name: string, typeAr
         return;
     }
 
-    info.typeConstraints.forEach((constraint, index) => {
-        const argument = typeArguments[index];
-
-        if (constraint === null || argument === undefined || argument.kind === 'any' || satisfies(context, argument, constraint)) {
-            return;
-        }
-
-        const parameter = info.typeParameters[index] ?? 'T';
-        const message = `Type argument "${typeToString(argument)}" does not satisfy "${parameter} extends ${typeToString(constraint)}" on class "${name}".`;
-
-        context.report('check-generic-constraint', message, position);
-    });
+    reportConstraintViolations(context, `class "${name}"`, info.typeParameters, info.typeConstraints, typeArguments, position);
 }
 
 export function specializedMembers(registry: DeclarationRegistry, receiver: NamedType): MemberInfo[] {

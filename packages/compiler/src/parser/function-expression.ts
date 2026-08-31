@@ -2,6 +2,7 @@ import type { Expression, FunctionDeclaration, FunctionExpression, Identifier, M
 import { parseBlock } from './statement';
 import type { TokenStream } from './token-stream';
 import { parseNamedAnnotation, parseOptionalAnnotation } from './type-annotation';
+import { parseTypeParameters } from './type-parameters';
 
 function parseParameter(stream: TokenStream): Parameter {
     const token = stream.current();
@@ -45,13 +46,22 @@ export function parseParameters(stream: TokenStream): Parameter[] {
 
 export function parseFunctionExpression(stream: TokenStream): FunctionExpression {
     const position = stream.expect('keyword', 'function').position;
+    const typeParameters = parseTypeParameters(stream);
     const parameters = parseParameters(stream);
     const returnAnnotation = parseOptionalAnnotation(stream);
     const body = parseBlock(stream, ['end']);
 
     stream.expect('keyword', 'end');
 
-    return { kind: 'function-expression', parameters, returnAnnotation, body, position };
+    return {
+        kind: 'function-expression',
+        typeParameters: typeParameters.names,
+        typeConstraints: typeParameters.constraints,
+        parameters,
+        returnAnnotation,
+        body,
+        position,
+    };
 }
 
 function parseFunctionName(stream: TokenStream): { name: Identifier | MemberExpression; isMethod: boolean } {
@@ -77,11 +87,25 @@ function parseFunctionName(stream: TokenStream): { name: Identifier | MemberExpr
 export function parseFunctionDeclaration(stream: TokenStream, isLocal: boolean, isExported = false, isHttpExport = false): FunctionDeclaration {
     const position = stream.expect('keyword', 'function').position;
     const { name, isMethod } = parseFunctionName(stream);
+    const typeParameters = parseTypeParameters(stream);
     const parameters = parseParameters(stream);
     const returnAnnotation = parseOptionalAnnotation(stream);
     const body = parseBlock(stream, ['end']);
 
     stream.expect('keyword', 'end');
 
-    return { kind: 'function-declaration', name, isLocal, isExported, isHttpExport, isMethod, parameters, returnAnnotation, body, position };
+    return {
+        kind: 'function-declaration',
+        name,
+        isLocal,
+        isExported,
+        isHttpExport,
+        isMethod,
+        typeParameters: typeParameters.names,
+        typeConstraints: typeParameters.constraints,
+        parameters,
+        returnAnnotation,
+        body,
+        position,
+    };
 }

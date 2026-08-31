@@ -9,6 +9,28 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.6 - 2026-08-31
+
+### Added
+
+- [Functions](/en/language/functions#generic-functions) describes generic
+  functions: the syntax, inference at the call site, explicit arguments and
+  constraints. [Types](/en/language/types#aliases) and
+  [Classes](/en/language/classes#type-parameters) now cross-link it, so the
+  three forms read as one feature.
+- [Limitations](/en/reference/limitations) gains two entries: `error(...)` does
+  not end a path, and a type parameter that appears only in the return position
+  is `any`.
+
+### Changed
+
+- [Functions](/en/language/functions#return-types) states that a declared return
+  type has to be produced on every path, and that an optional annotation is how
+  a function is allowed to end without a value.
+  [Diagnostics](/en/reference/diagnostics) lists `check-missing-return`.
+- [Types](/en/language/types#aliases) no longer says generic classes are
+  unsupported. They have been supported since 0.13.0.
+
 ## 0.19.5 - 2026-08-28
 
 ### Added
@@ -40,6 +62,11 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ### Added
 
+- [CLI commands](/en/tooling/cli) documents `luam test`: the interpreter it looks
+  for, the six globals a test file gets, every matcher, the MTA stubs and what
+  they cannot prove. [Testing a module](/en/recipes/testing-a-module) is a new
+  recipe with a complete project, and [CI and deployment](/en/tooling/ci-and-deployment)
+  shows the job that installs Lua and gates on the result.
 - [Editors](/en/tooling/editors) and [Formatting](/en/reference/formatting) record
   `luam.formatting`, the setting that turns the formatter off.
 - [Editors](/en/tooling/editors) records the `static` keyword hover and the
