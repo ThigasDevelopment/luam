@@ -105,15 +105,15 @@ export function constructionMembers(analysis: DocumentAnalysis, type: Type, writ
 
     const matching = shapes.filter((shape) => matchesWritten(shape, written));
     const chosen = matching.length === 0 ? shapes : matching;
-    const members = new Map<string, Type>();
+    const collected = new Map<string, Type[]>();
 
     for (const shape of chosen) {
         for (const [name, member] of shape) {
-            if (!members.has(name)) {
-                members.set(name, member);
-            }
+            collected.set(name, [...(collected.get(name) ?? []), member]);
         }
     }
+
+    const members = new Map<string, Type>([...collected].map(([name, types]) => [name, createUnion(types)]));
 
     return members.size === 0 ? null : members;
 }

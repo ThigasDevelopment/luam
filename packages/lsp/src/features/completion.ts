@@ -17,7 +17,7 @@ import { callbackParameterItems } from '@lsp/features/callback-parameter-complet
 import { classBodyNeedsConstructor, isClassBody } from '@lsp/features/class-body';
 import { classHeaderItems, classHeaderPosition } from '@lsp/features/class-header';
 import { directiveItems, isDirectivePosition } from '@lsp/features/directive-completion';
-import { tableLiteralMembers, writtenKeys } from '@lsp/features/table-literal';
+import { isTableKeyPosition, tableLiteralMembers, writtenKeys } from '@lsp/features/table-literal';
 import {
     completionContext,
     hasDecoratorPrefix,
@@ -72,6 +72,10 @@ function recordItems(analysis: DocumentAnalysis, record: RecordType): Completion
 }
 
 function tableKeyItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
+    if (!isTableKeyPosition(analysis.text, offset)) {
+        return [];
+    }
+
     const members = tableLiteralMembers(analysis, offset);
 
     if (members === null) {
@@ -313,9 +317,14 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         return deduplicate(expected);
     }
 
+    const keys = tableKeyItems(analysis, offset);
+
+    if (keys.length > 0) {
+        return deduplicate(plainItems(keys, expectation));
+    }
+
     return deduplicate([
         ...expected,
-        ...plainItems(tableKeyItems(analysis, offset), expectation),
         ...scopeItems(analysis, offset, expectation),
         ...projectItems(analysis, expectation),
         ...plainItems(workspaceItems(analysis, others), expectation),

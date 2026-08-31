@@ -2749,11 +2749,11 @@ from a discriminated union of intersections, where the editor named one
 discriminant value out of two, offered keys where a value goes, and buried the
 right answers under the whole global surface.
 
-Status: doing
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 41.01 | Complete a typed table literal by the keys its type still allows | ../plans/41.01-table-literal-key-completion.md | architecture-engineer | doing |
+| 41.01 | Complete a typed table literal by the keys its type still allows | ../plans/41.01-table-literal-key-completion.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -2784,6 +2784,30 @@ Deliberately excluded:
 - Lifting the single-line reach of the annotation, which keeps a multi-line or
   nested literal without key completion.
 - Completion for an array-style literal, which has no keys to offer.
+
+Decided during implementation:
+
+- **A key position offers the keys alone**, overturning the merge the suite fixed
+  deliberately. A position that takes an identifier the type names has no use for
+  seven hundred and fifty entries, and the one case the merge served — reaching a
+  scope name where a key goes — is one `=` away, in a value position that offers
+  the scope in full.
+- **The guard is `keys.length > 0`**, so every position outside the feature keeps
+  the list it built before: no annotation, a call argument, an array-style
+  literal, a class or interface body, and an annotation on an earlier line each
+  yield no key items and fall through untouched.
+- **A key declared by more than one matching member is typed as the union of what
+  they declare**, folded with `createUnion`. That is what made the discriminant
+  offer both values inside the quotes rather than the first one, and it is what
+  the `detail` of the item reads.
+- **The client decides the final order.** The items carry no `sortText`, so the
+  server returns declaration order and VS Code renders them alphabetically. The
+  list is short enough that the order is not what makes it readable.
+- **Reloading the window was not enough** to pick up a reinstalled VSIX on a
+  window that was already open; it took restarting the extension host. The two
+  brace shapes that exposed the stale server — braces the editor closed for you,
+  and a cursor on the line after the opening brace — are covered by their own
+  tests now.
 
 ## Milestone 42 — Class Output and Member Hover
 

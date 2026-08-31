@@ -64,7 +64,19 @@ describe('table literal completion', () => {
     it('offers the keys of the annotated type', () => {
         const found = labels(`${TYPES}local one: SQLite = { `, '= { ');
 
-        expect(found.slice(0, 3)).toEqual(['id', 'kind', 'sender']);
+        expect(found).toEqual(['id', 'kind', 'sender']);
+    });
+
+    it('offers the keys between braces the editor closed for you', () => {
+        const found = labels(`${TYPES}local one: SQLite = {}\n`, 'SQLite = {');
+
+        expect(found).toEqual(['id', 'kind', 'sender']);
+    });
+
+    it('offers the keys on the line after the opening brace', () => {
+        const found = labels(`${TYPES}local one: SQLite = {\n    \n}\n`, 'SQLite = {\n    ');
+
+        expect(found).toEqual(['id', 'kind', 'sender']);
     });
 
     it('inserts the key with its assignment', () => {
@@ -77,33 +89,39 @@ describe('table literal completion', () => {
     it('hides a key that is already written', () => {
         const found = labels(`${TYPES}local one: SQLite = { id = "a", `, '"a", ');
 
-        expect(found.slice(0, 2)).toEqual(['kind', 'sender']);
+        expect(found).toEqual(['kind', 'sender']);
     });
 
     it('offers every key of the union before a discriminant is written', () => {
         const found = labels(`${TYPES}local data: Config = { `, '= { ');
 
-        expect(found.slice(0, 4)).toEqual(['id', 'kind', 'sender', 'host']);
+        expect(found).toEqual(['id', 'kind', 'sender', 'host']);
     });
 
     it('narrows to one member once the discriminant is written', () => {
         const found = labels(`${TYPES}local data: Config = { kind = "mysql", `, '"mysql", ');
 
-        expect(found.slice(0, 2)).toEqual(['id', 'host']);
-        expect(found).not.toContain('sender');
+        expect(found).toEqual(['id', 'host']);
     });
 
     it('narrows to the other member', () => {
         const found = labels(`${TYPES}local data: Config = { kind = "sqlite", `, '"sqlite", ');
 
-        expect(found.slice(0, 2)).toEqual(['id', 'sender']);
-        expect(found).not.toContain('host');
+        expect(found).toEqual(['id', 'sender']);
     });
 
-    it('keeps the scope items available after the keys', () => {
+    it('offers the last remaining key once the others are written', () => {
+        const found = labels(`${TYPES}local data: Config = { kind = "sqlite", id = "a", `, '"a", ');
+
+        expect(found).toEqual(['sender']);
+    });
+
+    it('replaces the scope with the keys where only a key can go', () => {
         const found = labels(`${TYPES}local one: SQLite = { `, '= { ');
 
-        expect(found).toContain('outputChatBox');
+        expect(found).not.toContain('outputChatBox');
+        expect(found).not.toContain('SQLite');
+        expect(found).not.toContain('function');
     });
 
     it('offers nothing extra in a class body', () => {
@@ -112,11 +130,58 @@ describe('table literal completion', () => {
         expect(found).not.toContain('id');
     });
 
+    it('keeps the class body offering the scope and its own items', () => {
+        const found = labels('class Adapter {\n    ', 'Adapter {\n    ');
+
+        expect(found).toContain('outputChatBox');
+        expect(found).toContain('static');
+        expect(found).toContain('constructor');
+    });
+
+    it('keeps an interface body offering the scope', () => {
+        const found = labels('interface Row {\n    ', 'Row {\n    ');
+
+        expect(found).toContain('outputChatBox');
+    });
+
+    it('keeps the scope in a literal with no annotation', () => {
+        const found = labels(`${TYPES}local t = { `, 'local t = { ');
+
+        expect(found).toContain('outputChatBox');
+        expect(found).not.toContain('id');
+    });
+
+    it('keeps the scope in a literal passed as a call argument', () => {
+        const found = labels(`${TYPES}outputChatBox({ `, 'outputChatBox({ ');
+
+        expect(found).toContain('outputChatBox');
+        expect(found).not.toContain('id');
+    });
+
+    it('offers every discriminant value while more than one member matches', () => {
+        const found = labels(`${TYPES}local data: Config = { kind = "`, 'kind = "');
+
+        expect(found).toEqual(['sqlite', 'mysql']);
+    });
+
+    it('types a shared key as the union of the matching members', () => {
+        const [, discriminant] = completion(`${TYPES}local data: Config = { `, '= { ');
+
+        expect(discriminant?.detail).toBe("kind: 'sqlite' | 'mysql'");
+    });
+
+    it('offers no keys where a value is expected', () => {
+        const found = labels(`${TYPES}local one: SQLite = { sender = `, 'sender = ');
+
+        expect(found).not.toContain('id');
+        expect(found).toContain('outputChatBox');
+    });
+
     it('offers the keys of an interface', () => {
         const source = 'interface Row {\n    id: string\n    name: string\n}\n\nlocal row: Row = { ';
         const found = labels(source, '= { ');
 
-        expect(found.slice(0, 2)).toEqual(['id', 'name']);
+        expect(found).toEqual(['id', 'name']);
     });
 });
 
