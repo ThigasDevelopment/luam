@@ -11,6 +11,14 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.9 - 2026-08-31
+
+### Adicionado
+
+- [Editores](/pt-br/tooling/editors) e
+  [Language server](/pt-br/tooling/language-server) documentam as inlay hints:
+  os três tipos, o que cada um mostra, e a configuração que desliga cada um.
+
 ## 0.19.8 - 2026-08-31
 
 ### Adicionado
