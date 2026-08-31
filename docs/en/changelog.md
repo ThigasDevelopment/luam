@@ -9,6 +9,35 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.10 - 2026-08-31
+
+### Added
+
+- [Editors](/en/tooling/editors) records that a typed table literal completes by
+  the keys its type still allows, including how a key shared across a union is
+  typed and when every discriminant value is offered.
+
+## 0.19.9 - 2026-08-31
+
+### Added
+
+- [Editors](/en/tooling/editors) and
+  [Language server](/en/tooling/language-server) document the inlay hints: the
+  three kinds, what each one shows, and the setting that turns each off.
+
+## 0.19.8 - 2026-08-31
+
+### Added
+
+- [CLI commands](/en/tooling/cli) documents `luam format` and its check mode,
+  the machine-readable diagnostics a build can emit, and the watch mode of
+  `luam check`.
+- [Formatter file](/en/reference/formatter-file) is new: every field
+  `.luam.formatter` accepts, what each one changes, and how the editor and the
+  command agree on one layout.
+
+## 0.19.7 - 2026-08-31
+
 ### Added
 
 - [Libraries](/en/tooling/libraries) describes the whole model: installing and
@@ -24,6 +53,11 @@ Every heading below is a released version and the date it shipped, newest first.
   [Limitations](/en/reference/limitations) records three boundaries: requirements
   are named rather than resolved, collisions are reported rather than resolved,
   and a library ships code rather than assets.
+
+## 0.19.6 - 2026-08-31
+
+### Added
+
 - [Functions](/en/language/functions#generic-functions) describes generic
   functions: the syntax, inference at the call site, explicit arguments and
   constraints. [Types](/en/language/types#aliases) and

@@ -14,6 +14,60 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.10 - 2026-08-31
+
+### Added
+
+- Completion inside a table literal with a declared type offers only the keys
+  that type still allows, dropping the ones already written. It offered every
+  symbol in scope, so the editor knew the shape and would not say it, and the
+  writer had to read the type declaration in another file to learn which keys
+  were left. A key shared by more than one member of a union is typed as the
+  union of what those members declare, and while more than one member still
+  matches, every discriminant value is offered rather than the first one
+  guessed.
+
+## 0.19.9 - 2026-08-31
+
+### Added
+
+- The language server serves inlay hints for what it inferred and the source did
+  not write: the type of a local, a parameter that took its type from context,
+  and a return the signature left out. What the checker knew was visible only on
+  hover, one symbol at a time, which made an inferred local read like an untyped
+  one. Each kind is turned off on its own, so a reader who wants only parameter
+  names is not paying for the rest, and the extension surfaces the settings and
+  forwards them.
+
+## 0.19.8 - 2026-08-31
+
+### Added
+
+- `luam format` writes the layout the language server already served, so the
+  same formatting is reachable from an editor, a terminal and a pipeline.
+  `--check` reports what differs and writes nothing, which is the form a gate
+  uses.
+- A build result can be emitted machine-readable, so a tool consumes diagnostics
+  instead of parsing human text that was never a contract.
+- `luam check --watch` rechecks on change, including a change to the manifest,
+  rather than asking for a rerun.
+- A project configures the formatter through `.luam.formatter`
+  ([ADR-042](.claude/docs/adr/042-formatter-configuration-file.md)). The editor
+  completes and hovers its fields, the file has its own grammar and icons, and
+  the language server reads it like any other project setting.
+
+### Fixed
+
+- A call to a method a class does not declare is reported. `adapter:query(...)`
+  on a class with no `query` compiled clean, and the failure moved to the
+  server, where a nil call says nothing about which name was wrong. Member
+  resolution now answers for a class value and for a typed field that holds one,
+  walking the parent chain before deciding, so an inherited member is found
+  rather than reported, and the message names the members the class does
+  declare.
+
+## 0.19.7 - 2026-08-31
+
 ### Added
 
 - A Luam library is an npm package, listed in the new `libraries` manifest
@@ -30,6 +84,11 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   library claiming an MTA name is the warning `project-library-shadows-api`, and
   a library that reads a project global is `project-library-project-reference`.
   The editor resolves libraries the same way, so the CLI and the LSP agree.
+
+## 0.19.6 - 2026-08-31
+
+### Added
+
 - A function takes its own type parameters. `function identity<T>(value: T): T`
   parses, checks, infers the argument at the call site, accepts an explicit
   `identity<string>(...)`, enforces an `extends` constraint with the same
