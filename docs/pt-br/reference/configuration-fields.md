@@ -64,6 +64,15 @@ Duas entradas que caem no mesmo destino, ou um destino que sobrescreveria o
 
 Dependências opcionais não são suportadas. `mta.minVersion` não é aceito.
 
+## Bibliotecas
+
+| Campo | Tipo | Obrigatório | Padrão | Significado |
+| --- | --- | --- | --- | --- |
+| `libraries` | `string[]` | não | `{ }` | Pacotes npm instalados que publicam código Luam, compilados dentro deste resource e gravados sob `libs/`. A ordem é a ordem de emissão. Um valor que não é nome de pacote é `config-library-invalid`; uma entrada repetida é `config-library-duplicate`; um pacote não instalado é `config-library-missing`. |
+
+`libraries` obtém código e o compila dentro deste resource; `dependencies` nomeia
+outro resource que precisa estar rodando. Veja [Bibliotecas](/pt-br/tooling/libraries).
+
 ## Arquivos de ambiente
 
 | Campo | Tipo | Obrigatório | Padrão | Significado |

@@ -9,6 +9,7 @@ import { hashString } from './fingerprint';
 
 export interface DeclarationEntry {
     path: string;
+    isLibrary: boolean;
     hash: string;
     environment: Environment;
     declarations: AmbientDeclarations;
@@ -60,35 +61,52 @@ function baseKey(context: ScopeContext): string {
     return `${optionsKey(context.options)}|${mode}|${JSON.stringify(context.project.globals)}|${[...context.references].sort().join(',')}|${hashString(contracts)}`;
 }
 
-function environmentKeys(collected: readonly DeclarationEntry[]): Readonly<Record<Environment, string>> {
-    const keys: Partial<Record<Environment, string>> = {};
+function isVisible(environment: Environment, isLibrary: boolean, provider: DeclarationEntry): boolean {
+    return canReference(environment, provider.environment) && (!isLibrary || provider.isLibrary);
+}
+
+function scopeKey(environment: Environment, isLibrary: boolean): string {
+    return `${environment}|${isLibrary ? 'library' : 'project'}`;
+}
+
+const SCOPES: readonly boolean[] = [false, true];
+
+function environmentKeys(collected: readonly DeclarationEntry[]): ReadonlyMap<string, string> {
+    const keys = new Map<string, string>();
 
     for (const environment of ALL_ENVIRONMENTS) {
-        const visible = collected.filter((entry) => canReference(environment, entry.environment));
+        for (const isLibrary of SCOPES) {
+            const visible = collected.filter((entry) => isVisible(environment, isLibrary, entry));
 
-        keys[environment] = hashString(visible.map((entry) => `${entry.path}=${entry.fingerprint}`).join(';'));
+            keys.set(scopeKey(environment, isLibrary), hashString(visible.map((entry) => `${entry.path}=${entry.fingerprint}`).join(';')));
+        }
     }
 
-    return keys as Readonly<Record<Environment, string>>;
+    return keys;
 }
 
 function createResolver(collected: readonly DeclarationEntry[]): (entry: DeclarationEntry) => AmbientDeclarations {
-    const visible = new Map<Environment, DeclarationEntry[]>();
-    const merged = new Map<Environment, AmbientDeclarations>();
+    const visible = new Map<string, DeclarationEntry[]>();
+    const merged = new Map<string, AmbientDeclarations>();
 
     for (const environment of ALL_ENVIRONMENTS) {
-        const entries = collected.filter((entry) => canReference(environment, entry.environment) && !declaresNothing(entry.declarations));
+        for (const isLibrary of SCOPES) {
+            const key = scopeKey(environment, isLibrary);
+            const entries = collected.filter((entry) => isVisible(environment, isLibrary, entry) && !declaresNothing(entry.declarations));
 
-        visible.set(environment, entries);
-        merged.set(environment, mergeAmbient(entries.map((entry) => entry.declarations)));
+            visible.set(key, entries);
+            merged.set(key, mergeAmbient(entries.map((entry) => entry.declarations)));
+        }
     }
 
     return (entry: DeclarationEntry): AmbientDeclarations => {
+        const key = scopeKey(entry.environment, entry.isLibrary);
+
         if (declaresNothing(entry.declarations)) {
-            return merged.get(entry.environment) ?? EMPTY_AMBIENT;
+            return merged.get(key) ?? EMPTY_AMBIENT;
         }
 
-        const entries = visible.get(entry.environment) ?? [];
+        const entries = visible.get(key) ?? [];
 
         return mergeAmbient(entries.filter((candidate) => candidate.path !== entry.path).map((candidate) => candidate.declarations));
     };
@@ -101,7 +119,8 @@ export function createAmbientScope(collected: readonly DeclarationEntry[], conte
 
     return {
         graph,
-        keyFor: (entry: DeclarationEntry): string => hashString(`${base}|${graph.keyOf(entry.path) ?? fallback[entry.environment]}`),
+        keyFor: (entry: DeclarationEntry): string =>
+            hashString(`${base}|${graph.keyOf(entry.path) ?? fallback.get(scopeKey(entry.environment, entry.isLibrary)) ?? ''}`),
         resolve: createResolver(collected),
     };
 }

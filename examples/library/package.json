@@ -1,0 +1,15 @@
+{
+    "name": "@luam-example/collections",
+    "version": "0.1.0",
+    "private": true,
+    "description": "The example Luam library the manual builds against.",
+    "keywords": ["luam"],
+    "type": "module",
+    "files": ["src"],
+    "luam": {
+        "sources": {
+            "shared": ["src/**/*.luam", "src/**/*.lua"]
+        },
+        "requires": []
+    }
+}

@@ -5,6 +5,7 @@ import type { ManifestValue } from './manifest-value';
 export type ManifestRuleKind =
     | 'resource-name'
     | 'dependency-name'
+    | 'package-name'
     | 'contained-path'
     | 'server-contained-path'
     | 'static-path'
@@ -30,6 +31,7 @@ export interface ManifestField {
 const RULE_TEXT: Readonly<Record<ManifestRuleKind, string>> = {
     'resource-name': 'Letters, digits, dots, dashes, and underscores, starting with a letter or a digit.',
     'dependency-name': 'The name of another MTA resource, which cannot be this resource.',
+    'package-name': 'The name of an installed npm package that ships a Luam library.',
     'contained-path': 'A relative path that stays inside the project directory.',
     'server-contained-path': 'A relative path that stays inside the configured serverPath.',
     'static-path': 'A relative path with no wildcards that stays inside the project directory.',

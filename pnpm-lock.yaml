@@ -21,6 +21,14 @@ importers:
         specifier: ^2.1.4
         version: 2.1.9(@types/node@22.20.1)
 
+  docs/snippets/using-a-library:
+    dependencies:
+      '@luam-example/collections':
+        specifier: workspace:*
+        version: link:../../../examples/library
+
+  examples/library: {}
+
   packages/cli:
     dependencies:
       '@luam/compiler':

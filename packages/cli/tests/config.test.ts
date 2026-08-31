@@ -39,6 +39,7 @@ describe('configuration validation', () => {
             sources: { server: ['src/server/**/*.luam'], client: ['src/client/**/*.luam'], shared: ['src/shared/**/*.luam'] },
             assets: [],
             dependencies: [],
+            libraries: [],
             contracts: '.luam/contracts',
             engine: { minVersion: 'latest' },
             environment: { file: '.env', localFile: '.env.local' },

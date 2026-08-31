@@ -59,6 +59,7 @@ erro não escreve nada.
 | --- | --- | --- |
 | `env-conflicting-directive` | error | Duas diretivas `#!` de ambiente diferentes em um arquivo. |
 | `env-path-directive-conflict` | warning | A diretiva discorda do caminho. A diretiva vence. |
+| `env-library-directive` | error | Uma diretiva `#!` dentro de um arquivo de biblioteca discorda do lado que a biblioteca declara. |
 
 ## Checker — tipos
 
@@ -174,6 +175,10 @@ erro não escreve nada.
 | `project-duplicate-export` | Dois arquivos exportam o mesmo nome. |
 | `project-duplicate-output` | Dois fontes produziriam o mesmo caminho de saída. |
 | `project-load-order-missing` | Uma entrada de `loadOrder` não corresponde a nenhum arquivo ou asset. |
+| `project-load-order-library` | Uma entrada de `loadOrder` nomeia um arquivo de biblioteca. Scripts de biblioteca carregam na ordem que `libraries` declara. |
+| `project-library-collision` | Duas bibliotecas, ou uma biblioteca e um arquivo do projeto, declaram uma global no mesmo lado. |
+| `project-library-shadows-api` | Uma biblioteca declara um nome que a API do MTA define. Reportado como warning. |
+| `project-library-project-reference` | Um arquivo de biblioteca usa uma global que o projeto declara. Uma biblioteca enxerga só os arquivos dela. |
 | `project-bundle-toplevel-return` | Um módulo em bundle termina com `return` no nível superior. Remova-o ou selecione a árvore. |
 | `project-bundle-output-collision` | Um fonte ou asset produz um caminho reservado de bundle. Renomeie-o ou selecione a árvore. |
 
@@ -209,6 +214,11 @@ erro não escreve nada.
 | `config-missing-asset` | Uma entrada literal de `assets` nomeia um arquivo que não existe. |
 | `config-output-collision` | Dois assets caem no mesmo destino, ou um sobrescreveria um caminho gerado. |
 | `config-invalid-dependency` | Uma entrada de `dependencies` não é um nome de resource válido, ou nomeia este resource. |
+| `config-library-missing` | Uma entrada de `libraries` nomeia um pacote que não está instalado. A mensagem nomeia o comando de instalação. |
+| `config-library-invalid` | Uma entrada de `libraries` não é um nome de pacote, ou o pacote não declara um campo `luam` utilizável. |
+| `config-library-duplicate` | O mesmo pacote está listado duas vezes em `libraries`. |
+| `config-library-escape` | Um padrão de código da biblioteca resolve fora do diretório do pacote. |
+| `config-library-requirement-missing` | Uma biblioteca resolvida exige um pacote que `libraries` não lista. |
 | `config-invalid-engine-version` | `engine.minVersion` não é `'latest'` nem uma versão. |
 | `config-missing-env-file` | Um arquivo configurado em `environment` não existe. |
 | `config-unknown-helper` | `helpers` nomeia um helper inexistente. |

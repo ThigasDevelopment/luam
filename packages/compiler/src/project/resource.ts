@@ -1,10 +1,12 @@
 import { collectBundles, type ResourceBundle } from './bundle-layout';
+import type { LibraryFile } from './library';
 import { generateManifest, type ManifestContribution, type ManifestFile, type ManifestScript } from './manifest';
 import { sortFileDiagnostics, type FileDiagnostic, type ProjectResult } from './module';
 import type { AssemblyReporter } from './progress';
 import {
     collectHelpers,
     collectDevelopmentLogHelpers,
+    collectLibraryScripts,
     collectScripts,
     findDuplicateOutputs,
     resolveLoadOrder,
@@ -22,6 +24,15 @@ import { FILE_START } from '@compiler/environment/environment';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
 export { LIBRARY_DIRECTORY, libraryPath, outputPath, type ResourceAsset, type ResourceHelper, type ResourceScript } from './resource-layout';
+export {
+    LIBRARIES_DIRECTORY,
+    libraryDirectory,
+    libraryFilePath,
+    libraryOutputPath,
+    type LibraryDeclaration,
+    type LibraryFile,
+    type LibraryOrigin,
+} from './library';
 export { renderEnvironmentTemplate } from './env-template';
 export { BUNDLE_DIRECTORY, bundlePath, materializeBundles, type BundleMember, type HelperContentResolver, type ResourceBundle } from './bundle-layout';
 export {
@@ -53,6 +64,7 @@ export interface ResourceOptions {
     configuration?: ResourceConfiguration | null;
     environmentFile?: string | null;
     loadOrder?: readonly string[];
+    libraryFiles?: readonly LibraryFile[];
     minMtaVersion?: string | null;
     developmentLogs?: DevelopmentLogHelpers | null;
     layout?: OutputLayout;
@@ -101,10 +113,15 @@ function helperEntry(helper: ResourceHelper): ManifestScript {
     return { src: helper.path, environment: helper.environment, group: 'library' };
 }
 
-function manifestScripts(helpers: readonly ResourceHelper[], configuration: ResourceScript | null, sources: readonly ManifestScript[]): ManifestScript[] {
+function manifestScripts(
+    helpers: readonly ResourceHelper[],
+    libraries: readonly ManifestScript[],
+    configuration: ResourceScript | null,
+    sources: readonly ManifestScript[],
+): ManifestScript[] {
     const settings: ManifestScript[] = configuration === null ? [] : [{ src: configuration.path, environment: 'shared', group: 'configuration' }];
 
-    return [...helpers.map(helperEntry), ...settings, ...sources];
+    return [...helpers.map(helperEntry), ...libraries, ...settings, ...sources];
 }
 
 function collectContributions(project: ProjectResult): ManifestContribution[] {
@@ -202,16 +219,17 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
     const collected = [...collectHelpers(project.modules, options.helpers ?? []), ...collectDevelopmentLogHelpers(options.developmentLogs)];
     const helpers = withEnvironmentFile(collected, options.environmentFile);
     const scripts = collectScripts(project.modules);
+    const libraries = collectLibraryScripts(project.modules, options.libraryFiles ?? []);
     const configuration = configurationScript(options.configuration);
     const deployment = configuration === null ? [] : [configuration];
     const sorted = [...(options.assets ?? [])].sort((left, right) => left.path.localeCompare(right.path));
-    const order = resolveLoadOrder(options.loadOrder ?? [], scripts, sorted);
+    const order = resolveLoadOrder(options.loadOrder ?? [], scripts, sorted, libraries);
     const layout = options.layout ?? 'tree';
-    const bundles = layout === 'bundle' ? collectBundles(helpers, scripts, order.scripts) : [];
+    const bundles = layout === 'bundle' ? collectBundles(helpers, scripts, order.scripts, libraries) : [];
     const duplicates =
         layout === 'tree'
-            ? findDuplicateOutputs([...scripts, ...deployment], sorted)
-            : [...findDuplicateOutputs(scripts, []), ...findDuplicateOutputs(deployment, sorted)];
+            ? findDuplicateOutputs([...libraries, ...scripts, ...deployment], sorted)
+            : [...findDuplicateOutputs([...libraries, ...scripts], []), ...findDuplicateOutputs(deployment, sorted)];
     const collisions = layout === 'bundle' ? bundleDiagnostics(project, bundles, scripts, sorted) : [];
     const diagnostics = sortFileDiagnostics([...project.diagnostics, ...duplicates, ...collisions, ...order.diagnostics]);
 
@@ -227,9 +245,10 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
             ? sourceEntries(scripts, order.scripts).map((entry): ManifestScript => ({ ...entry, group: 'source' }))
             : bundles.map((bundle): ManifestScript => ({ src: bundle.path, environment: bundle.environment, group: 'source' }));
     const manifestHelpers = layout === 'tree' ? helpers : [];
+    const vendored = layout === 'tree' ? libraries.map((script): ManifestScript => ({ src: script.path, environment: script.environment, group: 'libraries' })) : [];
     const manifest = generateManifest(
         manifestInfo(options),
-        manifestScripts(manifestHelpers, configuration, sources),
+        manifestScripts(manifestHelpers, vendored, configuration, sources),
         manifestFiles(assets),
         collectContributions(project),
         { oop: options.oop === true, minMtaVersion: options.minMtaVersion ?? null, dependencies: options.dependencies ?? [] },
@@ -237,7 +256,8 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
 
     onStep?.('manifest');
 
-    const map = layout === 'tree' ? treeResourceMap(options.resourceName ?? '', scripts) : null;
+    const written = [...libraries, ...scripts];
+    const map = layout === 'tree' ? treeResourceMap(options.resourceName ?? '', written) : null;
 
-    return { build: { manifest, scripts: layout === 'tree' ? scripts : [], helpers, configuration, assets, bundles, layout, map }, diagnostics };
+    return { build: { manifest, scripts: layout === 'tree' ? written : [], helpers, configuration, assets, bundles, layout, map }, diagnostics };
 }

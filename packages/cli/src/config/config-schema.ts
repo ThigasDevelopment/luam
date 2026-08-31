@@ -27,6 +27,7 @@ export interface LuamConfig {
     sources: SourceMapping;
     assets: AssetMapping[];
     dependencies: string[];
+    libraries: string[];
     contracts: string;
     engine: EngineRequirement;
     environment: EnvironmentFiles;

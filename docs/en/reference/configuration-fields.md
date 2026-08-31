@@ -64,6 +64,15 @@ mapping names is copied.
 
 Optional dependencies are not supported. `mta.minVersion` is not accepted.
 
+## Libraries
+
+| Field | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `libraries` | `string[]` | no | `{ }` | Installed npm packages that ship Luam source, compiled into this resource and vendored under `libs/`. Order is emission order. A value that is not a package name is `config-library-invalid`; a repeated entry is `config-library-duplicate`; a package that is not installed is `config-library-missing`. |
+
+`libraries` obtains code and compiles it into this resource; `dependencies` names
+another resource that must be running. See [Libraries](/en/tooling/libraries).
+
 ## Environment files
 
 | Field | Type | Required | Default | Meaning |

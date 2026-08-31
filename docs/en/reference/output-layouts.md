@@ -72,6 +72,9 @@ my-resource/
 ├── lib/
 │   ├── class.lua
 │   └── string.lua
+├── libs/
+│   └── luam-example-collections/
+│       └── shared/src/queue.lua
 └── src/
     ├── shared/labels.lua
     ├── server/greet.lua
@@ -82,8 +85,12 @@ Runtime helpers sit flat in `lib/`, one file per helper. A helper resolves to a
 single environment per build, so the directory never needs to separate them —
 each `meta.xml` entry carries its own environment.
 
-The manifest lists helpers, `env.lua` and `config.lua`, pinned `loadOrder`
-entries, and then the source groups. This is the normal `ensure` and fixed `dev`
+A [library](/en/tooling/libraries) the manifest lists is vendored under `libs/`,
+one directory per package with its scoped name flattened, and its own source tree
+beneath the side it declares.
+
+The manifest lists helpers, library scripts, `env.lua` and `config.lua`, pinned
+`loadOrder` entries, and then the source groups. This is the normal `ensure` and fixed `dev`
 shape because a running resource remains easy to inspect. Use
 `luam build --no-bundle` when a local build also needs this shape.
 

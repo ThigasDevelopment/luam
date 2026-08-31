@@ -16,6 +16,20 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ### Added
 
+- A Luam library is an npm package, listed in the new `libraries` manifest
+  domain and compiled into the resource that names it. The compiler resolves the
+  package from `node_modules`, reads the layout its `package.json` declares in a
+  `luam` field, checks its sources with the project, and vendors the output to
+  `libs/<package>/<environment>/` in tree layout or into the environment bundle
+  ahead of the project's own modules. Nothing is fetched: installing is the
+  developer's step, and a build with a populated `node_modules` and no network
+  produces the same output. A missing package is `config-library-missing`, naming
+  the install command; a malformed `luam` field, a duplicate entry, an escaping
+  pattern and an unlisted `requires` entry each have their own diagnostic. Two
+  libraries claiming one global on one side are `project-library-collision`, a
+  library claiming an MTA name is the warning `project-library-shadows-api`, and
+  a library that reads a project global is `project-library-project-reference`.
+  The editor resolves libraries the same way, so the CLI and the LSP agree.
 - A function takes its own type parameters. `function identity<T>(value: T): T`
   parses, checks, infers the argument at the call site, accepts an explicit
   `identity<string>(...)`, enforces an `extends` constraint with the same

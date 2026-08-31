@@ -1,7 +1,7 @@
 import { basename } from 'node:path';
 
 import type { ManifestAnalysis } from '@compiler/manifest/manifest-analysis';
-import { readCompilerOptions, readEnvironmentFiles, readSourceMapping, sourcePatterns } from '@compiler/manifest/manifest-contract';
+import { readCompilerOptions, readEnvironmentFiles, readLibraries, readSourceMapping, sourcePatterns } from '@compiler/manifest/manifest-contract';
 import {
     DEFAULT_COMPILER_OPTIONS,
     DEFAULT_ENVIRONMENT_FILES,
@@ -15,6 +15,7 @@ import { createSourceResolver, type SourceResolver } from '@compiler/project/sou
 export interface ProjectSettings {
     compilerOptions: CompilerOptions;
     sources: SourceMapping;
+    libraries: string[];
     environment: EnvironmentFiles;
     resolver: SourceResolver;
 }
@@ -24,6 +25,7 @@ export const MANIFEST_FILE_NAME = '.luam.manifest';
 export const DEFAULT_PROJECT_SETTINGS: ProjectSettings = {
     compilerOptions: DEFAULT_COMPILER_OPTIONS,
     sources: DEFAULT_SOURCE_MAPPING,
+    libraries: [],
     environment: DEFAULT_ENVIRONMENT_FILES,
     resolver: createSourceResolver(DEFAULT_SOURCE_MAPPING),
 };
@@ -42,6 +44,7 @@ export function settingsFrom(manifest: ManifestAnalysis | null): ProjectSettings
     return {
         compilerOptions: readCompilerOptions(manifest.value),
         sources,
+        libraries: readLibraries(manifest.value),
         environment: readEnvironmentFiles(manifest.value),
         resolver: createSourceResolver(sources),
     };
@@ -52,5 +55,5 @@ export function settingsKey(settings: ProjectSettings): string {
         .map(([name, value]) => `${name}=${String(value)}`)
         .join(',');
 
-    return `${options}|${sourcePatterns(settings.sources).join(',')}|${settings.environment.file}|${settings.environment.localFile}`;
+    return `${options}|${sourcePatterns(settings.sources).join(',')}|${settings.libraries.join(',')}|${settings.environment.file}|${settings.environment.localFile}`;
 }

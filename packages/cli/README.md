@@ -108,6 +108,7 @@ assets = {
 }
 
 dependencies = { 'scoreboard' }
+libraries = { '@luam-example/collections' }
 
 engine = {
     minVersion = '1.6.0',
@@ -152,6 +153,7 @@ development = {
 | `sources` | `src/<side>/**/*.luam` | Patterns per side. The matched side is the file's environment unless a directive overrides it. |
 | `assets` | `{ }` | `{ from, to }` mappings. Everything a mapping names is copied and declared as `<file>`; nothing else is copied. |
 | `dependencies` | `{ }` | Resources written as `<include resource="..." />`. |
+| `libraries` | `{ }` | Installed npm packages that ship Luam source, compiled into this resource and vendored under `libs/`. Order is emission order; nothing is fetched. |
 | `engine.minVersion` | `'latest'` | Becomes `min_mta_version`. An explicit version keeps the build network-free. |
 | `environment` | `.env`, `.env.local` | Which files declare and override the keys behind `env` and `process.env`. |
 | `outDir` | `'build'` | Directory that receives `<outDir>/<name>`. |

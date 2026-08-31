@@ -93,7 +93,7 @@ describe('deployment env template', () => {
 });
 
 describe('generated roots', () => {
-    it('covers asset destinations and the runtime library without owning source directories', () => {
+    it('covers asset destinations, the runtime library, and vendored libraries without owning source directories', () => {
         const config: LuamConfig = {
             ...defaultConfig(),
             assets: [
@@ -102,6 +102,6 @@ describe('generated roots', () => {
             ],
         };
 
-        expect(generatedRoots(config)).toEqual(['assets', 'media', 'lib']);
+        expect(generatedRoots(config)).toEqual(['assets', 'media', 'lib', 'libs']);
     });
 });

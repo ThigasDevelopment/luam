@@ -1,0 +1,8 @@
+<meta>
+    <!-- Resource information -->
+    <info type="script" description="A resource that compiles an installed Luam library into its output." />
+    <!-- Source scripts -->
+    <script src="src/shared.lua" type="shared" cache="false" />
+    <!-- Minimum MTA version -->
+    <min_mta_version server="1.6.0" client="1.6.0" />
+</meta>

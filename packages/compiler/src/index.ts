@@ -28,6 +28,7 @@ export interface CompileOptions {
     compilerOptions?: CompilerOptions;
     projectReferences?: ReadonlySet<string>;
     contracts?: readonly ResourceAbi[];
+    environmentLocked?: boolean;
     emitCode?: boolean;
     development?: boolean;
 }
@@ -94,7 +95,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
     const settings = options.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
     const parsed = parse(source);
     const mode = resolveStrictMode(parsed.directives, settings.strict);
-    const resolved = resolveEnvironment(options.filePath ?? null, parsed.directives, options.environment ?? null);
+    const resolved = resolveEnvironment(options.filePath ?? null, parsed.directives, options.environment ?? null, options.environmentLocked === true);
     const environment = resolved.environment;
     const isDeclarationFile = options.filePath !== undefined && isDeclarationPath(options.filePath);
     const checked = check(parsed.program, mode, environment, {

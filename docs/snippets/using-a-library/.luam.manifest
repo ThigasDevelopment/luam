@@ -1,0 +1,4 @@
+name = 'luam-docs-using-a-library'
+description = 'A resource that compiles an installed Luam library into its output.'
+
+libraries = { '@luam-example/collections' }

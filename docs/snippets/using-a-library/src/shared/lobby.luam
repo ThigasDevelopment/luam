@@ -1,0 +1,7 @@
+class Lobby extends Queue {
+    label: string = 'lobby'
+
+    summary = function (): string
+        return self.label .. ': ' .. formatCount(self.size())
+    end
+}

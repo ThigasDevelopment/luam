@@ -20,6 +20,10 @@ export const INVALID_PATTERN = 'config-invalid-pattern';
 
 export const INVALID_DEPENDENCY = 'config-invalid-dependency';
 
+export const INVALID_LIBRARY = 'config-library-invalid';
+
+export const DUPLICATE_LIBRARY = 'config-library-duplicate';
+
 export const INVALID_ENGINE_VERSION = 'config-invalid-engine-version';
 
 export const REMOVED_FIELD = 'config-removed-field';

@@ -14,6 +14,13 @@ end
 <export function="getScore" type="server" http="false" />
 ```
 
+::: tip Compartilhar código, não chamadas
+Um export é uma fronteira de execução entre dois resources implantados: o código
+fica onde está e uma chamada atravessa até ele. Para *obter* código e enviá-lo
+dentro deste resource, a resposta é uma [biblioteca](/pt-br/tooling/libraries).
+Um serviço com estado é um resource com exports; um módulo puro é uma biblioteca.
+:::
+
 ## Chamando um export
 
 De outro resource, em Lua puro:

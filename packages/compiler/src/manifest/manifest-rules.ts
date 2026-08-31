@@ -1,10 +1,12 @@
 import { createPosition, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
+import { isPackageName } from '@compiler/project/library';
 import { isLiteralPattern, normalizePattern, patternProblem, patternProblemText } from '@compiler/project/path-pattern';
 
 import {
     ESCAPING_PATH,
     INVALID_DEPENDENCY,
     INVALID_ENGINE_VERSION,
+    INVALID_LIBRARY,
     INVALID_NAME,
     INVALID_PATTERN,
     INVALID_TYPE,
@@ -143,6 +145,10 @@ class RuleWalk {
 
         if (entry.rule === 'dependency-name' && !isValidResourceName(value)) {
             this.report(INVALID_DEPENDENCY, `"${path}" must be a valid MTA resource name but received "${value}".`, key);
+        }
+
+        if (entry.rule === 'package-name' && !isPackageName(value)) {
+            this.report(INVALID_LIBRARY, `"${path}" must be the name of an installed npm package but received "${value}".`, key);
         }
     }
 
