@@ -20,6 +20,7 @@ import {
     NATIVE_CONSTRUCTOR,
     nativeConstructor,
     resolveLibraryMember,
+    reportUnknownMethod,
     resolveNamedMember,
     resolveRecordMember,
 } from './members';
@@ -248,6 +249,10 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
     }
 
     if (!isMtaElement(context, receiver.name)) {
+        if (declared === null) {
+            reportUnknownMethod(context, receiver, expression.callee, method, expression.position);
+        }
+
         checkValueList(context, expression.args);
 
         return ANY_TYPE;
