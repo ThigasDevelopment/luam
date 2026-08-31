@@ -1,7 +1,7 @@
 import type { Statement } from '@compiler/parser/ast';
 import type { ClassDeclaration } from '@compiler/parser/declaration-nodes';
 
-import { declareClassInfo, resolveClassHeader, resolveSuperClass } from './classes';
+import { assignSuperClass, declareClassInfo, resolveClassHeader } from './classes';
 import type { CheckContext } from './context';
 import type { ClassInfo } from './registry';
 
@@ -53,7 +53,7 @@ export function predeclareModule(context: CheckContext, body: readonly Statement
     const declared = declareHeaders(context, body);
 
     for (const entry of declared) {
-        entry.info.superClass = resolveSuperClass(context, entry.statement);
+        assignSuperClass(context, entry.info, entry.statement);
         resolveClassHeader(context, entry.info, entry.statement);
     }
 
