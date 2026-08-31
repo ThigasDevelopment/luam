@@ -9,6 +9,17 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.8 - 2026-08-31
+
+### Added
+
+- [CLI commands](/en/tooling/cli) documents `luam format` and its check mode,
+  the machine-readable diagnostics a build can emit, and the watch mode of
+  `luam check`.
+- [Formatter file](/en/reference/formatter-file) is new: every field
+  `.luam.formatter` accepts, what each one changes, and how the editor and the
+  command agree on one layout.
+
 ## 0.19.7 - 2026-08-31
 
 ### Added

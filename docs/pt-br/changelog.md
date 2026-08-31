@@ -11,6 +11,17 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.8 - 2026-08-31
+
+### Adicionado
+
+- [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam format` e seu modo de
+  verificação, os diagnósticos legíveis por máquina que uma build pode emitir, e
+  o modo watch do `luam check`.
+- [Arquivo do formatador](/pt-br/reference/formatter-file) é nova: cada campo
+  que o `.luam.formatter` aceita, o que cada um muda, e como o editor e o
+  comando concordam num único layout.
+
 ## 0.19.7 - 2026-08-31
 
 ### Adicionado
