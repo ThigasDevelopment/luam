@@ -1,6 +1,7 @@
 import type { PhaseDuration } from '@cli/build/build-phase';
 import { readDependencyContracts } from '@cli/build/contract-files';
 import { readHelperSource } from '@cli/build/helper-files';
+import { resolveLibraries } from '@cli/build/library-resolution';
 import { createPhaseTracker, type PhaseTracker } from '@cli/build/phase-tracker';
 import { readProjectInputs, type ProjectInputs } from '@cli/build/project-inputs';
 import { discoverSources } from '@cli/build/source-discovery';
@@ -10,6 +11,7 @@ import { projectDeclarations } from '@compiler/checker/project-declarations';
 import type { FileDiagnostic, ProjectFile, ProjectStats } from '@compiler/project/module';
 import { createProjectCache, type ProjectCache } from '@compiler/project/project-cache';
 import { buildResourceAbi, type ResourceAbi } from '@compiler/project/export-abi';
+import type { LibraryFile } from '@compiler/project/library';
 import type { AssemblyStep } from '@compiler/project/progress';
 import {
     assembleResource,
@@ -63,6 +65,7 @@ function resourceOptions(
     minMtaVersion: string | null,
     developmentLogs: LuamConfig['development']['logs'] | null,
     layout: OutputLayout,
+    libraryFiles: readonly LibraryFile[],
 ): ResourceOptions {
     const options: ResourceOptions = {
         oop: config.compilerOptions.oop,
@@ -72,6 +75,7 @@ function resourceOptions(
         configuration: inputs.configuration,
         environmentFile: config.environment.file,
         loadOrder: config.loadOrder,
+        libraryFiles,
         minMtaVersion,
         developmentLogs,
         layout,
@@ -129,9 +133,11 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
     const excluded = [config.outDir, config.contracts];
     const sources = discoverSources(root, config.sources, excluded);
     const inputs = readProjectInputs(root, { assets: config.assets, environment: config.environment, excluded });
-    const files = [...sources.files, ...(options.additionalFiles ?? [])].sort((left, right) => left.path.localeCompare(right.path));
+    const libraries = resolveLibraries(root, config.libraries);
+    const projectFiles = [...sources.files, ...(options.additionalFiles ?? [])].sort((left, right) => left.path.localeCompare(right.path));
+    const files = [...libraries.files, ...projectFiles];
     const contracts = readDependencyContracts(root, config);
-    const diagnostics = [...sources.diagnostics, ...inputs.diagnostics, ...contracts.diagnostics];
+    const diagnostics = [...sources.diagnostics, ...inputs.diagnostics, ...libraries.diagnostics, ...contracts.diagnostics];
 
     if (hasCliErrors(diagnostics)) {
         tracker.end('failed');
@@ -166,7 +172,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     const assembly = assembleResource(
         project,
-        resourceOptions(config, inputs, options.minMtaVersion ?? null, options.developmentLogs ?? null, options.layout ?? 'tree'),
+        resourceOptions(config, inputs, options.minMtaVersion ?? null, options.developmentLogs ?? null, options.layout ?? 'tree', libraries.verbatim),
         (step: AssemblyStep) => {
             if (step === 'assembly') {
                 tracker.begin('manifest');

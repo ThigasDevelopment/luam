@@ -1,5 +1,7 @@
 packages:
   - 'packages/*'
   - 'tools/*'
+  - 'examples/library'
+  - 'docs/snippets/using-a-library'
 allowBuilds:
   esbuild: true

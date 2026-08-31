@@ -62,6 +62,10 @@ export function readDependencies(value: ManifestObject): string[] {
     return [...new Set(readStrings(value, 'dependencies'))].sort();
 }
 
+export function readLibraries(value: ManifestObject): string[] {
+    return readStrings(value, 'libraries');
+}
+
 export function readEngine(value: ManifestObject): EngineRequirement {
     const source = readTable(value, 'engine') ?? EMPTY;
 

@@ -373,3 +373,53 @@ resultado é `string`. É a mesma inferência que as
 [classes genéricas](/pt-br/language/classes#parametros-de-tipo) e as
 [funções genéricas](/pt-br/language/functions#funcoes-genericas) compartilham, e
 é a regra que a ADR-032 registrou, não uma que isto acrescenta.
+
+## Requisitos de biblioteca são nomeados, nunca resolvidos
+
+**Decisão de projeto.** Registrada na
+[ADR-038](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/038-library-distribution.md).
+
+O Luam compila os pacotes que `libraries` nomeia e para por aí. Uma biblioteca
+declara o que precisa na própria lista `requires`, e um requisito que o consumidor
+não listou é `config-library-requirement-missing`, nomeando o pacote e o comando
+de instalação — ele nunca é instalado, e os requisitos dele não são percorridos.
+
+A razão é o namespace plano do Lua. Duas versões de uma mesma biblioteca não
+coexistem em um resource, então um resolvedor gastaria toda a sua superfície
+produzindo conflitos que não teria como resolver. O gerenciador de pacotes segue
+instalando o grafo inteiro; o Luam apenas se recusa a adivinhar que partes dele
+entram no build.
+
+Uma biblioteca com três requisitos faz o consumidor listar quatro pacotes, um
+diagnóstico de cada vez.
+
+## Uma colisão de biblioteca é reportada, não resolvida
+
+**Decisão de projeto.** Registrada na
+[ADR-038](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/038-library-distribution.md).
+
+Todo nome de nível superior que uma biblioteca declara vira uma global no resource
+consumidor. Duas bibliotecas que declaram um nome no mesmo lado, ou uma biblioteca
+e um arquivo do projeto que façam isso, são `project-library-collision`.
+
+O Luam não cria namespace, alias nem renomeia para as duas caberem. O Lua 5.1 tem
+uma única tabela global por lado, e renomear mudaria o significado dos arquivos da
+própria biblioteca. O reparo é do consumidor: parar de usar uma das duas, ou pedir
+ao autor da biblioteca que qualifique os nomes dela.
+
+Uma biblioteca que declara um nome que a API do MTA define é
+`project-library-shadows-api`, um warning e não um erro, porque envolver uma
+função do MTA é algo legítimo para uma biblioteca fazer.
+
+## Uma biblioteca publica código, não assets
+
+**Decisão de projeto.** Registrada na
+[38.04](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/38.04-library-vendoring.md).
+
+O campo `luam` de uma biblioteca nomeia padrões de código, e o build grava o que
+eles casam: `.luam` compilado, `.lua` copiado, `.d.luam` apagado. Uma imagem, uma
+fonte ou um `.fx` dentro do pacote não é copiado para o resource, e não existe um
+mapeamento no estilo `assets` do lado da biblioteca.
+
+Um projeto que precisa de um asset da biblioteca o copia pelo próprio domínio
+`assets`, onde o destino é revisável no manifesto que é dono do build.

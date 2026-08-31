@@ -59,6 +59,7 @@ writes nothing.
 | --- | --- | --- |
 | `env-conflicting-directive` | error | Two different `#!` environment directives in one file. |
 | `env-path-directive-conflict` | warning | The directive disagrees with the path. The directive wins. |
+| `env-library-directive` | error | A `#!` directive inside a library file disagrees with the side the library declares. |
 
 ## Checker — types
 
@@ -174,6 +175,10 @@ writes nothing.
 | `project-duplicate-export` | Two files export the same name. |
 | `project-duplicate-output` | Two sources would produce the same output path. |
 | `project-load-order-missing` | A `loadOrder` entry matches no file or asset. |
+| `project-load-order-library` | A `loadOrder` entry names a library file. Library scripts load in the order `libraries` declares. |
+| `project-library-collision` | Two libraries, or a library and a project file, declare one global on one side. |
+| `project-library-shadows-api` | A library declares a name the MTA API defines. Reported as a warning. |
+| `project-library-project-reference` | A library file uses a global the project declares. A library sees only its own files. |
 | `project-bundle-toplevel-return` | A bundled module ends with a top-level `return`. Remove it or select tree output. |
 | `project-bundle-output-collision` | A source or asset produces a reserved bundle path. Rename it or select tree output. |
 
@@ -209,6 +214,11 @@ writes nothing.
 | `config-missing-asset` | A literal `assets` entry names a file that does not exist. |
 | `config-output-collision` | Two assets land on the same destination, or one would overwrite a generated path. |
 | `config-invalid-dependency` | A `dependencies` entry is not a valid resource name, or names this resource. |
+| `config-library-missing` | A `libraries` entry names a package that is not installed. The message names the install command. |
+| `config-library-invalid` | A `libraries` entry is not a package name, or the package declares no usable `luam` field. |
+| `config-library-duplicate` | The same package is listed twice in `libraries`. |
+| `config-library-escape` | A library source pattern resolves outside the package directory. |
+| `config-library-requirement-missing` | A resolved library requires a package `libraries` does not list. |
 | `config-invalid-engine-version` | `engine.minVersion` is neither `'latest'` nor a version. |
 | `config-missing-env-file` | A configured `environment` file does not exist. |
 | `config-unknown-helper` | `helpers` names a helper that does not exist. |

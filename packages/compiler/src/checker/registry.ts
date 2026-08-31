@@ -20,6 +20,7 @@ export interface ClassInfo {
     typeParameters: readonly string[];
     typeConstraints: readonly (Type | null)[];
     superClass: string | null;
+    hasUnresolvedParent?: boolean;
     superArguments: readonly Type[];
     interfaces: string[];
     members: Map<string, MemberInfo>;

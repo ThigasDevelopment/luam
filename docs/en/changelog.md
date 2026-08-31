@@ -9,6 +9,24 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.7 - 2026-08-31
+
+### Added
+
+- [Libraries](/en/tooling/libraries) describes the whole model: installing and
+  listing a package, the `luam` field a library declares, the one-way
+  visibility rule, the flat namespace every library name lands in, and where the
+  vendored output goes in both layouts.
+- [Using a library](/en/recipes/using-a-library) builds a project against the
+  example library end to end.
+- [.luam.manifest](/en/tooling/luam-manifest#libraries) and
+  [Configuration fields](/en/reference/configuration-fields) document the
+  `libraries` domain, and both state how it differs from `dependencies`.
+- [Diagnostics](/en/reference/diagnostics) lists the library codes, and
+  [Limitations](/en/reference/limitations) records three boundaries: requirements
+  are named rather than resolved, collisions are reported rather than resolved,
+  and a library ships code rather than assets.
+
 ## 0.19.6 - 2026-08-31
 
 ### Added

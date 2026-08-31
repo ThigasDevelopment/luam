@@ -11,6 +11,24 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.7 - 2026-08-31
+
+### Adicionado
+
+- [Bibliotecas](/pt-br/tooling/libraries) descreve o modelo inteiro: instalar e
+  listar um pacote, o campo `luam` que uma biblioteca declara, a visibilidade de
+  mão única, o namespace plano em que todo nome de biblioteca cai e onde a saída
+  embutida vai parar nos dois layouts.
+- [Usando uma biblioteca](/pt-br/recipes/using-a-library) monta um projeto com a
+  biblioteca de exemplo de ponta a ponta.
+- [.luam.manifest](/pt-br/tooling/luam-manifest#libraries) e
+  [Campos de configuração](/pt-br/reference/configuration-fields) documentam o
+  domínio `libraries`, e os dois dizem como ele difere de `dependencies`.
+- [Diagnósticos](/pt-br/reference/diagnostics) lista os códigos de biblioteca, e
+  [Limitações](/pt-br/reference/limitations) registra três fronteiras: requisitos
+  são nomeados e não resolvidos, colisões são reportadas e não resolvidas, e uma
+  biblioteca publica código e não assets.
+
 ## 0.19.6 - 2026-08-31
 
 ### Adicionado

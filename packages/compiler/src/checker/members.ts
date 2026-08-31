@@ -1,4 +1,5 @@
-import type { CallExpression, MemberExpression } from '@compiler/parser/ast';
+import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
+import type { CallExpression, Expression, MemberExpression } from '@compiler/parser/ast';
 import type { NewExpression } from '@compiler/parser/declaration-nodes';
 import { findLibraryMember, isLibrary } from '@mta-types/library-members';
 
@@ -10,6 +11,8 @@ import type { MemberInfo } from './registry';
 import { checkExpression, checkSignature } from './expressions';
 import { substituteType } from './type-substitution';
 import { ANY_TYPE, createNamed, NUMBER_TYPE, type FunctionType, type NamedType, type RecordType, type Type } from './types';
+
+const SELF_RECEIVER = 'self';
 
 function checkEnumMember(context: CheckContext, name: string, members: readonly string[], expression: MemberExpression): Type {
     if (members.includes(expression.property)) {
@@ -100,6 +103,47 @@ export function resolveStaticMember(context: CheckContext, className: string, ex
     return ANY_TYPE;
 }
 
+function isFullyDeclared(context: CheckContext, className: string): boolean {
+    const visited = new Set<string>();
+
+    let current = context.declarations.lookupClass(className);
+
+    while (current !== null && !visited.has(current.name)) {
+        visited.add(current.name);
+
+        if (current.hasUnresolvedParent === true || current.interfaces.some((name) => context.declarations.lookupInterface(name) === null)) {
+            return false;
+        }
+
+        if (current.superClass === null) {
+            return true;
+        }
+
+        current = context.declarations.lookupClass(current.superClass);
+    }
+
+    return current !== null;
+}
+
+function isSelfReceiver(receiver: Expression): boolean {
+    return receiver.kind === 'identifier' && receiver.name === SELF_RECEIVER;
+}
+
+function reportUnknownClassMember(context: CheckContext, className: string, property: string, position: SourcePosition): void {
+    const names = context.declarations.collectMembers(className).map((member) => `"${member.name}"`);
+    const known = names.length === 0 ? 'It declares no members.' : `Declared members: ${names.join(', ')}.`;
+
+    context.report('check-unknown-member', `Class "${className}" has no member "${property}". ${known}`, position);
+}
+
+function checkClassMember(context: CheckContext, className: string, expression: MemberExpression): Type {
+    if (!isSelfReceiver(expression.object)) {
+        reportUnknownClassMember(context, className, expression.property, expression.position);
+    }
+
+    return ANY_TYPE;
+}
+
 export function resolveNamedMember(context: CheckContext, receiver: NamedType, expression: MemberExpression): Type | null {
     const name = receiver.name;
     const enumeration = context.declarations.lookupEnum(name);
@@ -136,7 +180,11 @@ export function resolveNamedMember(context: CheckContext, receiver: NamedType, e
         return ANY_TYPE;
     }
 
-    const contract = context.declarations.lookupClass(name) === null ? context.declarations.lookupInterface(name) : null;
+    if (context.declarations.lookupClass(name) !== null) {
+        return isFullyDeclared(context, name) ? checkClassMember(context, name, expression) : null;
+    }
+
+    const contract = context.declarations.lookupInterface(name);
 
     if (contract === null) {
         return null;
@@ -145,6 +193,43 @@ export function resolveNamedMember(context: CheckContext, receiver: NamedType, e
     const members = new Map(context.declarations.collectMembers(name).map((member) => [member.name, member]));
 
     return checkInterfaceMember(context, name, members, expression);
+}
+
+export function reportUnknownMethod(context: CheckContext, receiver: NamedType, callee: Expression, method: string, position: SourcePosition): void {
+    const name = receiver.name;
+
+    if (context.declarations.lookupEnum(name) !== null || context.awaitsDeclaration(name) || isSelfReceiver(callee)) {
+        return;
+    }
+
+    const staticMember = context.declarations.lookupStaticMember(name, method);
+
+    if (staticMember !== null) {
+        const message = `"${method}" is a static member of class "${name}". Call it as "${name}.${method}(...)".`;
+
+        context.report('check-static-receiver', message, position);
+
+        return;
+    }
+
+    if (context.declarations.lookupClass(name) !== null) {
+        if (isFullyDeclared(context, name)) {
+            reportUnknownClassMember(context, name, method, position);
+        }
+
+        return;
+    }
+
+    if (context.declarations.lookupInterface(name) === null) {
+        return;
+    }
+
+    const keys = context.declarations
+        .collectMembers(name)
+        .map((member) => `"${member.name}"`)
+        .join(', ');
+
+    context.report('check-unknown-member', `Interface "${name}" has no member "${method}". Declared members: ${keys}.`, position);
 }
 
 export const NATIVE_CONSTRUCTOR = 'new';

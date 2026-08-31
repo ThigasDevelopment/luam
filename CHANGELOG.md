@@ -14,6 +14,35 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.7 - 2026-08-31
+
+### Added
+
+- A Luam library is an npm package, listed in the new `libraries` manifest
+  domain and compiled into the resource that names it. The compiler resolves the
+  package from `node_modules`, reads the layout its `package.json` declares in a
+  `luam` field, checks its sources with the project, and vendors the output to
+  `libs/<package>/<environment>/` in tree layout or into the environment bundle
+  ahead of the project's own modules. Nothing is fetched: installing is the
+  developer's step, and a build with a populated `node_modules` and no network
+  produces the same output. A missing package is `config-library-missing`, naming
+  the install command; a malformed `luam` field, a duplicate entry, an escaping
+  pattern and an unlisted `requires` entry each have their own diagnostic. Two
+  libraries claiming one global on one side are `project-library-collision`, a
+  library claiming an MTA name is the warning `project-library-shadows-api`, and
+  a library that reads a project global is `project-library-project-reference`.
+  The editor resolves libraries the same way, so the CLI and the LSP agree.
+
+### Fixed
+
+- A call to a method a class does not declare is reported. `adapter:query(...)`
+  on a class with no `query` compiled clean, and the failure moved to the
+  server, where a nil call says nothing about which name was wrong. Member
+  resolution now answers for a class value and for a typed field that holds one,
+  walking the parent chain before deciding, so an inherited member is found
+  rather than reported, and the message names the members the class does
+  declare.
+
 ## 0.19.6 - 2026-08-31
 
 ### Added

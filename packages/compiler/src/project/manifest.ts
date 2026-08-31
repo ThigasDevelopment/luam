@@ -26,6 +26,10 @@ export function occupiedSides(contribution: ExportContribution): readonly Enviro
     return OCCUPIED_SIDES[contribution.side];
 }
 
+export function sidesOf(environment: Environment): readonly Environment[] {
+    return OCCUPIED_SIDES[environment];
+}
+
 export function exportSignature(type: Type | undefined): ExportSignature | null {
     if (type === undefined || type.kind !== 'function') {
         return null;
@@ -61,7 +65,7 @@ export interface ManifestOptions {
     dependencies?: readonly string[];
 }
 
-export type ScriptGroup = 'library' | 'configuration' | 'source';
+export type ScriptGroup = 'library' | 'libraries' | 'configuration' | 'source';
 
 export interface ManifestScript {
     src: string;
@@ -81,10 +85,11 @@ const DEFAULT_SIDE: Environment = 'server';
 
 const SIDE_ORDER: Readonly<Record<Environment, number>> = { shared: 0, server: 1, client: 2 };
 
-const SCRIPT_GROUPS: readonly ScriptGroup[] = ['library', 'configuration', 'source'];
+const SCRIPT_GROUPS: readonly ScriptGroup[] = ['library', 'libraries', 'configuration', 'source'];
 
 const GROUP_COMMENTS: Readonly<Record<ScriptGroup, string>> = {
     library: 'Runtime library',
+    libraries: 'Libraries',
     configuration: 'Configuration',
     source: 'Source scripts',
 };

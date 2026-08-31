@@ -1,0 +1,9 @@
+{
+    "name": "luam-docs-using-a-library",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@luam-example/collections": "workspace:*"
+    }
+}

@@ -40,12 +40,14 @@ export function collectBundles(
     helpers: readonly ResourceHelper[],
     scripts: readonly ResourceScript[],
     pinned: readonly ResourceScript[],
+    libraries: readonly ResourceScript[] = [],
 ): ResourceBundle[] {
     const pinnedPaths = new Set(pinned.map((script) => script.path));
 
     return ENVIRONMENTS.flatMap((environment): ResourceBundle[] => {
         const environmentHelpers = helpers.filter((helper) => helper.environment === environment).map((helper): BundleMember => ({ kind: 'helper', helper }));
         const orderedModules = [
+            ...libraries.filter((script) => script.environment === environment),
             ...pinned.filter((script) => script.environment === environment),
             ...scripts.filter((script) => script.environment === environment && !pinnedPaths.has(script.path)),
         ].map((module): BundleMember => ({ kind: 'module', module }));

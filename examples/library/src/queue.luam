@@ -1,0 +1,17 @@
+class Queue {
+    items: string[] = {}
+
+    push = function (item: string): void
+        self.items[#self.items + 1] = item
+    end
+
+    size = function (): number
+        return #self.items
+    end
+
+    describe = function (): string
+        local total: number = self.size()
+
+        return `queue with ${total} items`
+    end
+}

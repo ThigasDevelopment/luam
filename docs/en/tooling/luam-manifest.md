@@ -27,6 +27,7 @@ assets = {
 }
 
 dependencies = { 'scoreboard' }
+libraries = { '@luam-example/collections' }
 
 engine = {
     minVersion = '1.6.0',
@@ -168,6 +169,7 @@ single implemented consumer, so a field never means two things in two places.
 | `sources` | Which files belong to the project and to which environment. |
 | `assets` | Which files are copied into the resource and where they land. |
 | `dependencies` | Resources this one requires at run time. |
+| `libraries` | Luam library packages compiled into this resource. |
 | `engine` | The MTA version the resource requires. |
 | `environment` | Which `.env` files supply `env` and `process.env`. |
 | output | `outDir`, `loadOrder`, `output`, `helpers`. |
@@ -252,6 +254,43 @@ the named resource first. Names are deduplicated and sorted. A value that is not
 a valid resource name, or that names this resource, is
 `config-invalid-dependency`. Optional dependencies are not supported — MTA has no
 such concept.
+
+## `libraries`
+
+```luam
+libraries = { '@luam-example/collections', 'mta-async' }
+```
+
+Each entry names an installed npm package that ships Luam source, described in
+[Libraries](/en/tooling/libraries). The compiler reads the package from
+`node_modules`, compiles it as part of this project, and vendors the result into
+the resource under `libs/`.
+
+The order is the emission order: libraries are written after the runtime library
+and before `config.lua`, the pinned `loadOrder` entries and the source wildcards,
+in the order this list declares.
+
+Nothing is implicit and nothing is fetched. A package installed but absent from
+this list is not compiled; a package listed but not installed is
+`config-library-missing`, which names the install command and leaves the output
+untouched. Installing is the developer's step — `npm install`, `pnpm add`, or
+whatever the project already uses — and a build with a populated `node_modules`
+and no network succeeds.
+
+::: tip `libraries` or `dependencies`?
+They answer different questions.
+
+- `libraries` **obtains code**. The package is compiled into this resource and
+  ships inside it, so its functions and classes are ordinary globals here.
+- `dependencies` **names another resource** that must be running. It is written
+  as `<include>` in `meta.xml`, and its code stays in its own resource, reached
+  through the [export contract](/en/language/exports).
+
+A pure module is a library. A stateful service is a resource with exports.
+:::
+
+A value that is not an npm package name is `config-library-invalid`, and the same
+package listed twice is `config-library-duplicate`.
 
 ## `engine`
 

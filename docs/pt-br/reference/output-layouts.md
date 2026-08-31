@@ -74,14 +74,21 @@ my-resource/
 ├── lib/
 │   ├── class.lua
 │   └── string.lua
+├── libs/
+│   └── luam-example-collections/
+│       └── shared/src/queue.lua
 └── src/
     ├── shared/labels.lua
     ├── server/greet.lua
     └── client/hud.lua
 ```
 
-O manifesto lista helpers, `config.lua`, entradas fixadas por `loadOrder` e então
-os grupos de código. Este é o formato normal do `ensure` e fixo do `dev`, pois um
+Uma [biblioteca](/pt-br/tooling/libraries) que o manifesto lista é gravada sob
+`libs/`, um diretório por pacote com o nome com escopo achatado, e a árvore de
+código dela por baixo do lado que ela declara.
+
+O manifesto lista helpers, scripts de biblioteca, `config.lua`, entradas fixadas
+por `loadOrder` e então os grupos de código. Este é o formato normal do `ensure` e fixo do `dev`, pois um
 resource em execução permanece fácil de inspecionar. Use
 `luam build --no-bundle` quando um build local também precisar desse formato.
 

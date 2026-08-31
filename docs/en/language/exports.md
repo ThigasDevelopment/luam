@@ -14,6 +14,13 @@ end
 <export function="getScore" type="server" http="false" />
 ```
 
+::: tip Sharing code, not calls
+An export is a run-time boundary between two deployed resources: the code stays
+where it is and a call crosses to it. To *obtain* code and ship it inside this
+resource, the answer is a [library](/en/tooling/libraries). A stateful service is
+a resource with exports; a pure module is a library.
+:::
+
 ## Calling an export
 
 From another resource, in plain Lua:

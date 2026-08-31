@@ -62,6 +62,7 @@ export interface AnalysisInput {
     project?: ProjectDeclarations;
     compilerOptions?: CompilerOptions;
     environment?: Environment | null;
+    environmentLocked?: boolean;
     env?: Readonly<Record<string, string>>;
     ambient?: (environment: Environment) => AmbientDeclarations;
 }
@@ -78,7 +79,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
     const compilerOptions = input.compilerOptions ?? DEFAULT_COMPILER_OPTIONS;
     const parsed = parse(input.text);
     const mode = resolveStrictMode(parsed.directives, compilerOptions.strict);
-    const resolved = resolveEnvironment(input.path, parsed.directives, input.environment ?? null);
+    const resolved = resolveEnvironment(input.path, parsed.directives, input.environment ?? null, input.environmentLocked === true);
     const project = input.project ?? EMPTY_PROJECT_DECLARATIONS;
     const ambient = input.ambient?.(resolved.environment) ?? EMPTY_AMBIENT;
     const checked = check(parsed.program, mode, resolved.environment, {

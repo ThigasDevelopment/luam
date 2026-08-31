@@ -27,6 +27,7 @@ assets = {
 }
 
 dependencies = { 'scoreboard' }
+libraries = { '@luam-example/collections' }
 
 engine = {
     minVersion = '1.6.0',
@@ -168,6 +169,7 @@ dois lugares.
 | `sources` | Quais arquivos pertencem ao projeto e a qual ambiente. |
 | `assets` | Quais arquivos são copiados para o resource e onde eles ficam. |
 | `dependencies` | Resources que este exige em tempo de execução. |
+| `libraries` | Pacotes de biblioteca Luam compilados dentro deste resource. |
 | `engine` | A versão do MTA que o resource exige. |
 | `environment` | Quais arquivos `.env` alimentam `env` e `process.env`. |
 | saída | `outDir`, `loadOrder`, `output`, `helpers`. |
@@ -248,6 +250,42 @@ resource nomeado primeiro. Os nomes são deduplicados e ordenados. Um valor que 
 é um nome de resource válido, ou que nomeia este resource, é
 `config-invalid-dependency`. Dependências opcionais não são suportadas — o MTA não
 tem esse conceito.
+
+## `libraries`
+
+```luam
+libraries = { '@luam-example/collections', 'mta-async' }
+```
+
+Cada entrada nomeia um pacote npm instalado que publica código Luam, descrito em
+[Bibliotecas](/pt-br/tooling/libraries). O compilador lê o pacote em
+`node_modules`, compila junto com este projeto e grava o resultado dentro do
+resource, sob `libs/`.
+
+A ordem é a ordem de emissão: bibliotecas são escritas depois da biblioteca de
+runtime e antes de `config.lua`, das entradas fixadas em `loadOrder` e dos
+curingas de código, na ordem que esta lista declara.
+
+Nada é implícito e nada é baixado. Um pacote instalado mas ausente desta lista não
+é compilado; um pacote listado mas não instalado é `config-library-missing`, que
+nomeia o comando de instalação e não escreve nada. Instalar é passo do
+desenvolvedor — `npm install`, `pnpm add`, ou o que o projeto já usa — e um build
+com `node_modules` preenchido e sem rede funciona igual.
+
+::: tip `libraries` ou `dependencies`?
+Elas respondem perguntas diferentes.
+
+- `libraries` **obtém código**. O pacote é compilado dentro deste resource e
+  viaja com ele, então suas funções e classes são globais comuns aqui.
+- `dependencies` **nomeia outro resource** que precisa estar rodando. Vira
+  `<include>` no `meta.xml`, e o código continua no resource dele, alcançado pelo
+  [contrato de exports](/pt-br/language/exports).
+
+Um módulo puro é uma biblioteca. Um serviço com estado é um resource com exports.
+:::
+
+Um valor que não é nome de pacote npm é `config-library-invalid`, e o mesmo pacote
+listado duas vezes é `config-library-duplicate`.
 
 ## `engine`
 

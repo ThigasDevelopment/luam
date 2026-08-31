@@ -4,16 +4,19 @@ import type { RuntimeHelper } from '@compiler/emitter/state';
 import type { SourceLineMapping } from '@compiler/emitter/source-map';
 import type { Environment } from '@compiler/environment/environment';
 
+import type { LibraryOrigin } from './library';
 import type { ManifestContribution } from './manifest';
 
 export interface ProjectFile {
     path: string;
     source: string;
     environment?: Environment;
+    origin?: LibraryOrigin;
 }
 
 export interface CompiledModule {
     path: string;
+    origin: LibraryOrigin | null;
     environment: Environment;
     isDeclaration: boolean;
     code: string | null;

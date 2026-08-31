@@ -9,7 +9,7 @@ import type { ResourceAbi } from './export-abi';
 import { fingerprintByName, fingerprintDeclarations, hashString } from './fingerprint';
 import { toContributions } from './manifest';
 import { sortFileDiagnostics, type CompiledModule, type FileDiagnostic, type ProjectFile, type ProjectResult } from './module';
-import { validateContributions, validateModuleReferences } from './module-graph';
+import { validateContributions, validateLibraryApiShadowing, validateLibraryGlobals, validateModuleReferences } from './module-graph';
 import type { ProgressReporter } from './progress';
 import { isDeclarationPath, isTestPath } from './source-kind';
 
@@ -55,6 +55,7 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
     const result = compile(file.source, {
         filePath: file.path,
         ...(file.environment === undefined ? {} : { environment: file.environment }),
+        environmentLocked: file.origin !== undefined,
         ambient,
         contracts: context.contracts,
         project: isTestPath(file.path) ? context.testProject : context.project,
@@ -65,6 +66,7 @@ function compileModule(file: ProjectFile, ambient: AmbientDeclarations, context:
 
     return {
         path: file.path,
+        origin: file.origin ?? null,
         environment: result.environment,
         isDeclaration: isDeclarationPath(file.path),
         code: result.code,
@@ -98,7 +100,7 @@ export function createProjectCache(): ProjectCache {
     const moduleCache = new Map<string, ModuleEntry>();
 
     function declarationsFor(file: ProjectFile, options: CompilerOptions, reused: { count: number }): DeclarationEntry {
-        const hash = hashString(`${file.environment ?? ''}|${optionsKey(options)}|${file.source}`);
+        const hash = hashString(`${file.environment ?? ''}|${file.origin?.root ?? ''}|${optionsKey(options)}|${file.source}`);
         const cached = declarationCache.get(file.path);
 
         if (cached !== undefined && cached.hash === hash) {
@@ -110,11 +112,13 @@ export function createProjectCache(): ProjectCache {
         const result = compile(file.source, {
             filePath: file.path,
             ...(file.environment === undefined ? {} : { environment: file.environment }),
+            environmentLocked: file.origin !== undefined,
             compilerOptions: options,
             emitCode: false,
         });
         const entry: DeclarationEntry = {
             path: file.path,
+            isLibrary: file.origin !== undefined,
             hash,
             environment: result.environment,
             declarations: result.declarations,
@@ -176,7 +180,8 @@ export function createProjectCache(): ProjectCache {
             });
             const references = validateModuleReferences(modules);
             const contributions = validateContributions(modules);
-            const collectedDiagnostics = sortFileDiagnostics([...flattenDiagnostics(modules), ...references, ...contributions]);
+            const libraries = [...validateLibraryGlobals(modules), ...validateLibraryApiShadowing(modules)];
+            const collectedDiagnostics = sortFileDiagnostics([...flattenDiagnostics(modules), ...references, ...contributions, ...libraries]);
             const diagnostics = compilerOptions.warningsAsErrors ? promoteWarnings(collectedDiagnostics) : collectedDiagnostics;
             const paths = new Set(files.map((file) => file.path));
 

@@ -12,8 +12,9 @@ import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-a
 import { declaredNames, dependentsOf } from './analysis-graph';
 import { pathKey, pathToUri, relativeToRoots, uriToPath } from './document-uri';
 import { forgetEnvironments, isEnvironmentPath, loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
+import { EMPTY_LIBRARY_INDEX, loadLibraries, type LibraryIndex } from './library-index';
 import { DEFAULT_PROJECT_SETTINGS, settingsFrom, settingsKey, type ProjectSettings } from './project-settings';
-import { scanSources } from './source-scanner';
+import { scanSources, type ScannedFile } from './source-scanner';
 
 export interface RescanResult {
     updated: DocumentAnalysis[];
@@ -31,17 +32,21 @@ export class WorkspaceIndex {
 
     private settings: ProjectSettings = DEFAULT_PROJECT_SETTINGS;
 
+    private libraries: LibraryIndex = EMPTY_LIBRARY_INDEX;
+
     private key = '';
 
-    private ambientFor(uri: string, environment: Environment): AmbientDeclarations {
-        const visible = this.others(uri).filter((analysis) => canReference(environment, analysis.environment) && !isTestPath(analysis.relative));
+    private ambientFor(uri: string, environment: Environment, isLibrary: boolean): AmbientDeclarations {
+        const others = this.others(uri).filter((analysis) => canReference(environment, analysis.environment) && !isTestPath(analysis.relative));
+        const visible = isLibrary ? others.filter((analysis) => this.libraries.isLibraryPath(analysis.path)) : others;
 
         return mergeAmbient(visible.map((analysis) => analysis.own));
     }
 
     private run(uri: string, version: number, text: string): DocumentAnalysis {
         const path = uriToPath(uri);
-        const relative = relativeToRoots(path, this.roots);
+        const library = this.libraries.fileFor(path);
+        const relative = library === null ? relativeToRoots(path, this.roots) : library.relative;
         const analysis = analyzeDocument({
             uri,
             path,
@@ -51,8 +56,9 @@ export class WorkspaceIndex {
             project: isTestPath(relative) ? { globals: [...this.project.globals, ...TEST_DECLARATIONS] } : this.project,
             env: this.env,
             compilerOptions: this.settings.compilerOptions,
-            environment: this.settings.resolver.side(relative),
-            ambient: (environment) => this.ambientFor(uri, environment),
+            environment: library === null ? this.settings.resolver.side(relative) : library.environment,
+            environmentLocked: library !== null,
+            ambient: (environment) => this.ambientFor(uri, environment, library !== null),
         });
 
         this.analyses.set(pathKey(path), analysis);
@@ -87,9 +93,27 @@ export class WorkspaceIndex {
 
         this.settings = settings;
         this.key = key;
+        this.libraries = this.loadLibraryIndex();
         this.loadEnvironment();
 
         return true;
+    }
+
+    private loadLibraryIndex(): LibraryIndex {
+        const manifest = this.manifest();
+
+        if (manifest === null || this.settings.libraries.length === 0) {
+            return EMPTY_LIBRARY_INDEX;
+        }
+
+        return loadLibraries(dirname(manifest.path), this.settings.libraries);
+    }
+
+    private scanAll(): ScannedFile[] {
+        const own = scanSources(this.roots);
+        const libraries = scanSources(this.libraries.roots).filter((file) => this.libraries.isLibraryPath(file.path));
+
+        return [...own, ...libraries];
     }
 
     private rerunOthers(uri: string): DocumentAnalysis[] {
@@ -160,7 +184,7 @@ export class WorkspaceIndex {
             return { updated: this.refresh(), removed: [] };
         }
 
-        const scanned = scanSources(this.roots);
+        const scanned = this.scanAll();
         const present = new Set(scanned.map((file) => pathKey(file.path)));
         const names = new Set<string>();
         const removed: string[] = [];
@@ -226,7 +250,7 @@ export class WorkspaceIndex {
 
         const loaded: DocumentAnalysis[] = [];
 
-        for (const file of scanSources(roots)) {
+        for (const file of this.scanAll()) {
             if (this.analyses.has(pathKey(file.path))) {
                 continue;
             }
@@ -235,6 +259,12 @@ export class WorkspaceIndex {
         }
 
         this.applySettings();
+
+        for (const file of this.scanAll()) {
+            if (!this.analyses.has(pathKey(file.path))) {
+                loaded.push(this.run(pathToUri(file.path), 0, file.text));
+            }
+        }
 
         for (const analysis of loaded) {
             this.run(analysis.uri, analysis.version, analysis.text);

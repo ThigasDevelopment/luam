@@ -121,6 +121,12 @@ export const MANIFEST_FIELDS: readonly ManifestField[] = [
         owner: 'dependencies',
         allowEmpty: true,
     }),
+    field('libraries', STRING_LIST, 'Luam library packages compiled into the resource, in the order they are emitted.', {
+        defaultValue: [],
+        rule: 'package-name',
+        owner: 'libraries',
+        allowEmpty: true,
+    }),
     field('contracts', STRING_TYPE, 'Directory the export contract is written to and dependency contracts are read from.', {
         defaultValue: DEFAULT_CONTRACTS_DIR,
         rule: 'contained-path',

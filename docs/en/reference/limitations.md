@@ -365,3 +365,52 @@ result is `string`. This is the same inference the
 [generic classes](/en/language/classes#type-parameters) and the
 [generic functions](/en/language/functions#generic-functions) share, and it is
 the rule ADR-032 recorded rather than one this adds.
+
+## Library requirements are named, never resolved
+
+**Design boundary.** Recorded in
+[ADR-038](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/038-library-distribution.md).
+
+Luam compiles the packages `libraries` names and stops there. A library declares
+what it needs in its own `requires` list, and a requirement the consumer did not
+list is `config-library-requirement-missing`, naming the package and the install
+command — it is never installed, and its own requirements are not walked.
+
+The reason is the flat Lua namespace. Two versions of one library cannot coexist
+in a resource, so a resolver would spend its whole surface producing conflicts it
+has no way to settle. The package manager still installs the full graph; Luam
+simply refuses to guess which parts of it belong in the build.
+
+A library with three requirements therefore makes the consumer list four
+packages, one diagnostic at a time.
+
+## A library collision is reported, not resolved
+
+**Design boundary.** Recorded in
+[ADR-038](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/038-library-distribution.md).
+
+Every top-level name a library declares becomes a global in the consuming
+resource. Two libraries that declare one name on one side, or a library and a
+project file that do, are `project-library-collision`.
+
+Luam does not namespace, alias, or rename to make both fit. Lua 5.1 has one flat
+global table per side, and a rename would change what the library's own files
+mean. The repair belongs to the consumer: stop using one of the two, or ask the
+library author to qualify its names.
+
+A library that declares a name the MTA API defines is
+`project-library-shadows-api`, a warning rather than an error, because wrapping
+an MTA function is a legitimate thing for a library to do.
+
+## A library ships code, not assets
+
+**Design boundary.** Recorded in
+[38.04](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/38.04-library-vendoring.md).
+
+A library's `luam` field names source patterns, and the build vendors what those
+match: `.luam` compiled, `.lua` copied, `.d.luam` erased. An image, a font, or a
+`.fx` shipped inside the package is not copied into the resource, and no
+`assets`-style mapping exists on the library side.
+
+A project that needs a library's asset copies it in through its own `assets`
+domain, where the destination is reviewable in the manifest that owns the build.

@@ -88,7 +88,19 @@ function reportAssignedConflict(assigned: Environment, fromDirective: Environmen
     diagnostics.push(createDiagnostic('checker', 'env-path-directive-conflict', message, FILE_START, 'warning'));
 }
 
-export function resolveEnvironment(filePath: string | null, directives: readonly string[], fromMapping: Environment | null = null): EnvironmentResolution {
+function reportLockedConflict(assigned: Environment, fromDirective: Environment, diagnostics: Diagnostic[]): void {
+    const subject = `A library declares this file as "${assigned}" but the directive declares "${fromDirective}"`;
+    const message = `${subject}. A library declares its layout once, in the "luam" field of its "package.json". Remove the directive.`;
+
+    diagnostics.push(createDiagnostic('checker', 'env-library-directive', message, FILE_START));
+}
+
+export function resolveEnvironment(
+    filePath: string | null,
+    directives: readonly string[],
+    fromMapping: Environment | null = null,
+    locked = false,
+): EnvironmentResolution {
     const diagnostics: Diagnostic[] = [];
     const fromPath = filePath === null ? null : environmentFromPath(filePath);
     const found = collectDirectiveEnvironments(directives);
@@ -96,6 +108,14 @@ export function resolveEnvironment(filePath: string | null, directives: readonly
     const assigned = fromMapping ?? fromPath;
 
     reportConflictingDirectives(found, diagnostics);
+
+    if (locked && assigned !== null) {
+        if (fromDirective !== null && fromDirective !== assigned) {
+            reportLockedConflict(assigned, fromDirective, diagnostics);
+        }
+
+        return { environment: assigned, fromPath, fromMapping, fromDirective, diagnostics };
+    }
 
     if (assigned !== null && fromDirective !== null) {
         reportAssignedConflict(assigned, fromDirective, fromMapping !== null, diagnostics);

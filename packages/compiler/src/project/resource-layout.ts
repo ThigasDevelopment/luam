@@ -1,3 +1,4 @@
+import { compareLibraryOrigins, libraryFilePath, libraryOutputPath, type LibraryFile, type LibraryOrigin } from './library';
 import type { CompiledModule, FileDiagnostic } from './module';
 
 import { createDiagnostic } from '@compiler/diagnostics/diagnostic';
@@ -111,11 +112,41 @@ export function collectDevelopmentLogHelpers(options: DevelopmentLogHelpers | nu
     }));
 }
 
+function emitted(modules: readonly CompiledModule[]): (CompiledModule & { code: string })[] {
+    return modules.filter((module): module is CompiledModule & { code: string } => module.code !== null);
+}
+
 export function collectScripts(modules: readonly CompiledModule[]): ResourceScript[] {
-    return modules
-        .filter((module): module is CompiledModule & { code: string } => module.code !== null)
+    return emitted(modules)
+        .filter((module) => module.origin === null)
         .map((module) => ({ path: outputPath(module.path), source: module.path, environment: module.environment, content: module.code, lines: module.lines }))
         .sort((left, right) => ENVIRONMENT_ORDER[left.environment] - ENVIRONMENT_ORDER[right.environment] || left.path.localeCompare(right.path));
+}
+
+interface OrderedScript {
+    origin: LibraryOrigin;
+    script: ResourceScript;
+}
+
+function libraryScript(origin: LibraryOrigin, environment: Environment, content: string, lines: SourceLineMapping[]): OrderedScript {
+    const script = {
+        path: libraryOutputPath(origin.package, environment, origin.relativePath),
+        source: libraryFilePath(origin.package, origin.relativePath),
+        environment,
+        content,
+        lines,
+    };
+
+    return { origin, script };
+}
+
+export function collectLibraryScripts(modules: readonly CompiledModule[], files: readonly LibraryFile[] = []): ResourceScript[] {
+    const compiled = emitted(modules)
+        .filter((module) => module.origin !== null)
+        .map((module) => libraryScript(module.origin as LibraryOrigin, module.environment, module.code, module.lines));
+    const verbatim = files.map((file) => libraryScript(file.origin, file.environment, file.content, []));
+
+    return [...compiled, ...verbatim].sort((left, right) => compareLibraryOrigins(left.origin, right.origin)).map((entry) => entry.script);
 }
 
 export interface LoadOrder {
@@ -126,13 +157,25 @@ export interface LoadOrder {
 
 const MISSING_LOAD_ORDER = 'is listed in "loadOrder" but no source file or asset matches it. Remove the entry or correct the path.';
 
+const LIBRARY_LOAD_ORDER = 'is listed in "loadOrder" but belongs to a library. Library scripts load in the order "libraries" declares. Remove the entry.';
+
 function missingEntry(entry: string): FileDiagnostic {
     return { path: entry, diagnostic: createDiagnostic('project', 'project-load-order-missing', `"${entry}" ${MISSING_LOAD_ORDER}`, FILE_START) };
 }
 
-export function resolveLoadOrder(entries: readonly string[], scripts: readonly ResourceScript[], assets: readonly ResourceAsset[]): LoadOrder {
+function libraryEntry(entry: string): FileDiagnostic {
+    return { path: entry, diagnostic: createDiagnostic('project', 'project-load-order-library', `"${entry}" ${LIBRARY_LOAD_ORDER}`, FILE_START) };
+}
+
+export function resolveLoadOrder(
+    entries: readonly string[],
+    scripts: readonly ResourceScript[],
+    assets: readonly ResourceAsset[],
+    libraries: readonly ResourceScript[] = [],
+): LoadOrder {
     const byScript = new Map(scripts.map((script) => [normalizePath(script.source), script]));
     const byAsset = new Map(assets.map((asset) => [normalizePath(asset.source), asset]));
+    const byLibrary = new Set(libraries.map((script) => normalizePath(script.source)));
     const resolved: LoadOrder = { scripts: [], assets: [], diagnostics: [] };
     const seen = new Set<string>();
 
@@ -148,7 +191,7 @@ export function resolveLoadOrder(entries: readonly string[], scripts: readonly R
         seen.add(path);
 
         if (script === undefined && asset === undefined) {
-            resolved.diagnostics.push(missingEntry(entry));
+            resolved.diagnostics.push(byLibrary.has(path) ? libraryEntry(entry) : missingEntry(entry));
 
             continue;
         }

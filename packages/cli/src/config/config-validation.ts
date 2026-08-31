@@ -5,10 +5,11 @@ import {
     readDependencies,
     readEngine,
     readEnvironmentFiles,
+    readLibraries,
     readOutputSettings,
     readSourceMapping,
 } from '@compiler/manifest/manifest-contract';
-import { INVALID_DEPENDENCY } from '@compiler/manifest/manifest-diagnostics';
+import { DUPLICATE_LIBRARY, INVALID_DEPENDENCY } from '@compiler/manifest/manifest-diagnostics';
 import { readBoolean, readNumber, readString, readStrings, readTable } from '@compiler/manifest/manifest-readers';
 import type { PositionLookup } from '@compiler/manifest/manifest-rules';
 import type { ManifestObject } from '@compiler/manifest/manifest-value';
@@ -53,10 +54,23 @@ function checkDependencies(name: string, dependencies: readonly string[], contex
     }
 }
 
+function checkLibraries(libraries: readonly string[], context: ValidationContext): void {
+    const seen = new Set<string>();
+
+    for (const [index, library] of libraries.entries()) {
+        if (seen.has(library)) {
+            context.error(DUPLICATE_LIBRARY, `"libraries" lists "${library}" more than once. Keep one entry.`, `libraries.${index}`);
+        }
+
+        seen.add(library);
+    }
+}
+
 export function validateConfig(value: ManifestObject, positions: PositionLookup): ValidatedConfig {
     const context = new ValidationContext(positions);
     const name = readString(value, 'name') ?? '';
     const dependencies = readDependencies(value);
+    const libraries = readLibraries(value);
     const config: LuamConfig = {
         name,
         author: readString(value, 'author'),
@@ -66,6 +80,7 @@ export function validateConfig(value: ManifestObject, positions: PositionLookup)
         sources: readSourceMapping(value),
         assets: readAssetMappings(value),
         dependencies,
+        libraries,
         contracts: readString(value, 'contracts') ?? '',
         engine: readEngine(value),
         environment: readEnvironmentFiles(value),
@@ -79,6 +94,7 @@ export function validateConfig(value: ManifestObject, positions: PositionLookup)
     };
 
     checkDependencies(name, dependencies, context);
+    checkLibraries(libraries, context);
 
     return { config, diagnostics: context.diagnostics };
 }
