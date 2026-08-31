@@ -9,6 +9,13 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.12 - 2026-08-31
+
+### Changed
+
+- [APIs and events](/en/mta/apis-and-events) and [MTA](/en/mta/) report 221
+  events in the catalog, against 203.
+
 ## 0.19.11 - 2026-08-31
 
 ### Changed

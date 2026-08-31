@@ -11,6 +11,13 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.12 - 2026-08-31
+
+### Alterado
+
+- [APIs e eventos](/pt-br/mta/apis-and-events) e [MTA](/pt-br/mta/) informam 221
+  eventos no catálogo, contra 203.
+
 ## 0.19.11 - 2026-08-31
 
 ### Alterado

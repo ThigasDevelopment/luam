@@ -14,6 +14,36 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.12 - 2026-08-31
+
+### Added
+
+- The catalog declares 221 MTA events against 203. The 18 the editor did not
+  know include `onAccountCreate`, `onAccountRemove`, `onExplosion`, `onShutdown`,
+  `onPlayerTeamChange`, `onPlayerTeleport`, `onPlayerWeaponReload`,
+  `onResourceStateChange` and `onClientCoreCommand`. An event the catalog does
+  not declare has no handler signature, so every one of its parameters was
+  `any`.
+
+### Fixed
+
+- Event handler parameters are read from the MTA wiki rather than from the
+  frozen upstream declarations, so a parameter carries the type and the name the
+  wiki documents. `onChatMessage` gives its second parameter as `Element` rather
+  than `any`, and `onPlayerPickupHit`, `onPlayerPickupLeave` and
+  `onPlayerPickupUse` give theirs as `Pickup`.
+- Seven signatures were short of the parameters MTA passes. `onVehicleExplode`
+  declared none against the wiki's `withExplosion` and `player`; `onPlayerWasted`,
+  `onPedWasted` and `onClientPlayerWasted` were missing `animGroup` and `animID`;
+  `onDebugMessage` was missing `r`, `g` and `b`; `onPlayerPrivateMessage` was
+  missing `content`.
+- Four parameters carried names the wiki has renamed, which the generated
+  documentation then attached to the wrong argument: `isMain`, `loss`,
+  `bodypart` and `weapon` are now `isMainFrame`, `lossOrStealth`, `bodyPart` and
+  `weaponID`.
+- A wiki type spelled `double` maps to `number` instead of degrading to `any`,
+  which corrects `onClientSoundBeat`.
+
 ## 0.19.11 - 2026-08-31
 
 ### Fixed
