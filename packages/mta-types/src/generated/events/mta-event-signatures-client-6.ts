@@ -3,6 +3,30 @@ import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descri
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_6: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientPlayerTarget: fn(
+        [
+            named('Element'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'target',
+        ],
+    ),
+    onClientPlayerVehicleEnter: fn(
+        [
+            named('Vehicle'),
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theVehicle',
+            'seat',
+        ],
+    ),
     onClientPlayerVehicleExit: fn(
         [
             named('Vehicle'),
@@ -62,15 +86,19 @@ export const MTA_EVENT_SIGNATURES_CLIENT_6: Readonly<Record<string, FunctionDesc
             NUMBER,
             NUMBER,
             BOOLEAN,
+            NUMBER,
+            NUMBER,
         ],
         VOID,
-        4,
+        6,
         false,
         [
             'killer',
             'weapon',
             'bodypart',
             'stealth',
+            'animGroup',
+            'animID',
         ],
     ),
     onClientPlayerWeaponFire: fn(
@@ -194,39 +222,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_6: Readonly<Record<string, FunctionDesc
         false,
         [
             'didClearRenderTargets',
-        ],
-    ),
-    onClientSoundBeat: fn(
-        [
-            NUMBER,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'theTime',
-        ],
-    ),
-    onClientSoundChangedMeta: fn(
-        [
-            STRING,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'streamTitle',
-        ],
-    ),
-    onClientSoundFinishedDownload: fn(
-        [
-            NUMBER,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'length',
         ],
     ),
 };

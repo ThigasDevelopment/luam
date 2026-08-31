@@ -158,6 +158,17 @@ function withoutVariadicTail(parsed: readonly ReadParameter[]): { positional: Wi
     return { positional: strip(repeats ? head : head.slice(0, -1)), isVariadic: true };
 }
 
+export function parseParameterList(body: string): WikiSignature {
+    const { positional, isVariadic } = withoutVariadicTail(splitParameters(body).map(readParameter));
+
+    return {
+        returns: [],
+        parameters: positional,
+        minimumArguments: positional.filter((parameter) => !parameter.isOptional && parameter.defaultValue === null).length,
+        isVariadic,
+    };
+}
+
 export function parseSignature(source: string, name: string): WikiSignature | null {
     const call = callOf(source.replace(/\s+/g, ' '), name);
 
@@ -165,7 +176,7 @@ export function parseSignature(source: string, name: string): WikiSignature | nu
         return null;
     }
 
-    const { positional, isVariadic } = withoutVariadicTail(splitParameters(call.body).map(readParameter));
+    const list = parseParameterList(call.body);
     const returns = stripMarkup(call.head)
         .replace(/[[\]]/g, ' ')
         .replace(/\s*([/|])\s*/g, '$1')
@@ -173,10 +184,5 @@ export function parseSignature(source: string, name: string): WikiSignature | nu
         .map((entry) => entry.trim())
         .filter((entry) => entry.length > 0);
 
-    return {
-        returns,
-        parameters: positional,
-        minimumArguments: positional.filter((parameter) => !parameter.isOptional && parameter.defaultValue === null).length,
-        isVariadic,
-    };
+    return { ...list, returns };
 }

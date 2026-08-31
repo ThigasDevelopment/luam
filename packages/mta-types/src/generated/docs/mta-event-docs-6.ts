@@ -1,6 +1,60 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
+    onClientVehicleCollision: {
+        summary: 'This event is triggered when a vehicle collides with an element or a world object.\n\nNote that the collision reported by this event doesn\'t always damage the vehicle by default (this event triggers when hitting lamp posts, but the vehicle isn\'t damaged by them automatically, for example). If you want to deal with real damage, please refer to onClientVehicleDamage.',
+        parameters: [
+            { name: 'theHitElement', isOptional: false, isVariadic: false, summary: 'the other entity, or nil if the vehicle collided with the world' },
+            { name: 'damageImpulseMag', isOptional: false, isVariadic: false, summary: 'the impact magnitude (Note: this is NOT the damage it is a force value which is then multiplied by the vehicles collision damage multiplier. for an example of this see below)' },
+            { name: 'bodyPart', isOptional: false, isVariadic: false, summary: 'the bodypart that hit the other element' },
+            { name: 'collisionX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the position the collision took place' },
+            { name: 'collisionY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the position the collision took place' },
+            { name: 'collisionZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate of the position the collision took place' },
+            { name: 'normalX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the surface normal of the hit object' },
+            { name: 'normalY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the surface normal of the hit object' },
+            { name: 'normalZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate of the surface normal of the hit object' },
+            { name: 'hitElementForce', isOptional: false, isVariadic: false, summary: '0 for non vehicles or the force of the other vehicle' },
+            { name: 'model', isOptional: false, isVariadic: false, summary: 'model of the hit element (useful to detect building collisions as hitElement will be nil)' },
+        ],
+        source: 'The source of this event is the vehicle that collided with something.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleCollision',
+    },
+    onClientVehicleDamage: {
+        summary: 'This event is triggered when a vehicle is damaged.',
+        parameters: [
+            { name: 'theAttacker', isOptional: false, isVariadic: false, summary: 'An element if there was an attacker.' },
+            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'An integer specifying the weapon ID if a weapon was used. Otherwise Damage Type ID is used.' },
+            { name: 'loss', isOptional: false, isVariadic: false, summary: 'A float representing the amount of damage taken.' },
+            { name: 'damagePosX', isOptional: false, isVariadic: false, summary: 'A float representing the X co-ordinate of where the damage took place.' },
+            { name: 'damagePosY', isOptional: false, isVariadic: false, summary: 'A float representing the Y co-ordinate of where the damage took place.' },
+            { name: 'damagePosZ', isOptional: false, isVariadic: false, summary: 'A float representing the Z co-ordinate of where the damage took place.' },
+            { name: 'tireID', isOptional: false, isVariadic: false, summary: 'A number representing the tire which took damage, if there is one.' },
+        ],
+        source: 'The source of this event is the vehicle that got damaged.',
+        cancel: 'If this event is canceled, the vehicle health won\'t be reduced. Physical damage to the vehicle will remain.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleDamage',
+    },
+    onClientVehicleEnter: {
+        summary: 'This event gets fired when a player or ped enters a vehicle.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped that entered the vehicle' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'the number of the seat that the ped is now sitting on. 0 = driver, higher numbers are passenger seats.' },
+        ],
+        source: 'The source of the event is the vehicle that the ped entered.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleEnter',
+    },
+    onClientVehicleExit: {
+        summary: 'This event gets fired when a ped or player gets out of a vehicle.',
+        parameters: [
+            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped element that exited the vehicle' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'the number of the seat that the player was sitting on. 0 = driver, higher numbers are passenger seats.' },
+        ],
+        source: 'The source of the event is the vehicle that the ped exited.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleExit',
+    },
     onClientVehicleExplode: {
         summary: 'This event is triggered when a vehicle explodes.',
         parameters: [],
@@ -128,6 +182,9 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
             { name: 'level', isOptional: false, isVariadic: false, summary: 'the type of debug message which was outputted.' },
             { name: 'file', isOptional: false, isVariadic: false, summary: 'the file from which the debug message was outputted.' },
             { name: 'line', isOptional: false, isVariadic: false, summary: 'the line in file **file** where the debug message was outputted.' },
+            { name: 'r', isOptional: false, isVariadic: false, summary: 'an int representing the amount of red color (0-255).' },
+            { name: 'g', isOptional: false, isVariadic: false, summary: 'an int representing the amount of green color (0-255).' },
+            { name: 'b', isOptional: false, isVariadic: false, summary: 'an int representing the amount of blue color (0-255).' },
         ],
         source: 'The source of this event is the root element.',
         cancel: 'If this event is canceled, the debug message won\'t appear.',
@@ -177,60 +234,5 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
         source: 'The source of this event is the element whose element data changed.',
         cancel: 'This event cannot be cancelled using cancelEvent. To reverse the effect, use setElementData with the old value. See Example. This event can be cancelled using cancelEvent. If a client sent the cancelled change to the server, the server will send the client the server\'s version of the element data. |25731',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDataChange',
-    },
-    onElementDestroy: {
-        summary: 'This event is triggered when an element gets destroyed by destroyElement or when the creator resource is stopping. It is also triggered when a parent element of this element is destroyed.',
-        parameters: [],
-        source: 'The source of this event is the element that is being destroyed.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDestroy',
-    },
-    onElementDimensionChange: {
-        summary: 'This event is triggered when the dimension of an element is changed using setElementDimension.',
-        parameters: [
-            { name: 'oldDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element was in before.' },
-            { name: 'newDimension', isOptional: false, isVariadic: false, summary: 'An int representing the dimension the element is in now.' },
-        ],
-        source: 'The source of this event is the element that changed its dimension.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDimensionChange',
-    },
-    onElementInteriorChange: {
-        summary: 'This event is triggered when the interior of an element is changed using setElementInterior.',
-        parameters: [
-            { name: 'oldInterior', isOptional: false, isVariadic: false, summary: 'an int representing the interior the element was in before.' },
-            { name: 'newInterior', isOptional: false, isVariadic: false, summary: 'an int representing the interior the element is in now.' },
-        ],
-        source: 'The source of this event is the element that changed its interior.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementInteriorChange',
-    },
-    onElementModelChange: {
-        summary: 'This event is triggered when the model of an element is changed using setElementModel.',
-        parameters: [
-            { name: 'oldModel', isOptional: false, isVariadic: false, summary: 'an int representing the model of the element before the change occurred.' },
-            { name: 'newModel', isOptional: false, isVariadic: false, summary: 'an int representing the new model of the element.' },
-        ],
-        source: 'The source of this event is the element that changed its model',
-        cancel: 'This event does NOT support cancellation. Use setElementModel with the old value to reverse.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementModelChange',
-    },
-    onElementStartSync: {
-        summary: 'This event is triggered when an element becomes synced by a player.',
-        parameters: [
-            { name: 'newSyncer', isOptional: false, isVariadic: false, summary: 'a player element representing the player who is now syncing the element.' },
-        ],
-        source: 'The source of this event is the element that got synced by a player.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementStartSync',
-    },
-    onElementStopSync: {
-        summary: 'This event is triggered when an element is no longer synced by a player.',
-        parameters: [
-            { name: 'oldSyncer', isOptional: false, isVariadic: false, summary: 'a player element representing the last player who was syncing the element.' },
-        ],
-        source: 'The source of this event is the element which is no longer synced by a player.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementStopSync',
     },
 };

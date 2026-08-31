@@ -1,8 +1,176 @@
-import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, VOID } from '@mta-types/type-descriptor';
 
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_SERVER_4: Readonly<Record<string, FunctionDescriptor>> = {
+    onPlayerMarkerHit: fn(
+        [
+            named('Marker'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'markerHit',
+            'matchingDimension',
+        ],
+    ),
+    onPlayerMarkerLeave: fn(
+        [
+            named('Marker'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'markerLeft',
+            'matchingDimension',
+        ],
+    ),
+    onPlayerModInfo: fn(
+        [
+            STRING,
+            TABLE,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'filename',
+            'itemlist',
+        ],
+    ),
+    onPlayerMute: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPlayerNetworkStatus: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'status',
+            'ticks',
+        ],
+    ),
+    onPlayerPickupHit: fn(
+        [
+            named('Pickup'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'pickupHit',
+        ],
+    ),
+    onPlayerPickupLeave: fn(
+        [
+            named('Pickup'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'pickupLeft',
+        ],
+    ),
+    onPlayerPickupUse: fn(
+        [
+            named('Pickup'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'thePickupToUse',
+        ],
+    ),
+    onPlayerPrivateMessage: fn(
+        [
+            STRING,
+            named('Player'),
+            STRING,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'fullMessage',
+            'recipient',
+            'content',
+        ],
+    ),
+    onPlayerProjectileCreation: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        12,
+        false,
+        [
+            'weaponType',
+            'x',
+            'y',
+            'z',
+            'force',
+            'target',
+            'rotX',
+            'rotY',
+            'rotZ',
+            'velX',
+            'velY',
+            'velZ',
+        ],
+    ),
+    onPlayerQuit: fn(
+        [
+            STRING,
+            STRING,
+            named('Element'),
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'quitType',
+            'reason',
+            'responsibleElement',
+        ],
+    ),
+    onPlayerResourceStart: fn(
+        [
+            named('Resource'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'loadedResource',
+        ],
+    ),
     onPlayerScreenShot: fn(
         [
             named('Resource'),
@@ -56,170 +224,6 @@ export const MTA_EVENT_SIGNATURES_SERVER_4: Readonly<Record<string, FunctionDesc
         false,
         [
             'targetPlayer',
-        ],
-    ),
-    onPlayerTarget: fn(
-        [
-            named('Element'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'targettedElement',
-        ],
-    ),
-    onPlayerUnmute: fn(
-        [
-        ],
-        VOID,
-        0,
-        false,
-        [
-        ],
-    ),
-    onPlayerVehicleEnter: fn(
-        [
-            named('Vehicle'),
-            NUMBER,
-            named('Ped'),
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'theVehicle',
-            'seat',
-            'jacked',
-        ],
-    ),
-    onPlayerVehicleExit: fn(
-        [
-            named('Vehicle'),
-            NUMBER,
-            named('Ped'),
-            BOOLEAN,
-        ],
-        VOID,
-        4,
-        false,
-        [
-            'theVehicle',
-            'seat',
-            'jacker',
-            'forcedByScript',
-        ],
-    ),
-    onPlayerVoiceStart: fn(
-        [
-        ],
-        VOID,
-        0,
-        false,
-        [
-        ],
-    ),
-    onPlayerVoiceStop: fn(
-        [
-        ],
-        VOID,
-        0,
-        false,
-        [
-        ],
-    ),
-    onPlayerWasted: fn(
-        [
-            NUMBER,
-            named('Element'),
-            NUMBER,
-            NUMBER,
-            BOOLEAN,
-        ],
-        VOID,
-        5,
-        false,
-        [
-            'totalAmmo',
-            'killer',
-            'killerWeapon',
-            'bodypart',
-            'stealth',
-        ],
-    ),
-    onPlayerWeaponFire: fn(
-        [
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            named('Element'),
-            NUMBER,
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        8,
-        false,
-        [
-            'weapon',
-            'endX',
-            'endY',
-            'endZ',
-            'hitElement',
-            'startX',
-            'startY',
-            'startZ',
-        ],
-    ),
-    onPlayerWeaponSwitch: fn(
-        [
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'previousWeaponID',
-            'currentWeaponID',
-        ],
-    ),
-    onResourceLoadStateChange: fn(
-        [
-            named('Resource'),
-            STRING,
-            STRING,
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'changedResource',
-            'oldState',
-            'newState',
-        ],
-    ),
-    onResourcePreStart: fn(
-        [
-            named('Resource'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'startingResource',
-        ],
-    ),
-    onResourceStart: fn(
-        [
-            named('Resource'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'startedResource',
         ],
     ),
 };

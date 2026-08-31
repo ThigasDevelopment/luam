@@ -3,6 +3,117 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, TABLE, VOID } from '@mta-types
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_SERVER_3: Readonly<Record<string, FunctionDescriptor>> = {
+    onPlayerACInfo: fn(
+        [
+            TABLE,
+            NUMBER,
+            STRING,
+            STRING,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'detectedACList',
+            'd3d9Size',
+            'd3d9MD5',
+            'd3d9SHA256',
+        ],
+    ),
+    onPlayerBan: fn(
+        [
+            named('Ban'),
+            named('Player'),
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'banPointer',
+            'responsibleElement',
+        ],
+    ),
+    onPlayerChangeNick: fn(
+        [
+            STRING,
+            STRING,
+            BOOLEAN,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'oldNick',
+            'newNick',
+            'changedByUser',
+        ],
+    ),
+    onPlayerChangesProtectedData: fn(
+        [
+            named('Element'),
+            STRING,
+            ANY,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'element',
+            'key',
+            'value',
+        ],
+    ),
+    onPlayerChangesWorldSpecialProperty: fn(
+        [
+            STRING,
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'property',
+            'enabled',
+        ],
+    ),
+    onPlayerChat: fn(
+        [
+            STRING,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'message',
+            'messageType',
+        ],
+    ),
+    onPlayerClick: fn(
+        [
+            STRING,
+            STRING,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        8,
+        false,
+        [
+            'mouseButton',
+            'buttonState',
+            'clickedElement',
+            'worldPosX',
+            'worldPosY',
+            'worldPosZ',
+            'screenPosX',
+            'screenPosY',
+        ],
+    ),
     onPlayerCommand: fn(
         [
             STRING,
@@ -65,6 +176,28 @@ export const MTA_EVENT_SIGNATURES_SERVER_3: Readonly<Record<string, FunctionDesc
             'loss',
         ],
     ),
+    onPlayerDetonateSatchels: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPlayerDiscordJoin: fn(
+        [
+            BOOLEAN,
+            STRING,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'justConnected',
+            'key',
+        ],
+    ),
     onPlayerJoin: fn(
         [
         ],
@@ -98,139 +231,6 @@ export const MTA_EVENT_SIGNATURES_SERVER_3: Readonly<Record<string, FunctionDesc
         [
             'thePreviousAccount',
             'theCurrentAccount',
-        ],
-    ),
-    onPlayerMarkerHit: fn(
-        [
-            named('Marker'),
-            BOOLEAN,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'markerHit',
-            'matchingDimension',
-        ],
-    ),
-    onPlayerMarkerLeave: fn(
-        [
-            named('Marker'),
-            BOOLEAN,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'markerLeft',
-            'matchingDimension',
-        ],
-    ),
-    onPlayerModInfo: fn(
-        [
-            STRING,
-            TABLE,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'filename',
-            'itemlist',
-        ],
-    ),
-    onPlayerMute: fn(
-        [
-        ],
-        VOID,
-        0,
-        false,
-        [
-        ],
-    ),
-    onPlayerNetworkStatus: fn(
-        [
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'status',
-            'ticks',
-        ],
-    ),
-    onPlayerPickupHit: fn(
-        [
-            ANY,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'pickupHit',
-        ],
-    ),
-    onPlayerPickupLeave: fn(
-        [
-            ANY,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'pickupLeft',
-        ],
-    ),
-    onPlayerPickupUse: fn(
-        [
-            ANY,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'thePickupToUse',
-        ],
-    ),
-    onPlayerPrivateMessage: fn(
-        [
-            STRING,
-            named('Player'),
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'message',
-            'recipient',
-        ],
-    ),
-    onPlayerQuit: fn(
-        [
-            STRING,
-            STRING,
-            named('Element'),
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'quitType',
-            'reason',
-            'responsibleElement',
-        ],
-    ),
-    onPlayerResourceStart: fn(
-        [
-            named('Resource'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'loadedResource',
         ],
     ),
 };

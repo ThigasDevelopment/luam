@@ -20,7 +20,7 @@ The compiler ships a generated catalog of the MTA surface:
 | Kind | Count |
 | --- | --- |
 | API declarations | 1413 |
-| Events | 203 |
+| Events | 221 |
 | Element types | 58 |
 | OOP classes | 58 |
 | OOP methods | 656 |

@@ -9,6 +9,7 @@ import { MTA_EVENT_DOCS_6 } from './mta-event-docs-6';
 import { MTA_EVENT_DOCS_7 } from './mta-event-docs-7';
 import { MTA_EVENT_DOCS_8 } from './mta-event-docs-8';
 import { MTA_EVENT_DOCS_9 } from './mta-event-docs-9';
+import { MTA_EVENT_DOCS_10 } from './mta-event-docs-10';
 
 export const MTA_EVENT_DOCS: EventDocumentationCatalog = {
     ...MTA_EVENT_DOCS_1,
@@ -20,4 +21,5 @@ export const MTA_EVENT_DOCS: EventDocumentationCatalog = {
     ...MTA_EVENT_DOCS_7,
     ...MTA_EVENT_DOCS_8,
     ...MTA_EVENT_DOCS_9,
+    ...MTA_EVENT_DOCS_10,
 };

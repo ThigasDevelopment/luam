@@ -9,13 +9,14 @@ import { emitEventDocumentation, type EventDocumentationEntry } from './event-do
 import { wikiEventDocumentation } from './event-documentation-parser.ts';
 import { parseEvents } from './event-parser.ts';
 import { emitEventSignatures } from './event-signature-emitter.ts';
-import { GeneratorError, type CatalogEntry, type GeneratedFile, type ParsedDeclaration } from './generator-model.ts';
+import { GeneratorError, type CatalogEntry, type GeneratedFile, type ParsedDeclaration, type ParsedEventHandler } from './generator-model.ts';
 import { emitOopSurface } from './oop-emitter.ts';
 import { parseOopClasses } from './oop-parser.ts';
 import { buildOopSurface, type OopSurfaceResult } from './oop-surface-builder.ts';
 import { parseUpstream } from './upstream-catalog.ts';
 import { eventFiles } from './upstream-source.ts';
 import { wikiCatalogSource, type WikiCatalogSource } from './wiki-catalog-source.ts';
+import { parseWikiEvents } from './wiki-event-parser.ts';
 
 const MINIMUM_DECLARATIONS = 1380;
 
@@ -27,11 +28,18 @@ export interface GenerationResult {
     oop: OopSurfaceResult;
     multiReturns: readonly string[];
     elementTypes: number;
-    events: { server: number; client: number; documented: number };
+    events: { server: number; client: number; documented: number; overridden: readonly string[]; redundantOverrides: readonly string[] };
     documented: number;
     source: WikiCatalogSource;
     index: CatalogIndex;
     diff: CatalogDiff;
+}
+
+function mergeEvents(wiki: readonly ParsedEventHandler[], upstream: readonly ParsedEventHandler[]): ParsedEventHandler[] {
+    const listed = new Set(wiki.map((event) => event.name));
+    const retained = upstream.filter((event) => !listed.has(event.name));
+
+    return [...wiki, ...retained].sort((left, right) => left.name.localeCompare(right.name, 'en'));
 }
 
 function sortedEntries(entries: readonly CatalogEntry[]): CatalogEntry[] {
@@ -112,8 +120,14 @@ export function generate(): GenerationResult {
 
     const catalog = normalize(server, client);
     auditCallbacks(server, client, catalog);
-    const serverEvents = parseEvents(eventFiles('server'), serverContext);
-    const clientEvents = parseEvents(eventFiles('client'), clientContext);
+    const wikiEvents = parseWikiEvents(source.eventPages, { elementTypes: serverContext.elementTypes });
+
+    if (wikiEvents.unparsed.length > 0) {
+        throw new GeneratorError('wiki snapshot', `${wikiEvents.unparsed.length} event pages carry no readable parameter list: ${wikiEvents.unparsed.join(', ')}`);
+    }
+
+    const serverEvents = mergeEvents(wikiEvents.server, parseEvents(eventFiles('server'), serverContext));
+    const clientEvents = mergeEvents(wikiEvents.client, parseEvents(eventFiles('client'), clientContext));
     const handlerParameters = new Map([...serverEvents, ...clientEvents].map((event) => [event.name, event.type.parameterNames ?? []]));
     const eventDocumentation: EventDocumentationEntry[] = source.eventPages
         .filter((page) => handlerParameters.has(page.name))
@@ -155,7 +169,13 @@ export function generate(): GenerationResult {
         diff: diffCatalogs(readIndex(), index),
         multiReturns: source.multiReturns,
         elementTypes: elementTypes.length,
-        events: { server: serverEvents.length, client: clientEvents.length, documented: eventDocumentation.length },
+        events: {
+            server: serverEvents.length,
+            client: clientEvents.length,
+            documented: eventDocumentation.length,
+            overridden: wikiEvents.overridden,
+            redundantOverrides: wikiEvents.redundantOverrides,
+        },
         documented: documented.filter((entry) => entry.documentation.summary.length > 0).length,
     };
 }

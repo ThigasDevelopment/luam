@@ -66,9 +66,17 @@ describe('wiki event documentation', () => {
         expect(drifted).toEqual([]);
     });
 
-    it('keeps the wiki text off the parameters the signature does not carry', () => {
-        expect(eventDocumentation('onPlayerWasted').parameters.map((parameter) => parameter.name)).toEqual(['totalAmmo', 'killer', 'killerWeapon', 'bodypart', 'stealth']);
-        expect(eventDocumentation('onDebugMessage').parameters.map((parameter) => parameter.name)).toEqual(['message', 'level', 'file', 'line']);
+    it('documents every parameter the wiki page lists', () => {
+        expect(eventDocumentation('onPlayerWasted').parameters.map((parameter) => parameter.name)).toEqual([
+            'totalAmmo',
+            'killer',
+            'killerWeapon',
+            'bodypart',
+            'stealth',
+            'animGroup',
+            'animID',
+        ]);
+        expect(eventDocumentation('onDebugMessage').parameters.map((parameter) => parameter.name)).toEqual(['message', 'level', 'file', 'line', 'r', 'g', 'b']);
     });
 
     it('links every built-in event to its wiki page', () => {

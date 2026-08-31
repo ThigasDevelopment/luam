@@ -1,6 +1,15 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
+    onAccountCreate: {
+        summary: 'This event is triggered every time an account is created',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'An account element that was created' },
+        ],
+        source: 'The source of this event is the root element.',
+        cancel: 'This event cannot be canceled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnAccountCreate',
+    },
     onAccountDataChange: {
         summary: 'This event is triggered when an accounts data changes through setAccountData.',
         parameters: [
@@ -11,6 +20,15 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         source: 'The source of this event is the root element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnAccountDataChange',
+    },
+    onAccountRemove: {
+        summary: 'This event is triggered every time an account is removed',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'An account element that was removed' },
+        ],
+        source: 'The source of this event is the root element.',
+        cancel: 'This event cannot be canceled.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnAccountRemove',
     },
     onBan: {
         summary: 'This event is triggered when an IP address or serial is banned from the server.',
@@ -80,7 +98,7 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         summary: 'The event is triggered when a webbrowser starts loading a page.',
         parameters: [
             { name: 'URL', isOptional: false, isVariadic: false, summary: 'string containing the URL that will be loaded.' },
-            { name: 'isMain', isOptional: false, isVariadic: false, summary: 'a boolean representing whether the entire page (main frame) was loaded or an \'** inside the page was loaded. **true**: If the URL is loaded in the main frame. **false**: If the URL is loaded in a **\'.' },
+            { name: 'isMainFrame', isOptional: false, isVariadic: false, summary: 'a boolean representing whether the entire page (main frame) was loaded or an \'** inside the page was loaded. **true**: If the URL is loaded in the main frame. **false**: If the URL is loaded in a **\'.' },
         ],
         source: 'The webbrowser element.',
         cancel: '',
@@ -204,34 +222,13 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientConsole',
     },
-    onClientCursorMove: {
-        summary: 'This event is called by the root element whenever the cursor is moved over the screen, by the player. It returns information about the world coordinates as well as the screen coordinates of where the player moved the cursor.\n\nThe difference between this event and onClientMouseMove, is that the latter is actually called by GUI elements. This is to prevent double calling of onClientCursorMove, as onClientCursorMove is always called.',
+    onClientCoreCommand: {
+        summary: 'This event is triggered when a built-in client command is used, check Client Commands.',
         parameters: [
-            { name: 'cursorX', isOptional: false, isVariadic: false, summary: 'the relative X coordinate of the mouse cursor. 0 = left side of the screen, 1 = right side.' },
-            { name: 'cursorY', isOptional: false, isVariadic: false, summary: 'the relative Y coordinate of the mouse cursor. 0 = top of the screen, 1 = bottom.' },
-            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the mouse cursor, in pixels, measured from the left side of the screen.' },
-            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the mouse cursor, in pixels, measured from the top of the screen.' },
-            { name: 'worldX', isOptional: false, isVariadic: false, summary: 'the 3D in-game world X coordinate that the cursor is pointing at.' },
-            { name: 'worldY', isOptional: false, isVariadic: false, summary: 'the 3D in-game world Y coordinate that the cursor is pointing at.' },
-            { name: 'worldZ', isOptional: false, isVariadic: false, summary: 'the 3D in-game world Z coordinate that the cursor is pointing at.' },
+            { name: 'command', isOptional: false, isVariadic: false, summary: 'The command that was executed.' },
         ],
-        source: 'The source of this event is the root element.',
+        source: 'The source of this event is the localPlayer player element.',
         cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientCursorMove',
-    },
-    onClientDebugMessage: {
-        summary: 'This event is triggered when client-side debug messages (for instance errors or warnings) would appear in the debug window. This event doesn\'t require the debug window to be enabled to trigger, however.\n\n**Note:** To prevent infinite loops, debug messages that occur inside the function that handles this event won\'t trigger this event, so you won\'t be able to rely on debug info to fix faulty code that is inside this function. Since build [https://buildinfo.mtasa.com/index.php?Revision=14683 r14683] debug messages from outputDebugString and iprint will show up.',
-        parameters: [
-            { name: 'message', isOptional: false, isVariadic: false, summary: 'The message which was outputted in the server console, without details like file, line etc' },
-            { name: 'level', isOptional: false, isVariadic: false, summary: 'The type of debug message which was outputted' },
-            { name: 'file', isOptional: false, isVariadic: false, summary: 'The file from which the debug message was outputted' },
-            { name: 'line', isOptional: false, isVariadic: false, summary: 'The line in file **file** where the debug message was outputted' },
-            { name: 'r', isOptional: false, isVariadic: false, summary: 'Amount of red color (0-255)' },
-            { name: 'g', isOptional: false, isVariadic: false, summary: 'Amount of green color (0-255)' },
-            { name: 'b', isOptional: false, isVariadic: false, summary: 'Amount of blue color (0-255)' },
-        ],
-        source: 'The source of this event is the root element.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientDebugMessage',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientCoreCommand',
     },
 };

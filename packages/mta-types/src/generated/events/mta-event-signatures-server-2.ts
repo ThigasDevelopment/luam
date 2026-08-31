@@ -1,8 +1,60 @@
-import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, VOID } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, VOID } from '@mta-types/type-descriptor';
 
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_SERVER_2: Readonly<Record<string, FunctionDescriptor>> = {
+    onElementModelChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldModel',
+            'newModel',
+        ],
+    ),
+    onElementStartSync: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'newSyncer',
+        ],
+    ),
+    onElementStopSync: fn(
+        [
+            named('Player'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'oldSyncer',
+        ],
+    ),
+    onExplosion: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'x',
+            'y',
+            'z',
+            'theType',
+        ],
+    ),
     onMarkerHit: fn(
         [
             named('Element'),
@@ -79,9 +131,11 @@ export const MTA_EVENT_SIGNATURES_SERVER_2: Readonly<Record<string, FunctionDesc
             NUMBER,
             NUMBER,
             BOOLEAN,
+            NUMBER,
+            NUMBER,
         ],
         VOID,
-        5,
+        7,
         false,
         [
             'totalAmmo',
@@ -89,6 +143,23 @@ export const MTA_EVENT_SIGNATURES_SERVER_2: Readonly<Record<string, FunctionDesc
             'killerWeapon',
             'bodypart',
             'stealth',
+            'animGroup',
+            'animID',
+        ],
+    ),
+    onPedWeaponReload: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'weapon',
+            'clip',
+            'ammo',
         ],
     ),
     onPedWeaponSwitch: fn(
@@ -144,89 +215,6 @@ export const MTA_EVENT_SIGNATURES_SERVER_2: Readonly<Record<string, FunctionDesc
         false,
         [
             'playerWhoUsed',
-        ],
-    ),
-    onPlayerACInfo: fn(
-        [
-            TABLE,
-            NUMBER,
-            STRING,
-            STRING,
-        ],
-        VOID,
-        4,
-        false,
-        [
-            'detectedACList',
-            'd3d9Size',
-            'd3d9MD5',
-            'd3d9SHA256',
-        ],
-    ),
-    onPlayerBan: fn(
-        [
-            named('Ban'),
-            named('Player'),
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'banPointer',
-            'responsibleElement',
-        ],
-    ),
-    onPlayerChangeNick: fn(
-        [
-            STRING,
-            STRING,
-            BOOLEAN,
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'oldNick',
-            'newNick',
-            'changedByUser',
-        ],
-    ),
-    onPlayerChat: fn(
-        [
-            STRING,
-            NUMBER,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'message',
-            'messageType',
-        ],
-    ),
-    onPlayerClick: fn(
-        [
-            STRING,
-            STRING,
-            named('Element'),
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        8,
-        false,
-        [
-            'mouseButton',
-            'buttonState',
-            'clickedElement',
-            'worldPosX',
-            'worldPosY',
-            'worldPosZ',
-            'screenPosX',
-            'screenPosY',
         ],
     ),
 };

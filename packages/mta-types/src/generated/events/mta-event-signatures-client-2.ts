@@ -3,6 +3,17 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-d
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_2: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientCoreCommand: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'command',
+        ],
+    ),
     onClientCursorMove: fn(
         [
             NUMBER,
@@ -220,15 +231,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_2: Readonly<Record<string, FunctionDesc
         false,
         [
             'editBox',
-        ],
-    ),
-    onClientGUIBlur: fn(
-        [
-        ],
-        VOID,
-        0,
-        false,
-        [
         ],
     ),
 };

@@ -6,8 +6,8 @@ import { MTA_EVENTS } from '@mta-types/generated/mta-events';
 
 describe('event signatures', () => {
     it('provides exactly one signature for every built-in event', () => {
-        expect(Object.keys(MTA_EVENT_SIGNATURES.server)).toHaveLength(79);
-        expect(Object.keys(MTA_EVENT_SIGNATURES.client)).toHaveLength(124);
+        expect(Object.keys(MTA_EVENT_SIGNATURES.server)).toHaveLength(95);
+        expect(Object.keys(MTA_EVENT_SIGNATURES.client)).toHaveLength(126);
         expect(Object.keys(MTA_EVENT_SIGNATURES.shared)).toHaveLength(0);
         expect(MTA_EVENTS.server.every((name) => eventHandler(name, 'server') !== null)).toBe(true);
         expect(MTA_EVENTS.client.every((name) => eventHandler(name, 'client') !== null)).toBe(true);
@@ -24,6 +24,20 @@ describe('event signatures', () => {
         });
         expect(eventHandler('onPlayerQuit', 'client')).toBeNull();
         expect(eventHandler('onCustomResourceEvent', 'server')).toBeNull();
+    });
+
+    it('types every element parameter the wiki names instead of degrading it to any', () => {
+        expect(eventHandler('onChatMessage', 'server')?.parameters).toEqual([{ kind: 'string' }, { kind: 'named', name: 'Element' }]);
+        expect(eventHandler('onPlayerPickupHit', 'server')?.parameters).toEqual([{ kind: 'named', name: 'Pickup' }]);
+        expect(eventHandler('onPlayerPickupUse', 'server')?.parameters).toEqual([{ kind: 'named', name: 'Pickup' }]);
+    });
+
+    it('carries the parameters the wiki added after the upstream declarations froze', () => {
+        expect(eventHandler('onVehicleExplode', 'server')?.parameterNames).toEqual(['withExplosion', 'player']);
+        expect(eventHandler('onPlayerWasted', 'server')?.parameterNames).toEqual(['totalAmmo', 'killer', 'killerWeapon', 'bodypart', 'stealth', 'animGroup', 'animID']);
+        expect(eventHandler('onDebugMessage', 'server')?.parameterNames).toEqual(['message', 'level', 'file', 'line', 'r', 'g', 'b']);
+        expect(eventHandler('onAccountCreate', 'server')?.parameters).toEqual([{ kind: 'named', name: 'Account' }]);
+        expect(eventHandler('onClientPedChoke', 'client')?.parameterNames).toEqual(['weaponID', 'responsiblePed']);
     });
 
     it('keeps the optional client player damage argument in the signature', () => {

@@ -43,6 +43,8 @@ export function summaryLines(result: GenerationResult): string[] {
         `shared: ${result.catalog.shared.length}, server: ${result.catalog.server.length}, client: ${result.catalog.client.length}`,
         `documented: ${result.documented}`,
         `events: ${result.events.server} server, ${result.events.client} client, ${result.events.documented} documented`,
+        `event signatures written by hand: ${result.events.overridden.length === 0 ? 'none' : result.events.overridden.join(', ')}`,
+        `event overrides the wiki made redundant: ${result.events.redundantOverrides.length === 0 ? 'none' : result.events.redundantOverrides.join(', ')}`,
         `element types: ${result.elementTypes}`,
         `oop: ${oop.classes.length} classes, ${oop.methods} methods, ${oop.staticMethods} static methods, ${oop.constructors} constructors, ${oop.properties} properties`,
         `oop members without a procedural function: ${oop.skippedMethods.length} methods, ${oop.skippedProperties.length} properties`,

@@ -21,7 +21,7 @@ O compilador traz um catálogo gerado da superfície do MTA:
 | Tipo | Quantidade |
 | --- | --- |
 | Declarações de API | 1413 |
-| Eventos | 203 |
+| Eventos | 221 |
 | Tipos de elemento | 58 |
 | Classes OOP | 58 |
 | Métodos OOP | 656 |

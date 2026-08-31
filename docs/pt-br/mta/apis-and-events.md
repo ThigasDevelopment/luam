@@ -9,7 +9,7 @@ embarcado no compilador. Ele é a única fonte de verdade sobre o que um arquivo
 | Tipo | Quantidade |
 | --- | --- |
 | Declarações de API | 1413 |
-| Eventos | 203 |
+| Eventos | 221 |
 | Tipos de elemento | 58 |
 
 A biblioteca padrão de Lua 5.1 — `math`, `string`, `table`, `os`, `tostring`,

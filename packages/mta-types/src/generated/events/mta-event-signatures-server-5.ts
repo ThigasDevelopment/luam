@@ -3,98 +3,104 @@ import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descri
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_SERVER_5: Readonly<Record<string, FunctionDescriptor>> = {
-    onResourceStop: fn(
+    onPlayerTarget: fn(
         [
-            named('Resource'),
+            named('Element'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'targettedElement',
+        ],
+    ),
+    onPlayerTeamChange: fn(
+        [
+            named('Team'),
+            named('Team'),
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldTeam',
+            'newTeam',
+        ],
+    ),
+    onPlayerTeleport: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        6,
+        false,
+        [
+            'previousX',
+            'previousY',
+            'previousZ',
+            'currentX',
+            'currentY',
+            'currentZ',
+        ],
+    ),
+    onPlayerTriggerEventThreshold: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'eventName',
+        ],
+    ),
+    onPlayerTriggerInvalidEvent: fn(
+        [
+            STRING,
+            BOOLEAN,
             BOOLEAN,
         ],
         VOID,
-        2,
-        false,
-        [
-            'stoppedResource',
-            'wasDeleted',
-        ],
-    ),
-    onSettingChange: fn(
-        [
-            STRING,
-            STRING,
-            STRING,
-        ],
-        VOID,
         3,
         false,
         [
-            'setting',
-            'oldValue',
-            'newValue',
+            'eventName',
+            'isAdded',
+            'isRemote',
         ],
     ),
-    onTrailerAttach: fn(
+    onPlayerUnmute: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
+    onPlayerVehicleEnter: fn(
         [
             named('Vehicle'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'theTruck',
-        ],
-    ),
-    onTrailerDetach: fn(
-        [
-            named('Vehicle'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'theTruck',
-        ],
-    ),
-    onUnban: fn(
-        [
-            named('Ban'),
-            named('Player'),
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'theBan',
-            'responsibleElement',
-        ],
-    ),
-    onVehicleDamage: fn(
-        [
             NUMBER,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'loss',
-        ],
-    ),
-    onVehicleEnter: fn(
-        [
             named('Ped'),
-            NUMBER,
-            named('Player'),
         ],
         VOID,
         3,
         false,
         [
-            'thePed',
+            'theVehicle',
             'seat',
             'jacked',
         ],
     ),
-    onVehicleExit: fn(
+    onPlayerVehicleExit: fn(
         [
-            named('Ped'),
+            named('Vehicle'),
             NUMBER,
             named('Ped'),
             BOOLEAN,
@@ -103,13 +109,13 @@ export const MTA_EVENT_SIGNATURES_SERVER_5: Readonly<Record<string, FunctionDesc
         4,
         false,
         [
-            'thePed',
+            'theVehicle',
             'seat',
             'jacker',
             'forcedByScript',
         ],
     ),
-    onVehicleExplode: fn(
+    onPlayerVoiceStart: fn(
         [
         ],
         VOID,
@@ -118,56 +124,104 @@ export const MTA_EVENT_SIGNATURES_SERVER_5: Readonly<Record<string, FunctionDesc
         [
         ],
     ),
-    onVehicleRespawn: fn(
+    onPlayerVoiceStop: fn(
         [
-            BOOLEAN,
         ],
         VOID,
-        1,
+        0,
         false,
         [
-            'exploded',
         ],
     ),
-    onVehicleStartEnter: fn(
+    onPlayerWasted: fn(
         [
-            named('Ped'),
             NUMBER,
-            named('Ped'),
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            BOOLEAN,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        7,
+        false,
+        [
+            'totalAmmo',
+            'killer',
+            'killerWeapon',
+            'bodypart',
+            'stealth',
+            'animGroup',
+            'animID',
+        ],
+    ),
+    onPlayerWeaponFire: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            NUMBER,
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        8,
+        false,
+        [
+            'weaponID',
+            'endX',
+            'endY',
+            'endZ',
+            'hitElement',
+            'startX',
+            'startY',
+            'startZ',
+        ],
+    ),
+    onPlayerWeaponReload: fn(
+        [
+            NUMBER,
+            NUMBER,
+            NUMBER,
         ],
         VOID,
         3,
         false,
         [
-            'enteringPed',
-            'seat',
-            'jacked',
+            'weapon',
+            'ammoInClip',
+            'ammo',
         ],
     ),
-    onVehicleStartExit: fn(
+    onPlayerWeaponSwitch: fn(
         [
-            named('Ped'),
             NUMBER,
-            named('Ped'),
             NUMBER,
         ],
         VOID,
-        4,
+        2,
         false,
         [
-            'exitingPed',
-            'seat',
-            'jacked',
-            'door',
+            'previousWeaponID',
+            'currentWeaponID',
         ],
     ),
-    onWeaponFire: fn(
+    onResourceLoadStateChange: fn(
         [
+            named('Resource'),
+            STRING,
+            STRING,
         ],
         VOID,
-        0,
+        3,
         false,
         [
+            'changedResource',
+            'oldState',
+            'newState',
         ],
     ),
 };

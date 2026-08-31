@@ -1,6 +1,43 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
+    onClientPlayerVoiceResumed: {
+        summary: 'This event is triggered when a player\'s voice sound is resumed using setSoundPaused.',
+        parameters: [
+            { name: 'reason', isOptional: false, isVariadic: false, summary: 'the reason for the pause, this can be only "resumed".' },
+        ],
+        source: 'The source of this event is the player whose voice got resumed.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoiceResumed',
+    },
+    onClientPlayerVoiceStart: {
+        summary: '**Note**:  This event should only be used as a low-level function for advanced users.  For typical Voice scripting, please see the Voice Resource\nThis event is triggered when a player starts talking through voice chat.',
+        parameters: [],
+        source: 'The source of this event is the player element that just started talking through voice chat.',
+        cancel: '* If the source is the local player, the local player will not broadcast his voice chat to the server * If the source is a remote player, the player who started talking will not be heard.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoiceStart',
+    },
+    onClientPlayerVoiceStop: {
+        summary: 'This event is triggered when a player stops talking through voice chat.',
+        parameters: [],
+        source: 'The source of this event is the player element that just stopped talking through voice chat.',
+        cancel: '* If the source is the local player, the local player will not broadcast his voice chat to the server * If the source is a remote player, the player who started talking will not be heard.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoiceStop',
+    },
+    onClientPlayerWasted: {
+        summary: 'This event is triggered whenever a player, including those remote, dies.',
+        parameters: [
+            { name: 'killer', isOptional: false, isVariadic: false, summary: 'A player, ped or vehicle element representing the killer.' },
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'An integer representing the killer weapon or the damage types.' },
+            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'An integer representing the bodypart the player was damaged.' },
+            { name: 'stealth', isOptional: false, isVariadic: false, summary: 'A boolean representing whether or not this was a stealth kill.' },
+            { name: 'animGroup', isOptional: false, isVariadic: false, summary: 'an integer representing the player\'s current animation group.' },
+            { name: 'animID', isOptional: false, isVariadic: false, summary: 'an integer representing the player\'s current animation ID.' },
+        ],
+        source: 'The source of this event is the player that died.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerWasted',
+    },
     onClientPlayerWeaponFire: {
         summary: 'This event is called when a player fires a weapon.  This event does not trigger for melee weapons. Projectile weapons or the camera will only trigger the event if fired by the local player.',
         parameters: [
@@ -186,59 +223,5 @@ export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
         source: 'The source of this event is the root element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientTransferBoxVisibilityChange',
-    },
-    onClientVehicleCollision: {
-        summary: 'This event is triggered when a vehicle collides with an element or a world object.\n\nNote that the collision reported by this event doesn\'t always damage the vehicle by default (this event triggers when hitting lamp posts, but the vehicle isn\'t damaged by them automatically, for example). If you want to deal with real damage, please refer to onClientVehicleDamage.',
-        parameters: [
-            { name: 'theHitElement', isOptional: false, isVariadic: false, summary: 'the other entity, or nil if the vehicle collided with the world' },
-            { name: 'damageImpulseMag', isOptional: false, isVariadic: false, summary: 'the impact magnitude (Note: this is NOT the damage it is a force value which is then multiplied by the vehicles collision damage multiplier. for an example of this see below)' },
-            { name: 'bodypart', isOptional: false, isVariadic: false, summary: 'the bodypart that hit the other element' },
-            { name: 'collisionX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the position the collision took place' },
-            { name: 'collisionY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the position the collision took place' },
-            { name: 'collisionZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate of the position the collision took place' },
-            { name: 'normalX', isOptional: false, isVariadic: false, summary: 'the X coordinate of the surface normal of the hit object' },
-            { name: 'normalY', isOptional: false, isVariadic: false, summary: 'the Y coordinate of the surface normal of the hit object' },
-            { name: 'normalZ', isOptional: false, isVariadic: false, summary: 'the Z coordinate of the surface normal of the hit object' },
-            { name: 'hitElementForce', isOptional: false, isVariadic: false, summary: '0 for non vehicles or the force of the other vehicle' },
-            { name: 'model', isOptional: false, isVariadic: false, summary: 'model of the hit element (useful to detect building collisions as hitElement will be nil)' },
-        ],
-        source: 'The source of this event is the vehicle that collided with something.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleCollision',
-    },
-    onClientVehicleDamage: {
-        summary: 'This event is triggered when a vehicle is damaged.',
-        parameters: [
-            { name: 'theAttacker', isOptional: false, isVariadic: false, summary: 'An element if there was an attacker.' },
-            { name: 'theWeapon', isOptional: false, isVariadic: false, summary: 'An integer specifying the weapon ID if a weapon was used. Otherwise Damage Type ID is used.' },
-            { name: 'loss', isOptional: false, isVariadic: false, summary: 'A float representing the amount of damage taken.' },
-            { name: 'damagePosX', isOptional: false, isVariadic: false, summary: 'A float representing the X co-ordinate of where the damage took place.' },
-            { name: 'damagePosY', isOptional: false, isVariadic: false, summary: 'A float representing the Y co-ordinate of where the damage took place.' },
-            { name: 'damagePosZ', isOptional: false, isVariadic: false, summary: 'A float representing the Z co-ordinate of where the damage took place.' },
-            { name: 'tireID', isOptional: false, isVariadic: false, summary: 'A number representing the tire which took damage, if there is one.' },
-        ],
-        source: 'The source of this event is the vehicle that got damaged.',
-        cancel: 'If this event is canceled, the vehicle health won\'t be reduced. Physical damage to the vehicle will remain.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleDamage',
-    },
-    onClientVehicleEnter: {
-        summary: 'This event gets fired when a player or ped enters a vehicle.',
-        parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped that entered the vehicle' },
-            { name: 'seat', isOptional: false, isVariadic: false, summary: 'the number of the seat that the ped is now sitting on. 0 = driver, higher numbers are passenger seats.' },
-        ],
-        source: 'The source of the event is the vehicle that the ped entered.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleEnter',
-    },
-    onClientVehicleExit: {
-        summary: 'This event gets fired when a ped or player gets out of a vehicle.',
-        parameters: [
-            { name: 'thePed', isOptional: false, isVariadic: false, summary: 'the player or ped element that exited the vehicle' },
-            { name: 'seat', isOptional: false, isVariadic: false, summary: 'the number of the seat that the player was sitting on. 0 = driver, higher numbers are passenger seats.' },
-        ],
-        source: 'The source of the event is the vehicle that the ped exited.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientVehicleExit',
     },
 };
