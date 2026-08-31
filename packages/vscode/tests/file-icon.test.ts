@@ -22,6 +22,8 @@ const language = manifest.contributes.languages.find((entry) => entry.id === 'lu
 
 const manifestLanguage = manifest.contributes.languages.find((entry) => entry.id === 'luam-manifest');
 
+const formatterLanguage = manifest.contributes.languages.find((entry) => entry.id === 'luam-formatter');
+
 function iconSource(relative: string): string {
     return readFileSync(`${packageRoot}${relative.replace('./', '')}`, 'utf8');
 }
@@ -87,6 +89,50 @@ describe('file icon', () => {
             expect(y - radius).toBeGreaterThanOrEqual(0);
             expect(x + radius).toBeLessThanOrEqual(32);
             expect(y + radius).toBeLessThanOrEqual(32);
+        }
+    });
+});
+
+describe('formatter file icon', () => {
+    it('contributes a dedicated light and dark icon for the formatter filename', () => {
+        expect(formatterLanguage?.filenames).toEqual(['.luam.formatter']);
+        expect(formatterLanguage?.icon?.light).toBe('./icons/luam-formatter-light.svg');
+        expect(formatterLanguage?.icon?.dark).toBe('./icons/luam-formatter-dark.svg');
+    });
+
+    it('ships both formatter icon files', () => {
+        for (const relative of [formatterLanguage?.icon?.light ?? '', formatterLanguage?.icon?.dark ?? '']) {
+            expect(existsSync(`${packageRoot}${relative.replace('./', '')}`), relative).toBe(true);
+        }
+    });
+
+    it('gives the formatter its own icon rather than reusing the source or manifest icon', () => {
+        for (const theme of ['light', 'dark'] as const) {
+            expect(formatterLanguage?.icon?.[theme]).not.toBe(language?.icon?.[theme]);
+            expect(formatterLanguage?.icon?.[theme]).not.toBe(manifestLanguage?.icon?.[theme]);
+        }
+    });
+
+    it('draws the same crescent and star as the other icons, with its own mask id', () => {
+        for (const relative of [formatterLanguage?.icon?.light ?? '', formatterLanguage?.icon?.dark ?? '']) {
+            const source = iconSource(relative);
+
+            expect(source, relative).toContain('viewBox="0 0 32 32"');
+            expect(source, relative).toContain('mask="url(#luamCrescentFormatter');
+            expect(source, relative).not.toContain('fill-rule="evenodd"');
+        }
+    });
+
+    it('keeps the indent guide and its lines inside the viewport', () => {
+        for (const relative of [formatterLanguage?.icon?.light ?? '', formatterLanguage?.icon?.dark ?? '']) {
+            const bars = [...iconSource(relative).matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)];
+
+            expect(bars.length, relative).toBe(4);
+
+            for (const bar of bars) {
+                expect(Number(bar[1]) + Number(bar[3]), relative).toBeLessThanOrEqual(32);
+                expect(Number(bar[2]) + Number(bar[4]), relative).toBeLessThanOrEqual(32);
+            }
         }
     });
 });

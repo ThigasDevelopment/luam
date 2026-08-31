@@ -8,6 +8,7 @@ import { nilValue } from './manifest-evaluated';
 import { findField, requiredFields } from './manifest-field';
 import { MANIFEST_FIELDS, REMOVED_FIELDS } from './manifest-fields';
 import { unknownNameMessage } from './manifest-messages';
+import type { ManifestField } from './manifest-field';
 import { ManifestPass, type ManifestContext } from './manifest-pass';
 import { normalizeManifest } from './manifest-rules';
 import type { ManifestObject } from './manifest-value';
@@ -17,6 +18,21 @@ export interface ManifestAssignment {
     position: SourcePosition;
     value: Expression;
 }
+
+export interface ManifestNormalization {
+    value: ManifestObject;
+    diagnostics: Diagnostic[];
+}
+
+export interface ManifestSchema {
+    fields: readonly ManifestField[];
+    removed: Readonly<Record<string, string>>;
+    normalize(raw: ManifestObject, positions: ReadonlyMap<string, SourcePosition>): ManifestNormalization;
+    retag?(diagnostic: Diagnostic): Diagnostic;
+    unknownName?(name: string): string;
+}
+
+export const MANIFEST_SCHEMA: ManifestSchema = { fields: MANIFEST_FIELDS, removed: REMOVED_FIELDS, normalize: normalizeManifest };
 
 export interface ManifestAnalysis {
     program: Program;
@@ -62,7 +78,7 @@ function readLocal(pass: ManifestPass, statement: LocalStatement): void {
     }
 }
 
-function readAssignment(pass: ManifestPass, statement: AssignmentStatement, assignments: ManifestAssignment[], value: ManifestObject): void {
+function readAssignment(pass: ManifestPass, statement: AssignmentStatement, assignments: ManifestAssignment[], value: ManifestObject, schema: ManifestSchema): void {
     const [target] = statement.targets;
     const [expression] = statement.values;
 
@@ -78,13 +94,13 @@ function readAssignment(pass: ManifestPass, statement: AssignmentStatement, assi
         return;
     }
 
-    const field = findField(MANIFEST_FIELDS, target.name);
+    const field = findField(schema.fields, target.name);
 
     if (field === null) {
-        const replacement = REMOVED_FIELDS[target.name];
+        const replacement = schema.removed[target.name];
 
         if (replacement === undefined) {
-            pass.report(UNKNOWN_FIELD, unknownNameMessage(target.name), target.position);
+            pass.report(UNKNOWN_FIELD, (schema.unknownName ?? unknownNameMessage)(target.name), target.position);
         } else {
             pass.report(REMOVED_FIELD, `"${target.name}" is no longer a manifest field. ${replacement}`, target.position);
         }
@@ -96,7 +112,7 @@ function readAssignment(pass: ManifestPass, statement: AssignmentStatement, assi
     value[target.name] = pass.expression(expression, { field, path: target.name, key: target.name }).value;
 }
 
-function readStatement(pass: ManifestPass, statement: Statement, assignments: ManifestAssignment[], value: ManifestObject): void {
+function readStatement(pass: ManifestPass, statement: Statement, assignments: ManifestAssignment[], value: ManifestObject, schema: ManifestSchema): void {
     if (statement.kind === 'local-statement') {
         readLocal(pass, statement);
 
@@ -104,7 +120,7 @@ function readStatement(pass: ManifestPass, statement: Statement, assignments: Ma
     }
 
     if (statement.kind === 'assignment-statement') {
-        readAssignment(pass, statement, assignments, value);
+        readAssignment(pass, statement, assignments, value, schema);
 
         return;
     }
@@ -112,15 +128,15 @@ function readStatement(pass: ManifestPass, statement: Statement, assignments: Ma
     pass.report(INVALID_STATEMENT, statementError(STATEMENT_NAMES[statement.kind] ?? 'this statement'), statement.position);
 }
 
-function reportMissing(diagnostics: Diagnostic[], value: ManifestObject): void {
-    for (const field of requiredFields(MANIFEST_FIELDS)) {
+function reportMissing(diagnostics: Diagnostic[], value: ManifestObject, schema: ManifestSchema): void {
+    for (const field of requiredFields(schema.fields)) {
         if (value[field.name] === undefined) {
             diagnostics.push(manifestError(MISSING_FIELD, `The manifest requires a "${field.name}" field. ${field.summary}`, START));
         }
     }
 }
 
-export function analyzeManifest(source: string, context: ManifestContext): ManifestAnalysis {
+export function analyzeManifest(source: string, context: ManifestContext, schema: ManifestSchema = MANIFEST_SCHEMA): ManifestAnalysis {
     const parsed = parse(source);
     const pass = new ManifestPass(context);
     const assignments: ManifestAssignment[] = [];
@@ -131,18 +147,18 @@ export function analyzeManifest(source: string, context: ManifestContext): Manif
     }
 
     for (const statement of parsed.program.body) {
-        readStatement(pass, statement, assignments, raw);
+        readStatement(pass, statement, assignments, raw, schema);
     }
 
-    reportMissing(pass.diagnostics, raw);
+    reportMissing(pass.diagnostics, raw, schema);
     pass.diagnostics.push(...pass.locals.unused());
 
-    const normalized = normalizeManifest(raw, pass.positions);
+    const normalized = schema.normalize(raw, pass.positions);
 
     return {
         program: parsed.program,
         tokens: parsed.tokens,
-        diagnostics: sortDiagnostics([...parsed.diagnostics, ...pass.diagnostics, ...normalized.diagnostics]),
+        diagnostics: sortDiagnostics([...parsed.diagnostics, ...pass.diagnostics, ...normalized.diagnostics]).map(schema.retag ?? ((entry) => entry)),
         value: normalized.value,
         raw,
         positions: pass.positions,

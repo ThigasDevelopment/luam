@@ -4,6 +4,7 @@ import type { DevelopmentLogsConfig } from '@cli/config/config-schema';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
 import type { ServerConsole } from '@cli/server/server-console';
+import { untilAborted } from '@cli/watch/abort-wait';
 import { watchedRoots, watchSources } from '@cli/watch/source-watcher';
 import type { BuildOutcome } from '@cli/build/build-runner';
 import type { OutputLayout } from '@compiler/project/resource';
@@ -17,28 +18,6 @@ export interface EnsureOptions {
     layout?: OutputLayout;
     map?: boolean;
     onBuild?: (outcome: BuildOutcome) => void;
-}
-
-function untilAborted(signal: AbortSignal | null): Promise<void> {
-    return new Promise<void>((resolveLoop) => {
-        if (signal?.aborted === true) {
-            resolveLoop();
-
-            return;
-        }
-
-        const stop = (): void => {
-            process.off('SIGINT', stop);
-            signal?.removeEventListener('abort', stop);
-            resolveLoop();
-        };
-
-        if (signal !== null) {
-            signal.addEventListener('abort', stop, { once: true });
-        }
-
-        process.on('SIGINT', stop);
-    });
 }
 
 async function watchLoop(context: CommandContext, runner: EnsureRunner, options: EnsureOptions): Promise<void> {

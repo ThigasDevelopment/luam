@@ -40,7 +40,7 @@ describe('class helper', () => {
     it('runs field initializers in the authored order', () => {
         const source = [
             'local log = {}',
-            "local function note(tag) log[#log + 1] = tag return tag end",
+            'local function note(tag) log[#log + 1] = tag return tag end',
             "class 'Child' :extends 'Parent' {",
             "    tag = note('child')",
             '}',

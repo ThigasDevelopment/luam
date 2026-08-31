@@ -1,4 +1,4 @@
-import { runCompile } from '@cli/build/build-runner';
+import { runCompile, type BuildOutcome } from '@cli/build/build-runner';
 import { writeResourceContract } from '@cli/build/contract-files';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
 import { writeResourceMap } from '@cli/build/resource-map-file';
@@ -16,6 +16,7 @@ export interface BuildCommandOptions {
     layout?: OutputLayout;
     map?: boolean;
     minify?: boolean;
+    onOutcome?: (outcome: BuildOutcome) => void;
 }
 
 function writtenMap(map: ResourceMap | null, minified: boolean): ResourceMap | null {
@@ -49,6 +50,7 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
     if (outcome.build === null) {
         reportBuildOutcome(context, outcome, 'Build');
         reportPhaseTimings(reporter, tracker.durations(), totalDuration(tracker.durations()));
+        options.onOutcome?.(outcome);
 
         return EXIT_DIAGNOSTICS;
     }
@@ -66,6 +68,7 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
         tracker.end('failed');
         renderer.clear();
         reporter.error(`Build wrote nothing to "${target}". ${error instanceof Error ? error.message : String(error)}`);
+        options.onOutcome?.(outcome);
 
         return EXIT_DIAGNOSTICS;
     }
@@ -84,6 +87,7 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
 
     reporter.info(`Wrote ${pluralize(result.written.length, 'file')} to "${target}" (${counts}).`);
     reportPhaseTimings(reporter, tracker.durations(), totalDuration(tracker.durations()));
+    options.onOutcome?.(outcome);
 
     return EXIT_OK;
 }

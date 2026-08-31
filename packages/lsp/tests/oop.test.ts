@@ -313,7 +313,7 @@ describe('constructor signature help', () => {
     });
 
     it('names the parameters of an element constructor', () => {
-        const text = "local marker = Marker(0, ";
+        const text = 'local marker = Marker(0, ';
         const workspace = openProject(true, { [SERVER_PATH]: text });
         const uri = workspace.uri(SERVER_PATH);
 

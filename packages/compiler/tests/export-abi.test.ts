@@ -145,7 +145,7 @@ describe('contract calls', () => {
             { kind: 'export', name: 'draw', http: false, side: 'client', signature: null, position: { line: 1, column: 1, offset: 0 } },
         ]);
 
-        expect(codes(consumer("exports.hud:draw()\n"), [clientAbi])).toEqual(['check-resource-export-side']);
+        expect(codes(consumer('exports.hud:draw()\n'), [clientAbi])).toEqual(['check-resource-export-side']);
     });
 });
 
@@ -159,7 +159,7 @@ describe('contract invalidation', () => {
 
         cache.compile(files, { contracts: [providerAbi()] });
 
-        const changed = providerAbi("export function getBalance(id: number): number\n    return id\nend\n");
+        const changed = providerAbi('export function getBalance(id: number): number\n    return id\nend\n');
         const second = cache.compile(files, { contracts: [changed] });
 
         expect(second.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['check-type-mismatch']);

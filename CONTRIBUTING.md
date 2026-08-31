@@ -36,7 +36,7 @@ pnpm install --frozen-lockfile
 
 ## Reproduce every required check
 
-Four checks must be green before a pull request can merge. Each one is a command
+Five checks must be green before a pull request can merge. Each one is a command
 you can run:
 
 ```bash
@@ -60,13 +60,22 @@ pnpm --filter @luam/cli bundle
 pnpm docs:verify
 ```
 
+```bash
+pnpm conventions:all
+```
+
 The first block is **Typecheck**: it also regenerates the MTA catalog offline and
 fails if the committed output differs, so a catalog change must be committed
 along with whatever produced it. The second is the **test matrix**, run twice in
 CI, once per Node version. The third is **Build**, which then packages a resource
 with the bundled CLI and loads the generated Lua in Lua 5.1. The fourth is
 **Docs**, which checks locale parity, the limitation and version contracts, the
-documented snippets and captured outputs, and builds the site.
+documented snippets and captured outputs, and builds the site. The fifth is
+**Conventions**, which enforces the mechanical rules in
+[code-conventions.md](.claude/docs/code-conventions.md) over the TypeScript
+sources and runs `luam format --check` over the repository’s own `.luam` corpus.
+Run `pnpm conventions` for the TypeScript half alone when you do not want to
+bundle the CLI.
 
 Two more jobs run and cannot block you. **Benchmark** measures the compiler after
 a merge to `develop`, and **Dependency audit** reports advisories on a schedule

@@ -9,16 +9,22 @@ import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from '
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
-const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'init', 'server', 'setup', 'test', 'trace'];
+const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'format', 'init', 'server', 'setup', 'test', 'trace'];
 
 const ACCEPTED: readonly [string, readonly string[]][] = [
     ['build', ['--manifest', '.luam.manifest', '--bundle', '--no-map', '--offline', '--no-color']],
     ['build', ['--no-bundle']],
     ['check', ['--manifest', '.luam.manifest', '--no-color']],
+    ['check', ['--json']],
+    ['build', ['--json']],
+    ['check', ['--watch']],
+    ['check', ['--no-watch']],
     ['config', ['--source', 'config.lua', '--out', 'config.d.luam', '--no-color']],
     ['dev', ['--no-watch', '--manifest', '.luam.manifest', '--no-map', '--offline']],
     ['ensure', ['--no-watch', '--bundle', '--no-map', '--offline']],
     ['ensure', ['--watch']],
+    ['format', ['--check', '--manifest', '.luam.manifest', '--no-color']],
+    ['format', ['src', '--cwd', '.']],
     ['trace', ['src/server.lua:1', '--map', 'build/luam-demo.luam-map.json', '--manifest', '.luam.manifest']],
     ['init', ['--name', 'demo', '--force', '--yes']],
     ['init', ['-y']],
@@ -31,9 +37,18 @@ const STUB_EDITORS = { detect: (): [] => [], hasExtension: (): boolean => false,
 
 const REJECTED: readonly [string, readonly string[]][] = [
     ['build', ['--watch']],
+    ['format', ['--watch']],
     ['build', ['--map', 'x.json']],
     ['build', ['--name', 'demo']],
     ['check', ['--bundle']],
+    ['test', ['--json']],
+    ['dev', ['--json']],
+    ['ensure', ['--json']],
+    ['format', ['--json']],
+    ['check', ['--check']],
+    ['build', ['--check']],
+    ['format', ['--bundle']],
+    ['format', ['--offline']],
     ['check', ['--offline']],
     ['check', ['--no-map']],
     ['dev', ['--bundle']],
@@ -108,12 +123,20 @@ describe('command help and version', () => {
         expect(help.server).toContain('--manifest');
         expect(help.server).not.toContain('--watch');
         expect(help.check).not.toContain('--offline');
+        expect(help.check).toContain('--watch');
+        expect(help.check).toContain('--json');
+        expect(help.build).toContain('--json');
+        expect(help.test).not.toContain('--json');
+        expect(help.format).not.toContain('--watch');
         expect(help.doctor).not.toContain('--config');
         expect(help.trace).toContain('--map <path>');
         expect(help.init).toContain('--name <name>');
         expect(help.setup).toContain('--yes');
         expect(help.test).toContain('--lua <path>');
         expect(help.test).not.toContain('--bundle');
+        expect(help.format).toContain('--check');
+        expect(help.format).toContain('[paths...]');
+        expect(help.build).not.toContain('--check');
     });
 
     it('prints the version once from the root', async () => {

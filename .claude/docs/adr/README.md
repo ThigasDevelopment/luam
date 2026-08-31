@@ -50,3 +50,4 @@ Each row links the record; the record itself carries the full status note.
 | 039 | [Ship no debugger, and keep the CLI out of a running server](039-no-debugger.md) | Accepted |
 | 040 | [One role per workflow, one gate, and a pinned supply chain](040-pipeline-contract.md) | Accepted |
 | 041 | [A fork pull request runs verification only, with no secret and no write](041-untrusted-contribution-boundary.md) | Accepted |
+| 042 | [The formatter is configured by `.luam.formatter`, not by the manifest](042-formatter-configuration-file.md) | Accepted |

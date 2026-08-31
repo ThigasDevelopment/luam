@@ -2433,16 +2433,16 @@ What it decided:
 Build what milestone 34 decided. A developer consuming third-party Luam code
 still copies files.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 38.01 | Add the libraries manifest domain and resolve packages from disk | ../plans/38.01-libraries-manifest-domain.md | architecture-engineer | todo |
-| 38.02 | Compile library sources as part of the consuming project | ../plans/38.02-library-compilation.md | architecture-engineer | todo |
-| 38.03 | Report global collisions and missing library requirements | ../plans/38.03-library-collisions.md | architecture-engineer | todo |
-| 38.04 | Vendor library output and order it in meta.xml | ../plans/38.04-library-vendoring.md | architecture-engineer | todo |
-| 38.05 | Cover milestone 38 with a real library fixture | ../plans/38.05-library-tests.md | test-engineer | todo |
-| 38.06 | Document authoring and consuming a Luam library | ../plans/38.06-library-documentation.md | documentation-engineer | todo |
+| 38.01 | Add the libraries manifest domain and resolve packages from disk | ../plans/38.01-libraries-manifest-domain.md | architecture-engineer | done |
+| 38.02 | Compile library sources as part of the consuming project | ../plans/38.02-library-compilation.md | architecture-engineer | done |
+| 38.03 | Report global collisions and missing library requirements | ../plans/38.03-library-collisions.md | architecture-engineer | done |
+| 38.04 | Vendor library output and order it in meta.xml | ../plans/38.04-library-vendoring.md | architecture-engineer | done |
+| 38.05 | Cover milestone 38 with a real library fixture | ../plans/38.05-library-tests.md | test-engineer | done |
+| 38.06 | Document authoring and consuming a Luam library | ../plans/38.06-library-documentation.md | documentation-engineer | done |
 
 Sequencing:
 
@@ -2507,19 +2507,102 @@ Deferred to a later milestone:
   question this milestone does not answer.
 - Anything that would require Luam to run infrastructure.
 
+What it decided:
+
+- **Resolution reads `<projectRoot>/node_modules/<name>` and stops.** Node's
+  algorithm was rejected: walking up would let a package a parent directory
+  installed reach a build the manifest never named, which is the opposite of the
+  rule ADR-038 set. A scoped name is looked up as the two directories npm writes,
+  `@scope/name`, independent of the `scope-name` flattening 38.04 applies to the
+  emitted path. A pnpm workspace link and a `file:` dependency resolve, because
+  the lookup reads through the symlink like any other path — the fixture in
+  `docs/snippets/using-a-library` is a workspace package and proves it.
+- **The library's resolved root is part of the cache key.** `declarationsFor`
+  hashes the origin root beside the environment, the options and the source, so a
+  library swapped for another copy of the same name invalidates rather than
+  reusing the previous declarations.
+- **A `#!` directive inside a library file that disagrees is an error.** The
+  library declares its layout once, in `luam.sources`; a second place that can
+  disagree is a bug source with no benefit, and `env-library-directive` names
+  both sides. An agreeing directive is accepted in silence, so a library that
+  documents its side in the file is not punished for it.
+- **Visibility is one way and reported, not merely absent.** `createAmbientScope`
+  gives a library file only library declarations, so a consumer global never
+  reaches it — but an unknown global is not a diagnostic in Lua, so the rule
+  would have been invisible. `project-library-project-reference` reports it
+  against the library file, with the project file that declares the name.
+- **A library claiming an MTA name is a warning, not an error.** A library that
+  wraps `getPlayerName` deliberately is a legitimate and probably common shape,
+  and the checker cannot tell it from an accident. `project-library-shadows-api`
+  is loud enough to be seen and quiet enough not to block. The rule is not
+  extended to project files: a project shadowing its own API is the developer's
+  own file, and reporting it would fire on existing projects this milestone has
+  no reason to migrate.
+- **A collision is reported once per pair, and reads as the library intruding.**
+  A `shared`-versus-`shared` collision occupies both sides; reporting per side
+  produced two messages for one problem, so the sides are gathered and the
+  message says `"shared"`. The diagnostic is attributed to the library's file
+  whichever module the walk recorded first, so the direction never depends on
+  list order.
+- **`libs/` beside `lib/` was reconsidered and kept.** The pairing is one letter
+  apart and is a real legibility hazard, but renaming means amending an accepted
+  ADR for a directory whose two occupants are already separated everywhere a
+  reader meets them: `meta.xml` labels them `Runtime library` and `Libraries`,
+  and both manual trees name them in the same paragraph. The hazard is cheaper
+  than the divergence.
+- **A `loadOrder` entry may not name a library file.** Pinning one would let a
+  consumer override the order the library declared, which the ADR's ordering rule
+  already refuses. `project-load-order-library` says so instead of leaving the
+  misleading "no source file matches" for a path that plainly exists.
+- **Two scoped names that flatten to one directory are not a new diagnostic.**
+  `@a/b-c` and `@a-b/c` both flatten to `a-b-c`, and the collision surfaces as
+  `project-duplicate-output`, which already reports two sources producing one
+  path and names both. A second code for an improbability the existing net
+  catches was not worth its weight.
+- **Library files are ordered by package, then by declared pattern, then by
+  path.** The sides are walked `shared`, `server`, `client`, matching the order
+  project scripts already use, and a file takes the side of the first pattern
+  that matches it. The compile order and the emission order are the same list, so
+  what the checker approved and what the resource loads cannot disagree.
+- **Verbatim `.lua` a library ships is vendored as its own kind.** It is not a
+  compiled module, so it reaches assembly as `ResourceOptions.libraryFiles` and
+  merges into the library scripts by the same origin ordering. `.d.luam` gives it
+  types and emits nothing, exactly as in a project.
+- **The LSP resolves libraries the same way, which the plans did not require.**
+  Without it every library symbol would be an unknown type in the editor while
+  the CLI passed. `workspace/library-index.ts` reuses the compiler's declaration
+  reader, scans only the package roots the manifest names, applies the same
+  locked environment and the same one-way visibility, and shows the same
+  `@scope/name/path` form the CLI prints.
+- **A call into a library *function* is not checked at the call site, and that is
+  not new.** Cross-file function signatures do not reach the checker for project
+  files either; classes, interfaces, enums and `declare`d globals do. A library's
+  classes and its `.d.luam` declarations are therefore checked precisely, and its
+  bare top-level functions are as unchecked as a project's own. It is a
+  pre-existing boundary this milestone inherits rather than one it introduces.
+
+Remaining:
+
+- Watching `node_modules` in `ensure` and `dev`. A library change is picked up by
+  the next build, not by the watcher, because installing is a step a person runs.
+- Publishing `examples/library` to npm. It is a workspace package the manual
+  compiles against; nothing in the model needs it published to prove the path.
+
 ## Milestone 39 — Toolchain Surfaces
 
-Give the toolchain the three surfaces it lacks outside the editor, and close the
-conventions gap milestone 36 deferred.
+Give the toolchain the three surfaces it lacks outside the editor, let a project
+choose the formatter's whitespace decisions, and close the conventions gap
+milestone 36 deferred.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 39.01 | Add luam format with a check mode | ../plans/39.01-format-command.md | architecture-engineer | todo |
-| 39.02 | Emit diagnostics in a machine-readable form | ../plans/39.02-machine-readable-diagnostics.md | architecture-engineer | todo |
-| 39.03 | Add a watch mode to luam check | ../plans/39.03-check-watch.md | architecture-engineer | todo |
-| 39.04 | Enforce the source conventions in the pipeline | ../plans/39.04-conventions-gate.md | github-engineer | todo |
+| 39.01 | Add luam format with a check mode | ../plans/39.01-format-command.md | architecture-engineer | done |
+| 39.02 | Emit diagnostics in a machine-readable form | ../plans/39.02-machine-readable-diagnostics.md | architecture-engineer | done |
+| 39.03 | Add a watch mode to luam check | ../plans/39.03-check-watch.md | architecture-engineer | done |
+| 39.04 | Enforce the source conventions in the pipeline | ../plans/39.04-conventions-gate.md | github-engineer | done |
+| 39.05 | Let a project configure the formatter through .luam.formatter | ../plans/39.05-formatter-configuration.md | architecture-engineer | done |
 
 Sequencing:
 
@@ -2527,6 +2610,10 @@ Sequencing:
   surface over an engine that already exists.
 - 39.04 waits on 39.01, because `luam format --check` is the half of the
   conventions gate that stops being a question once the command exists.
+- 39.05 waits on 39.01 too, and 39.04 should land before it. The gate is written
+  against a formatter with one style; adding configuration afterwards makes the
+  gate's independence from it a property to confirm rather than a question to
+  answer while both are moving.
 
 Acceptance:
 
@@ -2545,6 +2632,18 @@ Acceptance:
 - A pull request violating a mechanical convention fails the merge gate, proven
   by a deliberate violation; the check reports on every pull request, a fork run
   can satisfy it, and `CONTRIBUTING.md` names the command that reproduces it.
+- A project with no `.luam.formatter` formats byte-identically to before the
+  milestone, across the whole corpus.
+- A project that sets one gets tab or space indentation at the width it names,
+  `function(` or `function (` as it chooses, the blank-line run it asks for, and
+  the line ending it pins.
+- Every configuration is idempotent and preserves the compiled Lua modulo leading
+  indentation, and no configuration can produce output whose token stream differs
+  from the input — enforced by the formatter's existing round-trip check rather
+  than by review.
+- The nearest `.luam.formatter` wins with no merging, an unparseable one stops
+  the run rather than falling back, and the CLI and the editor agree byte for
+  byte under a non-default configuration.
 
 Why now:
 
@@ -2558,10 +2657,22 @@ Why now:
   `dev` and `ensure`, and both produce a resource.
 - Milestone 36 deferred conventions enforcement because "the workspace has no
   linter or formatter". Half of that stops being true with 39.01.
+- Milestone 32 settled `function (` over `function(` on a 60–37 corpus count.
+  That is a majority, not a consensus, and the minority currently cannot use the
+  formatter at all. `INDENT` is likewise a hard-coded four spaces, so a team that
+  indents with tabs has no path that does not involve not formatting. A formatter
+  nobody can adopt is a formatter nobody runs.
 
 Deliberately excluded:
 
-- New or configurable formatting rules. The style is fixed and this renders it.
+- Any formatter option that changes a token — quote style, semicolons, name
+  casing, line breaking. The formatter reprints the token stream and verifies the
+  result against the original, so such an option would produce no output rather
+  than wrong output.
+- Per-file or directive-based formatter overrides, ignore ranges, presets, and
+  inheritance from another package.
+- Reopening this repository's own style. It sets no `.luam.formatter` and keeps
+  the milestone 32 defaults, which is what keeps 39.04 enforceable.
 - A second machine-readable format.
 - Auto-fixing in CI. The gate reports; the developer fixes.
 - Broader static analysis than the conventions the project has already written
@@ -2608,3 +2719,92 @@ Deliberately excluded:
   the quick fixes.
 - Hints in `.luam.manifest`, where a field's type is already declared.
 - Any change to inference itself.
+
+## Milestone 41 — Table Literal Completion
+
+Answer the question a cursor inside a typed table literal is asking. Reported
+from a discriminated union of intersections, where the editor named one
+discriminant value out of two, offered keys where a value goes, and buried the
+right answers under the whole global surface.
+
+Status: doing
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 41.01 | Complete a typed table literal by the keys its type still allows | ../plans/41.01-table-literal-key-completion.md | architecture-engineer | doing |
+
+Acceptance:
+
+- Inside a literal annotated with a record type, a key position offers the keys
+  that type still allows and nothing else.
+- A written discriminant narrows the keys to the matching member; a written key
+  is removed from the list.
+- Inside the quotes of a discriminant, every value the remaining members declare
+  is offered, not the first one.
+- A value position, an unannotated literal, a call argument and a class body each
+  keep offering the scope, each proven by its own test.
+- The checker is untouched, and the diagnostic on the reported source is
+  unchanged.
+
+Why now:
+
+- The type system already answers this. Intersections merge, unions narrow by
+  discriminant, and the checker reports the missing key correctly — the editor
+  was reading that answer wrong on the way out.
+- A union of intersections is the shape the language pushes people toward, and it
+  is the shape where the completion list was least useful.
+- Two of the three defects are already fixed; what remains is one decision and
+  the code that follows it.
+
+Deliberately excluded:
+
+- Any change to inference, narrowing or the diagnostic.
+- Lifting the single-line reach of the annotation, which keeps a multi-line or
+  nested literal without key completion.
+- Completion for an array-style literal, which has no keys to offer.
+
+## Milestone 42 — Class Output and Member Hover
+
+Three defects reported from one file: a class field written with only a type disappeared
+from the generated class, the semicolon after a lowered statement was left alone on a line,
+and hovering the property of a typed table answered nothing.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 42.01 | Emit a class field declared without a default in the preserved class body | ../plans/42.01-declared-class-field-output.md | architecture-engineer | todo |
+| 42.02 | Keep the trailing semicolon of a lowered statement on the statement line | ../plans/42.02-lowered-statement-semicolon.md | architecture-engineer | todo |
+| 42.03 | Hover a member expression by the type the checker gave it | ../plans/42.03-member-expression-hover.md | architecture-engineer | todo |
+| 42.04 | Record what the class body and a hover now show | ../plans/42.04-class-output-documentation.md | documentation-engineer | todo |
+
+Acceptance:
+
+- A field written as `name: Type;` reaches the generated class as `name = nil`, on the line
+  it was written on, in a development build as well as a release build.
+- No generated line consists only of a semicolon, in either build mode.
+- Line counts are unchanged by all three repairs, proven by the line-fidelity fixtures.
+- Hovering the property of a class instance or of a typed table reports its type, while an
+  MTA API member, a library member and a record global hover exactly as before.
+- Both locales and the changelog describe what the build now produces.
+
+Why now:
+
+- The class-field repair already landed once, in the canonical emitter, and was never
+  carried into the source-preserving path a development build actually takes. The two paths
+  disagreeing is worse than either behaviour on its own.
+- `docs/en/reference/output-layouts.md` already documents `name = nil` for this path, so the
+  documentation and the compiler are in open contradiction.
+- The orphan semicolon is the defect milestone 27 closed for erased declarations, reappearing
+  through the lowering branch, which never called the repair that milestone added.
+- The types the hover is missing are already computed and already correct; only the read is
+  wrong, so the fix is small and the current behaviour makes a typed field look untyped.
+
+Deliberately excluded:
+
+- Finer-grained lowering. A `new` inside a table literal still collapses the whole statement
+  to canonical Lua, as the output-layouts page records; preserving the authored layout around
+  a lowered sub-expression is a separate milestone.
+- Building a table from a field annotation. A field initialised to a table in the class body
+  would share that table across every instance; the annotation stays compile-time only.
+- Any change to inference, to the checker, or to completion.

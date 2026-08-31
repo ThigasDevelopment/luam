@@ -31,7 +31,7 @@ describe('the formatter', () => {
 
     it('keeps a keyword apart from a parenthesis and a name against one', () => {
         expect(format('local f = function (a: number): void\nend\n')).toBe('local f = function (a: number): void\nend\n');
-        expect(format("local kind = type(value)\n")).toBe('local kind = type(value)\n');
+        expect(format('local kind = type(value)\n')).toBe('local kind = type(value)\n');
     });
 
     it('keeps a method call and a type annotation apart', () => {

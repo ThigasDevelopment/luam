@@ -113,5 +113,22 @@ Nem todo mundo quer um formatador. O `luam.formatting` desliga ele por inteiro �
 language server deixa de ser consultado, então `Shift+Alt+F` e formatar ao salvar
 ficam os dois quietos, e outra ferramenta pode assumir o layout.
 
-Não existe um comando `luam format`. O editor é a superfície aqui; o que um
-pipeline deveria cobrar é uma pergunta separada.
+Fora de um editor, o [`luam format`](/pt-br/tooling/cli#luam-format) aplica esse
+mesmo estilo sobre um projeto, e o `luam format --check` informa o que difere sem
+escrever. Os dois chamam o formatador do language server, então as duas
+superfícies concordam byte a byte.
+
+## O que um projeto pode mudar
+
+Esta página descreve o estilo **padrão**, que é o que você tem sem configuração.
+Um projeto pode escolher cinco dessas decisões num arquivo
+[`.luam.formatter`](/pt-br/reference/formatter-file): o caractere de indentação, a
+largura da indentação, o espaço do `function (`, a sequência de linhas em branco
+e o fim de linha.
+
+Todo o resto desta página é fixo e não tem opção — estilo de aspas, ponto e
+vírgula, capitalização de nomes, inserção de parênteses e onde uma linha quebra.
+Isso não é uma lacuna esperando ser preenchida: o formatador verifica a própria
+saída contra o fluxo de tokens original, então uma opção que mexesse em qualquer
+um deles produziria nenhuma saída em vez de uma saída diferente. Veja
+[limitações](/pt-br/reference/limitations).

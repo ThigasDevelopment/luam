@@ -90,10 +90,16 @@ code --extensionDevelopmentPath=packages/vscode
 
 ## Ativação
 
-A extensão ativa quando o workspace contém um `.luam.manifest` ou qualquer arquivo
-`.luam`, então **abra a pasta do seu resource como raiz do workspace**. Ela observa
-`**/*.luam`, `.luam.manifest` e `.env*`, então arquivos alterados fora do editor
-também chegam ao servidor.
+A extensão ativa quando o workspace contém um `.luam.manifest`, um
+[`.luam.formatter`](/pt-br/reference/formatter-file) ou qualquer arquivo `.luam`,
+então **abra a pasta do seu resource como raiz do workspace**. Ela observa
+`**/*.luam`, `.luam.manifest`, `.luam.formatter` e `.env*`, então arquivos
+alterados fora do editor também chegam ao servidor.
+
+Cada um dos três tem ícone de arquivo e linguagem próprios: os fontes `.luam`, o
+manifesto e o arquivo do formatador. O manifesto e o arquivo do formatador
+compartilham o mesmo dialeto e o mesmo destaque; são linguagens separadas para que
+a árvore de arquivos os distinga de relance.
 
 ## Comandos
 

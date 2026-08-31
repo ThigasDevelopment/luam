@@ -10,13 +10,15 @@ import type { Type } from '@compiler/checker/types';
 import { createPosition, sortDiagnostics, type Diagnostic, type SourcePosition } from '@compiler/diagnostics/diagnostic';
 import { resolveEnvironment, type Environment } from '@compiler/environment/environment';
 import type { Token } from '@compiler/lexer/token';
-import { analyzeManifest, type ManifestAnalysis } from '@compiler/manifest/manifest-analysis';
+import { analyzeManifest, MANIFEST_SCHEMA, type ManifestAnalysis, type ManifestSchema } from '@compiler/manifest/manifest-analysis';
 import { DEFAULT_COMPILER_OPTIONS, type CompilerOptions } from '@compiler/manifest/manifest-defaults';
 import type { Expression, Program } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
 import { parse } from '@compiler/parser/parser';
 import { isDeclarationPath } from '@compiler/project/source-kind';
 
+import { isFormatterPath } from '@compiler/format/formatter-fields';
+import { FORMATTER_SCHEMA } from '@compiler/format/formatter-file';
 import { isManifestPath } from '@lsp/workspace/project-settings';
 
 import { lineStarts } from '@lsp/support/source-text';
@@ -68,6 +70,10 @@ export interface AnalysisInput {
 }
 
 export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
+    if (isFormatterPath(input.path)) {
+        return analyzeManifestDocument(input, FORMATTER_SCHEMA);
+    }
+
     if (isManifestPath(input.path)) {
         return analyzeManifestDocument(input);
     }
@@ -121,9 +127,9 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
     };
 }
 
-function analyzeManifestDocument(input: AnalysisInput): DocumentAnalysis {
+function analyzeManifestDocument(input: AnalysisInput, schema: ManifestSchema = MANIFEST_SCHEMA): DocumentAnalysis {
     const root = dirname(input.path);
-    const manifest = analyzeManifest(input.text, { mode: DEFAULT_MANIFEST_MODE, root, env: input.env ?? {} });
+    const manifest = analyzeManifest(input.text, { mode: DEFAULT_MANIFEST_MODE, root, env: input.env ?? {} }, schema);
     const starts = lineStarts(input.text);
     const declarations = new DeclarationRegistry();
 

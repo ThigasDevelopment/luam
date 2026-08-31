@@ -93,6 +93,7 @@ export const ptBR: LocaleStrings = {
         'reference/output-layouts': 'Layouts de saída',
         'reference/diagnostics': 'Diagnósticos',
         'reference/formatting': 'Formatação',
+        'reference/formatter-file': 'Arquivo do formatador',
         'reference/limitations': 'Limitações',
         'reference/compatibility': 'Compatibilidade',
     },

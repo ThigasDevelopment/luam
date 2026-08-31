@@ -85,7 +85,7 @@ const NEW_HOVER = [
 const EXTENDS_HOVER = [
     '```luam',
     'class Child extends Parent { ... }',
-    "interface Entity extends Named, Identified { ... }",
+    'interface Entity extends Named, Identified { ... }',
     '```',
     '',
     '`extends` declares inheritance for a class or an interface.',

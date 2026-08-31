@@ -1,10 +1,9 @@
 import { parse } from '@compiler/parser/parser';
 
 import { indentOf } from './format-indent';
+import { indentUnit, newlineOf, resolveFormatOptions, type FormatOptions } from './format-options';
 import { linesOf, piecesOf, type Piece } from './format-pieces';
 import { renderLine } from './format-spacing';
-
-export const INDENT = '    ';
 
 export interface RangeEdit {
     text: string;
@@ -28,11 +27,7 @@ function signature(pieces: readonly Piece[]): string {
     return JSON.stringify(pieces.map((piece) => [piece.kind, piece.value]));
 }
 
-function newlineOf(source: string): string {
-    return source.includes('\r\n') ? '\r\n' : '\n';
-}
-
-function render(source: string): Formatted | null {
+function render(source: string, options: FormatOptions): Formatted | null {
     const parsed = parse(source);
 
     if (parsed.diagnostics.length > 0) {
@@ -41,6 +36,7 @@ function render(source: string): Formatted | null {
 
     const pieces = piecesOf(source, parsed.tokens, parsed.comments, parsed.erasures);
     const rendered: Rendered[] = [];
+    const unit = indentUnit(options);
 
     let depth = 0;
 
@@ -48,25 +44,26 @@ function render(source: string): Formatted | null {
         const { indent, next } = indentOf(depth, line.pieces);
         const first = line.pieces[0];
         const last = line.pieces[line.pieces.length - 1];
+        const blanks = rendered.length === 0 ? 0 : Math.min(line.blankLines, options.maxBlankLines);
 
-        if (line.blankBefore && rendered.length > 0) {
+        for (let count = 0; count < blanks; count += 1) {
             rendered.push({ text: '', line: 0, endLine: 0 });
         }
 
-        rendered.push({ text: `${INDENT.repeat(indent)}${renderLine(line.pieces)}`, line: first?.line ?? 0, endLine: last?.endLine ?? 0 });
+        rendered.push({ text: `${unit.repeat(indent)}${renderLine(line.pieces, options)}`, line: first?.line ?? 0, endLine: last?.endLine ?? 0 });
         depth = next;
     }
 
-    return { pieces, rendered, newline: newlineOf(source) };
+    return { pieces, rendered, newline: newlineOf(source, options) };
 }
 
 function assemble(rendered: readonly Rendered[], newline: string): string {
     return rendered.length === 0 ? '' : `${rendered.map((entry) => entry.text).join(newline)}${newline}`;
 }
 
-function verified(formatted: Formatted): string | null {
+function verified(formatted: Formatted, options: FormatOptions): string | null {
     const text = assemble(formatted.rendered, formatted.newline);
-    const round = render(text);
+    const round = render(text, options);
 
     if (round === null || signature(round.pieces) !== signature(formatted.pieces)) {
         return null;
@@ -75,16 +72,18 @@ function verified(formatted: Formatted): string | null {
     return text;
 }
 
-export function formatSource(source: string): string | null {
-    const formatted = render(source);
+export function formatSource(source: string, options: Partial<FormatOptions> = {}): string | null {
+    const resolved = resolveFormatOptions(options);
+    const formatted = render(source, resolved);
 
-    return formatted === null ? null : verified(formatted);
+    return formatted === null ? null : verified(formatted, resolved);
 }
 
-export function formatRange(source: string, startLine: number, endLine: number): RangeEdit | null {
-    const formatted = render(source);
+export function formatRange(source: string, startLine: number, endLine: number, options: Partial<FormatOptions> = {}): RangeEdit | null {
+    const resolved = resolveFormatOptions(options);
+    const formatted = render(source, resolved);
 
-    if (formatted === null || verified(formatted) === null) {
+    if (formatted === null || verified(formatted, resolved) === null) {
         return null;
     }
 

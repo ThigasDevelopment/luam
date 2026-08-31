@@ -49,7 +49,7 @@ describe('validate helper', () => {
     it('checks the key and the value of a map', () => {
         const descriptor = "{ kind = 'map', key = { kind = 'string' }, value = { kind = 'number' } }";
 
-        expect(validated("{ a = 1 }", descriptor).result).toBe('ok');
+        expect(validated('{ a = 1 }', descriptor).result).toBe('ok');
         expect(validated("{ a = 'one' }", descriptor).result).toBe('luam-validate: "a" expected "number"');
     });
 

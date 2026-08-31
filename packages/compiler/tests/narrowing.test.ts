@@ -20,8 +20,8 @@ describe('type guards', () => {
     });
 
     it('drops nil after a comparison with nil', () => {
-        const valid = "local name?: string = nil\n\nif name ~= nil then\n    local text: string = name\nend\n";
-        const invalid = "local name?: string = nil\nlocal text: string = name\n";
+        const valid = 'local name?: string = nil\n\nif name ~= nil then\n    local text: string = name\nend\n';
+        const invalid = 'local name?: string = nil\nlocal text: string = name\n';
 
         expect(codes(valid)).toEqual([]);
         expect(codes(invalid)).toEqual(['check-type-mismatch']);

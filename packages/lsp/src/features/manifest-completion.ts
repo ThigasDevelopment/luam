@@ -1,10 +1,11 @@
 import { ENV_GLOBAL, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import type { ManifestField } from '@compiler/manifest/manifest-field';
-import { findManifestField, MANIFEST_FIELDS, MANIFEST_MODES } from '@compiler/manifest/manifest-fields';
+import { MANIFEST_MODES } from '@compiler/manifest/manifest-fields';
 import type { CompletionItem } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { environmentItem, fieldItem, valueItem } from '@lsp/features/manifest-items';
+import { fieldAt, rootFields } from '@lsp/features/manifest-field-table';
 import { manifestScopeAt, type ManifestScope } from '@lsp/features/manifest-scope';
 
 const INJECTED: readonly string[] = ['mode', 'env', 'root'];
@@ -19,22 +20,22 @@ export function environmentKeys(project: ProjectDeclarations): string[] {
     return declaration?.type.kind === 'record' ? declaration.type.members.map((member) => member.name) : [];
 }
 
-function fieldsFor(path: readonly string[]): readonly ManifestField[] {
+function fieldsFor(document: string, path: readonly string[]): readonly ManifestField[] {
     if (path.length === 0) {
-        return MANIFEST_FIELDS;
+        return rootFields(document);
     }
 
-    return findManifestField(path)?.members ?? [];
+    return fieldAt(document, path)?.members ?? [];
 }
 
-function fieldItems(scope: ManifestScope): CompletionItem[] {
-    return fieldsFor(scope.path)
+function fieldItems(document: string, scope: ManifestScope): CompletionItem[] {
+    return fieldsFor(document, scope.path)
         .filter((field) => !scope.assigned.has(field.name))
         .map(fieldItem);
 }
 
-function pendingField(scope: ManifestScope): ManifestField | null {
-    return scope.pending === null ? null : findManifestField([...scope.path, scope.pending]);
+function pendingField(document: string, scope: ManifestScope): ManifestField | null {
+    return scope.pending === null ? null : fieldAt(document, [...scope.path, scope.pending]);
 }
 
 function closedSetItems(field: ManifestField | null, quoted: boolean): CompletionItem[] {
@@ -52,7 +53,7 @@ function stringItems(analysis: DocumentAnalysis, scope: ManifestScope): Completi
         return MANIFEST_MODES.map((mode) => valueItem(mode, 'build mode', false));
     }
 
-    return closedSetItems(pendingField(scope), false);
+    return closedSetItems(pendingField(analysis.path, scope), false);
 }
 
 function valueItems(field: ManifestField | null): CompletionItem[] {
@@ -82,5 +83,5 @@ export function manifestCompletion(analysis: DocumentAnalysis, offset: number): 
         return stringItems(analysis, scope);
     }
 
-    return scope.pending === null ? fieldItems(scope) : valueItems(pendingField(scope));
+    return scope.pending === null ? fieldItems(analysis.path, scope) : valueItems(pendingField(analysis.path, scope));
 }

@@ -423,3 +423,24 @@ mapeamento no estilo `assets` do lado da biblioteca.
 
 Um projeto que precisa de um asset da biblioteca o copia pelo próprio domínio
 `assets`, onde o destino é revisável no manifesto que é dono do build.
+
+## O formatador configura espaçamento, nunca um token
+
+**Decisão de projeto.** Registrado na
+[ADR-042](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/042-formatter-configuration-file.md).
+
+O [`.luam.formatter`](/pt-br/reference/formatter-file) escolhe a indentação, o
+espaço do `function (`, a sequência de linhas em branco e o fim de linha. Ele não
+escolhe o estilo de aspas, ponto e vírgula, capitalização de nomes, inserção de
+parênteses, nem onde uma linha quebra, e nenhuma opção para isso será
+acrescentada.
+
+Esse limite é garantido, não prometido. O formatador reimprime o fluxo de tokens,
+faz parse da própria saída e compara os dois fluxos. Uma opção que mudasse uma
+aspa, um nome ou uma construção falharia nessa comparação, e um arquivo que falha
+nela é deixado exatamente como estava — então tal opção produziria nenhuma saída
+em vez de uma saída errada.
+
+Também não existem sobrescritas por arquivo, sobrescritas por diretiva, trechos
+excluídos da formatação, presets, nem herança de outro pacote. Um arquivo, um
+estilo, para tudo abaixo dele.

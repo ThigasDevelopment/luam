@@ -49,6 +49,7 @@ nome válido de resource do MTA, ou de `luam-resource` como último recurso. Um
 
 ```bash
 luam check
+luam check --watch
 ```
 
 Compila tudo e imprime os diagnósticos. **Não escreve nada.** É o comando para CI
@@ -58,6 +59,51 @@ e para um hook de pre-commit.
 src/server/main.luam:11:23 error check-type-mismatch: Variable "total" expects "number" but received "string".
 Build failed: 1 error, 0 warnings in 4 ms.
 ```
+
+O `--watch` mantém o comando rodando e refaz a verificação a cada mudança sob os
+`sources` do manifesto, imprimindo entre as execuções o mesmo separador do
+`ensure` e reaproveitando o cache incremental. Ele continua sem escrever nada,
+não consulta nenhum release e não precisa de rede. Uma mudança no
+`.luam.manifest` relê a configuração e recalcula o conjunto observado. Diferente
+de `dev` e `ensure`, o `check` **não** observa por padrão. Um watch roda até ser
+interrompido, então o código de saída informa o encerramento e não a última
+verificação — um script que quer um veredito roda `luam check` sem a flag.
+
+## `luam format`
+
+```bash
+luam format
+luam format --check
+luam format src docs/snippets
+```
+
+Reescreve todos os fontes do projeto no estilo que a
+[referência de formatação](/pt-br/reference/formatting) registra, de modo que o
+editor deixa de ser o único caminho para satisfazê-lo. O comando aplica esse
+estilo e nunca o estende; um projeto escolhe as decisões de espaçamento num
+[`.luam.formatter`](/pt-br/reference/formatter-file), e uma configuração que não
+faz parse interrompe a execução com `2`.
+
+Sem caminho, os arquivos são os que o `luam check` compila — os padrões de
+`sources` do manifesto — mais todo arquivo de declaração `.d.luam` do projeto. O
+diretório de saída, `node_modules` e as bibliotecas resolvidas dentro dele nunca
+são tocados. Com um ou mais caminhos, esses arquivos e diretórios são formatados
+no lugar, nenhum manifesto é carregado, e todo arquivo `.luam` abaixo de um
+diretório entra. O `.luam.manifest` não é formatado: é configuração no
+[dialeto de manifesto](/pt-br/tooling/luam-manifest), não um arquivo de fonte.
+
+`--check` não escreve nada. Imprime o caminho de cada arquivo que difere, um por
+linha, e sai com `1` quando algum difere.
+
+```
+src/client/hud.luam
+Format failed: 12 files scanned, 1 differing in 8 ms.
+```
+
+Um arquivo que não faz parse recebe um **aviso e é deixado como está**, e não
+reprova a execução — o formatador não tem o que dizer sobre um arquivo que não
+consegue ler, e o `luam check` é o comando que explica o porquê. A formatação é
+idempotente, então uma segunda execução não muda nada.
 
 ## `luam test`
 
@@ -322,11 +368,13 @@ retorna `2` e não executa nada.
 | `--no-color` | todos os comandos | Saída simples, sem cor nem emoji. `NO_COLOR` faz o mesmo. |
 | `-h`, `--help` | todos os comandos | Imprime o texto de ajuda daquele comando. |
 | `-v`, `--version` | apenas a raiz | Imprime a versão da CLI, como `luam --version`. |
-| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `test`, `trace` | Carrega este arquivo em vez do `.luam.manifest`. |
+| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `format`, `test`, `trace` | Carrega este arquivo em vez do `.luam.manifest`. |
 | `--bundle` / `--no-bundle` | `build`, `ensure` | Seleciona bundle ou árvore. `dev` não possui nenhuma das duas. |
-| `--watch` / `--no-watch` | `dev`, `ensure` | Mantém observando, ou roda uma vez. Ambos observam por padrão. |
+| `--watch` / `--no-watch` | `check`, `dev`, `ensure` | Mantém observando, ou roda uma vez. `dev` e `ensure` observam por padrão; o `check` não. |
 | `--no-map` | `build`, `dev`, `ensure` | Desliga a geração do mapa. Para `build`, também remove o mapa padrão existente depois do sucesso. |
 | `--offline` | `build`, `dev`, `ensure` | Pula a consulta de `min_mta_version`. `LUAM_OFFLINE` faz o mesmo. |
+| `--json` | `build`, `check` | Escreve um documento legível por máquina no stdout em vez do relatório humano. |
+| `--check` | `format` | Não escreve nada e lista os arquivos que diferem. Sai com `1` quando algum difere. |
 | `--source <path>` | `config` | Arquivo Lua nativo a ler. Padrão `config.lua`. |
 | `--out <path>` | `config` | Arquivo de declaração a escrever. Padrão `config.d.luam`. |
 | `--write` | `config` | Escreve o arquivo de declaração em vez de imprimi-lo. |
@@ -352,6 +400,66 @@ ignorava as que não se aplicavam. Essas invocações agora falham com `2`:
 
 Scripts que passam apenas opções pertencentes ao comando não são afetados, e todo
 código de saída mantém o seu significado.
+
+## Saída legível por máquina
+
+O `luam check --json` e o `luam build --json` escrevem **um documento JSON no
+stdout e mais nada ali**. O relatório humano — progresso, tempos de fase, os
+trechos de diagnóstico e a linha de resumo — não é impresso, então o fluxo é
+parseável com um único `JSON.parse`. Os códigos de saída não mudam: o documento
+diz o que aconteceu, o código diz se passou, e nenhum dos dois precisa fazer o
+trabalho do outro.
+
+```json
+{
+    "version": 1,
+    "luam": "0.19.5",
+    "command": "check",
+    "success": false,
+    "diagnostics": [
+        {
+            "path": "src/server/main.luam",
+            "line": 2,
+            "column": 12,
+            "endLine": 2,
+            "endColumn": 17,
+            "severity": "error",
+            "code": "check-type-mismatch",
+            "message": "Return value expects \"number\" but received \"string\"."
+        }
+    ],
+    "summary": { "errors": 1, "warnings": 0, "files": 3, "durationMs": 4 }
+}
+```
+
+Toda chave de um diagnóstico está sempre presente. `path`, `line`, `column`,
+`endLine` e `endColumn` são `null` quando o diagnóstico não tem localização — um
+problema de manifesto ou de configuração, por exemplo — e `endLine`/`endColumn`
+são `null` quando o compilador informa um ponto em vez de um intervalo. O `path`
+é relativo ao diretório do projeto, o mesmo caminho que a saída humana imprime,
+de modo que os dois se conferem a olho.
+
+### Com o que você pode contar
+
+| Estável | Não estável |
+| --- | --- |
+| Todo campo acima existe, com o tipo mostrado. | O texto de `message`. Compare pelo `code`. |
+| Os valores de `code` e o que significam. | A ordem de `diagnostics` além da ordenação que a saída humana já aplica. |
+| `version` está presente e é um número. | `durationMs`, que é uma medição. |
+| Os códigos de saída batem com a execução sem `--json`. | Se uma versão futura acrescenta campos. |
+
+Um campo pode ser **acrescentado** sem mudar a versão; um consumidor precisa
+ignorar campos que não conhece. Um campo não pode ser removido, nem mudar de tipo
+ou de significado, sem elevar o `version`.
+
+### O que não tem
+
+O `--json` pertence ao `check` e ao `build` apenas, e passá-lo a qualquer outro
+comando sai com `2`. O `test` reporta execuções de teste, cujo formato de máquina
+é um documento diferente deste; emitir só os diagnósticos de compilação seria meio
+relatório. O `dev` e o `ensure` são laços de rebuild, e um documento por rebuild é
+um fluxo, não o documento único que este esquema descreve. Pela mesma razão,
+`--json` junto com `--watch` sai com `2`.
 
 ## Códigos de saída
 

@@ -275,7 +275,7 @@ describe('hover', () => {
         const service = new LanguageService();
         const shared = pathToUri('/project/src/shared/core.luam');
         const text = "local core: Core = new Core('client')\n";
-        const source = ["class Core {", "    side: string = ''", '', '    constructor = function (side: string)', '        self.side = side', '    end', '}', ''];
+        const source = ['class Core {', "    side: string = ''", '', '    constructor = function (side: string)', '        self.side = side', '    end', '}', ''];
 
         service.update(shared, 1, source.join('\n'));
         service.update(SERVER_FILE, 1, text);

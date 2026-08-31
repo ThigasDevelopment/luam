@@ -15,7 +15,7 @@ export interface Piece {
 
 export interface Line {
     pieces: Piece[];
-    blankBefore: boolean;
+    blankLines: number;
 }
 
 function isTypeOffset(erasures: readonly ErasureSpan[], offset: number): boolean {
@@ -64,7 +64,7 @@ export function linesOf(pieces: readonly Piece[]): Line[] {
         if (previous !== null && current !== undefined && piece.line === previous.endLine) {
             current.pieces.push(piece);
         } else {
-            lines.push({ pieces: [piece], blankBefore: previous !== null && piece.line - previous.endLine > 1 });
+            lines.push({ pieces: [piece], blankLines: previous === null ? 0 : Math.max(0, piece.line - previous.endLine - 1) });
         }
 
         previous = piece;

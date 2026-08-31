@@ -33,7 +33,8 @@
                     { "context": "test / Test on Node 22" },
                     { "context": "test / Test on Node 24" },
                     { "context": "build / Build" },
-                    { "context": "docs / Docs" }
+                    { "context": "docs / Docs" },
+                    { "context": "conventions / Conventions" }
                 ]
             }
         }

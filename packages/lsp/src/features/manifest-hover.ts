@@ -1,9 +1,10 @@
 import { typeToString } from '@compiler/checker/types';
-import { ENV_MEMBER_TYPE, findManifestField } from '@compiler/manifest/manifest-fields';
+import { ENV_MEMBER_TYPE } from '@compiler/manifest/manifest-fields';
 import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { fieldDocumentation } from '@lsp/features/manifest-items';
+import { fieldAt } from '@lsp/features/manifest-field-table';
 import { manifestScopeAt } from '@lsp/features/manifest-scope';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { isIdentifierChar, positionAt, wordAt } from '@lsp/support/source-text';
@@ -38,7 +39,7 @@ export function manifestHover(analysis: DocumentAnalysis, offset: number): Hover
     }
 
     const scope = manifestScopeAt(analysis.text, start);
-    const field = findManifestField([...scope.path, name]);
+    const field = fieldAt(analysis.path, [...scope.path, name]);
 
     if (field === null) {
         return null;

@@ -47,7 +47,7 @@ describe('string literal completion', () => {
     });
 
     it('offers the values of a key inside a table literal', () => {
-        const source = ["type Config = {", "    mode: 'auto' | 'manual',", '    id: string', '}', '', 'local config: Config = { mode = \''].join('\n');
+        const source = ['type Config = {', "    mode: 'auto' | 'manual',", '    id: string', '}', '', 'local config: Config = { mode = \''].join('\n');
 
         expect(labels(source, "mode = '")).toEqual(['auto', 'manual']);
     });
