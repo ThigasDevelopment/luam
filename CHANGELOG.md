@@ -33,6 +33,16 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   a library that reads a project global is `project-library-project-reference`.
   The editor resolves libraries the same way, so the CLI and the LSP agree.
 
+### Fixed
+
+- A call to a method a class does not declare is reported. `adapter:query(...)`
+  on a class with no `query` compiled clean, and the failure moved to the
+  server, where a nil call says nothing about which name was wrong. Member
+  resolution now answers for a class value and for a typed field that holds one,
+  walking the parent chain before deciding, so an inherited member is found
+  rather than reported, and the message names the members the class does
+  declare.
+
 ## 0.19.6 - 2026-08-31
 
 ### Added
