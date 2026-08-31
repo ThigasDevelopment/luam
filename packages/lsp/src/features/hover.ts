@@ -100,7 +100,7 @@ function libraryMemberHover(analysis: DocumentAnalysis, name: string, offset: nu
     return { contents: { kind: 'markdown', value } };
 }
 
-function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
+function apiHover(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): Hover | null {
     const name = wordAt(analysis.text, offset);
 
     if (name === null) {
@@ -116,7 +116,7 @@ function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
     const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null) {
-        return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? memberHover(analysis, offset);
+        return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? memberHover(analysis, offset, others);
     }
 
     return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };
@@ -158,7 +158,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
     const declaration = analysis.index.declarationFor(offset);
 
     if (declaration === null) {
-        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset) ?? keywordHover(analysis, offset);
+        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset, others) ?? keywordHover(analysis, offset);
     }
 
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;

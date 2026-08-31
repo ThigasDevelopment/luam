@@ -541,4 +541,57 @@ describe('project environment hover', () => {
     it('says nothing for a property of an untyped table', () => {
         expect(hoverText('local slot: table = {}\n\nprint(slot.label)\n', 'print(slot.', 'label')).toBe('');
     });
+
+    describe('member shape', () => {
+        const MAIN = [
+            'class Core {',
+            '    adapters: { mysql: MySQLAdapter };',
+            '',
+            '    init = function (): void',
+            '        print(self.adapters.mysql)',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+        const ADAPTER = 'class MySQLAdapter {\n    host: string = "localhost";\n\n    connect = function (): boolean\n        return true\n    end\n}\n';
+
+        function shapeHover(adapterPath: string): string {
+            const root = createWorkspace({ [adapterPath]: ADAPTER, 'src/server/main.luam': MAIN });
+            const service = new LanguageService();
+
+            try {
+                service.loadWorkspace([root]);
+
+                const hover = service.hover(uriFor(root, 'src/server/main.luam'), positionOf(MAIN, 'self.adapters.', 'mysql'));
+                const contents = hover?.contents;
+
+                return contents !== undefined && typeof contents !== 'string' && !Array.isArray(contents) ? contents.value : '';
+            } finally {
+                removeWorkspace(root);
+            }
+        }
+
+        it('carries the shape of a class declared in the same file', () => {
+            const value = hoverText(`${ADAPTER}\n${MAIN}`, 'self.adapters.', 'mysql');
+
+            expect(value).toContain('**Instance**');
+            expect(value).toContain('class MySQLAdapter');
+            expect(value).toContain('connect(): boolean');
+        });
+
+        it('carries the shape of a class declared in another file', () => {
+            const value = shapeHover('src/shared/adapter.luam');
+
+            expect(value).toContain('{ mysql: MySQLAdapter }.mysql: MySQLAdapter');
+            expect(value).toContain('**Instance**');
+            expect(value).toContain('connect(): boolean');
+        });
+
+        it('does not reach a class the environment may not reference', () => {
+            const value = shapeHover('src/client/adapter.luam');
+
+            expect(value).toContain('{ mysql: MySQLAdapter }.mysql: MySQLAdapter');
+            expect(value).not.toContain('**Instance**');
+        });
+    });
 });

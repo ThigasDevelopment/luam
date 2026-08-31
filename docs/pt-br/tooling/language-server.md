@@ -25,6 +25,12 @@ classe, de uma tabela tipada inline, de uma `interface` ou de um global do
 projeto informa o tipo que o checker deu àquela propriedade, lido da expressão
 sob o cursor e não do primeiro membro do arquivo que compartilha o nome.
 
+Quando essa propriedade é uma classe ou uma `interface`, o hover traz também a
+forma dela. A declaração é procurada primeiro no arquivo sob o cursor e depois
+no workspace, então uma classe declarada em outro arquivo ainda mostra seus
+membros. Só os arquivos que o ambiente pode referenciar são consultados, então um
+arquivo de servidor nunca informa a forma de uma classe só de cliente.
+
 ### Palavras reservadas
 
 Toda palavra reservada é completada, cada uma na posição em que é válida:

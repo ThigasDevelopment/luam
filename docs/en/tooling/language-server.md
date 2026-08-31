@@ -25,6 +25,12 @@ typed inline, of an `interface` or of a project global reports the type the
 checker gave that property, read from the expression under the cursor rather
 than from the first member in the file that shares its name.
 
+When that property is a class or an `interface`, the hover also carries its
+shape. The declaration is looked up in the file under the cursor first and then
+across the workspace, so a class declared in another file still shows its
+members. Only files the environment may reference are searched, so a server file
+never reports the shape of a client-only class.
+
 ### Reserved words
 
 Every reserved word is completed, each in the position where it is legal:

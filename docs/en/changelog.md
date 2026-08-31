@@ -48,7 +48,9 @@ Every heading below is a released version and the date it shipped, newest first.
   The row for a class field with no default already described `name = nil`, and
   the development build now produces it.
 - [Language server](/en/tooling/language-server) records that hover answers over
-  a member expression, reading the property under the cursor.
+  a member expression, reading the property under the cursor, and
+  that the shape of a class or an `interface` comes with it, from any file the
+  environment may reference.
 
 ## 0.19.5 - 2026-08-28
 

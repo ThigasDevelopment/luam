@@ -50,7 +50,9 @@ da versão atual.
   linha do campo de classe sem padrão já descrevia `name = nil`, e o build de
   desenvolvimento agora o produz.
 - [Language server](/pt-br/tooling/language-server) registra que o hover responde
-  sobre uma expressão de membro, lendo a propriedade sob o cursor.
+  sobre uma expressão de membro, lendo a propriedade sob o cursor, e que a
+  forma de uma classe ou `interface` vem junto, de qualquer arquivo que o ambiente
+  possa referenciar.
 
 ## 0.19.5 - 2026-08-28
 

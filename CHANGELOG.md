@@ -55,7 +55,9 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   editor answered only for a project global, and matched the first member in the
   file with that name, so two tables sharing a property name reported the same
   type for both. A class instance, a table typed inline and an `interface` now
-  answer too.
+  answer too. When the property is a class or an `interface`, the hover carries
+  its shape as well, looked up across the workspace and bounded by what the
+  environment may reference.
 - A declared return type is enforced on every path. A function annotated with a
   concrete type that can reach its closing `end` without returning is now
   `check-missing-return` instead of silently handing the caller `nil`. An
