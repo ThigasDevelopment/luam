@@ -2815,14 +2815,14 @@ Three defects reported from one file: a class field written with only a type dis
 from the generated class, the semicolon after a lowered statement was left alone on a line,
 and hovering the property of a typed table answered nothing.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 42.01 | Emit a class field declared without a default in the preserved class body | ../plans/42.01-declared-class-field-output.md | architecture-engineer | todo |
-| 42.02 | Keep the trailing semicolon of a lowered statement on the statement line | ../plans/42.02-lowered-statement-semicolon.md | architecture-engineer | todo |
-| 42.03 | Hover a member expression by the type the checker gave it | ../plans/42.03-member-expression-hover.md | architecture-engineer | todo |
-| 42.04 | Record what the class body and a hover now show | ../plans/42.04-class-output-documentation.md | documentation-engineer | todo |
+| 42.01 | Emit a class field declared without a default in the preserved class body | ../plans/42.01-declared-class-field-output.md | architecture-engineer | done |
+| 42.02 | Keep the trailing semicolon of a lowered statement on the statement line | ../plans/42.02-lowered-statement-semicolon.md | architecture-engineer | done |
+| 42.03 | Hover a member expression by the type the checker gave it | ../plans/42.03-member-expression-hover.md | architecture-engineer | done |
+| 42.04 | Record what the class body and a hover now show | ../plans/42.04-class-output-documentation.md | documentation-engineer | done |
 
 Acceptance:
 

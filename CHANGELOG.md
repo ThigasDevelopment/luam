@@ -14,6 +14,30 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.11 - 2026-08-31
+
+### Fixed
+
+- A class field written with only a type reaches the generated class. A
+  development build emitted a blank line where `name: Type;` was written, while
+  a release build already emitted `name = nil`; the two paths now agree, on the
+  line the field was written on, whatever separator the author wrote.
+- A statement lowered to canonical Lua keeps the semicolon written after it. A
+  multi-line statement holding a compound assignment left its `;` alone on the
+  next line; the semicolon now lands on the generated statement, and no
+  generated line is a bare `;`.
+- A `new`, a template string and a native extension are lowered as expressions
+  rather than as the statement holding them, so a development build keeps the
+  layout written around them. A table literal spanning several lines with a
+  `new` inside no longer collapses onto one line and leaves the rest blank.
+- Hovering a member reports the type of the property under the cursor. The
+  editor answered only for a project global, and matched the first member in the
+  file with that name, so two tables sharing a property name reported the same
+  type for both. A class instance, a table typed inline and an `interface` now
+  answer too. When the property is a class or an `interface`, the hover carries
+  its shape as well, looked up across the workspace and bounded by what the
+  environment may reference.
+
 ## 0.19.10 - 2026-08-31
 
 ### Added
@@ -98,6 +122,25 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ### Fixed
 
+- A class field written with only a type reaches the generated class. A
+  development build emitted a blank line where `name: Type;` was written, while
+  a release build already emitted `name = nil`; the two paths now agree, on the
+  line the field was written on, whatever separator the author wrote.
+- A statement lowered to canonical Lua keeps the semicolon written after it. A
+  multi-line statement holding a compound assignment left its `;` alone on the
+  next line; the semicolon now lands on the generated statement, and no
+  generated line is a bare `;`.
+- A `new`, a template string and a native extension are lowered as expressions
+  rather than as the statement holding them, so a development build keeps the
+  layout written around them. A table literal spanning several lines with a
+  `new` inside no longer collapses onto one line and leaves the rest blank.
+- Hovering a member reports the type of the property under the cursor. The
+  editor answered only for a project global, and matched the first member in the
+  file with that name, so two tables sharing a property name reported the same
+  type for both. A class instance, a table typed inline and an `interface` now
+  answer too. When the property is a class or an `interface`, the hover carries
+  its shape as well, looked up across the workspace and bounded by what the
+  environment may reference.
 - A declared return type is enforced on every path. A function annotated with a
   concrete type that can reach its closing `end` without returning is now
   `check-missing-return` instead of silently handing the caller `nil`. An

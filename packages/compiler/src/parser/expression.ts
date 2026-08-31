@@ -161,7 +161,10 @@ function isCallStart(stream: TokenStream): boolean {
 }
 
 export function parseSuffixed(stream: TokenStream): Expression {
+    const checkpoint = stream.checkpoint();
     let expression = parsePrimary(stream);
+
+    stream.recordSpan(expression, checkpoint);
 
     for (;;) {
         const token = stream.current();
@@ -172,6 +175,8 @@ export function parseSuffixed(stream: TokenStream): Expression {
             const property = stream.expectName().value;
 
             expression = { kind: 'member-expression', object: expression, property, position: token.position };
+
+            stream.recordSpan(expression, checkpoint);
 
             continue;
         }
@@ -185,6 +190,8 @@ export function parseSuffixed(stream: TokenStream): Expression {
 
             expression = { kind: 'index-expression', object: expression, index, position: token.position };
 
+            stream.recordSpan(expression, checkpoint);
+
             continue;
         }
 
@@ -197,6 +204,8 @@ export function parseSuffixed(stream: TokenStream): Expression {
 
             expression = { kind: 'call-expression', callee: expression, method, typeArguments, args: parseArguments(stream), position: token.position };
 
+            stream.recordSpan(expression, checkpoint);
+
             continue;
         }
 
@@ -204,6 +213,8 @@ export function parseSuffixed(stream: TokenStream): Expression {
 
         if (typeArguments.length > 0 || isCallStart(stream)) {
             expression = { kind: 'call-expression', callee: expression, method: null, typeArguments, args: parseArguments(stream), position: token.position };
+
+            stream.recordSpan(expression, checkpoint);
 
             continue;
         }

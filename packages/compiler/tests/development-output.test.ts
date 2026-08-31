@@ -43,6 +43,22 @@ const FIXTURES: readonly Fixture[] = [
         source: 'local total: number = 0\n\nfor index = 1, 3 do\n    total += index\n\n    print(total)\nend\n',
         lowered: [1, 4],
     },
+    { name: 'declared field', source: 'class Holder {\n    id: number;\n\n    label = 1\n}\n\nprint(1)\n', lowered: [1, 2] },
+    {
+        name: 'multi line declared field',
+        source: 'class Shape {\n    sides: {\n        count: number\n    };\n\n    label = 1\n}\n\nprint(1)\n',
+        lowered: [1, 2, 3, 4],
+    },
+    {
+        name: 'lowered expression in a table literal',
+        source: 'class Point {\n    x = 0\n}\n\nlocal value = {\n    point = new Point ()\n};\n\nprint(value)\n',
+        lowered: [1, 6],
+    },
+    {
+        name: 'lowered statement with a semicolon',
+        source: 'local total: number = 0\n\ntotal +=\n    1;\n\nprint(total)\n',
+        lowered: [1, 3, 4],
+    },
     { name: 'single line class', source: "class Tiny { label = 'a' }\n\nprint(1)\n", lowered: [1] },
     { name: 'single line enum', source: 'enum Colors { RED, GREEN }\n\nprint(Colors.RED)\n', lowered: [1] },
     { name: 'single line loop', source: 'for index = 1, 3 do if index == 2 then continue end print(index) end\n', lowered: [1] },
@@ -61,6 +77,89 @@ describe('development output', () => {
         for (const code of [developmentCode(source), releaseCode(source)]) {
             expect(toLines(code).filter((line) => line.trim() === ';')).toEqual([]);
         }
+    });
+
+    it('emits a field declared without a default on the line it was written on', () => {
+        const source = 'class Core {\n    adapters: { mysql: number };\n\n    label = 1\n}\n\nprint(1)\n';
+        const lines = toLines(developmentCode(source));
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[1]).toBe('    adapters = nil;');
+    });
+
+    it('keeps a declared field on one line when its annotation spans several', () => {
+        const source = 'class Shape {\n    sides: {\n        count: number\n    };\n\n    label = 1\n}\n\nprint(1)\n';
+        const lines = toLines(developmentCode(source));
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[1]).toBe('    sides = nil;');
+        expect(lines[2]).toBe('');
+        expect(lines[3]).toBe('');
+    });
+
+    it('separates a declared field the author left without one', () => {
+        const source = 'class Core {\n    adapters: number\n\n    label = 1\n}\n\nprint(1)\n';
+
+        expect(toLines(developmentCode(source))[1]).toBe('    adapters = nil,');
+    });
+
+    it('emits a declared field that is the only member of its class', () => {
+        const source = 'class Core {\n    adapters: number\n}\n\nprint(1)\n';
+        const code = developmentCode(source);
+
+        expect(toLines(code)[1]).toBe('    adapters = nil');
+        expect(toLines(code).length).toBe(toLines(source).length);
+    });
+
+    it('emits a declared field written last in its class', () => {
+        const source = 'class Core {\n    label = 1,\n\n    adapters: number\n}\n\nprint(1)\n';
+
+        expect(toLines(developmentCode(source))[3]).toBe('    adapters = nil');
+    });
+
+    it('emits a static field declared without a default', () => {
+        const source = 'class Core {\n    static registry: number\n}\n\nprint(1)\n';
+        const lines = toLines(developmentCode(source));
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[1]).toBe('    registry = nil');
+    });
+
+    it('names a declared field the same way in a development build and a release build', () => {
+        const source = 'class Core {\n    adapters: number;\n\n    label = 1\n}\n\nprint(1)\n';
+
+        expect(developmentCode(source)).toContain('adapters = nil');
+        expect(releaseCode(source)).toContain('adapters = nil');
+    });
+
+    it('lowers the expression alone and leaves the layout written around it', () => {
+        const source = 'class Point {\n    x = 0\n}\n\nlocal value = {\n    point = new Point ()\n};\n\nprint(value)\n';
+        const lines = toLines(developmentCode(source));
+
+        expect(lines.length).toBe(toLines(source).length);
+        expect(lines[4]).toBe('local value = {');
+        expect(lines[5]).toBe("    point = new 'Point' ()");
+        expect(lines[6]).toBe('};');
+    });
+
+    it('lowers a template string in place without collapsing the call around it', () => {
+        const lines = toLines(developmentCode("local name: string = 'a'\n\nprint(\n    `hi ${name}!`\n);\n\nprint(1)\n"));
+
+        expect(lines[2]).toBe('print(');
+        expect(lines[3]).toBe("    string.template('hi ${name}!', { name = name })");
+        expect(lines[4]).toBe(');');
+    });
+
+    it('keeps the semicolon of a statement that still lowers whole', () => {
+        const lines = toLines(developmentCode('local total: number = 0\n\ntotal +=\n    1;\n\nprint(total)\n'));
+
+        expect(lines[2]).toBe('total = total + 1;');
+        expect(lines[3]).toBe('');
+    });
+
+    it('invents no semicolon for a lowered statement written without one', () => {
+        expect(developmentCode('local total: number = 0\n\ntotal +=\n    1\n\nprint(total)\n')).not.toContain(';');
+        expect(developmentCode('class Point {\n    x = 0\n}\n\nlocal value = new Point ()\n')).not.toContain(';');
     });
 
     it('keeps an erased declaration visible as a comment only in a development build', () => {

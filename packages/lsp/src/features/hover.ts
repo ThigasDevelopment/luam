@@ -1,4 +1,3 @@
-import { typeToString } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
 import { findDeclaration } from '@mta-types/catalog';
 import { memberDocumentation } from '@mta-types/documentation-lookup';
@@ -15,6 +14,7 @@ import { eventHover } from '@lsp/features/event-hover';
 import { keywordHover } from '@lsp/features/keyword-hover';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
+import { memberHover } from '@lsp/features/member-hover';
 import { mtaClassHover } from '@lsp/features/mta-class-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
 import { declarationsIn } from '@lsp/features/symbol-lookup';
@@ -44,25 +44,6 @@ function projectHover(analysis: DocumentAnalysis, name: string): Hover | null {
     const scope = `declared in ${origin} (${target.environment})`;
 
     return { contents: { kind: 'markdown', value: `${markdown(descriptorShapeText(name, target.type, analysis.env))}\n\n${scope}` } };
-}
-
-function recordMemberHover(analysis: DocumentAnalysis, name: string): Hover | null {
-    for (const [expression, type] of analysis.types) {
-        if (expression.kind !== 'member-expression' || expression.property !== name) {
-            continue;
-        }
-
-        const owner = analysis.types.get(expression.object);
-
-        if (owner !== undefined && owner.kind === 'record') {
-            const signature = `${owner.name}.${name}: ${typeToString(type)}`;
-            const value = memberMarkdown(owner.name, name, signature, '') ?? markdown(signature);
-
-            return { contents: { kind: 'markdown', value } };
-        }
-    }
-
-    return null;
 }
 
 function workspaceHover(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[], offset: number): Hover | null {
@@ -119,7 +100,7 @@ function libraryMemberHover(analysis: DocumentAnalysis, name: string, offset: nu
     return { contents: { kind: 'markdown', value } };
 }
 
-function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
+function apiHover(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): Hover | null {
     const name = wordAt(analysis.text, offset);
 
     if (name === null) {
@@ -135,7 +116,7 @@ function apiHover(analysis: DocumentAnalysis, offset: number): Hover | null {
     const declaration = findDeclaration(name, analysis.environment);
 
     if (declaration === null) {
-        return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? recordMemberHover(analysis, name);
+        return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? memberHover(analysis, offset, others);
     }
 
     return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };
@@ -177,7 +158,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
     const declaration = analysis.index.declarationFor(offset);
 
     if (declaration === null) {
-        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset) ?? keywordHover(analysis, offset);
+        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset, others) ?? keywordHover(analysis, offset);
     }
 
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;

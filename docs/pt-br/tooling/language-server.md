@@ -9,7 +9,7 @@ editor que fale o Language Server Protocol pode iniciá-lo da mesma forma.
 | --- | --- |
 | Diagnósticos | Publicados ao abrir e a cada mudança, limpos quando o arquivo é corrigido. |
 | Completação | Símbolos do escopo, globais do workspace, APIs do MTA no ambiente e palavras-chave. |
-| Hover | Tipo declarado ou inferido, assinatura da função, ambiente da API do MTA. |
+| Hover | Tipo declarado ou inferido, assinatura da função, ambiente da API do MTA e o tipo da propriedade que uma expressão de membro lê. |
 | Definição | Locais, parâmetros, membros de classe e globais declarados em outro arquivo. |
 | Referências | Todo uso de um símbolo, entre arquivos para globais. |
 | Renomear | Edita todas as ocorrências, entre arquivos para globais. |
@@ -19,6 +19,17 @@ A completação dispara em `.` e `:` para membros: campos e métodos de classe
 (incluindo herdados), membros de enum, membros das bibliotecas `math` / `string` /
 `table` e as [extensões de objeto](/pt-br/language/extensions) que se aplicam ao
 tipo do receptor.
+
+O hover também responde sobre um membro. A propriedade de uma instância de
+classe, de uma tabela tipada inline, de uma `interface` ou de um global do
+projeto informa o tipo que o checker deu àquela propriedade, lido da expressão
+sob o cursor e não do primeiro membro do arquivo que compartilha o nome.
+
+Quando essa propriedade é uma classe ou uma `interface`, o hover traz também a
+forma dela. A declaração é procurada primeiro no arquivo sob o cursor e depois
+no workspace, então uma classe declarada em outro arquivo ainda mostra seus
+membros. Só os arquivos que o ambiente pode referenciar são consultados, então um
+arquivo de servidor nunca informa a forma de uma classe só de cliente.
 
 ### Palavras reservadas
 

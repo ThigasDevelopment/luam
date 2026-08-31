@@ -49,6 +49,17 @@ print(1)
 "
 `;
 
+exports[`development output > locks the release output of 'declared field' 1`] = `
+"class 'Holder' {
+    id = nil,
+
+    label = 1
+}
+
+print(1)
+"
+`;
+
 exports[`development output > locks the release output of 'enum' 1`] = `
 "GameState = enum { 'LOBBY', 'RUNNING' }
 
@@ -75,6 +86,42 @@ exports[`development output > locks the release output of 'local enum' 1`] = `
 
 
 print(Weather.RAIN)
+"
+`;
+
+exports[`development output > locks the release output of 'lowered expression in a table literal' 1`] = `
+"class 'Point' {
+    x = 0
+}
+
+local value = { point = new 'Point' () };
+
+
+
+print(value)
+"
+`;
+
+exports[`development output > locks the release output of 'lowered statement with a semicolon' 1`] = `
+"local total = 0
+
+total = total + 1;
+
+
+print(total)
+"
+`;
+
+exports[`development output > locks the release output of 'multi line declared field' 1`] = `
+"class 'Shape' {
+    sides = nil,
+
+
+
+    label = 1
+}
+
+print(1)
 "
 `;
 

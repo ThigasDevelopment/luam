@@ -1,6 +1,6 @@
 {
     "name": "@luam/conventions",
-    "version": "0.19.10",
+    "version": "0.19.11",
     "private": true,
     "type": "module",
     "imports": {

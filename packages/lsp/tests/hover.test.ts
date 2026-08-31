@@ -470,4 +470,128 @@ describe('project environment hover', () => {
     it('names the file the keys come from and the environment that may read them', () => {
         expect(environmentHover('local name = env.SERVER_NAME\n', 'local name', 'env')).toContain('declared in ".env" (server)');
     });
+
+    it('reports the property of a typed table under the cursor', () => {
+        const text = [
+            'class MySQLAdapter {',
+            '    id: number = 1',
+            '}',
+            '',
+            'class Core {',
+            '    adapters: { mysql: MySQLAdapter };',
+            '',
+            '    describe = function (): void',
+            '        print(self.adapters.mysql)',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+
+        expect(hoverText(text, 'print(self.', 'adapters')).toContain('adapters: { mysql: MySQLAdapter }');
+        expect(hoverText(text, 'print(self.adapters.', 'mysql')).toContain('mysql: MySQLAdapter');
+    });
+
+    it('answers by the member under the cursor, not the first with that name', () => {
+        const text = [
+            'local first: { value: string } = { value = "a" }',
+            'local second: { value: number } = { value = 1 }',
+            '',
+            'print(first.value)',
+            'print(second.value)',
+            '',
+        ].join('\n');
+
+        expect(hoverText(text, 'print(first.', 'value')).toContain('{ value: string }.value: string');
+        expect(hoverText(text, 'print(second.', 'value')).toContain('{ value: number }.value: number');
+    });
+
+    it('reports the receiver of a method call the same way it reports it alone', () => {
+        const text = [
+            'class Adapter {',
+            '    connect = function (): void',
+            '    end',
+            '}',
+            '',
+            'local holder: { db: Adapter } = { db = new Adapter() }',
+            '',
+            'holder.db:connect()',
+            '',
+            'print(holder.db)',
+            '',
+        ].join('\n');
+
+        expect(hoverText(text, '\nholder.', 'db')).toContain('{ db: Adapter }.db: Adapter');
+        expect(hoverText(text, 'print(holder.', 'db')).toContain('{ db: Adapter }.db: Adapter');
+    });
+
+    it('reports the field of a class instance and the member of an interface', () => {
+        const instance = ['class Core {', '    label: string = "a"', '}', '', 'local core = new Core()', '', 'print(core.label)', ''].join('\n');
+        const declared = ['interface Holder {', '    mysql: string;', '}', '', 'local held: Holder = { mysql = "a" }', '', 'print(held.mysql)', ''].join('\n');
+
+        expect(hoverText(instance, 'print(core.', 'label')).toContain('label: string');
+        expect(hoverText(declared, 'print(held.', 'mysql')).toContain('mysql: string');
+    });
+
+    it('keeps a record global, an mta member and a library member hovering as before', () => {
+        expect(environmentHover('local name = env.SERVER_NAME\n', 'env.', 'SERVER_NAME')).toContain('env.SERVER_NAME: string');
+        expect(hoverText('local value = math.floor(1.5)\n', 'math.', 'floor')).toContain('function math.floor(value: number): number');
+        expect(hoverText('local player = getRandomPlayer()\n', 'local player', 'getRandomPlayer')).toContain('getRandomPlayer');
+    });
+
+    it('says nothing for a property of an untyped table', () => {
+        expect(hoverText('local slot: table = {}\n\nprint(slot.label)\n', 'print(slot.', 'label')).toBe('');
+    });
+
+    describe('member shape', () => {
+        const MAIN = [
+            'class Core {',
+            '    adapters: { mysql: MySQLAdapter };',
+            '',
+            '    init = function (): void',
+            '        print(self.adapters.mysql)',
+            '    end',
+            '}',
+            '',
+        ].join('\n');
+        const ADAPTER = 'class MySQLAdapter {\n    host: string = "localhost";\n\n    connect = function (): boolean\n        return true\n    end\n}\n';
+
+        function shapeHover(adapterPath: string): string {
+            const root = createWorkspace({ [adapterPath]: ADAPTER, 'src/server/main.luam': MAIN });
+            const service = new LanguageService();
+
+            try {
+                service.loadWorkspace([root]);
+
+                const hover = service.hover(uriFor(root, 'src/server/main.luam'), positionOf(MAIN, 'self.adapters.', 'mysql'));
+                const contents = hover?.contents;
+
+                return contents !== undefined && typeof contents !== 'string' && !Array.isArray(contents) ? contents.value : '';
+            } finally {
+                removeWorkspace(root);
+            }
+        }
+
+        it('carries the shape of a class declared in the same file', () => {
+            const value = hoverText(`${ADAPTER}\n${MAIN}`, 'self.adapters.', 'mysql');
+
+            expect(value).toContain('**Instance**');
+            expect(value).toContain('class MySQLAdapter');
+            expect(value).toContain('connect(): boolean');
+        });
+
+        it('carries the shape of a class declared in another file', () => {
+            const value = shapeHover('src/shared/adapter.luam');
+
+            expect(value).toContain('{ mysql: MySQLAdapter }.mysql: MySQLAdapter');
+            expect(value).toContain('**Instance**');
+            expect(value).toContain('connect(): boolean');
+        });
+
+        it('does not reach a class the environment may not reference', () => {
+            const value = shapeHover('src/client/adapter.luam');
+
+            expect(value).toContain('{ mysql: MySQLAdapter }.mysql: MySQLAdapter');
+            expect(value).not.toContain('**Instance**');
+        });
+    });
 });

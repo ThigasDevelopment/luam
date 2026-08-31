@@ -50,15 +50,16 @@ export function canonicalEdit(input: PreserveInput, statement: Statement, span: 
         return erasedEdit(source, span);
     }
 
-    const authored = source.slice(span.start, span.end);
-    const replacement = reindent(trimmed, indentOf(source, span.start));
+    const end = erasedEnd(source, span);
+    const authored = source.slice(span.start, end);
+    const replacement = `${reindent(trimmed, indentOf(source, span.start))}${source.slice(span.end, end).trim()}`;
     const missing = lineCount(authored) - lineCount(replacement);
 
     if (missing < 0 && input.development) {
         return null;
     }
 
-    const padded = missing > 0 && source.slice(span.end).trim().length > 0 ? `${replacement}${'\n'.repeat(missing)}` : replacement;
+    const padded = missing > 0 && source.slice(end).trim().length > 0 ? `${replacement}${'\n'.repeat(missing)}` : replacement;
 
-    return { start: span.start, end: span.end, replacement: padded, lines: emitted.lines };
+    return { start: span.start, end, replacement: padded, lines: emitted.lines };
 }
