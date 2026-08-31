@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.6 - 2026-08-31
+
 ### Adicionado
 
 - [Bibliotecas](/pt-br/tooling/libraries) descreve o modelo inteiro: instalar e

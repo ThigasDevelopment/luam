@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.6 - 2026-08-31
+
 ### Added
 
 - [Libraries](/en/tooling/libraries) describes the whole model: installing and
