@@ -68,7 +68,7 @@ export const SECTIONS: readonly Section[] = [
     },
     {
         id: 'reference',
-        pages: ['index', 'keywords', 'operators', 'directives', 'configuration-fields', 'output-layouts', 'diagnostics', 'formatting', 'limitations', 'compatibility'],
+        pages: ['index', 'keywords', 'operators', 'directives', 'configuration-fields', 'output-layouts', 'diagnostics', 'formatting', 'formatter-file', 'limitations', 'compatibility'],
     },
 ];
 

@@ -222,3 +222,15 @@ writes nothing.
 | `config-invalid-engine-version` | `engine.minVersion` is neither `'latest'` nor a version. |
 | `config-missing-env-file` | A configured `environment` file does not exist. |
 | `config-unknown-helper` | `helpers` names a helper that does not exist. |
+
+## Formatter file
+
+Reported for [`.luam.formatter`](/en/reference/formatter-file). Any of them stops
+the run: `luam format` exits `2` and writes nothing, and the editor offers no
+edits.
+
+| Code | Meaning |
+| --- | --- |
+| `formatter-unknown-field` | A name the formatter field table does not define. |
+| `formatter-invalid-value` | A value outside the field's type or range — an unknown `indent`, an `indentWidth` outside 1 to 8, a `maxBlankLines` outside 0 to 4. |
+| `formatter-parse-error` | The file does not parse as the manifest dialect. |

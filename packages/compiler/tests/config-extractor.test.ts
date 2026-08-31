@@ -27,7 +27,7 @@ describe('config extraction', () => {
     });
 
     it('reads a positional table as an array', () => {
-        expect(types("SPAWNS = { 1, 2, 3 }\n")).toEqual({ SPAWNS: 'number[]' });
+        expect(types('SPAWNS = { 1, 2, 3 }\n')).toEqual({ SPAWNS: 'number[]' });
     });
 
     it('widens an array of mixed elements', () => {
@@ -39,11 +39,11 @@ describe('config extraction', () => {
     });
 
     it('reads a nested table', () => {
-        expect(types("ROOT = { inner = { flag = true } }\n")).toEqual({ ROOT: '{ inner: { flag: boolean } }' });
+        expect(types('ROOT = { inner = { flag = true } }\n')).toEqual({ ROOT: '{ inner: { flag: boolean } }' });
     });
 
     it('reads an array of tables', () => {
-        expect(types("ITEMS = { { id = 1 }, { id = 2 } }\n")).toEqual({ ITEMS: '{ id: number }[]' });
+        expect(types('ITEMS = { { id = 1 }, { id = 2 } }\n')).toEqual({ ITEMS: '{ id: number }[]' });
     });
 
     it('reads an empty table as a table', () => {
@@ -69,7 +69,7 @@ describe('config extraction', () => {
 
 describe('unsupported config content', () => {
     it('refuses a function call', () => {
-        expect(problems("NAME = getResourceName()\n")[0]).toContain('Declare this value by hand');
+        expect(problems('NAME = getResourceName()\n')[0]).toContain('Declare this value by hand');
     });
 
     it('refuses a function definition', () => {

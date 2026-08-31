@@ -51,7 +51,7 @@ describe('checker', () => {
     });
 
     it('accepts a call that omits an optional parameter', () => {
-        expect(codes("local function take(value?: string): void\nend\ntake()\n")).toEqual([]);
+        expect(codes('local function take(value?: string): void\nend\ntake()\n')).toEqual([]);
     });
 
     it('reports a return type mismatch', () => {
@@ -213,7 +213,7 @@ describe('checker', () => {
 
     it('reports a compound assignment applied to a string', () => {
         expect(codes("local name: string = 'Thigas'\nname += 1\n")).toEqual(['check-invalid-operand']);
-        expect(codes("local total: number = 1\ntotal ..= true\n")).toEqual(['check-invalid-operand']);
+        expect(codes('local total: number = 1\ntotal ..= true\n')).toEqual(['check-invalid-operand']);
     });
 
     it('reports diagnostics with the position of the offending expression', () => {

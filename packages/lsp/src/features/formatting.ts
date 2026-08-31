@@ -2,6 +2,8 @@ import type { Range, TextEdit } from 'vscode-languageserver';
 
 import { formatRange, formatSource } from '@compiler/format/format';
 
+import { formatterOptionsFor } from '@lsp/workspace/formatter-settings';
+
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
 function wholeDocument(text: string): Range {
@@ -11,7 +13,13 @@ function wholeDocument(text: string): Range {
 }
 
 export function formatDocument(analysis: DocumentAnalysis): TextEdit[] {
-    const formatted = formatSource(analysis.text);
+    const style = formatterOptionsFor(analysis.path);
+
+    if (!style.valid) {
+        return [];
+    }
+
+    const formatted = formatSource(analysis.text, style.options);
 
     if (formatted === null || formatted === analysis.text) {
         return [];
@@ -21,7 +29,13 @@ export function formatDocument(analysis: DocumentAnalysis): TextEdit[] {
 }
 
 export function formatDocumentRange(analysis: DocumentAnalysis, range: Range): TextEdit[] {
-    const edit = formatRange(analysis.text, range.start.line + 1, range.end.line + 1);
+    const style = formatterOptionsFor(analysis.path);
+
+    if (!style.valid) {
+        return [];
+    }
+
+    const edit = formatRange(analysis.text, range.start.line + 1, range.end.line + 1, style.options);
 
     if (edit === null) {
         return [];

@@ -53,7 +53,7 @@ describe('export directive parsing', () => {
     });
 
     it('keeps "export" usable as a table field and a call target', () => {
-        expect(codes("local settings: table = { export = true }\nprint(settings.export)\n")).toEqual([]);
+        expect(codes('local settings: table = { export = true }\nprint(settings.export)\n')).toEqual([]);
     });
 
     it('keeps "http" usable as an ordinary identifier', () => {
@@ -128,7 +128,7 @@ describe('removed build directives', () => {
     it('reads "depends" as an ordinary identifier and a call target', () => {
         expect(codes('local depends = 1\nprint(depends)\n')).toEqual([]);
         expect(codes("function depends(name: string): void\n    print(name)\nend\n\ndepends('scoreboard')\n")).toEqual([]);
-        expect(firstStatement("function depends(name: string): void\n    print(name)\nend\n").kind).toBe('function-declaration');
+        expect(firstStatement('function depends(name: string): void\n    print(name)\nend\n').kind).toBe('function-declaration');
     });
 
     it('leaves "export" as the only build directive', () => {

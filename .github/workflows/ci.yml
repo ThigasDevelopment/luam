@@ -24,6 +24,11 @@ jobs:
         permissions:
             contents: read
 
+    conventions:
+        uses: ./.github/workflows/unit-conventions.yml
+        permissions:
+            contents: read
+
     docs:
         uses: ./.github/workflows/unit-docs.yml
         permissions:

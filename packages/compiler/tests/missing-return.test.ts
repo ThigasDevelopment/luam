@@ -14,7 +14,7 @@ const EVERY_PATH = "    if flag then\n        return 'yes'\n    else\n        re
 
 const SOME_PATH = "    if flag then\n        return 'yes'\n    end\n";
 
-const NO_PATH = "    print(flag)\n";
+const NO_PATH = '    print(flag)\n';
 
 function declaration(annotation: string, body: string): string {
     const suffix = annotation.length === 0 ? '' : `: ${annotation}`;
@@ -115,7 +115,7 @@ describe('every construct that checks a function body', () => {
     });
 
     it('reports a class method', () => {
-        expect(codes("class A {\n    read = function (): string\n    end\n}\n")).toEqual(['check-missing-return']);
+        expect(codes('class A {\n    read = function (): string\n    end\n}\n')).toEqual(['check-missing-return']);
     });
 
     it('reports a static class method', () => {

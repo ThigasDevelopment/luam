@@ -67,19 +67,19 @@ describe('static members', () => {
     });
 
     it('rejects a name declared in both spaces', () => {
-        const source = "class Counter {\n    static total: number = 0\n\n    total: number = 0\n}\n";
+        const source = 'class Counter {\n    static total: number = 0\n\n    total: number = 0\n}\n';
 
         expect(codes(source)).toEqual(['check-duplicate-class-member']);
     });
 
     it('rejects "self" inside a static method', () => {
-        const source = "class Counter {\n    static bump = function (): void\n        self.total = 1\n    end\n}\n";
+        const source = 'class Counter {\n    static bump = function (): void\n        self.total = 1\n    end\n}\n';
 
         expect(codes(source)).toEqual(['check-invalid-self']);
     });
 
     it('rejects "super" inside a static method', () => {
-        const source = "class Base {\n    reset = function (): void\n    end\n}\n\nclass Counter extends Base {\n    static reset = function (): void\n        super()\n    end\n}\n";
+        const source = 'class Base {\n    reset = function (): void\n    end\n}\n\nclass Counter extends Base {\n    static reset = function (): void\n        super()\n    end\n}\n';
 
         expect(codes(source)).toEqual(['check-invalid-super']);
     });
@@ -103,7 +103,7 @@ describe('static members', () => {
     });
 
     it('keeps a field named static usable', () => {
-        const source = "class Counter {\n    static: number = 1\n}\n\nlocal counter = new Counter()\nlocal value: number = counter.static\n";
+        const source = 'class Counter {\n    static: number = 1\n}\n\nlocal counter = new Counter()\nlocal value: number = counter.static\n';
 
         expect(codes(source)).toEqual([]);
     });
@@ -113,13 +113,13 @@ describe('static members', () => {
     });
 
     it('reads a static from inside an instance method', () => {
-        const source = "class Counter {\n    static total: number = 0\n\n    describe = function (): number\n        return Counter.total\n    end\n}\n";
+        const source = 'class Counter {\n    static total: number = 0\n\n    describe = function (): number\n        return Counter.total\n    end\n}\n';
 
         expect(codes(source)).toEqual([]);
     });
 
     it('reads a static from inside another static method', () => {
-        const source = "class Counter {\n    static total: number = 0\n\n    static read = function (): number\n        return Counter.total\n    end\n}\n";
+        const source = 'class Counter {\n    static total: number = 0\n\n    static read = function (): number\n        return Counter.total\n    end\n}\n';
 
         expect(codes(source)).toEqual([]);
     });

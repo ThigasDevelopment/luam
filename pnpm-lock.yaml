@@ -195,6 +195,18 @@ importers:
         specifier: ^9.3.2
         version: 9.3.2
 
+  tools/conventions:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@22.20.1)
+
   tools/pipeline:
     devDependencies:
       '@types/node':

@@ -61,7 +61,7 @@ describe('emitter', () => {
 
 
     it('binds the field instead of self for a self interpolation in a class method', () => {
-        const source = ["class Example {", "    version: string = '0.18.2'", '', '    describe = function (): string', '        return `Current version: ${ self.version }`', '    end', '}', ''].join('\n');
+        const source = ['class Example {', "    version: string = '0.18.2'", '', '    describe = function (): string', '        return `Current version: ${ self.version }`', '    end', '}', ''].join('\n');
 
         expect(emit(source)).toContain("string.template('Current version: ${version}', { version = self.version })");
     });

@@ -6,6 +6,7 @@ import { fixtureText, loadGrammar, tokenize, type TokenRecord } from './support/
 
 let source: IGrammar;
 let manifest: IGrammar;
+let formatter: IGrammar;
 
 function lines(records: readonly TokenRecord[]): string {
     return records
@@ -24,6 +25,7 @@ function lastRoleOfText(records: readonly TokenRecord[], text: string): string |
 beforeAll(async () => {
     source = await loadGrammar('source.luam');
     manifest = await loadGrammar('source.luam-manifest');
+    formatter = await loadGrammar('source.luam-formatter');
 });
 
 describe('tokenization', () => {
@@ -87,5 +89,27 @@ describe('tokenization', () => {
 
         expect(tinted).toHaveLength(1);
         expect(tinted[0]?.text).toBe('server');
+    });
+});
+
+describe('the formatter file grammar', () => {
+    it('paints a formatter file exactly as the manifest grammar would', () => {
+        const text = fixtureText('theme-sample.luam.formatter');
+
+        expect(lines(tokenize(formatter, text, 'dark'))).toBe(lines(tokenize(manifest, text, 'dark')));
+    });
+
+    it('reads every formatter field as a key, and its value by kind', () => {
+        const records = tokenize(formatter, fixtureText('theme-sample.luam.formatter'), 'dark');
+        const roleOf = (text: string): string | null => roleOfText(records, text);
+
+        for (const key of ['indent', 'indentWidth', 'keywordParenSpace', 'maxBlankLines', 'lineEnding']) {
+            expect(roleOf(key), key).toBe('identifier.member');
+        }
+
+        expect(roleOf('tab')).toBe('literal.string');
+        expect(roleOf('crlf')).toBe('literal.string');
+        expect(roleOf('false')).toBe('literal.constant');
+        expect(roleOf('2')).toBe('literal.constant');
     });
 });

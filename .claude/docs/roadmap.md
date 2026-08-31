@@ -2594,15 +2594,15 @@ Give the toolchain the three surfaces it lacks outside the editor, let a project
 choose the formatter's whitespace decisions, and close the conventions gap
 milestone 36 deferred.
 
-Status: planned
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 39.01 | Add luam format with a check mode | ../plans/39.01-format-command.md | architecture-engineer | todo |
-| 39.02 | Emit diagnostics in a machine-readable form | ../plans/39.02-machine-readable-diagnostics.md | architecture-engineer | todo |
-| 39.03 | Add a watch mode to luam check | ../plans/39.03-check-watch.md | architecture-engineer | todo |
-| 39.04 | Enforce the source conventions in the pipeline | ../plans/39.04-conventions-gate.md | github-engineer | todo |
-| 39.05 | Let a project configure the formatter through .luam.formatter | ../plans/39.05-formatter-configuration.md | architecture-engineer | todo |
+| 39.01 | Add luam format with a check mode | ../plans/39.01-format-command.md | architecture-engineer | done |
+| 39.02 | Emit diagnostics in a machine-readable form | ../plans/39.02-machine-readable-diagnostics.md | architecture-engineer | done |
+| 39.03 | Add a watch mode to luam check | ../plans/39.03-check-watch.md | architecture-engineer | done |
+| 39.04 | Enforce the source conventions in the pipeline | ../plans/39.04-conventions-gate.md | github-engineer | done |
+| 39.05 | Let a project configure the formatter through .luam.formatter | ../plans/39.05-formatter-configuration.md | architecture-engineer | done |
 
 Sequencing:
 

@@ -34,7 +34,7 @@ describe('union member access', () => {
     });
 
     it('stays permissive for a union of primitives', () => {
-        const source = "function take(value: string | number): void\n    local length: any = value.anything\nend\n";
+        const source = 'function take(value: string | number): void\n    local length: any = value.anything\nend\n';
 
         expect(codes(source)).toEqual([]);
     });

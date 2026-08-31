@@ -33,7 +33,8 @@
     ],
     "activationEvents": [
         "workspaceContains:**/*.luam",
-        "workspaceContains:.luam.manifest"
+        "workspaceContains:.luam.manifest",
+        "workspaceContains:.luam.formatter"
     ],
     "contributes": {
         "languages": [
@@ -68,6 +69,23 @@
                     "light": "./icons/luam-manifest-light.svg",
                     "dark": "./icons/luam-manifest-dark.svg"
                 }
+            },
+            {
+                "id": "luam-formatter",
+                "aliases": [
+                    "Luam Formatter"
+                ],
+                "filenames": [
+                    ".luam.formatter"
+                ],
+                "extensions": [
+                    ".luam.formatter"
+                ],
+                "configuration": "./manifest-language-configuration.json",
+                "icon": {
+                    "light": "./icons/luam-formatter-light.svg",
+                    "dark": "./icons/luam-formatter-dark.svg"
+                }
             }
         ],
         "grammars": [
@@ -80,6 +98,11 @@
                 "language": "luam-manifest",
                 "scopeName": "source.luam-manifest",
                 "path": "./syntaxes/luam-manifest.tmLanguage.json"
+            },
+            {
+                "language": "luam-formatter",
+                "scopeName": "source.luam-formatter",
+                "path": "./syntaxes/luam-formatter.tmLanguage.json"
             }
         ],
         "commands": [

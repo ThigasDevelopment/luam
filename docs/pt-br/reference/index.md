@@ -13,6 +13,7 @@ linguagem realmente aceita.
 | [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts) | Bundles de produção, árvores de desenvolvimento, mapas e resolução de traces. |
 | [Diagnósticos](/pt-br/reference/diagnostics) | Cada código de diagnóstico, agrupado pelo estágio que o produz. |
 | [Formatação](/pt-br/reference/formatting) | O estilo que o language server escreve, e o que ele nunca toca. |
+| [Arquivo do formatador](/pt-br/reference/formatter-file) | Os campos do `.luam.formatter`, seus padrões e qual arquivo vale. |
 | [Limitações](/pt-br/reference/limitations) | O que o compilador deliberadamente não faz. |
 | [Compatibilidade](/pt-br/reference/compatibility) | Lua 5.1, MTA, Node.js e suporte de editores. |
 

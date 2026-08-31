@@ -83,7 +83,7 @@ describe('assignment facts', () => {
     });
 
     it('reports a later write that widens the path again', () => {
-        expect(codes(inFunction("    if value ~= nil then\n        value = nil\n\n        local text: string = value\n    end\n"))).toEqual([
+        expect(codes(inFunction('    if value ~= nil then\n        value = nil\n\n        local text: string = value\n    end\n'))).toEqual([
             'check-type-mismatch',
         ]);
     });
@@ -105,7 +105,7 @@ describe('loops', () => {
     });
 
     it('drops a fact a loop body can overwrite', () => {
-        const body = "    if value ~= nil then\n        for index = 1, 3 do\n            value = nil\n        end\n\n        local text: string = value\n    end\n";
+        const body = '    if value ~= nil then\n        for index = 1, 3 do\n            value = nil\n        end\n\n        local text: string = value\n    end\n';
 
         expect(codes(inFunction(body))).toEqual(['check-type-mismatch']);
     });

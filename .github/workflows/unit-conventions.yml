@@ -1,0 +1,31 @@
+name: Unit conventions
+
+on:
+    workflow_call:
+        inputs:
+            node-version:
+                description: Node version to run the conventions check on.
+                required: false
+                type: string
+                default: '22'
+
+jobs:
+    conventions:
+        name: Conventions
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: ./.github/actions/setup
+              with:
+                  node-version: ${{ inputs.node-version }}
+
+            - name: Check the TypeScript conventions
+              run: node tools/conventions/scripts/check-conventions.ts
+
+            - name: Bundle the CLI
+              run: pnpm --filter @luam/cli bundle
+
+            - name: Check the Luam corpus is formatted
+              run: node packages/cli/dist/luam.mjs format --check . --no-color

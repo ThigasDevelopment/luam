@@ -23,7 +23,10 @@
         "typecheck": "pnpm -r typecheck",
         "docs:examples": "node docs/scripts/check-examples.ts",
         "docs:layout": "node docs/scripts/check-layout.ts",
-        "docs:playground": "node docs/scripts/check-playground.ts"
+        "docs:playground": "node docs/scripts/check-playground.ts",
+        "conventions": "node tools/conventions/scripts/check-conventions.ts",
+        "conventions:format": "pnpm --filter @luam/cli bundle && node packages/cli/dist/luam.mjs format --check . --no-color",
+        "conventions:all": "pnpm conventions && pnpm conventions:format"
     },
     "devDependencies": {
         "esbuild": "^0.21.5",

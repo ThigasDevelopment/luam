@@ -222,3 +222,15 @@ erro não escreve nada.
 | `config-invalid-engine-version` | `engine.minVersion` não é `'latest'` nem uma versão. |
 | `config-missing-env-file` | Um arquivo configurado em `environment` não existe. |
 | `config-unknown-helper` | `helpers` nomeia um helper inexistente. |
+
+## Arquivo do formatador
+
+Reportados para o [`.luam.formatter`](/pt-br/reference/formatter-file). Qualquer
+um deles interrompe a execução: o `luam format` sai com `2` e não escreve nada, e
+o editor não oferece edições.
+
+| Código | Significado |
+| --- | --- |
+| `formatter-unknown-field` | Um nome que a tabela de campos do formatador não define. |
+| `formatter-invalid-value` | Um valor fora do tipo ou da faixa do campo — um `indent` desconhecido, um `indentWidth` fora de 1 a 8, um `maxBlankLines` fora de 0 a 4. |
+| `formatter-parse-error` | O arquivo não faz parse no dialeto de manifesto. |

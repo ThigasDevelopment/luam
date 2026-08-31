@@ -82,7 +82,7 @@ describe('generic classes', () => {
     });
 
     it('reports type arguments on a class that declares none', () => {
-        expect(codes("class Plain {\n    id: number = 1\n}\n\nlocal value = new Plain<string>()\n")).toEqual(['check-generic-arity']);
+        expect(codes('class Plain {\n    id: number = 1\n}\n\nlocal value = new Plain<string>()\n')).toEqual(['check-generic-arity']);
     });
 
     it('nests a specialization inside another', () => {

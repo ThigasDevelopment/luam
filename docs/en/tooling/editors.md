@@ -90,10 +90,16 @@ code --extensionDevelopmentPath=packages/vscode
 
 ## Activation
 
-The extension activates when the workspace holds a `.luam.manifest` or any `.luam`
-file, so **open your resource folder as the workspace root**. It watches
-`**/*.luam`, `.luam.manifest` and `.env*`, so files changed outside the editor
-still reach the server.
+The extension activates when the workspace holds a `.luam.manifest`, a
+[`.luam.formatter`](/en/reference/formatter-file) or any `.luam` file, so **open
+your resource folder as the workspace root**. It watches `**/*.luam`,
+`.luam.manifest`, `.luam.formatter` and `.env*`, so files changed outside the
+editor still reach the server.
+
+Each of the three gets its own file icon and its own language: `.luam` sources,
+the manifest, and the formatter file. The manifest and the formatter file share
+the same dialect and the same highlighting; they are separate languages so the
+file tree tells them apart at a glance.
 
 ## Commands
 

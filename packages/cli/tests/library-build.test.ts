@@ -119,7 +119,7 @@ describe('library output', () => {
         expect(exists(fixture, `${COLLECTIONS_ROOT}/shared/src/list.lua`)).toBe(true);
 
         fixture.write('.luam.manifest', consumerFiles([ASYNC])['.luam.manifest'] ?? '');
-        fixture.write('src/shared/main.luam', "function report(): number\n    return fixtureDelay(1)\nend\n");
+        fixture.write('src/shared/main.luam', 'function report(): number\n    return fixtureDelay(1)\nend\n');
         fixture.write('src/client/hud.luam', "dxDrawText('hud', 10, 10)\n");
 
         const reloaded = loadManifest(fixture.root).config;

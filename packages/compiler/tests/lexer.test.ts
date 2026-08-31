@@ -143,7 +143,7 @@ describe('lexer', () => {
     });
 
     it('matches the token snapshot for a typed program', () => {
-        const source = "#!strict\nlocal total: number = 0\nfor index = 1, 10 do\n    total += index\nend\n";
+        const source = '#!strict\nlocal total: number = 0\nfor index = 1, 10 do\n    total += index\nend\n';
 
         expect(describeTokens(source)).toMatchSnapshot();
     });

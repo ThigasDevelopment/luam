@@ -1,0 +1,6 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Luam Formatter",
+    "scopeName": "source.luam-formatter",
+    "patterns": [{ "include": "source.luam-manifest" }]
+}

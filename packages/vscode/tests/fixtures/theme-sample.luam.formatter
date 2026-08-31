@@ -1,0 +1,5 @@
+indent = 'tab'
+indentWidth = 2
+keywordParenSpace = false
+maxBlankLines = 0
+lineEnding = 'crlf'

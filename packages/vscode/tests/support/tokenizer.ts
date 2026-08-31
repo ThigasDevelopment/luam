@@ -20,6 +20,7 @@ export interface TokenRecord {
 const SOURCES: Readonly<Record<string, string>> = {
     'source.luam': 'luam.tmLanguage.json',
     'source.luam-manifest': 'luam-manifest.tmLanguage.json',
+    'source.luam-formatter': 'luam-formatter.tmLanguage.json',
 };
 
 function wasmBinary(): ArrayBuffer {

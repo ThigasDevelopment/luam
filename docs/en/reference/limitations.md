@@ -414,3 +414,23 @@ match: `.luam` compiled, `.lua` copied, `.d.luam` erased. An image, a font, or a
 
 A project that needs a library's asset copies it in through its own `assets`
 domain, where the destination is reviewable in the manifest that owns the build.
+
+## The formatter configures whitespace, never a token
+
+**Design boundary.** Recorded in
+[ADR-042](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/042-formatter-configuration-file.md).
+
+[`.luam.formatter`](/en/reference/formatter-file) chooses the indent, the
+`function (` space, the blank-line run and the line ending. It cannot choose the
+quote style, semicolons, name casing, parenthesis insertion, or where a line
+breaks, and no option for those will be added.
+
+That bound is enforced rather than promised. The formatter reprints the token
+stream, re-parses its own output, and compares the two token streams. An option
+that changed a quote, a name or a construct would fail that comparison, and a
+file that fails it is left exactly as it was — so such an option would produce no
+output rather than wrong output.
+
+There are also no per-file overrides, no directive-based overrides, no ranges
+excluded from formatting, no presets, and no inheritance from another package.
+One file, one style, for everything below it.

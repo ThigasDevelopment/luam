@@ -93,6 +93,7 @@ export const en: LocaleStrings = {
         'reference/output-layouts': 'Output layouts',
         'reference/diagnostics': 'Diagnostics',
         'reference/formatting': 'Formatting',
+        'reference/formatter-file': 'Formatter file',
         'reference/limitations': 'Limitations',
         'reference/compatibility': 'Compatibility',
     },

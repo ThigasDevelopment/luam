@@ -49,6 +49,7 @@ a valid MTA resource name, or from `luam-resource` as a last resort. An existing
 
 ```bash
 luam check
+luam check --watch
 ```
 
 Compiles everything and prints diagnostics. **Writes nothing.** This is the
@@ -58,6 +59,51 @@ command for CI and for a pre-commit hook.
 src/server/main.luam:11:23 error check-type-mismatch: Variable "total" expects "number" but received "string".
 Build failed: 1 error, 0 warnings in 4 ms.
 ```
+
+`--watch` keeps it running and re-checks on every change under the manifest’s
+`sources`, printing the same separator `ensure` does between runs and reusing the
+incremental cache. It still writes nothing, performs no release lookup, and needs
+no network. A change to `.luam.manifest` re-reads the configuration and
+re-derives the watched set. Unlike `dev` and `ensure`, `check` does **not** watch
+by default. A watch runs until interrupted, so its exit code reports termination
+rather than the last check — a script that wants a verdict runs `luam check`
+without the flag.
+
+## `luam format`
+
+```bash
+luam format
+luam format --check
+luam format src docs/snippets
+```
+
+Rewrites every project source in the style the
+[formatting reference](/en/reference/formatting) records, so the editor is no
+longer the only way to satisfy it. The command renders that style and never
+extends it; a project chooses the whitespace decisions in a
+[`.luam.formatter`](/en/reference/formatter-file), and a configuration that does
+not parse stops the run with `2`.
+
+With no path, the files are the ones `luam check` compiles — the manifest's
+`sources` patterns — plus every `.d.luam` declaration file in the project. The
+output directory, `node_modules` and the libraries resolved inside it are never
+touched. With one or more paths, those files and directories are formatted
+instead, no manifest is loaded, and every `.luam` file below a directory is
+included. `.luam.manifest` is not formatted: it is configuration in the
+[manifest dialect](/en/tooling/luam-manifest), not a source file.
+
+`--check` writes nothing. It prints the path of every file that differs, one per
+line, and exits `1` when any does.
+
+```
+src/client/hud.luam
+Format failed: 12 files scanned, 1 differing in 8 ms.
+```
+
+A file that does not parse is **warned about and left alone**, and does not fail
+the run — the formatter has nothing to say about a file it cannot read, and
+`luam check` is the command that explains why. Formatting is idempotent, so a
+second run changes nothing.
 
 ## `luam test`
 
@@ -314,11 +360,13 @@ returns `2` and runs nothing.
 | `--no-color` | every command | Plain output, no colour or emoji. `NO_COLOR` does the same. |
 | `-h`, `--help` | every command | Print the help text for that command. |
 | `-v`, `--version` | root only | Print the CLI version, as `luam --version`. |
-| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `test`, `trace` | Load this file instead of `.luam.manifest`. |
+| `--manifest <path>` | `build`, `check`, `dev`, `ensure`, `format`, `test`, `trace` | Load this file instead of `.luam.manifest`. |
 | `--bundle` / `--no-bundle` | `build`, `ensure` | Select bundle or tree output. `dev` owns neither. |
-| `--watch` / `--no-watch` | `dev`, `ensure` | Keep watching, or run once. Both watch by default. |
+| `--watch` / `--no-watch` | `check`, `dev`, `ensure` | Keep watching, or run once. `dev` and `ensure` watch by default; `check` does not. |
 | `--no-map` | `build`, `dev`, `ensure` | Disable map generation. For `build`, also remove the existing default map after success. |
 | `--offline` | `build`, `dev`, `ensure` | Skip the `min_mta_version` lookup. `LUAM_OFFLINE` does the same. |
+| `--json` | `build`, `check` | Write one machine-readable document to stdout instead of the human report. |
+| `--check` | `format` | Write nothing and list the files that differ. Exits `1` when any does. |
 | `--source <path>` | `config` | Native Lua file to read. Defaults to `config.lua`. |
 | `--out <path>` | `config` | Declaration file to write. Defaults to `config.d.luam`. |
 | `--write` | `config` | Write the declaration file instead of printing it. |
@@ -344,6 +392,66 @@ ignored the ones that did not apply. Those invocations now fail with `2`:
 
 Scripts that pass only options the command owns are unaffected, and every exit
 code keeps its meaning.
+
+## Machine-readable output
+
+`luam check --json` and `luam build --json` write **one JSON document to stdout
+and nothing else there**. The human report — progress, phase timings, the
+diagnostic excerpts and the summary line — is not printed at all, so the stream
+is parseable with a single `JSON.parse`. Exit codes are unchanged: the document
+says what happened, the code says whether it passed, and neither has to do the
+other's job.
+
+```json
+{
+    "version": 1,
+    "luam": "0.19.5",
+    "command": "check",
+    "success": false,
+    "diagnostics": [
+        {
+            "path": "src/server/main.luam",
+            "line": 2,
+            "column": 12,
+            "endLine": 2,
+            "endColumn": 17,
+            "severity": "error",
+            "code": "check-type-mismatch",
+            "message": "Return value expects \"number\" but received \"string\"."
+        }
+    ],
+    "summary": { "errors": 1, "warnings": 0, "files": 3, "durationMs": 4 }
+}
+```
+
+Every key on a diagnostic is always present. `path`, `line`, `column`, `endLine`
+and `endColumn` are `null` where the diagnostic has no location — a manifest or
+configuration problem, for instance — and `endLine`/`endColumn` are `null` where
+the compiler reports a point rather than a span. `path` is relative to the
+project directory, the same path the human output prints, so the two reconcile by
+eye.
+
+### What you may rely on
+
+| Stable | Not stable |
+| --- | --- |
+| Every field above exists, with the type shown. | The wording of `message`. Match on `code`. |
+| `code` values, and their meaning. | The order of `diagnostics` beyond the sort the human output already applies. |
+| `version` is present and is a number. | `durationMs`, which is a measurement. |
+| Exit codes match the run without `--json`. | Whether a future release adds fields. |
+
+A field may be **added** without a version bump; a consumer must ignore fields it
+does not know. A field may not be removed, or change type or meaning, without
+raising `version`.
+
+### What does not have it
+
+`--json` is owned by `check` and `build` only, and passing it to any other
+command exits `2`. `test` reports test runs, whose machine shape is a different
+document from this one; emitting only its compile diagnostics would be a
+half-report. `dev` and `ensure` are rebuild loops, and a document per rebuild is
+a stream rather than the single document this schema describes. For the same
+reason `--json` and `--watch` together exit `2`.
 
 ## Exit codes
 

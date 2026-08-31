@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+    <defs>
+        <linearGradient id="luamFormatterLight" x1="3" y1="4" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#6B57E8" />
+            <stop offset="0.55" stop-color="#3E63CC" />
+            <stop offset="1" stop-color="#1478B4" />
+        </linearGradient>
+        <mask id="luamCrescentFormatterLight">
+            <circle cx="12" cy="11" r="8.4" fill="#ffffff" />
+            <circle cx="18.4" cy="5.6" r="8" fill="#000000" />
+        </mask>
+    </defs>
+    <rect width="32" height="32" fill="url(#luamFormatterLight)" mask="url(#luamCrescentFormatterLight)" />
+    <circle cx="26.5" cy="6" r="2.8" fill="#6B57E8" />
+    <rect x="4" y="20.4" width="2.8" height="11" rx="1.4" fill="url(#luamFormatterLight)" />
+    <rect x="10.4" y="20.4" width="17.6" height="2.8" rx="1.4" fill="url(#luamFormatterLight)" />
+    <rect x="14.4" y="24.5" width="13.6" height="2.8" rx="1.4" fill="url(#luamFormatterLight)" />
+    <rect x="10.4" y="28.6" width="10.4" height="2.8" rx="1.4" fill="url(#luamFormatterLight)" />
+</svg>

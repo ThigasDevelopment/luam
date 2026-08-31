@@ -1,5 +1,6 @@
 import { isLuamKeyword } from '@compiler/lexer/token';
 
+import type { FormatOptions } from './format-options';
 import type { Piece, PieceKind } from './format-pieces';
 
 const FUNCTION_TYPE = 'fun';
@@ -63,7 +64,7 @@ export function isMethodColon(pieces: readonly Piece[], index: number): boolean 
     return after !== undefined && after.value === '(';
 }
 
-function spaceBefore(pieces: readonly Piece[], index: number): boolean {
+function spaceBefore(pieces: readonly Piece[], index: number, options: FormatOptions): boolean {
     const piece = pieces[index];
     const previous = pieces[index - 1];
 
@@ -99,18 +100,22 @@ function spaceBefore(pieces: readonly Piece[], index: number): boolean {
         return false;
     }
 
-    if (piece.value === '(' || piece.value === '[') {
+    if (piece.value === '(') {
+        return !bindsTight(previous) && (options.keywordParenSpace || previous.kind !== 'keyword');
+    }
+
+    if (piece.value === '[') {
         return !bindsTight(previous);
     }
 
     return true;
 }
 
-export function renderLine(pieces: readonly Piece[]): string {
+export function renderLine(pieces: readonly Piece[], options: FormatOptions): string {
     let text = '';
 
     for (const [index, piece] of pieces.entries()) {
-        text += spaceBefore(pieces, index) ? ` ${piece.value}` : piece.value;
+        text += spaceBefore(pieces, index, options) ? ` ${piece.value}` : piece.value;
     }
 
     return text;

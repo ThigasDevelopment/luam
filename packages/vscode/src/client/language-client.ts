@@ -13,11 +13,15 @@ export const LANGUAGE_ID = 'luam';
 
 export const MANIFEST_LANGUAGE_ID = 'luam-manifest';
 
+export const FORMATTER_LANGUAGE_ID = 'luam-formatter';
+
 export const SERVER_MODULE = join('dist', 'server', 'luam-lsp.cjs');
 
 export const SOURCE_PATTERN = '**/*.luam';
 
 export const MANIFEST_PATTERN = '**/.luam.manifest';
+
+export const FORMATTER_PATTERN = '**/.luam.formatter';
 
 export const ENVIRONMENT_PATTERN = '**/.env*';
 
@@ -54,11 +58,13 @@ export function createClientOptions(): LanguageClientOptions {
         documentSelector: [
             { scheme: 'file', language: LANGUAGE_ID },
             { scheme: 'file', language: MANIFEST_LANGUAGE_ID },
+            { scheme: 'file', language: FORMATTER_LANGUAGE_ID },
         ],
         synchronize: {
             fileEvents: [
                 workspace.createFileSystemWatcher(SOURCE_PATTERN),
                 workspace.createFileSystemWatcher(MANIFEST_PATTERN),
+                workspace.createFileSystemWatcher(FORMATTER_PATTERN),
                 workspace.createFileSystemWatcher(ENVIRONMENT_PATTERN),
             ],
         },

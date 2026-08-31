@@ -111,5 +111,21 @@ Not everyone wants a formatter. `luam.formatting` turns it off entirely — the
 language server stops being asked, so `Shift+Alt+F` and format-on-save both go
 quiet, and another tool can own the layout.
 
-There is no `luam format` command. The editor is the surface; what a pipeline
-should enforce is a separate question.
+Outside an editor, [`luam format`](/en/tooling/cli#luam-format) renders this same
+style over a project, and `luam format --check` reports what differs without
+writing. Both call the language server’s formatter, so the two surfaces agree
+byte for byte.
+
+## What a project may change
+
+This page describes the **default** style, which is what you get with no
+configuration. A project may choose five of these decisions in a
+[`.luam.formatter`](/en/reference/formatter-file) file: the indent character, the
+indent width, the space in `function (`, the blank-line run, and the line ending.
+
+Everything else on this page is fixed and has no option — quote style,
+semicolons, name casing, parenthesis insertion, and where a line breaks. That is
+not a gap waiting to be filled: the formatter verifies its own output against the
+original token stream, so an option that touched any of them would produce no
+output rather than different output. See
+[limitations](/en/reference/limitations).

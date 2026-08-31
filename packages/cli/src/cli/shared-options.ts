@@ -24,6 +24,10 @@ export function colorOption(): Option {
     return new Option('--no-color', 'Print plain output with no colour and no emoji.');
 }
 
+export function jsonOption(): Option {
+    return new Option('--json', 'Write one machine-readable document to stdout instead of the human report.');
+}
+
 export function offlineOption(): Option {
     return new Option('--offline', 'Skip the MTA release lookup and use the cached version, if there is one.');
 }
