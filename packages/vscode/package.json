@@ -3,7 +3,7 @@
     "displayName": "Luam",
     "icon": "icon.png",
     "description": "Language support for Luam, a typed Lua that compiles to Multi Theft Auto resources.",
-    "version": "0.19.8",
+    "version": "0.19.9",
     "private": true,
     "type": "module",
     "main": "./dist/extension.cjs",
@@ -162,6 +162,26 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Format .luam files with the Luam language server. Turn it off to leave formatting to another tool, or to none."
+                },
+                "luam.inlayHints.localTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show the inferred type of a local declared without an annotation."
+                },
+                "luam.inlayHints.returnTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show the inferred return type of a function declared without a return annotation."
+                },
+                "luam.inlayHints.callbackParameterTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show the type a callback parameter was given by the call it was passed to."
+                },
+                "luam.inlayHints.parameterNames": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show the parameter name in front of a literal argument at a call site."
                 },
                 "luam.trace.server": {
                     "type": "string",

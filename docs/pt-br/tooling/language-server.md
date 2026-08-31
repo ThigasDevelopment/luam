@@ -13,6 +13,7 @@ editor que fale o Language Server Protocol pode iniciá-lo da mesma forma.
 | Definição | Locais, parâmetros, membros de classe e globais declarados em outro arquivo. |
 | Referências | Todo uso de um símbolo, entre arquivos para globais. |
 | Renomear | Edita todas as ocorrências, entre arquivos para globais. |
+| Inlay hints | O tipo inferido de um local, do retorno de uma função e de um parâmetro de callback tipado pelo contexto, além dos nomes de parâmetro em uma chamada. |
 
 A completação dispara em `.` e `:` para membros: campos e métodos de classe
 (incluindo herdados), membros de enum, membros das bibliotecas `math` / `string` /
@@ -124,6 +125,32 @@ O dialeto não tem chamadas nem valores de função, então o próprio servidor 
 o manifesto. Abrir uma pasta nunca executa código do projeto, e `oop` passa a
 valer ao salvar em vez de depois da próxima execução da CLI.
 
+## Inlay hints
+
+O servidor responde `textDocument/inlayHint` para um intervalo visível a partir da
+análise que já mantém. Uma requisição de intervalo nunca recompila: sobre o maior
+fixture do repositório uma requisição de documento inteiro leva cerca de
+**0,12 ms**, e cerca de **1,7 ms** sobre um documento sintético de 2000 linhas.
+
+Quatro tipos são servidos, descritos do lado do editor em
+[Editores](/pt-br/tooling/editors#inlay-hints). Cada um tem seu próprio
+interruptor, enviado nas **opções de inicialização** para que um cliente que não
+seja o VS Code também consiga defini-los:
+
+```json
+{
+    "inlayHints": {
+        "localTypes": true,
+        "returnTypes": true,
+        "callbackParameterTypes": true,
+        "parameterNames": false
+    }
+}
+```
+
+Todo campo é opcional e todo valor desconhecido cai no padrão acima. Não enviar
+opção nenhuma entrega os três tipos de tipo e nenhum nome de parâmetro.
+
 ## Executando
 
 ```bash
@@ -149,9 +176,11 @@ Qualquer cliente LSP precisa de três coisas:
 4. **Observadores de arquivo** — opcionais, sobre `**/*.luam`, `.luam.manifest` e
    `.env*`, para que uma mudança feita fora do editor chegue ao servidor.
 
-Não há seção de configuração exigida pelo servidor; as configurações listadas em
-[Editores](/pt-br/tooling/editors) pertencem à extensão do VS Code, não ao
-protocolo.
+O servidor não exige seção de configuração alguma. As únicas opções que ele lê
+são os [interruptores de inlay hint](#inlay-hints) nas opções de inicialização, e
+ele roda com os padrões deles quando o cliente não envia nenhuma. Todo o resto
+listado em [Editores](/pt-br/tooling/editors) pertence à extensão do VS Code, não
+ao protocolo.
 
 ## Relatando um problema
 

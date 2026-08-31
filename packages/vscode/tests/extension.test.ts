@@ -72,7 +72,7 @@ describe('activation', () => {
         const { context } = activateExtension();
 
         expect([...state.registered.keys()].sort()).toEqual([BUILD_COMMAND, ENSURE_COMMAND, RESCAN_COMMAND, RESTART_COMMAND].sort());
-        expect(context.subscriptions).toHaveLength(4);
+        expect(context.subscriptions).toHaveLength(5);
     });
 
     it('stops the client on deactivate', async () => {
@@ -139,14 +139,14 @@ describe('ensure command', () => {
     });
 
     it('builds a single run command line when watch is off', () => {
-        expect(ensureCommandLine({ cliPath: 'pnpm luam', ensureWatch: false, formatting: true, semanticHighlighting: true })).toBe('pnpm luam ensure');
+        expect(ensureCommandLine({ ...DEFAULT_SETTINGS, cliPath: 'pnpm luam', ensureWatch: false })).toBe('pnpm luam ensure');
     });
 
     it('reads the configured cli path', () => {
         state.settings.set('luam.cliPath', 'node ./bin/luam.mjs');
         state.settings.set('luam.ensureWatch', false);
 
-        expect(readSettings()).toEqual({ cliPath: 'node ./bin/luam.mjs', ensureWatch: false, formatting: true, semanticHighlighting: true });
+        expect(readSettings()).toEqual({ ...DEFAULT_SETTINGS, cliPath: 'node ./bin/luam.mjs', ensureWatch: false });
     });
 
     it('runs the cli in a dedicated terminal', () => {

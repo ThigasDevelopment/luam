@@ -14,6 +14,18 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.9 - 2026-08-31
+
+### Added
+
+- The language server serves inlay hints for what it inferred and the source did
+  not write: the type of a local, a parameter that took its type from context,
+  and a return the signature left out. What the checker knew was visible only on
+  hover, one symbol at a time, which made an inferred local read like an untyped
+  one. Each kind is turned off on its own, so a reader who wants only parameter
+  names is not paying for the rest, and the extension surfaces the settings and
+  forwards them.
+
 ## 0.19.8 - 2026-08-31
 
 ### Added

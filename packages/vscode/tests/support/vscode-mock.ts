@@ -7,6 +7,10 @@ export interface MockTerminal {
     sendText: (text: string) => void;
 }
 
+export interface MockConfigurationChangeEvent {
+    affectsConfiguration: (section: string) => boolean;
+}
+
 export interface MockState {
     settings: Map<string, unknown>;
     folders: Array<{ uri: { fsPath: string } }> | undefined;
@@ -14,6 +18,7 @@ export interface MockState {
     registered: Map<string, (...args: unknown[]) => unknown>;
     errors: string[];
     watchers: string[];
+    configurationListeners: Array<(event: MockConfigurationChangeEvent) => void>;
     disposed: number;
 }
 
@@ -24,6 +29,7 @@ export const state: MockState = {
     registered: new Map(),
     errors: [],
     watchers: [],
+    configurationListeners: [],
     disposed: 0,
 };
 
@@ -34,6 +40,7 @@ export function resetMock(): void {
     state.registered = new Map();
     state.errors = [];
     state.watchers = [];
+    state.configurationListeners = [];
     state.disposed = 0;
 }
 
@@ -63,6 +70,15 @@ export const workspace = {
     getConfiguration: (section: string) => ({
         get: <T>(key: string): T | undefined => state.settings.get(`${section}.${key}`) as T | undefined,
     }),
+    onDidChangeConfiguration: (listener: (event: MockConfigurationChangeEvent) => void): { dispose: () => void } => {
+        state.configurationListeners.push(listener);
+
+        return {
+            dispose: (): void => {
+                state.disposed += 1;
+            },
+        };
+    },
     createFileSystemWatcher: (pattern: string): { pattern: string; dispose: () => void } => {
         state.watchers.push(pattern);
 

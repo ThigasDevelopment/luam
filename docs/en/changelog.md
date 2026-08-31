@@ -9,6 +9,14 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.9 - 2026-08-31
+
+### Added
+
+- [Editors](/en/tooling/editors) and
+  [Language server](/en/tooling/language-server) document the inlay hints: the
+  three kinds, what each one shows, and the setting that turns each off.
+
 ## 0.19.8 - 2026-08-31
 
 ### Added

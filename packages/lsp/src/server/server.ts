@@ -4,6 +4,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { FileChangeType, TextDocuments, type Connection, type FileEvent, type InitializeParams, type InitializeResult } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { readInlayHintSettings } from '@lsp/features/inlay-hint-settings';
 import { LanguageService } from '@lsp/server/language-service';
 import { capabilitiesFor, RESCAN_COMMAND } from '@lsp/server/capabilities';
 import { uriToPath } from '@lsp/workspace/document-uri';
@@ -127,6 +128,7 @@ function registerFeatures(connection: Connection, service: LanguageService): voi
     connection.onWorkspaceSymbol((params) => service.workspaceSymbols(params.query));
     connection.onDocumentFormatting((params) => service.formatting(params.textDocument.uri));
     connection.onDocumentRangeFormatting((params) => service.rangeFormatting(params.textDocument.uri, params.range));
+    connection.languages.inlayHint.on((params) => service.inlayHints(params.textDocument.uri, params.range));
 }
 
 export function startServer(connection: Connection): LanguageService {
@@ -136,6 +138,7 @@ export function startServer(connection: Connection): LanguageService {
     connection.onInitialize((params: InitializeParams): InitializeResult => {
         service.loadWorkspace(workspaceRoots(params));
         service.useSnippets(params.capabilities.textDocument?.completion?.completionItem?.snippetSupport === true);
+        service.useInlayHints(readInlayHintSettings(params.initializationOptions));
 
         return { capabilities: capabilitiesFor(params.capabilities.textDocument?.semanticTokens !== undefined) };
     });

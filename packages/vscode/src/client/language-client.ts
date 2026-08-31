@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { workspace, type ExtensionContext } from 'vscode';
 import { LanguageClient, TransportKind, type LanguageClientOptions, type Middleware, type ServerOptions } from 'vscode-languageclient/node';
 
-import { readSettings } from '@vscode-extension/config/settings';
+import { readInlayHints, readSettings } from '@vscode-extension/config/settings';
 
 export const CLIENT_ID = 'luam';
 
@@ -54,6 +54,7 @@ function formattingMiddleware(): Middleware {
 
 export function createClientOptions(): LanguageClientOptions {
     return {
+        initializationOptions: { inlayHints: readInlayHints() },
         middleware: { ...semanticTokensMiddleware(), ...formattingMiddleware() },
         documentSelector: [
             { scheme: 'file', language: LANGUAGE_ID },

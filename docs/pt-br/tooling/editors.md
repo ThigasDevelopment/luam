@@ -27,6 +27,7 @@ frontend que a CLI usa, então o editor e o build nunca discordam sobre um arqui
 | Símbolos do workspace | `Ctrl+T` encontra uma classe, uma interface, um enum, um alias de tipo, uma função ou um evento declarado em qualquer lugar do projeto, inclusive em arquivos que você nunca abriu. Cada resultado carrega o ambiente do arquivo em que vive. |
 | Quick fixes | Um diagnóstico com exatamente um reparo correto oferece ele na lâmpada. Veja [a lista](#quick-fixes). |
 | Formatação | Formata o documento ou a seleção, com formatar ao salvar. O estilo é [Formatação](/pt-br/reference/formatting). |
+| Inlay hints | O que o checker inferiu, mostrado inline: o tipo de um local, o retorno de uma função e o tipo que um parâmetro de callback ganhou da chamada que o recebeu. Veja [os tipos](#inlay-hints). |
 
 A completação tem exatamente o mesmo escopo do checker: `dxDrawText` nunca aparece
 em um arquivo de servidor, `kickPlayer` nunca aparece em um de cliente.
@@ -116,8 +117,16 @@ a árvore de arquivos os distinga de relance.
 | `luam.cliPath` | `"luam"` | Comando usado para rodar a CLI. Aponte para um bundle para testar uma build não publicada. |
 | `luam.ensureWatch` | `true` | Passa `--watch` quando o comando ensure roda. |
 | `luam.formatting` | `true` | Formata `.luam` com o language server. Desligue para deixar a formatação com outra ferramenta, ou com nenhuma — o servidor deixa de ser consultado, então `Shift+Alt+F` e formatar ao salvar ficam os dois quietos. |
+| `luam.inlayHints.localTypes` | `true` | Mostra o tipo inferido de um local declarado sem anotação. |
+| `luam.inlayHints.returnTypes` | `true` | Mostra o tipo de retorno inferido de uma função declarada sem anotação de retorno. |
+| `luam.inlayHints.callbackParameterTypes` | `true` | Mostra o tipo que um parâmetro de callback ganhou da chamada que o recebeu. |
+| `luam.inlayHints.parameterNames` | `false` | Mostra o nome do parâmetro na frente de um argumento literal em uma chamada. |
 | `luam.semanticHighlighting` | `true` | Colore Luam com os tokens semânticos do servidor. Desligue para manter só a camada da gramática. |
 | `luam.trace.server` | `"off"` | Registra o tráfego LSP. Use `"verbose"` ao relatar um bug. |
+
+Mudar qualquer interruptor `luam.inlayHints.*` reinicia o language server, porque
+o servidor os lê uma vez quando o cliente conecta. O reinício é o mesmo que
+**Luam: Restart Language Server** faz, e custa uma varredura do workspace.
 
 ## Formatação
 
@@ -136,6 +145,33 @@ configuração só:
 Um arquivo que não parseia devolve nenhuma edição, então salvar no meio da edição
 nunca estraga o arquivo. [Formatação](/pt-br/reference/formatting) é o estilo que
 ele escreve.
+
+## Inlay hints
+
+Luam apaga toda anotação, então nada do que o checker inferiu sobrevive na saída.
+Os inlay hints devolvem isso à tela: o tipo aparece onde ele teria sido escrito,
+esmaecido, e não faz parte do arquivo.
+
+| Tipo | Onde aparece | Você vê |
+| --- | --- | --- |
+| Tipo do local | Um `local` com inicializador e sem anotação | `local count` vira `local count: number` |
+| Tipo de retorno | Uma função, método ou callback sem anotação de retorno | `function total()` vira `function total(): number` |
+| Parâmetro de callback | Um parâmetro tipado pela chamada que recebeu o callback | `function (player)` vira `function (player: Player)` |
+| Nome do parâmetro | Um argumento **literal** em uma chamada | `setTimer(tick, 1000, 0)` vira `setTimer(tick, timeInterval: 1000, timesToExecute: 0)` |
+
+Três regras os mantêm fora do caminho:
+
+- Uma declaração anotada não mostra nada. O hint só preenche uma lacuna.
+- Um hint nunca diz `any`. Ocupar espaço para informar que o checker não sabe
+  nada é pior do que ficar quieto.
+- Um arquivo que não parseia não gera hint nenhum, a mesma regra da formatação.
+
+Um hint e um hover sobre o mesmo nome sempre mostram o mesmo tipo: os dois passam
+pelo renderizador do próprio checker.
+
+Os nomes de parâmetro são o único tipo **desligado por padrão**. Os outros três
+mostram o que foi inferido; esse repete o que você já pode consultar, e em código
+denso custa mais do que entrega.
 
 ## Quick fixes
 
