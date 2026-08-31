@@ -181,7 +181,12 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
     context.popClassMethod();
 }
 
-export function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): string | null {
+export function assignSuperClass(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
+    info.superClass = resolveSuperClass(context, statement);
+    info.hasUnresolvedParent = statement.superClass !== null && info.superClass === null;
+}
+
+function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): string | null {
     if (statement.superClass === null) {
         return null;
     }
@@ -254,7 +259,7 @@ function declareLocalClass(context: CheckContext, statement: ClassDeclaration): 
         return null;
     }
 
-    info.superClass = resolveSuperClass(context, statement);
+    assignSuperClass(context, info, statement);
     resolveClassHeader(context, info, statement);
 
     return info;

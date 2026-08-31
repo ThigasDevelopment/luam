@@ -11,6 +11,27 @@ da versão atual.
 
 ## Não lançado
 
+## 0.19.9 - 2026-08-31
+
+### Adicionado
+
+- [Editores](/pt-br/tooling/editors) e
+  [Language server](/pt-br/tooling/language-server) documentam as inlay hints:
+  os três tipos, o que cada um mostra, e a configuração que desliga cada um.
+
+## 0.19.8 - 2026-08-31
+
+### Adicionado
+
+- [Comandos da CLI](/pt-br/tooling/cli) documenta o `luam format` e seu modo de
+  verificação, os diagnósticos legíveis por máquina que uma build pode emitir, e
+  o modo watch do `luam check`.
+- [Arquivo do formatador](/pt-br/reference/formatter-file) é nova: cada campo
+  que o `.luam.formatter` aceita, o que cada um muda, e como o editor e o
+  comando concordam num único layout.
+
+## 0.19.7 - 2026-08-31
+
 ### Adicionado
 
 - [Bibliotecas](/pt-br/tooling/libraries) descreve o modelo inteiro: instalar e
@@ -26,6 +47,11 @@ da versão atual.
   [Limitações](/pt-br/reference/limitations) registra três fronteiras: requisitos
   são nomeados e não resolvidos, colisões são reportadas e não resolvidas, e uma
   biblioteca publica código e não assets.
+
+## 0.19.6 - 2026-08-31
+
+### Adicionado
+
 - [Funções](/pt-br/language/functions#funcoes-genericas) descreve funções
   genéricas: a sintaxe, a inferência na chamada, os argumentos explícitos e as
   restrições. [Tipos](/pt-br/language/types#aliases) e

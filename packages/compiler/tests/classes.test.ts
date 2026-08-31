@@ -18,6 +18,10 @@ function codes(source: string): string[] {
     return compile(source).diagnostics.map((diagnostic) => diagnostic.code);
 }
 
+function messages(source: string): string[] {
+    return compile(source).diagnostics.map((diagnostic) => diagnostic.message);
+}
+
 function helpers(source: string): string[] {
     return compile(source).requiredHelpers;
 }
@@ -91,6 +95,38 @@ describe('classes', () => {
         const source = `${PLAYER}class VIPPlayer extends Player {\n}\nlocal vip = new VIPPlayer('Thigas')\nlocal total: number = vip.health\n`;
 
         expect(codes(source)).toEqual([]);
+    });
+
+    it('reports a method that the class does not declare', () => {
+        const source = `${PLAYER}local player = new Player('Thigas')\nplayer:heal(10)\n`;
+
+        expect(codes(source)).toEqual(['check-unknown-member']);
+        expect(messages(source)).toEqual(['Class "Player" has no member "heal". Declared members: "health", "constructor".']);
+    });
+
+    it('reports a field that the class does not declare', () => {
+        const source = `${PLAYER}local player = new Player('Thigas')\nprint(player.armour)\n`;
+
+        expect(codes(source)).toEqual(['check-unknown-member']);
+    });
+
+    it('reports an unknown member reached through a typed field', () => {
+        const adapter = 'class Adapter {\n    constructor = function (): void\n\n    end\n}\n';
+        const core = 'class Core {\n    adapters: { mysql: Adapter }\n\n    init = function (): void\n        self.adapters.mysql:connect()\n    end\n}\n';
+
+        expect(codes(`${adapter}${core}`)).toEqual(['check-unknown-member']);
+    });
+
+    it('resolves an inherited method before reporting it as unknown', () => {
+        const source = `${PLAYER}class VIPPlayer extends Player {\n}\nlocal vip = new VIPPlayer('Thigas')\nprint(vip.health)\nvip:missing()\n`;
+
+        expect(codes(source)).toEqual(['check-unknown-member']);
+    });
+
+    it('leaves a class whose parent is not declared unchecked', () => {
+        const source = 'class VIPPlayer extends Missing {\n}\n';
+
+        expect(codes(`${source}local vip = new VIPPlayer()\nvip:anything()\n`)).toEqual(['check-unknown-class']);
     });
 
     it('checks constructor arguments at the instantiation site', () => {
