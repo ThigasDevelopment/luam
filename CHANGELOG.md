@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 0.19.7 - 2026-08-31
+
 ### Added
 
 - A Luam library is an npm package, listed in the new `libraries` manifest
@@ -30,6 +32,21 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   library claiming an MTA name is the warning `project-library-shadows-api`, and
   a library that reads a project global is `project-library-project-reference`.
   The editor resolves libraries the same way, so the CLI and the LSP agree.
+
+### Fixed
+
+- A call to a method a class does not declare is reported. `adapter:query(...)`
+  on a class with no `query` compiled clean, and the failure moved to the
+  server, where a nil call says nothing about which name was wrong. Member
+  resolution now answers for a class value and for a typed field that holds one,
+  walking the parent chain before deciding, so an inherited member is found
+  rather than reported, and the message names the members the class does
+  declare.
+
+## 0.19.6 - 2026-08-31
+
+### Added
+
 - A function takes its own type parameters. `function identity<T>(value: T): T`
   parses, checks, infers the argument at the call site, accepts an explicit
   `identity<string>(...)`, enforces an `extends` constraint with the same

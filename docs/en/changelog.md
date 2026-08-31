@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 0.19.7 - 2026-08-31
+
 ### Added
 
 - [Libraries](/en/tooling/libraries) describes the whole model: installing and
@@ -24,6 +26,11 @@ Every heading below is a released version and the date it shipped, newest first.
   [Limitations](/en/reference/limitations) records three boundaries: requirements
   are named rather than resolved, collisions are reported rather than resolved,
   and a library ships code rather than assets.
+
+## 0.19.6 - 2026-08-31
+
+### Added
+
 - [Functions](/en/language/functions#generic-functions) describes generic
   functions: the syntax, inference at the call site, explicit arguments and
   constraints. [Types](/en/language/types#aliases) and
