@@ -2970,3 +2970,83 @@ Deliberately excluded:
   fixture and 44.04 records that an editor keeps the old answers until the
   extension is reinstalled.
 - Completion, which resolves members through a different path and is correct.
+
+## Milestone 45 — Porting a Real Lua Resource
+
+A 3,600-line MTA resource annotated for the Lua language server was converted to
+Luam, file for file, to find what a real port runs into. The first `luam check`
+reported 56 errors and 2 warnings across 24 files. Removing the findings milestone
+43 already owns, and the genuine defects the port exposed in the resource itself,
+what is left is fourteen compiler gaps, two stale rules in the internal design
+document, and one pattern with no Luam spelling at all.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 45.01 | Reconcile the internal language design with the optional marker and super rules | ../plans/45.01-optional-marker-and-super-drift.md | documentation-engineer | todo |
+| 45.02 | Accept the empty table literal for a map whose value is an element class | ../plans/45.02-empty-literal-element-map.md | architecture-engineer | todo |
+| 45.03 | Accept nil assignment as the deletion of a key | ../plans/45.03-nil-assignment-deletes-a-key.md | architecture-engineer | todo |
+| 45.04 | Spread unpack into the argument list it ends | ../plans/45.04-unpack-argument-spread.md | architecture-engineer | todo |
+| 45.05 | Declare a member whose key is not an identifier | ../plans/45.05-quoted-member-keys.md | architecture-engineer | todo |
+| 45.06 | Take an optional parameter in a fun type | ../plans/45.06-optional-parameter-in-fun-type.md | architecture-engineer | todo |
+| 45.07 | Take type parameters on an interface | ../plans/45.07-generic-interfaces.md | architecture-engineer | todo |
+| 45.08 | Publish a type alias to the project, the way an interface already is | ../plans/45.08-project-wide-type-aliases.md | architecture-engineer | todo |
+| 45.09 | Type a global the source assigns later | ../plans/45.09-typed-globals.md | architecture-engineer | todo |
+| 45.10 | Build a record over several statements | ../plans/45.10-incremental-record-construction.md | architecture-engineer | todo |
+| 45.11 | Widen the members of an inferred table literal | ../plans/45.11-widen-inferred-literal-members.md | architecture-engineer | todo |
+| 45.12 | Accept nil for a parameter the catalog declares optional | ../plans/45.12-nil-for-an-optional-catalog-parameter.md | architecture-engineer | todo |
+| 45.13 | Report a declaration that overwrites an MTA API or a runtime helper | ../plans/45.13-shadowed-api-and-helper.md | architecture-engineer | todo |
+| 45.14 | Say what a class receiver and a reserved parameter name really are | ../plans/45.14-class-receiver-and-reserved-name-messages.md | architecture-engineer | todo |
+| 45.15 | Author a multi-return signature | ../plans/45.15-author-a-multi-return-signature.md | architecture-engineer | todo |
+| 45.16 | Decide what replaces instantiating a class the code names at runtime | ../plans/45.16-runtime-named-instantiation.md | architecture-engineer | todo |
+| 45.17 | Keep a ported Lua resource as a compiler corpus | ../plans/45.17-ported-resource-corpus.md | test-engineer | todo |
+| 45.18 | Document what porting a Lua resource to Luam actually costs | ../plans/45.18-porting-guide.md | documentation-engineer | todo |
+| 45.19 | Detect the extension by the identifier it actually publishes | ../plans/45.19-extension-identifier-mismatch.md | architecture-engineer | todo |
+
+Acceptance:
+
+- Every shape the port could not express has either a spelling or a recorded
+  refusal, and the corpus in 45.17 carries one occurrence of each.
+- A Lua idiom that is correct Lua and correct in the resource — deleting a key,
+  spreading `unpack`, initialising a container with `{}`, filling a record over
+  several statements — compiles.
+- A type the resource needs to describe — a quoted key, an optional callback
+  parameter, a generic contract, a global assigned later, a multi-return wrapper —
+  can be written.
+- No relaxation is silent: each one keeps a negative test proving the diagnostic
+  it replaces still fires where it should.
+- The emitted Lua, the line map and the generated manifest are unchanged by every
+  task in the milestone except 45.05 and 45.16, and each of those carries its own
+  baseline.
+
+Why now:
+
+- The gaps are not exotic. Eleven of the fourteen are single Lua idioms that
+  appear in every resource, and four of them produced false positives on code that
+  is correct — a false positive is worse than a missing check, because it teaches
+  the author to stop reading the output.
+- Two of the milestone's findings are the internal design document teaching forms
+  the compiler rejects, in the exact section a porting author reads first. Both
+  were corrected in `docs/en` and never carried back.
+- The port also found seventeen genuine defects in a resource that had been
+  running in production, including a getter typed non-optional over an optional
+  field and an event handler that validates everything and then does nothing.
+  That is the argument for the language, and it is unusable while the port itself
+  costs a day of fighting the checker.
+- Nothing here needs a new subsystem. Twelve of the tasks are local changes to the
+  checker or the parser, and the two that are not — 45.16 and 45.10 — are
+  decisions with the machinery already built.
+- 45.19 is one wrong string. `luam doctor` tells every user their extension is not
+  installed, and `luam setup` re-downloads it every run, because the identifier the
+  CLI looks for is not the one the extension publishes.
+
+Deliberately excluded:
+
+- The environment findings in a `shared` file, which milestone 43 owns in full.
+  The port reproduced them exactly and adds nothing.
+- The member resolution and hover findings, which milestone 44 owns.
+- Auto-loading and any framework surface. 45.16 decides how a resource that has
+  one is ported; it does not put one in the language. CLAUDE.md stands.
+- The defects the port found in the resource itself. They are the output of the
+  exercise, not work for this repository.
