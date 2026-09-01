@@ -17,6 +17,14 @@ Every heading below is a released version and the date it shipped, newest first.
   example. It states plainly that the compiler does not verify the runtime
   branch, and that the editor labels are where the side now shows up. Imports
   are unchanged.
+- [Language server](/en/tooling/language-server) records that a property hover
+  reports the type the checker gave the access — narrowed where a guard narrowed
+  it, and never a same-named declaration elsewhere in the file — and that
+  hovering a value lists the fields of its type, one level deep and capped at the
+  member limit.
+- [Editors](/en/tooling/editors) records that a fix to the language server
+  reaches the editor only after the extension is reinstalled and the window
+  reloaded.
 
 ## 0.19.12 - 2026-08-31
 

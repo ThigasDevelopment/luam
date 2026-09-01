@@ -2918,15 +2918,15 @@ Hovering `props.password`, where `props` is a parameter typed `NetworkProps` and
 property by name against every declaration in the file instead of against the
 receiver it was written on.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 44.01 | Bind a member reference to its receiver | ../plans/44.01-member-reference-binding.md | architecture-engineer | todo |
-| 44.02 | Answer a property hover with the type the checker gave it | ../plans/44.02-member-hover-type.md | architecture-engineer | todo |
-| 44.03 | Test member resolution against name collisions | ../plans/44.03-member-resolution-tests.md | test-engineer | todo |
-| 44.04 | Record what a property hover answers | ../plans/44.04-member-hover-documentation.md | documentation-engineer | todo |
-| 44.05 | Show the fields of a value's type on hover | ../plans/44.05-hover-type-shape.md | architecture-engineer | todo |
+| 44.01 | Bind a member reference to its receiver | ../plans/44.01-member-reference-binding.md | architecture-engineer | done |
+| 44.02 | Answer a property hover with the type the checker gave it | ../plans/44.02-member-hover-type.md | architecture-engineer | done |
+| 44.03 | Test member resolution against name collisions | ../plans/44.03-member-resolution-tests.md | test-engineer | done |
+| 44.04 | Record what a property hover answers | ../plans/44.04-member-hover-documentation.md | documentation-engineer | done |
+| 44.05 | Show the fields of a value's type on hover | ../plans/44.05-hover-type-shape.md | architecture-engineer | done |
 
 Acceptance:
 

@@ -23,6 +23,10 @@ function walkFunction(state: CollectorState, block: BlockContext, expression: Fu
 }
 
 function containerMatches(declaration: SymbolDeclaration, reference: SymbolReference): boolean {
+    if (reference.kind === 'member') {
+        return reference.container !== null && declaration.container === reference.container;
+    }
+
     return reference.container === null || declaration.container === null || declaration.container === reference.container;
 }
 

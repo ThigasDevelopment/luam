@@ -240,3 +240,9 @@ ou apagado fora do editor chega até ele sem reinício. **Luam: Rescan Workspace
 reconstrói o índice a partir do disco se alguma mudança escapou do observador, e
 **Luam: Restart Language Server** é a saída se o servidor e o projeto ainda
 discordarem.
+
+Nada disso alcança uma mudança no próprio servidor. O editor roda o servidor
+embutido na extensão que ele tem instalada, então uma correção em hover,
+completação ou diagnóstico só chega depois de reinstalar a extensão e recarregar
+a janela — **Developer: Reload Window**. Até lá o editor continua respondendo do
+jeito que o build instalado responde, por mais atual que o checkout esteja.

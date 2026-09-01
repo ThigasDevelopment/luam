@@ -239,3 +239,9 @@ moved or deleted outside the editor reaches it without a restart. **Luam: Rescan
 Workspace** rebuilds the index from disk if a change slipped past the watcher,
 and **Luam: Restart Language Server** is the way out if the server and the
 project still disagree.
+
+None of this reaches a change to the server itself. The editor runs the server
+bundled into the extension it has installed, so a fix to hover, completion or
+diagnostics lands only after the extension is reinstalled and the window
+reloaded — **Developer: Reload Window**. Until then the editor keeps answering
+the way the installed build answers, however current the checkout is.

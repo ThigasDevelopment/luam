@@ -19,6 +19,14 @@ da versão atual.
   execução como exemplo trabalhado. Afirma com todas as letras que o compilador
   não verifica a ramificação em tempo de execução, e que os rótulos do editor são
   onde o lado agora aparece. Os imports não mudam.
+- [Language server](/pt-br/tooling/language-server) registra que o hover de uma
+  propriedade informa o tipo que o checker deu ao acesso — estreitado onde uma
+  guarda estreitou, e nunca uma declaração de mesmo nome em outro ponto do
+  arquivo — e que o hover sobre um valor lista os campos do tipo dele, um nível
+  de profundidade e com corte no limite de membros.
+- [Editores](/pt-br/tooling/editors) registra que uma correção no servidor de
+  linguagem só chega ao editor depois de reinstalar a extensão e recarregar a
+  janela.
 
 ## 0.19.12 - 2026-08-31
 

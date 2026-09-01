@@ -21,15 +21,28 @@ members, and the [object extensions](/en/language/extensions) that apply to the
 receiver's type.
 
 Hover answers over a member too. The property of a class instance, of a table
-typed inline, of an `interface` or of a project global reports the type the
-checker gave that property, read from the expression under the cursor rather
-than from the first member in the file that shares its name.
+typed inline, of a `type` alias, of an `interface` or of a project global
+reports the type the checker gave that property, read from the expression under
+the cursor. A declaration elsewhere in the file that happens to share the
+property's name never answers for it — a class with a `password` field does not
+answer a hover on `props.password`, and an optional field reads `string?`, with
+its `?`.
 
-When that property is a class or an `interface`, the hover also carries its
-shape. The declaration is looked up in the file under the cursor first and then
-across the workspace, so a class declared in another file still shows its
-members. Only files the environment may reference are searched, so a server file
-never reports the shape of a client-only class.
+Where a guard narrowed the access, the hover reports the narrowed type and names
+the declared one under it. Inside
+`if props.password and type(props.password) == 'string' then`, the assignment's
+`props.password` reads `string`, followed by `narrowed from string?`.
+
+Hovering a value carries the shape of its type. A local, a parameter, a field or
+a global typed by a `type` alias, an `interface`, a class or an inline object
+type lists that type's fields under the signature — one level deep, optional
+fields keeping their `?`, capped at 24 with a `# N more` line. A value typed
+`string`, `number`, `any`, `table` or a function hovers with no shape block.
+
+The declaration is looked up in the file under the cursor first and then across
+the workspace, so a class declared in another file still shows its members. Only
+files the environment may reference are searched, so a server file never reports
+the shape of a client-only class.
 
 ### Reserved words
 

@@ -28,6 +28,32 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   after them, each carrying its side in the completion detail, and hover on a
   side-restricted name adds a line naming its side. With no diagnostic, these
   labels are where the side is reported.
+- Hovering a value now lists the fields of its type. A local, a parameter, a
+  field or a global typed by a `type` alias, an `interface`, a class or an
+  inline object type carries that type's fields under the signature — one level
+  deep, optional fields keeping their `?`, capped at 24 with a `# N more` line.
+  A value typed `string`, `number`, `any`, `table` or a function is unchanged.
+  `parameter props: NetworkProps` stops being a name the author has to go look
+  up.
+
+### Fixed
+
+- Hovering a property answered with an unrelated declaration that happened to
+  share its name. With a `class Network { password: string }` anywhere in the
+  file, hovering `props.password` — where `props` is typed by a `type` alias
+  declaring `password?: string` — reported the class field. It now reports the
+  type the checker gave the access, `string?`, and deleting the class no longer
+  changes the answer. Definition and rename on that property no longer reach the
+  class field either. A member of a class instance, of an MTA element, of a
+  library and of an enum resolves as it did before, and `self.password` still
+  answers with the class field.
+- A property narrowed by a guard hovered with its declared type. Inside
+  `if props.password and type(props.password) == 'string' then`, the
+  assignment's `props.password` now reports `string` and names the declared type
+  under it, `narrowed from string?`.
+
+The editor picks these up only after the extension is reinstalled and the window
+reloaded; until then it keeps answering the way the installed build answers.
 
 ## 0.19.12 - 2026-08-31
 

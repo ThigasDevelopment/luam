@@ -9,6 +9,9 @@ function codes(source: string): string[] {
 const TYPES =
     "type Socket = {\n    handle?: string\n}\n\ntype Ready = {\n    kind: 'ready',\n    port: number\n}\n\ntype Idle = {\n    kind: 'idle'\n}\n\ntype State = Ready | Idle\n\ntype Session = {\n    connection?: string,\n    socket: Socket,\n    state: State,\n    slots: table<string, string?>\n}\n\n";
 
+const PROPS =
+    "type NetworkProps = {\n    password?: string\n}\n\nclass Network {\n    password: string = ''\n\n    constructor = function (props: NetworkProps)\n";
+
 function inFunction(body: string): string {
     return `${TYPES}function take(session: Session, other: Session, key: string): void\n${body}end\n`;
 }
@@ -86,6 +89,16 @@ describe('access path invalidation', () => {
         const body = '    if session.slots[key] ~= nil then\n        local text: string = session.slots[key]\n    end\n';
 
         expect(codes(inFunction(body))).toEqual(['check-type-mismatch']);
+    });
+
+    it('narrows an optional property assigned to a class field behind a guard', () => {
+        const guard = "        if props.password and type(props.password) == 'string' then\n            self.password = props.password\n        end\n";
+
+        expect(codes(`${PROPS}${guard}    end\n}\n`)).toEqual([]);
+    });
+
+    it('reports the same assignment without the guard', () => {
+        expect(codes(`${PROPS}        self.password = props.password\n    end\n}\n`)).toEqual(['check-type-mismatch']);
     });
 
     it('produces no fact for a call in the path', () => {
