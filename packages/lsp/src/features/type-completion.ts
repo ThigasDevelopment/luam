@@ -180,6 +180,12 @@ export function typeItems(analysis: DocumentAnalysis, offset: number): Completio
         push(info.name, CompletionItemKind.Enum, `enum ${info.name}`);
     }
 
+    for (const info of analysis.declarations.allAliases()) {
+        const generics = info.typeParameters.length === 0 ? '' : `<${info.typeParameters.join(', ')}>`;
+
+        push(info.name, CompletionItemKind.Struct, `type ${info.name}${generics}`);
+    }
+
     for (const element of ELEMENT_TYPES) {
         const detail = element.parent === null ? 'mta element type' : `mta element type extending ${element.parent}`;
 

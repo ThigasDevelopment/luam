@@ -1,0 +1,50 @@
+#* The form ADR-045 recommends: a registry the author writes, iterated normally.
+   Every entry is created with "new", so the constructor arity, the argument
+   types and the value the registry holds are all checked. Compare loader.luam,
+   which builds the same set by reflection and produces "any" throughout. *#
+
+class Registry {
+    core: any = nil
+    listeners: Listener[] = {}
+    commands: Command[] = {}
+
+    constructor = function (core: any)
+        self.core = core
+        self.listeners = {}
+        self.commands = {}
+    end
+
+    #* Add a line here when a listener or a command joins the resource. That
+       list is the loading order, and it is the whole cost of the registry. *#
+    load = function (): void
+        local joined: Listener = new Listener(self.core)
+
+        joined.event = 'onPlayerJoin'
+
+        local hello: Command = new Command(self.core)
+
+        hello.name = 'hello'
+
+        self.listeners = { joined }
+        self.commands = { hello }
+    end
+
+    registerAll = function (): void
+        for index = 1, #self.listeners do
+            self.listeners[index]:register()
+        end
+
+        for index = 1, #self.commands do
+            self.commands[index]:register()
+        end
+    end
+
+    unregisterAll = function (): void
+        for index = 1, #self.listeners do
+            self.listeners[index]:unregister()
+        end
+
+        self.listeners = {}
+        self.commands = {}
+    end
+}

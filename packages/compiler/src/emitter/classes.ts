@@ -4,6 +4,12 @@ import { indentLine, markSource, requireHelper, withSymbol, type EmitState } fro
 import type { Parameter } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration, EnumDeclaration } from '@compiler/parser/declaration-nodes';
 
+const BARE_KEY = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+export function emitMemberKey(name: string): string {
+    return BARE_KEY.test(name) ? name : `[${emitString(name)}]`;
+}
+
 export function emitMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {
     const self: Parameter = { name: 'self', annotation: null, isVararg: false, position: member.position };
 
@@ -13,7 +19,7 @@ export function emitMethod(state: EmitState, className: string, member: ClassMet
 
     const parameters = member.isStatic ? member.parameters : [self, ...member.parameters];
 
-    return withSymbol(state, `${className}${member.isStatic ? '.' : ':'}${member.name}`, () => emitFunctionBody(state, parameters, member.body, `${member.name} = function`));
+    return withSymbol(state, `${className}${member.isStatic ? '.' : ':'}${member.name}`, () => emitFunctionBody(state, parameters, member.body, `${emitMemberKey(member.name)} = function`));
 }
 
 function emitGeneratedMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {
@@ -94,7 +100,7 @@ function emitMembers(state: EmitState, statement: ClassDeclaration): string[] {
 
         const value = member.value === null ? 'nil' : emitExpression(state, member.value);
 
-        entries.push(indentLine(state, `${markSource(state, member.position.line, statement.name)}${member.name} = ${value}`));
+        entries.push(indentLine(state, `${markSource(state, member.position.line, statement.name)}${emitMemberKey(member.name)} = ${value}`));
     }
 
     for (const generated of state.generatedMembers.get(statement) ?? []) {

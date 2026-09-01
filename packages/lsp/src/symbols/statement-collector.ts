@@ -5,6 +5,7 @@ import type {
     Expression,
     FunctionDeclaration,
     GenericForStatement,
+    GlobalStatement,
     IfStatement,
     LocalStatement,
     NumericForStatement,
@@ -245,13 +246,34 @@ function collectDeclare(state: CollectorState, block: BlockContext, statement: D
 
     if (position !== null) {
         const detail = variableText('declare', statement.name, statement.annotation, null);
+        const type = annotationType(statement.annotation);
 
-        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'global', position, detail });
+        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'global', position, detail, type });
+    }
+}
+
+function collectGlobalDeclaration(state: CollectorState, block: BlockContext, statement: GlobalStatement): void {
+    const declaration = statement.declaration;
+    const position = locatePosition(state, statement.position.offset, declaration.name);
+
+    collectAnnotation(state, block, declaration.annotation);
+
+    for (const value of statement.values) {
+        collectExpression(state, block, value);
+    }
+
+    if (position !== null) {
+        const detail = variableText('', declaration.name, declaration.annotation, null).trimStart();
+        const type = annotationType(declaration.annotation);
+
+        declareSymbol(state, ROOT_SCOPE, { name: declaration.name, kind: 'global', position, detail, type });
     }
 }
 
 function collectStatement(state: CollectorState, block: BlockContext, statement: Statement): void {
-    if (statement.kind === 'local-statement') {
+    if (statement.kind === 'global-statement') {
+        collectGlobalDeclaration(state, block, statement);
+    } else if (statement.kind === 'local-statement') {
         collectLocal(state, block, statement);
     } else if (statement.kind === 'assignment-statement') {
         collectAssignment(state, block, statement);

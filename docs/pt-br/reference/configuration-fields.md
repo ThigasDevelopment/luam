@@ -22,6 +22,7 @@ Para a versão narrada, veja [.luam.manifest](/pt-br/tooling/luam-manifest).
 | `compiler.strict` | `boolean` | não | `true` | Modo estrito de todo o projeto. Uma diretiva `#!strict` ou `#!nonstrict` ainda vence para o arquivo que a carrega. |
 | `compiler.oop` | `boolean` | não | `false` | Liga a API OOP do MTA e escreve `<oop>true</oop>`. Veja [API OOP](/pt-br/mta/oop). |
 | `compiler.noUnusedLocals` | `boolean` | não | `false` | Reporta um local que nunca é lido como `check-unused-local`. |
+| `compiler.noImplicitGlobals` | `boolean` | não | `false` | Relata uma atribuição que cria um global que nada declara como `check-implicit-global`. |
 | `compiler.noUnusedParameters` | `boolean` | não | `false` | Reporta um parâmetro que nunca é lido como `check-unused-parameter`. |
 | `compiler.warningsAsErrors` | `boolean` | não | `false` | Promove todo aviso a erro. |
 

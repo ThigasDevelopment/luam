@@ -67,11 +67,11 @@ describe('editor command', () => {
     it('runs a batch launcher through the command interpreter as a single quoted line', () => {
         const executable = join('C:\\Program Files', 'Microsoft VS Code', 'bin', 'code.cmd');
 
-        const invocation = buildInvocation(executable, ['--install-extension', 'thigasdevelopment.luam', '--force']);
+        const invocation = buildInvocation(executable, ['--install-extension', 'luam.luam', '--force']);
 
         expect(invocation.verbatim).toBe(true);
         expect(invocation.args.slice(0, 3)).toEqual(['/d', '/s', '/c']);
-        expect(invocation.args[3]).toBe(`""${executable}" "--install-extension" "thigasdevelopment.luam" "--force""`);
+        expect(invocation.args[3]).toBe(`""${executable}" "--install-extension" "luam.luam" "--force""`);
     });
 
     it('spawns a native executable directly', () => {

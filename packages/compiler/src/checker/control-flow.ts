@@ -1,6 +1,7 @@
 import type { Expression, GenericForStatement, IfClause, NumericForStatement, RepeatStatement, Statement, WhileStatement } from '@compiler/parser/ast';
 
 import { forgetAssignedPaths } from './access-path';
+import { settleRecordObligations } from './record-completion';
 import type { CheckContext } from './context';
 import { checkExpression } from './expressions';
 import { applyFacts, cloneFlow, joinFlows, type FlowState } from './flow';
@@ -11,8 +12,13 @@ import { ANY_TYPE, isNumeric, NUMBER_TYPE, typeToString, type Type } from './typ
 const ITERATOR_FUNCTIONS: ReadonlySet<string> = new Set(['pairs', 'ipairs']);
 
 export function checkBlock(context: CheckContext, body: readonly Statement[]): void {
+    const opened = new Set(context.recordObligationPaths());
+
     context.binder.pushScope();
+    context.blockDepth += 1;
     checkStatements(context, body);
+    context.blockDepth -= 1;
+    settleRecordObligations(context, opened);
 
     const declared = context.binder.currentScopeNames();
 

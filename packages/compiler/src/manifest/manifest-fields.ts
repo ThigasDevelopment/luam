@@ -30,6 +30,9 @@ const COMPILER_OPTION_FIELDS: readonly ManifestField[] = [
     }),
     field('oop', BOOLEAN_TYPE, 'Enables the MTA OOP API in the checker and the generated meta.xml.', { defaultValue: DEFAULT_COMPILER_OPTIONS.oop }),
     field('noUnusedLocals', BOOLEAN_TYPE, 'Reports local declarations that are never read.', { defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedLocals }),
+    field('noImplicitGlobals', BOOLEAN_TYPE, 'Reports an assignment that creates a global the project never declares.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.noImplicitGlobals,
+    }),
     field('noUnusedParameters', BOOLEAN_TYPE, 'Reports function and method parameters that are never read.', {
         defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedParameters,
     }),

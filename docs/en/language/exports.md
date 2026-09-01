@@ -38,13 +38,13 @@ client side.
 Add the contextual `http` modifier to let MTA's HTTP server call the function:
 
 ```luam
-export http function getPlayerCount(): number
+export http function getOnlineCount(): number
     return getPlayerCount()
 end
 ```
 
 ```xml
-<export function="getPlayerCount" type="server" http="true" />
+<export function="getOnlineCount" type="server" http="true" />
 ```
 
 Without the modifier, the compiler always emits `http="false"`. Outside an

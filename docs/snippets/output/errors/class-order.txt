@@ -1,5 +1,5 @@
-Discovery: done in 2 ms.
-Compile: 1 file in 6 ms.
+Discovery: done in 3 ms.
+Compile: 1 file in 14 ms.
 Assembly: failed in 0 ms.
 src/shared/slots.luam:1:18 error check-class-before-declaration: Class "VehicleSlot" is declared further down this file, so it does not exist yet at this point.
-Check failed: 1 error, 0 warnings in 9 ms.
+Check failed: 1 error, 0 warnings in 18 ms.

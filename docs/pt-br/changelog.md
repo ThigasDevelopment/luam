@@ -11,6 +11,27 @@ da versão atual.
 
 ## Não lançado
 
+### Adicionado
+
+- [Portando um resource Lua](/pt-br/guide/porting) é a lista ordenada de decisões
+  que converter um resource MTA existente impõe: a ordem de trabalho e o porquê,
+  o que traduz mecanicamente em forma de tabela, o que precisa ser reestruturado,
+  o que o Luam recusa e o que escrever no lugar, e o que o port encontra —
+  dezessete defeitos genuínos em um resource que estava rodando.
+- [Limitações](/pt-br/reference/limitations) registra as duas formas que o marco
+  45 deixou sem equivalente: instanciar uma classe que o código nomeia em tempo
+  de execução, e a aridade fixa de uma assinatura de múltiplos retornos escrita à
+  mão.
+- [Diagnósticos](/pt-br/reference/diagnostics) ganha `check-duplicate-type`,
+  `check-duplicate-global`, `check-global-annotation-scope`,
+  `check-incomplete-record`, `check-tuple-position`, `check-class-receiver`,
+  `parse-reserved-name`, `check-shadowed-api`, `check-shadowed-helper` e
+  `check-implicit-global`, e registra que um argumento final espalhado não é
+  verificado.
+- [Campos de configuração](/pt-br/reference/configuration-fields) e
+  [.luam.manifest](/pt-br/tooling/luam-manifest) registram
+  `compiler.noImplicitGlobals`, desligado por padrão.
+
 ### Alterado
 
 - [Ambientes](/pt-br/mta/environments) registra que um arquivo `shared` enxerga

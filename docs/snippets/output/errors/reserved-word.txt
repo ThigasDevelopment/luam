@@ -1,7 +1,8 @@
 Discovery: done in 2 ms.
-Compile: 1 file in 4 ms.
+Compile: 1 file in 8 ms.
 Assembly: failed in 0 ms.
-src/server/legacy.luam:1:7 error parse-unexpected-token: Expected identifier but found "export".
-src/server/legacy.luam:2:7 error parse-unexpected-token: Expected identifier but found "class".
-src/server/legacy.luam:4:7 error parse-unexpected-token: Unexpected "export" in expression.
-Check failed: 3 errors, 0 warnings in 7 ms.
+src/server/legacy.luam:1:7 error parse-reserved-name: "export" is a reserved word and cannot name a local. Rename it — a property of the same name is still legal, so "value.export" keeps working.
+src/server/legacy.luam:2:7 error parse-reserved-name: "class" is a reserved word and cannot name a local. Rename it — a property of the same name is still legal, so "value.class" keeps working.
+src/server/legacy.luam:4:7 error parse-reserved-name: "export" is a reserved word and cannot be read as a value. Rename the declaration — a property of the same name is still legal, so "value.export" keeps working.
+src/server/legacy.luam:4:15 error parse-reserved-name: "class" is a reserved word and cannot be read as a value. Rename the declaration — a property of the same name is still legal, so "value.class" keeps working.
+Check failed: 4 errors, 0 warnings in 10 ms.

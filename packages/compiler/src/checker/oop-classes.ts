@@ -43,6 +43,7 @@ function buildRegistry(): DeclarationRegistry {
             superClass: declaration.parent,
             superArguments: [],
             interfaces: [],
+        interfaceArguments: [],
             members,
             statics: new Map(),
             position: MTA_POSITION,

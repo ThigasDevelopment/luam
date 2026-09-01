@@ -14,7 +14,7 @@ import { eventHover } from '@lsp/features/event-hover';
 import { keywordHover } from '@lsp/features/keyword-hover';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
-import { memberAccessAt, memberHover } from '@lsp/features/member-hover';
+import { memberAccessAt, memberHover, methodHover } from '@lsp/features/member-hover';
 import { mtaClassHover } from '@lsp/features/mta-class-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
 import { isSideRestricted, sideNote } from '@lsp/features/side-surface';
@@ -201,7 +201,7 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
     const declaration = analysis.index.declarationFor(offset);
 
     if (declaration === null) {
-        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset, others) ?? keywordHover(analysis, offset);
+        return methodHover(analysis, offset, others) ?? workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset, others) ?? keywordHover(analysis, offset);
     }
 
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;

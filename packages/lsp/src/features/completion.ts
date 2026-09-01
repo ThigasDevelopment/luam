@@ -126,6 +126,26 @@ function memberItems(analysis: DocumentAnalysis, target: ReceiverTarget, trigger
     return target.kind === 'enum' ? enumItems(analysis, target.name) : classItems(analysis, target.name, target.typeArguments, trigger === ':');
 }
 
+function indexKeyItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
+    const context = completionContext(analysis.text, offset);
+
+    if (context.trigger !== '[') {
+        return [];
+    }
+
+    const target = resolveReceiver(analysis, offset, context.segments);
+
+    return target === null ? [] : deduplicate(indexItems(memberItems(analysis, target, '.'), context.quoted));
+}
+
+function indexItems(items: readonly CompletionItem[], quoted: boolean): CompletionItem[] {
+    if (quoted) {
+        return [...items];
+    }
+
+    return items.map((item) => ({ ...item, label: `'${item.label}'`, insertText: `'${item.label}'` }));
+}
+
 function superItems(analysis: DocumentAnalysis, offset: number): CompletionItem[] {
     const target = resolveReceiver(analysis, offset, ['self']);
 
@@ -252,6 +272,12 @@ function stringItems(
         return eventItems(analysis, others, frame, { stringStart: context.stringStart, snippets });
     }
 
+    const keys = indexKeyItems(analysis, offset);
+
+    if (keys.length > 0) {
+        return keys;
+    }
+
     const expected = expectedStringType(analysis, context.stringStart) ?? expectedArgument(analysis, offset, frame)?.type ?? null;
 
     return expected === null ? [] : literalItems(stringLiteralValues(expected));
@@ -297,6 +323,12 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
     }
 
     const context = completionContext(analysis.text, offset);
+
+    if (context.trigger === '[') {
+        const target = resolveReceiver(analysis, offset, context.segments);
+
+        return target === null ? [] : deduplicate(indexItems(memberItems(analysis, target, '.'), context.quoted));
+    }
 
     if (context.trigger !== null) {
         const target = resolveReceiver(analysis, offset, context.segments);

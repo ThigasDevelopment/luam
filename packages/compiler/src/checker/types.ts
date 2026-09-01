@@ -73,6 +73,7 @@ export interface RecordType {
     origin: string | null;
     members: ReadonlyMap<string, Type>;
     isLiteral?: boolean;
+    isInferred?: boolean;
 }
 
 export type Type =
@@ -180,11 +181,26 @@ function isEmptyLiteral(type: Type): boolean {
 }
 
 export function widenInferred(type: Type): Type {
+    if (type.kind === 'array') {
+        return createArray(widenInferred(type.element));
+    }
+
+    if (type.kind === 'union') {
+        return createUnion(type.options.map(widenInferred));
+    }
+
     if (type.kind !== 'record' || type.isLiteral !== true) {
         return widenLiteral(type);
     }
 
-    return type.members.size === 0 ? TABLE_TYPE : createRecord(type.name, type.members, type.origin);
+    if (type.members.size === 0) {
+        return TABLE_TYPE;
+    }
+
+    const widened = new Map([...type.members].map(([name, member]) => [name, widenInferred(member)]));
+    const record = createObjectType(widened);
+
+    return record.kind === 'record' ? { ...record, isInferred: true } : record;
 }
 
 export function createFunction(
@@ -405,7 +421,7 @@ function isFunctionAssignable(source: FunctionType, target: FunctionType, option
 }
 
 function isMapAssignable(source: Type, target: MapType, options: AssignabilityOptions): boolean {
-    if (source.kind === 'table') {
+    if (source.kind === 'table' || isEmptyLiteral(source)) {
         return true;
     }
 

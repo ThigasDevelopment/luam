@@ -18,7 +18,9 @@ export interface MemberAccess {
     start: number;
 }
 
-function ownerName(owner: Type): string | null {
+function ownerName(received: Type): string | null {
+    const owner = received.kind === 'optional' ? received.element : received;
+
     if (owner.kind === 'record' || owner.kind === 'named') {
         return owner.name;
     }
@@ -99,4 +101,38 @@ export function memberHover(analysis: DocumentAnalysis, offset: number, others: 
         contents: { kind: 'markdown', value: contents(analysis, others, owner, name, expression.property, type) },
         range: toRange(positionAt(analysis.starts, start), expression.property.length),
     };
+}
+
+export function methodHover(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[] = []): Hover | null {
+    for (const [expression] of analysis.types) {
+        if (expression.kind !== 'call-expression' || expression.method === null) {
+            continue;
+        }
+
+        const start = locateWord(analysis.text, expression.position.offset, expression.method);
+
+        if (start === null || offset < start || offset > start + expression.method.length) {
+            continue;
+        }
+
+        const received = analysis.types.get(expression.callee);
+        const receiver = received === undefined || received.kind !== 'optional' ? received : received.element;
+
+        if (receiver === undefined || receiver.kind !== 'named') {
+            continue;
+        }
+
+        const member = analysis.declarations.lookupMember(receiver.name, expression.method);
+
+        if (member === null) {
+            continue;
+        }
+
+        return {
+            contents: { kind: 'markdown', value: contents(analysis, others, receiver, receiver.name, expression.method, member.type) },
+            range: toRange(positionAt(analysis.starts, start), expression.method.length),
+        };
+    }
+
+    return null;
 }

@@ -21,7 +21,8 @@ function parseParameter(stream: TokenStream): Parameter {
         return { name, annotation, isVararg: true, position: token.position };
     }
 
-    const name = stream.expect('identifier').value;
+    const reserved = stream.reservedNameAt('parameter');
+    const name = reserved === null ? stream.expect('identifier').value : reserved.value;
 
     return { name, annotation: parseNamedAnnotation(stream, 'parameter'), isVararg: false, position: token.position };
 }

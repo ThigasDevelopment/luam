@@ -185,6 +185,7 @@ Uma tabela campo a campo completa, incluindo cada regra de validação, está em
 | `strict` | `true` | Modo estrito de todo o projeto. Uma diretiva `#!strict` ou `#!nonstrict` no arquivo ainda vence para aquele arquivo. |
 | `oop` | `false` | Liga a API OOP do MTA e escreve `<oop>true</oop>`. |
 | `noUnusedLocals` | `false` | Reporta um local que nunca é lido como `check-unused-local`. |
+| `noImplicitGlobals` | `false` | Reporta uma atribuição que cria um global que nada declara como `check-implicit-global`. |
 | `noUnusedParameters` | `false` | Reporta um parâmetro que nunca é lido como `check-unused-parameter`. |
 | `warningsAsErrors` | `false` | Promove todo aviso a erro, então um aviso reprova o build. |
 

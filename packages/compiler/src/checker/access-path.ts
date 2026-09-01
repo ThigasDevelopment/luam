@@ -63,6 +63,7 @@ function statementExpressions(statement: Statement): readonly Expression[] {
     switch (statement.kind) {
         case 'local-statement':
         case 'return-statement':
+        case 'global-statement':
             return statement.values;
         case 'assignment-statement':
             return [...statement.targets, ...statement.values];
@@ -125,6 +126,10 @@ function addTargets(statement: Statement, paths: Set<string>): void {
 
     if (statement.kind === 'local-statement') {
         statement.declarations.forEach((declaration) => paths.add(declaration.name));
+    }
+
+    if (statement.kind === 'global-statement') {
+        paths.add(statement.declaration.name);
     }
 }
 

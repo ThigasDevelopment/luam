@@ -80,6 +80,9 @@ export function nestedBlocks(statement: Statement): Statement[][] {
         case 'assignment-statement':
             fromExpressions([...statement.targets, ...statement.values], blocks);
             break;
+        case 'global-statement':
+            fromExpressions(statement.values, blocks);
+            break;
         case 'call-statement':
             fromExpression(statement.expression, blocks);
             break;

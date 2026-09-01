@@ -31,7 +31,7 @@ export function annotationText(annotation: TypeAnnotation | null): string {
     }
 
     if (annotation.kind === 'type-function') {
-        const parameters = annotation.parameters.map(annotationText);
+        const parameters = annotation.parameters.map((parameter, index) => namedAnnotationText(annotation.parameterNames[index] ?? null, parameter));
 
         if (annotation.isVariadic) {
             parameters.push('...');
@@ -57,7 +57,11 @@ export function annotationText(annotation: TypeAnnotation | null): string {
     return `${annotation.name}<${annotation.typeArguments.map(annotationText).join(', ')}>`;
 }
 
-export function namedAnnotationText(name: string, annotation: TypeAnnotation | null): string {
+export function namedAnnotationText(name: string | null, annotation: TypeAnnotation | null): string {
+    if (name === null) {
+        return annotationText(annotation);
+    }
+
     if (annotation === null) {
         return name;
     }

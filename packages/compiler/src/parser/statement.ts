@@ -27,7 +27,7 @@ export function parseExpressionList(stream: TokenStream): Expression[] {
 }
 
 export function parseDeclarator(stream: TokenStream): VariableDeclarator {
-    const token = stream.expect('identifier');
+    const token = stream.reservedNameAt('local') ?? stream.expect('identifier');
 
     return { name: token.value, annotation: parseNamedAnnotation(stream, 'local'), position: token.position };
 }
@@ -169,7 +169,39 @@ function invalidStatement(stream: TokenStream, target: Expression | undefined, s
     return stream.errorAt(message, 'parse-invalid-statement', start.position, start.end);
 }
 
+function parseGlobalDeclaration(stream: TokenStream): Statement | null {
+    const marked = stream.checkAhead(1, 'operator', '?') && stream.checkAhead(2, 'punctuation', ':');
+
+    if (!stream.check('identifier') || (!marked && !stream.checkAhead(1, 'punctuation', ':'))) {
+        return null;
+    }
+
+    const point = stream.speculate();
+
+    try {
+        const declaration = parseDeclarator(stream);
+
+        if (declaration.annotation !== null && stream.match('operator', '=')) {
+            return { kind: 'global-statement', declaration, values: parseExpressionList(stream), position: declaration.position };
+        }
+    } catch (error) {
+        if (!(error instanceof ParserError)) {
+            throw error;
+        }
+    }
+
+    stream.rewind(point);
+
+    return null;
+}
+
 function parseExpressionStatement(stream: TokenStream): Statement {
+    const declaration = parseGlobalDeclaration(stream);
+
+    if (declaration !== null) {
+        return declaration;
+    }
+
     const start = stream.current();
     const position = start.position;
     const targets: Expression[] = [parseSuffixed(stream)];
@@ -209,7 +241,9 @@ function parseKeywordStatement(stream: TokenStream, value: string): Statement | 
             return parseFunctionDeclaration(stream, true);
         }
 
-        return stream.check('keyword', 'enum') ? parseEnumDeclaration(stream, true) : parseLocalStatement(stream, token.position);
+        const isEnum = stream.check('keyword', 'enum') && stream.checkAhead(1, 'identifier');
+
+        return isEnum ? parseEnumDeclaration(stream, true) : parseLocalStatement(stream, token.position);
     }
 
     if (value === 'function') {

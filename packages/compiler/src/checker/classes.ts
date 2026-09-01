@@ -16,7 +16,7 @@ function fieldType(context: CheckContext, member: ClassFieldDeclaration): Type {
         return valueType === null ? ANY_TYPE : widenInferred(valueType);
     }
 
-    const declared = context.resolveAnnotation(member.annotation);
+    const declared = context.resolveValueAnnotation(member.annotation, 'a field');
 
     if (valueType !== null && member.value !== null) {
         context.expectAssignable(valueType, declared, member.value.position, `Field "${member.name}"`);
@@ -146,6 +146,7 @@ export function declareBuilder(context: CheckContext, info: ClassInfo, statement
         superClass: null,
         superArguments: [],
         interfaces: [],
+        interfaceArguments: [],
         members,
         statics: new Map(),
         position: statement.position,
@@ -182,8 +183,10 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
 }
 
 export function assignSuperClass(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {
-    info.superClass = resolveSuperClass(context, statement);
-    info.hasUnresolvedParent = statement.superClass !== null && info.superClass === null;
+    const resolved = resolveSuperClass(context, statement);
+
+    info.superClass = resolved ?? statement.superClass;
+    info.hasUnresolvedParent = statement.superClass !== null && resolved === null;
 }
 
 function resolveSuperClass(context: CheckContext, statement: ClassDeclaration): string | null {
@@ -240,6 +243,7 @@ export function declareClassInfo(context: CheckContext, statement: ClassDeclarat
         superClass: null,
         superArguments: [],
         interfaces: statement.interfaces,
+        interfaceArguments: statement.interfaceArguments.map((args) => args.map((argument) => context.resolveAnnotation(argument))),
         members: new Map(),
         statics: new Map(),
         position: statement.position,
@@ -291,6 +295,8 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
         return;
     }
 
+    context.noteTypeParameters(statement.typeParameters);
+
     const members = new Map<string, MemberInfo>();
 
     for (const name of new Set(statement.superInterfaces)) {
@@ -313,7 +319,7 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
     for (const member of statement.members) {
         const type =
             member.kind === 'interface-field'
-                ? context.resolveAnnotation(member.annotation)
+                ? context.resolveValueAnnotation(member.annotation, 'a member')
                 : buildFunctionType(context, member.parameters, member.returnAnnotation);
 
         const info = { name: member.name, type, isMethod: member.kind === 'interface-method', position: member.position };
@@ -341,6 +347,8 @@ export function checkInterfaceDeclaration(context: CheckContext, statement: Inte
 
     context.declarations.declareInterface({
         name: statement.name,
+        typeParameters: statement.typeParameters,
+        typeConstraints: statement.typeConstraints.map((constraint) => (constraint === null ? null : context.resolveAnnotation(constraint))),
         superInterfaces: statement.superInterfaces,
         members,
         position: statement.position,

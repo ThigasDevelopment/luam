@@ -1,0 +1,37 @@
+class Core {
+    adapters: table<string, Adapter> = {}
+    events: table<string, Event> = {}
+    listeners: Listener[] = {}
+
+    loadAdapters = function (): void
+        self.adapters['redis'] = new RedisAdapter(self)
+        self.adapters['mysql'] = new MySqlAdapter(self)
+
+        for name, adapter in pairs(self.adapters) do
+            if not adapter:connect() then
+                outputDebugString('adapter failed: ' .. name)
+            end
+        end
+    end
+
+    loadEvents = function (): void
+        self.events['dealership:buy'] = new DealershipBuyEvent()
+        self.events['dealership:sell'] = new DealershipSellEvent()
+    end
+
+    loadListeners = function (): void
+        self.listeners = { new PlayerJoinListener() }
+
+        for index = 1, #self.listeners do
+            self.listeners[index]:register()
+        end
+    end
+
+    fire = function (name: string): void
+        local event = self.events[name]
+
+        if event ~= nil then
+            event:fire()
+        end
+    end
+}

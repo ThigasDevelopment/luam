@@ -9,6 +9,25 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Added
+
+- [Porting a Lua resource](/en/guide/porting) is the ordered list of decisions
+  converting an existing MTA resource forces: the order to work in and why, what
+  translates mechanically as a table, what has to be restructured, what Luam
+  refuses and what to write instead, and what the port finds — seventeen genuine
+  defects in a resource that had been running.
+- [Limitations](/en/reference/limitations) records the two shapes milestone 45
+  left without an equivalent: instantiating a class the code names at runtime,
+  and the fixed arity of an authored multi-return signature.
+- [Diagnostics](/en/reference/diagnostics) gains `check-duplicate-type`,
+  `check-duplicate-global`, `check-global-annotation-scope`,
+  `check-incomplete-record`, `check-tuple-position`, `check-class-receiver`,
+  `parse-reserved-name`, `check-shadowed-api`, `check-shadowed-helper` and
+  `check-implicit-global`, and records that a final spread argument is unchecked.
+- [Configuration fields](/en/reference/configuration-fields) and
+  [.luam.manifest](/en/tooling/luam-manifest) record
+  `compiler.noImplicitGlobals`, off by default.
+
 ### Changed
 
 - [Environments](/en/mta/environments) records that a `shared` file sees both

@@ -37,6 +37,8 @@ export const LIMITATIONS: readonly Limitation[] = [
     { id: 'library-collisions-reported', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/038-library-distribution.md' },
     { id: 'library-assets', label: 'design-boundary', owners: [], decision: '.claude/plans/38.04-library-vendoring.md' },
     { id: 'formatter-whitespace-only', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/042-formatter-configuration-file.md' },
+    { id: 'runtime-named-instantiation', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/045-runtime-named-instantiation.md' },
+    { id: 'fixed-tuple-arity', label: 'design-boundary', owners: [], decision: '.claude/plans/45.15-author-a-multi-return-signature.md' },
 ];
 
 export const LABEL_TEXT: Readonly<Record<LocaleId, Readonly<Record<LimitationLabel, string>>>> = {

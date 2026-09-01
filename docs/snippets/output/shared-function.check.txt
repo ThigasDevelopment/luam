@@ -1,5 +1,5 @@
-Discovery: done in 14 ms.
-Compile: 3 files in 12 ms.
+Discovery: done in 11 ms.
+Compile: 3 files in 23 ms.
 Assembly: done in 1 ms.
 Manifest: done in 1 ms.
-Check passed: 3 files, 0 errors, 0 warnings in 28 ms (tree layout).
+Check passed: 3 files, 0 errors, 0 warnings in 35 ms (tree layout).

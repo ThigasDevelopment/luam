@@ -11,6 +11,10 @@ export function classSubstitutions(info: ClassInfo, typeArguments: readonly Type
     return new Map(info.typeParameters.map((parameter, index) => [parameter, typeArguments[index] ?? ANY_TYPE]));
 }
 
+export function parameterSubstitutions(typeParameters: readonly string[], typeArguments: readonly Type[]): Map<string, Type> {
+    return new Map(typeParameters.map((parameter, index) => [parameter, typeArguments[index] ?? ANY_TYPE]));
+}
+
 function parentSubstitutions(registry: DeclarationRegistry, info: ClassInfo, current: ReadonlyMap<string, Type>): Map<string, Type> | null {
     const parent = info.superClass === null ? null : registry.lookupClass(info.superClass);
 
@@ -49,7 +53,19 @@ export function substitutionsFor(registry: DeclarationRegistry, receiver: NamedT
     return new Map();
 }
 
+function interfaceSubstitutions(registry: DeclarationRegistry, receiver: NamedType): Map<string, Type> | null {
+    const contract = registry.lookupInterface(receiver.name);
+
+    return contract === null ? null : parameterSubstitutions(contract.typeParameters, receiver.typeArguments ?? []);
+}
+
 export function specializeMember(context: CheckContext, receiver: NamedType, member: MemberInfo, property: string): MemberInfo {
+    const contract = interfaceSubstitutions(context.declarations, receiver);
+
+    if (contract !== null) {
+        return contract.size === 0 ? member : { ...member, type: substituteType(member.type, contract) };
+    }
+
     const owner = context.declarations.lookupMemberOwner(receiver.name, property);
 
     if (owner === null || owner === receiver.name) {
@@ -174,6 +190,14 @@ export function reportConstraintViolations(
 }
 
 export function checkTypeConstraints(context: CheckContext, name: string, typeArguments: readonly Type[], position: SourcePosition): void {
+    const contract = context.declarations.lookupInterface(name);
+
+    if (contract !== null) {
+        reportConstraintViolations(context, `interface "${name}"`, contract.typeParameters, contract.typeConstraints, typeArguments, position);
+
+        return;
+    }
+
     const info = context.declarations.lookupClass(name);
 
     if (info === null) {
@@ -190,9 +214,11 @@ export function specializedMembers(registry: DeclarationRegistry, receiver: Name
         return registry.collectMembers(receiver.name);
     }
 
+    const contract = interfaceSubstitutions(registry, receiver);
+
     return registry.collectMembers(receiver.name).map((member) => {
         const owner = registry.lookupMemberOwner(receiver.name, member.name);
-        const substitutions = owner === null ? new Map<string, Type>() : substitutionsFor(registry, receiver, owner);
+        const substitutions = contract ?? (owner === null ? new Map<string, Type>() : substitutionsFor(registry, receiver, owner));
 
         return { ...member, type: substituteType(member.type, substitutions) };
     });

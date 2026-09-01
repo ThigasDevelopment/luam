@@ -1,0 +1,27 @@
+interface Adapter {
+    connect(): boolean
+}
+
+class RedisAdapter implements Adapter {
+    core: Core
+
+    constructor = function (core: Core)
+        self.core = core
+    end
+
+    connect = function (): boolean
+        return true
+    end
+}
+
+class MySqlAdapter implements Adapter {
+    core: Core
+
+    constructor = function (core: Core)
+        self.core = core
+    end
+
+    connect = function (): boolean
+        return true
+    end
+}

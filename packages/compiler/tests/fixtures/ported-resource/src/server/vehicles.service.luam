@@ -1,0 +1,37 @@
+#* 45.09 - a global the source assigns later.
+   45.04 - unpack spread into the argument list it ends.
+   45.10 - a record built over several statements.
+   45.11 - an inferred literal whose members widen. *#
+
+interface GarageBounds {
+    collision: number[]
+    shape: ColShape
+    centre: number[]
+}
+
+garageService?: GarageRegistry = nil
+
+local offset = { x = 0, y = 0, z = 0 }
+
+function bootstrapGarages(): void
+    garageService = new GarageRegistry()
+
+    offset = { x = 1.5, y = 2.5, z = 3.5 }
+end
+
+function buildBounds(data: table<string, number[]>): GarageBounds
+    local bounds: GarageBounds = { collision = { 0, 0, 0, 0, 0, 0, 0, 0 } }
+
+    bounds.shape = createColPolygon(unpack(bounds.collision))
+    bounds.centre = { offset.x, offset.y, offset.z }
+
+    return bounds
+end
+
+function cacheRow(owner: string, plate: string): table
+    local row = { owner = owner, plate = plate }
+
+    row.cacheTime = getRealTime().timestamp
+
+    return row
+end

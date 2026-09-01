@@ -141,6 +141,8 @@ function emitStatement(state: EmitState, statement: Statement): string | null {
             return emitLocal(state, statement);
         case 'assignment-statement':
             return emitAssignment(state, statement);
+        case 'global-statement':
+            return `${statement.declaration.name} = ${statement.values.map((value) => emitExpression(state, value)).join(', ')}`;
         case 'call-statement':
             return emitExpression(state, statement.expression);
         case 'function-declaration':

@@ -43,6 +43,7 @@ export const en: LocaleStrings = {
         'guide/daily-development': 'Daily development',
         'guide/how-luam-works': 'How Luam works',
         'guide/migration': 'Migration',
+        'guide/porting': 'Porting a Lua resource',
         'guide/troubleshooting': 'Troubleshooting',
         'guide/contributing': 'Contributing',
         'language/index': 'Overview',

@@ -54,7 +54,7 @@ Acceptance:
 
 - `pnpm typecheck` passes with no errors.
 - `pnpm test` passes the full suite (168 compiler tests, 16 runtime tests).
-- Classes, inheritance, `self:super`, interfaces, enums, and `new` bind and
+- Classes, inheritance, `super`, interfaces, enums, and `new` bind and
   check, with fixture snapshots locking the generated Lua.
 - `class.lua` is required only when an OOP or enum feature is emitted.
 - Interfaces are compile-only and never reach the generated Lua.
@@ -2984,25 +2984,25 @@ Status: todo
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 45.01 | Reconcile the internal language design with the optional marker and super rules | ../plans/45.01-optional-marker-and-super-drift.md | documentation-engineer | todo |
-| 45.02 | Accept the empty table literal for a map whose value is an element class | ../plans/45.02-empty-literal-element-map.md | architecture-engineer | todo |
-| 45.03 | Accept nil assignment as the deletion of a key | ../plans/45.03-nil-assignment-deletes-a-key.md | architecture-engineer | todo |
-| 45.04 | Spread unpack into the argument list it ends | ../plans/45.04-unpack-argument-spread.md | architecture-engineer | todo |
-| 45.05 | Declare a member whose key is not an identifier | ../plans/45.05-quoted-member-keys.md | architecture-engineer | todo |
-| 45.06 | Take an optional parameter in a fun type | ../plans/45.06-optional-parameter-in-fun-type.md | architecture-engineer | todo |
-| 45.07 | Take type parameters on an interface | ../plans/45.07-generic-interfaces.md | architecture-engineer | todo |
-| 45.08 | Publish a type alias to the project, the way an interface already is | ../plans/45.08-project-wide-type-aliases.md | architecture-engineer | todo |
-| 45.09 | Type a global the source assigns later | ../plans/45.09-typed-globals.md | architecture-engineer | todo |
-| 45.10 | Build a record over several statements | ../plans/45.10-incremental-record-construction.md | architecture-engineer | todo |
-| 45.11 | Widen the members of an inferred table literal | ../plans/45.11-widen-inferred-literal-members.md | architecture-engineer | todo |
-| 45.12 | Accept nil for a parameter the catalog declares optional | ../plans/45.12-nil-for-an-optional-catalog-parameter.md | architecture-engineer | todo |
-| 45.13 | Report a declaration that overwrites an MTA API or a runtime helper | ../plans/45.13-shadowed-api-and-helper.md | architecture-engineer | todo |
-| 45.14 | Say what a class receiver and a reserved parameter name really are | ../plans/45.14-class-receiver-and-reserved-name-messages.md | architecture-engineer | todo |
-| 45.15 | Author a multi-return signature | ../plans/45.15-author-a-multi-return-signature.md | architecture-engineer | todo |
-| 45.16 | Decide what replaces instantiating a class the code names at runtime | ../plans/45.16-runtime-named-instantiation.md | architecture-engineer | todo |
-| 45.17 | Keep a ported Lua resource as a compiler corpus | ../plans/45.17-ported-resource-corpus.md | test-engineer | todo |
-| 45.18 | Document what porting a Lua resource to Luam actually costs | ../plans/45.18-porting-guide.md | documentation-engineer | todo |
-| 45.19 | Detect the extension by the identifier it actually publishes | ../plans/45.19-extension-identifier-mismatch.md | architecture-engineer | todo |
+| 45.01 | Reconcile the internal language design with the optional marker and super rules | ../plans/45.01-optional-marker-and-super-drift.md | documentation-engineer | done |
+| 45.02 | Accept the empty table literal for a map whose value is an element class | ../plans/45.02-empty-literal-element-map.md | architecture-engineer | done |
+| 45.03 | Accept nil assignment as the deletion of a key | ../plans/45.03-nil-assignment-deletes-a-key.md | architecture-engineer | done |
+| 45.04 | Spread unpack into the argument list it ends | ../plans/45.04-unpack-argument-spread.md | architecture-engineer | done |
+| 45.05 | Declare a member whose key is not an identifier | ../plans/45.05-quoted-member-keys.md | architecture-engineer | done |
+| 45.06 | Take an optional parameter in a fun type | ../plans/45.06-optional-parameter-in-fun-type.md | architecture-engineer | done |
+| 45.07 | Take type parameters on an interface | ../plans/45.07-generic-interfaces.md | architecture-engineer | done |
+| 45.08 | Publish a type alias to the project, the way an interface already is | ../plans/45.08-project-wide-type-aliases.md | architecture-engineer | done |
+| 45.09 | Type a global the source assigns later | ../plans/45.09-typed-globals.md | architecture-engineer | done |
+| 45.10 | Build a record over several statements | ../plans/45.10-incremental-record-construction.md | architecture-engineer | done |
+| 45.11 | Widen the members of an inferred table literal | ../plans/45.11-widen-inferred-literal-members.md | architecture-engineer | done |
+| 45.12 | Accept nil for a parameter the catalog declares optional | ../plans/45.12-nil-for-an-optional-catalog-parameter.md | architecture-engineer | done |
+| 45.13 | Report a declaration that overwrites an MTA API or a runtime helper | ../plans/45.13-shadowed-api-and-helper.md | architecture-engineer | done |
+| 45.14 | Say what a class receiver and a reserved parameter name really are | ../plans/45.14-class-receiver-and-reserved-name-messages.md | architecture-engineer | done |
+| 45.15 | Author a multi-return signature | ../plans/45.15-author-a-multi-return-signature.md | architecture-engineer | done |
+| 45.16 | Decide what replaces instantiating a class the code names at runtime | ../plans/45.16-runtime-named-instantiation.md | architecture-engineer | done |
+| 45.17 | Keep a ported Lua resource as a compiler corpus | ../plans/45.17-ported-resource-corpus.md | test-engineer | done |
+| 45.18 | Document what porting a Lua resource to Luam actually costs | ../plans/45.18-porting-guide.md | documentation-engineer | done |
+| 45.19 | Detect the extension by the identifier it actually publishes | ../plans/45.19-extension-identifier-mismatch.md | architecture-engineer | done |
 
 Acceptance:
 
@@ -3050,3 +3050,57 @@ Deliberately excluded:
   one is ported; it does not put one in the language. CLAUDE.md stands.
 - The defects the port found in the resource itself. They are the output of the
   exercise, not work for this repository.
+
+## Milestone 46 — A Multi-Return Local in the Editor
+
+`local cX, cY, cZ = getVehicleComponentPosition(...)` shows the whole tuple as the
+type of `cX` and shows nothing on `cY` and `cZ`. The checker is correct — it has
+always applied Lua's adjust rules — but two places in the language server pair
+declarator `n` with value expression `n` and read that expression's type whole, so
+the hint and the hover contradict the compiler that produced them.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 46.01 | Share one distribution rule for a value list | ../plans/46.01-value-list-distribution.md | architecture-engineer | todo |
+| 46.02 | Hint every name a multi-return local declares | ../plans/46.02-multi-return-inlay-hints.md | architecture-engineer | todo |
+| 46.03 | Answer hover and completion with the destructured type | ../plans/46.03-multi-return-hover-and-completion.md | architecture-engineer | todo |
+| 46.04 | Cover a multi-return local across the editor surfaces | ../plans/46.04-multi-return-editor-tests.md | test-engineer | todo |
+| 46.05 | Record what a multi-return local shows in the editor | ../plans/46.05-multi-return-documentation.md | documentation-engineer | todo |
+
+Acceptance:
+
+- The adjust rules exist once. The checker and the language server read the same
+  `distributeValueTypes`, and neither carries a second copy of the rule.
+- A `local` that destructures a multi-return call answers one type per name, in
+  the inlay hint, in hover, in completion detail and in both symbol outlines.
+- A call in non-final position contributes only its first value, and
+  `local only = f()` narrows to the first element rather than labelling a tuple.
+- Every suppression the hint has today survives: an annotated declarator, an empty
+  name, a type that prints as `any`, and an index the value list cannot account
+  for.
+- The emitted Lua, the line map and every existing compiler fixture are unchanged.
+
+Why now:
+
+- The wrong answer is rendered without being asked for. Hover is one name at a
+  time; a hint appears on every name at once, so on the reported line the wrong
+  label sits beside two names the editor left blank.
+- The documentation already promises the correct behaviour. `functions.md` states
+  that each target gets its own type, so a reader who checks their editor concludes
+  the language lacks the feature rather than the hint.
+- The fix is extraction, not new machinery. `checkValueList` already implements the
+  rule in four lines, and both helpers it uses are exported.
+- Two surfaces drifted apart because the rule was written twice. Fixing either one
+  in place would write it a third and a fourth time.
+
+Deliberately excluded:
+
+- `generic-for` variables. They record no type and receive no hint today; giving
+  them one is its own decision, not part of repairing a value list.
+- Assignment targets, the return, callback-parameter and parameter-name hint
+  kinds, and the hint settings. None of them reads a value list.
+- Any change to the checker's behaviour, to inference, or to the emitted Lua.
+  46.01 rewrites `checkValueList` over the extracted helper and changes nothing it
+  answers.

@@ -1,0 +1,17 @@
+#* 45.14 - a class used as a receiver, and a reserved word in a name position. *#
+
+class RedisAdapter {
+    connect = function (): boolean
+        return true
+    end
+}
+
+class MarkersService {
+    markers: table<Marker, string> = {}
+
+    isMarkerType = function (marker: Marker, type: string): boolean
+        return self.markers[marker] == type
+    end
+}
+
+RedisAdapter:connect()

@@ -1,0 +1,11 @@
+#* 45.13 - a declaration that overwrites an MTA API and a runtime helper. *#
+
+_outputChatBox = outputChatBox
+
+function outputChatBox(text: string): boolean
+    return _outputChatBox('[luam] ' .. text, root)
+end
+
+function math.clamp(value: number, min: number, max: number): number
+    return math.max(math.min(value, max), min)
+end

@@ -43,6 +43,7 @@ export const ptBR: LocaleStrings = {
         'guide/daily-development': 'Desenvolvimento diário',
         'guide/how-luam-works': 'Como o Luam funciona',
         'guide/migration': 'Migração',
+        'guide/porting': 'Portando um resource Lua',
         'guide/troubleshooting': 'Solução de problemas',
         'guide/contributing': 'Contribuindo',
         'language/index': 'Visão geral',

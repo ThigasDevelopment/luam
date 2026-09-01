@@ -25,9 +25,11 @@ function typeParameters(type: Type, names: readonly string[] = []): { parameters
         return { parameters: [], returnText: typeToString(type) };
     }
 
+    const declared = type.parameterNames ?? [];
+
     const parameters = type.parameters.map((parameter, index) => {
         const optional = index >= type.minimumArguments ? '?' : '';
-        const name = names[index] ?? `argument${index + 1}`;
+        const name = names[index] ?? declared[index] ?? `argument${index + 1}`;
 
         return `${name}${optional}: ${typeToString(parameter)}`;
     });

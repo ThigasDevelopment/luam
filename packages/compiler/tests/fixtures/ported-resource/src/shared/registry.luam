@@ -1,0 +1,18 @@
+#* 45.02 - an empty literal for a map whose key is not a string.
+   45.03 - nil assignment deletes a key.
+   45.16 - a registry, not a class the code names at runtime. *#
+
+class GarageRegistry {
+    byId: table<number, GarageEntity> = {}
+    shapes: table<number, ColShape> = {}
+    owners: table<Vehicle, Vehicle> = {}
+
+    add = function (garage: GarageEntity): void
+        self.byId[garage.id] = garage
+    end
+
+    forget = function (id: number): void
+        self.byId[id] = nil
+        self.shapes[id] = nil
+    end
+}

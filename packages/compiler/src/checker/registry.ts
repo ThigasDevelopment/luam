@@ -18,6 +18,7 @@ export interface MemberInfo {
 export interface ClassInfo {
     name: string;
     typeParameters: readonly string[];
+    interfaceArguments: readonly (readonly Type[])[];
     typeConstraints: readonly (Type | null)[];
     superClass: string | null;
     hasUnresolvedParent?: boolean;
@@ -30,8 +31,17 @@ export interface ClassInfo {
 
 export interface InterfaceInfo {
     name: string;
+    typeParameters: readonly string[];
+    typeConstraints: readonly (Type | null)[];
     superInterfaces: string[];
     members: Map<string, MemberInfo>;
+    position: SourcePosition;
+}
+
+export interface AliasInfo {
+    name: string;
+    typeParameters: readonly string[];
+    type: Type;
     position: SourcePosition;
 }
 
@@ -45,6 +55,7 @@ export interface EnumInfo {
 export interface GlobalInfo {
     name: string;
     type: Type;
+    isDeclared?: boolean;
     position: SourcePosition;
 }
 
@@ -69,12 +80,18 @@ export class DeclarationRegistry {
 
     private readonly enums = new Map<string, EnumInfo>();
 
+    private readonly aliases = new Map<string, AliasInfo>();
+
     private readonly globals = new Map<string, GlobalInfo>();
 
     private readonly events = new Map<string, EventInfo>();
 
     declareGlobal(info: GlobalInfo): void {
         this.globals.set(info.name, info);
+    }
+
+    lookupGlobal(name: string): GlobalInfo | null {
+        return this.globals.get(name) ?? null;
     }
 
     allGlobals(): GlobalInfo[] {
@@ -123,6 +140,18 @@ export class DeclarationRegistry {
 
     declareEnum(info: EnumInfo): void {
         this.enums.set(info.name, info);
+    }
+
+    declareAlias(info: AliasInfo): void {
+        this.aliases.set(info.name, info);
+    }
+
+    lookupAlias(name: string): AliasInfo | null {
+        return this.aliases.get(name) ?? null;
+    }
+
+    allAliases(): AliasInfo[] {
+        return [...this.aliases.values()];
     }
 
     lookupEnum(name: string): EnumInfo | null {
