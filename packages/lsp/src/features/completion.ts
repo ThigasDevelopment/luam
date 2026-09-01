@@ -4,7 +4,7 @@ import { specializedMembers } from '@compiler/checker/generic-class';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import { createNamed, typeToString, type RecordType, type Type } from '@compiler/checker/types';
 import { canReference } from '@compiler/environment/environment';
-import { isAvailableIn } from '@mta-types/api-declaration';
+import { isVisibleIn } from '@mta-types/api-declaration';
 import { globalsFor } from '@mta-types/catalog';
 import { oopClassDocumentation } from '@mta-types/oop-documentation';
 import { oopClassesFor } from '@mta-types/oop-surface';
@@ -45,6 +45,7 @@ import {
 import { eventItems, insideEventHandler, isEventArgument } from '@lsp/features/event-completion';
 import { manifestCompletion } from '@lsp/features/manifest-completion';
 import { expectedStringType, literalItems, onlyStringLiterals, quotedLiteralItems, stringLiteralValues } from '@lsp/features/literal-completion';
+import { withSideOrder, withSideRank } from '@lsp/features/side-surface';
 import { scanContext, type SourceContext } from '@lsp/features/source-context';
 import { isTypePosition, typeItems } from '@lsp/features/type-completion';
 import { MEMBER_KINDS } from '@lsp/symbols/symbol';
@@ -161,15 +162,22 @@ function apiItems(analysis: DocumentAnalysis, offset: number, expectation: Argum
     return globalsFor(analysis.environment)
         .filter((declaration) => inContext(declaration.name))
         .filter((declaration) => !conflictsWithExpectation(expectation, descriptorToType(declaration.type)))
-        .map((declaration) =>
-            withEventContextRank(withArgumentRank(apiItem(declaration), descriptorToType(declaration.type), expectation), inHandler));
+        .map((declaration) => {
+            const item = withSideRank(apiItem(declaration), declaration.environment, analysis.environment);
+
+            return withEventContextRank(withArgumentRank(item, descriptorToType(declaration.type), expectation), inHandler);
+        });
 }
 
 function projectItems(analysis: DocumentAnalysis, expectation: ArgumentExpectation | null): CompletionItem[] {
     return analysis.project.globals
-        .filter((declaration) => isAvailableIn(declaration.environment, analysis.environment))
+        .filter((declaration) => isVisibleIn(declaration.environment, analysis.environment))
         .filter((declaration) => !conflictsWithExpectation(expectation, descriptorToType(declaration.type)))
-        .map((declaration) => withArgumentRank(projectItem(declaration, analysis.env), descriptorToType(declaration.type), expectation));
+        .map((declaration) => {
+            const item = withSideOrder(projectItem(declaration, analysis.env), declaration.environment, analysis.environment);
+
+            return withArgumentRank(item, descriptorToType(declaration.type), expectation);
+        });
 }
 
 function plainItems(items: readonly CompletionItem[], expectation: ArgumentExpectation | null): CompletionItem[] {

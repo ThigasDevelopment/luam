@@ -3,15 +3,12 @@ import { isAvailableIn } from '@mta-types/api-declaration';
 import { isElementType } from '@mta-types/element-hierarchy';
 
 import type { CheckContext } from './context';
+import { reportEnvironment, scopeLabel, unavailableTail } from './environment-message';
 import { isMtaClass, mtaConstructor, mtaMember, mtaStaticMember } from './oop-classes';
 import type { DeclarationRegistry, MemberInfo } from './registry';
 import type { FunctionType } from './types';
 
 const OOP_HINT = 'Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.';
-
-function scopeLabel(environment: string): string {
-    return environment === 'shared' ? 'shared' : `${environment}-only`;
-}
 
 export function isMtaElementName(declarations: DeclarationRegistry, className: string): boolean {
     if (!isElementType(className)) {
@@ -35,6 +32,18 @@ function reportDisabled(context: CheckContext, className: string, name: string, 
     const subject = `"${className}.${name}" is part of the MTA OOP API, which this project does not enable.`;
 
     context.report('check-oop-disabled', `${subject} Call "${member.procedural}" instead. ${OOP_HINT}`, position);
+}
+
+function acceptsMember(context: CheckContext, className: string, name: string, member: MemberInfo, position: SourcePosition): boolean {
+    if (member.environment === undefined || isAvailableIn(member.environment, context.environment)) {
+        return true;
+    }
+
+    const subject = `"${className}.${name}" wraps "${member.procedural}", which is ${scopeLabel(member.environment)}`;
+
+    reportEnvironment(context, 'check-environment-api', `${subject} and ${unavailableTail(context.environment)}`, position);
+
+    return context.environment === 'shared';
 }
 
 export function isMtaClassReference(context: CheckContext, className: string): boolean {
@@ -63,15 +72,7 @@ export function resolveMtaStaticMember(context: CheckContext, className: string,
         return null;
     }
 
-    if (member.environment !== undefined && !isAvailableIn(member.environment, context.environment)) {
-        const subject = `"${className}.${name}" wraps "${member.procedural}", which is ${scopeLabel(member.environment)}`;
-
-        context.report('check-environment-api', `${subject} and is not available in a "${context.environment}" file.`, position);
-
-        return null;
-    }
-
-    return member;
+    return acceptsMember(context, className, name, member, position) ? member : null;
 }
 
 export function resolveMtaConstructor(context: CheckContext, className: string, position: SourcePosition): FunctionType | null {
@@ -94,9 +95,11 @@ export function resolveMtaConstructor(context: CheckContext, className: string, 
     if (!isAvailableIn(constructor.environment, context.environment)) {
         const subject = `"${className}(...)" is ${scopeLabel(constructor.environment)}`;
 
-        context.report('check-environment-api', `${subject} and is not available in a "${context.environment}" file.`, position);
+        reportEnvironment(context, 'check-environment-api', `${subject} and ${unavailableTail(context.environment)}`, position);
 
-        return null;
+        if (context.environment !== 'shared') {
+            return null;
+        }
     }
 
     return constructor.type;
@@ -125,13 +128,5 @@ export function resolveMtaMember(context: CheckContext, className: string, name:
         return null;
     }
 
-    if (member.environment !== undefined && !isAvailableIn(member.environment, context.environment)) {
-        const subject = `"${className}.${name}" wraps "${member.procedural}", which is ${scopeLabel(member.environment)}`;
-
-        context.report('check-environment-api', `${subject} and is not available in a "${context.environment}" file.`, position);
-
-        return null;
-    }
-
-    return member;
+    return acceptsMember(context, className, name, member, position) ? member : null;
 }

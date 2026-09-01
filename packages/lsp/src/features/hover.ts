@@ -17,6 +17,7 @@ import { manifestHover } from '@lsp/features/manifest-hover';
 import { memberHover } from '@lsp/features/member-hover';
 import { mtaClassHover } from '@lsp/features/mta-class-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
+import { isSideRestricted, sideNote } from '@lsp/features/side-surface';
 import { declarationsIn } from '@lsp/features/symbol-lookup';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { wordAt, wordStart } from '@lsp/support/source-text';
@@ -42,8 +43,10 @@ function projectHover(analysis: DocumentAnalysis, name: string): Hover | null {
 
     const origin = target.type.kind === 'record' && target.type.origin !== null ? `"${target.type.origin}"` : 'the project';
     const scope = `declared in ${origin} (${target.environment})`;
+    const side = isSideRestricted(target.environment, analysis.environment) ? [sideNote(target.environment)] : [];
+    const sections = [markdown(descriptorShapeText(name, target.type, analysis.env)), scope, ...side];
 
-    return { contents: { kind: 'markdown', value: `${markdown(descriptorShapeText(name, target.type, analysis.env))}\n\n${scope}` } };
+    return { contents: { kind: 'markdown', value: sections.join('\n\n') } };
 }
 
 function workspaceHover(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[], offset: number): Hover | null {
@@ -119,7 +122,11 @@ function apiHover(analysis: DocumentAnalysis, offset: number, others: readonly D
         return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? memberHover(analysis, offset, others);
     }
 
-    return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };
+    if (!isSideRestricted(declaration.environment, analysis.environment)) {
+        return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };
+    }
+
+    return { contents: { kind: 'markdown', value: `${apiMarkdown(declaration)}\n\n${sideNote(declaration.environment)}` } };
 }
 
 function exportNote(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {

@@ -107,7 +107,11 @@ Todo documento resolve o seu ambiente (`server`, `client` ou `shared`) a partir 
 caminho ou de uma diretiva `#!` **antes de qualquer outra coisa acontecer**. Isso
 decide quais APIs do MTA o documento enxerga, então `dxDrawText` nunca completa em
 um arquivo de servidor e `kickPlayer` nunca completa em um de cliente. Um documento
-`shared` enxerga apenas declarações compartilhadas.
+`shared` enxerga os dois lados: primeiro as declarações compartilhadas, depois as
+de servidor e as de cliente como complementos, cada uma carregando seu lado no
+detalhe do item. O hover sobre uma delas nomeia o lado. Um arquivo shared não
+emite diagnóstico de ambiente, então esses rótulos são o único lugar onde o lado
+aparece.
 
 Globais declarados por outros arquivos seguem a mesma regra: um arquivo `server`
 completa globais de módulos `shared`, nunca de módulos `client`.

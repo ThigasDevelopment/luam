@@ -20,3 +20,7 @@ export function declareAll(catalog: ApiCatalog, environment: ApiEnvironment, sou
 export function isAvailableIn(declared: ApiEnvironment, environment: ApiEnvironment): boolean {
     return declared === 'shared' || declared === environment;
 }
+
+export function isVisibleIn(declared: ApiEnvironment, environment: ApiEnvironment): boolean {
+    return environment === 'shared' || isAvailableIn(declared, environment);
+}

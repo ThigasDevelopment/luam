@@ -89,6 +89,11 @@ export const STALE_CLAIMS: readonly StaleClaim[] = [
         pattern: /\b(invisible until it is saved or opened|invisível até ser salvo ou aberto)\b/i,
         correction: 'The server scans the workspace on start and watches the source, manifest and environment patterns.',
     },
+    {
+        id: 'shared-sees-only-shared',
+        pattern: /\b(only shared declarations|shared declarations only|only shared APIs|apenas declarações compartilhadas|apenas APIs compartilhadas)\b/i,
+        correction: 'A shared file sees both sides and reports nothing for a side-restricted name. Say that, and that imports do not change.',
+    },
 ];
 
 export function labelOf(locale: LocaleId, label: LimitationLabel): string {

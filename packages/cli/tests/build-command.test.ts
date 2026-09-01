@@ -49,6 +49,16 @@ describe('build command', () => {
         expect(fixture.exists('build/luam-demo/lib/string.lua')).toBe(true);
     });
 
+    it('builds a shared file that reaches for a side-restricted API', async () => {
+        const shared = ['#!shared', '', 'function isOnClient(): boolean', '    return isElement(localPlayer)', 'end', ''].join('\n');
+        const { context, logger, fixture } = harness({ ...defaultProjectFiles(), 'src/shared/config.luam': shared });
+
+        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+        expect(logger.text()).not.toContain('check-environment-api');
+        expect(fixture.read('build/luam-demo/src/shared/config.lua')).toContain('isElement(localPlayer)');
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="src/shared/**/*.lua" type="shared" cache="false" />');
+    });
+
     it('lists every script in the manifest with its environment', async () => {
         const { context, fixture } = harness(defaultProjectFiles());
 

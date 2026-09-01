@@ -9,6 +9,15 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Changed
+
+- [Environments](/en/mta/environments) records that a `shared` file sees both
+  sides and reports nothing for a side-restricted name, rather than shared APIs
+  only, with the network class that decides its side at runtime as the worked
+  example. It states plainly that the compiler does not verify the runtime
+  branch, and that the editor labels are where the side now shows up. Imports
+  are unchanged.
+
 ## 0.19.12 - 2026-08-31
 
 ### Changed

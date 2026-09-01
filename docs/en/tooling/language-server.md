@@ -105,8 +105,11 @@ cross-environment trigger lists the events of the side it targets, so
 Every document resolves its environment (`server`, `client` or `shared`) from its
 path or a `#!` directive **before anything else runs**. That decides which MTA
 APIs the document sees, so `dxDrawText` never completes in a server file and
-`kickPlayer` never completes in a client file. A `shared` document sees only
-shared declarations.
+`kickPlayer` never completes in a client file. A `shared` document sees both
+sides: the shared declarations first, then the server and client ones as
+complements, each carrying its side in the completion detail. Hover on one of
+them names its side. A shared file reports no environment diagnostic, so these
+labels are the only place the side appears.
 
 Globals declared by other files follow the same rule: a `server` file completes
 globals from `shared` modules, never from `client` modules.

@@ -11,6 +11,15 @@ da versão atual.
 
 ## Não lançado
 
+### Alterado
+
+- [Ambientes](/pt-br/mta/environments) registra que um arquivo `shared` enxerga
+  os dois lados e não emite nada para um nome exclusivo de um lado, em vez de só
+  as APIs compartilhadas, com a classe de rede que decide seu lado em tempo de
+  execução como exemplo trabalhado. Afirma com todas as letras que o compilador
+  não verifica a ramificação em tempo de execução, e que os rótulos do editor são
+  onde o lado agora aparece. Os imports não mudam.
+
 ## 0.19.12 - 2026-08-31
 
 ### Alterado

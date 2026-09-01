@@ -1,11 +1,12 @@
 import { mtaConstructor, mtaMembersFor, mtaStaticMembersFor } from '@compiler/checker/oop-classes';
-import { isAvailableIn, type ApiEnvironment } from '@mta-types/api-declaration';
+import { isAvailableIn, isVisibleIn, type ApiEnvironment } from '@mta-types/api-declaration';
 import { findOopClassDocumentation } from '@mta-types/oop-documentation';
 import { findOopClass, oopClassAncestors, oopClassEnvironment } from '@mta-types/oop-surface';
 import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { markdown } from '@lsp/features/declaration-shape';
+import { isSideRestricted, sideNote } from '@lsp/features/side-surface';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { positionAt, wordAt, wordStart } from '@lsp/support/source-text';
 
@@ -28,7 +29,7 @@ function inheritanceText(name: string): string {
 function constructorText(name: string, environment: ApiEnvironment): string {
     const constructor = mtaConstructor(name);
 
-    return constructor !== null && isAvailableIn(constructor.environment, environment) ? `callable as \`${name}(...)\`` : '';
+    return constructor !== null && isVisibleIn(constructor.environment, environment) ? `callable as \`${name}(...)\`` : '';
 }
 
 function memberText(name: string, environment: ApiEnvironment, members: number): string {
@@ -36,7 +37,7 @@ function memberText(name: string, environment: ApiEnvironment, members: number):
         return '';
     }
 
-    const own = findOopClass(name)?.members.filter((member) => isAvailableIn(member.environment, environment)).length ?? members;
+    const own = findOopClass(name)?.members.filter((member) => isVisibleIn(member.environment, environment)).length ?? members;
     const inherited = members - own;
 
     return inherited === 0 ? countText(members, 'instance member') : `${countText(members, 'instance member')} (${inherited} inherited)`;
@@ -59,6 +60,10 @@ function availabilityText(analysis: DocumentAnalysis, name: string, declared: Ap
         return '';
     }
 
+    if (isSideRestricted(declared, analysis.environment)) {
+        return `\`${name}\` is ${sideNote(declared)}`;
+    }
+
     return `\`${name}\` is ${scopeLabel(declared)} and its members are not available in a \`${analysis.environment}\` file.`;
 }
 
@@ -78,7 +83,7 @@ export function mtaClassHover(analysis: DocumentAnalysis, offset: number): Hover
     const environment = oopClassEnvironment(name) ?? 'shared';
     const parent = findOopClass(name)?.parent ?? null;
     const heading = markdown(parent === null ? `class ${name}` : `class ${name} extends ${parent}`);
-    const reachable = isAvailableIn(environment, analysis.environment);
+    const reachable = isVisibleIn(environment, analysis.environment);
     const sections = [
         heading,
         findOopClassDocumentation(name) ?? '',

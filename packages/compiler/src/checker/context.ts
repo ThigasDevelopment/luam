@@ -2,7 +2,7 @@ import { createDiagnostic, type Diagnostic, type DiagnosticSeverity, type Source
 import type { Environment } from '@compiler/environment/environment';
 import type { Expression, TypeAnnotation } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
-import { isAvailableIn, type ApiEnvironment } from '@mta-types/api-declaration';
+import { isVisibleIn, type ApiEnvironment } from '@mta-types/api-declaration';
 
 import { EMPTY_AMBIENT, type AmbientDeclarations } from './ambient';
 import { descriptorToType } from './api-types';
@@ -502,7 +502,7 @@ export class CheckContext {
         for (const declaration of project.globals) {
             this.projectEnvironments.set(declaration.name, declaration.environment);
 
-            if (isAvailableIn(declaration.environment, this.environment)) {
+            if (isVisibleIn(declaration.environment, this.environment)) {
                 const symbol = { name: declaration.name, type: descriptorToType(declaration.type), isLocal: false, position: PROJECT_POSITION };
 
                 this.binder.declareGlobal(symbol);

@@ -14,6 +14,21 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Changed
+
+- A `shared` file now sees the shared MTA surface plus the server and client
+  ones, and reports **nothing** for a side-restricted API, event, project
+  declaration or MTA OOP member. A module that decides its own side at runtime
+  compiles in one file, clean, with the real types of both surfaces — so
+  `localPlayer` is a `Player` and `triggerServerEvent()` with no arguments is
+  still `check-argument-count`. A `server` or `client` file is unchanged, and a
+  `shared` file importing a `server` or `client` module is still an error. The
+  emitted Lua, the line map and the generated manifest are unchanged.
+- In a `shared` file the editor offers the shared APIs first and the two sides
+  after them, each carrying its side in the completion detail, and hover on a
+  side-restricted name adds a line naming its side. With no diagnostic, these
+  labels are where the side is reported.
+
 ## 0.19.12 - 2026-08-31
 
 ### Added

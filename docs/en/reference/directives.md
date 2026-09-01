@@ -17,7 +17,7 @@ statement is not a directive.
 | --- | --- |
 | `#!server` | The file is server-side. |
 | `#!client` | The file is client-side. |
-| `#!shared` | The file runs on both sides and may use only shared declarations. |
+| `#!shared` | The file runs on both sides, and sees both sides. A side-restricted name is accepted with no diagnostic. |
 
 A directive **overrides the folder**, which is what lets a file live outside
 `src/server`, `src/client` or `src/shared`:

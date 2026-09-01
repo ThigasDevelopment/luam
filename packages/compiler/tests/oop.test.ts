@@ -80,6 +80,21 @@ describe('mta oop member resolution', () => {
         expect(codes(`${PLAYER}player:setNametagText(5)\n`)).toEqual(['check-type-mismatch']);
     });
 
+    it('reports nothing for a server-only method in a shared file', () => {
+        const source = `${PLAYER}player:kick()\n`;
+        const result = compile(source, { filePath: 'src/shared/util.luam', compilerOptions: compilerOptions({ oop: true }) });
+
+        expect(result.diagnostics).toEqual([]);
+        expect(result.code).not.toBeNull();
+    });
+
+    it('keeps checking the arguments of a side-restricted method in a shared file', () => {
+        const source = `${PLAYER}player:kick(root, 5)\n`;
+
+        expect(codes(source, 'src/shared/util.luam')).toEqual(['check-type-mismatch']);
+        expect(codes(source, CLIENT_FILE)).toEqual(['check-environment-api']);
+    });
+
     it('reports a server-only method called from a client file', () => {
         expect(codes(`${PLAYER}player:kick()\n`, CLIENT_FILE)).toContain('check-environment-api');
         expect(messages(`${PLAYER}player:kick()\n`, CLIENT_FILE)).toContain(

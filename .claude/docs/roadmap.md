@@ -2864,14 +2864,14 @@ stores the answer in `self.isClient`, and branches on that field between
 `check-environment-api` in a `shared` file — six errors on a file that would run
 correctly as written.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 43.01 | Merge the server and client surfaces in a shared file | ../plans/43.01-merged-shared-surface.md | architecture-engineer | todo |
-| 43.02 | Offer the shared surface first and the sides as complements | ../plans/43.02-shared-completion-order.md | architecture-engineer | todo |
-| 43.03 | Test the merged shared surface | ../plans/43.03-shared-surface-tests.md | test-engineer | todo |
-| 43.04 | Record what a shared file may use | ../plans/43.04-shared-surface-documentation.md | documentation-engineer | todo |
+| 43.01 | Merge the server and client surfaces in a shared file | ../plans/43.01-merged-shared-surface.md | architecture-engineer | done |
+| 43.02 | Offer the shared surface first and the sides as complements | ../plans/43.02-shared-completion-order.md | architecture-engineer | done |
+| 43.03 | Test the merged shared surface | ../plans/43.03-shared-surface-tests.md | test-engineer | done |
+| 43.04 | Record what a shared file may use | ../plans/43.04-shared-surface-documentation.md | documentation-engineer | done |
 
 Acceptance:
 

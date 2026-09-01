@@ -6,7 +6,7 @@ import { pathOf } from './access-path';
 import { extensionFor, reportExtensionForm, reportNotCallable } from './callable';
 import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
-import { checkEventUsage, checkGlobalReference } from './environment-checks';
+import { checkEventUsage, checkGlobalReference, checkSharedReference } from './environment-checks';
 import { specializeEventCall } from './event-calls';
 import { specializeCall } from './generic-call';
 import { memberOf } from './generic-class';
@@ -413,6 +413,8 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
 
             if (symbol === null) {
                 checkGlobalReference(context, expression.name, expression.position);
+            } else {
+                checkSharedReference(context, expression.name, expression.position);
             }
 
             if (symbol === null || symbol.isLocal !== true) {

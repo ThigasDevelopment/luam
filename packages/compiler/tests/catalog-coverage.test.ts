@@ -31,6 +31,10 @@ function codes(source: string, filePath: string): string[] {
     return compile(source, { filePath }).diagnostics.map((diagnostic) => diagnostic.code);
 }
 
+function findings(source: string, filePath: string): string[] {
+    return compile(source, { filePath }).diagnostics.map((diagnostic) => `${diagnostic.severity} ${diagnostic.code}`);
+}
+
 describe('full catalog coverage', () => {
     const project = compileProject(readProject('mta-api'));
 
@@ -61,9 +65,10 @@ describe('imported API environments', () => {
         expect(codes('engineLoadTXD("model.txd")\n', 'src/server/main.luam')).toEqual(['check-environment-api']);
     });
 
-    it('rejects a one-sided API in a shared file', () => {
-        expect(codes('dxDrawLine(0, 0, 1, 1)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
-        expect(codes('banPlayer(source)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
+    it('reports nothing for a one-sided API in a shared file', () => {
+        expect(findings('guiGetScreenSize()\n', 'src/shared/tools.luam')).toEqual([]);
+        expect(findings('banPlayer(source)\n', 'src/shared/tools.luam')).toEqual([]);
+        expect(findings('setPlayerMuted(source, true)\n', 'src/shared/tools.luam')).toEqual([]);
     });
 
     it('accepts a newly imported shared API everywhere', () => {
@@ -89,7 +94,6 @@ describe('imported API environments', () => {
 
     it('still rejects a one-sided neighbour of a widened declaration', () => {
         expect(codes('getPlayerACInfo(source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
-        expect(codes('setPlayerMuted(source, true)\n', 'src/shared/tools.luam')).toEqual(['check-environment-api']);
         expect(codes('usePickup(source, source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
     });
 });

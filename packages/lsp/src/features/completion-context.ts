@@ -2,7 +2,7 @@ import { descriptorToType } from '@compiler/checker/api-types';
 import { isMtaClass, mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import type { RecordType, Type } from '@compiler/checker/types';
-import { isAvailableIn } from '@mta-types/api-declaration';
+import { isVisibleIn } from '@mta-types/api-declaration';
 import { findDeclaration } from '@mta-types/catalog';
 import { isLibrary, type LibraryName } from '@mta-types/library-members';
 
@@ -130,7 +130,7 @@ function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<strin
 function projectTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget | null {
     const declaration = analysis.project.globals.find((global) => global.name === name);
 
-    if (declaration === undefined || !isAvailableIn(declaration.environment, analysis.environment)) {
+    if (declaration === undefined || !isVisibleIn(declaration.environment, analysis.environment)) {
         return null;
     }
 
@@ -140,7 +140,7 @@ function projectTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget
 function catalogTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget | null {
     const declaration = findDeclaration(name, analysis.environment);
 
-    if (declaration === null || !isAvailableIn(declaration.environment, analysis.environment)) {
+    if (declaration === null || !isVisibleIn(declaration.environment, analysis.environment)) {
         return null;
     }
 

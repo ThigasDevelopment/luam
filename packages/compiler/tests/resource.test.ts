@@ -358,10 +358,7 @@ describe('project environment validation', () => {
 
     it('reports every cross-environment violation', () => {
         expect(project.hasErrors).toBe(true);
-        expect(project.diagnostics.map((entry) => `${entry.path} ${entry.diagnostic.code}`)).toEqual([
-            'src/server/admin.luam project-environment-import',
-            'src/shared/tools.luam check-environment-api',
-        ]);
+        expect(project.diagnostics.map((entry) => `${entry.path} ${entry.diagnostic.code}`)).toEqual(['src/server/admin.luam project-environment-import']);
     });
 
     it('explains where the referenced module lives', () => {
@@ -384,6 +381,16 @@ describe('project environment validation', () => {
         ]);
 
         expect(allowed.diagnostics).toEqual([]);
+    });
+
+    it('stops a shared file from using a client declaration', () => {
+        const project = compileProject([
+            { path: 'src/client/gui.luam', source: 'function openMenu(): void\nend\n' },
+            { path: 'src/shared/util.luam', source: 'openMenu()\n' },
+        ]);
+
+        expect(project.hasErrors).toBe(true);
+        expect(project.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['project-environment-import']);
     });
 
     it('stops a shared file from using a server declaration', () => {

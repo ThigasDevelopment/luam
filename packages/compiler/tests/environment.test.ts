@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 
 import { canReference, environmentFromPath, resolveEnvironment } from '@compiler/environment/environment';
@@ -84,8 +87,26 @@ describe('environment API validation', () => {
         expect(codes('banPlayer(source)\n', 'src/client/hud.luam')).toEqual(['check-environment-api']);
     });
 
-    it('reports a server-only API used in a shared file', () => {
-        expect(codes('kickPlayer(source)\n', 'src/shared/util.luam')).toEqual(['check-environment-api']);
+    it('reports nothing for a server-only API used in a shared file', () => {
+        const result = compile('kickPlayer(source)\n', { filePath: 'src/shared/util.luam' });
+
+        expect(result.diagnostics).toEqual([]);
+        expect(result.code).not.toBeNull();
+    });
+
+    it('reports nothing for a client event handled in a shared file', () => {
+        expect(codes('addEventHandler("onClientRender", root, print)\n', 'src/shared/util.luam')).toEqual([]);
+        expect(codes('addEventHandler("onResourceStart", root, print)\n', 'src/shared/util.luam')).toEqual([]);
+    });
+
+    it('carries the real type of a side-restricted API into a shared file', () => {
+        expect(codes('local player: Player = localPlayer\n', 'src/shared/util.luam')).toEqual([]);
+        expect(codes('local name: number = getPlayerName(localPlayer)\n', 'src/shared/util.luam')).toEqual(['check-type-mismatch']);
+        expect(codes('triggerServerEvent()\n', 'src/shared/util.luam')).toEqual(['check-argument-count']);
+    });
+
+    it('keeps a name declared on both sides resolving to its shared form', () => {
+        expect(codes('outputChatBox("hi", root)\n', 'src/shared/util.luam')).toEqual([]);
     });
 
     it('accepts an API declared for the resolved environment', () => {
@@ -128,5 +149,27 @@ describe('environment API validation', () => {
         expect(compile('local a = 1', { filePath: 'src/client/hud.luam' }).environment).toBe('client');
         expect(compile('#!server\nlocal a = 1').environment).toBe('server');
         expect(compile('local a = 1', { environment: 'server' }).environment).toBe('server');
+    });
+});
+
+describe('the merged shared surface', () => {
+    const source = readFileSync(fileURLToPath(new URL('./fixtures/shared-surface/src/network.luam', import.meta.url)), 'utf8');
+    const result = compile(source, { filePath: 'src/network.luam' });
+
+    it('compiles a class that decides its side at runtime with no finding', () => {
+        expect(result.environment).toBe('shared');
+        expect(result.code).not.toBeNull();
+        expect(result.diagnostics).toEqual([]);
+    });
+
+    it('keeps checking everything else in the same file', () => {
+        const broken = source.replace('triggerServerEvent(name, target)', 'triggerServerEvent()');
+
+        expect(compile(broken, { filePath: 'src/network.luam' }).diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['check-argument-count']);
+    });
+
+    it('keeps a side file reporting an error', () => {
+        expect(compile('dxDrawText("hi", 10, 10)\n', { filePath: 'src/server/main.luam' }).code).toBeNull();
+        expect(compile('banPlayer(source)\n', { filePath: 'src/client/hud.luam' }).code).toBeNull();
     });
 });
