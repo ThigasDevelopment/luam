@@ -2854,3 +2854,119 @@ Deliberately excluded:
 - Building a table from a field annotation. A field initialised to a table in the class body
   would share that table across every instance; the annotation stays compile-time only.
 - Any change to inference, to the checker, or to completion.
+
+## Milestone 43 — One Shared File, Both Sides
+
+A shared module that decides its own side at runtime cannot be written today. The
+reported `Network` class asks which side it is on with `isElement(localPlayer)`,
+stores the answer in `self.isClient`, and branches on that field between
+`triggerServerEvent` and `triggerClientEvent`; every one of those names is
+`check-environment-api` in a `shared` file — six errors on a file that would run
+correctly as written.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 43.01 | Merge the server and client surfaces in a shared file | ../plans/43.01-merged-shared-surface.md | architecture-engineer | todo |
+| 43.02 | Offer the shared surface first and the sides as complements | ../plans/43.02-shared-completion-order.md | architecture-engineer | todo |
+| 43.03 | Test the merged shared surface | ../plans/43.03-shared-surface-tests.md | test-engineer | todo |
+| 43.04 | Record what a shared file may use | ../plans/43.04-shared-surface-documentation.md | documentation-engineer | todo |
+
+Acceptance:
+
+- A shared file resolves every MTA API: the shared surface as the standard list,
+  the server and client declarations complementing it, each keeping its real type
+  and signature instead of falling back to `any`.
+- A side-restricted API, event or OOP member in a shared file is a warning that
+  names its side, not an error; the same use in a `server` or `client` file is
+  still an error, unchanged.
+- Completion in a shared file offers the shared names first and labels every
+  side-restricted one with the side it belongs to; hover repeats that note.
+- Import direction does not change: a `shared` module still cannot import a
+  `server` or `client` module.
+- The emitted Lua, the line map and the generated manifest are untouched.
+
+Why now:
+
+- The reported file is the common shape for a network, log or config module, and
+  the compiler rejects it outright while MTA runs it.
+- The decision cannot be recovered by the compiler. The branch tests a stored
+  field, so neither control-flow narrowing nor a compiler-provided `isClient`
+  would accept the class without restructuring it — a large mechanism that misses
+  the case that motivated it.
+- The author already knows the side; they wrote the test that proves it. What the
+  compiler can still add is the type of the API and a visible label, not a verdict.
+
+Deliberately excluded:
+
+- Control-flow narrowing over a side test, and any `isClient` / `isServer` global.
+  Both were designed and dropped: see ADR-044 for why.
+- Silence. A file whose path does not resolve is `shared` by default — the
+  reported one included — so reporting nothing would strip environment checking
+  from every misplaced file. The warning is what keeps that signal.
+- Block-level or function-level environments, which ADR-023 rejected and this does
+  not reopen: nothing is split and no chunk is generated.
+- Import direction, which resolves when the chunk loads and cannot be undone by a
+  runtime branch.
+
+## Milestone 44 — Member Resolution in the Editor
+
+Hovering `props.password`, where `props` is a parameter typed `NetworkProps` and
+`password` is declared `password?: string`, answers with the class field
+`password: string` declared elsewhere in the same file. The editor is resolving a
+property by name against every declaration in the file instead of against the
+receiver it was written on.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 44.01 | Bind a member reference to its receiver | ../plans/44.01-member-reference-binding.md | architecture-engineer | todo |
+| 44.02 | Answer a property hover with the type the checker gave it | ../plans/44.02-member-hover-type.md | architecture-engineer | todo |
+| 44.03 | Test member resolution against name collisions | ../plans/44.03-member-resolution-tests.md | test-engineer | todo |
+| 44.04 | Record what a property hover answers | ../plans/44.04-member-hover-documentation.md | documentation-engineer | todo |
+| 44.05 | Show the fields of a value's type on hover | ../plans/44.05-hover-type-shape.md | architecture-engineer | todo |
+
+Acceptance:
+
+- A property whose receiver is a record, an alias, a class instance, an MTA
+  element or a library resolves against that receiver and never against a
+  same-named declaration elsewhere in the file.
+- A member reference whose receiver cannot be named resolves to nothing rather
+  than to the first name that matches, and the hover answers from the checker's
+  type instead.
+- Hovering an optional member reports its optionality; hovering it inside a guard
+  reports the narrowed type.
+- Hovering a value whose type has fields answers with those fields under the
+  signature, whether the type is a `type` alias, an interface, a class or an
+  inline object type; a primitive, a function and an opaque type hover unchanged.
+- Hover, definition, references, highlight and rename all inherit the fix, each
+  covered by a fixture that fails against the current tree.
+
+Why now:
+
+- The wrong answer is not a near miss — it names a different declaration, of a
+  different type, from a different container. An author reading `string` where the
+  type is `string?` is being told the guard they wrote is unnecessary.
+- The correct answer is already computed: `memberHover` reads the checker's type
+  map and returns `Props.secret: string?` the moment the collision is removed.
+  Only the resolution order and one wildcard match stand in front of it.
+- The same wildcard sits under go-to-definition and rename, where a wrong binding
+  is not a cosmetic problem.
+- Milestone 42 fixed member hover for the receivers it could name; this closes the
+  case it could not.
+- A hover that answers `parameter props: NetworkProps` and stops sends the author
+  back to the type declaration to read two fields. The renderer that expands a
+  body already exists — it is reached only from the declaration itself, never from
+  a value that carries the type.
+
+Deliberately excluded:
+
+- Any change to the checker, to inference or to narrowing. The compiler already
+  accepts the reported guard: `if props.password and type(props.password) == "string" then`
+  narrows correctly on the current tree, and the assignment diagnostic in the
+  report comes from an extension build that predates it. 44.03 locks that with a
+  fixture and 44.04 records that an editor keeps the old answers until the
+  extension is reinstalled.
+- Completion, which resolves members through a different path and is correct.
