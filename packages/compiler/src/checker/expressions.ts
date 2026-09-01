@@ -36,6 +36,7 @@ import { checkBinary, checkUnary } from './operators';
 import { applyTypeParameters, buildFunctionType, checkFunctionBody } from './statements';
 import { collectInterpolations } from './template';
 import { resolveUnionMember } from './union-members';
+import { distributeValueTypes } from './value-distribution';
 import {
     ANY_TYPE,
     BOOLEAN_TYPE,
@@ -53,7 +54,6 @@ import {
     NUMBER_TYPE,
     STRING_TYPE,
     TABLE_TYPE,
-    valuesOf,
     type FunctionType,
     type Type,
 } from './types';
@@ -527,21 +527,13 @@ export function checkExpression(context: CheckContext, expression: Expression, e
 }
 
 export function checkValueList(context: CheckContext, values: readonly Expression[], expected: readonly Type[] = []): Type[] {
-    const types: Type[] = [];
-
-    values.forEach((value, index) => {
+    const types = values.map((value, index) => {
         const type = checkMultiValueExpression(context, value, expected[index] ?? null);
 
         escapesRecordObligation(context, value);
 
-        if (index === values.length - 1) {
-            types.push(...valuesOf(type));
-
-            return;
-        }
-
-        types.push(firstValueOf(type));
+        return type;
     });
 
-    return types;
+    return distributeValueTypes(types);
 }

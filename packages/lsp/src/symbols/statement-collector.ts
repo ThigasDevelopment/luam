@@ -15,6 +15,7 @@ import type {
 } from '@compiler/parser/ast';
 import type { EventDeclaration } from '@compiler/parser/declaration-nodes';
 
+import { distributeValues } from '@lsp/analysis/value-distribution';
 import { positionAt } from '@lsp/support/source-text';
 import { annotationType, signatureType } from '@lsp/symbols/annotation-type';
 
@@ -90,15 +91,17 @@ function collectLocal(state: CollectorState, block: BlockContext, statement: Loc
         collectExpression(state, block, value);
     }
 
+    const distributed = distributeValues(state.types, statement.values);
+
     statement.declarations.forEach((declarator, index) => {
         collectAnnotation(state, block, declarator.annotation);
 
-        const value = statement.values[index];
-        const inferredType = value === undefined ? null : typeOf(state, value);
-        const inferred = inferredType === null ? null : widenInferred(inferredType);
+        const element = distributed[index];
+        const inferred = element === undefined || element.type === null ? null : widenInferred(element.type);
         const type = declarator.annotation === null ? inferred : annotationType(declarator.annotation);
         const declared = variableText('local', declarator.name, declarator.annotation, inferred === null ? null : typeToString(inferred));
-        const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1), valueBytes(value));
+        const source = element !== undefined && element.isFirst ? element.value : undefined;
+        const detail = assignedText(declared, valueText(state.text, source, statement.values.length === 1), valueBytes(source));
 
         declareSymbol(state, block.scopeId, { name: declarator.name, kind: 'local', position: declarator.position, detail, type });
     });

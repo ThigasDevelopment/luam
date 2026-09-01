@@ -176,6 +176,21 @@ the **initialization options** so a client that is not VS Code can set them too:
 Every field is optional and every unknown value falls back to the default above.
 Sending no options at all gets the three type kinds and no parameter names.
 
+A value list is adjusted the way Lua adjusts one, by the rule the checker itself
+applies: the last expression expands across every name still waiting, and every
+earlier expression contributes its first value alone. A `local` that destructures
+a multi-return call therefore answers one type per name — in the hint, in the
+hover, in the completion detail and in both symbol outlines. With
+`local cX, cY, cZ = getVehicleComponentPosition(...)`, all three answer `number`;
+with `local only = f()`, `only` answers the first value of `f` rather than the
+tuple; with `local x, y = 1, f()`, `y` answers the first value of `f` because the
+call is not last. A name the value list cannot account for answers as it always
+did, with no type.
+
+The hover of such a name carries the initializer text only on the first name the
+call covers. `a` reads `local a: number = triple()` and `b` reads
+`local b: string`, because `b` holds one value of the call and not the call.
+
 ## Running it
 
 ```bash

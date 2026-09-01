@@ -180,6 +180,21 @@ seja o VS Code também consiga defini-los:
 Todo campo é opcional e todo valor desconhecido cai no padrão acima. Não enviar
 opção nenhuma entrega os três tipos de tipo e nenhum nome de parâmetro.
 
+Uma lista de valores é ajustada como Lua ajusta a dela, pela regra que o próprio
+checker aplica: a última expressão se expande por todo nome ainda pendente, e
+cada expressão anterior contribui só com o primeiro valor dela. Um `local` que
+desestrutura uma chamada de múltiplos retornos responde, portanto, um tipo por
+nome — no hint, no hover, no detalhe do completion e nos dois outlines de
+símbolos. Com `local cX, cY, cZ = getVehicleComponentPosition(...)`, os três
+respondem `number`; com `local only = f()`, `only` responde o primeiro valor de
+`f` em vez da tupla; com `local x, y = 1, f()`, `y` responde o primeiro valor de
+`f` porque a chamada não é a última. Um nome que a lista de valores não alcança
+responde como sempre respondeu, sem tipo.
+
+O hover de um nome desses carrega o texto do inicializador só no primeiro nome
+que a chamada cobre. `a` mostra `local a: number = triple()` e `b` mostra
+`local b: string`, porque `b` guarda um valor da chamada e não a chamada.
+
 ## Executando
 
 ```bash

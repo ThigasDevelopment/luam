@@ -167,6 +167,21 @@ Três regras os mantêm fora do caminho:
   nada é pior do que ficar quieto.
 - Um arquivo que não parseia não gera hint nenhum, a mesma regra da formatação.
 
+Um `local` que desestrutura uma chamada de múltiplos retornos ganha um hint por
+nome, do jeito que [funções](/pt-br/language/functions#multiplos-retornos) dizem
+que cada alvo recebe o tipo dele. Dado `function triple(): (number, string, boolean)`,
+`local a, b, c = triple()` mostra `a: number`, `b: string` e `c: boolean` — três
+hints em uma linha, não a tupla inteira no primeiro nome. O mesmo vale para o
+catálogo: `local cX, cY, cZ = getVehicleComponentPosition(...)` mostra `number`
+em cada um dos três.
+
+Dois casos vêm das regras de ajuste do próprio Lua, e não do hint:
+
+- Um nome sozinho fica com o primeiro valor e mais nada, então
+  `local only = triple()` mostra `number`, não `(number, string, boolean)`.
+- Uma chamada em qualquer posição que não a última contribui só com o primeiro
+  valor dela, então `local x, y = 1, triple()` mostra `number` duas vezes.
+
 Um hint e um hover sobre o mesmo nome sempre mostram o mesmo tipo: os dois passam
 pelo renderizador do próprio checker.
 

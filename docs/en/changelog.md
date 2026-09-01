@@ -44,6 +44,16 @@ Every heading below is a released version and the date it shipped, newest first.
 - [Editors](/en/tooling/editors) records that a fix to the language server
   reaches the editor only after the extension is reinstalled and the window
   reloaded.
+- [Editors](/en/tooling/editors) and
+  [Language server](/en/tooling/language-server) record what a `local` that
+  destructures a multi-return call shows in the editor: one inlay hint and one
+  hover answer per name, a name standing alone taking the first value rather
+  than the tuple, a call in non-final position contributing its first value
+  alone, and the initializer text carried on the first name the call covers.
+  The rule [functions](/en/language/functions#multi-return) already stated is
+  now the rule the editor follows. An editor still running the 0.19.12
+  extension keeps the old hints until it is reinstalled and the window is
+  reloaded.
 
 ## 0.19.12 - 2026-08-31
 

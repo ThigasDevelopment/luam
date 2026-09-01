@@ -3059,15 +3059,15 @@ always applied Lua's adjust rules — but two places in the language server pair
 declarator `n` with value expression `n` and read that expression's type whole, so
 the hint and the hover contradict the compiler that produced them.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 46.01 | Share one distribution rule for a value list | ../plans/46.01-value-list-distribution.md | architecture-engineer | todo |
-| 46.02 | Hint every name a multi-return local declares | ../plans/46.02-multi-return-inlay-hints.md | architecture-engineer | todo |
-| 46.03 | Answer hover and completion with the destructured type | ../plans/46.03-multi-return-hover-and-completion.md | architecture-engineer | todo |
-| 46.04 | Cover a multi-return local across the editor surfaces | ../plans/46.04-multi-return-editor-tests.md | test-engineer | todo |
-| 46.05 | Record what a multi-return local shows in the editor | ../plans/46.05-multi-return-documentation.md | documentation-engineer | todo |
+| 46.01 | Share one distribution rule for a value list | ../plans/46.01-value-list-distribution.md | architecture-engineer | done |
+| 46.02 | Hint every name a multi-return local declares | ../plans/46.02-multi-return-inlay-hints.md | architecture-engineer | done |
+| 46.03 | Answer hover and completion with the destructured type | ../plans/46.03-multi-return-hover-and-completion.md | architecture-engineer | done |
+| 46.04 | Cover a multi-return local across the editor surfaces | ../plans/46.04-multi-return-editor-tests.md | test-engineer | done |
+| 46.05 | Record what a multi-return local shows in the editor | ../plans/46.05-multi-return-documentation.md | documentation-engineer | done |
 
 Acceptance:
 

@@ -48,6 +48,16 @@ da versão atual.
 - [Editores](/pt-br/tooling/editors) registra que uma correção no servidor de
   linguagem só chega ao editor depois de reinstalar a extensão e recarregar a
   janela.
+- [Editores](/pt-br/tooling/editors) e
+  [Language server](/pt-br/tooling/language-server) registram o que um `local`
+  que desestrutura uma chamada de múltiplos retornos mostra no editor: um inlay
+  hint e uma resposta de hover por nome, um nome sozinho ficando com o primeiro
+  valor em vez da tupla, uma chamada fora da última posição contribuindo só com
+  o primeiro valor dela, e o texto do inicializador carregado no primeiro nome
+  que a chamada cobre. A regra que
+  [funções](/pt-br/language/functions#multiplos-retornos) já enunciava agora é a
+  regra que o editor segue. Um editor ainda rodando a extensão 0.19.12 mantém os
+  hints antigos até ser reinstalada e a janela recarregada.
 
 ## 0.19.12 - 2026-08-31
 

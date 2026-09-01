@@ -108,9 +108,24 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   `if props.password and type(props.password) == 'string' then`, the
   assignment's `props.password` now reports `string` and names the declared type
   under it, `narrowed from string?`.
+- A `local` that destructures a multi-return call labelled the whole tuple on
+  the first name and left every other name blank.
+  `local cX, cY, cZ = getVehicleComponentPosition(vehicle, part, 'root')` showed
+  `cX: (number, number, number)` and no hint at all on `cY` and `cZ`, and
+  hovering `cY` answered `local cY`, with no type. Each name now answers
+  `number` — in the inlay hint, in hover, in the completion detail and in both
+  symbol outlines. `local only = f()` narrows to the first value instead of
+  labelling the tuple, and a call anywhere but last in a value list contributes
+  its first value alone. The checker was always right about this: the adjust
+  rules now exist once, and the two places in the language server that paired a
+  name with a value expression read that one distribution. The initializer text
+  is shown on the first name the call covers, so `b` reads `local b: string`
+  rather than claiming it holds `triple()`.
 
 The editor picks these up only after the extension is reinstalled and the window
-reloaded; until then it keeps answering the way the installed build answers.
+reloaded; until then it keeps answering the way the installed build answers. An
+editor still running the 0.19.12 extension keeps the tuple on the first name and
+the blank hints on the rest, however current the checkout is.
 
 ## 0.19.12 - 2026-08-31
 
