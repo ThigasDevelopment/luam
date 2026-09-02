@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.0 - 2026-09-02
+
 ### Adicionado
 
 - [Portando um resource Lua](/pt-br/guide/porting) é a lista ordenada de decisões

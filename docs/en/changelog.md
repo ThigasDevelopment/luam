@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-02
+
 ### Added
 
 - [Porting a Lua resource](/en/guide/porting) is the ordered list of decisions

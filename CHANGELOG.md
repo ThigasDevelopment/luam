@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-02
+
 ### Added
 
 - A `type` alias now reaches the whole project, the way an `interface`, a
