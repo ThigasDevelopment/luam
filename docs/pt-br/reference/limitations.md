@@ -444,3 +444,40 @@ em vez de uma saída errada.
 Também não existem sobrescritas por arquivo, sobrescritas por diretiva, trechos
 excluídos da formatação, presets, nem herança de outro pacote. Um arquivo, um
 estilo, para tudo abaixo dele.
+
+## Uma classe que o código nomeia em tempo de execução não pode ser instanciada
+
+**Decisão de projeto.** Registrada na
+[ADR-045](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/045-runtime-named-instantiation.md).
+
+`new` é um operador sobre o **nome** de uma classe, resolvido quando o arquivo é
+verificado. Não existe valor que represente uma classe, nem `new` sobre um nome
+calculado, nem forma de auto-carregar varrendo `_G` — as duas formas que um
+resource Lua usa para montar sua ordem de carga por convenção de nomes.
+
+Escreva um **registro** no lugar: uma tabela listando as classes que o resource
+carrega, cada entrada criada com `new`, iterada normalmente. A aridade do
+construtor, os tipos dos argumentos e o tipo do valor do registro passam todos a
+ser verificados, que é exatamente o que a varredura do `_G` abria mão. O custo é
+que a lista é escrita uma vez.
+
+`getClass(name)` e `getClasses()` permanecem como a saída sem tipos, para um
+conjunto de classes que genuinamente não é conhecido quando o código é escrito.
+Tudo que produzem é `any`. [Portando um resource Lua](/pt-br/guide/porting)
+mostra as duas formas.
+
+## Uma assinatura de múltiplos retornos escrita à mão tem aridade fixa
+
+**Decisão de projeto.** Registrada na
+[45.15](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/45.15-author-a-multi-return-signature.md).
+
+Uma função declara vários valores de retorno como uma lista entre parênteses —
+`function f(): (number, number, number)` — e cada `return` é verificado elemento
+a elemento. A lista não tem cauda variádica: não existe sintaxe para "estes três,
+depois qualquer quantidade de `T`".
+
+Uma assinatura cuja aridade não é fixa permanece `any`, que é o limite que o
+catálogo MTA já tinha para um `LuaMultiReturn<[...any[]]>` de origem. Uma lista
+entre parênteses também é **apenas uma forma de retorno**: escrita em um
+parâmetro, uma variável, um campo, um membro de interface ou o corpo de um alias
+ela é `check-tuple-position`.

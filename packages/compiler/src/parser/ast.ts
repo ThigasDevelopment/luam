@@ -211,6 +211,12 @@ export interface LocalStatement extends NodeBase {
     values: Expression[];
 }
 
+export interface GlobalStatement extends NodeBase {
+    kind: 'global-statement';
+    declaration: VariableDeclarator;
+    values: Expression[];
+}
+
 export interface AssignmentStatement extends NodeBase {
     kind: 'assignment-statement';
     operator: string;
@@ -310,6 +316,7 @@ export interface DeclareStatement extends NodeBase {
 export type Statement =
     | LocalStatement
     | AssignmentStatement
+    | GlobalStatement
     | CallStatement
     | FunctionDeclaration
     | ReturnStatement

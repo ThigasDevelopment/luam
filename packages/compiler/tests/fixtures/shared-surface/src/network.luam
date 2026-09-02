@@ -1,0 +1,23 @@
+class Network {
+    isClient: boolean = false
+
+    constructor = function ()
+        self.isClient = isElement(localPlayer)
+    end
+
+    emit = function (name: string, target: Element): void
+        if self.isClient then
+            triggerServerEvent(name, target)
+        else
+            triggerClientEvent(target, name, target)
+        end
+    end
+
+    listen = function (name: string, handler: fun(): void): void
+        if self.isClient then
+            addEvent(name, true)
+        end
+
+        addEventHandler(name, root, handler)
+    end
+}

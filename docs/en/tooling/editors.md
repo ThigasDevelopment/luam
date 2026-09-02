@@ -166,6 +166,21 @@ Three rules keep them out of the way:
   nothing is worse than staying quiet.
 - A file that does not parse yields no hints, the same rule formatting follows.
 
+A `local` that destructures a multi-return call is hinted name by name, the way
+[functions](/en/language/functions#multi-return) says each target gets
+its own type. Given `function triple(): (number, string, boolean)`,
+`local a, b, c = triple()` reads `a: number`, `b: string` and `c: boolean` — three
+hints on one line, not the whole tuple on the first name. The same holds for the
+catalog: `local cX, cY, cZ = getVehicleComponentPosition(...)` reads `number` on
+each of the three.
+
+Two cases follow from Lua's own adjust rules rather than from the hint:
+
+- A name that stands alone takes the first value and nothing else, so
+  `local only = triple()` reads `number`, not `(number, string, boolean)`.
+- A call anywhere but last in the value list contributes its first value only, so
+  `local x, y = 1, triple()` reads `number` twice.
+
 A hint and a hover on the same name always render the same type: both go through
 the checker's own renderer.
 
@@ -239,3 +254,9 @@ moved or deleted outside the editor reaches it without a restart. **Luam: Rescan
 Workspace** rebuilds the index from disk if a change slipped past the watcher,
 and **Luam: Restart Language Server** is the way out if the server and the
 project still disagree.
+
+None of this reaches a change to the server itself. The editor runs the server
+bundled into the extension it has installed, so a fix to hover, completion or
+diagnostics lands only after the extension is reinstalled and the window
+reloaded — **Developer: Reload Window**. Until then the editor keeps answering
+the way the installed build answers, however current the checkout is.

@@ -105,6 +105,7 @@ export function compile(source: string, options: CompileOptions = {}): CompileRe
         isDeclarationFile,
         oop: settings.oop,
         noUnusedLocals: settings.noUnusedLocals,
+        noImplicitGlobals: settings.noImplicitGlobals,
         noUnusedParameters: settings.noUnusedParameters,
     });
     const diagnostics = sortDiagnostics([...parsed.diagnostics, ...resolved.diagnostics, ...checked.diagnostics]);

@@ -1,0 +1,24 @@
+#* 45.15 - an authored multi-return signature.
+   45.06 - an optional parameter in a fun type. *#
+
+class MySqlAdapter {
+    handle: number = 0
+
+    query = function (statement: string): (boolean, number, number)
+        return true, 0, self.handle
+    end
+
+    queryAsync = function (statement: string, done?: fun(rows?: number): void): void
+        if done ~= nil then
+            done(0)
+        end
+    end
+}
+
+function runMigration(adapter: MySqlAdapter): boolean
+    local result, rows, lastId = adapter:query('select 1')
+
+    outputDebugString(tostring(rows) .. '/' .. tostring(lastId))
+
+    return result
+end

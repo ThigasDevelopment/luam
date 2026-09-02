@@ -11,6 +11,56 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.0 - 2026-09-02
+
+### Adicionado
+
+- [Portando um resource Lua](/pt-br/guide/porting) é a lista ordenada de decisões
+  que converter um resource MTA existente impõe: a ordem de trabalho e o porquê,
+  o que traduz mecanicamente em forma de tabela, o que precisa ser reestruturado,
+  o que o Luam recusa e o que escrever no lugar, e o que o port encontra —
+  dezessete defeitos genuínos em um resource que estava rodando.
+- [Limitações](/pt-br/reference/limitations) registra as duas formas que o marco
+  45 deixou sem equivalente: instanciar uma classe que o código nomeia em tempo
+  de execução, e a aridade fixa de uma assinatura de múltiplos retornos escrita à
+  mão.
+- [Diagnósticos](/pt-br/reference/diagnostics) ganha `check-duplicate-type`,
+  `check-duplicate-global`, `check-global-annotation-scope`,
+  `check-incomplete-record`, `check-tuple-position`, `check-class-receiver`,
+  `parse-reserved-name`, `check-shadowed-api`, `check-shadowed-helper` e
+  `check-implicit-global`, e registra que um argumento final espalhado não é
+  verificado.
+- [Campos de configuração](/pt-br/reference/configuration-fields) e
+  [.luam.manifest](/pt-br/tooling/luam-manifest) registram
+  `compiler.noImplicitGlobals`, desligado por padrão.
+
+### Alterado
+
+- [Ambientes](/pt-br/mta/environments) registra que um arquivo `shared` enxerga
+  os dois lados e não emite nada para um nome exclusivo de um lado, em vez de só
+  as APIs compartilhadas, com a classe de rede que decide seu lado em tempo de
+  execução como exemplo trabalhado. Afirma com todas as letras que o compilador
+  não verifica a ramificação em tempo de execução, e que os rótulos do editor são
+  onde o lado agora aparece. Os imports não mudam.
+- [Language server](/pt-br/tooling/language-server) registra que o hover de uma
+  propriedade informa o tipo que o checker deu ao acesso — estreitado onde uma
+  guarda estreitou, e nunca uma declaração de mesmo nome em outro ponto do
+  arquivo — e que o hover sobre um valor lista os campos do tipo dele, um nível
+  de profundidade e com corte no limite de membros.
+- [Editores](/pt-br/tooling/editors) registra que uma correção no servidor de
+  linguagem só chega ao editor depois de reinstalar a extensão e recarregar a
+  janela.
+- [Editores](/pt-br/tooling/editors) e
+  [Language server](/pt-br/tooling/language-server) registram o que um `local`
+  que desestrutura uma chamada de múltiplos retornos mostra no editor: um inlay
+  hint e uma resposta de hover por nome, um nome sozinho ficando com o primeiro
+  valor em vez da tupla, uma chamada fora da última posição contribuindo só com
+  o primeiro valor dela, e o texto do inicializador carregado no primeiro nome
+  que a chamada cobre. A regra que
+  [funções](/pt-br/language/functions#multiplos-retornos) já enunciava agora é a
+  regra que o editor segue. Um editor ainda rodando a extensão 0.19.12 mantém os
+  hints antigos até ser reinstalada e a janela recarregada.
+
 ## 0.19.12 - 2026-08-31
 
 ### Alterado

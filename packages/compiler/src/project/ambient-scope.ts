@@ -34,13 +34,15 @@ export interface AmbientScope {
 }
 
 export function optionsKey(options: CompilerOptions): string {
-    return `${options.strict ? 'strict' : ''}|${options.oop ? 'oop' : ''}|${options.noUnusedLocals ? 'nul' : ''}|${options.noUnusedParameters ? 'nup' : ''}`;
+    const flags = [options.strict ? 'strict' : '', options.oop ? 'oop' : '', options.noUnusedLocals ? 'nul' : '', options.noUnusedParameters ? 'nup' : ''];
+
+    return `${flags.join('|')}|${options.noImplicitGlobals ? 'nig' : ''}`;
 }
 
 export function declaresNothing(declarations: AmbientDeclarations): boolean {
-    const { classes, interfaces, enums, globals, events } = declarations;
+    const { classes, interfaces, enums, aliases, globals, events } = declarations;
 
-    return classes.length === 0 && interfaces.length === 0 && enums.length === 0 && globals.length === 0 && events.length === 0;
+    return classes.length === 0 && interfaces.length === 0 && enums.length === 0 && aliases.length === 0 && globals.length === 0 && events.length === 0;
 }
 
 export function sharedEnums(collected: readonly DeclarationEntry[]): ReadonlySet<string> {

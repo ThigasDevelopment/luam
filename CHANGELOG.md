@@ -14,6 +14,121 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-02
+
+### Added
+
+- A `type` alias now reaches the whole project, the way an `interface`, a
+  `class` and an `enum` already did. Two declarations of one alias name are
+  `check-duplicate-type`.
+- An `interface` takes type parameters, with the constraint syntax a class and
+  an alias already accept. A member is substituted where it is read, `implements`
+  is checked against the substituted contract, and a wrong argument count is the
+  `check-generic-arity` the other two forms report.
+- A global assignment at the top level of a file carries a type —
+  `network?: Network = nil` — and that annotation is the contract every later
+  assignment and every other file is checked against. The annotation is erased.
+- A project function declares several return values as a parenthesised list,
+  `function f(): (number, number, number)`. Each `return` is checked element by
+  element, and the call site distributes exactly as an MTA catalog call does. A
+  list written anywhere but a return type is `check-tuple-position`.
+- An `interface`, an object type and a `class` declare a key an identifier
+  cannot spell: `['medium:20']: DxFont`. It is read through the index form,
+  offered in completion with its quotes, and emitted quoted in a class body.
+- A `fun` type takes an optional parameter by name, `fun(reason?: string): void`,
+  which lowers the type's required arity. Hover prints the marker on the name.
+- Three warnings for a declaration that overwrites something the compiler models:
+  `check-shadowed-api` for an MTA API, `check-shadowed-helper` for a standard
+  library member an object extension lowers to, and `check-implicit-global` for
+  an assignment that creates an undeclared global — the last behind
+  `compiler = { noImplicitGlobals = true }`, off by default.
+- [Porting a Lua resource](https://thigasdevelopment.github.io/luam/en/guide/porting)
+  documents what converting an existing MTA resource costs, and a compiler corpus
+  keeps every shape it names.
+
+### Changed
+
+- `{}` initialises **any** map. The empty literal was compared against the map's
+  key type, so `table<number, Vehicle>` and `table<Ped, Data>` rejected it while
+  `table<string, number>` accepted it.
+- `map[key] = nil` and `map.key = nil` delete an entry. `nil` is accepted on the
+  right of an assignment whose target is an index or a property on a map, an
+  array or `table`; everywhere else it still reports, and a read is unchanged.
+- A final argument that is a call of unknown return arity — `f(unpack(t))` —
+  spreads into the rest of the list, so the minimum is not checked and the
+  maximum counts only the arguments before it.
+- A parameter positioned at or beyond a signature's required-argument count
+  accepts `nil`, on the procedural catalog, the OOP surface and the runtime
+  globals alike. Forwarding an optional value into an API that already accepts
+  none compiles.
+- A partial table literal assigned to a record, interface or class-typed target
+  is completed by later assignments in the same block; a key still missing when
+  the value escapes or the block ends is `check-incomplete-record`. An inferred
+  literal that a later statement extends widens to include the key.
+- An unannotated table literal widens its members, so `local shape = { x = 0 }`
+  infers `{ x: number }` and can be reassigned with computed values. Widening
+  recurses through a nested literal, an array element and a union member.
+- `RedisAdapter:connect()` on an instance member is now `check-class-receiver`,
+  whose message names instantiating with `new` instead of prescribing a dotted
+  call that does not work. A genuinely static member keeps `check-static-receiver`.
+- A reserved word in a name position is `parse-reserved-name`, the parser
+  recovers at the word, and the surrounding declaration still registers. One
+  reserved parameter name produced eight diagnostics and a cross-file
+  `check-unknown-member`; it now produces two and nothing downstream.
+- A `shared` file now sees the shared MTA surface plus the server and client
+  ones, and reports **nothing** for a side-restricted API, event, project
+  declaration or MTA OOP member. A module that decides its own side at runtime
+  compiles in one file, clean, with the real types of both surfaces — so
+  `localPlayer` is a `Player` and `triggerServerEvent()` with no arguments is
+  still `check-argument-count`. A `server` or `client` file is unchanged, and a
+  `shared` file importing a `server` or `client` module is still an error. The
+  emitted Lua, the line map and the generated manifest are unchanged.
+- In a `shared` file the editor offers the shared APIs first and the two sides
+  after them, each carrying its side in the completion detail, and hover on a
+  side-restricted name adds a line naming its side. With no diagnostic, these
+  labels are where the side is reported.
+- Hovering a value now lists the fields of its type. A local, a parameter, a
+  field or a global typed by a `type` alias, an `interface`, a class or an
+  inline object type carries that type's fields under the signature — one level
+  deep, optional fields keeping their `?`, capped at 24 with a `# N more` line.
+  A value typed `string`, `number`, `any`, `table` or a function is unchanged.
+  `parameter props: NetworkProps` stops being a name the author has to go look
+  up.
+
+### Fixed
+
+- Hovering a property answered with an unrelated declaration that happened to
+  share its name. With a `class Network { password: string }` anywhere in the
+  file, hovering `props.password` — where `props` is typed by a `type` alias
+  declaring `password?: string` — reported the class field. It now reports the
+  type the checker gave the access, `string?`, and deleting the class no longer
+  changes the answer. Definition and rename on that property no longer reach the
+  class field either. A member of a class instance, of an MTA element, of a
+  library and of an enum resolves as it did before, and `self.password` still
+  answers with the class field.
+- A property narrowed by a guard hovered with its declared type. Inside
+  `if props.password and type(props.password) == 'string' then`, the
+  assignment's `props.password` now reports `string` and names the declared type
+  under it, `narrowed from string?`.
+- A `local` that destructures a multi-return call labelled the whole tuple on
+  the first name and left every other name blank.
+  `local cX, cY, cZ = getVehicleComponentPosition(vehicle, part, 'root')` showed
+  `cX: (number, number, number)` and no hint at all on `cY` and `cZ`, and
+  hovering `cY` answered `local cY`, with no type. Each name now answers
+  `number` — in the inlay hint, in hover, in the completion detail and in both
+  symbol outlines. `local only = f()` narrows to the first value instead of
+  labelling the tuple, and a call anywhere but last in a value list contributes
+  its first value alone. The checker was always right about this: the adjust
+  rules now exist once, and the two places in the language server that paired a
+  name with a value expression read that one distribution. The initializer text
+  is shown on the first name the call covers, so `b` reads `local b: string`
+  rather than claiming it holds `triple()`.
+
+The editor picks these up only after the extension is reinstalled and the window
+reloaded; until then it keeps answering the way the installed build answers. An
+editor still running the 0.19.12 extension keeps the tuple on the first name and
+the blank hints on the rest, however current the checkout is.
+
 ## 0.19.12 - 2026-08-31
 
 ### Added

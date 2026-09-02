@@ -11,6 +11,15 @@ import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
 import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
+const SIDED_SHARED = [
+    '#!shared',
+    '',
+    'function isOnClient(): boolean',
+    '    return isElement(localPlayer)',
+    'end',
+    '',
+].join('\n');
+
 const fixtures: ProjectFixture[] = [];
 
 interface Harness {
@@ -89,6 +98,14 @@ describe('check command', () => {
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
         expect(logger.errors.join('\n')).toContain('project-environment-import');
+    });
+
+    it('reports nothing for a side-restricted API in a shared file', () => {
+        const { context, logger } = harness({ ...defaultProjectFiles(), 'src/shared/config.luam': SIDED_SHARED });
+
+        expect(runCheckCommand(context)).toBe(EXIT_OK);
+        expect(logger.text()).not.toContain('check-environment-api');
+        expect(logger.text()).toContain('Check passed: 3 files, 0 errors, 0 warnings');
     });
 
     it('reports a source mapping that matches nothing', () => {

@@ -21,15 +21,29 @@ A completação dispara em `.` e `:` para membros: campos e métodos de classe
 tipo do receptor.
 
 O hover também responde sobre um membro. A propriedade de uma instância de
-classe, de uma tabela tipada inline, de uma `interface` ou de um global do
-projeto informa o tipo que o checker deu àquela propriedade, lido da expressão
-sob o cursor e não do primeiro membro do arquivo que compartilha o nome.
+classe, de uma tabela tipada inline, de um alias `type`, de uma `interface` ou de
+um global do projeto informa o tipo que o checker deu àquela propriedade, lido da
+expressão sob o cursor. Uma declaração em outro ponto do arquivo que por acaso
+compartilhe o nome da propriedade nunca responde por ela — uma classe com um
+campo `password` não responde ao hover em `props.password` —, e um campo opcional
+é lido como `string?`, com o `?`.
 
-Quando essa propriedade é uma classe ou uma `interface`, o hover traz também a
-forma dela. A declaração é procurada primeiro no arquivo sob o cursor e depois
-no workspace, então uma classe declarada em outro arquivo ainda mostra seus
-membros. Só os arquivos que o ambiente pode referenciar são consultados, então um
-arquivo de servidor nunca informa a forma de uma classe só de cliente.
+Onde uma guarda estreitou o acesso, o hover informa o tipo estreitado e nomeia o
+declarado abaixo dele. Dentro de
+`if props.password and type(props.password) == 'string' then`, o `props.password`
+da atribuição é lido como `string`, seguido de `narrowed from string?`.
+
+O hover sobre um valor traz a forma do tipo dele. Um local, um parâmetro, um
+campo ou um global tipado por um alias `type`, por uma `interface`, por uma
+classe ou por um tipo objeto inline lista os campos desse tipo abaixo da
+assinatura — um nível de profundidade, campos opcionais mantendo o `?`, com corte
+em 24 e uma linha `# N more`. Um valor tipado como `string`, `number`, `any`,
+`table` ou uma função aparece sem bloco de forma.
+
+A declaração é procurada primeiro no arquivo sob o cursor e depois no workspace,
+então uma classe declarada em outro arquivo ainda mostra seus membros. Só os
+arquivos que o ambiente pode referenciar são consultados, então um arquivo de
+servidor nunca informa a forma de uma classe só de cliente.
 
 ### Palavras reservadas
 
@@ -107,7 +121,11 @@ Todo documento resolve o seu ambiente (`server`, `client` ou `shared`) a partir 
 caminho ou de uma diretiva `#!` **antes de qualquer outra coisa acontecer**. Isso
 decide quais APIs do MTA o documento enxerga, então `dxDrawText` nunca completa em
 um arquivo de servidor e `kickPlayer` nunca completa em um de cliente. Um documento
-`shared` enxerga apenas declarações compartilhadas.
+`shared` enxerga os dois lados: primeiro as declarações compartilhadas, depois as
+de servidor e as de cliente como complementos, cada uma carregando seu lado no
+detalhe do item. O hover sobre uma delas nomeia o lado. Um arquivo shared não
+emite diagnóstico de ambiente, então esses rótulos são o único lugar onde o lado
+aparece.
 
 Globais declarados por outros arquivos seguem a mesma regra: um arquivo `server`
 completa globais de módulos `shared`, nunca de módulos `client`.
@@ -161,6 +179,21 @@ seja o VS Code também consiga defini-los:
 
 Todo campo é opcional e todo valor desconhecido cai no padrão acima. Não enviar
 opção nenhuma entrega os três tipos de tipo e nenhum nome de parâmetro.
+
+Uma lista de valores é ajustada como Lua ajusta a dela, pela regra que o próprio
+checker aplica: a última expressão se expande por todo nome ainda pendente, e
+cada expressão anterior contribui só com o primeiro valor dela. Um `local` que
+desestrutura uma chamada de múltiplos retornos responde, portanto, um tipo por
+nome — no hint, no hover, no detalhe do completion e nos dois outlines de
+símbolos. Com `local cX, cY, cZ = getVehicleComponentPosition(...)`, os três
+respondem `number`; com `local only = f()`, `only` responde o primeiro valor de
+`f` em vez da tupla; com `local x, y = 1, f()`, `y` responde o primeiro valor de
+`f` porque a chamada não é a última. Um nome que a lista de valores não alcança
+responde como sempre respondeu, sem tipo.
+
+O hover de um nome desses carrega o texto do inicializador só no primeiro nome
+que a chamada cobre. `a` mostra `local a: number = triple()` e `b` mostra
+`local b: string`, porque `b` guarda um valor da chamada e não a chamada.
 
 ## Executando
 

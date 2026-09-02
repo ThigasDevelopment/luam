@@ -35,7 +35,7 @@ describe('configuration validation', () => {
             author: null,
             version: null,
             description: null,
-            compilerOptions: { strict: true, oop: false, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false },
+            compilerOptions: { strict: true, oop: false, noUnusedLocals: false, noUnusedParameters: false, noImplicitGlobals: false, warningsAsErrors: false },
             sources: { server: ['src/server/**/*.luam'], client: ['src/client/**/*.luam'], shared: ['src/shared/**/*.luam'] },
             assets: [],
             dependencies: [],

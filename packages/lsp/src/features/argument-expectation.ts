@@ -2,7 +2,7 @@ import { descriptorToType } from '@compiler/checker/api-types';
 import { mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import { firstValueOf, isAssignable, type Type } from '@compiler/checker/types';
-import { isAvailableIn } from '@mta-types/api-declaration';
+import { isVisibleIn } from '@mta-types/api-declaration';
 import { findDeclaration } from '@mta-types/catalog';
 import { elementAncestors } from '@mta-types/element-hierarchy';
 import { isLibrary, LIBRARY_MEMBERS } from '@mta-types/library-members';
@@ -37,7 +37,7 @@ export function localType(analysis: DocumentAnalysis, offset: number, name: stri
 function apiType(analysis: DocumentAnalysis, name: string): Type | null {
     const declaration = findDeclaration(name, analysis.environment);
 
-    if (declaration === null || !isAvailableIn(declaration.environment, analysis.environment)) {
+    if (declaration === null || !isVisibleIn(declaration.environment, analysis.environment)) {
         return null;
     }
 

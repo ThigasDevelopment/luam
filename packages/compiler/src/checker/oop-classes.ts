@@ -1,4 +1,4 @@
-import { isAvailableIn, type ApiEnvironment } from '@mta-types/api-declaration';
+import { isVisibleIn, type ApiEnvironment } from '@mta-types/api-declaration';
 import { allOopClasses } from '@mta-types/oop-surface';
 
 import { descriptorToType } from './api-types';
@@ -43,6 +43,7 @@ function buildRegistry(): DeclarationRegistry {
             superClass: declaration.parent,
             superArguments: [],
             interfaces: [],
+        interfaceArguments: [],
             members,
             statics: new Map(),
             position: MTA_POSITION,
@@ -113,7 +114,7 @@ export function mtaStaticMembersFor(className: string, environment: ApiEnvironme
     staticCache ??= buildStaticMembers();
 
     return [...(staticCache.get(className)?.values() ?? [])].filter(
-        (member) => member.environment !== undefined && isAvailableIn(member.environment, environment),
+        (member) => member.environment !== undefined && isVisibleIn(member.environment, environment),
     );
 }
 
@@ -136,5 +137,5 @@ export function mtaMember(className: string, member: string): MemberInfo | null 
 export function mtaMembersFor(className: string, environment: ApiEnvironment): MemberInfo[] {
     const members = mtaClassRegistry().collectMembers(className);
 
-    return members.filter((member) => member.environment !== undefined && isAvailableIn(member.environment, environment));
+    return members.filter((member) => member.environment !== undefined && isVisibleIn(member.environment, environment));
 }

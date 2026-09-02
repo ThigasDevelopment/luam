@@ -1,10 +1,11 @@
 import { mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import { typeToString } from '@compiler/checker/types';
-import { isAvailableIn } from '@mta-types/api-declaration';
+import { isVisibleIn } from '@mta-types/api-declaration';
 import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { isSideRestricted, sideNote } from '@lsp/features/side-surface';
 import { isIdentifierChar } from '@lsp/support/source-text';
 
 function markdown(value: string): string {
@@ -59,12 +60,13 @@ export function mtaMemberHover(analysis: DocumentAnalysis, name: string, offset:
     const owner = staticMember === null ? instanceReceiver(analysis, name) : staticOwner;
     const member = staticMember ?? (owner === null ? null : mtaMember(owner, name));
 
-    if (owner === null || member === null || member.environment === undefined || !isAvailableIn(member.environment, analysis.environment)) {
+    if (owner === null || member === null || member.environment === undefined || !isVisibleIn(member.environment, analysis.environment)) {
         return null;
     }
 
     const signature = `${owner}.${name}: ${typeToString(member.type)}`;
     const note = `wraps \`${member.procedural ?? ''}\` (${member.environment})`;
+    const side = isSideRestricted(member.environment, analysis.environment) ? [sideNote(member.environment)] : [];
 
-    return { contents: { kind: 'markdown', value: `${markdown(signature)}\n\n${note}` } };
+    return { contents: { kind: 'markdown', value: [markdown(signature), note, ...side].join('\n\n') } };
 }

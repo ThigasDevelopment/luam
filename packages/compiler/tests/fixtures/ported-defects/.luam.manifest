@@ -1,0 +1,14 @@
+name = 'ported-defects'
+author = 'Luam'
+version = '1.0.0'
+description = 'The shapes milestone 45 found while porting a real MTA resource.'
+
+compiler = {
+    strict = true,
+    oop = false,
+}
+
+output = {
+    bundle = false,
+    map = true,
+}

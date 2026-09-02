@@ -32,11 +32,17 @@ export function allDeclarations(): readonly ApiDeclaration[] {
 }
 
 export function globalsFor(environment: ApiEnvironment): ApiDeclaration[] {
-    return DECLARATIONS.flatMap((declaration) => {
+    const resolved = new Map<string, ApiDeclaration>();
+
+    for (const declaration of DECLARATIONS) {
         const exact = findDeclaration(declaration.name, environment);
 
-        return exact === null ? [] : [exact];
-    });
+        if (exact !== null && !resolved.has(exact.name)) {
+            resolved.set(exact.name, exact);
+        }
+    }
+
+    return [...resolved.values()];
 }
 
 export function findDeclaration(name: string, environment?: ApiEnvironment): ApiDeclaration | null {
@@ -47,7 +53,7 @@ export function findDeclaration(name: string, environment?: ApiEnvironment): Api
     }
 
     if (!isAvailableIn(declaration.environment, environment)) {
-        return null;
+        return environment === 'shared' ? declaration : null;
     }
 
     if (declaration.source !== 'mta') {

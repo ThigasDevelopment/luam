@@ -1,0 +1,21 @@
+#* The genuine defects a resource of this shape has. The corpus keeps them so it
+   proves the checker stayed useful, not merely quiet. *#
+
+interface Ticket {
+    id: number
+    note?: string
+}
+
+function ticketNote(ticket: Ticket): string
+    return ticket.note
+end
+
+function ticketAge(ticket: Ticket): number
+    return ticket.id + ticket.opened
+end
+
+function ticketLabel(ticket: Ticket): string
+    if ticket.id > 0 then
+        return 'open'
+    end
+end

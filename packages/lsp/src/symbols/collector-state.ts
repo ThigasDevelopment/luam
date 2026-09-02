@@ -87,10 +87,20 @@ export function typeOf(state: CollectorState, expression: Expression): Type | nu
     return state.types.get(expression) ?? null;
 }
 
-export function receiverName(state: CollectorState, expression: Expression): string | null {
-    const type = typeOf(state, expression);
+function typeName(type: Type | null): string | null {
+    if (type === null) {
+        return null;
+    }
 
-    return type !== null && type.kind === 'named' ? type.name : null;
+    if (type.kind === 'named' || type.kind === 'record') {
+        return type.name;
+    }
+
+    return type.kind === 'optional' ? typeName(type.element) : null;
+}
+
+export function receiverName(state: CollectorState, expression: Expression): string | null {
+    return typeName(typeOf(state, expression));
 }
 
 export function locatePosition(state: CollectorState, from: number, word: string): SourcePosition | null {

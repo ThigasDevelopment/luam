@@ -9,6 +9,54 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-02
+
+### Added
+
+- [Porting a Lua resource](/en/guide/porting) is the ordered list of decisions
+  converting an existing MTA resource forces: the order to work in and why, what
+  translates mechanically as a table, what has to be restructured, what Luam
+  refuses and what to write instead, and what the port finds — seventeen genuine
+  defects in a resource that had been running.
+- [Limitations](/en/reference/limitations) records the two shapes milestone 45
+  left without an equivalent: instantiating a class the code names at runtime,
+  and the fixed arity of an authored multi-return signature.
+- [Diagnostics](/en/reference/diagnostics) gains `check-duplicate-type`,
+  `check-duplicate-global`, `check-global-annotation-scope`,
+  `check-incomplete-record`, `check-tuple-position`, `check-class-receiver`,
+  `parse-reserved-name`, `check-shadowed-api`, `check-shadowed-helper` and
+  `check-implicit-global`, and records that a final spread argument is unchecked.
+- [Configuration fields](/en/reference/configuration-fields) and
+  [.luam.manifest](/en/tooling/luam-manifest) record
+  `compiler.noImplicitGlobals`, off by default.
+
+### Changed
+
+- [Environments](/en/mta/environments) records that a `shared` file sees both
+  sides and reports nothing for a side-restricted name, rather than shared APIs
+  only, with the network class that decides its side at runtime as the worked
+  example. It states plainly that the compiler does not verify the runtime
+  branch, and that the editor labels are where the side now shows up. Imports
+  are unchanged.
+- [Language server](/en/tooling/language-server) records that a property hover
+  reports the type the checker gave the access — narrowed where a guard narrowed
+  it, and never a same-named declaration elsewhere in the file — and that
+  hovering a value lists the fields of its type, one level deep and capped at the
+  member limit.
+- [Editors](/en/tooling/editors) records that a fix to the language server
+  reaches the editor only after the extension is reinstalled and the window
+  reloaded.
+- [Editors](/en/tooling/editors) and
+  [Language server](/en/tooling/language-server) record what a `local` that
+  destructures a multi-return call shows in the editor: one inlay hint and one
+  hover answer per name, a name standing alone taking the first value rather
+  than the tuple, a call in non-final position contributing its first value
+  alone, and the initializer text carried on the first name the call covers.
+  The rule [functions](/en/language/functions#multi-return) already stated is
+  now the rule the editor follows. An editor still running the 0.19.12
+  extension keeps the old hints until it is reinstalled and the window is
+  reloaded.
+
 ## 0.19.12 - 2026-08-31
 
 ### Changed

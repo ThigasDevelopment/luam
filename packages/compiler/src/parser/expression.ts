@@ -1,4 +1,4 @@
-import { CALLABLE_KEYWORDS, type Token } from '@compiler/lexer/token';
+import { CALLABLE_KEYWORDS, isLuamKeyword, type Token } from '@compiler/lexer/token';
 
 import type { Expression, TableField, TypeAnnotation } from './ast';
 import { parseFunctionExpression } from './function-expression';
@@ -131,6 +131,15 @@ function parsePrimary(stream: TokenStream): Expression {
         return { kind: 'group-expression', expression, position: token.position };
     }
 
+    if (token.kind === 'keyword' && isLuamKeyword(token.value)) {
+        const message = `"${token.value}" is a reserved word and cannot be read as a value. Rename the declaration — a property of the same name is still legal, so "value.${token.value}" keeps working.`;
+
+        stream.report('parse-reserved-name', message, token.position);
+        stream.next();
+
+        return { kind: 'identifier', name: token.value, position: token.position };
+    }
+
     throw stream.error(`Unexpected "${stream.describeCurrent()}" in expression.`, 'parse-unexpected-token');
 }
 
@@ -182,6 +191,10 @@ export function parseSuffixed(stream: TokenStream): Expression {
         }
 
         if (token.kind === 'punctuation' && token.value === '[') {
+            if (!stream.indexContinues(token)) {
+                return expression;
+            }
+
             stream.next();
 
             const index = parseExpression(stream);

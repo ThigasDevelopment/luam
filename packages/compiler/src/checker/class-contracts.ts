@@ -1,8 +1,10 @@
 import type { ClassDeclaration } from '@compiler/parser/declaration-nodes';
 
 import type { CheckContext } from './context';
+import { parameterSubstitutions } from './generic-class';
 import type { ClassInfo, MemberInfo } from './registry';
-import { isAssignable, typeToString } from './types';
+import { substituteType } from './type-substitution';
+import { isAssignable, typeToString, type Type } from './types';
 
 function checkContract(context: CheckContext, info: ClassInfo, contract: string, member: MemberInfo): void {
     const actual = context.declarations.lookupClassMember(info.name, member.name);
@@ -27,21 +29,36 @@ function checkContract(context: CheckContext, info: ClassInfo, contract: string,
     context.report('check-unimplemented-interface', message, actual.position);
 }
 
+function contractName(name: string, typeArguments: readonly Type[]): string {
+    return typeArguments.length === 0 ? name : `${name}<${typeArguments.map(typeToString).join(', ')}>`;
+}
+
 export function checkInterfaces(context: CheckContext, info: ClassInfo): void {
-    for (const name of info.interfaces) {
+    info.interfaces.forEach((name, index) => {
         const contract = context.declarations.lookupInterface(name);
 
         if (contract === null) {
             context.noteExternalReference(name, info.position);
             context.report('check-unknown-interface', `Class "${info.name}" implements "${name}", which is not defined.`, info.position);
 
-            continue;
+            return;
         }
 
-        for (const member of context.declarations.collectInterfaceContract(contract.name)) {
-            checkContract(context, info, name, member);
+        const typeArguments = info.interfaceArguments[index] ?? [];
+
+        if (contract.typeParameters.length > 0 && typeArguments.length !== contract.typeParameters.length) {
+            const expected = contract.typeParameters.length === 1 ? '1 type argument' : `${contract.typeParameters.length} type arguments`;
+
+            context.report('check-generic-arity', `Interface "${name}" expects ${expected} but received ${typeArguments.length}.`, info.position);
         }
-    }
+
+        const substitutions = parameterSubstitutions(contract.typeParameters, typeArguments);
+        const label = contractName(name, typeArguments);
+
+        for (const member of context.declarations.collectInterfaceContract(contract.name)) {
+            checkContract(context, info, label, substitutions.size === 0 ? member : { ...member, type: substituteType(member.type, substitutions) });
+        }
+    });
 }
 
 export function checkOverrides(context: CheckContext, info: ClassInfo, statement: ClassDeclaration): void {

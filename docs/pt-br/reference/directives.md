@@ -17,7 +17,7 @@ primeiro comando não é uma diretiva.
 | --- | --- |
 | `#!server` | O arquivo roda no servidor. |
 | `#!client` | O arquivo roda no cliente. |
-| `#!shared` | O arquivo roda nos dois lados e pode usar apenas declarações compartilhadas. |
+| `#!shared` | O arquivo roda nos dois lados e enxerga os dois lados. Um nome exclusivo de um lado é aceito sem diagnóstico. |
 
 Uma diretiva **sobrepõe a pasta**, e é isso que permite a um arquivo viver fora de
 `src/server`, `src/client` ou `src/shared`:

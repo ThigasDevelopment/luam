@@ -1,0 +1,8 @@
+src/server/defects.luam:10 error check-type-mismatch
+src/server/defects.luam:14 error check-unknown-member
+src/server/defects.luam:17 error check-missing-return
+src/server/patches.luam:5 warning check-shadowed-api
+src/server/patches.luam:9 warning check-shadowed-helper
+src/shared/adapters.luam:12 error parse-reserved-name
+src/shared/adapters.luam:13 error parse-reserved-name
+src/shared/adapters.luam:17 error check-class-receiver

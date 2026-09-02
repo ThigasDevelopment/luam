@@ -1,3 +1,9 @@
+#* The untyped escape hatch ADR-045 records: getClasses() and getClass() build
+   the same set by reflection, for the case where the class set genuinely is
+   not known when the code is written. Every value below is "any" — the
+   constructor arity is unchecked and so is the constructed type. Prefer
+   registry.luam, which lists the classes once and keeps all of that. *#
+
 class Loader {
     core: any = nil
 

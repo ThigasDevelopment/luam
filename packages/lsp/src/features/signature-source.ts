@@ -1,7 +1,7 @@
 import { mtaConstructor, mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import { typeToString, type RecordType, type Type } from '@compiler/checker/types';
-import { isAvailableIn } from '@mta-types/api-declaration';
+import { isVisibleIn } from '@mta-types/api-declaration';
 import { findDeclaration } from '@mta-types/catalog';
 import { apiDocumentation, memberDocumentation } from '@mta-types/documentation-lookup';
 import { isLibrary, LIBRARY_MEMBERS } from '@mta-types/library-members';
@@ -25,9 +25,11 @@ function typeParameters(type: Type, names: readonly string[] = []): { parameters
         return { parameters: [], returnText: typeToString(type) };
     }
 
+    const declared = type.parameterNames ?? [];
+
     const parameters = type.parameters.map((parameter, index) => {
         const optional = index >= type.minimumArguments ? '?' : '';
-        const name = names[index] ?? `argument${index + 1}`;
+        const name = names[index] ?? declared[index] ?? `argument${index + 1}`;
 
         return `${name}${optional}: ${typeToString(parameter)}`;
     });
@@ -152,7 +154,7 @@ function fromMtaMember(owner: string, member: string, isMethodCall: boolean): Si
 function fromMtaStaticMember(analysis: DocumentAnalysis, owner: string, member: string): SignatureSource | null {
     const found = mtaStaticMember(owner, member);
 
-    if (found === null || found.type.kind !== 'function' || found.environment === undefined || !isAvailableIn(found.environment, analysis.environment)) {
+    if (found === null || found.type.kind !== 'function' || found.environment === undefined || !isVisibleIn(found.environment, analysis.environment)) {
         return null;
     }
 
@@ -176,7 +178,7 @@ function fromMtaStaticMember(analysis: DocumentAnalysis, owner: string, member: 
 
 function fromMtaConstructor(analysis: DocumentAnalysis, name: string): SignatureSource | null {
     const found = mtaConstructor(name);
-    const constructor = found === null || !isAvailableIn(found.environment, analysis.environment) ? undefined : found.type;
+    const constructor = found === null || !isVisibleIn(found.environment, analysis.environment) ? undefined : found.type;
 
     if (constructor === undefined) {
         return null;

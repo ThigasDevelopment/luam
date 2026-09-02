@@ -1,16 +1,17 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { ExtensionResult } from '@compiler/extensions/native-extensions';
-import type { CallExpression, Expression, MemberExpression, TableExpression, TemplateLiteral, TypeAnnotation } from '@compiler/parser/ast';
+import type { CallExpression, Expression, IndexExpression, MemberExpression, TableExpression, TemplateLiteral, TypeAnnotation } from '@compiler/parser/ast';
 
 import { pathOf } from './access-path';
 import { extensionFor, reportExtensionForm, reportNotCallable } from './callable';
 import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
-import { checkEventUsage, checkGlobalReference } from './environment-checks';
+import { checkEventUsage, checkGlobalReference, checkSharedReference } from './environment-checks';
 import { specializeEventCall } from './event-calls';
 import { specializeCall } from './generic-call';
 import { memberOf } from './generic-class';
 import { resolveNonNominalMethod, withoutSelfParameter } from './method-receiver';
+import { escapesRecordObligation } from './record-completion';
 import { checkResourceCall } from './resource-exports';
 import {
     checkNewExpression,
@@ -35,6 +36,7 @@ import { checkBinary, checkUnary } from './operators';
 import { applyTypeParameters, buildFunctionType, checkFunctionBody } from './statements';
 import { collectInterpolations } from './template';
 import { resolveUnionMember } from './union-members';
+import { distributeValueTypes } from './value-distribution';
 import {
     ANY_TYPE,
     BOOLEAN_TYPE,
@@ -42,6 +44,7 @@ import {
     createBooleanLiteral,
     createLiteralRecord,
     createNumberLiteral,
+    createOptional,
     createStringLiteral,
     createUnion,
     firstValueOf,
@@ -51,7 +54,6 @@ import {
     NUMBER_TYPE,
     STRING_TYPE,
     TABLE_TYPE,
-    valuesOf,
     type FunctionType,
     type Type,
 } from './types';
@@ -117,7 +119,9 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
         return context.record(expression, library);
     }
 
-    const objectType = checkExpression(context, expression.object);
+    const received = checkExpression(context, expression.object);
+
+    const objectType = received.kind === 'optional' ? received.element : received;
 
     if (objectType.kind === 'record') {
         return context.record(expression, resolveRecordMember(context, objectType, expression));
@@ -150,6 +154,24 @@ function checkMember(context: CheckContext, expression: MemberExpression): Type 
     return context.record(expression, extension === null ? ANY_TYPE : EXTENSION_RESULTS[extension.result]);
 }
 
+function spreadsUnknownArity(args: readonly Expression[], argumentTypes: readonly Type[]): boolean {
+    if (args.length === 0 || args.length !== argumentTypes.length) {
+        return false;
+    }
+
+    return args[args.length - 1]?.kind === 'call-expression' && argumentTypes[argumentTypes.length - 1]?.kind === 'any';
+}
+
+function resolveKeyedMember(context: CheckContext, objectType: Type, expression: IndexExpression): Type | null {
+    if (expression.index.kind !== 'string-literal' || (objectType.kind !== 'record' && objectType.kind !== 'named')) {
+        return null;
+    }
+
+    const access: MemberExpression = { kind: 'member-expression', object: expression.object, property: expression.index.value, position: expression.index.position };
+
+    return objectType.kind === 'record' ? resolveRecordMember(context, objectType, access) : resolveNamedMember(context, objectType, access);
+}
+
 function countArguments(total: number): string {
     return total === 1 ? '1 argument' : `${total} arguments`;
 }
@@ -165,13 +187,16 @@ export function checkSignature(
     const argumentTypes = checkValueList(context, args, declared.parameters);
     const signature = specializeCall(context, owner, declared, argumentTypes, typeArguments, position);
 
-    if (argumentTypes.length < signature.minimumArguments) {
+    const spreads = spreadsUnknownArity(args, argumentTypes);
+    const fixed = spreads ? argumentTypes.length - 1 : argumentTypes.length;
+
+    if (!spreads && argumentTypes.length < signature.minimumArguments) {
         const message = `This call expects at least ${countArguments(signature.minimumArguments)} but received ${argumentTypes.length}.`;
 
         context.report('check-argument-count', message, position);
     }
 
-    if (!signature.isVariadic && argumentTypes.length > signature.parameters.length) {
+    if (!signature.isVariadic && fixed > signature.parameters.length) {
         const message = `This call expects at most ${countArguments(signature.parameters.length)} but received ${argumentTypes.length}.`;
 
         context.report('check-argument-count', message, position);
@@ -181,9 +206,14 @@ export function checkSignature(
         const argumentType = argumentTypes[index];
         const argument = args[index];
 
-        if (argumentType !== undefined && argument !== undefined) {
-            context.expectAssignable(argumentType, parameter, argument.position, `Argument ${index + 1}`);
+        if (argumentType === undefined || argument === undefined) {
+            return;
         }
+
+        const optional = index >= signature.minimumArguments && parameter.kind !== 'optional';
+        const expected = optional ? createOptional(parameter) : parameter;
+
+        context.expectAssignable(argumentType, expected, argument.position, `Argument ${index + 1}`, parameter);
     });
 
     if (signature.isVariadic && signature.variadicType !== undefined) {
@@ -198,6 +228,31 @@ export function checkSignature(
     }
 
     return signature.returnType;
+}
+
+function reportClassReceiver(context: CheckContext, name: string, method: string, position: SourcePosition): void {
+    if (context.declarations.lookupStaticMember(name, method) !== null) {
+        const message = `Call the static member "${method}" as "${name}.${method}(...)". A class value has no "self" to pass.`;
+
+        context.report('check-static-receiver', message, position);
+
+        return;
+    }
+
+    if (context.declarations.lookupMember(name, method) === null) {
+        const message = `Call the static member "${method}" as "${name}.${method}(...)". A class value has no "self" to pass.`;
+
+        context.report('check-static-receiver', message, position);
+
+        return;
+    }
+
+    const message =
+        `The receiver here is the class "${name}" itself, and "${method}" is one of its instance members. ` +
+        `Create an instance — "local value = new ${name}()" — and call "value:${method}(...)", or read the member from a value of that class. ` +
+        `Where the class and its single instance share one name, give the instance its own name.`;
+
+    context.report('check-class-receiver', message, position);
 }
 
 function callOwner(expression: CallExpression): string {
@@ -302,10 +357,7 @@ function checkCall(context: CheckContext, expression: CallExpression): Type {
     }
 
     if (expression.method !== null && expression.callee.kind === 'identifier' && isUserClassReference(context, expression.callee.name)) {
-        const name = expression.callee.name;
-        const message = `Call the static member "${expression.method}" as "${name}.${expression.method}(...)". A class value has no "self" to pass.`;
-
-        context.report('check-static-receiver', message, expression.position);
+        reportClassReceiver(context, expression.callee.name, expression.method, expression.position);
         checkValueList(context, expression.args);
 
         return context.record(expression, ANY_TYPE);
@@ -413,6 +465,8 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
 
             if (symbol === null) {
                 checkGlobalReference(context, expression.name, expression.position);
+            } else {
+                checkSharedReference(context, expression.name, expression.position);
             }
 
             if (symbol === null || symbol.isLocal !== true) {
@@ -431,6 +485,12 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
                 context.expectAssignable(indexType, objectType.key, expression.index.position, 'Key');
 
                 return context.record(expression, objectType.value);
+            }
+
+            const keyed = resolveKeyedMember(context, objectType, expression);
+
+            if (keyed !== null) {
+                return context.record(expression, keyed);
             }
 
             return context.record(expression, objectType.kind === 'array' ? objectType.element : ANY_TYPE);
@@ -467,19 +527,13 @@ export function checkExpression(context: CheckContext, expression: Expression, e
 }
 
 export function checkValueList(context: CheckContext, values: readonly Expression[], expected: readonly Type[] = []): Type[] {
-    const types: Type[] = [];
-
-    values.forEach((value, index) => {
+    const types = values.map((value, index) => {
         const type = checkMultiValueExpression(context, value, expected[index] ?? null);
 
-        if (index === values.length - 1) {
-            types.push(...valuesOf(type));
+        escapesRecordObligation(context, value);
 
-            return;
-        }
-
-        types.push(firstValueOf(type));
+        return type;
     });
 
-    return types;
+    return distributeValueTypes(types);
 }

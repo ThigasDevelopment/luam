@@ -118,9 +118,27 @@ describe('catalog environments', () => {
         }
     });
 
-    it('grows the global set from shared to an explicit environment', () => {
-        expect(globalsFor('server').length).toBeGreaterThan(globalsFor('shared').length);
-        expect(globalsFor('client').length).toBeGreaterThan(globalsFor('shared').length);
+    it('merges both sides into the shared surface', () => {
+        const shared = globalsFor('shared').map((declaration) => declaration.name);
+
+        expect(shared.length).toBeGreaterThan(globalsFor('server').length);
+        expect(shared.length).toBeGreaterThan(globalsFor('client').length);
+        expect(new Set(shared).size).toBe(shared.length);
+    });
+
+    it('keeps the declared side on a merged shared declaration', () => {
+        const shared = new Map(globalsFor('shared').map((declaration) => [declaration.name, declaration.environment]));
+
+        expect(shared.get('dxDrawText')).toBe('client');
+        expect(shared.get('banPlayer')).toBe('server');
+        expect(shared.get('outputChatBox')).toBe('shared');
+    });
+
+    it('resolves a side-restricted name only in a shared file', () => {
+        expect(findDeclaration('dxDrawText', 'shared')?.environment).toBe('client');
+        expect(findDeclaration('dxDrawText', 'server')).toBeNull();
+        expect(findDeclaration('banPlayer', 'shared')?.environment).toBe('server');
+        expect(findDeclaration('banPlayer', 'client')).toBeNull();
     });
 
     it('includes the Lua standard library in every environment', () => {
@@ -128,7 +146,7 @@ describe('catalog environments', () => {
 
         expect(shared).toContain('print');
         expect(shared).toContain('tostring');
-        expect(shared).not.toContain('dxDrawText');
+        expect(globalsFor('server').map((declaration) => declaration.name)).not.toContain('dxDrawText');
     });
 
     it('treats an unknown name as available', () => {

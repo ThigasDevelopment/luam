@@ -5,6 +5,7 @@ import { apiDocumentation } from '@mta-types/documentation-lookup';
 import { InlayHintKind, type InlayHint } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { distributeValues } from '@lsp/analysis/value-distribution';
 import type { InlayHintSettings } from '@lsp/features/inlay-hint-settings';
 import { parameterListEnd, typeLabel, type ParenIndex } from '@lsp/features/inlay-hint-text';
 import { toLspPosition } from '@lsp/support/lsp-position';
@@ -46,14 +47,16 @@ export function localHints(state: HintState, statement: LocalStatement): void {
         return;
     }
 
-    statement.declarations.forEach((declarator, index) => {
-        const value = statement.values[index];
+    const distributed = distributeValues(state.analysis.types, statement.values);
 
-        if (declarator.annotation !== null || value === undefined || declarator.name.length === 0) {
+    statement.declarations.forEach((declarator, index) => {
+        const element = distributed[index];
+
+        if (declarator.annotation !== null || element === undefined || declarator.name.length === 0) {
             return;
         }
 
-        const inferred = typeOf(state, value);
+        const inferred = element.type;
 
         typeHint(state, declarator.position.offset + declarator.name.length, inferred === null ? null : widenInferred(inferred));
     });

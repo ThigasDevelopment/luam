@@ -54,7 +54,7 @@ Acceptance:
 
 - `pnpm typecheck` passes with no errors.
 - `pnpm test` passes the full suite (168 compiler tests, 16 runtime tests).
-- Classes, inheritance, `self:super`, interfaces, enums, and `new` bind and
+- Classes, inheritance, `super`, interfaces, enums, and `new` bind and
   check, with fixture snapshots locking the generated Lua.
 - `class.lua` is required only when an OOP or enum feature is emitted.
 - Interfaces are compile-only and never reach the generated Lua.
@@ -2854,3 +2854,253 @@ Deliberately excluded:
 - Building a table from a field annotation. A field initialised to a table in the class body
   would share that table across every instance; the annotation stays compile-time only.
 - Any change to inference, to the checker, or to completion.
+
+## Milestone 43 — One Shared File, Both Sides
+
+A shared module that decides its own side at runtime cannot be written today. The
+reported `Network` class asks which side it is on with `isElement(localPlayer)`,
+stores the answer in `self.isClient`, and branches on that field between
+`triggerServerEvent` and `triggerClientEvent`; every one of those names is
+`check-environment-api` in a `shared` file — six errors on a file that would run
+correctly as written.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 43.01 | Merge the server and client surfaces in a shared file | ../plans/43.01-merged-shared-surface.md | architecture-engineer | done |
+| 43.02 | Offer the shared surface first and the sides as complements | ../plans/43.02-shared-completion-order.md | architecture-engineer | done |
+| 43.03 | Test the merged shared surface | ../plans/43.03-shared-surface-tests.md | test-engineer | done |
+| 43.04 | Record what a shared file may use | ../plans/43.04-shared-surface-documentation.md | documentation-engineer | done |
+
+Acceptance:
+
+- A shared file resolves every MTA API: the shared surface as the standard list,
+  the server and client declarations complementing it, each keeping its real type
+  and signature instead of falling back to `any`.
+- A side-restricted API, event or OOP member in a shared file is a warning that
+  names its side, not an error; the same use in a `server` or `client` file is
+  still an error, unchanged.
+- Completion in a shared file offers the shared names first and labels every
+  side-restricted one with the side it belongs to; hover repeats that note.
+- Import direction does not change: a `shared` module still cannot import a
+  `server` or `client` module.
+- The emitted Lua, the line map and the generated manifest are untouched.
+
+Why now:
+
+- The reported file is the common shape for a network, log or config module, and
+  the compiler rejects it outright while MTA runs it.
+- The decision cannot be recovered by the compiler. The branch tests a stored
+  field, so neither control-flow narrowing nor a compiler-provided `isClient`
+  would accept the class without restructuring it — a large mechanism that misses
+  the case that motivated it.
+- The author already knows the side; they wrote the test that proves it. What the
+  compiler can still add is the type of the API and a visible label, not a verdict.
+
+Deliberately excluded:
+
+- Control-flow narrowing over a side test, and any `isClient` / `isServer` global.
+  Both were designed and dropped: see ADR-044 for why.
+- Silence. A file whose path does not resolve is `shared` by default — the
+  reported one included — so reporting nothing would strip environment checking
+  from every misplaced file. The warning is what keeps that signal.
+- Block-level or function-level environments, which ADR-023 rejected and this does
+  not reopen: nothing is split and no chunk is generated.
+- Import direction, which resolves when the chunk loads and cannot be undone by a
+  runtime branch.
+
+## Milestone 44 — Member Resolution in the Editor
+
+Hovering `props.password`, where `props` is a parameter typed `NetworkProps` and
+`password` is declared `password?: string`, answers with the class field
+`password: string` declared elsewhere in the same file. The editor is resolving a
+property by name against every declaration in the file instead of against the
+receiver it was written on.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 44.01 | Bind a member reference to its receiver | ../plans/44.01-member-reference-binding.md | architecture-engineer | done |
+| 44.02 | Answer a property hover with the type the checker gave it | ../plans/44.02-member-hover-type.md | architecture-engineer | done |
+| 44.03 | Test member resolution against name collisions | ../plans/44.03-member-resolution-tests.md | test-engineer | done |
+| 44.04 | Record what a property hover answers | ../plans/44.04-member-hover-documentation.md | documentation-engineer | done |
+| 44.05 | Show the fields of a value's type on hover | ../plans/44.05-hover-type-shape.md | architecture-engineer | done |
+
+Acceptance:
+
+- A property whose receiver is a record, an alias, a class instance, an MTA
+  element or a library resolves against that receiver and never against a
+  same-named declaration elsewhere in the file.
+- A member reference whose receiver cannot be named resolves to nothing rather
+  than to the first name that matches, and the hover answers from the checker's
+  type instead.
+- Hovering an optional member reports its optionality; hovering it inside a guard
+  reports the narrowed type.
+- Hovering a value whose type has fields answers with those fields under the
+  signature, whether the type is a `type` alias, an interface, a class or an
+  inline object type; a primitive, a function and an opaque type hover unchanged.
+- Hover, definition, references, highlight and rename all inherit the fix, each
+  covered by a fixture that fails against the current tree.
+
+Why now:
+
+- The wrong answer is not a near miss — it names a different declaration, of a
+  different type, from a different container. An author reading `string` where the
+  type is `string?` is being told the guard they wrote is unnecessary.
+- The correct answer is already computed: `memberHover` reads the checker's type
+  map and returns `Props.secret: string?` the moment the collision is removed.
+  Only the resolution order and one wildcard match stand in front of it.
+- The same wildcard sits under go-to-definition and rename, where a wrong binding
+  is not a cosmetic problem.
+- Milestone 42 fixed member hover for the receivers it could name; this closes the
+  case it could not.
+- A hover that answers `parameter props: NetworkProps` and stops sends the author
+  back to the type declaration to read two fields. The renderer that expands a
+  body already exists — it is reached only from the declaration itself, never from
+  a value that carries the type.
+
+Deliberately excluded:
+
+- Any change to the checker, to inference or to narrowing. The compiler already
+  accepts the reported guard: `if props.password and type(props.password) == "string" then`
+  narrows correctly on the current tree, and the assignment diagnostic in the
+  report comes from an extension build that predates it. 44.03 locks that with a
+  fixture and 44.04 records that an editor keeps the old answers until the
+  extension is reinstalled.
+- Completion, which resolves members through a different path and is correct.
+
+## Milestone 45 — Porting a Real Lua Resource
+
+A 3,600-line MTA resource annotated for the Lua language server was converted to
+Luam, file for file, to find what a real port runs into. The first `luam check`
+reported 56 errors and 2 warnings across 24 files. Removing the findings milestone
+43 already owns, and the genuine defects the port exposed in the resource itself,
+what is left is fourteen compiler gaps, two stale rules in the internal design
+document, and one pattern with no Luam spelling at all.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 45.01 | Reconcile the internal language design with the optional marker and super rules | ../plans/45.01-optional-marker-and-super-drift.md | documentation-engineer | done |
+| 45.02 | Accept the empty table literal for a map whose value is an element class | ../plans/45.02-empty-literal-element-map.md | architecture-engineer | done |
+| 45.03 | Accept nil assignment as the deletion of a key | ../plans/45.03-nil-assignment-deletes-a-key.md | architecture-engineer | done |
+| 45.04 | Spread unpack into the argument list it ends | ../plans/45.04-unpack-argument-spread.md | architecture-engineer | done |
+| 45.05 | Declare a member whose key is not an identifier | ../plans/45.05-quoted-member-keys.md | architecture-engineer | done |
+| 45.06 | Take an optional parameter in a fun type | ../plans/45.06-optional-parameter-in-fun-type.md | architecture-engineer | done |
+| 45.07 | Take type parameters on an interface | ../plans/45.07-generic-interfaces.md | architecture-engineer | done |
+| 45.08 | Publish a type alias to the project, the way an interface already is | ../plans/45.08-project-wide-type-aliases.md | architecture-engineer | done |
+| 45.09 | Type a global the source assigns later | ../plans/45.09-typed-globals.md | architecture-engineer | done |
+| 45.10 | Build a record over several statements | ../plans/45.10-incremental-record-construction.md | architecture-engineer | done |
+| 45.11 | Widen the members of an inferred table literal | ../plans/45.11-widen-inferred-literal-members.md | architecture-engineer | done |
+| 45.12 | Accept nil for a parameter the catalog declares optional | ../plans/45.12-nil-for-an-optional-catalog-parameter.md | architecture-engineer | done |
+| 45.13 | Report a declaration that overwrites an MTA API or a runtime helper | ../plans/45.13-shadowed-api-and-helper.md | architecture-engineer | done |
+| 45.14 | Say what a class receiver and a reserved parameter name really are | ../plans/45.14-class-receiver-and-reserved-name-messages.md | architecture-engineer | done |
+| 45.15 | Author a multi-return signature | ../plans/45.15-author-a-multi-return-signature.md | architecture-engineer | done |
+| 45.16 | Decide what replaces instantiating a class the code names at runtime | ../plans/45.16-runtime-named-instantiation.md | architecture-engineer | done |
+| 45.17 | Keep a ported Lua resource as a compiler corpus | ../plans/45.17-ported-resource-corpus.md | test-engineer | done |
+| 45.18 | Document what porting a Lua resource to Luam actually costs | ../plans/45.18-porting-guide.md | documentation-engineer | done |
+| 45.19 | Detect the extension by the identifier it actually publishes | ../plans/45.19-extension-identifier-mismatch.md | architecture-engineer | done |
+
+Acceptance:
+
+- Every shape the port could not express has either a spelling or a recorded
+  refusal, and the corpus in 45.17 carries one occurrence of each.
+- A Lua idiom that is correct Lua and correct in the resource — deleting a key,
+  spreading `unpack`, initialising a container with `{}`, filling a record over
+  several statements — compiles.
+- A type the resource needs to describe — a quoted key, an optional callback
+  parameter, a generic contract, a global assigned later, a multi-return wrapper —
+  can be written.
+- No relaxation is silent: each one keeps a negative test proving the diagnostic
+  it replaces still fires where it should.
+- The emitted Lua, the line map and the generated manifest are unchanged by every
+  task in the milestone except 45.05 and 45.16, and each of those carries its own
+  baseline.
+
+Why now:
+
+- The gaps are not exotic. Eleven of the fourteen are single Lua idioms that
+  appear in every resource, and four of them produced false positives on code that
+  is correct — a false positive is worse than a missing check, because it teaches
+  the author to stop reading the output.
+- Two of the milestone's findings are the internal design document teaching forms
+  the compiler rejects, in the exact section a porting author reads first. Both
+  were corrected in `docs/en` and never carried back.
+- The port also found seventeen genuine defects in a resource that had been
+  running in production, including a getter typed non-optional over an optional
+  field and an event handler that validates everything and then does nothing.
+  That is the argument for the language, and it is unusable while the port itself
+  costs a day of fighting the checker.
+- Nothing here needs a new subsystem. Twelve of the tasks are local changes to the
+  checker or the parser, and the two that are not — 45.16 and 45.10 — are
+  decisions with the machinery already built.
+- 45.19 is one wrong string. `luam doctor` tells every user their extension is not
+  installed, and `luam setup` re-downloads it every run, because the identifier the
+  CLI looks for is not the one the extension publishes.
+
+Deliberately excluded:
+
+- The environment findings in a `shared` file, which milestone 43 owns in full.
+  The port reproduced them exactly and adds nothing.
+- The member resolution and hover findings, which milestone 44 owns.
+- Auto-loading and any framework surface. 45.16 decides how a resource that has
+  one is ported; it does not put one in the language. CLAUDE.md stands.
+- The defects the port found in the resource itself. They are the output of the
+  exercise, not work for this repository.
+
+## Milestone 46 — A Multi-Return Local in the Editor
+
+`local cX, cY, cZ = getVehicleComponentPosition(...)` shows the whole tuple as the
+type of `cX` and shows nothing on `cY` and `cZ`. The checker is correct — it has
+always applied Lua's adjust rules — but two places in the language server pair
+declarator `n` with value expression `n` and read that expression's type whole, so
+the hint and the hover contradict the compiler that produced them.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 46.01 | Share one distribution rule for a value list | ../plans/46.01-value-list-distribution.md | architecture-engineer | done |
+| 46.02 | Hint every name a multi-return local declares | ../plans/46.02-multi-return-inlay-hints.md | architecture-engineer | done |
+| 46.03 | Answer hover and completion with the destructured type | ../plans/46.03-multi-return-hover-and-completion.md | architecture-engineer | done |
+| 46.04 | Cover a multi-return local across the editor surfaces | ../plans/46.04-multi-return-editor-tests.md | test-engineer | done |
+| 46.05 | Record what a multi-return local shows in the editor | ../plans/46.05-multi-return-documentation.md | documentation-engineer | done |
+
+Acceptance:
+
+- The adjust rules exist once. The checker and the language server read the same
+  `distributeValueTypes`, and neither carries a second copy of the rule.
+- A `local` that destructures a multi-return call answers one type per name, in
+  the inlay hint, in hover, in completion detail and in both symbol outlines.
+- A call in non-final position contributes only its first value, and
+  `local only = f()` narrows to the first element rather than labelling a tuple.
+- Every suppression the hint has today survives: an annotated declarator, an empty
+  name, a type that prints as `any`, and an index the value list cannot account
+  for.
+- The emitted Lua, the line map and every existing compiler fixture are unchanged.
+
+Why now:
+
+- The wrong answer is rendered without being asked for. Hover is one name at a
+  time; a hint appears on every name at once, so on the reported line the wrong
+  label sits beside two names the editor left blank.
+- The documentation already promises the correct behaviour. `functions.md` states
+  that each target gets its own type, so a reader who checks their editor concludes
+  the language lacks the feature rather than the hint.
+- The fix is extraction, not new machinery. `checkValueList` already implements the
+  rule in four lines, and both helpers it uses are exported.
+- Two surfaces drifted apart because the rule was written twice. Fixing either one
+  in place would write it a third and a fourth time.
+
+Deliberately excluded:
+
+- `generic-for` variables. They record no type and receive no hint today; giving
+  them one is its own decision, not part of repairing a value list.
+- Assignment targets, the return, callback-parameter and parameter-name hint
+  kinds, and the hint settings. None of them reads a value list.
+- Any change to the checker's behaviour, to inference, or to the emitted Lua.
+  46.01 rewrites `checkValueList` over the extracted helper and changes nothing it
+  answers.

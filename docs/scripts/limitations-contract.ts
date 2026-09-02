@@ -37,6 +37,8 @@ export const LIMITATIONS: readonly Limitation[] = [
     { id: 'library-collisions-reported', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/038-library-distribution.md' },
     { id: 'library-assets', label: 'design-boundary', owners: [], decision: '.claude/plans/38.04-library-vendoring.md' },
     { id: 'formatter-whitespace-only', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/042-formatter-configuration-file.md' },
+    { id: 'runtime-named-instantiation', label: 'design-boundary', owners: [], decision: '.claude/docs/adr/045-runtime-named-instantiation.md' },
+    { id: 'fixed-tuple-arity', label: 'design-boundary', owners: [], decision: '.claude/plans/45.15-author-a-multi-return-signature.md' },
 ];
 
 export const LABEL_TEXT: Readonly<Record<LocaleId, Readonly<Record<LimitationLabel, string>>>> = {
@@ -88,6 +90,11 @@ export const STALE_CLAIMS: readonly StaleClaim[] = [
         id: 'unscanned-files-invisible',
         pattern: /\b(invisible until it is saved or opened|invisível até ser salvo ou aberto)\b/i,
         correction: 'The server scans the workspace on start and watches the source, manifest and environment patterns.',
+    },
+    {
+        id: 'shared-sees-only-shared',
+        pattern: /\b(only shared declarations|shared declarations only|only shared APIs|apenas declarações compartilhadas|apenas APIs compartilhadas)\b/i,
+        correction: 'A shared file sees both sides and reports nothing for a side-restricted name. Say that, and that imports do not change.',
     },
 ];
 

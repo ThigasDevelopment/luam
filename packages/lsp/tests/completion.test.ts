@@ -35,13 +35,50 @@ describe('completion', () => {
         expect(found).not.toContain('kickPlayer');
     });
 
-    it('offers only shared apis in a shared file', () => {
+    it('offers both sides in a shared file', () => {
         const text = 'local value = 1\nget\n';
         const found = labels(new LanguageService(), SHARED_FILE, text, 'get');
 
         expect(found).toContain('getElementType');
+        expect(found).toContain('dxDrawText');
+        expect(found).toContain('kickPlayer');
+        expect(found).toContain('localPlayer');
+    });
+
+    it('offers the shared surface before the sides in a shared file', () => {
+        const service = new LanguageService();
+        const text = 'local value = 1\ntrigger\n';
+
+        service.update(SHARED_FILE, 1, text);
+
+        const items = service.completion(SHARED_FILE, markerAt(text, 'trigger'));
+        const ordered = ['triggerEvent', 'triggerClientEvent', 'triggerServerEvent'].map((name) => items.find((item) => item.label === name));
+        const [shared, toClient, toServer] = ordered;
+
+        expect(shared?.sortText).toBeUndefined();
+        expect(toClient?.sortText).toBe('~triggerClientEvent');
+        expect(toServer?.sortText).toBe('~triggerServerEvent');
+        expect(toClient?.detail?.endsWith('(server)')).toBe(true);
+        expect(toServer?.detail?.endsWith('(client)')).toBe(true);
+    });
+
+    it('marks a side-restricted global with its side in a shared file', () => {
+        const service = new LanguageService();
+        const text = 'local value = 1\nlocalP\n';
+
+        service.update(SHARED_FILE, 1, text);
+
+        const item = service.completion(SHARED_FILE, markerAt(text, 'localP')).find((candidate) => candidate.label === 'localPlayer');
+
+        expect(item?.detail?.endsWith('(client)')).toBe(true);
+    });
+
+    it('keeps a server file offering only its own side', () => {
+        const text = 'local value = 1\nget\n';
+        const found = labels(new LanguageService(), SERVER_FILE, text, 'get');
+
+        expect(found).toContain('getElementType');
         expect(found).not.toContain('dxDrawText');
-        expect(found).not.toContain('kickPlayer');
     });
 
     it('offers locals, parameters, and keywords in scope', () => {
@@ -394,8 +431,16 @@ describe('project environment completion', () => {
         expect(labels(environmentService(), CLIENT_FILE, 'local value = en\n', 'en')).not.toContain('env');
     });
 
-    it('hides the environment globals in a shared file', () => {
-        expect(labels(environmentService(), SHARED_FILE, 'local value = en\n', 'en')).not.toContain('env');
+    it('offers the environment global in a shared file as a complement', () => {
+        const service = environmentService();
+        const text = 'local value = en\n';
+
+        service.update(SHARED_FILE, 1, text);
+
+        const item = service.completion(SHARED_FILE, markerAt(text, 'en')).find((candidate) => candidate.label === 'env');
+
+        expect(item?.detail).toBe('declared in ".env" (server)');
+        expect(item?.sortText).toBe('~env');
     });
 
     it('names the file that declares the keys and lists them on the "env" item', () => {

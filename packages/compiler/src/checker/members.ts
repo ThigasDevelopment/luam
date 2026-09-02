@@ -5,7 +5,7 @@ import { findLibraryMember, isLibrary } from '@mta-types/library-members';
 
 import { descriptorToType } from './api-types';
 import type { CheckContext } from './context';
-import { checkTypeConstraints, classSubstitutions, inferTypeArguments, memberOf } from './generic-class';
+import { checkTypeConstraints, classSubstitutions, inferTypeArguments, memberOf, parameterSubstitutions } from './generic-class';
 import { isMtaElement, resolveMtaMember } from './oop-members';
 import type { MemberInfo } from './registry';
 import { checkExpression, checkSignature } from './expressions';
@@ -190,7 +190,11 @@ export function resolveNamedMember(context: CheckContext, receiver: NamedType, e
         return null;
     }
 
-    const members = new Map(context.declarations.collectMembers(name).map((member) => [member.name, member]));
+    const substitutions = parameterSubstitutions(contract.typeParameters, receiver.typeArguments ?? []);
+    const collected = context.declarations
+        .collectMembers(name)
+        .map((entry) => (substitutions.size === 0 ? entry : { ...entry, type: substituteType(entry.type, substitutions) }));
+    const members = new Map(collected.map((entry) => [entry.name, entry]));
 
     return checkInterfaceMember(context, name, members, expression);
 }

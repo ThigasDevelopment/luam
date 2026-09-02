@@ -1,0 +1,25 @@
+#* 45.08 - a type alias that another file reads.
+   45.07 - an interface that takes type parameters.
+   45.05 - a member whose key is not an identifier. *#
+
+type VehicleGarageType = 'private' | 'public' | 'faction'
+
+interface Promise<T> {
+    state: 'pending' | 'fulfilled' | 'rejected'
+    value: T[]
+}
+
+interface ClientFonts {
+    ['medium:20']: string
+    ['bold:15']: string
+}
+
+class GarageEntity {
+    id: number = 0
+    kind: VehicleGarageType = 'private'
+
+    constructor = function (id: number, kind: VehicleGarageType)
+        self.id = id
+        self.kind = kind
+    end
+}

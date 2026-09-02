@@ -1,5 +1,5 @@
 Discovery: done in 2 ms.
-Compile: 1 file in 7 ms.
+Compile: 1 file in 8 ms.
 Assembly: failed in 0 ms.
 src/server/admin.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 Check failed: 1 error, 0 warnings in 10 ms.

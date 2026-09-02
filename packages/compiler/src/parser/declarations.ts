@@ -1,5 +1,5 @@
 import type { Token } from '@compiler/lexer/token';
-import type { TypeAnnotation } from '@compiler/parser/ast';
+import type { Expression, TypeAnnotation } from '@compiler/parser/ast';
 
 import type {
     ClassDeclaration,
@@ -82,9 +82,13 @@ export function isDeclarationStart(stream: TokenStream): boolean {
         return isClassHeader(stream, offset);
     }
 
-    return token.value === 'interface'
-        ? stream.checkAhead(offset + 2, 'punctuation', '{') || stream.checkAhead(offset + 2, 'keyword', 'extends')
-        : stream.checkAhead(offset + 2, 'punctuation', '{');
+    if (token.value === 'interface') {
+        const after = skipTypeParameters(stream, offset + 2);
+
+        return stream.checkAhead(after, 'punctuation', '{') || stream.checkAhead(after, 'keyword', 'extends');
+    }
+
+    return stream.checkAhead(offset + 2, 'punctuation', '{');
 }
 
 function skipDecoratorArguments(stream: TokenStream): void {
@@ -173,6 +177,16 @@ function parseFieldAnnotation(stream: TokenStream): ReturnType<typeof parseOptio
     return parseNamedAnnotation(stream, 'field');
 }
 
+function parseFieldValue(stream: TokenStream): Expression {
+    stream.stopIndexAtNewline(true);
+
+    try {
+        return parseExpression(stream);
+    } finally {
+        stream.stopIndexAtNewline(false);
+    }
+}
+
 function expectClassFieldBoundary(stream: TokenStream, token: Token): void {
     const current = stream.current();
     const delimiter = current.kind === 'punctuation' && (current.value === '}' || current.value === ';' || current.value === ',');
@@ -208,7 +222,7 @@ function parseStaticModifier(stream: TokenStream): boolean {
 function parseClassMember(stream: TokenStream): ClassMember {
     const decorators = parseDecorators(stream);
     const isStatic = parseStaticModifier(stream);
-    const token = stream.expectName();
+    const token = stream.expectMemberKey();
 
     if (stream.check('punctuation', '(')) {
         stream.report('parse-class-method-form', `Write class member "${token.value}" as "${token.value} = function (...) ... end".`, token.position);
@@ -221,7 +235,7 @@ function parseClassMember(stream: TokenStream): ClassMember {
     }
 
     const annotation = parseFieldAnnotation(stream);
-    const value = stream.match('operator', '=') ? parseExpression(stream) : null;
+    const value = stream.match('operator', '=') ? parseFieldValue(stream) : null;
 
     expectClassFieldBoundary(stream, token);
 
@@ -239,6 +253,7 @@ function parseClassModifiers(stream: TokenStream, declaration: ClassDeclaration)
 
         do {
             declaration.interfaces.push(stream.expect('identifier').value);
+            declaration.interfaceArguments.push(parseTypeArguments(stream));
         } while (stream.match('punctuation', ','));
     }
 }
@@ -255,6 +270,7 @@ function parseClassDeclaration(stream: TokenStream, decorators: Decorator[]): Cl
         superClass: null,
         superClassArguments: [],
         interfaces: [],
+        interfaceArguments: [],
         members: [],
         decorators,
         position,
@@ -289,7 +305,7 @@ function parseClassDeclaration(stream: TokenStream, decorators: Decorator[]): Cl
 }
 
 function parseInterfaceMember(stream: TokenStream): InterfaceMember {
-    const token = stream.expectName();
+    const token = stream.expectMemberKey();
 
     if (stream.check('punctuation', '(')) {
         const parameters = parseParameters(stream);
@@ -311,6 +327,7 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
     const checkpoint = stream.checkpoint();
     const position = stream.next().position;
     const name = stream.expect('identifier').value;
+    const typeParameters = parseTypeParameters(stream);
     const superInterfaces: string[] = [];
     const members: InterfaceMember[] = [];
 
@@ -340,7 +357,15 @@ function parseInterfaceDeclaration(stream: TokenStream): InterfaceDeclaration {
 
     stream.expect('punctuation', '}');
 
-    const declaration: InterfaceDeclaration = { kind: 'interface-declaration', name, superInterfaces, members, position };
+    const declaration: InterfaceDeclaration = {
+        kind: 'interface-declaration',
+        name,
+        typeParameters: typeParameters.names,
+        typeConstraints: typeParameters.constraints,
+        superInterfaces,
+        members,
+        position,
+    };
 
     stream.eraseFrom(checkpoint, 'declaration');
 

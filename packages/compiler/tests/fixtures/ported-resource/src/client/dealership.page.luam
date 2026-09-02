@@ -1,0 +1,15 @@
+#* 45.05 - a quoted key read through the index form.
+   45.12 - nil for a parameter the catalog declares optional.
+   45.08 - the shared alias read from a client file. *#
+
+local fonts: ClientFonts = { ['medium:20'] = 'default', ['bold:15'] = 'default-bold' }
+
+local kind: VehicleGarageType = 'public'
+
+function drawTitle(): void
+    dxDrawText(fonts['medium:20'] .. ' ' .. kind, 10, 10)
+end
+
+function makeBadge(width: number, height: number, painted?: fun): DxTexture
+    return svgCreate(width, height, '<svg/>', painted)
+end

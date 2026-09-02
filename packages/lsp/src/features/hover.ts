@@ -8,22 +8,35 @@ import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { descriptorShapeText, namedDescriptorText } from '@lsp/features/api-text';
 import { contextualHover } from '@lsp/features/contextual-hover';
 import { declarationDocumentation } from '@lsp/features/declaration-documentation';
-import { markdown, summaryText } from '@lsp/features/declaration-shape';
+import { markdown, summaryText, typeShape } from '@lsp/features/declaration-shape';
 import { decoratorHover } from '@lsp/features/decorator-hover';
 import { eventHover } from '@lsp/features/event-hover';
 import { keywordHover } from '@lsp/features/keyword-hover';
 import { apiMarkdown, memberMarkdown } from '@lsp/features/documentation-text';
 import { manifestHover } from '@lsp/features/manifest-hover';
-import { memberHover } from '@lsp/features/member-hover';
+import { memberAccessAt, memberHover, methodHover } from '@lsp/features/member-hover';
 import { mtaClassHover } from '@lsp/features/mta-class-hover';
 import { mtaMemberHover } from '@lsp/features/mta-hover';
+import { isSideRestricted, sideNote } from '@lsp/features/side-surface';
 import { declarationsIn } from '@lsp/features/symbol-lookup';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { wordAt, wordStart } from '@lsp/support/source-text';
 import type { SymbolDeclaration } from '@lsp/symbols/symbol';
 
+const VALUE_KINDS: ReadonlySet<string> = new Set(['local', 'parameter', 'field', 'global']);
+
+function shapeSection(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {
+    if (!VALUE_KINDS.has(declaration.kind) || declaration.type === null) {
+        return '';
+    }
+
+    const shape = typeShape(analysis, declaration.type);
+
+    return shape === null ? '' : `\n\n**Instance**\n\n${markdown(shape)}`;
+}
+
 function declarationMarkdown(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {
-    const signature = markdown(summaryText(analysis, declaration));
+    const signature = `${markdown(summaryText(analysis, declaration))}${shapeSection(analysis, declaration)}`;
     const documentation = declarationDocumentation(analysis.text, declaration);
 
     return documentation.length === 0 ? signature : `${signature}\n\n${documentation}`;
@@ -42,8 +55,10 @@ function projectHover(analysis: DocumentAnalysis, name: string): Hover | null {
 
     const origin = target.type.kind === 'record' && target.type.origin !== null ? `"${target.type.origin}"` : 'the project';
     const scope = `declared in ${origin} (${target.environment})`;
+    const side = isSideRestricted(target.environment, analysis.environment) ? [sideNote(target.environment)] : [];
+    const sections = [markdown(descriptorShapeText(name, target.type, analysis.env)), scope, ...side];
 
-    return { contents: { kind: 'markdown', value: `${markdown(descriptorShapeText(name, target.type, analysis.env))}\n\n${scope}` } };
+    return { contents: { kind: 'markdown', value: sections.join('\n\n') } };
 }
 
 function workspaceHover(analysis: DocumentAnalysis, others: readonly DocumentAnalysis[], offset: number): Hover | null {
@@ -119,7 +134,29 @@ function apiHover(analysis: DocumentAnalysis, offset: number, others: readonly D
         return mtaMemberHover(analysis, name, offset) ?? mtaClassHover(analysis, offset) ?? projectHover(analysis, name) ?? memberHover(analysis, offset, others);
     }
 
-    return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };
+    if (!isSideRestricted(declaration.environment, analysis.environment)) {
+        return { contents: { kind: 'markdown', value: apiMarkdown(declaration) } };
+    }
+
+    return { contents: { kind: 'markdown', value: `${apiMarkdown(declaration)}\n\n${sideNote(declaration.environment)}` } };
+}
+
+function resolvedMember(analysis: DocumentAnalysis, offset: number): SymbolDeclaration | null {
+    const reference = analysis.index.findReferenceAt(offset);
+
+    return reference === null || reference.kind !== 'member' ? null : analysis.index.resolve(reference);
+}
+
+function propertyHover(analysis: DocumentAnalysis, offset: number, others: readonly DocumentAnalysis[]): Hover | null {
+    if (memberAccessAt(analysis, offset) === null || resolvedMember(analysis, offset) !== null) {
+        return null;
+    }
+
+    const name = wordAt(analysis.text, offset);
+    const library = name === null ? null : libraryMemberHover(analysis, name, offset);
+    const mta = name === null ? null : mtaMemberHover(analysis, name, offset);
+
+    return library ?? mta ?? memberHover(analysis, offset, others);
 }
 
 function exportNote(analysis: DocumentAnalysis, declaration: SymbolDeclaration): string {
@@ -155,10 +192,16 @@ export function hoverAt(analysis: DocumentAnalysis, offset: number, others: read
         return event;
     }
 
+    const property = propertyHover(analysis, offset, others);
+
+    if (property !== null) {
+        return property;
+    }
+
     const declaration = analysis.index.declarationFor(offset);
 
     if (declaration === null) {
-        return workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset, others) ?? keywordHover(analysis, offset);
+        return methodHover(analysis, offset, others) ?? workspaceHover(analysis, others, offset) ?? apiHover(analysis, offset, others) ?? keywordHover(analysis, offset);
     }
 
     const anchor = analysis.index.findReferenceAt(offset) ?? declaration;

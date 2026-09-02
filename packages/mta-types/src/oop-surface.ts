@@ -1,4 +1,4 @@
-import { isAvailableIn, type ApiEnvironment } from './api-declaration';
+import { isVisibleIn, type ApiEnvironment } from './api-declaration';
 import { MTA_OOP_CLASSES } from '@mta-types/generated/oop/mta-oop';
 import type { OopClass, OopMember } from './oop-declaration';
 
@@ -16,10 +16,10 @@ export function oopClassesFor(environment: ApiEnvironment): OopClass[] {
     return MTA_OOP_CLASSES.map((declaration) => ({
         name: declaration.name,
         parent: declaration.parent,
-        members: declaration.members.filter((member) => isAvailableIn(member.environment, environment)),
-        staticMethods: declaration.staticMethods.filter((member) => isAvailableIn(member.environment, environment)),
+        members: declaration.members.filter((member) => isVisibleIn(member.environment, environment)),
+        staticMethods: declaration.staticMethods.filter((member) => isVisibleIn(member.environment, environment)),
         constructor:
-            declaration.constructor !== null && isAvailableIn(declaration.constructor.environment, environment) ? declaration.constructor : null,
+            declaration.constructor !== null && isVisibleIn(declaration.constructor.environment, environment) ? declaration.constructor : null,
     }));
 }
 

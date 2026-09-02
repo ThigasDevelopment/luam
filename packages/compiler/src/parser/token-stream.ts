@@ -31,8 +31,18 @@ export class TokenStream {
 
     private readonly spans = new Map<SpannedNode, SourceSpan>();
 
+    private breaksIndexAtNewline = false;
+
     constructor(tokens: readonly Token[]) {
         this.tokens = tokens;
+    }
+
+    stopIndexAtNewline(active: boolean): void {
+        this.breaksIndexAtNewline = active;
+    }
+
+    indexContinues(bracket: Token): boolean {
+        return !this.breaksIndexAtNewline || this.index === 0 || bracket.position.line === this.peek(-1).end.line;
     }
 
     peek(offset = 0): Token {
@@ -157,6 +167,48 @@ export class TokenStream {
         const token = this.peek(offset);
 
         return token.kind === 'identifier' || (token.kind === 'keyword' && isLuamKeyword(token.value));
+    }
+
+    checkMemberKey(offset = 0): boolean {
+        return this.checkName(offset) || (this.peek(offset).kind === 'punctuation' && this.peek(offset).value === '[');
+    }
+
+    expectMemberKey(): Token {
+        if (!this.check('punctuation', '[')) {
+            return this.expectName();
+        }
+
+        const open = this.next();
+        const literal = this.current();
+
+        if (literal.kind !== 'string') {
+            throw this.error(`Expected a quoted key but found "${this.describeCurrent()}".`, 'parse-unexpected-token');
+        }
+
+        this.next();
+
+        const close = this.expect('punctuation', ']');
+
+        return { ...literal, position: open.position, end: close.end };
+    }
+
+    reservedNameAt(subject: string, offset = 0): Token | null {
+        const token = this.peek(offset);
+        const next = this.peek(offset + 1);
+        const continues =
+            (next.kind === 'punctuation' && (next.value === ',' || next.value === ')' || next.value === ':')) ||
+            (next.kind === 'operator' && (next.value === '?' || next.value === '='));
+
+        if (token.kind !== 'keyword' || !continues) {
+            return null;
+        }
+
+        const message =
+            `"${token.value}" is a reserved word and cannot name a ${subject}. Rename it — a property of the same name is still legal, so "value.${token.value}" keeps working.`;
+
+        this.report('parse-reserved-name', message, token.position);
+
+        return this.next();
     }
 
     expectName(): Token {

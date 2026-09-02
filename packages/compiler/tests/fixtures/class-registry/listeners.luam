@@ -1,0 +1,11 @@
+interface Listener {
+    register(): void
+}
+
+class PlayerJoinListener implements Listener {
+    register = function (): void
+        addEventHandler('onPlayerJoin', root, function ()
+            outputDebugString('joined')
+        end)
+    end
+}

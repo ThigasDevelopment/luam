@@ -9,7 +9,7 @@ import { parseFenceInfo } from '../.vitepress/live-examples.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDir, '..', '..');
-const docsRoot = join(repositoryRoot, 'docs');
+const documentedRoots = [join(repositoryRoot, 'docs'), join(repositoryRoot, '.claude', 'docs')];
 
 const FENCE = /^```luam([^\n]*)\n([\s\S]*?)^```/gm;
 
@@ -98,7 +98,7 @@ let deliberate = 0;
 try {
     const compile = await loadCompiler(join(workspace, 'compiler.mjs'));
 
-    for (const file of markdownFiles(docsRoot)) {
+    for (const file of documentedRoots.flatMap((root) => markdownFiles(root))) {
         for (const block of blocksIn(file)) {
             checked += 1;
 

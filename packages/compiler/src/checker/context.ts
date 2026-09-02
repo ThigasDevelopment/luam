@@ -2,7 +2,7 @@ import { createDiagnostic, type Diagnostic, type DiagnosticSeverity, type Source
 import type { Environment } from '@compiler/environment/environment';
 import type { Expression, TypeAnnotation } from '@compiler/parser/ast';
 import type { ClassDeclaration, ClassMethodDeclaration } from '@compiler/parser/declaration-nodes';
-import { isAvailableIn, type ApiEnvironment } from '@mta-types/api-declaration';
+import { isVisibleIn, type ApiEnvironment } from '@mta-types/api-declaration';
 
 import { EMPTY_AMBIENT, type AmbientDeclarations } from './ambient';
 import { descriptorToType } from './api-types';
@@ -16,6 +16,7 @@ import type { ResourceAbi } from '@compiler/project/export-abi';
 import { mtaClassRegistry } from './oop-classes';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import { DeclarationRegistry, type ClassInfo } from './registry';
+import type { RecordObligation } from './record-completion';
 import { missingKeyHint } from './shape-hint';
 import { mergeIntersection } from './type-intersection';
 import { substituteType } from './type-substitution';
@@ -33,6 +34,7 @@ import {
     createStringLiteral,
     createTuple,
     createUnion,
+    firstValueOf,
     isAssignable,
     isLiteralType,
     namedNesting,
@@ -150,6 +152,16 @@ export class CheckContext {
 
     private readonly ambientEnums = new Set<string>();
 
+    private readonly ambientAliases = new Set<string>();
+
+    private readonly ambientGlobals = new Set<string>();
+
+    private readonly obligations = new Map<string, RecordObligation>();
+
+    blockDepth = 0;
+
+    noImplicitGlobals = false;
+
     constructor(
         mode: StrictMode,
         environment: Environment,
@@ -255,6 +267,30 @@ export class CheckContext {
 
     isAmbientEnum(name: string): boolean {
         return this.ambientEnums.has(name);
+    }
+
+    isAmbientAlias(name: string): boolean {
+        return this.ambientAliases.has(name);
+    }
+
+    isAmbientGlobal(name: string): boolean {
+        return this.ambientGlobals.has(name);
+    }
+
+    openRecordObligation(obligation: RecordObligation): void {
+        this.obligations.set(obligation.path, obligation);
+    }
+
+    recordObligation(path: string): RecordObligation | null {
+        return this.obligations.get(path) ?? null;
+    }
+
+    closeRecordObligation(path: string): void {
+        this.obligations.delete(path);
+    }
+
+    recordObligationPaths(): string[] {
+        return [...this.obligations.keys()];
     }
 
     noteExternalReference(name: string, position: SourcePosition): void {
@@ -485,13 +521,27 @@ export class CheckContext {
         return { allowNil: this.allowNil, resolveNominal: (name) => this.nominalShape(name) };
     }
 
-    expectAssignable(source: Type, target: Type, position: SourcePosition, subject: string): void {
+    resolveValueAnnotation(annotation: TypeAnnotation, subject: string): Type {
+        const resolved = this.resolveAnnotation(annotation);
+
+        if (resolved.kind !== 'tuple') {
+            return resolved;
+        }
+
+        const message = `A parenthesised list like "${typeToString(resolved)}" is a return shape and cannot type ${subject}. Name one type instead.`;
+
+        this.report('check-tuple-position', message, annotation.position);
+
+        return firstValueOf(resolved);
+    }
+
+    expectAssignable(source: Type, target: Type, position: SourcePosition, subject: string, printed: Type = target): void {
         if (isAssignable(source, target, this.assignability())) {
             return;
         }
 
         const received = isLiteralType(target) || target.kind === 'union' ? source : widenLiteral(source);
-        const message = `${subject} expects "${typeToString(target)}" but received "${typeToString(received)}".`;
+        const message = `${subject} expects "${typeToString(printed)}" but received "${typeToString(received)}".`;
 
         const hint = `${nilHint(source, target, this.mode)}${missingKeyHint(source, target, (name) => this.nominalShape(name))}`;
 
@@ -502,7 +552,7 @@ export class CheckContext {
         for (const declaration of project.globals) {
             this.projectEnvironments.set(declaration.name, declaration.environment);
 
-            if (isAvailableIn(declaration.environment, this.environment)) {
+            if (isVisibleIn(declaration.environment, this.environment)) {
                 const symbol = { name: declaration.name, type: descriptorToType(declaration.type), isLocal: false, position: PROJECT_POSITION };
 
                 this.binder.declareGlobal(symbol);
@@ -528,7 +578,15 @@ export class CheckContext {
             this.binder.declareGlobal({ name: info.name, type: createNamed(info.name), isLocal: false, position: info.position });
         }
 
+        for (const info of ambient.aliases) {
+            this.ambientAliases.add(info.name);
+            this.binder.declareAlias(info.name, info.type, info.typeParameters);
+            this.declarations.declareAlias(info);
+        }
+
         for (const info of ambient.globals) {
+            this.ambientGlobals.add(info.name);
+            this.declarations.declareGlobal(info);
             this.binder.declareGlobal({ name: info.name, type: info.type, isLocal: false, position: info.position });
         }
 
@@ -556,7 +614,9 @@ export class CheckContext {
     }
 
     private resolveClassAnnotation(name: string, typeArguments: readonly TypeAnnotation[], position: SourcePosition): Type {
-        const declared = this.declarations.lookupClass(name)?.typeParameters ?? [];
+        const declaredInterface = this.declarations.lookupInterface(name);
+        const owner = declaredInterface === null ? 'Class' : 'Interface';
+        const declared = declaredInterface?.typeParameters ?? this.declarations.lookupClass(name)?.typeParameters ?? [];
         const resolved = typeArguments.map((argument) => this.resolveAnnotation(argument));
 
         if (declared.length === 0) {
@@ -566,13 +626,13 @@ export class CheckContext {
         if (resolved.length !== declared.length) {
             const expected = declared.length === 1 ? '1 type argument' : `${declared.length} type arguments`;
 
-            this.report('check-generic-arity', `Class "${name}" expects ${expected} but received ${resolved.length}.`, position);
+            this.report('check-generic-arity', `${owner} "${name}" expects ${expected} but received ${resolved.length}.`, position);
         }
 
         const specialized = createNamed(name, declared.map((unused, index) => resolved[index] ?? ANY_TYPE));
 
         if (namedNesting(specialized) > MAX_GENERIC_DEPTH) {
-            const message = `Class "${name}" is nested more than ${MAX_GENERIC_DEPTH} levels deep here. Name the inner type with a "type" alias.`;
+            const message = `${owner} "${name}" is nested more than ${MAX_GENERIC_DEPTH} levels deep here. Name the inner type with a "type" alias.`;
 
             this.report('check-generic-depth', message, position);
 

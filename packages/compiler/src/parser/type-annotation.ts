@@ -34,7 +34,28 @@ interface ParameterType {
     annotation: TypeAnnotation;
 }
 
+function parseOptionalParameterType(stream: TokenStream): ParameterType {
+    const name = stream.next().value;
+    const marker = stream.next();
+
+    stream.next();
+
+    const annotation = parseTypeAnnotation(stream);
+
+    if (annotation.kind === 'type-optional') {
+        stream.report('parse-redundant-optional', 'The marker on the name already allows "nil". Remove the "?" after the type.', annotation.position);
+    }
+
+    const element = annotation.kind === 'type-optional' ? annotation.element : annotation;
+
+    return { name, annotation: { kind: 'type-optional', element, position: marker.position } };
+}
+
 function parseParameterType(stream: TokenStream): ParameterType {
+    if (stream.check('identifier') && stream.checkAhead(1, 'operator', '?') && stream.checkAhead(2, 'punctuation', ':')) {
+        return parseOptionalParameterType(stream);
+    }
+
     let name: string | null = null;
 
     if (stream.check('identifier') && stream.checkAhead(1, 'punctuation', ':')) {
@@ -108,7 +129,7 @@ function parseGroupedType(stream: TokenStream): TypeAnnotation {
 }
 
 function parseObjectMember(stream: TokenStream): TypeObjectMember {
-    const token = stream.expectName();
+    const token = stream.expectMemberKey();
     const annotation = parseNamedAnnotation(stream, 'field');
 
     if (annotation === null) {

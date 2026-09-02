@@ -19,6 +19,7 @@ export const SECTIONS: readonly Section[] = [
             'daily-development',
             'how-luam-works',
             'migration',
+            'porting',
             'troubleshooting',
             'contributing',
         ],

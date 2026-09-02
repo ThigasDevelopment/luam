@@ -30,7 +30,7 @@ describe('compiler', () => {
     it('reads each option independently', () => {
         const options = readCompilerOptions(value('compiler = { strict = false, noUnusedLocals = true, warningsAsErrors = true }\n'));
 
-        expect(options).toEqual({ strict: false, oop: false, noUnusedLocals: true, noUnusedParameters: false, warningsAsErrors: true });
+        expect(options).toEqual({ strict: false, oop: false, noUnusedLocals: true, noUnusedParameters: false, noImplicitGlobals: false, warningsAsErrors: true });
     });
 
     it('rejects an unknown option and a wrongly typed one', () => {

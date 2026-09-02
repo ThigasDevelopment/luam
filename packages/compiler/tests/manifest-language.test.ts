@@ -152,7 +152,7 @@ describe('manifest evaluation', () => {
 
         expect(analysis.diagnostics).toEqual([]);
         expect(analysis.value.version).toBe('1.2.3');
-        expect(analysis.value.compiler).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, warningsAsErrors: false });
+        expect(analysis.value.compiler).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, noImplicitGlobals: false, warningsAsErrors: false });
         expect(analysis.value.development).toEqual({ logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 }, server: {} });
     });
 

@@ -1,4 +1,4 @@
-import type { ClassInfo, DeclarationRegistry, EnumInfo, EventInfo, GlobalInfo, InterfaceInfo } from './registry';
+import type { AliasInfo, ClassInfo, DeclarationRegistry, EnumInfo, EventInfo, GlobalInfo, InterfaceInfo } from './registry';
 
 export const EVENT_NAME_PREFIX = 'event:';
 
@@ -6,17 +6,19 @@ export interface AmbientDeclarations {
     classes: readonly ClassInfo[];
     interfaces: readonly InterfaceInfo[];
     enums: readonly EnumInfo[];
+    aliases: readonly AliasInfo[];
     globals: readonly GlobalInfo[];
     events: readonly EventInfo[];
 }
 
-export const EMPTY_AMBIENT: AmbientDeclarations = { classes: [], interfaces: [], enums: [], globals: [], events: [] };
+export const EMPTY_AMBIENT: AmbientDeclarations = { classes: [], interfaces: [], enums: [], aliases: [], globals: [], events: [] };
 
 export function ambientFromRegistry(registry: DeclarationRegistry): AmbientDeclarations {
     return {
         classes: registry.allClasses(),
         interfaces: registry.allInterfaces(),
         enums: registry.allEnums().filter((info) => info.isLocal !== true),
+        aliases: registry.allAliases(),
         globals: registry.allGlobals(),
         events: registry.allEvents(),
     };
@@ -39,6 +41,7 @@ export function ownDeclarations(registry: DeclarationRegistry, ambient: AmbientD
         classes: withoutNames(all.classes, ambient.classes),
         interfaces: withoutNames(all.interfaces, ambient.interfaces),
         enums: withoutNames(all.enums, ambient.enums),
+        aliases: withoutNames(all.aliases, ambient.aliases),
         globals: withoutNames(all.globals, ambient.globals),
         events: withoutNames(all.events, ambient.events),
     };
@@ -61,6 +64,7 @@ export function mergeAmbient(sources: readonly AmbientDeclarations[]): AmbientDe
         classes: mergeByName(sources.map((source) => source.classes)),
         interfaces: mergeByName(sources.map((source) => source.interfaces)),
         enums: mergeByName(sources.map((source) => source.enums)),
+        aliases: mergeByName(sources.map((source) => source.aliases)),
         globals: mergeByName(sources.map((source) => source.globals)),
         events: mergeByName(sources.map((source) => source.events)),
     };

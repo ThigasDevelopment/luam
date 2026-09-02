@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { compile } from '@compiler/index';
+import type { ProjectFile } from '@compiler/project/module';
+import { compileProject } from '@compiler/project/project';
 
 function codes(source: string): string[] {
     return compile(source).diagnostics.map((diagnostic) => diagnostic.code);
@@ -101,5 +103,34 @@ describe('class declaration order', () => {
         const source = "class Base {\n    greet = function (): string\n        return 'hi'\n    end\n}\n\nclass Child extends Base {\n    run = function (): string\n        return self:greet()\n    end\n}\n";
 
         expect(codes(source)).toEqual([]);
+    });
+});
+
+describe('a subclass whose parent is in another file', () => {
+    it('is assignable to the parent it extends', () => {
+        const files: ProjectFile[] = [
+            { path: 'src/server/base.luam', source: 'class Event {\n    id: number = 0\n}\n' },
+            { path: 'src/server/derived.luam', source: 'class Buy extends Event {\n}\n' },
+            { path: 'src/server/use.luam', source: 'local held: Event = new Buy()\n\nprint(held)\n' },
+        ];
+
+        expect(compileProject(files).diagnostics).toEqual([]);
+    });
+
+    it('is assignable through a map the parent types', () => {
+        const files: ProjectFile[] = [
+            { path: 'src/server/base.luam', source: 'class Event {\n    id: number = 0\n\n    handle = function (...): void\n    end\n}\n' },
+            { path: 'src/server/derived.luam', source: 'class Buy extends Event {\n    handle = function (request: table): void\n    end\n}\n' },
+            { path: 'src/server/use.luam', source: "local events: table<string, Event> = {}\n\nevents['buy'] = new Buy()\n" },
+        ];
+
+        expect(compileProject(files).diagnostics).toEqual([]);
+    });
+
+    it('still reports a parent no file declares', () => {
+        const files: ProjectFile[] = [{ path: 'src/server/orphan.luam', source: 'class Buy extends Missing {\n}\n' }];
+        const found = compileProject(files).diagnostics.map((entry) => entry.diagnostic.code);
+
+        expect(found).toContain('check-unknown-class');
     });
 });

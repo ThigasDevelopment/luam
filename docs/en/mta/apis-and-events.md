@@ -71,7 +71,7 @@ end)
 
 An event name is checked against the catalog and against the file's environment:
 
-```luam expect-error
+```luam env=server expect-error
 # src/server/join.luam
 addEventHandler('onPlayerJoin', root, function () end)      # ok
 addEventHandler('onClientRender', root, function () end)    # check-environment-event
@@ -102,7 +102,7 @@ a client file and `onPlayerQuit` in a server file each get their own parameters.
 
 The payload of a trigger is checked against the same signature:
 
-```luam expect-error
+```luam env=server expect-error
 triggerEvent('onPlayerQuit', root, 'Quit', 'Timed out.', root)   # ok
 triggerEvent('onPlayerQuit', root, 1, 'Timed out.', root)        # check-type-mismatch
 triggerEvent('onPlayerQuit', root, 'Quit')                       # check-argument-count

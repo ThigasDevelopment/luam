@@ -4,6 +4,7 @@ import type {
     DeclareStatement,
     Expression,
     FunctionDeclaration,
+    GlobalStatement,
     LocalStatement,
     Parameter,
     ReturnStatement,
@@ -12,6 +13,8 @@ import type {
 } from '@compiler/parser/ast';
 
 import { assignedPath, forgetAssignedPaths, pathOf } from './access-path';
+import { deferRecordCompletion, dischargeRecordKey, extendInferredRecord, settleRecordObligations } from './record-completion';
+import { reportImplicitGlobal, reportShadowedGlobal, reportShadowedHelper } from './shadowing';
 import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration } from './classes';
 import type { CheckContext } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor, checkRepeat, checkWhile } from './control-flow';
@@ -52,7 +55,9 @@ export function buildFunctionType(
 ): FunctionType {
     const isVariadic = parameters.some((parameter) => parameter.isVararg);
     const named = parameters.filter((parameter) => !parameter.isVararg);
-    const types = named.map((parameter, index) => parameter.annotation === null ? (contextual?.parameters[index] ?? ANY_TYPE) : context.resolveAnnotation(parameter.annotation));
+    const types = named.map((parameter, index) =>
+        parameter.annotation === null ? (contextual?.parameters[index] ?? ANY_TYPE) : context.resolveValueAnnotation(parameter.annotation, 'a parameter'),
+    );
     const names = named.map((parameter) => parameter.name);
 
     return createFunction(types, context.resolveAnnotation(returnAnnotation), minimumArguments(context, parameters), isVariadic, names);
@@ -130,7 +135,12 @@ export function checkFunctionBody(
         }
     }
 
+    const opened = new Set(context.recordObligationPaths());
+
+    context.blockDepth += 1;
     checkStatements(context, body);
+    context.blockDepth -= 1;
+    settleRecordObligations(context, opened);
 
     const declared = context.currentReturnType();
 
@@ -173,10 +183,12 @@ function checkLocal(context: CheckContext, statement: LocalStatement): void {
             return;
         }
 
-        const declared = context.resolveAnnotation(declaration.annotation);
+        const declared = context.resolveValueAnnotation(declaration.annotation, 'a local');
+        const subject = `Variable "${declaration.name}"`;
+        const deferred = value !== undefined && deferRecordCompletion(context, { kind: 'identifier', name: declaration.name, position: declaration.position }, valueType, declared, subject, value.position);
 
-        if (value !== undefined) {
-            context.expectAssignable(valueType, declared, value.position, `Variable "${declaration.name}"`);
+        if (value !== undefined && !deferred) {
+            context.expectAssignable(valueType, declared, value.position, subject);
         }
 
         context.binder.declare({ name: declaration.name, type: declared, isLocal: true, position: declaration.position, origin: 'local' });
@@ -201,6 +213,16 @@ function checkCompoundOperand(context: CheckContext, operator: string, type: Typ
     }
 }
 
+const DELETABLE_CONTAINERS = new Set(['map', 'array', 'table']);
+
+function deletesContainerKey(context: CheckContext, target: Expression, valueType: Type): boolean {
+    if (valueType.kind !== 'nil' || (target.kind !== 'index-expression' && target.kind !== 'member-expression')) {
+        return false;
+    }
+
+    return DELETABLE_CONTAINERS.has(context.typeOf(target.object).kind);
+}
+
 function recordAssignedFact(context: CheckContext, path: string | null, valueType: Type, declared: Type): void {
     if (path === null || valueType.kind === 'any') {
         return;
@@ -223,9 +245,14 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
             context.forgetNarrowing(assigned);
         }
 
-        const targetType = checkExpression(context, target);
         const valueType = valueTypes[index] ?? NIL_TYPE;
         const value = valueAt(statement.values, valueTypes, index);
+
+        if (value !== undefined && extendInferredRecord(context, target, valueType)) {
+            return;
+        }
+
+        const targetType = checkExpression(context, target);
 
         if (target.kind === 'member-expression') {
             const object = context.typeOf(target.object);
@@ -251,12 +278,35 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
         }
 
         if (target.kind === 'identifier' && context.binder.lookup(target.name) === null) {
+            reportImplicitGlobal(context, target.name, target.position);
             context.declareModuleGlobal({ name: target.name, type: valueType, isLocal: false, position: target.position });
 
             return;
         }
 
+        if (!context.insideFunction()) {
+            reportShadowedAssignment(context, target);
+        }
+
         const declared = target.kind === 'identifier' ? (context.binder.lookup(target.name)?.type ?? targetType) : targetType;
+
+        if (deletesContainerKey(context, target, valueType)) {
+            return;
+        }
+
+        if (value !== undefined && dischargeRecordKey(context, target, valueType, value.position)) {
+            return;
+        }
+
+        const path = pathOf(target);
+
+        if (path !== null) {
+            context.closeRecordObligation(path);
+        }
+
+        if (value !== undefined && deferRecordCompletion(context, target, valueType, declared, 'Assignment', value.position)) {
+            return;
+        }
 
         if (value !== undefined) {
             context.expectAssignable(valueType, declared, value.position, 'Assignment');
@@ -264,6 +314,34 @@ function checkAssignment(context: CheckContext, statement: AssignmentStatement):
 
         recordAssignedFact(context, pathOf(target), valueType, declared);
     });
+}
+
+function rootIdentifier(expression: Expression): string | null {
+    if (expression.kind === 'identifier') {
+        return expression.name;
+    }
+
+    return expression.kind === 'member-expression' || expression.kind === 'index-expression' ? rootIdentifier(expression.object) : null;
+}
+
+function reportShadowedAssignment(context: CheckContext, target: Expression): void {
+    if (target.kind !== 'identifier') {
+        const root = rootIdentifier(target);
+
+        if (root !== null && context.binder.lookup(root) === null) {
+            reportImplicitGlobal(context, root, target.position);
+        }
+    }
+
+    if (target.kind === 'identifier') {
+        reportShadowedGlobal(context, target.name, target.position);
+
+        return;
+    }
+
+    if (target.kind === 'member-expression' && target.object.kind === 'identifier') {
+        reportShadowedHelper(context, target.object.name, target.property, target.position);
+    }
 }
 
 function checkFunctionDeclaration(context: CheckContext, statement: FunctionDeclaration): void {
@@ -276,8 +354,13 @@ function checkFunctionDeclaration(context: CheckContext, statement: FunctionDecl
         if (statement.isLocal) {
             context.binder.declare({ ...symbol, origin: 'local' });
         } else {
+            reportShadowedGlobal(context, statement.name.name, statement.position);
             context.declareModuleGlobal(symbol);
         }
+    }
+
+    if (!statement.isLocal && statement.name.kind !== 'identifier') {
+        reportShadowedAssignment(context, statement.name);
     }
 
     context.record(statement.name, type);
@@ -356,7 +439,44 @@ function checkDeclareStatement(context: CheckContext, statement: DeclareStatemen
     const type = context.resolveAnnotation(statement.annotation);
 
     context.declareModuleGlobal({ name: statement.name, type, isLocal: false, position: statement.position });
-    context.declarations.declareGlobal({ name: statement.name, type, position: statement.position });
+    context.declarations.declareGlobal({ name: statement.name, type, isDeclared: true, position: statement.position });
+}
+
+function checkGlobalStatement(context: CheckContext, statement: GlobalStatement): void {
+    const declaration = statement.declaration;
+    const declared = declaration.annotation === null ? ANY_TYPE : context.resolveValueAnnotation(declaration.annotation, 'a global');
+    const valueTypes = checkValueList(context, statement.values);
+    const value = valueAt(statement.values, valueTypes, 0);
+
+    if (context.insideFunction()) {
+        const message = `A type on global "${declaration.name}" is only valid at the top level of a file. Assign it without the annotation here.`;
+
+        context.report('check-global-annotation-scope', message, statement.position);
+
+        return;
+    }
+
+    const existing = context.declarations.lookupGlobal(declaration.name);
+    const contract = existing !== null && existing.isDeclared === true ? existing.type : declared;
+
+    if (existing !== null && existing.isDeclared !== true) {
+        context.report('check-duplicate-global', `Global "${declaration.name}" is already declared with a type.`, statement.position);
+    }
+
+    if (value !== undefined) {
+        context.expectAssignable(valueTypes[0] ?? NIL_TYPE, contract, value.position, `Global "${declaration.name}"`);
+    }
+
+    context.forgetNarrowing(declaration.name);
+    context.declareModuleGlobal({ name: declaration.name, type: contract, isLocal: false, position: declaration.position });
+
+    if (existing === null) {
+        context.declarations.declareGlobal({ name: declaration.name, type: contract, position: declaration.position });
+    }
+
+    if (value !== undefined) {
+        recordAssignedFact(context, declaration.name, valueTypes[0] ?? NIL_TYPE, contract);
+    }
 }
 
 function checkStatement(context: CheckContext, statement: Statement): void {
@@ -365,6 +485,8 @@ function checkStatement(context: CheckContext, statement: Statement): void {
             return checkLocal(context, statement);
         case 'assignment-statement':
             return checkAssignment(context, statement);
+        case 'global-statement':
+            return checkGlobalStatement(context, statement);
         case 'call-statement':
             checkExpression(context, statement.expression);
 
@@ -394,12 +516,17 @@ function checkStatement(context: CheckContext, statement: Statement): void {
         case 'generic-for-statement':
             return checkGenericFor(context, statement);
         case 'type-alias-statement': {
-            const resolved = context.resolveAnnotation(statement.annotation);
+            const resolved = context.resolveValueAnnotation(statement.annotation, 'a type alias');
             const shape = statement.annotation.kind === 'type-object' || statement.annotation.kind === 'type-intersection';
             const named = shape ? renameRecord(resolved, statement.name) : resolved;
 
+            if (context.isAmbientAlias(statement.name)) {
+                context.report('check-duplicate-type', `Type "${statement.name}" is already defined.`, statement.position);
+            }
+
             context.noteTypeParameters(statement.typeParameters);
             context.binder.declareAlias(statement.name, named, statement.typeParameters);
+            context.declarations.declareAlias({ name: statement.name, typeParameters: statement.typeParameters, type: named, position: statement.position });
 
             return;
         }

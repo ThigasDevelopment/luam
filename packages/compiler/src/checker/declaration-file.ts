@@ -15,6 +15,7 @@ const ALLOWED: ReadonlySet<string> = new Set([
 const LABELS: Readonly<Record<string, string>> = {
     'local-statement': 'A "local" declaration',
     'assignment-statement': 'An assignment',
+    'global-statement': 'A global declaration',
     'call-statement': 'A call',
     'return-statement': 'A "return"',
     'break-statement': 'A "break"',

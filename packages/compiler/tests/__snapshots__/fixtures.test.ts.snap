@@ -1318,9 +1318,12 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
         "offset": 0,
       },
       "superInterfaces": [],
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "decorators": [],
+      "interfaceArguments": [],
       "interfaces": [],
       "kind": "class-declaration",
       "members": [
@@ -1614,6 +1617,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
     },
     {
       "decorators": [],
+      "interfaceArguments": [],
       "interfaces": [],
       "kind": "class-declaration",
       "members": [
@@ -1903,6 +1907,9 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
     },
     {
       "decorators": [],
+      "interfaceArguments": [
+        [],
+      ],
       "interfaces": [
         "Command",
       ],
@@ -3520,6 +3527,7 @@ exports[`fixture decorators.luam > locks the abstract syntax tree 1`] = `
           },
         },
       ],
+      "interfaceArguments": [],
       "interfaces": [],
       "kind": "class-declaration",
       "members": [
@@ -6978,9 +6986,14 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
         "offset": 9,
       },
       "superInterfaces": [],
+      "typeConstraints": [],
+      "typeParameters": [],
     },
     {
       "decorators": [],
+      "interfaceArguments": [
+        [],
+      ],
       "interfaces": [
         "Named",
       ],
@@ -7030,6 +7043,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
     },
     {
       "decorators": [],
+      "interfaceArguments": [],
       "interfaces": [],
       "kind": "class-declaration",
       "members": [

@@ -2,7 +2,7 @@ import { descriptorToType } from '@compiler/checker/api-types';
 import { isMtaClass, mtaMember, mtaStaticMember } from '@compiler/checker/oop-classes';
 import { isMtaElementName } from '@compiler/checker/oop-members';
 import type { RecordType, Type } from '@compiler/checker/types';
-import { isAvailableIn } from '@mta-types/api-declaration';
+import { isVisibleIn } from '@mta-types/api-declaration';
 import { findDeclaration } from '@mta-types/catalog';
 import { isLibrary, type LibraryName } from '@mta-types/library-members';
 
@@ -22,8 +22,35 @@ export type ReceiverTarget =
     | { kind: 'native'; receiver: 'table' | 'string' | 'number' };
 
 export interface CompletionContext {
-    trigger: '.' | ':' | null;
+    trigger: '.' | ':' | '[' | null;
+    quoted: boolean;
     segments: string[];
+}
+
+const QUOTES = new Set(["'", '"']);
+
+interface IndexOpening {
+    trigger: '.' | ':' | '[';
+    quoted: boolean;
+    separator: number;
+}
+
+function openingAt(text: string, wordStart: number): IndexOpening | null {
+    const previous = text[wordStart - 1];
+
+    if (previous === '.' || previous === ':') {
+        return { trigger: previous, quoted: false, separator: wordStart - 1 };
+    }
+
+    if (previous === '[') {
+        return { trigger: '[', quoted: false, separator: wordStart - 1 };
+    }
+
+    if (previous !== undefined && QUOTES.has(previous) && text[wordStart - 2] === '[') {
+        return { trigger: '[', quoted: true, separator: wordStart - 2 };
+    }
+
+    return null;
 }
 
 function scanIdentifier(text: string, from: number): number {
@@ -54,15 +81,15 @@ export function hasDecoratorPrefix(text: string, offset: number): boolean {
 
 export function completionContext(text: string, offset: number): CompletionContext {
     const wordStart = scanIdentifier(text, offset);
-    const separator = text[wordStart - 1];
+    const opening = openingAt(text, wordStart);
 
-    if (separator !== '.' && separator !== ':') {
-        return { trigger: null, segments: [] };
+    if (opening === null) {
+        return { trigger: null, quoted: false, segments: [] };
     }
 
     const segments: string[] = [];
 
-    let cursor = wordStart - 1;
+    let cursor = opening.separator;
 
     for (;;) {
         const start = scanIdentifier(text, cursor);
@@ -82,12 +109,16 @@ export function completionContext(text: string, offset: number): CompletionConte
         cursor = start - 1;
     }
 
-    return { trigger: separator, segments };
+    return { trigger: opening.trigger, quoted: opening.quoted, segments };
 }
 
 function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<string> = new Set()): ReceiverTarget | null {
     if (type === null) {
         return null;
+    }
+
+    if (type.kind === 'optional') {
+        return fromType(analysis, type.element, seen);
     }
 
     if (type.kind === 'named') {
@@ -130,7 +161,7 @@ function fromType(analysis: DocumentAnalysis, type: Type | null, seen: Set<strin
 function projectTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget | null {
     const declaration = analysis.project.globals.find((global) => global.name === name);
 
-    if (declaration === undefined || !isAvailableIn(declaration.environment, analysis.environment)) {
+    if (declaration === undefined || !isVisibleIn(declaration.environment, analysis.environment)) {
         return null;
     }
 
@@ -140,7 +171,7 @@ function projectTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget
 function catalogTarget(analysis: DocumentAnalysis, name: string): ReceiverTarget | null {
     const declaration = findDeclaration(name, analysis.environment);
 
-    if (declaration === null || !isAvailableIn(declaration.environment, analysis.environment)) {
+    if (declaration === null || !isVisibleIn(declaration.environment, analysis.environment)) {
         return null;
     }
 

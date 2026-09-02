@@ -7,7 +7,7 @@ import { runEditorCommand } from '@cli/editor/editor-command';
 
 import type { SpawnSyncReturns } from 'node:child_process';
 
-export const EXTENSION_ID = 'thigasdevelopment.luam';
+export const EXTENSION_ID = 'luam.luam';
 
 export interface Editor {
     id: string;

@@ -185,6 +185,7 @@ A complete field-by-field table, including every validation rule, is in
 | `strict` | `true` | Project-wide strict mode. A `#!strict` or `#!nonstrict` directive in a file still wins for that file. |
 | `oop` | `false` | Enables the MTA OOP API and writes `<oop>true</oop>`. |
 | `noUnusedLocals` | `false` | Reports a local that is never read as `check-unused-local`. |
+| `noImplicitGlobals` | `false` | Reports an assignment that creates a global nothing declares as `check-implicit-global`. |
 | `noUnusedParameters` | `false` | Reports a parameter that is never read as `check-unused-parameter`. |
 | `warningsAsErrors` | `false` | Promotes every warning to an error, so a warning fails the build. |
 

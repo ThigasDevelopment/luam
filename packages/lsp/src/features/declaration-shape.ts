@@ -1,6 +1,7 @@
-import { typeToString } from '@compiler/checker/types';
+import { typeToString, type Type } from '@compiler/checker/types';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { shapeMembers } from '@lsp/features/type-shape';
 import type { SymbolDeclaration } from '@lsp/symbols/symbol';
 
 const FIELD_PREFIX = 'field ';
@@ -76,4 +77,40 @@ export function containerShape(analysis: DocumentAnalysis, name: string): string
     const found = analysis.index.declarations.find((declaration) => isContainer(declaration, name));
 
     return found === undefined ? null : summaryText(analysis, found);
+}
+
+function fieldLine(name: string, type: Type): string {
+    return type.kind === 'optional' ? `${name}?: ${typeToString(type.element)}` : `${name}: ${typeToString(type)}`;
+}
+
+function shapeBody(name: string, members: ReadonlyMap<string, Type>): string {
+    const entries = [...members];
+    const visible = entries.slice(0, MEMBER_LIMIT);
+    const shown = visible.map(([field, type]) => `    ${fieldLine(field, type)}`);
+    const hidden = entries.length - visible.length;
+
+    if (hidden > 0) {
+        shown.push(`    # ${hidden} more`);
+    }
+
+    const header = name.startsWith('{') ? '' : `${name} `;
+
+    return `${header}{\n${shown.join('\n')}\n}`;
+}
+
+export function declaredShape(analysis: DocumentAnalysis, type: Type): string | null {
+    const resolved = type.kind === 'optional' ? type.element : type;
+
+    return resolved.kind === 'named' ? containerShape(analysis, resolved.name) : null;
+}
+
+export function inferredShape(analysis: DocumentAnalysis, type: Type): string | null {
+    const resolved = type.kind === 'optional' ? type.element : type;
+    const members = shapeMembers(analysis, resolved);
+
+    return members === null || members.size === 0 ? null : shapeBody(typeToString(resolved), members);
+}
+
+export function typeShape(analysis: DocumentAnalysis, type: Type): string | null {
+    return declaredShape(analysis, type) ?? inferredShape(analysis, type);
 }

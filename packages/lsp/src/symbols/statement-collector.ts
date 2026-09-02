@@ -5,6 +5,7 @@ import type {
     Expression,
     FunctionDeclaration,
     GenericForStatement,
+    GlobalStatement,
     IfStatement,
     LocalStatement,
     NumericForStatement,
@@ -14,6 +15,7 @@ import type {
 } from '@compiler/parser/ast';
 import type { EventDeclaration } from '@compiler/parser/declaration-nodes';
 
+import { distributeValues } from '@lsp/analysis/value-distribution';
 import { positionAt } from '@lsp/support/source-text';
 import { annotationType, signatureType } from '@lsp/symbols/annotation-type';
 
@@ -89,15 +91,17 @@ function collectLocal(state: CollectorState, block: BlockContext, statement: Loc
         collectExpression(state, block, value);
     }
 
+    const distributed = distributeValues(state.types, statement.values);
+
     statement.declarations.forEach((declarator, index) => {
         collectAnnotation(state, block, declarator.annotation);
 
-        const value = statement.values[index];
-        const inferredType = value === undefined ? null : typeOf(state, value);
-        const inferred = inferredType === null ? null : widenInferred(inferredType);
+        const element = distributed[index];
+        const inferred = element === undefined || element.type === null ? null : widenInferred(element.type);
         const type = declarator.annotation === null ? inferred : annotationType(declarator.annotation);
         const declared = variableText('local', declarator.name, declarator.annotation, inferred === null ? null : typeToString(inferred));
-        const detail = assignedText(declared, valueText(state.text, value, statement.values.length === 1), valueBytes(value));
+        const source = element !== undefined && element.isFirst ? element.value : undefined;
+        const detail = assignedText(declared, valueText(state.text, source, statement.values.length === 1), valueBytes(source));
 
         declareSymbol(state, block.scopeId, { name: declarator.name, kind: 'local', position: declarator.position, detail, type });
     });
@@ -245,13 +249,34 @@ function collectDeclare(state: CollectorState, block: BlockContext, statement: D
 
     if (position !== null) {
         const detail = variableText('declare', statement.name, statement.annotation, null);
+        const type = annotationType(statement.annotation);
 
-        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'global', position, detail });
+        declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'global', position, detail, type });
+    }
+}
+
+function collectGlobalDeclaration(state: CollectorState, block: BlockContext, statement: GlobalStatement): void {
+    const declaration = statement.declaration;
+    const position = locatePosition(state, statement.position.offset, declaration.name);
+
+    collectAnnotation(state, block, declaration.annotation);
+
+    for (const value of statement.values) {
+        collectExpression(state, block, value);
+    }
+
+    if (position !== null) {
+        const detail = variableText('', declaration.name, declaration.annotation, null).trimStart();
+        const type = annotationType(declaration.annotation);
+
+        declareSymbol(state, ROOT_SCOPE, { name: declaration.name, kind: 'global', position, detail, type });
     }
 }
 
 function collectStatement(state: CollectorState, block: BlockContext, statement: Statement): void {
-    if (statement.kind === 'local-statement') {
+    if (statement.kind === 'global-statement') {
+        collectGlobalDeclaration(state, block, statement);
+    } else if (statement.kind === 'local-statement') {
         collectLocal(state, block, statement);
     } else if (statement.kind === 'assignment-statement') {
         collectAssignment(state, block, statement);

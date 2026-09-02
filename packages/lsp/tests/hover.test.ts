@@ -595,3 +595,38 @@ describe('project environment hover', () => {
         });
     });
 });
+
+describe('hover on the merged shared surface', () => {
+    const SHARED_FILE = pathToUri('/project/src/shared/util.luam');
+
+    function sharedHover(text: string, anchor: string, word: string): string {
+        const service = new LanguageService();
+
+        service.update(SHARED_FILE, 1, text);
+
+        const contents = service.hover(SHARED_FILE, positionOf(text, anchor, word))?.contents;
+
+        return contents === undefined || typeof contents === 'string' || Array.isArray(contents) ? '' : contents.value;
+    }
+
+    it('shows the signature and the side of a side-restricted API', () => {
+        const value = sharedHover('triggerClientEvent(root, "ping", root)\n', 'triggerClientEvent', 'triggerClientEvent');
+
+        expect(value).toContain('function triggerClientEvent(');
+        expect(value).toContain('server-only — a `shared` file runs on both sides. Decide the side at runtime before using it.');
+    });
+
+    it('leaves a shared API without a side note', () => {
+        const value = sharedHover('triggerEvent("ping", root)\n', 'triggerEvent', 'triggerEvent');
+
+        expect(value).toContain('function triggerEvent(');
+        expect(value).not.toContain('Decide the side at runtime');
+    });
+
+    it('leaves a server file hovering the same API without a side note', () => {
+        const value = hoverText('triggerClientEvent(root, "ping", root)\n', 'triggerClientEvent', 'triggerClientEvent');
+
+        expect(value).toContain('function triggerClientEvent(');
+        expect(value).not.toContain('Decide the side at runtime');
+    });
+});

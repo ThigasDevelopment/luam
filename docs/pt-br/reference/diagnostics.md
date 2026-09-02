@@ -41,6 +41,7 @@ erro não escreve nada.
 | --- | --- |
 | `parse-error` | O arquivo não pôde ser analisado neste ponto. |
 | `parse-unexpected-token` | Um token que a gramática não permite aqui. |
+| `parse-reserved-name` | Uma palavra reservada em posição de nome — `function f(type: T)`, `local enum = 3` — ou lida como valor. A palavra continua legal como propriedade, então `value.type` continua funcionando. O parser se recupera na palavra, então a declaração ao redor ainda registra. |
 | `parse-invalid-statement` | A construção não é um comando. |
 | `parse-invalid-type` | A anotação de tipo não pôde ser analisada. |
 | `parse-invalid-increment` | `++` ou `--` usados como expressão. Ambos são comandos. |
@@ -67,14 +68,16 @@ erro não escreve nada.
 | --- | --- | --- |
 | `check-type-mismatch` | error | Um valor não corresponde ao tipo declarado. |
 | `check-return-mismatch` | error | Um `return` não corresponde ao tipo de retorno declarado. |
+| `check-tuple-position` | error | Uma lista de retorno entre parênteses — `(number, number)` — em um parâmetro, uma variável, um campo, um membro de interface ou o corpo de um alias. Uma tupla é apenas uma forma de retorno. |
 | `check-missing-return` | error | Uma função que declara um tipo de retorno pode terminar sem retornar um valor. |
-| `check-argument-count` | error | Argumentos de menos ou de mais. |
+| `check-argument-count` | error | Argumentos de menos ou de mais. Um argumento final que é uma chamada de aridade de retorno desconhecida — `f(unpack(t))` — se espalha pelo resto da lista, então o mínimo não é verificado e o máximo conta apenas os argumentos antes dele. Essas posições espalhadas não são verificadas, porque não há aridade contra a qual verificá-las. |
 | `check-invalid-operand` | error | Um operador não pode ser aplicado a esse tipo. |
 | `check-unknown-member` | error | O membro não existe no receptor. |
 | `check-not-callable` | error | Uma chamada em um valor que não é função. |
 | `check-extension-form` | error | Uma extensão de objeto usada na outra forma: uma extensão de propriedade chamada, ou uma extensão de chamada apenas lida. |
 | `check-unknown-record-key` | error | A chave não é declarada pelo tipo de objeto. Também usado por `process.env`. |
 | `check-unknown-union-key` | error | A chave falta em pelo menos um membro da união. |
+| `check-incomplete-record` | error | Um literal de tabela que instruções posteriores estavam completando é usado, ou o bloco termina, com uma chave obrigatória ainda não atribuída. |
 | `check-invalid-intersection` | error | Uma parte da interseção não é um tipo objeto, uma interface ou uma classe. |
 | `check-conflicting-intersection-member` | error | Duas partes da interseção declaram a mesma chave com tipos diferentes. |
 | `check-generic-arity` | error | Um alias de tipo ou uma classe recebeu a quantidade errada de argumentos de tipo. |
@@ -101,6 +104,7 @@ erro não escreve nada.
 | `check-class-before-declaration` | Um efeito de topo instancia uma classe declarada mais abaixo no arquivo. |
 | `check-duplicate-class-member` | Um nome é declarado como membro estático e de instância. |
 | `check-static-receiver` | Um estático lido por uma instância, ou chamado com dois-pontos. |
+| `check-class-receiver` | Uma chamada com dois-pontos na própria classe para um membro que **não** é estático, ex. `RedisAdapter:connect()`. Instancie com `new`, ou leia o membro de um valor dessa classe; onde uma classe e sua única instância compartilham um nome, dê à instância o nome dela. |
 | `check-unknown-interface` | `implements` ou `extends` de interface nomeia uma interface não declarada. |
 | `check-duplicate-interface` | Duas interfaces com o mesmo nome em um arquivo. |
 | `check-duplicate-interface-parent` | Uma interface estende a mesma interface pai mais de uma vez. |
@@ -112,12 +116,18 @@ erro não escreve nada.
 | `check-invalid-self` | `self` fora de um método de classe ou de uma declaração `function Nome:metodo()`. |
 | `check-invalid-constructor` | Uma classe declara `constructor` como campo em vez de método. |
 | `check-duplicate-enum` | Dois enums com o mesmo nome em um arquivo. |
+| `check-duplicate-type` | Dois arquivos, ou um arquivo duas vezes, declaram o mesmo alias `type`. Um alias alcança o projeto inteiro, como uma classe, uma interface e um enum. |
+| `check-duplicate-global` | Duas declarações anotadas do mesmo global. Um `declare` em `.d.luam` não é duplicata: ele vence, e a atribuição é verificada contra ele. |
+| `check-global-annotation-scope` | Um tipo em uma atribuição de global fora do nível superior de um arquivo. |
 | `check-unknown-enum-member` | O enum não tem esse membro. |
 | `check-invalid-super` | `super(...)` fora de uma classe ou a sintaxe inválida `self:super(...)`. |
 | `check-unknown-super-method` | A classe pai não tem método com esse nome. |
 | `check-declare-outside-declaration-file` | `declare` fora de um arquivo `.d.luam`. |
 | `check-declaration-file-statement` | Um arquivo `.d.luam` contém um comando. |
 | `check-unused-local` | Um local nunca é lido, com `compiler.noUnusedLocals` ligado, ou em qualquer ponto do manifesto. |
+| `check-shadowed-api` | warning | Uma declaração de nível superior sobrescreve uma API que este ambiente declara, ex. `function dxDrawText(...)`. Chamadas posteriores mantêm a assinatura declarada. Renomeie-a, ou registre a nova assinatura em um arquivo `.d.luam`. |
+| `check-shadowed-helper` | warning | Uma declaração de nível superior sobrescreve um membro da biblioteca padrão que o build modela, ex. `function math.clamp(...)`. A mensagem nomeia a extensão de objeto que baixa para ele. |
+| `check-implicit-global` | warning | Uma atribuição cria um global que nada declara, com `compiler.noImplicitGlobals` ligado. Desligado por padrão. |
 | `check-unused-parameter` | Um parâmetro nunca é lido, com `compiler.noUnusedParameters` ligado. |
 
 ## Checker — decoradores

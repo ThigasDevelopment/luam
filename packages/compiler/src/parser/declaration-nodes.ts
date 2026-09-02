@@ -43,6 +43,7 @@ export interface ClassDeclaration extends NodeBase {
     superClass: string | null;
     superClassArguments: TypeAnnotation[];
     interfaces: string[];
+    interfaceArguments: TypeAnnotation[][];
     members: ClassMember[];
     decorators: Decorator[];
 }
@@ -65,6 +66,8 @@ export type InterfaceMember = InterfaceFieldSignature | InterfaceMethodSignature
 export interface InterfaceDeclaration extends NodeBase {
     kind: 'interface-declaration';
     name: string;
+    typeParameters: string[];
+    typeConstraints: (TypeAnnotation | null)[];
     superInterfaces: string[];
     members: InterfaceMember[];
 }

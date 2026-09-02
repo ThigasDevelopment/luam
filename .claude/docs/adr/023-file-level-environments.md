@@ -20,3 +20,6 @@ The environment is a property of the file. A file is `server`, `client`, or `sha
 - Positive: no construct can quietly change the visibility of a local or the order of a top-level effect.
 - Negative: a small piece of client code inside a mostly server-side feature needs its own file, which makes some features span more files than the author would like.
 - Negative: authors arriving from single-file Lua resources have to learn the split before writing anything that touches both sides.
+
+**References:**
+- [ADR-044](044-merged-surface-in-shared-files.md) — a `shared` file sees both sides and reports nothing. The environment is still a property of the file; only what a `shared` file may name changed.

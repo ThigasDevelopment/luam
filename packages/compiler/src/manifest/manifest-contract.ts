@@ -30,6 +30,7 @@ export function readCompilerOptions(value: ManifestObject): CompilerOptions {
         strict: flag(source, 'strict', DEFAULT_COMPILER_OPTIONS.strict),
         oop: flag(source, 'oop', DEFAULT_COMPILER_OPTIONS.oop),
         noUnusedLocals: flag(source, 'noUnusedLocals', DEFAULT_COMPILER_OPTIONS.noUnusedLocals),
+        noImplicitGlobals: flag(source, 'noImplicitGlobals', DEFAULT_COMPILER_OPTIONS.noImplicitGlobals),
         noUnusedParameters: flag(source, 'noUnusedParameters', DEFAULT_COMPILER_OPTIONS.noUnusedParameters),
         warningsAsErrors: flag(source, 'warningsAsErrors', DEFAULT_COMPILER_OPTIONS.warningsAsErrors),
     };

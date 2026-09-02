@@ -13,6 +13,7 @@ import { checkJumps } from './jumps';
 import { predeclareModule } from './predeclaration';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from './project-declarations';
 import type { DeclarationRegistry, EventInfo } from './registry';
+import { settleRecordObligations } from './record-completion';
 import { checkStatements } from './statements';
 import { reportUnknownTypes } from './type-names';
 import type { Type } from './types';
@@ -61,6 +62,7 @@ export interface CheckOptions {
     isDeclarationFile?: boolean;
     oop?: boolean;
     noUnusedLocals?: boolean;
+    noImplicitGlobals?: boolean;
     noUnusedParameters?: boolean;
 }
 
@@ -68,6 +70,8 @@ export function check(program: Program, mode: StrictMode, environment: Environme
     const ambient = options.ambient ?? EMPTY_AMBIENT;
     const project = options.project ?? EMPTY_PROJECT_DECLARATIONS;
     const context = new CheckContext(mode, environment, ambient, project, options.oop === true);
+
+    context.noImplicitGlobals = options.noImplicitGlobals === true;
 
     context.isDeclarationFile = options.isDeclarationFile === true;
     context.contracts = options.contracts ?? [];
@@ -77,6 +81,7 @@ export function check(program: Program, mode: StrictMode, environment: Environme
 
     predeclareModule(context, program.body);
     checkStatements(context, program.body);
+    settleRecordObligations(context, new Set());
     reportUnknownTypes(context);
     reportUnusedSymbols(context, options.noUnusedLocals === true, options.noUnusedParameters === true);
 

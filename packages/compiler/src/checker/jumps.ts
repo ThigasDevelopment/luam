@@ -38,6 +38,7 @@ function statementExpressions(statement: Statement): readonly Expression[] {
     switch (statement.kind) {
         case 'local-statement':
         case 'return-statement':
+        case 'global-statement':
             return statement.values;
         case 'assignment-statement':
             return [...statement.targets, ...statement.values];

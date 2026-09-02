@@ -1,0 +1,20 @@
+interface Event {
+    name: string
+    fire(): void
+}
+
+class DealershipBuyEvent implements Event {
+    name: string = 'dealership:buy'
+
+    fire = function (): void
+        outputDebugString(self.name)
+    end
+}
+
+class DealershipSellEvent implements Event {
+    name: string = 'dealership:sell'
+
+    fire = function (): void
+        outputDebugString(self.name)
+    end
+}

@@ -167,6 +167,21 @@ Três regras os mantêm fora do caminho:
   nada é pior do que ficar quieto.
 - Um arquivo que não parseia não gera hint nenhum, a mesma regra da formatação.
 
+Um `local` que desestrutura uma chamada de múltiplos retornos ganha um hint por
+nome, do jeito que [funções](/pt-br/language/functions#multiplos-retornos) dizem
+que cada alvo recebe o tipo dele. Dado `function triple(): (number, string, boolean)`,
+`local a, b, c = triple()` mostra `a: number`, `b: string` e `c: boolean` — três
+hints em uma linha, não a tupla inteira no primeiro nome. O mesmo vale para o
+catálogo: `local cX, cY, cZ = getVehicleComponentPosition(...)` mostra `number`
+em cada um dos três.
+
+Dois casos vêm das regras de ajuste do próprio Lua, e não do hint:
+
+- Um nome sozinho fica com o primeiro valor e mais nada, então
+  `local only = triple()` mostra `number`, não `(number, string, boolean)`.
+- Uma chamada em qualquer posição que não a última contribui só com o primeiro
+  valor dela, então `local x, y = 1, triple()` mostra `number` duas vezes.
+
 Um hint e um hover sobre o mesmo nome sempre mostram o mesmo tipo: os dois passam
 pelo renderizador do próprio checker.
 
@@ -240,3 +255,9 @@ ou apagado fora do editor chega até ele sem reinício. **Luam: Rescan Workspace
 reconstrói o índice a partir do disco se alguma mudança escapou do observador, e
 **Luam: Restart Language Server** é a saída se o servidor e o projeto ainda
 discordarem.
+
+Nada disso alcança uma mudança no próprio servidor. O editor roda o servidor
+embutido na extensão que ele tem instalada, então uma correção em hover,
+completação ou diagnóstico só chega depois de reinstalar a extensão e recarregar
+a janela — **Developer: Reload Window**. Até lá o editor continua respondendo do
+jeito que o build instalado responde, por mais atual que o checkout esteja.

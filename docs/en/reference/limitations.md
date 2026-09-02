@@ -434,3 +434,37 @@ output rather than wrong output.
 There are also no per-file overrides, no directive-based overrides, no ranges
 excluded from formatting, no presets, and no inheritance from another package.
 One file, one style, for everything below it.
+
+## A class the code names at runtime cannot be instantiated
+
+**Design boundary.** Recorded in
+[ADR-045](https://github.com/ThigasDevelopment/luam/blob/main/.claude/docs/adr/045-runtime-named-instantiation.md).
+
+`new` is an operator over a class **name**, resolved when the file is checked.
+There is no value that stands for a class, no `new` over a computed name, and no
+way to auto-load by walking `_G` — the two shapes a Lua resource uses to build
+its loading order by naming convention.
+
+Write a **registry** instead: a table listing the classes the resource loads,
+each entry created with `new`, iterated normally. The constructor arity, the
+argument types and the value the registry holds are then all checked, which is
+exactly what the `_G` scan gave up. The cost is that the list is written once.
+
+`getClass(name)` and `getClasses()` stay as the untyped escape hatch, for a set
+of classes that genuinely is not known when the code is written. Everything they
+produce is `any`. [Porting a Lua resource](/en/guide/porting) shows both forms.
+
+## An authored multi-return signature has a fixed arity
+
+**Design boundary.** Recorded in
+[45.15](https://github.com/ThigasDevelopment/luam/blob/main/.claude/plans/45.15-author-a-multi-return-signature.md).
+
+A function declares several return values as a parenthesised list —
+`function f(): (number, number, number)` — and every `return` is checked element
+by element. The list has no variadic tail: there is no syntax for "these three,
+then any number of `T`".
+
+A signature whose arity is not fixed stays `any`, which is the boundary the MTA
+catalog already had for an upstream `LuaMultiReturn<[...any[]]>`. A parenthesised
+list is also a **return shape only**: written in a parameter, a variable, a
+field, an interface member or an alias body it is `check-tuple-position`.

@@ -1,8 +1,8 @@
 Version: done in 1 ms.
-Discovery: done in 12 ms.
-Compile: 3 files in 22 ms.
-Assembly: done in 1 ms.
+Discovery: done in 14 ms.
+Compile: 3 files in 30 ms.
+Assembly: done in 2 ms.
 Manifest: done in 1 ms.
-Write: 2 files in 8 ms.
-Build passed: 3 files, 0 errors, 0 warnings in 37 ms (bundle layout).
+Write: 2 files in 7 ms.
+Build passed: 3 files, 0 errors, 0 warnings in 48 ms (bundle layout).
 Wrote 2 files to "build/luam-docs-using-a-library" (0 unchanged, 0 removed).

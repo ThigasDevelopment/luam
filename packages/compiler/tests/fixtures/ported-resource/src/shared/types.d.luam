@@ -1,0 +1,5 @@
+interface ConfigShape {
+    dealership: table<string, table>
+}
+
+declare Config: ConfigShape

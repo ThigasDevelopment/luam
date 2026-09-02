@@ -71,7 +71,7 @@ end)
 
 Um nome de evento é verificado contra o catálogo e contra o ambiente do arquivo:
 
-```luam expect-error
+```luam env=server expect-error
 # src/server/join.luam
 addEventHandler('onPlayerJoin', root, function () end)      # ok
 addEventHandler('onClientRender', root, function () end)    # check-environment-event
@@ -103,7 +103,7 @@ próprios parâmetros.
 
 O payload de um trigger é verificado contra a mesma assinatura:
 
-```luam expect-error
+```luam env=server expect-error
 triggerEvent('onPlayerQuit', root, 'Quit', 'Timed out.', root)   # ok
 triggerEvent('onPlayerQuit', root, 1, 'Timed out.', root)        # check-type-mismatch
 triggerEvent('onPlayerQuit', root, 'Quit')                       # check-argument-count

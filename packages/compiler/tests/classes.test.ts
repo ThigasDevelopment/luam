@@ -287,10 +287,10 @@ describe('classes', () => {
     });
 
     it('reserves class, interface, enum, and new so they cannot name a variable', () => {
-        expect(codes('local class = 1\n')).toEqual(['parse-unexpected-token']);
-        expect(codes('local new = 2\n')).toEqual(['parse-unexpected-token']);
-        expect(codes('local enum = 3\n')).toEqual(['parse-unexpected-token']);
-        expect(codes('local interface = 4\n')).toEqual(['parse-unexpected-token']);
+        expect(codes('local class = 1\n')).toEqual(['parse-reserved-name']);
+        expect(codes('local new = 2\n')).toEqual(['parse-reserved-name']);
+        expect(codes('local enum = 3\n')).toEqual(['parse-reserved-name']);
+        expect(codes('local interface = 4\n')).toEqual(['parse-reserved-name']);
     });
 
     it('keeps the reserved words usable as table fields and members', () => {

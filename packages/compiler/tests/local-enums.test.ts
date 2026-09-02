@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { compile } from '@compiler/index';
+import { compilerOptions } from '@compiler/manifest/manifest-defaults';
 import type { ProjectFile } from '@compiler/project/module';
 import { compileProject } from '@compiler/project/project';
 
@@ -57,7 +58,7 @@ describe('local enums', () => {
     });
 
     it('reports an unread local enum under noUnusedLocals', () => {
-        const options = { strict: false, oop: false, noUnusedLocals: true, noUnusedParameters: false, warningsAsErrors: false };
+        const options = compilerOptions({ noUnusedLocals: true, strict: false });
         const result = compile(UNUSED.source, { compilerOptions: options });
 
         expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain('check-unused-local');

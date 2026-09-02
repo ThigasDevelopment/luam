@@ -20,7 +20,7 @@ import {
 } from './collector-state';
 import { collectAnnotation, collectExpression } from './expression-collector';
 import { ROOT_SCOPE } from './scope-tree';
-import { assignedText, fieldText, inferredFieldText, parameterText, signatureText, variableText } from './signature-text';
+import { assignedText, fieldText, inferredFieldText, parameterText, signatureText, typeParameterText, variableText } from './signature-text';
 import { collectFunctionScope } from './statement-collector';
 import { valueBytes, valueText } from './value-text';
 
@@ -165,7 +165,9 @@ function collectInterface(state: CollectorState, block: BlockContext, statement:
     const position = namePosition(state, statement);
     const extendsText = statement.superInterfaces.length === 0 ? '' : ` extends ${statement.superInterfaces.join(', ')}`;
 
-    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'interface', position, detail: `interface ${statement.name}${extendsText}` });
+    const generics = typeParameterText(statement.typeParameters);
+
+    declareSymbol(state, ROOT_SCOPE, { name: statement.name, kind: 'interface', position, detail: `interface ${statement.name}${generics}${extendsText}` });
     collectSuperTypes(state, block, statement.superInterfaces, position.offset + statement.name.length);
 
     for (const member of statement.members) {

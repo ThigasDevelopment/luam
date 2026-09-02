@@ -41,6 +41,7 @@ writes nothing.
 | --- | --- |
 | `parse-error` | The file could not be parsed at this point. |
 | `parse-unexpected-token` | A token the grammar does not allow here. |
+| `parse-reserved-name` | A reserved word in a name position — `function f(type: T)`, `local enum = 3` — or read as a value. The word stays legal as a property, so `value.type` keeps working. The parser recovers at the word, so the surrounding declaration still registers. |
 | `parse-invalid-statement` | The construct is not a statement. |
 | `parse-invalid-type` | The type annotation could not be parsed. |
 | `parse-invalid-increment` | `++` or `--` used as an expression. Both are statements. |
@@ -67,14 +68,16 @@ writes nothing.
 | --- | --- | --- |
 | `check-type-mismatch` | error | A value does not match the declared type. |
 | `check-return-mismatch` | error | A `return` does not match the declared return type. |
+| `check-tuple-position` | error | A parenthesised return list — `(number, number)` — in a parameter, a variable, a field, an interface member, or an alias body. A tuple is a return shape only. |
 | `check-missing-return` | error | A function that declares a return type can end without returning a value. |
-| `check-argument-count` | error | Too few or too many arguments. |
+| `check-argument-count` | error | Too few or too many arguments. A final argument that is a call of unknown return arity — `f(unpack(t))` — spreads into the rest of the list, so the minimum is not checked and the maximum counts only the arguments before it. Those spread positions are unchecked, because there is no arity to check them against. |
 | `check-invalid-operand` | error | An operator cannot be applied to that type. |
 | `check-unknown-member` | error | The member does not exist on the receiver. |
 | `check-not-callable` | error | A call on a value that is not a function. |
 | `check-extension-form` | error | An object extension used in the other form: a property extension called, or a call extension only read. |
 | `check-unknown-record-key` | error | The key is not declared by the object type. Also used by `process.env`. |
 | `check-unknown-union-key` | error | The key is missing from at least one member of the union. |
+| `check-incomplete-record` | error | A table literal that later statements were completing is used, or the block ends, with a required key still unassigned. |
 | `check-invalid-intersection` | error | A part of an intersection is not an object type, an interface, or a class. |
 | `check-conflicting-intersection-member` | error | Two parts of an intersection declare the same key with different types. |
 | `check-generic-arity` | error | A type alias or a class received the wrong number of type arguments. |
@@ -101,6 +104,7 @@ writes nothing.
 | `check-class-before-declaration` | A top-level effect instantiates a class declared further down the file. |
 | `check-duplicate-class-member` | One name is declared as both a static and an instance member. |
 | `check-static-receiver` | A static read through an instance, or called with a colon. |
+| `check-class-receiver` | A colon call on the class itself for a member that is **not** static, e.g. `RedisAdapter:connect()`. Instantiate with `new`, or read the member from a value of that class; where a class and its single instance share one name, give the instance its own name. |
 | `check-unknown-interface` | `implements` or interface `extends` names an interface that is not declared. |
 | `check-duplicate-interface` | Two interfaces with the same name in one file. |
 | `check-duplicate-interface-parent` | An interface extends the same parent more than once. |
@@ -112,12 +116,18 @@ writes nothing.
 | `check-invalid-self` | `self` outside a class method or a `function Name:method()` declaration. |
 | `check-invalid-constructor` | A class declares `constructor` as a field instead of a method. |
 | `check-duplicate-enum` | Two enums with the same name in one file. |
+| `check-duplicate-type` | Two files, or one file twice, declare the same `type` alias. An alias reaches the whole project, like a class, an interface, and an enum. |
+| `check-duplicate-global` | Two annotated declarations of the same global. A `.d.luam` `declare` is not a duplicate: it wins, and the assignment is checked against it. |
+| `check-global-annotation-scope` | A type on a global assignment outside the top level of a file. |
 | `check-unknown-enum-member` | The enum has no such member. |
 | `check-invalid-super` | `super(...)` outside a class or the invalid `self:super(...)` syntax. |
 | `check-unknown-super-method` | The parent has no method of that name. |
 | `check-declare-outside-declaration-file` | `declare` outside a `.d.luam` file. |
 | `check-declaration-file-statement` | A `.d.luam` file contains a statement. |
 | `check-unused-local` | A local is never read, with `compiler.noUnusedLocals` on, or anywhere in the manifest. |
+| `check-shadowed-api` | warning | A top-level declaration overwrites an API this environment declares, e.g. `function dxDrawText(...)`. Later calls keep the declared signature. Rename it, or record the new signature in a `.d.luam` file. |
+| `check-shadowed-helper` | warning | A top-level declaration overwrites a standard-library member the build models, e.g. `function math.clamp(...)`. The message names the object extension that lowers to it. |
+| `check-implicit-global` | warning | An assignment creates a global nothing declares, with `compiler.noImplicitGlobals` on. Off by default. |
 | `check-unused-parameter` | A parameter is never read, with `compiler.noUnusedParameters` on. |
 
 ## Checker — decorators

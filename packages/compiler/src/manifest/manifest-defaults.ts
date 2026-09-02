@@ -5,6 +5,7 @@ export interface CompilerOptions {
     oop: boolean;
     noUnusedLocals: boolean;
     noUnusedParameters: boolean;
+    noImplicitGlobals: boolean;
     warningsAsErrors: boolean;
 }
 
@@ -49,6 +50,7 @@ export const DEFAULT_COMPILER_OPTIONS: CompilerOptions = {
     oop: false,
     noUnusedLocals: false,
     noUnusedParameters: false,
+    noImplicitGlobals: false,
     warningsAsErrors: false,
 };
 

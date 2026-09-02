@@ -48,8 +48,8 @@ describe('export directive parsing', () => {
     });
 
     it('reserves "export" so it cannot name a variable', () => {
-        expect(codes('local export = 1\n')).toEqual(['parse-unexpected-token']);
-        expect(codes('export = getPlayers()\n')).toEqual(['parse-unexpected-token']);
+        expect(codes('local export = 1\n')).toEqual(['parse-reserved-name']);
+        expect(codes('export = getPlayers()\n')).toEqual(['parse-reserved-name']);
     });
 
     it('keeps "export" usable as a table field and a call target', () => {

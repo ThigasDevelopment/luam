@@ -1,14 +1,24 @@
 import type { SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { CallExpression } from '@compiler/parser/ast';
+import type { ApiEnvironment } from '@mta-types/api-declaration';
 import { declarationEnvironment } from '@mta-types/catalog';
 import { eventEnvironment } from '@mta-types/event-lookup';
 
 import type { CheckContext } from './context';
+import { reportEnvironment, scopeLabel, unavailableTail, unusableTail } from './environment-message';
 
 const EVENT_FUNCTIONS: ReadonlySet<string> = new Set(['addEventHandler', 'removeEventHandler', 'triggerEvent']);
 
-function scopeLabel(environment: string): string {
-    return environment === 'shared' ? 'shared' : `${environment}-only`;
+function reportProject(context: CheckContext, name: string, declared: ApiEnvironment, position: SourcePosition): void {
+    const message = `"${name}" is declared by the project, is ${scopeLabel(declared)}, and ${unavailableTail(context.environment)}`;
+
+    reportEnvironment(context, 'check-environment-api', message, position);
+}
+
+function reportApi(context: CheckContext, name: string, declared: ApiEnvironment, position: SourcePosition): void {
+    const message = `API "${name}" is ${scopeLabel(declared)} and ${unavailableTail(context.environment)}`;
+
+    reportEnvironment(context, 'check-environment-api', message, position);
 }
 
 export function checkGlobalReference(context: CheckContext, name: string, position: SourcePosition): void {
@@ -23,9 +33,7 @@ export function checkGlobalReference(context: CheckContext, name: string, positi
     const project = context.projectEnvironmentOf(name);
 
     if (project !== null) {
-        const message = `"${name}" is declared by the project, is ${scopeLabel(project)}, and is not available in a "${context.environment}" file.`;
-
-        context.report('check-environment-api', message, position);
+        reportProject(context, name, project, position);
 
         return;
     }
@@ -38,9 +46,33 @@ export function checkGlobalReference(context: CheckContext, name: string, positi
         return;
     }
 
-    const message = `API "${name}" is ${scopeLabel(declared)} and is not available in a "${context.environment}" file.`;
+    reportApi(context, name, declared, position);
+}
 
-    context.report('check-environment-api', message, position);
+export function checkSharedReference(context: CheckContext, name: string, position: SourcePosition): void {
+    if (context.environment !== 'shared' || context.moduleGlobals.has(name)) {
+        return;
+    }
+
+    const project = context.projectEnvironmentOf(name);
+
+    if (project !== null) {
+        if (project !== 'shared') {
+            reportProject(context, name, project, position);
+        }
+
+        return;
+    }
+
+    if (!context.binder.isBuiltinReference(name)) {
+        return;
+    }
+
+    const declared = declarationEnvironment(name);
+
+    if (declared !== null && declared !== 'shared') {
+        reportApi(context, name, declared, position);
+    }
 }
 
 function eventName(expression: CallExpression): string | null {
@@ -67,7 +99,7 @@ export function checkEventUsage(context: CheckContext, expression: CallExpressio
         return;
     }
 
-    const message = `Event "${name}" is ${scopeLabel(declared)} and cannot be used in a "${context.environment}" file.`;
+    const message = `Event "${name}" is ${scopeLabel(declared)} and ${unusableTail(context.environment)}`;
 
-    context.report('check-environment-event', message, expression.position);
+    reportEnvironment(context, 'check-environment-event', message, expression.position);
 }

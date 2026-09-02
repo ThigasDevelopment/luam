@@ -38,13 +38,13 @@ Adicione o modificador contextual `http` para permitir que o servidor HTTP do
 MTA chame a função:
 
 ```luam
-export http function getPlayerCount(): number
+export http function getOnlineCount(): number
     return getPlayerCount()
 end
 ```
 
 ```xml
-<export function="getPlayerCount" type="server" http="true" />
+<export function="getOnlineCount" type="server" http="true" />
 ```
 
 Sem o modificador, o compilador sempre gera `http="false"`. Fora de uma diretiva
