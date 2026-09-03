@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.1 - 2026-09-03
+
 ### Added
 
 - [Functions](/en/language/functions) gains **Async functions**: what an

@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.1 - 2026-09-03
+
 ### Adicionado
 
 - [Funções](/pt-br/language/functions) ganha **Funções async**: o que uma
