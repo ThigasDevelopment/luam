@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.3 - 2026-09-03
+
 ### Adicionado
 
 - [Estrutura do projeto](/pt-br/guide/project-layout) documenta a estrutura

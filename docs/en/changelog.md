@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.3 - 2026-09-03
+
 ### Added
 
 - [Project layout](/en/guide/project-layout) documents the flat layout: a
