@@ -9,6 +9,16 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.2 - 2026-09-03
+
+### Added
+
+- [Language server](/en/tooling/language-server) gains **Blocks**: the closers
+  that write `then .. end`, `do .. end` and `until condition` on an open block,
+  the scaffolds that write a whole block from the word that opens it, the rule
+  that preselects a closer only while the block is unclosed, and the plain-text
+  block a client without snippet support receives.
+
 ## 1.0.1 - 2026-09-03
 
 ### Added

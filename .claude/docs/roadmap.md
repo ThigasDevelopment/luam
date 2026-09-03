@@ -3176,3 +3176,66 @@ Deliberately excluded:
   `Promise<any>` is enough here.
 - Removing or deprecating any `Threads` or `Async` method. 47.05 keeps every one
   of them working; only the recommendation changes.
+
+## Milestone 48 — Block Completion in the Editor
+
+Typing `if 1 + 1 == 2 then` and pressing Enter leaves an open block. The author
+writes the header, the body, and then goes back for the `end` — or forgets it and
+reads a parser diagnostic pointing at the end of the file. Every editor for a
+block language answers this from the completion list, and the language server
+already has what the answer needs: it knows where strings and comments are, and
+it can see whether the block ahead is closed. Accepting `then .. end` writes the
+header, an indented empty line holding the cursor, and the `end`.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 48.01 | Close a block from the completion list | ../plans/48.01-close-a-block-from-completion.md | architecture-engineer | done |
+| 48.02 | Scaffold a block from its opening keyword | ../plans/48.02-scaffold-a-block-at-a-statement-start.md | architecture-engineer | done |
+| 48.03 | Cover block completion in the editor tests | ../plans/48.03-block-completion-tests.md | test-engineer | done |
+| 48.04 | Document block completion | ../plans/48.04-block-completion-documentation.md | documentation-engineer | done |
+
+Acceptance:
+
+- Completing `then` on an open `if` or `elseif` header inserts `then`, an
+  indented empty line with the cursor on it, and `end` at the header
+  indentation. `do` behaves the same on a `for` or `while` header, and a
+  `repeat` block offers `until condition`.
+- The closer is preselected only while the block is unclosed. On code that
+  already ends, the item is still offered, one row lower and unselected, so
+  Enter never writes a second `end` into working code.
+- Nothing is offered inside a string, inside a comment, in a type position,
+  after `.` or `:`, or inside a call's arguments.
+- Scaffolds — `if`, both `for` forms, `while`, `repeat`, `do`, `function` —
+  appear only at a statement start, are never preselected, and never replace the
+  plain keyword, which stays in the list.
+- A client that reports no snippet support receives the same block as plain
+  text, with no tab stops leaking into the buffer.
+- One scan serves the feature. The block walk drives the scanner
+  `source-context.ts` already owns instead of adding a second string and comment
+  reader to the LSP.
+
+Why now:
+
+- The information is already in the LSP and unused. `scanContext` walks the
+  document on every completion and knows exactly where code ends and a string
+  begins; nothing reads that to decide whether a block is open.
+- The cheap alternative is worse than nothing. A VS Code `snippets` file serves
+  one editor and no context: it would offer `then .. end` inside a string and on
+  a block that already ends, and the second `end` costs more than the first one
+  saved.
+- The scaffolding pattern is proven here. The event handler completion already
+  inserts a multi-line snippet with a tab stop and a plain-text fallback, so
+  this is the same mechanism applied to the language's own blocks.
+
+Deliberately excluded:
+
+- `class`, `interface` and `enum` scaffolds. Their bodies are brace blocks the
+  editor already closes, and their members are typed — a frozen scaffold would
+  compete with the member completion that already exists.
+- `else` and `elseif` continuations. They close nothing, so they carry none of
+  the reasoning this milestone is built on.
+- Rewriting or repairing blocks the author did not just type. Completion writes
+  at the cursor; an unclosed block elsewhere in the file is a diagnostic and a
+  quick fix, not a completion item.

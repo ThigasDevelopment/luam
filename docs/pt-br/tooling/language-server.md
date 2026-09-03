@@ -100,6 +100,59 @@ tipos herdados dentro do corpo. As variantes de callbacks MTA seguem o ambiente
 do arquivo atual, então `addCommandHandler` oferece `player, commandName, ...` no
 servidor e `commandName, ...` no cliente.
 
+### Blocos
+
+A completação escreve o bloco inteiro, então o `end` nunca fica para depois.
+Dois tipos de item fazem isso.
+
+**Fechadores** aparecem enquanto um bloco está aberto e oferecem a palavra que o
+fecha:
+
+| O que você digitou | O que você recebe | O que ele escreve |
+| --- | --- | --- |
+| `if 1 + 1 == 2 the` | `then .. end` | `then`, uma linha vazia indentada com o cursor nela, e `end` |
+| `for index = 1, 10 d` | `do .. end` | as mesmas três linhas, abertas por `do` |
+| `while running d` | `do .. end` | as mesmas três linhas, abertas por `do` |
+| Uma linha dentro de um `repeat` | `until condition` | `until condition`, com `condition` selecionado |
+
+Aceitar a primeira linha em `if 1 + 1 == 2 the` deixa o cursor na linha vazia
+entre as duas:
+
+```luam
+if 1 + 1 == 2 then
+
+end
+```
+
+O fechador é **pré-selecionado apenas enquanto o bloco está aberto**. Em código
+que já tem o seu `end`, o item continua sendo oferecido, uma linha abaixo da
+palavra-chave simples e sem seleção, então o Enter nunca escreve um segundo
+`end` em código que funciona.
+
+**Esqueletos** aparecem no início de uma instrução e escrevem o bloco a partir da
+palavra que o abre — `if .. then .. end`, `for .. do .. end`,
+`for .. in .. do .. end`, `while .. do .. end`, `repeat .. until`, `do .. end` e
+`function .. end`. Cada um carrega os pontos de parada na ordem em que um leitor
+os preencheria, então `for` completa para `for index = 1, 10 do` com `index`
+selecionado e `1` e `10` a um Tab de distância. Um esqueleto nunca é
+pré-selecionado: abrir um bloco é uma escolha, fechar o que você acabou de abrir
+não é.
+
+Os dois tipos se recusam a aparecer dentro de uma string, dentro de um
+comentário, em uma posição de tipo, depois de `.` ou `:` e dentro dos argumentos
+de uma chamada — um corpo de função escrito como argumento de chamada continua
+recebendo os dois, já que o bloco começa dentro da função.
+
+A palavra-chave simples nunca é removida; `then`, `do` e `until` continuam na
+lista ao lado da linha do bloco. Um cliente que não anuncia suporte a snippets
+recebe o mesmo bloco como texto puro, com os valores padrão preenchidos e sem
+pontos de parada.
+
+O bloco é inserido com `adjustIndentation`, então ele cai na indentação do
+cabeçalho e o `increaseIndentPattern` de
+[`language-configuration.json`](https://github.com/ThigasDevelopment/luam/blob/main/packages/vscode/language-configuration.json)
+não o indenta uma segunda vez.
+
 ## Eventos
 
 O nome do evento é resolvido a partir do literal de string na chamada, então o
