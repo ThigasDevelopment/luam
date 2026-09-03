@@ -24,6 +24,11 @@ Every heading below is a released version and the date it shipped, newest first.
 - [Diagnostics](/en/reference/diagnostics) gains `check-await-outside-async`,
   `check-await-non-promise`, `check-async-return-annotation` and
   `check-sleep-outside-async`.
+- [Language server](/en/tooling/language-server) gains **Blocks**: the closers
+  that write `then .. end`, `do .. end` and `until condition` on an open block,
+  the scaffolds that write a whole block from the word that opens it, the rule
+  that preselects a closer only while the block is unclosed, and the plain-text
+  block a client without snippet support receives.
 
 ## 1.0.0 - 2026-09-02
 

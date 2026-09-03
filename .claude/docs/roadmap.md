@@ -3187,14 +3187,14 @@ already has what the answer needs: it knows where strings and comments are, and
 it can see whether the block ahead is closed. Accepting `then .. end` writes the
 header, an indented empty line holding the cursor, and the `end`.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 48.01 | Close a block from the completion list | ../plans/48.01-close-a-block-from-completion.md | architecture-engineer | todo |
-| 48.02 | Scaffold a block from its opening keyword | ../plans/48.02-scaffold-a-block-at-a-statement-start.md | architecture-engineer | todo |
-| 48.03 | Cover block completion in the editor tests | ../plans/48.03-block-completion-tests.md | test-engineer | todo |
-| 48.04 | Document block completion | ../plans/48.04-block-completion-documentation.md | documentation-engineer | todo |
+| 48.01 | Close a block from the completion list | ../plans/48.01-close-a-block-from-completion.md | architecture-engineer | done |
+| 48.02 | Scaffold a block from its opening keyword | ../plans/48.02-scaffold-a-block-at-a-statement-start.md | architecture-engineer | done |
+| 48.03 | Cover block completion in the editor tests | ../plans/48.03-block-completion-tests.md | test-engineer | done |
+| 48.04 | Document block completion | ../plans/48.04-block-completion-documentation.md | documentation-engineer | done |
 
 Acceptance:
 
