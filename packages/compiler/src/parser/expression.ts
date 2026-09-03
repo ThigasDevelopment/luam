@@ -1,13 +1,25 @@
 import { CALLABLE_KEYWORDS, isLuamKeyword, type Token } from '@compiler/lexer/token';
 
-import type { Expression, TableField, TypeAnnotation } from './ast';
-import { parseFunctionExpression } from './function-expression';
+import type { AwaitExpression, Expression, TableField, TypeAnnotation } from './ast';
+import { consumeAsyncModifier, isAsyncFunctionStart, parseFunctionExpression } from './function-expression';
 import { binaryPrecedence, isRightAssociative, UNARY_OPERATORS, UNARY_PRECEDENCE } from './precedence';
 import type { TokenStream } from './token-stream';
 import { parseTypeAnnotation } from './type-annotation';
 import { parseCallTypeArguments, parseTypeArguments } from './type-parameters';
 
 const LITERAL_KEYWORDS: ReadonlySet<string> = new Set(['nil', 'true', 'false']);
+
+const AWAIT_OPERATOR = 'await';
+
+export function isAwaitStart(stream: TokenStream): boolean {
+    return stream.check('keyword', AWAIT_OPERATOR);
+}
+
+export function parseAwaitExpression(stream: TokenStream): AwaitExpression {
+    const position = stream.next().position;
+
+    return { kind: 'await-expression', operand: parseSuffixed(stream), position };
+}
 
 function parseKeywordLiteral(token: Token): Expression {
     if (token.value === 'nil') {
@@ -93,6 +105,12 @@ function parsePrimary(stream: TokenStream): Expression {
         stream.next();
 
         return { kind: 'identifier', name: token.value, position: token.position };
+    }
+
+    if (isAsyncFunctionStart(stream)) {
+        consumeAsyncModifier(stream);
+
+        return parseFunctionExpression(stream, true);
     }
 
     if (token.kind === 'identifier') {
@@ -237,6 +255,10 @@ export function parseSuffixed(stream: TokenStream): Expression {
 }
 
 function parseUnary(stream: TokenStream): Expression {
+    if (isAwaitStart(stream)) {
+        return parseAwaitExpression(stream);
+    }
+
     const token = stream.current();
     const isUnary = (token.kind === 'operator' || token.kind === 'keyword') && UNARY_OPERATORS.has(token.value);
 

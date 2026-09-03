@@ -564,6 +564,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
               ],
             },
           ],
+          "isAsync": false,
           "kind": "function-expression",
           "parameters": [
             {
@@ -808,6 +809,7 @@ exports[`fixture annotations.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": true,
@@ -1245,6 +1247,973 @@ exports[`fixture annotations.luam > locks the token stream 1`] = `
 ]
 `;
 
+exports[`fixture async.luam > locks the abstract syntax tree 1`] = `
+{
+  "body": [
+    {
+      "body": [
+        {
+          "expression": {
+            "kind": "await-expression",
+            "operand": {
+              "args": [
+                {
+                  "kind": "number-literal",
+                  "position": {
+                    "column": 17,
+                    "line": 3,
+                    "offset": 65,
+                  },
+                  "raw": "100",
+                  "value": 100,
+                },
+              ],
+              "callee": {
+                "kind": "identifier",
+                "name": "delay",
+                "position": {
+                  "column": 11,
+                  "line": 3,
+                  "offset": 59,
+                },
+              },
+              "kind": "call-expression",
+              "method": null,
+              "position": {
+                "column": 16,
+                "line": 3,
+                "offset": 64,
+              },
+              "typeArguments": [],
+            },
+            "position": {
+              "column": 5,
+              "line": 3,
+              "offset": 53,
+            },
+          },
+          "kind": "call-statement",
+          "position": {
+            "column": 5,
+            "line": 3,
+            "offset": 53,
+          },
+        },
+        {
+          "kind": "return-statement",
+          "position": {
+            "column": 5,
+            "line": 5,
+            "offset": 75,
+          },
+          "values": [
+            {
+              "kind": "identifier",
+              "name": "id",
+              "position": {
+                "column": 12,
+                "line": 5,
+                "offset": 82,
+              },
+            },
+          ],
+        },
+      ],
+      "isAsync": true,
+      "isExported": false,
+      "isHttpExport": false,
+      "isLocal": false,
+      "isMethod": false,
+      "kind": "function-declaration",
+      "name": {
+        "kind": "identifier",
+        "name": "load",
+        "position": {
+          "column": 16,
+          "line": 2,
+          "offset": 24,
+        },
+      },
+      "parameters": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "number",
+            "position": {
+              "column": 25,
+              "line": 2,
+              "offset": 33,
+            },
+            "typeArguments": [],
+          },
+          "isVararg": false,
+          "name": "id",
+          "position": {
+            "column": 21,
+            "line": 2,
+            "offset": 29,
+          },
+        },
+      ],
+      "position": {
+        "column": 7,
+        "line": 2,
+        "offset": 15,
+      },
+      "returnAnnotation": {
+        "kind": "type-name",
+        "name": "number",
+        "position": {
+          "column": 34,
+          "line": 2,
+          "offset": 42,
+        },
+        "typeArguments": [],
+      },
+      "typeConstraints": [],
+      "typeParameters": [],
+    },
+    {
+      "body": [
+        {
+          "declarations": [
+            {
+              "annotation": null,
+              "name": "value",
+              "position": {
+                "column": 11,
+                "line": 9,
+                "offset": 133,
+              },
+            },
+          ],
+          "kind": "local-statement",
+          "position": {
+            "column": 5,
+            "line": 9,
+            "offset": 127,
+          },
+          "values": [
+            {
+              "kind": "await-expression",
+              "operand": {
+                "args": [
+                  {
+                    "kind": "number-literal",
+                    "position": {
+                      "column": 30,
+                      "line": 9,
+                      "offset": 152,
+                    },
+                    "raw": "1",
+                    "value": 1,
+                  },
+                ],
+                "callee": {
+                  "kind": "identifier",
+                  "name": "load",
+                  "position": {
+                    "column": 25,
+                    "line": 9,
+                    "offset": 147,
+                  },
+                },
+                "kind": "call-expression",
+                "method": null,
+                "position": {
+                  "column": 29,
+                  "line": 9,
+                  "offset": 151,
+                },
+                "typeArguments": [],
+              },
+              "position": {
+                "column": 19,
+                "line": 9,
+                "offset": 141,
+              },
+            },
+          ],
+        },
+        {
+          "expression": {
+            "args": [
+              {
+                "kind": "identifier",
+                "name": "value",
+                "position": {
+                  "column": 11,
+                  "line": 11,
+                  "offset": 166,
+                },
+              },
+              {
+                "kind": "vararg-expression",
+                "position": {
+                  "column": 18,
+                  "line": 11,
+                  "offset": 173,
+                },
+              },
+            ],
+            "callee": {
+              "kind": "identifier",
+              "name": "print",
+              "position": {
+                "column": 5,
+                "line": 11,
+                "offset": 160,
+              },
+            },
+            "kind": "call-expression",
+            "method": null,
+            "position": {
+              "column": 10,
+              "line": 11,
+              "offset": 165,
+            },
+            "typeArguments": [],
+          },
+          "kind": "call-statement",
+          "position": {
+            "column": 5,
+            "line": 11,
+            "offset": 160,
+          },
+        },
+      ],
+      "isAsync": true,
+      "isExported": false,
+      "isHttpExport": false,
+      "isLocal": false,
+      "isMethod": false,
+      "kind": "function-declaration",
+      "name": {
+        "kind": "identifier",
+        "name": "report",
+        "position": {
+          "column": 16,
+          "line": 8,
+          "offset": 105,
+        },
+      },
+      "parameters": [
+        {
+          "annotation": null,
+          "isVararg": true,
+          "name": "",
+          "position": {
+            "column": 23,
+            "line": 8,
+            "offset": 112,
+          },
+        },
+      ],
+      "position": {
+        "column": 7,
+        "line": 8,
+        "offset": 96,
+      },
+      "returnAnnotation": {
+        "kind": "type-name",
+        "name": "void",
+        "position": {
+          "column": 29,
+          "line": 8,
+          "offset": 118,
+        },
+        "typeArguments": [],
+      },
+      "typeConstraints": [],
+      "typeParameters": [],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": null,
+          "name": "queue",
+          "position": {
+            "column": 7,
+            "line": 14,
+            "offset": 189,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 14,
+        "offset": 183,
+      },
+      "values": [
+        {
+          "body": [
+            {
+              "declarations": [
+                {
+                  "annotation": null,
+                  "name": "held",
+                  "position": {
+                    "column": 11,
+                    "line": 15,
+                    "offset": 245,
+                  },
+                },
+              ],
+              "kind": "local-statement",
+              "position": {
+                "column": 5,
+                "line": 15,
+                "offset": 239,
+              },
+              "values": [
+                {
+                  "kind": "await-expression",
+                  "operand": {
+                    "args": [
+                      {
+                        "kind": "number-literal",
+                        "position": {
+                          "column": 29,
+                          "line": 15,
+                          "offset": 263,
+                        },
+                        "raw": "2",
+                        "value": 2,
+                      },
+                    ],
+                    "callee": {
+                      "kind": "identifier",
+                      "name": "load",
+                      "position": {
+                        "column": 24,
+                        "line": 15,
+                        "offset": 258,
+                      },
+                    },
+                    "kind": "call-expression",
+                    "method": null,
+                    "position": {
+                      "column": 28,
+                      "line": 15,
+                      "offset": 262,
+                    },
+                    "typeArguments": [],
+                  },
+                  "position": {
+                    "column": 18,
+                    "line": 15,
+                    "offset": 252,
+                  },
+                },
+              ],
+            },
+            {
+              "kind": "return-statement",
+              "position": {
+                "column": 5,
+                "line": 17,
+                "offset": 271,
+              },
+              "values": [
+                {
+                  "kind": "binary-expression",
+                  "left": {
+                    "kind": "identifier",
+                    "name": "name",
+                    "position": {
+                      "column": 12,
+                      "line": 17,
+                      "offset": 278,
+                    },
+                  },
+                  "operator": "..",
+                  "position": {
+                    "column": 17,
+                    "line": 17,
+                    "offset": 283,
+                  },
+                  "right": {
+                    "args": [
+                      {
+                        "kind": "identifier",
+                        "name": "held",
+                        "position": {
+                          "column": 29,
+                          "line": 17,
+                          "offset": 295,
+                        },
+                      },
+                    ],
+                    "callee": {
+                      "kind": "identifier",
+                      "name": "tostring",
+                      "position": {
+                        "column": 20,
+                        "line": 17,
+                        "offset": 286,
+                      },
+                    },
+                    "kind": "call-expression",
+                    "method": null,
+                    "position": {
+                      "column": 28,
+                      "line": 17,
+                      "offset": 294,
+                    },
+                    "typeArguments": [],
+                  },
+                },
+              ],
+            },
+          ],
+          "isAsync": true,
+          "kind": "function-expression",
+          "parameters": [
+            {
+              "annotation": {
+                "kind": "type-name",
+                "name": "string",
+                "position": {
+                  "column": 37,
+                  "line": 14,
+                  "offset": 219,
+                },
+                "typeArguments": [],
+              },
+              "isVararg": false,
+              "name": "name",
+              "position": {
+                "column": 31,
+                "line": 14,
+                "offset": 213,
+              },
+            },
+          ],
+          "position": {
+            "column": 21,
+            "line": 14,
+            "offset": 203,
+          },
+          "returnAnnotation": {
+            "kind": "type-name",
+            "name": "string",
+            "position": {
+              "column": 46,
+              "line": 14,
+              "offset": 228,
+            },
+            "typeArguments": [],
+          },
+          "typeConstraints": [],
+          "typeParameters": [],
+        },
+      ],
+    },
+    {
+      "declarations": [
+        {
+          "annotation": {
+            "kind": "type-name",
+            "name": "table",
+            "position": {
+              "column": 17,
+              "line": 20,
+              "offset": 322,
+            },
+            "typeArguments": [],
+          },
+          "name": "settings",
+          "position": {
+            "column": 7,
+            "line": 20,
+            "offset": 312,
+          },
+        },
+      ],
+      "kind": "local-statement",
+      "position": {
+        "column": 1,
+        "line": 20,
+        "offset": 306,
+      },
+      "values": [
+        {
+          "fields": [
+            {
+              "key": null,
+              "name": "async",
+              "position": {
+                "column": 27,
+                "line": 20,
+                "offset": 332,
+              },
+              "value": {
+                "kind": "boolean-literal",
+                "position": {
+                  "column": 35,
+                  "line": 20,
+                  "offset": 340,
+                },
+                "value": true,
+              },
+            },
+            {
+              "key": null,
+              "name": "await",
+              "position": {
+                "column": 41,
+                "line": 20,
+                "offset": 346,
+              },
+              "value": {
+                "kind": "boolean-literal",
+                "position": {
+                  "column": 49,
+                  "line": 20,
+                  "offset": 354,
+                },
+                "value": false,
+              },
+            },
+          ],
+          "kind": "table-expression",
+          "position": {
+            "column": 25,
+            "line": 20,
+            "offset": 330,
+          },
+        },
+      ],
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "member-expression",
+            "object": {
+              "kind": "identifier",
+              "name": "settings",
+              "position": {
+                "column": 7,
+                "line": 22,
+                "offset": 369,
+              },
+            },
+            "position": {
+              "column": 15,
+              "line": 22,
+              "offset": 377,
+            },
+            "property": "async",
+          },
+          {
+            "kind": "member-expression",
+            "object": {
+              "kind": "identifier",
+              "name": "settings",
+              "position": {
+                "column": 23,
+                "line": 22,
+                "offset": 385,
+              },
+            },
+            "position": {
+              "column": 31,
+              "line": 22,
+              "offset": 393,
+            },
+            "property": "await",
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "print",
+          "position": {
+            "column": 1,
+            "line": 22,
+            "offset": 363,
+          },
+        },
+        "kind": "call-expression",
+        "method": null,
+        "position": {
+          "column": 6,
+          "line": 22,
+          "offset": 368,
+        },
+        "typeArguments": [],
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 22,
+        "offset": 363,
+      },
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "body": [
+              {
+                "expression": {
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "name": "value",
+                      "position": {
+                        "column": 11,
+                        "line": 25,
+                        "offset": 442,
+                      },
+                    },
+                  ],
+                  "callee": {
+                    "kind": "identifier",
+                    "name": "print",
+                    "position": {
+                      "column": 5,
+                      "line": 25,
+                      "offset": 436,
+                    },
+                  },
+                  "kind": "call-expression",
+                  "method": null,
+                  "position": {
+                    "column": 10,
+                    "line": 25,
+                    "offset": 441,
+                  },
+                  "typeArguments": [],
+                },
+                "kind": "call-statement",
+                "position": {
+                  "column": 5,
+                  "line": 25,
+                  "offset": 436,
+                },
+              },
+            ],
+            "isAsync": false,
+            "kind": "function-expression",
+            "parameters": [
+              {
+                "annotation": null,
+                "isVararg": false,
+                "name": "value",
+                "position": {
+                  "column": 24,
+                  "line": 24,
+                  "offset": 425,
+                },
+              },
+            ],
+            "position": {
+              "column": 14,
+              "line": 24,
+              "offset": 415,
+            },
+            "returnAnnotation": null,
+            "typeConstraints": [],
+            "typeParameters": [],
+          },
+        ],
+        "callee": {
+          "args": [
+            {
+              "kind": "number-literal",
+              "position": {
+                "column": 6,
+                "line": 24,
+                "offset": 407,
+              },
+              "raw": "3",
+              "value": 3,
+            },
+          ],
+          "callee": {
+            "kind": "identifier",
+            "name": "load",
+            "position": {
+              "column": 1,
+              "line": 24,
+              "offset": 402,
+            },
+          },
+          "kind": "call-expression",
+          "method": null,
+          "position": {
+            "column": 5,
+            "line": 24,
+            "offset": 406,
+          },
+          "typeArguments": [],
+        },
+        "kind": "call-expression",
+        "method": "next",
+        "position": {
+          "column": 8,
+          "line": 24,
+          "offset": 409,
+        },
+        "typeArguments": [],
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 24,
+        "offset": 402,
+      },
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "string-literal",
+            "position": {
+              "column": 8,
+              "line": 28,
+              "offset": 462,
+            },
+            "value": "a",
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "report",
+          "position": {
+            "column": 1,
+            "line": 28,
+            "offset": 455,
+          },
+        },
+        "kind": "call-expression",
+        "method": null,
+        "position": {
+          "column": 7,
+          "line": 28,
+          "offset": 461,
+        },
+        "typeArguments": [],
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 28,
+        "offset": 455,
+      },
+    },
+    {
+      "expression": {
+        "args": [
+          {
+            "kind": "string-literal",
+            "position": {
+              "column": 7,
+              "line": 29,
+              "offset": 473,
+            },
+            "value": "b",
+          },
+        ],
+        "callee": {
+          "kind": "identifier",
+          "name": "queue",
+          "position": {
+            "column": 1,
+            "line": 29,
+            "offset": 467,
+          },
+        },
+        "kind": "call-expression",
+        "method": null,
+        "position": {
+          "column": 6,
+          "line": 29,
+          "offset": 472,
+        },
+        "typeArguments": [],
+      },
+      "kind": "call-statement",
+      "position": {
+        "column": 1,
+        "line": 29,
+        "offset": 467,
+      },
+    },
+  ],
+  "kind": "program",
+  "position": {
+    "column": 1,
+    "line": 1,
+    "offset": 0,
+  },
+}
+`;
+
+exports[`fixture async.luam > locks the generated Lua 5.1 output 1`] = `
+"--!strict
+function load(id) return Promise.spawn(function(id)
+    Promise.await(delay(100))
+
+    return id
+end, id) end
+
+function report(...) return Promise.spawn(function(...)
+    local value = Promise.await(load(1))
+
+    print(value, ...)
+end, ...) end
+
+local queue = function(name) return Promise.spawn(function(name)
+    local held = Promise.await(load(2))
+
+    return name .. tostring(held)
+end, name) end
+
+local settings = { async = true, await = false }
+
+print(settings.async, settings.await)
+
+load(3):next(function (value)
+    print(value)
+end)
+
+report('a')
+queue('b')
+"
+`;
+
+exports[`fixture async.luam > locks the generated Lua 5.1 output 2`] = `
+[
+  "promise",
+]
+`;
+
+exports[`fixture async.luam > locks the token stream 1`] = `
+[
+  "keyword "async" 2:1",
+  "keyword "function" 2:7",
+  "identifier "load" 2:16",
+  "punctuation "(" 2:20",
+  "identifier "id" 2:21",
+  "punctuation ":" 2:23",
+  "identifier "number" 2:25",
+  "punctuation ")" 2:31",
+  "punctuation ":" 2:32",
+  "identifier "number" 2:34",
+  "keyword "await" 3:5",
+  "identifier "delay" 3:11",
+  "punctuation "(" 3:16",
+  "number "100" 3:17",
+  "punctuation ")" 3:20",
+  "keyword "return" 5:5",
+  "identifier "id" 5:12",
+  "keyword "end" 6:1",
+  "keyword "async" 8:1",
+  "keyword "function" 8:7",
+  "identifier "report" 8:16",
+  "punctuation "(" 8:22",
+  "operator "..." 8:23",
+  "punctuation ")" 8:26",
+  "punctuation ":" 8:27",
+  "identifier "void" 8:29",
+  "keyword "local" 9:5",
+  "identifier "value" 9:11",
+  "operator "=" 9:17",
+  "keyword "await" 9:19",
+  "identifier "load" 9:25",
+  "punctuation "(" 9:29",
+  "number "1" 9:30",
+  "punctuation ")" 9:31",
+  "identifier "print" 11:5",
+  "punctuation "(" 11:10",
+  "identifier "value" 11:11",
+  "punctuation "," 11:16",
+  "operator "..." 11:18",
+  "punctuation ")" 11:21",
+  "keyword "end" 12:1",
+  "keyword "local" 14:1",
+  "identifier "queue" 14:7",
+  "operator "=" 14:13",
+  "keyword "async" 14:15",
+  "keyword "function" 14:21",
+  "punctuation "(" 14:30",
+  "identifier "name" 14:31",
+  "punctuation ":" 14:35",
+  "identifier "string" 14:37",
+  "punctuation ")" 14:43",
+  "punctuation ":" 14:44",
+  "identifier "string" 14:46",
+  "keyword "local" 15:5",
+  "identifier "held" 15:11",
+  "operator "=" 15:16",
+  "keyword "await" 15:18",
+  "identifier "load" 15:24",
+  "punctuation "(" 15:28",
+  "number "2" 15:29",
+  "punctuation ")" 15:30",
+  "keyword "return" 17:5",
+  "identifier "name" 17:12",
+  "operator ".." 17:17",
+  "identifier "tostring" 17:20",
+  "punctuation "(" 17:28",
+  "identifier "held" 17:29",
+  "punctuation ")" 17:33",
+  "keyword "end" 18:1",
+  "keyword "local" 20:1",
+  "identifier "settings" 20:7",
+  "punctuation ":" 20:15",
+  "identifier "table" 20:17",
+  "operator "=" 20:23",
+  "punctuation "{" 20:25",
+  "keyword "async" 20:27",
+  "operator "=" 20:33",
+  "keyword "true" 20:35",
+  "punctuation "," 20:39",
+  "keyword "await" 20:41",
+  "operator "=" 20:47",
+  "keyword "false" 20:49",
+  "punctuation "}" 20:55",
+  "identifier "print" 22:1",
+  "punctuation "(" 22:6",
+  "identifier "settings" 22:7",
+  "punctuation "." 22:15",
+  "keyword "async" 22:16",
+  "punctuation "," 22:21",
+  "identifier "settings" 22:23",
+  "punctuation "." 22:31",
+  "keyword "await" 22:32",
+  "punctuation ")" 22:37",
+  "identifier "load" 24:1",
+  "punctuation "(" 24:5",
+  "number "3" 24:6",
+  "punctuation ")" 24:7",
+  "punctuation ":" 24:8",
+  "identifier "next" 24:9",
+  "punctuation "(" 24:13",
+  "keyword "function" 24:14",
+  "punctuation "(" 24:23",
+  "identifier "value" 24:24",
+  "punctuation ")" 24:29",
+  "identifier "print" 25:5",
+  "punctuation "(" 25:10",
+  "identifier "value" 25:11",
+  "punctuation ")" 25:16",
+  "keyword "end" 26:1",
+  "punctuation ")" 26:4",
+  "identifier "report" 28:1",
+  "punctuation "(" 28:7",
+  "string "a" 28:8",
+  "punctuation ")" 28:11",
+  "identifier "queue" 29:1",
+  "punctuation "(" 29:6",
+  "string "b" 29:7",
+  "punctuation ")" 29:10",
+]
+`;
+
 exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
 {
   "body": [
@@ -1424,6 +2393,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": true,
           "isStatic": false,
           "isSynthetic": false,
@@ -1503,6 +2473,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": false,
           "isStatic": false,
           "isSynthetic": false,
@@ -1579,6 +2550,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": false,
           "isStatic": false,
           "isSynthetic": false,
@@ -1734,6 +2706,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": true,
           "isStatic": false,
           "isSynthetic": false,
@@ -1849,6 +2822,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": false,
           "isStatic": false,
           "isSynthetic": false,
@@ -1996,6 +2970,7 @@ exports[`fixture classes.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": false,
           "isStatic": false,
           "isSynthetic": false,
@@ -4001,6 +4976,7 @@ exports[`fixture directives.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": true,
       "isHttpExport": false,
       "isLocal": false,
@@ -6178,6 +7154,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": false,
@@ -6299,6 +7276,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": true,
@@ -6411,6 +7389,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
               },
             },
           ],
+          "isAsync": false,
           "kind": "function-expression",
           "parameters": [
             {
@@ -6515,6 +7494,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
           },
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": false,
@@ -6598,6 +7578,7 @@ exports[`fixture functions.luam > locks the abstract syntax tree 1`] = `
           },
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": false,
@@ -7113,6 +8094,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": true,
           "isStatic": false,
           "isSynthetic": false,
@@ -7180,6 +8162,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": false,
           "isStatic": false,
           "isSynthetic": false,
@@ -7257,6 +8240,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
             },
           ],
           "decorators": [],
+          "isAsync": false,
           "isConstructor": false,
           "isStatic": false,
           "isSynthetic": false,
@@ -7367,6 +8351,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": false,
@@ -7464,6 +8449,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": false,
@@ -7568,6 +8554,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
           ],
         },
       ],
+      "isAsync": false,
       "isExported": false,
       "isHttpExport": false,
       "isLocal": false,
@@ -7723,6 +8710,7 @@ exports[`fixture generics.luam > locks the abstract syntax tree 1`] = `
               ],
             },
           ],
+          "isAsync": false,
           "kind": "function-expression",
           "parameters": [
             {

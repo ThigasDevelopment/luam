@@ -94,6 +94,18 @@ function calleeType(analysis: DocumentAnalysis, offset: number, segments: readon
     return target === null ? null : memberType(analysis, target, member);
 }
 
+const NATIVE_CONSTRUCTION = /\bnew\s+[A-Za-z_][A-Za-z0-9_]*\s*$/;
+
+const NATIVE_CONSTRUCTOR = 'new';
+
+function constructorType(text: string, open: number, callee: Type | null): Type | null {
+    if (callee === null || callee.kind !== 'record' || !NATIVE_CONSTRUCTION.test(text.slice(0, open))) {
+        return callee;
+    }
+
+    return callee.members.get(NATIVE_CONSTRUCTOR) ?? null;
+}
+
 const BLOCK_OPENERS: ReadonlySet<string> = new Set(['function', 'if', 'do']);
 
 function insideNestedFunction(analysis: DocumentAnalysis, frame: CallFrame, offset: number): boolean {
@@ -130,7 +142,7 @@ export function expectedArgument(analysis: DocumentAnalysis, offset: number, fra
     }
 
     const { segments } = calleeSegments(analysis.text, frame.open);
-    const callee = calleeType(analysis, offset, segments);
+    const callee = constructorType(analysis.text, frame.open, calleeType(analysis, offset, segments));
 
     if (callee === null || callee.kind !== 'function') {
         return null;

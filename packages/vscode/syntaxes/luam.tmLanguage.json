@@ -364,6 +364,14 @@
                     "match": "\\bnew\\b"
                 },
                 {
+                    "name": "storage.modifier.async.luam",
+                    "match": "\\basync\\b"
+                },
+                {
+                    "name": "keyword.control.await.luam",
+                    "match": "\\bawait\\b"
+                },
+                {
                     "name": "variable.language.self.luam",
                     "match": "\\b(?:self|super)\\b"
                 }

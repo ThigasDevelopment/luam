@@ -1,4 +1,4 @@
-import type { Token } from '@compiler/lexer/token';
+import type { Token, TokenKind } from '@compiler/lexer/token';
 import type { Expression, TypeAnnotation } from '@compiler/parser/ast';
 
 import type {
@@ -13,7 +13,7 @@ import type {
     InterfaceMember,
 } from './declaration-nodes';
 import { parseExpression } from './expression';
-import { parseFunctionExpression, parseParameters } from './function-expression';
+import { ASYNC_MODIFIER, consumeAsyncModifier, isAsyncFunctionStart, parseFunctionExpression, parseParameters } from './function-expression';
 import { recoverInBlock } from './recovery';
 import { parseBraceBlock } from './statement';
 import { ParserError, type TokenStream } from './token-stream';
@@ -131,14 +131,16 @@ export function parseDecorators(stream: TokenStream): Decorator[] {
     return decorators;
 }
 
-function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorator[], isStatic: boolean): ClassMethodDeclaration {
+function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorator[], isStatic: boolean, isAsync: boolean): ClassMethodDeclaration {
     stream.expect('operator', '=');
 
-    const expression = parseFunctionExpression(stream);
+    const modified = consumeAsyncModifier(stream) || isAsync;
+    const expression = parseFunctionExpression(stream, modified);
 
     return {
         kind: 'class-method',
         name: token.value,
+        isAsync: modified,
         isConstructor: token.value === 'constructor',
         isSynthetic: false,
         isStatic,
@@ -152,7 +154,7 @@ function parseClassMethod(stream: TokenStream, token: Token, decorators: Decorat
     };
 }
 
-function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: Decorator[], isStatic: boolean): ClassMethodDeclaration {
+function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: Decorator[], isStatic: boolean, isAsync: boolean): ClassMethodDeclaration {
     const parameters = parseParameters(stream);
     const returnAnnotation = parseOptionalAnnotation(stream);
     const body = parseBraceBlock(stream);
@@ -160,6 +162,7 @@ function parseBraceClassMethod(stream: TokenStream, token: Token, decorators: De
     return {
         kind: 'class-method',
         name: token.value,
+        isAsync,
         isConstructor: token.value === 'constructor',
         isSynthetic: false,
         isStatic,
@@ -200,14 +203,14 @@ function expectClassFieldBoundary(stream: TokenStream, token: Token): void {
 
 const STATIC_MODIFIER = 'static';
 
-function parseStaticModifier(stream: TokenStream): boolean {
-    if (!stream.check('identifier', STATIC_MODIFIER)) {
+function parseMemberModifier(stream: TokenStream, modifier: string, kind: TokenKind = 'identifier'): boolean {
+    if (!stream.check(kind, modifier)) {
         return false;
     }
 
-    const modifier = stream.current();
+    const token = stream.current();
 
-    if (!stream.checkName(1) || stream.peek(1).position.line !== modifier.position.line) {
+    if (!stream.checkName(1) || stream.peek(1).position.line !== token.position.line) {
         return false;
     }
 
@@ -221,17 +224,18 @@ function parseStaticModifier(stream: TokenStream): boolean {
 
 function parseClassMember(stream: TokenStream): ClassMember {
     const decorators = parseDecorators(stream);
-    const isStatic = parseStaticModifier(stream);
+    const isStatic = parseMemberModifier(stream, STATIC_MODIFIER);
+    const isAsync = parseMemberModifier(stream, ASYNC_MODIFIER, 'keyword');
     const token = stream.expectMemberKey();
 
     if (stream.check('punctuation', '(')) {
         stream.report('parse-class-method-form', `Write class member "${token.value}" as "${token.value} = function (...) ... end".`, token.position);
 
-        return parseBraceClassMethod(stream, token, decorators, isStatic);
+        return parseBraceClassMethod(stream, token, decorators, isStatic, isAsync);
     }
 
-    if (stream.check('operator', '=') && stream.checkAhead(1, 'keyword', 'function')) {
-        return parseClassMethod(stream, token, decorators, isStatic);
+    if (stream.check('operator', '=') && (stream.checkAhead(1, 'keyword', 'function') || isAsyncFunctionStart(stream, 1))) {
+        return parseClassMethod(stream, token, decorators, isStatic, isAsync);
     }
 
     const annotation = parseFieldAnnotation(stream);

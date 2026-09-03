@@ -3104,3 +3104,75 @@ Deliberately excluded:
 - Any change to the checker's behaviour, to inference, or to the emitted Lua.
   46.01 rewrites `checkValueList` over the extracted helper and changes nothing it
   answers.
+
+## Milestone 47 — Async Functions and a Promise Runtime
+
+`sleep` only works inside a coroutine that a `Threads` pool created and resumes.
+Called anywhere else it fails at runtime with *attempt to yield from outside a
+coroutine*, and the compiler says nothing about it. A blocking `sleep` outside a
+coroutine is impossible on Lua 5.1 — there is no stack to suspend, so it would
+freeze the server — which means the answer is not a better `sleep` but making the
+coroutine invisible. An `async function` compiles its body into a coroutine the
+promise scheduler drives, so `await` and `sleep` work anywhere inside it.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 47.01 | Ship a promise runtime with an event-driven scheduler | ../plans/47.01-promise-runtime.md | architecture-engineer | done |
+| 47.02 | Parse async functions and await expressions | ../plans/47.02-async-await-front-end.md | architecture-engineer | done |
+| 47.03 | Type Promise, async returns and await | ../plans/47.03-promise-type.md | architecture-engineer | done |
+| 47.04 | Lower async bodies onto coroutines | ../plans/47.04-async-lowering.md | architecture-engineer | done |
+| 47.05 | Fold Threads onto the promise scheduler | ../plans/47.05-threads-on-the-promise-scheduler.md | architecture-engineer | done |
+| 47.06 | Surface async, await and Promise in the editor | ../plans/47.06-async-editor-support.md | architecture-engineer | done |
+| 47.07 | Cover async, await and the promise scheduler | ../plans/47.07-async-tests.md | test-engineer | done |
+| 47.08 | Document async, await and the promise runtime | ../plans/47.08-async-documentation.md | documentation-engineer | done |
+
+Acceptance:
+
+- `local variable = await otherAsyncFn()` binds the resolved value, typed as the
+  async function's declared return. A rejection raises at the `await` site and
+  rejects the promise of the function containing it, so it reaches `:catch()`
+  rather than disappearing.
+- `async` and `await` are contextual, not reserved. `local async = new Async(100)`
+  still compiles, and every existing fixture is unchanged.
+- An async body is a real coroutine, so `await` lowers to a plain call. The
+  emitter gains no statement buffer, no temporary-name counter and no CPS pass.
+- One yield protocol and one pulse timer serve both libraries. `await` and `sleep`
+  behave identically inside an async function and inside a pool job.
+- `pool:add(fn)` still returns its id first, so existing code is untouched, and
+  its second value is a promise that settles when the job finishes.
+- No failure is silent. Every `coroutine.resume` result is read, a double settle
+  is a no-op, an executor that throws rejects, and `await` outside a task errors
+  instead of returning nil.
+- A resource that names none of the runtime globals and declares no async
+  function ships no promise file.
+
+Why now:
+
+- The gap is already being worked around by hand. Resource code in the wild
+  reimplements `async`, `await` and a promise per project, and those copies share
+  the same defects: resumes whose results are discarded, no guard against a
+  double settle, rejection reasons dropped, and `unpack` truncating a trailing
+  nil. Every one of those is a language-level fix, made once.
+- The two libraries are on a collision course. `Threads` resumes a coroutine with
+  the `Thread` object and a promise scheduler resumes it with `(ok, ...)`. Until
+  they merge, `await` inside a pool job is broken, and broken quietly.
+- The cheap version of this feature is available and the expensive one is not.
+  Because the body is a coroutine, `await` needs no continuation transform — the
+  work is a wrap and a call. A design without coroutines would need hoisting
+  machinery the emitter does not have.
+- `sleep` is the wrong default today. It busy-yields and is re-checked on every
+  pulse; a timer-driven wait consumes nothing while suspended.
+
+Deliberately excluded:
+
+- Promise wrappers for `fetchRemote`, `dbQuery` and event round trips. They are
+  the obvious payoff and they belong to their own milestone, once the core is
+  proven.
+- `try` / `catch`. `Promise.settle` covers branching on an outcome without
+  syntax, and a statement form is a separate language decision.
+- Inferring `T` from an executor's `resolve` calls. An explicit type argument or
+  `Promise<any>` is enough here.
+- Removing or deprecating any `Threads` or `Async` method. 47.05 keeps every one
+  of them working; only the recommendation changes.

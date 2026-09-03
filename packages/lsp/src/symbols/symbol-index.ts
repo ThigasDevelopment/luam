@@ -19,6 +19,7 @@ function walkFunction(state: CollectorState, block: BlockContext, expression: Fu
         body: expression.body,
         selfType: null,
         container: block.container,
+        isAsync: expression.isAsync,
     });
 }
 

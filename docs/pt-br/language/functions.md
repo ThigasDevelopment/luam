@@ -199,6 +199,72 @@ local function trace(...): void
 end
 ```
 
+## Funções async
+
+Uma `async function` roda o corpo como corrotina e devolve uma promise, então
+`await` lê um valor que chega depois sem travar o servidor:
+
+```luam
+async function loadProfile(id: number): number
+    local record = await readRecord(id)
+
+    sleep(200)
+
+    return record
+end
+
+async function greet(id: number): void
+    local record = await loadProfile(id)
+
+    outputChatBox(tostring(record))
+end
+```
+
+A anotação de retorno é o tipo **interno**. O `loadProfile` acima tem a
+assinatura `loadProfile(id: number): Promise<number>`, e o `await` devolve o
+`number`. Anotar `Promise` por conta própria é `check-async-return-annotation`.
+
+Uma rejeição é **levantada** no ponto do `await`, e esse erro rejeita a promise
+da função que o contém, então ela chega ao `:catch()` no fim da cadeia em vez de
+desaparecer. Para decidir pelo resultado sem levantar, use `Promise.settle`, que
+devolve `true` e o valor, ou `false` e o motivo:
+
+```luam
+async function tryLoad(id: number): string
+    local ok, reason = Promise.settle(loadProfile(id))
+
+    if ok then
+        return 'loaded'
+    end
+
+    return tostring(reason)
+end
+```
+
+Quem não é uma função async pode encadear:
+
+```luam
+loadProfile(1):next(function (record)
+    outputChatBox(tostring(record))
+end):catch(function (reason)
+    outputDebugString(tostring(reason))
+end)
+```
+
+### Duas fronteiras
+
+**Lua 5.1 não consegue dar yield através de uma fronteira C.** Nada de `await`
+dentro de `pcall`, `xpcall`, de um comparador de `table.sort` ou de um
+metamétodo — o runtime levanta *attempt to yield across a C-call boundary*.
+Chamar uma função async **a partir** de um handler de evento do MTA é seguro: só
+existem frames Lua entre o resume e o yield.
+
+**O MTA nunca dispara um timer antes de 50ms.** `delay(0)` e `sleep(0)` dentro
+de uma função async voltam no próximo tick, não no próximo frame. Dentro de um
+job de `Threads`, o `sleep` continua cedendo ao pulso do pool, que é o que
+mantém o orçamento de frames útil. Veja
+[Helpers de runtime](/pt-br/mta/resources#helpers-de-runtime).
+
 ## Um exemplo completo
 
 <<< @/snippets/language/src/shared/functions.luam

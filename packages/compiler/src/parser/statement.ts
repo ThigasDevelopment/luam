@@ -7,8 +7,8 @@ import { isDeclarationStart, parseDeclaration, parseDecorators, parseEnumDeclara
 import type { EventDeclaration } from './declaration-nodes';
 import { absorbDeclarationTerminator } from './erased-declarations';
 import { isDirectiveStart, parseDirective } from './directives';
-import { parseExpression, parseSuffixed } from './expression';
-import { parseFunctionDeclaration, parseParameters } from './function-expression';
+import { isAwaitStart, parseAwaitExpression, parseExpression, parseSuffixed } from './expression';
+import { consumeAsyncModifier, isAsyncFunctionStart, parseFunctionDeclaration, parseParameters } from './function-expression';
 import { ASSIGNMENT_OPERATORS, INCREMENT_OPERATORS } from './precedence';
 import { BRACE_TERMINATORS, recoverInBlock } from './recovery';
 import { ParserError, type TokenStream } from './token-stream';
@@ -196,6 +196,12 @@ function parseGlobalDeclaration(stream: TokenStream): Statement | null {
 }
 
 function parseExpressionStatement(stream: TokenStream): Statement {
+    if (isAwaitStart(stream)) {
+        const expression = parseAwaitExpression(stream);
+
+        return { kind: 'call-statement', expression, position: expression.position };
+    }
+
     const declaration = parseGlobalDeclaration(stream);
 
     if (declaration !== null) {
@@ -239,6 +245,12 @@ function parseKeywordStatement(stream: TokenStream, value: string): Statement | 
 
         if (stream.check('keyword', 'function')) {
             return parseFunctionDeclaration(stream, true);
+        }
+
+        if (isAsyncFunctionStart(stream)) {
+            consumeAsyncModifier(stream);
+
+            return parseFunctionDeclaration(stream, true, false, false, true);
         }
 
         const isEnum = stream.check('keyword', 'enum') && stream.checkAhead(1, 'identifier');
@@ -298,6 +310,12 @@ export function parseStatement(stream: TokenStream): Statement {
         if (statement !== null) {
             return statement;
         }
+    }
+
+    if (isAsyncFunctionStart(stream)) {
+        consumeAsyncModifier(stream);
+
+        return parseFunctionDeclaration(stream, false, false, false, true);
     }
 
     if (isTypeAlias(stream)) {

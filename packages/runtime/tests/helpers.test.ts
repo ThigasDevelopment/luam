@@ -76,24 +76,28 @@ describe('runtime helpers', () => {
     it('injects a helper from a language feature, a referenced global, or an opt-in', () => {
         expect(automaticHelpers()).toEqual(['class', 'math', 'string', 'table', 'validate']);
         expect(manualHelpers()).toEqual(['env']);
-        expect(referenceHelpers()).toEqual(['async', 'threads']);
+        expect(referenceHelpers()).toEqual(['async', 'promise', 'threads']);
     });
 
     it('names the globals that pull a library in', () => {
-        expect(runtimeGlobals()).toEqual(['Async', 'Threads', 'sleep']);
-        expect(helperForGlobal('sleep')).toBe('threads');
+        expect(runtimeGlobals()).toEqual(['Async', 'Promise', 'Threads', 'delay', 'sleep']);
+        expect(helperForGlobal('sleep')).toBe('promise');
+        expect(helperForGlobal('delay')).toBe('promise');
+        expect(helperForGlobal('Promise')).toBe('promise');
         expect(helperForGlobal('Threads')).toBe('threads');
         expect(helperForGlobal('Async')).toBe('async');
         expect(helperForGlobal('outputChatBox')).toBeNull();
     });
 
     it('pulls in what a library depends on', () => {
-        expect(expandHelpers(['async']).sort()).toEqual(['async', 'threads']);
-        expect(expandHelpers(['threads'])).toEqual(['threads']);
+        expect(expandHelpers(['async']).sort()).toEqual(['async', 'promise', 'threads']);
+        expect(expandHelpers(['threads']).sort()).toEqual(['promise', 'threads']);
+        expect(expandHelpers(['promise'])).toEqual(['promise']);
         expect(expandHelpers([])).toEqual([]);
     });
 
     it('loads a library after everything it requires', () => {
+        expect(helperDepth('promise')).toBeLessThan(helperDepth('threads'));
         expect(helperDepth('threads')).toBeLessThan(helperDepth('async'));
         expect(helperDepth('class')).toBe(0);
     });
@@ -109,15 +113,16 @@ describe('runtime helpers', () => {
     it('recognizes only the helpers it ships', () => {
         expect(names.every(isRuntimeHelperName)).toBe(true);
         expect(isRuntimeHelperName('async')).toBe(true);
-        expect(isRuntimeHelperName('promise')).toBe(false);
+        expect(isRuntimeHelperName('promise')).toBe(true);
+        expect(isRuntimeHelperName('coroutine')).toBe(false);
         expect(isRuntimeHelperName('toString')).toBe(false);
     });
 
     it('defines the class registry the framework loader scans', () => {
         const source = read('class');
 
-        expect(source).toContain('function getClasses()');
-        expect(source).toContain('function bind(func, self)');
+        expect(source).toContain('function getClasses ()');
+        expect(source).toContain('function bind (func, self)');
         expect(source).toContain('__super');
         expect(source).toContain('__name');
     });
@@ -125,15 +130,15 @@ describe('runtime helpers', () => {
     it('defines the global entry points the generated Lua calls', () => {
         const source = read('class');
 
-        expect(source).toContain('function class(name)');
-        expect(source).toContain('function new(name)');
-        expect(source).toContain('function enum(names)');
+        expect(source).toContain('function class (name)');
+        expect(source).toContain('function new (name)');
+        expect(source).toContain('function enum (names)');
     });
 
     it('extends the standard libraries the emitter rewrites to', () => {
-        expect(read('table')).toContain('function table.size(');
-        expect(read('string')).toContain('function string.template(');
-        expect(read('math')).toContain('function math.clamp(');
+        expect(read('table')).toContain('function table.size (');
+        expect(read('string')).toContain('function string.template (');
+        expect(read('math')).toContain('function math.clamp (');
     });
 
     it.each(names)('keeps %s free of syntax newer than Lua 5.1', (name) => {
@@ -147,7 +152,7 @@ describe('runtime helpers', () => {
     it('builds one instance metatable and one constructor per class', () => {
         const source = read('class');
 
-        expect(source).toContain('local constructors = {}');
+        expect(source).toContain('local constructors = { }');
         expect(source).toContain('constructors[definition] = constructor');
         expect(source).not.toMatch(/setmetatable\(\{\}, instanceMetatable\(/);
     });

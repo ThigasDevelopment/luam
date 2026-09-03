@@ -29,6 +29,20 @@ function reindent(code: string, indent: string): string {
         .join('\n');
 }
 
+const CLOSING_LINE = /^\s*(?:end|\})/;
+
+function padAboveClosing(replacement: string, missing: number): string {
+    const lines = replacement.split('\n');
+    const closing = lines[lines.length - 1] ?? '';
+    const blanks = Array.from({ length: missing }, () => '');
+
+    if (lines.length < 2 || !CLOSING_LINE.test(closing)) {
+        return [replacement, ...blanks].join('\n');
+    }
+
+    return [...lines.slice(0, -1), ...blanks, closing].join('\n');
+}
+
 function erasedEnd(source: string, span: SourceSpan): number {
     const trailing = TRAILING_SEMICOLON.exec(source.slice(span.end));
 
@@ -59,7 +73,7 @@ export function canonicalEdit(input: PreserveInput, statement: Statement, span: 
         return null;
     }
 
-    const padded = missing > 0 && source.slice(end).trim().length > 0 ? `${replacement}${'\n'.repeat(missing)}` : replacement;
+    const padded = missing > 0 && source.slice(end).trim().length > 0 ? padAboveClosing(replacement, missing) : replacement;
 
     return { start: span.start, end, replacement: padded, lines: emitted.lines };
 }

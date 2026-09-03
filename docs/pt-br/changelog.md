@@ -11,6 +11,25 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.1 - 2026-09-03
+
+### Adicionado
+
+- [Funções](/pt-br/language/functions) ganha **Funções async**: o que uma
+  `async function` devolve, por que a anotação é o tipo interno, como uma
+  rejeição é levantada no ponto do `await` e as duas fronteiras — nada de
+  `await` através de uma fronteira C como `pcall`, e o piso de 50ms dos timers
+  do MTA.
+- [Resources MTA](/pt-br/mta/resources) documenta o runtime de promises membro a
+  membro e responde quando usar uma promise e quando usar um pool, com a
+  aritmética de orçamento de frames por trás da resposta.
+- [Palavras-chave](/pt-br/reference/keywords) registra que `async` e `await` são
+  contextuais, e que `sleep` é válido dentro de uma função async e dentro de um
+  job de `Threads`, e em nenhum outro lugar.
+- [Diagnósticos](/pt-br/reference/diagnostics) ganha `check-await-outside-async`,
+  `check-await-non-promise`, `check-async-return-annotation` e
+  `check-sleep-outside-async`.
+
 ## 1.0.0 - 2026-09-02
 
 ### Adicionado

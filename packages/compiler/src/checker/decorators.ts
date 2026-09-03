@@ -40,6 +40,7 @@ function accessorMethod(field: ClassFieldDeclaration, decorator: string, name: s
     return {
         kind: 'class-method',
         name,
+        isAsync: false,
         isConstructor: false,
         isSynthetic: true,
         isStatic: false,
@@ -61,7 +62,7 @@ function generatedMethod(
     kind: NonNullable<ClassMethodDeclaration['generated']>['kind'],
     fields: ClassFieldDeclaration[],
 ): ClassMethodDeclaration {
-    return { kind: 'class-method', name, isConstructor: false, isSynthetic: true, isStatic: false, typeParameters: [], typeConstraints: [], parameters, returnAnnotation, body: [], decorators: [], generated: { kind, fields }, position: field.position };
+    return { kind: 'class-method', name, isAsync: false, isConstructor: false, isSynthetic: true, isStatic: false, typeParameters: [], typeConstraints: [], parameters, returnAnnotation, body: [], decorators: [], generated: { kind, fields }, position: field.position };
 }
 
 function typeName(name: string, node: { position: TypeAnnotation['position'] }): TypeAnnotation {
@@ -117,6 +118,7 @@ function staticMethod(
     return {
         kind: 'class-method',
         name,
+        isAsync: false,
         isConstructor: false,
         isSynthetic: true,
         isStatic: true,

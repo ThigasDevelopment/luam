@@ -13,10 +13,11 @@ import type {
 } from '@compiler/parser/ast';
 
 import { assignedPath, forgetAssignedPaths, pathOf } from './access-path';
+import { asyncInnerAnnotation, promiseOf, reportAsyncAnnotation } from './async';
 import { deferRecordCompletion, dischargeRecordKey, extendInferredRecord, settleRecordObligations } from './record-completion';
 import { reportImplicitGlobal, reportShadowedGlobal, reportShadowedHelper } from './shadowing';
 import { checkClassDeclaration, checkEnumDeclaration, checkInterfaceDeclaration } from './classes';
-import type { CheckContext } from './context';
+import type { CheckContext, FunctionFrame } from './context';
 import { checkBlock, checkGenericFor, checkIf, checkNumericFor, checkRepeat, checkWhile } from './control-flow';
 import { checkExpression, checkValueList } from './expressions';
 import { checkEventDeclaration } from './events';
@@ -52,6 +53,7 @@ export function buildFunctionType(
     parameters: readonly Parameter[],
     returnAnnotation: TypeAnnotation | null,
     contextual: FunctionType | null = null,
+    isAsync = false,
 ): FunctionType {
     const isVariadic = parameters.some((parameter) => parameter.isVararg);
     const named = parameters.filter((parameter) => !parameter.isVararg);
@@ -60,7 +62,12 @@ export function buildFunctionType(
     );
     const names = named.map((parameter) => parameter.name);
 
-    return createFunction(types, context.resolveAnnotation(returnAnnotation), minimumArguments(context, parameters), isVariadic, names);
+    reportAsyncAnnotation(context, isAsync, returnAnnotation);
+
+    const declared = context.resolveAnnotation(asyncInnerAnnotation(isAsync, returnAnnotation));
+    const returnType = isAsync ? promiseOf(declared) : declared;
+
+    return createFunction(types, returnType, minimumArguments(context, parameters), isVariadic, names);
 }
 
 export function applyTypeParameters(
@@ -110,14 +117,17 @@ export function checkFunctionBody(
     signature: FunctionType,
     selfType: Type | null,
     position: SourcePosition = ORIGIN,
+    frame: FunctionFrame = { isAsync: false, isExpression: false },
 ): void {
     forgetAssignedPaths(context, body);
 
     const entry = context.flowState;
+    const annotation = asyncInnerAnnotation(frame.isAsync, returnAnnotation);
 
     context.setFlow(cloneFlow(entry));
     context.binder.pushScope();
-    context.pushReturnType(returnAnnotation === null ? null : context.resolveAnnotation(returnAnnotation));
+    context.pushFunctionFrame(frame);
+    context.pushReturnType(annotation === null ? null : context.resolveAnnotation(annotation));
 
     if (selfType !== null) {
         context.binder.declare({ name: 'self', type: selfType, isLocal: true, position: ORIGIN });
@@ -150,10 +160,11 @@ export function checkFunctionBody(
 
     const inferred = context.popReturnType();
 
-    if (returnAnnotation === null) {
-        signature.returnType = inferred;
+    if (annotation === null) {
+        signature.returnType = frame.isAsync ? promiseOf(inferred) : inferred;
     }
 
+    context.popFunctionFrame();
     context.binder.popScope();
     context.setFlow(entry);
 }
@@ -345,7 +356,7 @@ function reportShadowedAssignment(context: CheckContext, target: Expression): vo
 }
 
 function checkFunctionDeclaration(context: CheckContext, statement: FunctionDeclaration): void {
-    const built = buildFunctionType(context, statement.parameters, statement.returnAnnotation);
+    const built = buildFunctionType(context, statement.parameters, statement.returnAnnotation, null, statement.isAsync);
     const type = applyTypeParameters(context, built, statement.typeParameters, statement.typeConstraints);
 
     if (statement.name.kind === 'identifier') {
@@ -364,7 +375,10 @@ function checkFunctionDeclaration(context: CheckContext, statement: FunctionDecl
     }
 
     context.record(statement.name, type);
-    checkFunctionBody(context, statement.parameters, statement.returnAnnotation, statement.body, type, statement.isMethod ? ANY_TYPE : null, statement.position);
+    checkFunctionBody(context, statement.parameters, statement.returnAnnotation, statement.body, type, statement.isMethod ? ANY_TYPE : null, statement.position, {
+        isAsync: statement.isAsync,
+        isExpression: false,
+    });
 }
 
 function checkReturn(context: CheckContext, statement: ReturnStatement): void {

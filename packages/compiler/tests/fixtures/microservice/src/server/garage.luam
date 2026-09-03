@@ -1,0 +1,27 @@
+serve('garage.read', function (payload: table, resolve: fun, reject: fun)
+    resolve({ owner = payload.owner, slots = 4 })
+end)
+
+serve('garage.fail', function (payload: table, resolve: fun, reject: fun)
+    reject('the garage is closed')
+end)
+
+serve('garage.silent', function (payload: table, resolve: fun, reject: fun)
+    print('nobody answers this one')
+end)
+
+async function readGarage(owner: string): table
+    local garage = await request('garage.read', { owner = owner })
+
+    return garage
+end
+
+async function readOrReport(name: string): string
+    local ok, reason = Promise.settle(request(name, {}))
+
+    if ok then
+        return 'answered'
+    end
+
+    return tostring(reason)
+end

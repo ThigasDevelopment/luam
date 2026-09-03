@@ -1,4 +1,4 @@
-export type RuntimeHelperName = 'async' | 'class' | 'env' | 'math' | 'string' | 'table' | 'threads' | 'validate';
+export type RuntimeHelperName = 'async' | 'class' | 'env' | 'math' | 'promise' | 'string' | 'table' | 'threads' | 'validate';
 
 export type DevelopmentRuntimeHelperName = 'development-logs-client' | 'development-logs-server';
 
@@ -17,6 +17,7 @@ export type RuntimeFeature =
     | 'table-extension'
     | 'template-string'
     | 'thread'
+    | 'async-function'
     | 'boundary-validation';
 
 export interface RuntimeHelperModule {
@@ -52,9 +53,16 @@ export const RUNTIME_HELPERS: Readonly<Record<RuntimeHelperName, RuntimeHelperMo
     },
     env: { name: 'env', file: 'env.lua', injection: 'manual', features: [], environment: 'server' },
     math: { name: 'math', file: 'math.lua', injection: 'automatic', features: ['number-extension'] },
+    promise: {
+        name: 'promise',
+        file: 'promise.lua',
+        injection: 'reference',
+        features: ['async-function'],
+        globals: ['Promise', 'delay', 'sleep'],
+    },
     string: { name: 'string', file: 'string.lua', injection: 'automatic', features: ['string-extension', 'template-string'] },
     table: { name: 'table', file: 'table.lua', injection: 'automatic', features: ['table-extension'] },
-    threads: { name: 'threads', file: 'threads.lua', injection: 'reference', features: ['thread'], globals: ['sleep', 'Threads'] },
+    threads: { name: 'threads', file: 'threads.lua', injection: 'reference', features: ['thread'], globals: ['Threads'], requires: ['promise'] },
     validate: { name: 'validate', file: 'validate.lua', injection: 'automatic', features: ['boundary-validation'] },
 };
 
@@ -82,6 +90,7 @@ export const FEATURE_HELPERS: Readonly<Record<RuntimeFeature, RuntimeHelperName>
     'table-extension': 'table',
     'template-string': 'string',
     thread: 'threads',
+    'async-function': 'promise',
     'boundary-validation': 'validate',
 };
 

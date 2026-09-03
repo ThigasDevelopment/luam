@@ -122,11 +122,11 @@ describe('configuration validation', () => {
     });
 
     it('rejects a helper the runtime does not ship', () => {
-        const loaded = load("name = 'demo'\nhelpers = { 'promise' }\n");
+        const loaded = load("name = 'demo'\nhelpers = { 'coroutine' }\n");
 
         expect(loaded.config).toBeNull();
         expect(codes(loaded.diagnostics)).toEqual(['config-unknown-helper']);
-        expect(loaded.diagnostics[0]?.message).toContain('Known helpers: "async", "class", "env", "math", "string", "table", "threads"');
+        expect(loaded.diagnostics[0]?.message).toContain('Known helpers: "async", "class", "env", "math", "promise", "string", "table", "threads"');
     });
 
     it('reads development log capture limits', () => {

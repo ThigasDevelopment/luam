@@ -16,7 +16,7 @@ export const EMPTY_AMBIENT: AmbientDeclarations = { classes: [], interfaces: [],
 export function ambientFromRegistry(registry: DeclarationRegistry): AmbientDeclarations {
     return {
         classes: registry.allClasses(),
-        interfaces: registry.allInterfaces(),
+        interfaces: registry.allInterfaces().filter((info) => info.isBuiltin !== true),
         enums: registry.allEnums().filter((info) => info.isLocal !== true),
         aliases: registry.allAliases(),
         globals: registry.allGlobals(),

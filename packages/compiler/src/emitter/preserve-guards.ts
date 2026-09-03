@@ -13,7 +13,10 @@ export function isPreservableExpression(expression: Expression, types: Expressio
     switch (expression.kind) {
         case 'template-literal':
         case 'new-expression':
+        case 'await-expression':
             return false;
+        case 'function-expression':
+            return !expression.isAsync;
         case 'member-expression':
             return (
                 !statics.has(expression) &&
@@ -77,11 +80,12 @@ export function isPreservableStatement(statement: Statement, types: ExpressionTy
             );
         case 'generic-for-statement':
             return every(statement.iterators, types, statics);
+        case 'function-declaration':
+            return !statement.isAsync;
         case 'break-statement':
         case 'declare-statement':
         case 'do-statement':
         case 'event-declaration':
-        case 'function-declaration':
         case 'interface-declaration':
         case 'type-alias-statement':
             return true;

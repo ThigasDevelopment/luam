@@ -2,7 +2,7 @@
 
 Every word in this page is reserved by the lexer: none of them can name a
 variable, a parameter or a function. Luam reserves the 21 Lua 5.1 keywords and
-adds 11 of its own.
+adds 13 of its own.
 
 The one place a reserved word is still allowed is a **property name** — after a
 `.` or a `:`, as a table field key, and as a class, interface or enum member.
@@ -44,10 +44,12 @@ than mapped onto `goto` — see [Lua foundations](/en/language/syntax).
 
 ## Keywords Luam adds
 
-These 11 words are reserved on top of Lua 5.1.
+These 13 words are reserved on top of Lua 5.1.
 
 | Keyword | Role | Page |
 | --- | --- | --- |
+| `async` | Runs a function body as a coroutine that returns a promise | [Functions](/en/language/functions#async-functions) |
+| `await` | Waits for a promise inside an async function | [Functions](/en/language/functions#async-functions) |
 | `continue` | Skips to the next iteration of the innermost loop | [Lua foundations](/en/language/syntax) |
 | `class` | Opens a class declaration | [Classes](/en/language/classes) |
 | `extends` | Names the parent of a class | [Classes](/en/language/classes) |
@@ -141,6 +143,11 @@ They are not identifiers you can shadow, and an unknown name there is
 
 ## Runtime globals
 
-`sleep`, `Threads`, `Async`, `env` and `process` are **globals declared by the
-runtime**, not keywords. Naming one pulls its helper into the build; shadowing
-one with your own local is legal Lua and simply hides it.
+`sleep`, `delay`, `Promise`, `Threads`, `Async`, `env` and `process` are
+**globals declared by the runtime**, not keywords. Naming one pulls its helper
+into the build; shadowing one with your own local is legal Lua and simply hides
+it.
+
+`sleep` is valid inside an async function and inside a `Threads` job. Anywhere
+else there is no coroutine to suspend: the compiler warns with
+`check-sleep-outside-async` and the runtime raises.
