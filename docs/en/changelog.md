@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.2 - 2026-09-03
+
 ### Added
 
 - [Language server](/en/tooling/language-server) gains **Blocks**: the closers

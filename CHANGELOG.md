@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.2 - 2026-09-03
+
 ### Added
 
 - Completion closes an open block and scaffolds a whole one. The closer item

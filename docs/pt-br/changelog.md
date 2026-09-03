@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.2 - 2026-09-03
+
 ### Adicionado
 
 - [Language server](/pt-br/tooling/language-server) ganha **Blocos**: os
