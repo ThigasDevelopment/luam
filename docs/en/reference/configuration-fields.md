@@ -39,8 +39,13 @@ A pattern accepts `*`, `**`, and `?`, with `/` as the separator. Regex, negation
 brace expansion, and extglobs are `config-invalid-pattern`. A file matched by two
 sides is `config-source-side-conflict`, a literal path naming no file is
 `config-missing-source`, and a project where no pattern matched is
-`config-no-sources`. An environment directive in the file wins over the mapping
+`config-unmatched-source` when it holds `.luam` files and `config-no-sources`
+when it holds none. An environment directive in the file wins over the mapping
 and reports `env-path-directive-conflict`.
+
+A `.luam` file in the project root is compiled whether or not `sources` names
+it, with the side its directive declares and `shared` without one, so removing
+the block and keeping the scaffolded one both work for a flat resource.
 
 ## Assets
 
@@ -51,8 +56,9 @@ and reports `env-path-directive-conflict`.
 | `assets[].to` | `string` | no | `'.'` | Destination directory inside the resource. |
 
 Two entries landing on the same destination, or a destination that would
-overwrite `meta.xml` or `lib/`, are `config-output-collision`. Only what a
-mapping names is copied.
+overwrite `meta.xml` or `lib/`, are `config-output-collision`. A mapping that
+copies nothing is the `config-empty-asset` warning. Only what a mapping names is
+copied.
 
 ## Dependencies and engine
 

@@ -38,6 +38,26 @@ Veja [Ambientes](/pt-br/mta/environments) para a regra completa.
 Um arquivo que nenhum padrão de `sources` e nenhum mapeamento de `assets` nomeia
 não faz parte do build. Nada é copiado por acidente.
 
+### Um arquivo ao lado do manifesto
+
+Há uma exceção, e ela é a raiz do projeto. Um arquivo `.luam` diretamente ao lado
+do `.luam.manifest` é compilado mesmo quando nenhum padrão de `sources` o nomeia,
+então o menor resource possível tem dois arquivos:
+
+```
+my-resource/
+├── .luam.manifest
+└── index.luam
+```
+
+Um arquivo na raiz não tem pasta de onde ler seu lado, então sua diretiva `#!`
+decide, e ele roda como `shared` quando não declara nenhuma. Nada mais muda: um
+arquivo `.luam` em um subdiretório que nenhum padrão nomeia continua fora do
+build, e o build diz isso com `config-unmatched-source`.
+
+A exceção para na raiz. Um diretório, o que guarda o manifesto, é o único lugar
+lido sem um padrão — um arquivo colocado ali foi colocado ali de propósito.
+
 ## O que um build escreve
 
 ```

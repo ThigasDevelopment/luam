@@ -14,6 +14,8 @@ import { createProjectFixture, manifestSource, VALID_SERVER, type ProjectFixture
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
+const SCAFFOLD_SOURCE = ['function greet(name: string): string', "    return 'hi ' .. name", 'end', ''].join('\n');
+
 const fixtures: ProjectFixture[] = [];
 
 function fixture(files: Readonly<Record<string, string>> = {}): ProjectFixture {
@@ -59,7 +61,22 @@ describe('scaffold plan', () => {
         expect(content).toContain("author = 'Luam Team'");
         expect(content).toContain("outDir = 'build'");
         expect(content).toContain("server = { 'src/server/**/*.luam' },");
-        expect(content).toContain("{ from = 'assets/**/*', to = 'assets' },");
+        expect(content).toContain("#     { from = 'assets/**/*', to = 'assets' },");
+        expect(content).not.toMatch(/^assets = \{/m);
+    });
+
+    it('scaffolds a manifest whose first build reports no warning', async () => {
+        const created = fixture();
+
+        expect((await init(created.root, '--name', 'demo')).code).toBe(EXIT_OK);
+
+        created.write('src/shared/config.luam', SCAFFOLD_SOURCE);
+
+        const logger = createMemoryLogger();
+
+        expect(await runCli(['build', '--cwd', created.root], { logger, env: OFFLINE })).toBe(EXIT_OK);
+        expect(logger.warnings).toEqual([]);
+        expect(logger.text()).toContain('0 errors, 0 warnings');
     });
 
     it('scaffolds the project manifest and nothing else', async () => {

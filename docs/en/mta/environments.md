@@ -15,6 +15,11 @@ file is declared in `meta.xml`.
 | `src/server/**` | `server` |
 | `src/client/**` | `client` |
 | `src/shared/**` | `shared` |
+| `index.luam`, in the project root | `shared` |
+
+A file in the project root has no folder to read, so the directive is the only
+thing that speaks, and `shared` is the answer when it stays silent. See
+[Project layout](/en/guide/project-layout) for the layout that produces one.
 
 ```luam env=client
 #!client

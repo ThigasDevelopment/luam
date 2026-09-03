@@ -3256,16 +3256,16 @@ whose glob matches nothing finishes with `0 errors, 0 warnings` and copies
 nothing, which reads as a broken glob engine and is not one — so it gets the
 same treatment here.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 49.01 | Compile a source file that sits at the project root | ../plans/49.01-compile-a-root-level-source.md | architecture-engineer | todo |
-| 49.02 | Rebuild when a root-level source changes | ../plans/49.02-watch-a-root-level-source.md | architecture-engineer | todo |
-| 49.03 | Name the source files no pattern matched | ../plans/49.03-name-the-unmatched-sources.md | architecture-engineer | todo |
-| 49.04 | Cover the root-level layout in the tests | ../plans/49.04-root-level-source-tests.md | test-engineer | todo |
-| 49.05 | Document the root-level layout | ../plans/49.05-root-level-source-documentation.md | documentation-engineer | todo |
-| 49.06 | Report an assets mapping that matched nothing | ../plans/49.06-report-an-empty-asset-mapping.md | architecture-engineer | todo |
+| 49.01 | Compile a source file that sits at the project root | ../plans/49.01-compile-a-root-level-source.md | architecture-engineer | done |
+| 49.02 | Rebuild when a root-level source changes | ../plans/49.02-watch-a-root-level-source.md | architecture-engineer | done |
+| 49.03 | Name the source files no pattern matched | ../plans/49.03-name-the-unmatched-sources.md | architecture-engineer | done |
+| 49.04 | Cover the root-level layout in the tests | ../plans/49.04-root-level-source-tests.md | test-engineer | done |
+| 49.05 | Document the root-level layout | ../plans/49.05-root-level-source-documentation.md | documentation-engineer | done |
+| 49.06 | Report an assets mapping that matched nothing | ../plans/49.06-report-an-empty-asset-mapping.md | architecture-engineer | done |
 
 Acceptance:
 

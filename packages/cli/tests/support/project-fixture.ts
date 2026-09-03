@@ -109,12 +109,13 @@ export function manifestConfig(config: Readonly<Record<string, unknown>>, env: R
     return validated.config;
 }
 
+export const DEFAULT_ASSETS = [{ from: 'assets/**/*', to: 'assets' }];
+
 export function defaultProjectFiles(config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     return {
         [MANIFEST_FILE]: manifestSource({
             name: 'luam-demo',
             output: { bundle: false, map: true },
-            assets: [{ from: 'assets/**/*', to: 'assets' }],
             ...config,
         }),
         'src/shared/config.luam': VALID_SHARED,

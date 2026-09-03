@@ -219,10 +219,15 @@ The side a file gets is the side that matched it. A `#!server`, `#!client`, or
 `#!shared` directive in the file still wins, and the mismatch is reported as
 `env-path-directive-conflict` so the disagreement is visible rather than silent.
 A file matched by two sides is `config-source-side-conflict`; a literal path that
-names no file is `config-missing-source`; a project where nothing matched at all
-is `config-no-sources`.
+names no file is `config-missing-source`; a project that holds `.luam` files none
+of which matched is `config-unmatched-source`, which names them; a project with no
+`.luam` file at all is `config-no-sources`.
 
 Omitting `sources` keeps the default layout, which is the three patterns above.
+Either way, a `.luam` file directly in the project root is compiled without a
+pattern, with the side its `#!` directive declares and `shared` without one. The
+scaffolded block and no block at all both build a flat resource — see
+[Project layout](/en/guide/project-layout).
 
 ## `assets`
 
@@ -242,7 +247,32 @@ needs its own mapping, which is what makes the resource contents predictable.
 `to` is a destination directory inside the resource. Two entries that resolve to
 the same destination are `config-output-collision`, and so is a destination that
 would overwrite `meta.xml` or the generated `lib/` directory. A literal `from`
-that names no file is `config-missing-asset`.
+that names no file is `config-missing-asset`, and a mapping that copies nothing
+is the `config-empty-asset` warning — a build that declared a mapping and shipped
+none of it no longer passes in silence.
+
+### What each `from` matches
+
+Against a project holding `assets/readme.txt` and `assets/img/logo.png`, with
+`to = 'assets'`:
+
+| `from` | Copies | Lands at |
+| --- | --- | --- |
+| `assets` | both files | `assets/readme.txt`, `assets/img/logo.png` |
+| `assets/**` | both files | `assets/readme.txt`, `assets/img/logo.png` |
+| `assets/**/*` | both files | `assets/readme.txt`, `assets/img/logo.png` |
+| `assets/*` | `readme.txt` only | `assets/readme.txt` |
+| `assets/**/*.png` | `logo.png` only | `assets/img/logo.png` |
+| `**/*.png` | `logo.png` only | `assets/assets/img/logo.png` |
+
+`assets/*` and `assets/**/*` are the pair worth reading twice: `*` stops at one
+segment, so `assets/*` never reaches `img/logo.png`. The last row is not a bug
+either — a pattern's root is everything before its first wildcard, so `**/*.png`
+roots at the project and the copied path keeps `assets/` in front of it.
+
+The scaffolded manifest ships this block commented out with `#`, the manifest's
+line comment, so the first build of a new project declares nothing it does not
+have. `--` is not a comment here; it is `lex-foreign-comment`.
 
 ## `dependencies`
 

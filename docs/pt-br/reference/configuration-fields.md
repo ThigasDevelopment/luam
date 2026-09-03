@@ -40,8 +40,14 @@ Um padrão aceita `*`, `**` e `?`, com `/` como separador. Regex, negação, exp
 de chaves e extglob são `config-invalid-pattern`. Um arquivo casado por dois lados
 é `config-source-side-conflict`, um caminho literal que não nomeia arquivo algum é
 `config-missing-source`, e um projeto onde nenhum padrão casou é
-`config-no-sources`. Uma diretiva de ambiente no arquivo vence o mapeamento e
+`config-unmatched-source` quando ele tem arquivos `.luam` e `config-no-sources`
+quando não tem nenhum. Uma diretiva de ambiente no arquivo vence o mapeamento e
 reporta `env-path-directive-conflict`.
+
+Um arquivo `.luam` na raiz do projeto é compilado com ou sem `sources` o
+nomeando, com o lado que sua diretiva declara e `shared` sem nenhuma, então
+remover o bloco ou manter o do scaffold funcionam igualmente para um resource
+plano.
 
 ## Assets
 
@@ -52,8 +58,8 @@ reporta `env-path-directive-conflict`.
 | `assets[].to` | `string` | não | `'.'` | Diretório de destino dentro do resource. |
 
 Duas entradas que caem no mesmo destino, ou um destino que sobrescreveria o
-`meta.xml` ou `lib/`, são `config-output-collision`. Só o que um mapeamento nomeia
-é copiado.
+`meta.xml` ou `lib/`, são `config-output-collision`. Um mapeamento que não copia
+nada é o aviso `config-empty-asset`. Só o que um mapeamento nomeia é copiado.
 
 ## Dependências e engine
 

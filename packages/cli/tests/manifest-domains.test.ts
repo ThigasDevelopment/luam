@@ -8,6 +8,8 @@ import { DEFAULT_ENVIRONMENT_FILES, type SourceMapping } from '@compiler/manifes
 
 import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
+const ROOT_SOURCE = ['function greet(name: string): string', "    return 'hi ' .. name", 'end', ''].join('\n');
+
 const fixtures: ProjectFixture[] = [];
 
 const OFFLINE = { skip: true } as const;
@@ -81,6 +83,61 @@ describe('source discovery', () => {
         expect(codes(discovered.diagnostics)).toEqual(['config-missing-source']);
         expect(discovered.diagnostics[0]?.message).toContain('src/shared/missing.luam');
     });
+
+    it('builds a source file in the project root that no pattern names', () => {
+        const discovered = discoverSources(fixture({ ...defaultProjectFiles(), 'index.luam': ROOT_SOURCE }), sources());
+
+        expect(discovered.diagnostics).toEqual([]);
+        expect(discovered.files.map((file) => file.path)).toContain('index.luam');
+        expect(discovered.files.find((file) => file.path === 'index.luam')?.environment).toBeUndefined();
+    });
+
+    it('leaves the side of a root file to the compiler even when the file declares one', () => {
+        const files = { ...defaultProjectFiles(), 'index.luam': `#!client\n\n${ROOT_SOURCE}` };
+        const discovered = discoverSources(fixture(files), sources());
+
+        expect(discovered.files.find((file) => file.path === 'index.luam')?.environment).toBeUndefined();
+    });
+
+    it('keeps the mapped side of a root file a pattern does name', () => {
+        const files = { ...defaultProjectFiles(), 'index.luam': ROOT_SOURCE };
+        const discovered = discoverSources(fixture(files), sources({ client: ['src/client/**/*.luam', '*.luam'] }));
+
+        expect(discovered.files.find((file) => file.path === 'index.luam')?.environment).toBe('client');
+    });
+
+    it('builds neither a root test file nor a source no pattern reaches', () => {
+        const files = { ...defaultProjectFiles(), 'index.test.luam': ROOT_SOURCE, 'tools/helper.luam': ROOT_SOURCE };
+        const discovered = discoverSources(fixture(files), sources());
+
+        expect(discovered.files.map((file) => file.path)).toEqual(['src/client/hud.luam', 'src/server/main.luam', 'src/shared/config.luam']);
+    });
+
+    it('names the source files no pattern matched when the build found none', () => {
+        const discovered = discoverSources(fixture({ 'tools/helper.luam': ROOT_SOURCE }), sources());
+
+        expect(codes(discovered.diagnostics)).toEqual(['config-unmatched-source']);
+        expect(discovered.diagnostics[0]?.message).toContain('"tools/helper.luam"');
+        expect(discovered.diagnostics[0]?.message).toContain('Add a pattern to "sources"');
+        expect(discovered.diagnostics[0]?.message).toContain('move the file under a directory "sources" already names');
+        expect(discovered.diagnostics[0]?.message).toContain('put it in the project root');
+    });
+
+    it('names five unmatched files and counts the rest', () => {
+        const files = Object.fromEntries(Array.from({ length: 8 }, (_, index) => [`tools/file-${index}.luam`, ROOT_SOURCE]));
+        const discovered = discoverSources(fixture(files), sources());
+
+        expect(codes(discovered.diagnostics)).toEqual(['config-unmatched-source']);
+        expect(discovered.diagnostics[0]?.message).toContain('"tools/file-4.luam" and 3 more');
+        expect(discovered.diagnostics[0]?.message).not.toContain('tools/file-5.luam');
+    });
+
+    it('still reports no sources for a project that holds no source file at all', () => {
+        const discovered = discoverSources(fixture({ 'docs/notes.md': 'ignored\n' }), sources());
+
+        expect(codes(discovered.diagnostics)).toEqual(['config-no-sources']);
+        expect(discovered.diagnostics[0]?.message).toContain('No ".luam" source files matched "sources"');
+    });
 });
 
 describe('asset resolution', () => {
@@ -147,6 +204,47 @@ describe('asset resolution', () => {
         const root = fixture({ 'assets/logo.png': 'binary' });
 
         expect(resolveAssets(root, []).assets).toEqual([]);
+    });
+
+    it('warns when the root a glob points at is not a directory', () => {
+        const resolved = resolveAssets(fixture({}), [{ from: 'assets/**/*', to: 'assets' }]);
+
+        expect(codes(resolved.diagnostics)).toEqual(['config-empty-asset']);
+        expect(resolved.diagnostics[0]?.severity).toBe('warning');
+        expect(resolved.diagnostics[0]?.message).toContain('"assets" is not a directory');
+    });
+
+    it('warns when a glob whose root exists matches no file', () => {
+        const resolved = resolveAssets(fixture({ 'assets/readme.txt': 'text' }), [{ from: 'assets/**/*.jpg', to: 'assets' }]);
+
+        expect(codes(resolved.diagnostics)).toEqual(['config-empty-asset']);
+        expect(resolved.diagnostics[0]?.message).toContain('matched no file under "assets"');
+    });
+
+    it('stays quiet for a mapping that matches at least one file', () => {
+        const resolved = resolveAssets(fixture({ 'assets/logo.png': 'binary' }), [{ from: 'assets/**/*', to: 'assets' }]);
+
+        expect(resolved.diagnostics).toEqual([]);
+    });
+
+    it('resolves every documented "from" shape to the files it names today', () => {
+        const root = fixture({ 'assets/readme.txt': 'text', 'assets/img/logo.png': 'binary' });
+        const both = ['assets/img/logo.png', 'assets/readme.txt'];
+        const cases: readonly (readonly [string, readonly string[]])[] = [
+            ['assets/**/*', both],
+            ['assets', both],
+            ['assets/**', both],
+            ['assets/*', ['assets/readme.txt']],
+            ['assets/**/*.png', ['assets/img/logo.png']],
+            ['**/*.png', ['assets/assets/img/logo.png']],
+        ];
+
+        for (const [from, expected] of cases) {
+            const resolved = resolveAssets(root, [{ from, to: 'assets' }]);
+
+            expect([from, resolved.assets.map((asset) => asset.path)]).toEqual([from, expected]);
+            expect([from, codes(resolved.diagnostics)]).toEqual([from, []]);
+        }
     });
 });
 

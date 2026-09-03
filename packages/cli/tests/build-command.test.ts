@@ -7,7 +7,23 @@ import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
-import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import {
+    BROKEN_SERVER,
+    createProjectFixture,
+    DEFAULT_ASSETS,
+    defaultProjectFiles,
+    MANIFEST_FILE,
+    manifestSource,
+    type ProjectFixture,
+} from './support/project-fixture';
+
+const ROOT_SOURCE = ['function greet(name: string): string', "    return 'hi ' .. name", 'end', ''].join('\n');
+
+function flatFiles(directive: string | null, config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
+    const source = directive === null ? ROOT_SOURCE : `${directive}\n\n${ROOT_SOURCE}`;
+
+    return { [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', output: { bundle: false, map: true }, ...config }), 'index.luam': source };
+}
 
 const fixtures: ProjectFixture[] = [];
 
@@ -35,6 +51,49 @@ afterEach(() => {
     for (const fixture of fixtures.splice(0)) {
         fixture.dispose();
     }
+});
+
+describe('root level layout', () => {
+    it('builds a resource whose only source sits next to the manifest', async () => {
+        const { context, fixture, logger } = harness(flatFiles(null));
+
+        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+        expect(fixture.exists('build/luam-demo/index.lua')).toBe(true);
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="index.lua" type="shared" cache="false" />');
+        expect(logger.text()).not.toContain('config-no-sources');
+    });
+
+    it('lets a directive give the root file its side without reporting a conflict', async () => {
+        for (const side of ['client', 'server'] as const) {
+            const { context, fixture, logger } = harness(flatFiles(`#!${side}`));
+
+            expect(await runBuildCommand(context)).toBe(EXIT_OK);
+
+            const manifest = fixture.read('build/luam-demo/meta.xml');
+            const expected = side === 'server' ? '<script src="index.lua" />' : '<script src="index.lua" type="client" cache="false" />';
+
+            expect([side, manifest.includes(expected)]).toEqual([side, true]);
+            expect([side, logger.text().includes('env-path-directive-conflict')]).toEqual([side, false]);
+        }
+    });
+
+    it('folds the root file into the shared bundle in the bundled layout', async () => {
+        const { context, fixture } = harness(flatFiles(null, { output: { bundle: true, map: true } }));
+
+        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+        expect(fixture.exists('build/luam-demo/index.lua')).toBe(false);
+        expect(fixture.read('build/luam-demo/src/shared.lua')).toContain('function greet');
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="src/shared.lua" type="shared" cache="false" />');
+    });
+
+    it('names the unmatched source instead of failing without one', async () => {
+        const files = { [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'tools/helper.luam': ROOT_SOURCE };
+        const { context, logger } = harness(files);
+
+        expect(await runBuildCommand(context)).toBe(EXIT_DIAGNOSTICS);
+        expect(logger.text()).toContain('config-unmatched-source');
+        expect(logger.text()).toContain('tools/helper.luam');
+    });
 });
 
 describe('build command', () => {
@@ -151,7 +210,7 @@ describe('build command', () => {
     });
 
     it('copies only the files a mapping names and declares them in the manifest', async () => {
-        const files = { ...defaultProjectFiles(), 'assets/images/logo.png': 'binary', 'src/server/data/spawns.json': '[]' };
+        const files = { ...defaultProjectFiles({ assets: DEFAULT_ASSETS }), 'assets/images/logo.png': 'binary', 'src/server/data/spawns.json': '[]' };
         const { context, fixture } = harness(files);
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
@@ -174,7 +233,7 @@ describe('build command', () => {
     });
 
     it('removes a copied asset when its source disappears', async () => {
-        const files = { ...defaultProjectFiles(), 'assets/images/logo.png': 'binary' };
+        const files = { ...defaultProjectFiles({ assets: DEFAULT_ASSETS }), 'assets/images/logo.png': 'binary' };
         const { context, fixture } = harness(files);
 
         await runBuildCommand(context);
