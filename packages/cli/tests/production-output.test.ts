@@ -10,7 +10,7 @@ import { runCli } from '@cli/cli/run';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { parsesAsLua51, tokenTexts } from './support/lua-check';
-import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, createProjectFixture, DEFAULT_ASSETS, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
 
 import type { ResourceBuild } from '@compiler/project/resource';
 
@@ -25,6 +25,7 @@ const fixtures: ProjectFixture[] = [];
 function projectFiles(bundle: boolean): Record<string, string> {
     return {
         ...defaultProjectFiles({
+            assets: DEFAULT_ASSETS,
             serverPath: 'mta-server',
             output: { bundle, map: true },
             loadOrder: ['src/shared/config.luam'],

@@ -16,6 +16,12 @@ são visíveis e onde o arquivo compilado é declarado no `meta.xml`.
 | `src/server/**` | `server` |
 | `src/client/**` | `client` |
 | `src/shared/**` | `shared` |
+| `index.luam`, na raiz do projeto | `shared` |
+
+Um arquivo na raiz do projeto não tem pasta para ler, então a diretiva é a única
+coisa que fala, e `shared` é a resposta quando ela fica calada. Veja
+[Estrutura do projeto](/pt-br/guide/project-layout) para a estrutura que produz
+um.
 
 ```luam env=client
 #!client

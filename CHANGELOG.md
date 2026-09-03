@@ -14,6 +14,26 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.3 - 2026-09-03
+
+### Added
+
+- A `.luam` file directly in the project root is compiled even when no `sources`
+  pattern names it, so the smallest resource is a manifest plus `index.luam`. It
+  has no folder to read its side from, so its `#!` directive decides and `shared`
+  applies without one, and `luam dev` watches the project root for it.
+- `config-unmatched-source`: a build that matched nothing now names the `.luam`
+  files the project does have — up to five, then a count — and the three ways
+  out. `config-no-sources` narrows to a project with no `.luam` file at all.
+- `config-empty-asset`: an `assets` mapping that copies nothing is a warning
+  instead of silence, whether its root is not a directory or nothing under it
+  matched.
+
+### Changed
+
+- `luam init` scaffolds the `assets` block commented out, so the first build of
+  a new project reports no warning, and the mapping is one uncomment away.
+
 ## 1.0.2 - 2026-09-03
 
 ### Added

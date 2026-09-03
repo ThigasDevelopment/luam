@@ -4,7 +4,7 @@ import { relative, resolve } from 'node:path';
 import type { SourceMapping } from '@compiler/manifest/manifest-contract';
 import { normalizePattern } from '@compiler/project/path-pattern';
 import { createSourceResolver } from '@compiler/project/source-mapping';
-import { SOURCE_EXTENSION } from '@compiler/project/source-kind';
+import { isTestPath, SOURCE_EXTENSION } from '@compiler/project/source-kind';
 
 export interface SourceWatcher {
     close(): void;
@@ -31,23 +31,33 @@ export function watchSources(root: string, sources: SourceMapping, onChange: () 
     const isWatched = (directory: string, filename: string): boolean => {
         const path = normalizePattern(relative(root, resolve(directory, filename)));
 
-        return path.endsWith(SOURCE_EXTENSION) && resolver.resolve(path).matches.length > 0;
+        if (!path.endsWith(SOURCE_EXTENSION) || isTestPath(path)) {
+            return false;
+        }
+
+        return resolver.resolve(path).matches.length > 0 || !path.includes('/');
     };
 
-    for (const entry of resolver.roots) {
-        const absolute = resolve(root, entry);
-
+    const observe = (absolute: string, recursive: boolean): void => {
         if (!existsSync(absolute)) {
-            continue;
+            return;
         }
 
         watchers.push(
-            watch(absolute, { recursive: true }, (_event, filename) => {
+            watch(absolute, { recursive }, (_event, filename) => {
                 if (filename !== null && isWatched(absolute, filename.toString())) {
                     schedule();
                 }
             }),
         );
+    };
+
+    for (const entry of resolver.roots) {
+        observe(resolve(root, entry), true);
+    }
+
+    if (!resolver.roots.includes('')) {
+        observe(root, false);
     }
 
     return {

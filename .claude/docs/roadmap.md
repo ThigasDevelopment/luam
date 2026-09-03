@@ -3239,3 +3239,99 @@ Deliberately excluded:
 - Rewriting or repairing blocks the author did not just type. Completion writes
   at the cursor; an unclosed block elsewhere in the file is a diagnostic and a
   quick fix, not a completion item.
+
+## Milestone 49 — Code at the Project Root
+
+A new project runs `luam init`, gets a manifest, writes `index.luam` beside it,
+runs `luam build`, and reads `config-no-sources: No ".luam" source files matched
+"sources"`. The file is right there. The scaffolded `sources` block points at
+`src/server`, `src/client` and `src/shared`, none of which exist yet, and the
+message names none of that. The language server, meanwhile, opens the same file
+and analyses it as `shared`, because it scans the workspace folder rather than
+the `sources` roots. The editor accepts what the build refuses. This milestone
+settles that in the build's favour: the project root is the one directory read
+without a pattern, and when a file really is unreachable the diagnostic says
+which file and what to do about it. `assets` has the same silence — a mapping
+whose glob matches nothing finishes with `0 errors, 0 warnings` and copies
+nothing, which reads as a broken glob engine and is not one — so it gets the
+same treatment here.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 49.01 | Compile a source file that sits at the project root | ../plans/49.01-compile-a-root-level-source.md | architecture-engineer | done |
+| 49.02 | Rebuild when a root-level source changes | ../plans/49.02-watch-a-root-level-source.md | architecture-engineer | done |
+| 49.03 | Name the source files no pattern matched | ../plans/49.03-name-the-unmatched-sources.md | architecture-engineer | done |
+| 49.04 | Cover the root-level layout in the tests | ../plans/49.04-root-level-source-tests.md | test-engineer | done |
+| 49.05 | Document the root-level layout | ../plans/49.05-root-level-source-documentation.md | documentation-engineer | done |
+| 49.06 | Report an assets mapping that matched nothing | ../plans/49.06-report-an-empty-asset-mapping.md | architecture-engineer | done |
+
+Acceptance:
+
+- A project holding a manifest and `index.luam` builds. The script is declared
+  `shared` in `meta.xml` and written as `index.lua`, and `#!server` or `#!client`
+  on the first line moves it to that side with no conflict warning, because
+  discovery assigns the file no side for the directive to argue with.
+- The root pickup is independent of `sources`. Removing the block, keeping the
+  scaffolded one, or writing patterns that name other directories all leave a
+  root-level file compiled, and a root file a pattern does name keeps the side
+  the mapping gives it.
+- `.test.luam` at the root is still never built, and a `.luam` file in a
+  directory no pattern names is still not built — the root is the exception, not
+  the end of the rule.
+- A build that matches nothing now names what it found:
+  `config-unmatched-source` lists up to five `.luam` files and the three ways to
+  reach them, and `config-no-sources` is left for a project that has no source
+  file at all.
+- `luam dev` rebuilds when a root-level file is saved or created, without
+  watching the output directory and without a rebuild loop.
+- An `assets` mapping that copies nothing says so. `config-empty-asset` warns
+  when a pattern's root is not a directory and when the root exists and nothing
+  matched, `config-missing-asset` stays the error for a literal path, and what
+  the patterns match does not move: `assets`, `assets/**` and `assets/**/*`
+  take a tree, `assets/*` takes one level, and a pattern rooted at the project
+  keeps its full path below `to`.
+- The scaffolded manifest builds with no warnings, which means it stops
+  declaring an `assets` mapping for a directory `luam init` does not create.
+- Both documentation languages describe the flat layout, the side a root file
+  runs on, and the new diagnostic.
+
+Why now:
+
+- The two failures are one failure. The build refuses a file it can see and stays
+  quiet about a mapping that copied nothing, and from the terminal both look like
+  a glob engine that does not work. Measured, the matcher is correct in every
+  shape; what is missing is the sentence naming what was not found.
+- It is the first thing a new user hits. The scaffold writes a manifest and no
+  directories, so the shortest path from `luam init` to `luam build` is a file in
+  the root, and that path currently ends in an error that explains nothing.
+- The semantics already exist. `resolveEnvironment` returns
+  `fromDirective ?? assigned ?? shared` and warns about a conflict only when a
+  mapping or a path assigned a side, so a file discovery leaves unassigned lands
+  exactly where this milestone wants it. Nothing new has to be designed, and one
+  layer — CLI discovery — is what refuses today.
+- The inconsistency is already shipped. The language server compiles the root
+  file and offers completion in it; only the build disagrees, and a toolchain
+  whose editor and compiler disagree about which files exist teaches users not to
+  trust either.
+
+Deliberately excluded:
+
+- Reporting unmatched files on a build that succeeded. A project may keep `.luam`
+  files it does not compile, and a warning on every green build is a warning
+  nobody reads. The new diagnostic fires only where the build already failed.
+- Reading unmatched files in nested directories. That is where a vendored copy or
+  an `examples/` tree lives, and picking those up would break the rule
+  [project-layout](../../docs/en/guide/project-layout.md) states: nothing enters
+  the build by accident.
+- Changing `DEFAULT_SOURCE_MAPPING` or the scaffolded `sources` block. A pattern
+  such as `*.luam` mapped to a side would make the root file's directive fight
+  the mapping and warn, which is the opposite of the point.
+- Inferring a side from a file name — `index.server.luam` and the like. The
+  language already has one way to declare an environment without a folder, the
+  `#!` directive, and a second one would need its own conflict rules.
+- Changing what an `assets` pattern matches. Every shape was measured against a
+  real tree and every one is correct, including the `assets/*` and
+  `assets/**/*` difference an author is most likely to guess wrong. The fix is
+  a diagnostic and a documented table, not a new matcher.

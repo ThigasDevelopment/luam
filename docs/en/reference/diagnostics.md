@@ -228,9 +228,11 @@ writes nothing.
 | `config-escaping-path` | A path is absolute or contains a `..` segment. |
 | `config-invalid-pattern` | A pattern uses something the glob grammar does not allow. |
 | `config-missing-source` | A literal `sources` entry names a file that does not exist. |
-| `config-no-sources` | No `.luam` file matched `sources`. |
+| `config-no-sources` | The project has no `.luam` file at all. |
+| `config-unmatched-source` | No `sources` pattern matched, and the project does hold `.luam` files. The message names them and the three ways out. |
 | `config-source-side-conflict` | One file is matched by more than one side of `sources`. |
 | `config-missing-asset` | A literal `assets` entry names a file that does not exist. |
+| `config-empty-asset` | An `assets` pattern copied nothing — its root is not a directory, or nothing under it matched. A warning. |
 | `config-output-collision` | Two assets land on the same destination, or one would overwrite a generated path. |
 | `config-invalid-dependency` | A `dependencies` entry is not a valid resource name, or names this resource. |
 | `config-library-missing` | A `libraries` entry names a package that is not installed. The message names the install command. |

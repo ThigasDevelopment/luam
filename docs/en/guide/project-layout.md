@@ -38,6 +38,27 @@ See [Environments](/en/mta/environments) for the full rule.
 A file no `sources` pattern and no `assets` mapping names is not part of the
 build. Nothing is copied by accident.
 
+### One file next to the manifest
+
+There is one exception, and it is the project root. A `.luam` file directly
+beside `.luam.manifest` is compiled even when no `sources` pattern names it, so
+the smallest resource is two files:
+
+```
+my-resource/
+├── .luam.manifest
+└── index.luam
+```
+
+A root file has no folder to read its side from, so its `#!` directive decides,
+and it runs `shared` when it declares none. Nothing else changes: a `.luam` file
+in a subdirectory no pattern names is still not built, and the build says so with
+`config-unmatched-source`.
+
+The exception stops at the root. One directory, the one holding the manifest, is
+the only place read without a pattern — a file put there was put there on
+purpose.
+
 ## What a build writes
 
 ```

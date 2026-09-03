@@ -9,6 +9,23 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.3 - 2026-09-03
+
+### Added
+
+- [Project layout](/en/guide/project-layout) documents the flat layout: a
+  `.luam` file next to the manifest is compiled without a `sources` pattern, and
+  runs `shared` unless its `#!` directive says otherwise.
+  [Environments](/en/mta/environments) gains the row for it.
+- [`.luam.manifest`](/en/tooling/luam-manifest) explains `assets` patterns by
+  example, including what separates `assets/*` from `assets/**/*`, and records
+  that the scaffolded block ships commented out with `#`.
+- [Diagnostics](/en/reference/diagnostics) gains `config-unmatched-source` and
+  the `config-empty-asset` warning, and narrows `config-no-sources` to a project
+  with no `.luam` file at all.
+- [Troubleshooting](/en/guide/troubleshooting) answers a build that fails with a
+  source file sitting right there, and an `assets` mapping that copied nothing.
+
 ## 1.0.2 - 2026-09-03
 
 ### Added

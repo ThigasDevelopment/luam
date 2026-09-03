@@ -67,7 +67,7 @@ describe('project inputs', () => {
     });
 
     it('reports a malformed env entry with the file that holds it', () => {
-        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), '.env': 'PORT 3306\n' }).root);
+        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), '.env': 'PORT 3306\n' }).root, []);
 
         expect(inputs.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['build-env-malformed']);
         expect(inputs.diagnostics[0]?.message).toBe('".env" is malformed: Malformed entry on line 1. Expected "KEY=value".');

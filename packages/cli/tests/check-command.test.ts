@@ -108,14 +108,16 @@ describe('check command', () => {
         expect(logger.text()).toContain('Check passed: 3 files, 0 errors, 0 warnings');
     });
 
-    it('reports a source mapping that matches nothing', () => {
-        const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }) });
+    it('names the source file no "sources" pattern matched', () => {
+        const files = { [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'tools/helper.luam': 'function helper(): void\nend\n' };
+        const { context, logger } = harness(files);
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
-        expect(logger.errors[0]).toContain('config-no-sources');
+        expect(logger.errors[0]).toContain('config-unmatched-source');
+        expect(logger.errors[0]).toContain('tools/helper.luam');
     });
 
-    it('reports a project without source files', () => {
+    it('reports a project that holds no source file at all', () => {
         const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'src/shared/notes.md': 'ignored\n' });
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
