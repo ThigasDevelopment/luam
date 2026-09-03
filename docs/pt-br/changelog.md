@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.3 - 2026-09-03
+
 ### Adicionado
 
 - [Estrutura do projeto](/pt-br/guide/project-layout) documenta a estrutura
@@ -26,6 +28,21 @@ da versão atual.
 - [Solução de problemas](/pt-br/guide/troubleshooting) responde a um build que
   falha com um arquivo de código bem ali, e a um mapeamento de `assets` que não
   copiou nada.
+
+## 1.0.2 - 2026-09-03
+
+### Adicionado
+
+- [Language server](/pt-br/tooling/language-server) ganha **Blocos**: os
+  fechadores que escrevem `then .. end`, `do .. end` e `until condition` em um
+  bloco aberto, os esqueletos que escrevem o bloco inteiro a partir da palavra
+  que o abre, a regra que pré-seleciona um fechador apenas enquanto o bloco está
+  aberto e o bloco em texto puro que um cliente sem suporte a snippets recebe.
+
+## 1.0.1 - 2026-09-03
+
+### Adicionado
+
 - [Funções](/pt-br/language/functions) ganha **Funções async**: o que uma
   `async function` devolve, por que a anotação é o tipo interno, como uma
   rejeição é levantada no ponto do `await` e as duas fronteiras — nada de
@@ -40,11 +57,6 @@ da versão atual.
 - [Diagnósticos](/pt-br/reference/diagnostics) ganha `check-await-outside-async`,
   `check-await-non-promise`, `check-async-return-annotation` e
   `check-sleep-outside-async`.
-- [Language server](/pt-br/tooling/language-server) ganha **Blocos**: os
-  fechadores que escrevem `then .. end`, `do .. end` e `until condition` em um
-  bloco aberto, os esqueletos que escrevem o bloco inteiro a partir da palavra
-  que o abre, a regra que pré-seleciona um fechador apenas enquanto o bloco está
-  aberto e o bloco em texto puro que um cliente sem suporte a snippets recebe.
 
 ## 1.0.0 - 2026-09-02
 

@@ -14,6 +14,41 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.3 - 2026-09-03
+
+### Added
+
+- A `.luam` file directly in the project root is compiled even when no `sources`
+  pattern names it, so the smallest resource is a manifest plus `index.luam`. It
+  has no folder to read its side from, so its `#!` directive decides and `shared`
+  applies without one, and `luam dev` watches the project root for it.
+- `config-unmatched-source`: a build that matched nothing now names the `.luam`
+  files the project does have — up to five, then a count — and the three ways
+  out. `config-no-sources` narrows to a project with no `.luam` file at all.
+- `config-empty-asset`: an `assets` mapping that copies nothing is a warning
+  instead of silence, whether its root is not a directory or nothing under it
+  matched.
+
+### Changed
+
+- `luam init` scaffolds the `assets` block commented out, so the first build of
+  a new project reports no warning, and the mapping is one uncomment away.
+
+## 1.0.2 - 2026-09-03
+
+### Added
+
+- Completion closes an open block and scaffolds a whole one. The closer item
+  writes `then .. end`, `do .. end` or `until condition` on the block the
+  cursor sits in and lands on the indented line between them, and the scaffold
+  writes the whole block — `if`, `for` in both forms, `while`, `repeat`,
+  `do` and `function` — from the word that opens it at a statement start. A
+  closer is preselected only while the block is still unclosed, and a client
+  without snippet support receives the block as plain text. The block scanner
+  lives in the language server, so every LSP client gets it, not one editor.
+
+## 1.0.1 - 2026-09-03
+
 ### Added
 
 - `async function` compiles its body into a coroutine the promise scheduler
@@ -36,21 +71,9 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   promise instead of raising out of the timer callback.
 - Four diagnostics: `check-await-outside-async`, `check-await-non-promise`,
   `check-async-return-annotation`, and the `check-sleep-outside-async` warning.
-- A `.luam` file directly in the project root is compiled even when no `sources`
-  pattern names it, so the smallest resource is a manifest plus `index.luam`. It
-  has no folder to read its side from, so its `#!` directive decides and `shared`
-  applies without one, and `luam dev` watches the project root for it.
-- `config-unmatched-source`: a build that matched nothing now names the `.luam`
-  files the project does have — up to five, then a count — and the three ways
-  out. `config-no-sources` narrows to a project with no `.luam` file at all.
-- `config-empty-asset`: an `assets` mapping that copies nothing is a warning
-  instead of silence, whether its root is not a directory or nothing under it
-  matched.
 
 ### Changed
 
-- `luam init` scaffolds the `assets` block commented out, so the first build of
-  a new project reports no warning, and the mapping is one uncomment away.
 - `sleep` moved from `threads.lua` to `promise.lua` and dispatches on the
   coroutine it runs in: a timer inside an async function, the pool pulse inside a
   `Threads` job, and an actionable error anywhere else. Because MTA never fires a

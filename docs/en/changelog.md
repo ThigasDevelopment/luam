@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.3 - 2026-09-03
+
 ### Added
 
 - [Project layout](/en/guide/project-layout) documents the flat layout: a
@@ -23,6 +25,21 @@ Every heading below is a released version and the date it shipped, newest first.
   with no `.luam` file at all.
 - [Troubleshooting](/en/guide/troubleshooting) answers a build that fails with a
   source file sitting right there, and an `assets` mapping that copied nothing.
+
+## 1.0.2 - 2026-09-03
+
+### Added
+
+- [Language server](/en/tooling/language-server) gains **Blocks**: the closers
+  that write `then .. end`, `do .. end` and `until condition` on an open block,
+  the scaffolds that write a whole block from the word that opens it, the rule
+  that preselects a closer only while the block is unclosed, and the plain-text
+  block a client without snippet support receives.
+
+## 1.0.1 - 2026-09-03
+
+### Added
+
 - [Functions](/en/language/functions) gains **Async functions**: what an
   `async function` returns, why the annotation is the inner type, how a
   rejection is raised at the `await` site, and the two boundaries — no `await`
@@ -36,11 +53,6 @@ Every heading below is a released version and the date it shipped, newest first.
 - [Diagnostics](/en/reference/diagnostics) gains `check-await-outside-async`,
   `check-await-non-promise`, `check-async-return-annotation` and
   `check-sleep-outside-async`.
-- [Language server](/en/tooling/language-server) gains **Blocks**: the closers
-  that write `then .. end`, `do .. end` and `until condition` on an open block,
-  the scaffolds that write a whole block from the word that opens it, the rule
-  that preselects a closer only while the block is unclosed, and the plain-text
-  block a client without snippet support receives.
 
 ## 1.0.0 - 2026-09-02
 
