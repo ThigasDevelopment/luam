@@ -21,6 +21,7 @@ import {
     VOID_TYPE,
     type Type,
 } from '@compiler/checker/types';
+import { promiseOf } from '@compiler/checker/async';
 import type { Parameter, TypeAnnotation } from '@compiler/parser/ast';
 
 const PRIMITIVE_TYPES: Readonly<Record<string, Type>> = {
@@ -106,9 +107,11 @@ export function annotationType(annotation: TypeAnnotation | null): Type {
     return PRIMITIVE_TYPES[annotation.name] ?? createNamed(annotation.name, annotation.typeArguments.map((argument) => annotationType(argument)));
 }
 
-export function signatureType(parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null): Type {
+export function signatureType(parameters: readonly Parameter[], returnAnnotation: TypeAnnotation | null, isAsync = false): Type {
     const named = parameters.filter((parameter) => !parameter.isVararg);
     const types = named.map((parameter) => annotationType(parameter.annotation));
+    const declared = annotationType(returnAnnotation);
+    const returnType = isAsync ? promiseOf(declared) : declared;
 
-    return createFunction(types, annotationType(returnAnnotation), minimumOf(types), named.length !== parameters.length);
+    return createFunction(types, returnType, minimumOf(types), named.length !== parameters.length);
 }

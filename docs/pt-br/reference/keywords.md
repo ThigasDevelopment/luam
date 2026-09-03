@@ -2,7 +2,7 @@
 
 Toda palavra desta página é reservada pelo lexer: nenhuma delas pode nomear uma
 variável, um parâmetro ou uma função. O Luam reserva as 21 palavras-chave do
-Lua 5.1 e adiciona 11 próprias.
+Lua 5.1 e adiciona 13 próprias.
 
 O único lugar onde uma palavra reservada continua permitida é como **nome de
 propriedade** — depois de um `.` ou de um `:`, como chave de campo de tabela e
@@ -46,10 +46,12 @@ e ele é reescrito em vez de mapeado para `goto` — veja
 
 ## Palavras-chave que o Luam adiciona
 
-Estas 11 palavras são reservadas além das do Lua 5.1.
+Estas 13 palavras são reservadas além das do Lua 5.1.
 
 | Palavra-chave | Papel | Página |
 | --- | --- | --- |
+| `async` | Roda o corpo de uma função como corrotina que devolve uma promise | [Funções](/pt-br/language/functions#funcoes-async) |
+| `await` | Espera uma promise dentro de uma função async | [Funções](/pt-br/language/functions#funcoes-async) |
 | `continue` | Pula para a próxima iteração do laço mais interno | [Fundamentos de Lua](/pt-br/language/syntax) |
 | `class` | Abre uma declaração de classe | [Classes](/pt-br/language/classes) |
 | `extends` | Nomeia a classe pai | [Classes](/pt-br/language/classes) |
@@ -146,6 +148,11 @@ ali é `check-unknown-decorator`. Veja
 
 ## Globais de runtime
 
-`sleep`, `Threads`, `Async`, `env` e `process` são **globais declarados pelo
-runtime**, não palavras-chave. Nomear um deles traz o helper correspondente para o
-build; sombrear um com um local seu é Lua válido e simplesmente o esconde.
+`sleep`, `delay`, `Promise`, `Threads`, `Async`, `env` e `process` são
+**globais declarados pelo runtime**, não palavras-chave. Nomear um deles traz o
+helper correspondente para o build; sombrear um com um local seu é Lua válido e
+simplesmente o esconde.
+
+`sleep` é válido dentro de uma função async e dentro de um job de `Threads`. Em
+qualquer outro lugar não há corrotina para suspender: o compilador avisa com
+`check-sleep-outside-async` e o runtime levanta erro.

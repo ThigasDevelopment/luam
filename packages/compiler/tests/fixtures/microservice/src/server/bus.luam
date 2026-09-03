@@ -1,0 +1,27 @@
+declare event 'onServiceRequest' (name: string, payload: table, resolve: fun, reject: fun)
+
+handlers = {}
+
+function serve(name: string, handler: fun): void
+    handlers[name] = handler
+end
+
+async function request(name: string, payload: table): table
+    local answered = new Promise(function (resolve, reject)
+        triggerEvent('onServiceRequest', root, name, payload, resolve, reject)
+    end)
+
+    return await answered
+end
+
+addEventHandler('onServiceRequest', root, function (name: string, payload: table, resolve: fun, reject: fun)
+    local handler = handlers[name]
+
+    if handler == nil then
+        reject('no handler answers "' .. name .. '"')
+
+        return
+    end
+
+    handler(payload, resolve, reject)
+end)

@@ -84,7 +84,7 @@ function emitFunctionDeclaration(state: EmitState, statement: FunctionDeclaratio
     const name = emitFunctionName(state, statement);
     const header = `${prefix}${name}`;
 
-    return withSymbol(state, name, () => emitFunctionBody(state, statement.parameters, statement.body, header));
+    return withSymbol(state, name, () => emitFunctionBody(state, statement.parameters, statement.body, header, statement.isAsync, statement.isMethod ? 'self' : null));
 }
 
 function emitNested(state: EmitState, body: readonly Statement[]): string[] {

@@ -110,8 +110,8 @@ describe('manifest checking', () => {
     });
 
     it('rejects a helper the runtime does not ship', () => {
-        expect(codes(`${NAME}helpers = { 'promise' }`)).toEqual(['config-unknown-helper']);
-        expect(messages(`${NAME}helpers = { 'promise' }`)[0]).toContain('Known helpers: "async", "class", "env"');
+        expect(codes(`${NAME}helpers = { 'coroutine' }`)).toEqual(['config-unknown-helper']);
+        expect(messages(`${NAME}helpers = { 'coroutine' }`)[0]).toContain('Known helpers: "async", "class", "env"');
     });
 
     it('types env members as optional strings', () => {

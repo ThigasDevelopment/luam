@@ -1,63 +1,71 @@
-function table.size(value)
-    local size = 0
+---@param value table
+---@return number
+function table.size (value)
+	local size = 0;
+	if (type (value) ~= 'table') then
+		return size;
+	end
 
-    if type(value) ~= 'table' then
-        return size
-    end
+	for _ in pairs (value) do
+		size = size + 1;
+	end
 
-    for _ in pairs(value) do
-        size = size + 1
-    end
-
-    return size
+	return size;
 end
 
-function table.isEmpty(value)
-    if type(value) ~= 'table' then
-        return true
-    end
+---@param value table
+---@return boolean
+function table.isEmpty (value)
+	if (type (value) ~= 'table') then
+		return true;
+	end
 
-    return next(value) == nil
+	return next (value) == nil;
 end
 
-function table.keys(value)
-    local keys = {}
+---@param value table
+---@return table
+function table.keys (value)
+	local keys = { };
+	if (type (value) ~= 'table') then
+		return keys;
+	end
 
-    if type(value) ~= 'table' then
-        return keys
-    end
+	for key in pairs (value) do
+		keys[#keys + 1] = key;
+	end
 
-    for key in pairs(value) do
-        keys[#keys + 1] = key
-    end
-
-    return keys
+	return keys;
 end
 
-function table.values(value)
-    local values = {}
+---@param value table
+---@return table
+function table.values (value)
+	local values = { };
+	if (type (value) ~= 'table') then
+		return values;
+	end
 
-    if type(value) ~= 'table' then
-        return values
-    end
+	for _, item in pairs (value) do
+		values[#values + 1] = item;
+	end
 
-    for _, item in pairs(value) do
-        values[#values + 1] = item
-    end
-
-    return values
+	return values;
 end
 
-function table.includes(value, item)
-    if type(value) ~= 'table' then
-        return false
-    end
+---@param value table
+---@param item any
+---@return boolean
+function table.includes (value, item)
+	if (type (value) ~= 'table') then
+		return false;
+	end
 
-    for _, current in pairs(value) do
-        if current == item then
-            return true
-        end
-    end
+	for _, current in pairs (value) do
+		if (current == item) then
+			return true;
+		end
+	end
 
-    return false
+	return false;
 end

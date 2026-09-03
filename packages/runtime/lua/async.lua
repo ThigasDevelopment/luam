@@ -1,9 +1,9 @@
 ---@class Async
 ---@field tasks Threads
 ---@field interval number
----@field map fun(self: Async, array: table, func: fun(value: any, index: number): any, callback?: fun(elapsed: number): any): number
----@field iterate fun(self: Async, from: number, to: number, increment: number, func: fun(i: number): any, callback?: fun(elapsed: number): any): number
----@field foreach fun(self: Async, object: table<any, any>, func: fun(value: any, key: any): any, callback?: fun(elapsed: number): any): number
+---@field map fun(self: Async, array: table, func: fun(value: any, index: number): any, callback?: fun(elapsed: number): any): number, Promise
+---@field iterate fun(self: Async, from: number, to: number, increment: number, func: fun(i: number): any, callback?: fun(elapsed: number): any): number, Promise
+---@field foreach fun(self: Async, object: table<any, any>, func: fun(value: any, key: any): any, callback?: fun(elapsed: number): any): number, Promise
 ---@field getInterval fun(self: Async): number
 ---@field setInterval fun(self: Async, interval: number): boolean
 Async = {
@@ -23,7 +23,7 @@ Async = {
 	---@param array table
 	---@param func fun(value: any, index: number): any
 	---@param callback? fun(elapsed: number): any
-	---@return number
+	---@return number, Promise
 	map = function (self, array, func, callback)
 		return self.tasks:add (
 			function (self)
@@ -49,7 +49,7 @@ Async = {
 	---@param increment number
 	---@param func fun(i: number): any
 	---@param callback? fun(elapsed: number): any
-	---@return number
+	---@return number, Promise
 	iterate = function (self, from, to, increment, func, callback)
 		return self.tasks:add (
 			function (self)
@@ -74,7 +74,7 @@ Async = {
 	---@param object table<any, any>
 	---@param func fun(value: any, key: any): any
 	---@param callback? fun(elapsed: number): any
-	---@return number
+	---@return number, Promise
 	foreach = function (self, object, func, callback)
 		return self.tasks:add (
 			function (self)

@@ -19,7 +19,7 @@ export function emitMethod(state: EmitState, className: string, member: ClassMet
 
     const parameters = member.isStatic ? member.parameters : [self, ...member.parameters];
 
-    return withSymbol(state, `${className}${member.isStatic ? '.' : ':'}${member.name}`, () => emitFunctionBody(state, parameters, member.body, `${emitMemberKey(member.name)} = function`));
+    return withSymbol(state, `${className}${member.isStatic ? '.' : ':'}${member.name}`, () => emitFunctionBody(state, parameters, member.body, `${emitMemberKey(member.name)} = function`, member.isAsync));
 }
 
 function emitGeneratedMethod(state: EmitState, className: string, member: ClassMethodDeclaration): string {

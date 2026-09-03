@@ -146,6 +146,7 @@ export interface CallExpression extends NodeBase {
 
 export interface FunctionExpression extends NodeBase {
     kind: 'function-expression';
+    isAsync: boolean;
     typeParameters: string[];
     typeConstraints: (TypeAnnotation | null)[];
     parameters: Parameter[];
@@ -177,6 +178,11 @@ export interface UnaryExpression extends NodeBase {
     operand: Expression;
 }
 
+export interface AwaitExpression extends NodeBase {
+    kind: 'await-expression';
+    operand: Expression;
+}
+
 export interface GroupExpression extends NodeBase {
     kind: 'group-expression';
     expression: Expression;
@@ -197,6 +203,7 @@ export type Expression =
     | TableExpression
     | BinaryExpression
     | UnaryExpression
+    | AwaitExpression
     | GroupExpression
     | NewExpression;
 
@@ -226,12 +233,13 @@ export interface AssignmentStatement extends NodeBase {
 
 export interface CallStatement extends NodeBase {
     kind: 'call-statement';
-    expression: CallExpression;
+    expression: CallExpression | AwaitExpression;
 }
 
 export interface FunctionDeclaration extends NodeBase {
     kind: 'function-declaration';
     name: Identifier | MemberExpression;
+    isAsync: boolean;
     isLocal: boolean;
     isExported: boolean;
     isHttpExport: boolean;

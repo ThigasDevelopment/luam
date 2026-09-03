@@ -60,12 +60,63 @@ os escreve direto em `lib/`, fora da árvore de código:
 | `string.lua` | Uma string de template ou uma extensão de string é usada. |
 | `table.lua` | Uma extensão de tabela é usada. |
 | `math.lua` | Uma extensão de número como `clamp` é usada. |
-| `threads.lua` | `sleep` ou `Threads` é nomeado. Também selecionável por `helpers`. |
-| `async.lua` | `Async` é nomeado. |
+| `promise.lua` | Uma `async function` é declarada, ou `Promise`, `delay` ou `sleep` é nomeado. Também selecionável por `helpers`. |
+| `threads.lua` | `Threads` é nomeado. Requer `promise.lua`. |
+| `async.lua` | `Async` é nomeado. Requer `threads.lua`. |
 
 Um resource sem classes nunca carrega `class.lua`, e um helper só de servidor
 nunca é baixado por um cliente. Valores de implantação não são um helper: um
 projeto com `.env` recebe um `env.lua` gerado na raiz do resource.
+
+### O runtime de promises
+
+O `promise.lua` declara `Promise`, `delay` e `sleep`. Uma
+[função async](/pt-br/language/functions#funcoes-async) compila em cima dele, e
+estes membros também estão disponíveis para código escrito à mão:
+
+| Membro | O que faz |
+| --- | --- |
+| `new Promise(executor)` | Cria uma promise a partir de um executor que recebe `resolve` e `reject`. Um erro lançado dentro do executor rejeita a promise. |
+| `Promise.resolve(...)` / `Promise.reject(...)` | Uma promise já resolvida. O `resolve` devolve inalterada uma promise passada para ele. |
+| `Promise.all(list)` / `Promise.race(list)` | Espera todas as promises, ou espelha a primeira que se resolver. |
+| `Promise.settle(promise)` | Espera e reporta: `true` e os valores, ou `false` e o motivo. Válido dentro de uma função async. |
+| `promise:next(onFulfilled, onRejected)` | Roda um callback quando a promise resolve, sem suspender quem chamou. Encadeável. |
+| `promise:catch(onRejected)` | Roda um callback quando a promise rejeita. Encadeável. |
+| `delay(milliseconds)` | Uma promise que resolve depois de uma espera, limitada ao piso de 50ms dos timers do MTA. |
+| `sleep(milliseconds)` | Suspende a corrotina em execução. Válido dentro de uma função async e dentro de um job de `Threads`; em qualquer outro lugar levanta erro. |
+
+### Uma promise ou um pool
+
+Use uma **promise** quando o trabalho *espera* — uma ida ao banco, uma chamada
+remota, um evento respondido em outro tick. Use um **pool** quando o trabalho é
+*longo* — um laço sobre dez mil linhas que não pode segurar um frame.
+
+O motivo é o orçamento de frames. Fatiar com `await delay(0)` custa um timer por
+fatia e cai no piso de 50ms, algo como 20 fatias por segundo. Um pool retoma jobs
+a partir de um único pulso compartilhado, sob um orçamento de 150 frames em
+`normal` e 500 em `high` — uma a duas ordens de grandeza a mais de fatias no
+mesmo tempo de relógio.
+
+As duas bibliotecas rodam nesse mesmo escalonador e no mesmo timer de pulso,
+então misturá-las não custa nada: o `await` se comporta igual dentro de um job
+de pool, e `pool:add(fn)` devolve primeiro o id do job e, em segundo, uma
+promise que se resolve quando ele termina.
+
+```luam
+local pool = new Threads('concurrent', 'normal')
+
+async function slice(): void
+    local id, done = pool:add(function ()
+        for index = 1, 10000 do
+            sleep(0)
+        end
+    end)
+
+    await done
+
+    outputDebugString('job ' .. tostring(id) .. ' finished')
+end
+```
 
 ## `min_mta_version`
 

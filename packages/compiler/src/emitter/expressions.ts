@@ -5,7 +5,7 @@ import { binaryPrecedence, isRightAssociative, UNARY_PRECEDENCE } from '@compile
 import { emitBlock } from './emitter';
 import { escapeStringLiteral } from './escape';
 import { resolveCallExtension, resolvePropertyExtension } from './extensions';
-import { indentLine, requireHelper, typeOf, type EmitState } from './state';
+import { indentLine, INDENT, requireHelper, typeOf, type EmitState } from './state';
 import { lowerTemplate, templateContext } from './template';
 
 export function emitString(value: string): string {
@@ -16,7 +16,39 @@ function emitParameters(parameters: readonly Parameter[]): string {
     return parameters.map((parameter) => (parameter.isVararg ? '...' : parameter.name)).join(', ');
 }
 
-export function emitFunctionBody(state: EmitState, parameters: readonly Parameter[], body: readonly Statement[], header: string): string {
+function emitAsyncFunctionBody(state: EmitState, parameters: readonly Parameter[], body: readonly Statement[], header: string, receiver: string | null): string {
+    requireHelper(state, 'promise');
+
+    const declared = emitParameters(parameters);
+    const forwarded = (receiver === null ? [declared] : [receiver, declared]).filter((part) => part.length > 0).join(', ');
+    const previous = state.loopWrap;
+
+    state.indent += 1;
+    state.loopWrap = false;
+
+    const lines = emitBlock(state, body);
+
+    state.loopWrap = previous;
+    state.indent -= 1;
+
+    const signature = `${header}(${declared}) return Promise.spawn(function(${forwarded})`;
+    const closing = indentLine(state, `end${forwarded.length === 0 ? '' : `, ${forwarded}`}) end`);
+
+    return [signature, ...lines, closing].join('\n');
+}
+
+export function emitFunctionBody(
+    state: EmitState,
+    parameters: readonly Parameter[],
+    body: readonly Statement[],
+    header: string,
+    isAsync = false,
+    receiver: string | null = null,
+): string {
+    if (isAsync) {
+        return emitAsyncFunctionBody(state, parameters, body, header, receiver);
+    }
+
     const previous = state.loopWrap;
 
     state.indent += 1;
@@ -158,7 +190,7 @@ export function emitExpression(state: EmitState, expression: Expression, limit =
         case 'table-expression':
             return emitTable(state, expression);
         case 'function-expression':
-            return emitFunctionBody(state, expression.parameters, expression.body, 'function');
+            return emitFunctionBody(state, expression.parameters, expression.body, 'function', expression.isAsync);
         case 'binary-expression':
             return emitBinary(state, expression, limit);
         case 'unary-expression': {
@@ -167,6 +199,10 @@ export function emitExpression(state: EmitState, expression: Expression, limit =
 
             return UNARY_PRECEDENCE < limit ? `(${text})` : text;
         }
+        case 'await-expression':
+            requireHelper(state, 'promise');
+
+            return `Promise.await(${emitExpression(state, expression.operand)})`;
         default:
             return `(${emitExpression(state, expression.expression)})`;
     }

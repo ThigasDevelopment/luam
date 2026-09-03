@@ -92,6 +92,15 @@ erro não escreve nada.
 | `check-invalid-break` | Um `break` fora de um laço, ou que não é o último do bloco. |
 | `check-invalid-continue` | Um `continue` fora de um laço, que não é o último do bloco, ou que pularia sobre um local lido pela condição do `until`. |
 
+## Checker — async
+
+| Código | Severidade | Significado |
+| --- | --- | --- |
+| `check-await-outside-async` | erro | `await` lido como valor fora de uma função async. A palavra só é operador dentro de uma; em qualquer outro lugar é um identificador comum e lê um global que é `nil`. |
+| `check-await-non-promise` | erro | `await` aplicado a algo que não é uma promise. A mensagem nomeia o tipo encontrado. |
+| `check-async-return-annotation` | erro | Uma função async anotada diretamente com `Promise`. A anotação é o tipo **interno**: `async function f(): number` já tem a assinatura `f(): Promise<number>`. |
+| `check-sleep-outside-async` | aviso | Uma chamada de `sleep` sem corrotina para suspender — no topo do arquivo ou dentro de uma função nomeada comum. Uma **expressão** de função está isenta, porque pode ser um job de `Threads`. |
+
 ## Checker — declarações
 
 | Código | Significado |

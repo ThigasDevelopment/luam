@@ -12,7 +12,7 @@ function callbackType(source: string, argument = 0): FunctionType {
     const checked = check(parsed.program, 'strict');
     const statement = parsed.program.body.at(-1);
 
-    if (statement?.kind !== 'call-statement') {
+    if (statement?.kind !== 'call-statement' || statement.expression.kind !== 'call-expression') {
         throw new Error('Expected the source to end with a call statement.');
     }
 

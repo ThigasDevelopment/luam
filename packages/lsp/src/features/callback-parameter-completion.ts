@@ -123,7 +123,11 @@ export function callbackParameterItems(analysis: DocumentAnalysis, offset: numbe
         return [];
     }
 
-    const insert = callback.parameters.map((type, index) => `${placeholder(index + 1, names[index] ?? `argument${index + 1}`)}: ${typeToString(type)}`);
+    const insert = callback.parameters.map((type, index) => {
+        const name = placeholder(index + 1, names[index] ?? `argument${index + 1}`);
+
+        return type.kind === 'function' ? name : `${name}: ${typeToString(type)}`;
+    });
 
     if (variadic !== null) {
         insert.push(variadic);

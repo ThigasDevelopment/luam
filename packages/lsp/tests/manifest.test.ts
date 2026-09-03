@@ -108,7 +108,7 @@ describe('manifest completion', () => {
     it('offers the closed set inside an open string', () => {
         const manifest = openManifest("name = 'demo'\nhelpers = ''\n");
 
-        expect(labels(manifest, "helpers = '")).toEqual(['async', 'class', 'env', 'math', 'string', 'table', 'threads', 'validate']);
+        expect(labels(manifest, "helpers = '")).toEqual(['async', 'class', 'env', 'math', 'promise', 'string', 'table', 'threads', 'validate']);
     });
 
     it('offers the build modes when comparing against mode', () => {

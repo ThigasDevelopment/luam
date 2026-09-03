@@ -1,0 +1,29 @@
+#!strict
+async function load(id: number): number
+    await delay(100)
+
+    return id
+end
+
+async function report(...): void
+    local value = await load(1)
+
+    print(value, ...)
+end
+
+local queue = async function (name: string): string
+    local held = await load(2)
+
+    return name .. tostring(held)
+end
+
+local settings: table = { async = true, await = false }
+
+print(settings.async, settings.await)
+
+load(3):next(function (value)
+    print(value)
+end)
+
+report('a')
+queue('b')

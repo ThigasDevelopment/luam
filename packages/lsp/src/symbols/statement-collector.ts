@@ -44,6 +44,7 @@ export interface FunctionScopeInput {
     selfType: string | null;
     container: string | null;
     owner?: string | null;
+    isAsync?: boolean;
 }
 
 export function collectBlock(state: CollectorState, block: BlockContext, start: number, body: readonly Statement[]): void {
@@ -54,7 +55,7 @@ export function collectBlock(state: CollectorState, block: BlockContext, start: 
 }
 
 export function collectFunctionScope(state: CollectorState, block: BlockContext, input: FunctionScopeInput): void {
-    const scopeId = state.scopes.open(block.scopeId, input.start, { name: input.owner ?? null });
+    const scopeId = state.scopes.open(block.scopeId, input.start, { name: input.owner ?? null, isAsync: input.isAsync === true });
     const inner: BlockContext = { scopeId, end: input.end, container: input.container };
 
     if (input.selfType !== null) {
@@ -127,14 +128,14 @@ function collectFunctionName(state: CollectorState, block: BlockContext, stateme
     if (name.kind === 'identifier') {
         const checked = typeOf(state, name);
         const inferredReturn = checked?.kind === 'function' ? checked.returnType : null;
-        const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation, inferredReturn, statement.typeParameters);
+        const detail = signatureText(name.name, statement.parameters, statement.returnAnnotation, inferredReturn, statement.typeParameters, statement.isAsync);
         const scopeId = statement.isLocal ? block.scopeId : ROOT_SCOPE;
 
         const parameters = statement.parameters.map(parameterText);
         const type =
             statement.returnAnnotation === null && checked?.kind === 'function'
                 ? checked
-                : signatureType(statement.parameters, statement.returnAnnotation);
+                : signatureType(statement.parameters, statement.returnAnnotation, statement.isAsync);
 
         declareSymbol(state, scopeId, { name: name.name, kind: 'function', position: name.position, detail, parameters, type });
         addReference(state, name.name, 'value', name.position, block.scopeId);
@@ -165,6 +166,7 @@ function collectFunctionDeclaration(state: CollectorState, block: BlockContext, 
         selfType: statement.isMethod ? owner : null,
         container: block.container,
         owner: statement.name.kind === 'identifier' ? statement.name.name : statement.name.property,
+        isAsync: statement.isAsync,
     });
 }
 

@@ -10,6 +10,7 @@ const FUNCTION_HOVER = [
     '- `function Name:method()` receives the typed `self` implicitly; the dot form `function Name.method()` does not.',
     '- `local function name()` scopes the function like any other local.',
     '- `export function name()` makes a top-level function callable by other MTA resources.',
+    '- `async function name(): Inner` runs the body as a coroutine and returns `Promise<Inner>`, so `await` and `sleep` work anywhere inside it.',
     '- Without a return annotation, the return type is inferred from the body.',
 ].join('\n');
 

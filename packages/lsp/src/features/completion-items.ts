@@ -29,12 +29,30 @@ const ITEM_KINDS: Readonly<Record<SymbolKind, CompletionItemKind>> = {
     event: CompletionItemKind.Event,
 };
 
-const CONTEXTUAL_KEYWORDS: ReadonlySet<string> = new Set(['constructor', 'export', 'extends', 'implements']);
+const CONTEXTUAL_KEYWORDS: ReadonlySet<string> = new Set(['async', 'await', 'constructor', 'export', 'extends', 'implements']);
 
 export const KEYWORD_ITEMS: readonly CompletionItem[] = [...KEYWORDS]
     .filter((label) => !CONTEXTUAL_KEYWORDS.has(label))
     .sort()
     .map((label) => ({ label, kind: CompletionItemKind.Keyword }));
+
+export function asyncItem(): CompletionItem {
+    return {
+        label: 'async',
+        kind: CompletionItemKind.Keyword,
+        detail: 'async function — run the body as a coroutine and return a promise',
+        documentation: 'Inside an async function, "await" reads a promise and "sleep" suspends without blocking the server.',
+    };
+}
+
+export function awaitItem(): CompletionItem {
+    return {
+        label: 'await',
+        kind: CompletionItemKind.Keyword,
+        detail: 'await promise — wait for a promise and read its value',
+        documentation: 'Suspends the async function until the promise settles. A rejection is raised here and rejects the promise this function returns.',
+    };
+}
 
 export const DIRECTIVE_ITEMS: readonly CompletionItem[] = [
     { label: 'export', kind: CompletionItemKind.Keyword, detail: 'export function — expose a function to other resources' },

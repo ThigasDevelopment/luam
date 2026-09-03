@@ -92,6 +92,15 @@ writes nothing.
 | `check-invalid-break` | A `break` outside a loop, or not last in its block. |
 | `check-invalid-continue` | A `continue` outside a loop, not last in its block, or one that would jump over a local the `until` condition reads. |
 
+## Checker — async
+
+| Code | Severity | Meaning |
+| --- | --- | --- |
+| `check-await-outside-async` | error | `await` read as a value outside an async function. The word is an operator only inside one; elsewhere it is an ordinary identifier and reads a global that is `nil`. |
+| `check-await-non-promise` | error | `await` applied to something that is not a promise. The message names the type it found. |
+| `check-async-return-annotation` | error | An async function annotated `Promise` directly. The annotation is the **inner** type: `async function f(): number` already has the signature `f(): Promise<number>`. |
+| `check-sleep-outside-async` | warning | A `sleep` call with no coroutine to suspend — at the top level of a file, or inside a plain named function. A function **expression** is exempt, because it may be a `Threads` job. |
+
 ## Checker — declarations
 
 | Code | Meaning |

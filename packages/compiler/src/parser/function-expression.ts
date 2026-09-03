@@ -45,7 +45,26 @@ export function parseParameters(stream: TokenStream): Parameter[] {
     return parameters;
 }
 
-export function parseFunctionExpression(stream: TokenStream): FunctionExpression {
+export const ASYNC_MODIFIER = 'async';
+
+export function isAsyncFunctionStart(stream: TokenStream, offset = 0): boolean {
+    return stream.checkAhead(offset, 'keyword', ASYNC_MODIFIER) && stream.checkAhead(offset + 1, 'keyword', 'function');
+}
+
+export function consumeAsyncModifier(stream: TokenStream): boolean {
+    if (!isAsyncFunctionStart(stream)) {
+        return false;
+    }
+
+    const checkpoint = stream.checkpoint();
+
+    stream.next();
+    stream.eraseToCurrent(checkpoint);
+
+    return true;
+}
+
+export function parseFunctionExpression(stream: TokenStream, isAsync = false): FunctionExpression {
     const position = stream.expect('keyword', 'function').position;
     const typeParameters = parseTypeParameters(stream);
     const parameters = parseParameters(stream);
@@ -56,6 +75,7 @@ export function parseFunctionExpression(stream: TokenStream): FunctionExpression
 
     return {
         kind: 'function-expression',
+        isAsync,
         typeParameters: typeParameters.names,
         typeConstraints: typeParameters.constraints,
         parameters,
@@ -85,7 +105,13 @@ function parseFunctionName(stream: TokenStream): { name: Identifier | MemberExpr
     return { name: { kind: 'member-expression', object: name as Expression, property, position: token.position }, isMethod: true };
 }
 
-export function parseFunctionDeclaration(stream: TokenStream, isLocal: boolean, isExported = false, isHttpExport = false): FunctionDeclaration {
+export function parseFunctionDeclaration(
+    stream: TokenStream,
+    isLocal: boolean,
+    isExported = false,
+    isHttpExport = false,
+    isAsync = false,
+): FunctionDeclaration {
     const position = stream.expect('keyword', 'function').position;
     const { name, isMethod } = parseFunctionName(stream);
     const typeParameters = parseTypeParameters(stream);
@@ -98,6 +124,7 @@ export function parseFunctionDeclaration(stream: TokenStream, isLocal: boolean, 
     return {
         kind: 'function-declaration',
         name,
+        isAsync,
         isLocal,
         isExported,
         isHttpExport,

@@ -93,7 +93,12 @@ export function registerMembers(context: CheckContext, info: ClassInfo, statemen
             ? fieldTypes.get(member) ?? ANY_TYPE
             : member.isSynthetic
                ? syntheticMethodType(context, member, fieldTypes)
-               : applyTypeParameters(context, buildFunctionType(context, member.parameters, member.returnAnnotation), member.typeParameters, member.typeConstraints);
+               : applyTypeParameters(
+                     context,
+                     buildFunctionType(context, member.parameters, member.returnAnnotation, null, member.isAsync),
+                     member.typeParameters,
+                     member.typeConstraints,
+                 );
 
         const decorators = member.decorators.map((decorator) => decorator.name);
 
@@ -171,14 +176,16 @@ function checkMethodBody(context: CheckContext, info: ClassInfo, member: ClassMe
         return;
     }
 
+    const frame = { isAsync: member.isAsync, isExpression: false };
+
     if (member.isStatic) {
-        checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, null, member.position);
+        checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, null, member.position, frame);
 
         return;
     }
 
     context.pushClassMethod({ className: info.name, methodName: member.name });
-    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, selfType(info), member.position);
+    checkFunctionBody(context, member.parameters, member.returnAnnotation, member.body, signature, selfType(info), member.position, frame);
     context.popClassMethod();
 }
 
@@ -289,7 +296,9 @@ export function checkClassDeclaration(context: CheckContext, statement: ClassDec
 }
 
 export function checkInterfaceDeclaration(context: CheckContext, statement: InterfaceDeclaration): void {
-    if (context.declarations.lookupInterface(statement.name) !== null) {
+    const existing = context.declarations.lookupInterface(statement.name);
+
+    if (existing !== null && existing.isBuiltin !== true) {
         context.report('check-duplicate-interface', `Interface "${statement.name}" is already defined.`, statement.position);
 
         return;

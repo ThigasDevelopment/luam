@@ -43,6 +43,8 @@ export const LUA_KEYWORDS: ReadonlySet<string> = new Set([
 ]);
 
 export const LUAM_KEYWORDS: ReadonlySet<string> = new Set([
+    'async',
+    'await',
     'class',
     'constructor',
     'continue',

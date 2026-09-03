@@ -454,6 +454,7 @@
                 "storage.type.constructor.luam",
                 "keyword.operator.new.luam",
                 "storage.modifier.local.luam-manifest",
+                "keyword.control.await.luam",
                 "keyword",
                 "keyword.control",
                 "storage.type",
@@ -470,7 +471,8 @@
                 "storage.modifier.luam",
                 "storage.modifier.extends.luam",
                 "storage.modifier.export.luam",
-                "storage.modifier.http.luam"
+                "storage.modifier.http.luam",
+                "storage.modifier.async.luam"
             ],
             "settings": {
                 "foreground": "#ad4dab"

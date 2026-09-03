@@ -170,7 +170,7 @@
 			<key>name</key>
 			<string>keyword</string>
 			<key>scope</key>
-			<string>keyword.control.luam, keyword.local.luam, storage.type.function.luam, storage.type.class.luam, storage.type.enum.luam, storage.type.interface.luam, storage.type.alias.luam, storage.type.declare.luam, storage.type.constructor.luam, keyword.operator.new.luam, storage.modifier.local.luam-manifest, keyword, keyword.control, storage.type, storage.modifier</string>
+			<string>keyword.control.luam, keyword.local.luam, storage.type.function.luam, storage.type.class.luam, storage.type.enum.luam, storage.type.interface.luam, storage.type.alias.luam, storage.type.declare.luam, storage.type.constructor.luam, keyword.operator.new.luam, storage.modifier.local.luam-manifest, keyword.control.await.luam, keyword, keyword.control, storage.type, storage.modifier</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -183,7 +183,7 @@
 			<key>name</key>
 			<string>keyword.modifier</string>
 			<key>scope</key>
-			<string>storage.modifier.luam, storage.modifier.extends.luam, storage.modifier.export.luam, storage.modifier.http.luam</string>
+			<string>storage.modifier.luam, storage.modifier.extends.luam, storage.modifier.export.luam, storage.modifier.http.luam, storage.modifier.async.luam</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>

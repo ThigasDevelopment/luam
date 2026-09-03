@@ -54,6 +54,13 @@ describe('tokenization', () => {
         expect(roleOfText(records, 'strict')).toBe('directive.strictness');
     });
 
+    it('paints async and await as keywords wherever they appear', () => {
+        const records = tokenize(source, 'async function load()\n    await other()\nend\n', 'dark');
+
+        expect(roleOfText(records, 'async')).toBe('keyword.modifier');
+        expect(roleOfText(records, 'await')).toBe('keyword');
+    });
+
     it('separates a bare call, a method call, and a lua library call', () => {
         const records = tokenize(source, fixtureText('theme-sample.luam'), 'dark');
 
