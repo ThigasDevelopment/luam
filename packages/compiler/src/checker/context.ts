@@ -6,6 +6,7 @@ import { isVisibleIn, type ApiEnvironment } from '@mta-types/api-declaration';
 
 import { EMPTY_AMBIENT, type AmbientDeclarations } from './ambient';
 import { descriptorToType } from './api-types';
+import { declarePromiseType } from './async';
 import { Binder, type SymbolInfo } from './binder';
 import type { StrictMode } from './directives';
 import { applyFacts, createFlow, forgetPath, type FlowState } from './flow';
@@ -80,6 +81,11 @@ export interface ClassMethodFrame {
     methodName: string;
 }
 
+export interface FunctionFrame {
+    isAsync: boolean;
+    isExpression: boolean;
+}
+
 interface ReturnFrame {
     expected: Type | null;
     inferred: Type[];
@@ -142,6 +148,8 @@ export class CheckContext {
 
     private readonly methodStack: ClassMethodFrame[] = [];
 
+    private readonly functionStack: FunctionFrame[] = [];
+
     private readonly projectEnvironments = new Map<string, ApiEnvironment>();
 
     private readonly predeclared = new Map<string, ClassInfo>();
@@ -174,6 +182,7 @@ export class CheckContext {
         this.mtaClasses = oop ? mtaClassRegistry() : null;
 
         this.binder.useBuiltins(builtinSymbols(environment));
+        declarePromiseType(this.declarations);
         this.declareProject(project);
         this.declareAmbient(ambient);
     }
@@ -405,6 +414,22 @@ export class CheckContext {
 
     currentClassMethod(): ClassMethodFrame | null {
         return this.methodStack[this.methodStack.length - 1] ?? null;
+    }
+
+    pushFunctionFrame(frame: FunctionFrame): void {
+        this.functionStack.push(frame);
+    }
+
+    popFunctionFrame(): void {
+        this.functionStack.pop();
+    }
+
+    inAsyncBody(): boolean {
+        return this.functionStack[this.functionStack.length - 1]?.isAsync === true;
+    }
+
+    suspendable(): boolean {
+        return this.functionStack.some((frame) => frame.isAsync || frame.isExpression);
     }
 
     resolveAnnotation(annotation: TypeAnnotation | null): Type {

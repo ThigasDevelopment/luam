@@ -1,0 +1,46 @@
+const ASYNC_HOVER = [
+    '```luam',
+    'async function name(...): Inner',
+    '```',
+    '',
+    '`async` compiles the function body into a coroutine the promise scheduler drives, so `await` and `sleep` work anywhere inside it without the caller ever constructing a pool.',
+    '',
+    '**The annotation is the inner type**',
+    '',
+    '- `async function f(): number` has the signature `f(): Promise<number>`, and an omitted annotation wraps the inferred type the same way.',
+    '- Annotating `Promise` yourself is `check-async-return-annotation`.',
+    '',
+    '**Emission**',
+    '',
+    '- The body is wrapped in `Promise.spawn`, with the parameters re-declared on the inner closure and forwarded — including `...` — so the wrap costs no line of the file it was written in.',
+    '- The keyword is erased; what reaches the generated Lua is an ordinary `function` that returns a promise.',
+    '',
+    '**Rules**',
+    '',
+    '- Lua 5.1 cannot yield across a C boundary: no `await` inside `pcall`, `xpcall`, a `table.sort` comparator or a metamethod. Calling an async function **from** an MTA event handler is fine.',
+    '- Naming the resource helper is what pulls `promise.lua` into the build; a resource with no async function and no promise global ships nothing.',
+].join('\n');
+
+const AWAIT_HOVER = [
+    '```luam',
+    'local value = await promise',
+    '```',
+    '',
+    '`await` suspends the async function until the promise settles, then reads the value it resolved with. It binds tighter than every binary operator and looser than a call, so `await f()` waits on the call and `await a + 1` adds to the awaited value.',
+    '',
+    '**A rejection raises**',
+    '',
+    '- The reason is raised at the `await` site, and that error rejects the promise of the function containing it, so it reaches `:catch()` at the end of the chain instead of disappearing.',
+    '- To branch on the outcome instead of raising, use `Promise.settle(promise)`, which returns `true` and the values, or `false` and the reason.',
+    '',
+    '**Rules**',
+    '',
+    '- Only inside an async function: elsewhere it is `check-await-outside-async`, and a plain function expression nested in an async body is not one.',
+    '- The operand has to be a promise; anything else is `check-await-non-promise`, and the message names the type it found.',
+    '- It lowers to a plain `Promise.await(...)` call, with no hoisting and no temporary.',
+].join('\n');
+
+export const ASYNC_KEYWORD_TEXT: ReadonlyMap<string, string> = new Map([
+    ['async', ASYNC_HOVER],
+    ['await', AWAIT_HOVER],
+]);

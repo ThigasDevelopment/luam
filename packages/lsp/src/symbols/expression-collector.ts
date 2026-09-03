@@ -212,7 +212,7 @@ export function collectExpression(state: CollectorState, block: BlockContext, ex
         return;
     }
 
-    if (expression.kind === 'unary-expression') {
+    if (expression.kind === 'unary-expression' || expression.kind === 'await-expression') {
         collectExpression(state, block, expression.operand);
 
         return;

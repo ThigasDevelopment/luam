@@ -4,6 +4,7 @@ export const ROOT_SCOPE = 0;
 
 export interface ScopeOwner {
     name: string | null;
+    isAsync?: boolean;
 }
 
 export interface Scope {
@@ -54,6 +55,16 @@ export class ScopeTree {
         }
 
         return chain;
+    }
+
+    isAsyncAt(offset: number): boolean {
+        for (const scope of this.chain(this.innermostAt(offset))) {
+            if (scope.owner !== null) {
+                return scope.owner.isAsync === true;
+            }
+        }
+
+        return false;
     }
 
     innermostAt(offset: number): number {

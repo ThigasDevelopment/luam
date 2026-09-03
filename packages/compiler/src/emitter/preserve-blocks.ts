@@ -40,6 +40,7 @@ function fromExpression(expression: Expression, blocks: Statement[][]): void {
 
             return;
         case 'unary-expression':
+        case 'await-expression':
             fromExpression(expression.operand, blocks);
 
             return;

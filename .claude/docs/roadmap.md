@@ -3115,18 +3115,18 @@ freeze the server — which means the answer is not a better `sleep` but making 
 coroutine invisible. An `async function` compiles its body into a coroutine the
 promise scheduler drives, so `await` and `sleep` work anywhere inside it.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 47.01 | Ship a promise runtime with an event-driven scheduler | ../plans/47.01-promise-runtime.md | architecture-engineer | todo |
-| 47.02 | Parse async functions and await expressions | ../plans/47.02-async-await-front-end.md | architecture-engineer | todo |
-| 47.03 | Type Promise, async returns and await | ../plans/47.03-promise-type.md | architecture-engineer | todo |
-| 47.04 | Lower async bodies onto coroutines | ../plans/47.04-async-lowering.md | architecture-engineer | todo |
-| 47.05 | Fold Threads onto the promise scheduler | ../plans/47.05-threads-on-the-promise-scheduler.md | architecture-engineer | todo |
-| 47.06 | Surface async, await and Promise in the editor | ../plans/47.06-async-editor-support.md | architecture-engineer | todo |
-| 47.07 | Cover async, await and the promise scheduler | ../plans/47.07-async-tests.md | test-engineer | todo |
-| 47.08 | Document async, await and the promise runtime | ../plans/47.08-async-documentation.md | documentation-engineer | todo |
+| 47.01 | Ship a promise runtime with an event-driven scheduler | ../plans/47.01-promise-runtime.md | architecture-engineer | done |
+| 47.02 | Parse async functions and await expressions | ../plans/47.02-async-await-front-end.md | architecture-engineer | done |
+| 47.03 | Type Promise, async returns and await | ../plans/47.03-promise-type.md | architecture-engineer | done |
+| 47.04 | Lower async bodies onto coroutines | ../plans/47.04-async-lowering.md | architecture-engineer | done |
+| 47.05 | Fold Threads onto the promise scheduler | ../plans/47.05-threads-on-the-promise-scheduler.md | architecture-engineer | done |
+| 47.06 | Surface async, await and Promise in the editor | ../plans/47.06-async-editor-support.md | architecture-engineer | done |
+| 47.07 | Cover async, await and the promise scheduler | ../plans/47.07-async-tests.md | test-engineer | done |
+| 47.08 | Document async, await and the promise runtime | ../plans/47.08-async-documentation.md | documentation-engineer | done |
 
 Acceptance:
 

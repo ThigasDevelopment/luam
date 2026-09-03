@@ -1,24 +1,27 @@
-function math.clamp(value, minimum, maximum)
-    value = tonumber(value)
+---@param value number
+---@param minimum? number
+---@param maximum? number
+---@return number
+function math.clamp (value, minimum, maximum)
+	value = tonumber (value);
+	if (not value) then
+		return 0;
+	end
 
-    if not value then
-        return 0
-    end
+	minimum = tonumber (minimum) or value;
+	maximum = tonumber (maximum) or value;
 
-    minimum = tonumber(minimum) or value
-    maximum = tonumber(maximum) or value
+	if (minimum > maximum) then
+		minimum, maximum = maximum, minimum;
+	end
 
-    if minimum > maximum then
-        minimum, maximum = maximum, minimum
-    end
+	if (value < minimum) then
+		return minimum;
+	end
 
-    if value < minimum then
-        return minimum
-    end
+	if (value > maximum) then
+		return maximum;
+	end
 
-    if value > maximum then
-        return maximum
-    end
-
-    return value
+	return value;
 end

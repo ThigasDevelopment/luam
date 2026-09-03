@@ -13,16 +13,21 @@ describe('native libraries', () => {
         expect(helpers("outputChatBox('hi', root)\n")).toEqual([]);
     });
 
-    it('injects threads when the module calls sleep', () => {
-        expect(helpers('sleep(100)\n')).toEqual(['threads']);
+    it('injects promise when the module calls sleep', () => {
+        expect(helpers('sleep(100)\n')).toEqual(['promise']);
     });
 
-    it('injects threads when the module uses the Threads library', () => {
-        expect(helpers("local pool = new Threads('concurrent', 'normal')\n")).toEqual(['threads']);
+    it('injects promise when the module names the promise library', () => {
+        expect(helpers('local pending = Promise.resolve(1)\n')).toEqual(['promise']);
+        expect(helpers('local waiting = delay(100)\n')).toEqual(['promise']);
+    });
+
+    it('injects threads and the promise scheduler it runs on', () => {
+        expect(helpers("local pool = new Threads('concurrent', 'normal')\n")).toEqual(['promise', 'threads']);
     });
 
     it('injects async and the threads it depends on', () => {
-        expect(helpers('local task = new Async(100)\n')).toEqual(['async', 'threads']);
+        expect(helpers('local task = new Async(100)\n')).toEqual(['async', 'promise', 'threads']);
     });
 
     it('keeps injecting the helpers a language feature requires', () => {
@@ -30,7 +35,7 @@ describe('native libraries', () => {
     });
 
     it('injects a library alongside a feature helper', () => {
-        expect(helpers("class Session {\n    name: string = ''\n}\n\nsleep(50)\n")).toEqual(['class', 'threads']);
+        expect(helpers("class Session {\n    name: string = ''\n}\n\nsleep(50)\n")).toEqual(['class', 'promise']);
     });
 
     it('leaves the library out when the module declares the name itself', () => {

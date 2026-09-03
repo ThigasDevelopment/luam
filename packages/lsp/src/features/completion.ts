@@ -28,6 +28,8 @@ import {
 } from '@lsp/features/completion-context';
 import {
     apiItem,
+    asyncItem,
+    awaitItem,
     constructorItem,
     staticItem,
     DIRECTIVE_ITEMS,
@@ -346,7 +348,10 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         return [];
     }
 
-    const directives = isStatementStart(analysis.text, offset) ? DIRECTIVE_ITEMS : [];
+    const statementStart = isStatementStart(analysis.text, offset);
+    const directives = statementStart ? DIRECTIVE_ITEMS : [];
+    const asyncModifier = statementStart ? [asyncItem()] : [];
+    const awaitOperator = analysis.index.scopes.isAsyncAt(offset) ? [awaitItem()] : [];
     const constructor = classBodyNeedsConstructor(analysis, lexical.frame, offset) ? [constructorItem()] : [];
     const modifiers = isClassBody(analysis, lexical.frame, offset) ? [staticItem()] : [];
     const expectation = expectedArgument(analysis, offset, lexical.frame);
@@ -371,7 +376,9 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...plainItems(mtaClassItems(analysis), expectation),
         ...plainItems(superItems(analysis, offset), expectation),
         ...apiItems(analysis, offset, expectation, inHandler),
+        ...plainItems(awaitOperator, expectation),
         ...plainItems(directives, expectation),
+        ...plainItems(asyncModifier, expectation),
         ...plainItems(constructor, expectation),
         ...plainItems(modifiers, expectation),
         ...plainItems(keywordItems(expectation), expectation),

@@ -17,6 +17,7 @@ export interface ClassFieldDeclaration extends NodeBase {
 export interface ClassMethodDeclaration extends NodeBase {
     kind: 'class-method';
     name: string;
+    isAsync: boolean;
     isConstructor: boolean;
     isSynthetic: boolean;
     isStatic: boolean;

@@ -14,6 +14,40 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- `async function` compiles its body into a coroutine the promise scheduler
+  drives, so `await` and `sleep` work anywhere inside it without the author
+  constructing a pool. The return annotation is the inner type:
+  `async function f(): number` has the signature `f(): Promise<number>`, and
+  `local value = await f()` binds the resolved value with that type.
+- `async` and `await` are reserved words. Both remain legal as property names —
+  `value.async`, `Threads.await` — like every other reserved word, and naming a
+  local or a parameter with either is `parse-reserved-name`.
+- A promise runtime, `promise.lua`: `new Promise(executor)`, `Promise.resolve`,
+  `Promise.reject`, `Promise.all`, `Promise.race`, `Promise.settle`,
+  `promise:next`, `promise:catch`, and `delay(milliseconds)`. A settle fires
+  its handlers once, a trailing `nil` survives the round trip, an executor that
+  throws rejects, and every `coroutine.resume` result is read.
+- `Threads` and `Async` run on that scheduler: one pulse timer for the runtime,
+  the frame budget and the three scheduling styles unchanged. `pool:add(fn)`
+  still returns the job id first and now returns a promise second, as do
+  `Async.map`, `Async.iterate` and `Async.foreach`. A failing job rejects its
+  promise instead of raising out of the timer callback.
+- Four diagnostics: `check-await-outside-async`, `check-await-non-promise`,
+  `check-async-return-annotation`, and the `check-sleep-outside-async` warning.
+
+### Changed
+
+- `sleep` moved from `threads.lua` to `promise.lua` and dispatches on the
+  coroutine it runs in: a timer inside an async function, the pool pulse inside a
+  `Threads` job, and an actionable error anywhere else. Because MTA never fires a
+  timer sooner than 50ms, `sleep(0)` inside an async function resumes on the next
+  tick.
+- `PRIORITIES.extreme` no longer asks `setTimer` for a 0ms interval, which MTA
+  refuses. A pool now throttles itself against the shared pulse, so `extreme`
+  means every pulse.
+
 ## 1.0.0 - 2026-09-02
 
 ### Added

@@ -85,9 +85,11 @@ export function signatureText(
     returnAnnotation: TypeAnnotation | null,
     inferredReturn: Type | null = null,
     typeParameters: readonly string[] = [],
+    isAsync = false,
 ): string {
     const rendered = parameters.map(parameterText).join(', ');
-    const returnType = returnAnnotation === null && inferredReturn !== null ? typeToString(inferredReturn) : annotationText(returnAnnotation);
+    const declared = returnAnnotation === null && inferredReturn !== null ? typeToString(inferredReturn) : annotationText(returnAnnotation);
+    const returnType = isAsync && returnAnnotation !== null ? `Promise<${declared}>` : declared;
 
     return `${name}${typeParameterText(typeParameters)}(${rendered}): ${returnType}`;
 }

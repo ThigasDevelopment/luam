@@ -43,7 +43,7 @@ describe('a generic interface', () => {
     });
 
     it('infers the element type through a generic function', () => {
-        const source = `${PROMISE}local function await<T>(p: Promise<T>): T[]\n    return p.value\nend\n\nlocal function take(p: Promise<Vehicle>): void\n    local held: Vehicle[] = await(p)\n\n    print(held)\nend\n`;
+        const source = `${PROMISE}local function unwrap<T>(p: Promise<T>): T[]\n    return p.value\nend\n\nlocal function take(p: Promise<Vehicle>): void\n    local held: Vehicle[] = unwrap(p)\n\n    print(held)\nend\n`;
 
         expect(codes(source)).toEqual([]);
     });

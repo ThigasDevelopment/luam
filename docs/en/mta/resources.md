@@ -58,12 +58,61 @@ them flat under `lib/`, outside the source tree:
 | `string.lua` | A template string or a string extension is used. |
 | `table.lua` | A table extension is used. |
 | `math.lua` | A number extension such as `clamp` is used. |
-| `threads.lua` | `sleep` or `Threads` is named. Also selectable through `helpers`. |
-| `async.lua` | `Async` is named. |
+| `promise.lua` | An `async function` is declared, or `Promise`, `delay` or `sleep` is named. Also selectable through `helpers`. |
+| `threads.lua` | `Threads` is named. Requires `promise.lua`. |
+| `async.lua` | `Async` is named. Requires `threads.lua`. |
 
 A resource with no classes never carries `class.lua`, and a server-only helper is
 never downloaded by a client. Deployment values are not a helper: a project with
 a `.env` gets a generated `env.lua` at the resource root instead.
+
+### The promise runtime
+
+`promise.lua` declares `Promise`, `delay` and `sleep`. An
+[async function](/en/language/functions#async-functions) compiles onto it, and
+these members are available to hand-written code as well:
+
+| Member | What it does |
+| --- | --- |
+| `new Promise(executor)` | Creates a promise from an executor that receives `resolve` and `reject`. An error thrown inside the executor rejects the promise. |
+| `Promise.resolve(...)` / `Promise.reject(...)` | A promise that is already settled. `resolve` returns a promise passed to it unchanged. |
+| `Promise.all(list)` / `Promise.race(list)` | Wait for every promise, or mirror the first one to settle. |
+| `Promise.settle(promise)` | Waits and reports: `true` and the values, or `false` and the reason. Valid inside an async function. |
+| `promise:next(onFulfilled, onRejected)` | Runs a callback when the promise resolves, without suspending the caller. Chainable. |
+| `promise:catch(onRejected)` | Runs a callback when the promise rejects. Chainable. |
+| `delay(milliseconds)` | A promise that resolves after a wait, clamped to MTA's 50ms timer floor. |
+| `sleep(milliseconds)` | Suspends the running coroutine. Valid inside an async function and inside a `Threads` job; anywhere else it raises. |
+
+### A promise or a pool
+
+Reach for a **promise** when the work *waits* — a database round trip, a remote
+call, an event answered on another tick. Reach for a **pool** when the work is
+*long* — a loop over ten thousand rows that must not hold a frame.
+
+The reason is the frame budget. Slicing with `await delay(0)` costs one timer
+per slice and lands on the 50ms floor, roughly 20 slices a second. A pool resumes
+jobs from one shared pulse under a frame budget of 150 at `normal` and 500 at
+`high` — one to two orders of magnitude more slices for the same wall clock.
+
+Both libraries run on that one scheduler and one pulse timer, so nothing is lost
+by mixing them: `await` behaves the same inside a pool job, and `pool:add(fn)`
+returns the job id first and a promise that settles when the job finishes second.
+
+```luam
+local pool = new Threads('concurrent', 'normal')
+
+async function slice(): void
+    local id, done = pool:add(function ()
+        for index = 1, 10000 do
+            sleep(0)
+        end
+    end)
+
+    await done
+
+    outputDebugString('job ' .. tostring(id) .. ' finished')
+end
+```
 
 ## `min_mta_version`
 

@@ -1,6 +1,6 @@
 import { EMPTY_DOCUMENTATION, type ApiDocumentation, type ApiDocumentationCatalog } from '@mta-types/api-documentation';
 import { MTA_API_DOCS } from '@mta-types/generated/docs/mta-docs';
-import { ASYNC_DOCS, RUNTIME_DOCS, THREAD_DOCS, THREADS_DOCS } from '@mta-types/runtime-documentation';
+import { ASYNC_DOCS, PROMISE_DOCS, RUNTIME_DOCS, THREAD_DOCS, THREADS_DOCS } from '@mta-types/runtime-documentation';
 import { MATH_DOCS, STRING_DOCS, TABLE_DOCS } from '@mta-types/library-documentation';
 import { LUA_DOCS } from '@mta-types/lua-documentation';
 
@@ -13,8 +13,10 @@ const MEMBER_DOCS: Readonly<Record<string, ApiDocumentationCatalog>> = {
     Thread: THREAD_DOCS,
     Threads: THREADS_DOCS,
     Async: ASYNC_DOCS,
+    Promise: PROMISE_DOCS,
     ThreadsLibrary: THREADS_DOCS,
     AsyncLibrary: ASYNC_DOCS,
+    PromiseLibrary: PROMISE_DOCS,
 };
 
 export function findApiDocumentation(name: string): ApiDocumentation | null {

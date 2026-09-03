@@ -1,0 +1,14 @@
+name = 'microservice'
+author = 'Luam'
+version = '1.0.0'
+description = 'A request and response bus that crosses an event with a promise.'
+
+compiler = {
+    strict = true,
+    oop = false,
+}
+
+output = {
+    bundle = false,
+    map = true,
+}

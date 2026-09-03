@@ -31,6 +31,7 @@ export interface ClassInfo {
 
 export interface InterfaceInfo {
     name: string;
+    isBuiltin?: boolean;
     typeParameters: readonly string[];
     typeConstraints: readonly (Type | null)[];
     superInterfaces: string[];

@@ -1,6 +1,7 @@
 import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { ASYNC_KEYWORD_TEXT } from '@lsp/features/async-keyword-text';
 import { CLASS_KEYWORD_TEXT } from '@lsp/features/class-keyword-text';
 import { DECLARATION_KEYWORD_TEXT } from '@lsp/features/declaration-keyword-text';
 import { LUA_KEYWORD_TEXT } from '@lsp/features/lua-keyword-text';
@@ -9,6 +10,7 @@ import { toWordRange } from '@lsp/support/lsp-position';
 import { positionAt, wordAt, wordStart } from '@lsp/support/source-text';
 
 const KEYWORD_TEXT: ReadonlyMap<string, string> = new Map([
+    ...ASYNC_KEYWORD_TEXT,
     ...CLASS_KEYWORD_TEXT,
     ...DECLARATION_KEYWORD_TEXT,
     ...LUA_KEYWORD_TEXT,

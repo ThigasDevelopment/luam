@@ -198,6 +198,72 @@ local function trace(...): void
 end
 ```
 
+## Async functions
+
+An `async function` runs its body as a coroutine and returns a promise, so
+`await` reads a value that arrives later without blocking the server:
+
+```luam
+async function loadProfile(id: number): number
+    local record = await readRecord(id)
+
+    sleep(200)
+
+    return record
+end
+
+async function greet(id: number): void
+    local record = await loadProfile(id)
+
+    outputChatBox(tostring(record))
+end
+```
+
+The return annotation is the **inner** type. `loadProfile` above has the
+signature `loadProfile(id: number): Promise<number>`, and `await` gives the
+`number` back. Annotating `Promise` yourself is `check-async-return-annotation`.
+
+A rejection is **raised** at the `await` site, and that error rejects the promise
+of the function containing it, so it reaches `:catch()` at the end of the chain
+instead of disappearing. To branch on the outcome instead of raising, use
+`Promise.settle`, which returns `true` and the value, or `false` and the reason:
+
+```luam
+async function tryLoad(id: number): string
+    local ok, reason = Promise.settle(loadProfile(id))
+
+    if ok then
+        return 'loaded'
+    end
+
+    return tostring(reason)
+end
+```
+
+Callers that are not async functions can chain instead:
+
+```luam
+loadProfile(1):next(function (record)
+    outputChatBox(tostring(record))
+end):catch(function (reason)
+    outputDebugString(tostring(reason))
+end)
+```
+
+### Two boundaries
+
+**Lua 5.1 cannot yield across a C boundary.** No `await` inside `pcall`,
+`xpcall`, a `table.sort` comparator or a metamethod — the runtime raises
+*attempt to yield across a C-call boundary*. Calling an async function **from**
+an MTA event handler is fine: only Lua frames sit between the resume and the
+yield.
+
+**MTA never fires a timer sooner than 50ms.** `delay(0)` and `sleep(0)` inside
+an async function resume on the next tick, not the next frame. Inside a
+`Threads` job `sleep` still yields to the pool pulse, which is what keeps the
+frame budget worth having. See
+[Runtime helpers](/en/mta/resources#runtime-helpers).
+
 ## A complete example
 
 <<< @/snippets/language/src/shared/functions.luam

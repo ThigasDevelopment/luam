@@ -3,6 +3,7 @@ import type { ExtensionResult } from '@compiler/extensions/native-extensions';
 import type { CallExpression, Expression, IndexExpression, MemberExpression, TableExpression, TemplateLiteral, TypeAnnotation } from '@compiler/parser/ast';
 
 import { pathOf } from './access-path';
+import { awaitedType, reportSleepOutsideAsync } from './async';
 import { extensionFor, reportExtensionForm, reportNotCallable } from './callable';
 import type { CheckContext } from './context';
 import { contextualFunction } from './contextual-function';
@@ -325,6 +326,10 @@ function checkMethodCall(context: CheckContext, expression: CallExpression, meth
 }
 
 function checkCall(context: CheckContext, expression: CallExpression): Type {
+    if (expression.method === null && expression.callee.kind === 'identifier') {
+        reportSleepOutsideAsync(context, expression.callee.name, expression.position);
+    }
+
     const contracted = checkResourceCall(context, expression);
 
     if (contracted !== null) {
@@ -502,10 +507,13 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         case 'table-expression':
             return checkTable(context, expression);
         case 'function-expression': {
-            const built = buildFunctionType(context, expression.parameters, expression.returnAnnotation, contextualFunction(expected));
+            const built = buildFunctionType(context, expression.parameters, expression.returnAnnotation, contextualFunction(expected), expression.isAsync);
             const type = applyTypeParameters(context, built, expression.typeParameters, expression.typeConstraints);
 
-            checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, type, null, expression.position);
+            checkFunctionBody(context, expression.parameters, expression.returnAnnotation, expression.body, type, null, expression.position, {
+                isAsync: expression.isAsync,
+                isExpression: true,
+            });
 
             return context.record(expression, type);
         }
@@ -517,6 +525,8 @@ export function checkMultiValueExpression(context: CheckContext, expression: Exp
         }
         case 'unary-expression':
             return checkUnary(context, expression.operator, checkExpression(context, expression.operand), expression);
+        case 'await-expression':
+            return context.record(expression, awaitedType(context, checkExpression(context, expression.operand), expression));
         default:
             return context.record(expression, checkExpression(context, expression.expression, expected));
     }

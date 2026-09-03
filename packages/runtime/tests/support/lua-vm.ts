@@ -10,6 +10,8 @@ export interface LuaOutcome {
     error: string | null;
 }
 
+const LUA_51_COMPATIBILITY = 'unpack = unpack or table.unpack';
+
 function helperSource(name: RuntimeHelperName): string {
     return readFileSync(fileURLToPath(resolveHelperUrl(name)), 'utf8');
 }
@@ -32,6 +34,8 @@ export function runWithHelpers(helpers: readonly RuntimeHelperName[], source: st
     const state = lauxlib.luaL_newstate();
 
     lualib.luaL_openlibs(state);
+
+    lauxlib.luaL_dostring(state, to_luastring(LUA_51_COMPATIBILITY));
 
     for (const helper of helpers) {
         if (lauxlib.luaL_dostring(state, to_luastring(helperSource(helper))) !== lua.LUA_OK) {

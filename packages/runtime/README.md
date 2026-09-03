@@ -1,9 +1,10 @@
 # Runtime Helpers
 
-Lua 5.1 helper modules copied into a generated MTA resource. Every file is
-standalone: it declares globals or extends a standard library and never
-requires another file. The compiler never bundles these files — it records
-which helpers the generated code needs and the CLI copies them.
+Lua 5.1 helper modules copied into a generated MTA resource. A file declares
+globals or extends a standard library, and never calls `require`; where one
+builds on another it declares that in `requires`, and the catalog orders the
+files so the dependency loads first. The compiler never bundles these files — it
+records which helpers the generated code needs and the CLI copies them.
 
 ## Modules
 
@@ -13,11 +14,16 @@ which helpers the generated code needs and the CLI copies them.
 | `math` | `lua/math.lua` | automatic | number extensions Lua 5.1 does not ship (`math.clamp`) |
 | `string` | `lua/string.lua` | automatic | template strings, string extensions (`string.trim`, `string.startsWith`, `string.endsWith`) |
 | `table` | `lua/table.lua` | automatic | table extensions (`table.size`, `table.isEmpty`, `table.keys`, `table.values`, `table.includes`) |
-| `threads` | `lua/threads.lua` | manual | coroutine-based threads (`sleep`, `Threads`) |
+| `promise` | `lua/promise.lua` | reference | the promise state machine, the task scheduler, one shared pulse timer (`Promise`, `delay`, `sleep`) |
+| `threads` | `lua/threads.lua` | reference | the cooperative time slicer (`Threads`), driven by the promise scheduler |
+| `async` | `lua/async.lua` | reference | slice-at-a-time iteration over a table or a numeric range (`Async`) |
 
 `automatic` helpers are copied when the compiler reports them in
-`requiredHelpers`. `threads` is opt-in: no language feature requires it, so a
-resource includes it only when the developer asks for it.
+`requiredHelpers`. A `reference` helper comes in when the code names one of the
+globals it declares — and `promise` also comes in when the module declares an
+`async function`, because the emitted `Promise.spawn` call never appears among
+the module's own references. A module that declares its own `sleep` pulls in
+nothing.
 
 Rewrites that land on the Lua 5.1 standard library (`string.upper`,
 `math.floor`, and similar) require no helper and are never copied.
@@ -25,7 +31,9 @@ Rewrites that land on the Lua 5.1 standard library (`string.upper`,
 ## Load Order
 
 Helpers must load before the scripts that depend on them. `meta.xml` lists the
-copied helpers first, in the order returned by the catalog.
+copied helpers first, in the order returned by the catalog. `helperDepth`
+orders a helper after everything it requires, which is what puts `promise.lua`
+before `threads.lua` before `async.lua`.
 
 ## Catalog
 

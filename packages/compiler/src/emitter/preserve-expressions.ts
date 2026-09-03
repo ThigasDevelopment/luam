@@ -1,11 +1,13 @@
 import { resolveCallExtension, resolvePropertyExtension } from './extensions';
-import { emitExpression } from './expressions';
+import { emitExpression, emitString } from './expressions';
 import type { HybridSourceEdit } from './hybrid-source-map';
 import { isPreservableExpression, type ExpressionTypes, type StaticAccess } from './preserve-guards';
 import type { PreserveInput } from './preserve-input';
 import { createEmitState } from './state';
 
 import type { Expression, Statement } from '@compiler/parser/ast';
+import type { NewExpression } from '@compiler/parser/declaration-nodes';
+import type { SourceSpan } from '@compiler/parser/source-metadata';
 
 function children(expression: Expression): Expression[] {
     switch (expression.kind) {
@@ -22,6 +24,7 @@ function children(expression: Expression): Expression[] {
         case 'binary-expression':
             return [expression.left, expression.right];
         case 'unary-expression':
+        case 'await-expression':
             return [expression.operand];
         case 'group-expression':
             return [expression.expression];
@@ -86,6 +89,28 @@ function statementExpressions(statement: Statement): Expression[] | null {
     }
 }
 
+function constructionEdit(input: PreserveInput, expression: NewExpression, span: SourceSpan): HybridSourceEdit | null {
+    const start = input.source.indexOf(expression.className, span.start);
+
+    if (start === -1 || start >= span.end) {
+        return null;
+    }
+
+    const isLibrary = input.types.get(expression)?.kind === 'record';
+
+    if (isLibrary) {
+        return { start: span.start, end: start + expression.className.length, replacement: `${expression.className}.new` };
+    }
+
+    const spacing = /^[ \t]*/.exec(input.source.slice(start + expression.className.length))?.[0] ?? '';
+
+    return {
+        start: span.start,
+        end: start + expression.className.length + spacing.length,
+        replacement: `new ${emitString(expression.className)} `,
+    };
+}
+
 export function expressionEdits(input: PreserveInput, statement: Statement): HybridSourceEdit[] | null {
     const slots = input.development ? statementExpressions(statement) : null;
 
@@ -104,7 +129,23 @@ export function expressionEdits(input: PreserveInput, statement: Statement): Hyb
     for (const expression of found) {
         const span = input.spans.get(expression);
 
-        if (span === undefined || holdsFunction(expression)) {
+        if (span === undefined) {
+            return null;
+        }
+
+        if (expression.kind === 'new-expression') {
+            const edit = constructionEdit(input, expression, span);
+
+            if (edit === null) {
+                return null;
+            }
+
+            edits.push(edit);
+
+            continue;
+        }
+
+        if (holdsFunction(expression)) {
             return null;
         }
 

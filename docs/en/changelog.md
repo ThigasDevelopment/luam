@@ -9,6 +9,22 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Added
+
+- [Functions](/en/language/functions) gains **Async functions**: what an
+  `async function` returns, why the annotation is the inner type, how a
+  rejection is raised at the `await` site, and the two boundaries — no `await`
+  across a C boundary such as `pcall`, and MTA's 50ms timer floor.
+- [MTA resources](/en/mta/resources) documents the promise runtime member by
+  member, and answers when to reach for a promise and when for a pool, with the
+  frame-budget arithmetic behind the answer.
+- [Keywords](/en/reference/keywords) records that `async` and `await` are
+  contextual, and that `sleep` is valid inside an async function and inside a
+  `Threads` job and nowhere else.
+- [Diagnostics](/en/reference/diagnostics) gains `check-await-outside-async`,
+  `check-await-non-promise`, `check-async-return-annotation` and
+  `check-sleep-outside-async`.
+
 ## 1.0.0 - 2026-09-02
 
 ### Added

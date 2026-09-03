@@ -26,6 +26,7 @@ function childExpressions(expression: Expression): readonly Expression[] {
         case 'binary-expression':
             return [expression.left, expression.right];
         case 'unary-expression':
+        case 'await-expression':
             return [expression.operand];
         case 'group-expression':
             return [expression.expression];

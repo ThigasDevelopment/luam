@@ -61,6 +61,7 @@ function visitExpression(state: HintState, expression: Expression): void {
 
             return;
         case 'unary-expression':
+        case 'await-expression':
             visitExpression(state, expression.operand);
 
             return;
