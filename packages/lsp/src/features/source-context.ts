@@ -16,7 +16,7 @@ export interface SourceContext {
 
 type ScanMode = 'code' | 'line-comment' | 'block-comment' | 'short-string' | 'long-string';
 
-interface ScanState {
+export interface ScanState {
     mode: ScanMode;
     quote: string;
     level: number;
@@ -140,7 +140,7 @@ function advanceCode(text: string, state: ScanState, index: number): number {
     return index + 1;
 }
 
-function advance(text: string, state: ScanState, index: number): number {
+export function advance(text: string, state: ScanState, index: number): number {
     const char = text[index] ?? '';
 
     if (state.mode === 'line-comment') {

@@ -12,6 +12,7 @@ import { CompletionItemKind, MarkupKind, type CompletionItem } from 'vscode-lang
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { conflictsWithExpectation, expectedArgument, withArgumentRank, type ArgumentExpectation } from '@lsp/features/argument-expectation';
+import { blockItems } from '@lsp/features/block-completion';
 import { contextGlobalFilter, EVENT_CONTEXT_GLOBALS } from '@lsp/features/context-globals';
 import { callbackParameterItems } from '@lsp/features/callback-parameter-completion';
 import { classBodyNeedsConstructor, isClassBody } from '@lsp/features/class-body';
@@ -368,6 +369,8 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         return deduplicate(plainItems(keys, expectation));
     }
 
+    const blocks = expectation === null ? blockItems(analysis.text, offset, { statementStart, snippets, bracket: lexical.frame }) : [];
+
     return deduplicate([
         ...expected,
         ...scopeItems(analysis, offset, expectation),
@@ -381,6 +384,7 @@ export function completionAt(analysis: DocumentAnalysis, offset: number, others:
         ...plainItems(asyncModifier, expectation),
         ...plainItems(constructor, expectation),
         ...plainItems(modifiers, expectation),
+        ...blocks,
         ...plainItems(keywordItems(expectation), expectation),
     ]);
 }

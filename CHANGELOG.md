@@ -14,6 +14,17 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Added
+
+- Completion closes an open block and scaffolds a whole one. The closer item
+  writes `then .. end`, `do .. end` or `until condition` on the block the
+  cursor sits in and lands on the indented line between them, and the scaffold
+  writes the whole block — `if`, `for` in both forms, `while`, `repeat`,
+  `do` and `function` — from the word that opens it at a statement start. A
+  closer is preselected only while the block is still unclosed, and a client
+  without snippet support receives the block as plain text. The block scanner
+  lives in the language server, so every LSP client gets it, not one editor.
+
 ## 1.0.1 - 2026-09-03
 
 ### Added

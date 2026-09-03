@@ -99,6 +99,55 @@ inherited types inside the body. MTA callback variants follow the current file's
 environment, so `addCommandHandler` offers `player, commandName, ...` on the
 server and `commandName, ...` on the client.
 
+### Blocks
+
+Completion writes the whole block, so the `end` is never left for later. Two
+kinds of item do it.
+
+**Closers** appear while a block is open and offer the word that closes it:
+
+| You have typed | You get | It writes |
+| --- | --- | --- |
+| `if 1 + 1 == 2 the` | `then .. end` | `then`, an indented empty line with the cursor on it, and `end` |
+| `for index = 1, 10 d` | `do .. end` | the same three lines, opened by `do` |
+| `while running d` | `do .. end` | the same three lines, opened by `do` |
+| A line inside a `repeat` | `until condition` | `until condition`, with `condition` selected |
+
+Accepting the first row on `if 1 + 1 == 2 the` leaves the cursor on the empty
+line between the two:
+
+```luam
+if 1 + 1 == 2 then
+
+end
+```
+
+The closer is **preselected only while the block is unclosed**. On code that
+already has its `end`, the item is still offered, one row below the plain
+keyword and unselected, so Enter never writes a second `end` into working code.
+
+**Scaffolds** appear at a statement start and write the block from the word that
+opens it — `if .. then .. end`, `for .. do .. end`, `for .. in .. do .. end`,
+`while .. do .. end`, `repeat .. until`, `do .. end` and `function .. end`. Each
+one carries tab stops in the order a reader would fill them, so `for` completes
+to `for index = 1, 10 do` with `index` selected and `1` and `10` one Tab away. A
+scaffold is never preselected: opening a block is a choice, closing the one you
+just opened is not.
+
+Both kinds refuse to appear inside a string, inside a comment, in a type
+position, after `.` or `:`, and inside a call's arguments — a function body
+written as a call argument still gets them, since the block starts inside the
+function.
+
+The plain keyword is never removed; `then`, `do` and `until` stay in the list
+beside their block row. A client that reports no snippet support receives the
+same block as plain text, with the defaults filled in and no tab stops.
+
+The block is inserted with `adjustIndentation`, so it lands at the header's
+indentation and the `increaseIndentPattern` in
+[`language-configuration.json`](https://github.com/ThigasDevelopment/luam/blob/main/packages/vscode/language-configuration.json)
+does not indent it a second time.
+
 ## Events
 
 An event name is resolved from the string literal in the call, so the handler of

@@ -11,6 +11,14 @@ da versão atual.
 
 ## Não lançado
 
+### Adicionado
+
+- [Language server](/pt-br/tooling/language-server) ganha **Blocos**: os
+  fechadores que escrevem `then .. end`, `do .. end` e `until condition` em um
+  bloco aberto, os esqueletos que escrevem o bloco inteiro a partir da palavra
+  que o abre, a regra que pré-seleciona um fechador apenas enquanto o bloco está
+  aberto e o bloco em texto puro que um cliente sem suporte a snippets recebe.
+
 ## 1.0.1 - 2026-09-03
 
 ### Adicionado
