@@ -13,6 +13,19 @@ da versão atual.
 
 ### Adicionado
 
+- [Estrutura do projeto](/pt-br/guide/project-layout) documenta a estrutura
+  plana: um arquivo `.luam` ao lado do manifesto é compilado sem um padrão de
+  `sources`, e roda como `shared` a menos que sua diretiva `#!` diga outra coisa.
+  [Ambientes](/pt-br/mta/environments) ganha a linha correspondente.
+- [`.luam.manifest`](/pt-br/tooling/luam-manifest) explica os padrões de `assets`
+  por exemplo, incluindo o que separa `assets/*` de `assets/**/*`, e registra que
+  o bloco do scaffold sai comentado com `#`.
+- [Diagnósticos](/pt-br/reference/diagnostics) ganha `config-unmatched-source` e
+  o aviso `config-empty-asset`, e restringe `config-no-sources` a um projeto sem
+  arquivo `.luam` algum.
+- [Solução de problemas](/pt-br/guide/troubleshooting) responde a um build que
+  falha com um arquivo de código bem ali, e a um mapeamento de `assets` que não
+  copiou nada.
 - [Funções](/pt-br/language/functions) ganha **Funções async**: o que uma
   `async function` devolve, por que a anotação é o tipo interno, como uma
   rejeição é levantada no ponto do `await` e as duas fronteiras — nada de

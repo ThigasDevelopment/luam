@@ -228,9 +228,11 @@ erro não escreve nada.
 | `config-escaping-path` | Um caminho é absoluto ou contém um segmento `..`. |
 | `config-invalid-pattern` | Um padrão usa algo que a gramática de glob não permite. |
 | `config-missing-source` | Uma entrada literal de `sources` nomeia um arquivo que não existe. |
-| `config-no-sources` | Nenhum arquivo `.luam` casou com `sources`. |
+| `config-no-sources` | O projeto não tem arquivo `.luam` algum. |
+| `config-unmatched-source` | Nenhum padrão de `sources` casou, e o projeto tem arquivos `.luam`. A mensagem os nomeia e dá as três saídas. |
 | `config-source-side-conflict` | Um arquivo é casado por mais de um lado de `sources`. |
 | `config-missing-asset` | Uma entrada literal de `assets` nomeia um arquivo que não existe. |
+| `config-empty-asset` | Um padrão de `assets` não copiou nada — sua raiz não é um diretório, ou nada abaixo dela casou. Um aviso. |
 | `config-output-collision` | Dois assets caem no mesmo destino, ou um sobrescreveria um caminho gerado. |
 | `config-invalid-dependency` | Uma entrada de `dependencies` não é um nome de resource válido, ou nomeia este resource. |
 | `config-library-missing` | Uma entrada de `libraries` nomeia um pacote que não está instalado. A mensagem nomeia o comando de instalação. |

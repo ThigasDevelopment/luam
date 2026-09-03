@@ -44,6 +44,38 @@ you actually use.
 A literal path that names a file the project does not have is
 `config-missing-source` instead, which names the path.
 
+## The build fails with a source file sitting right there
+
+```
+config-unmatched-source: No "sources" pattern matched "tools/helper.luam" in "…".
+```
+
+The project has `.luam` files; none of them is under a directory `sources` names.
+The message lists up to five of them, counts the rest, and the fix is one of
+three:
+
+- add a pattern to `sources` that covers where the file already is;
+- move the file under a directory the manifest already names, usually
+  `src/server`, `src/client` or `src/shared`;
+- move it to the project root, which is compiled without a pattern — with the
+  side its `#!` directive declares, and `shared` without one.
+
+`config-no-sources` is the neighbouring case: the project holds no `.luam` file
+at all, so there is nothing to name.
+
+## An `assets` mapping copied nothing
+
+```
+config-empty-asset: "assets/**/*" is listed in "assets" but "assets" is not a directory in "…".
+```
+
+The build passes — this is a warning — but the resource ships without the files
+the mapping declared. Either create the directory, or drop the mapping. The
+second wording, "matched no file under `assets`", means the directory is there
+and the pattern reached nothing inside it; `assets/*` stops at one segment, so a
+file in `assets/img/` needs `assets/**/*`. The full table is in
+[`.luam.manifest`](/en/tooling/luam-manifest#what-each-from-matches).
+
 ## An MTA function is "not available"
 
 ```

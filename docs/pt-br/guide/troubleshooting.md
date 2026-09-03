@@ -43,6 +43,38 @@ cada lado de `sources` para os padrões que você realmente usa.
 Um caminho literal que nomeia um arquivo que o projeto não tem gera
 `config-missing-source`, que nomeia o caminho.
 
+## O build falha com um arquivo de código bem ali
+
+```
+config-unmatched-source: No "sources" pattern matched "tools/helper.luam" in "…".
+```
+
+O projeto tem arquivos `.luam`; nenhum deles está sob um diretório que `sources`
+nomeia. A mensagem lista até cinco deles, conta o resto, e a correção é uma de
+três:
+
+- adicione a `sources` um padrão que cubra onde o arquivo já está;
+- mova o arquivo para um diretório que o manifesto já nomeia, normalmente
+  `src/server`, `src/client` ou `src/shared`;
+- mova-o para a raiz do projeto, que é compilada sem padrão — com o lado que sua
+  diretiva `#!` declara, e `shared` sem nenhuma.
+
+`config-no-sources` é o caso vizinho: o projeto não tem arquivo `.luam` algum,
+então não há o que nomear.
+
+## Um mapeamento de `assets` não copiou nada
+
+```
+config-empty-asset: "assets/**/*" is listed in "assets" but "assets" is not a directory in "…".
+```
+
+O build passa — isso é um aviso — mas o resource sai sem os arquivos que o
+mapeamento declarou. Crie o diretório, ou remova o mapeamento. A segunda redação,
+"matched no file under `assets`", significa que o diretório existe e o padrão não
+alcançou nada dentro dele; `assets/*` para em um segmento, então um arquivo em
+`assets/img/` precisa de `assets/**/*`. A tabela completa está em
+[`.luam.manifest`](/pt-br/tooling/luam-manifest#o-que-cada-from-casa).
+
 ## Uma função do MTA está "not available"
 
 ```

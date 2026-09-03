@@ -187,4 +187,14 @@ describe('project settings drive analysis', () => {
 
         expect(manifest.service.environment(uriFor(manifest.root, 'src/server/main.luam'))).toBe('server');
     });
+
+    it('gives a file in the workspace root the side its directive declares, and "shared" without one', () => {
+        const manifest = openManifest("name = 'demo'\n", {
+            'index.luam': 'function greet(): void\nend\n',
+            'boot.luam': '#!server\n\nfunction boot(): void\nend\n',
+        });
+
+        expect(manifest.service.environment(uriFor(manifest.root, 'index.luam'))).toBe('shared');
+        expect(manifest.service.environment(uriFor(manifest.root, 'boot.luam'))).toBe('server');
+    });
 });

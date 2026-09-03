@@ -47,6 +47,28 @@ function walk(root: string, directory: string, excluded: readonly string[], tree
     }
 }
 
+export function listRootFiles(root: string, excluded: readonly string[] = []): string[] {
+    let entries: Dirent[];
+
+    try {
+        entries = readdirSync(root, { withFileTypes: true });
+    } catch {
+        return [];
+    }
+
+    const files: string[] = [];
+
+    for (const entry of entries) {
+        const path = normalizePattern(entry.name);
+
+        if (entry.isFile() && path.length > 0 && !isExcludedPath(path, excluded)) {
+            files.push(path);
+        }
+    }
+
+    return files.sort();
+}
+
 export function listProjectFiles(root: string, roots: readonly string[], excluded: readonly string[] = []): ProjectTree {
     const tree: ProjectTree = { files: [], errors: [] };
     const seen = new Set<string>();

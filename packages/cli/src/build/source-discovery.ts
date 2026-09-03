@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { listProjectFiles } from '@cli/build/project-files';
+import { listProjectFiles, listRootFiles } from '@cli/build/project-files';
 import { cliError, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
 import type { SourceMapping } from '@compiler/manifest/manifest-contract';
 import type { ProjectFile } from '@compiler/project/module';
@@ -23,7 +23,16 @@ const SIDE_CONFLICT = 'config-source-side-conflict';
 
 const TEST_SOURCE = 'config-test-source';
 
+const UNMATCHED_SOURCE = 'config-unmatched-source';
+
 const UNREADABLE_SOURCE = 'build-source-unreadable';
+
+const NAMED_LIMIT = 5;
+
+const REMEDIES = [
+    'Add a pattern to "sources", move the file under a directory "sources" already names,',
+    'or put it in the project root, where a file no pattern names is built with the side its "#!" directive declares.',
+].join(' ');
 
 function checkLiterals(root: string, resolver: SourceResolver, found: ReadonlySet<string>, diagnostics: CliDiagnostic[]): void {
     for (const pattern of resolver.patterns.filter(isLiteralPattern)) {
@@ -45,6 +54,40 @@ function checkLiterals(root: string, resolver: SourceResolver, found: ReadonlySe
             diagnostics.push(cliError(MISSING_SOURCE, `"${pattern}" is listed in "sources" but does not exist in "${normalizePattern(root)}".`));
         }
     }
+}
+
+function collectRootSources(root: string, resolver: SourceResolver, excluded: readonly string[], files: ProjectFile[], diagnostics: CliDiagnostic[]): void {
+    for (const path of listRootFiles(root, excluded)) {
+        if (!path.endsWith(SOURCE_EXTENSION) || isTestPath(path) || resolver.resolve(path).matches.length > 0) {
+            continue;
+        }
+
+        const source = readSource(root, path, diagnostics);
+
+        if (source !== null) {
+            files.push({ path, source });
+        }
+    }
+}
+
+function describePaths(paths: readonly string[]): string {
+    const named = paths
+        .slice(0, NAMED_LIMIT)
+        .map((path) => `"${path}"`)
+        .join(', ');
+    const rest = paths.length - NAMED_LIMIT;
+
+    return rest > 0 ? `${named} and ${rest} more` : named;
+}
+
+function reportNothingBuilt(root: string, excluded: readonly string[]): CliDiagnostic {
+    const paths = listProjectFiles(root, [''], excluded).files.filter((path) => path.endsWith(SOURCE_EXTENSION) && !isTestPath(path));
+
+    if (paths.length === 0) {
+        return cliError(NO_SOURCES, `No "${SOURCE_EXTENSION}" source files matched "sources" in "${normalizePattern(root)}".`);
+    }
+
+    return cliError(UNMATCHED_SOURCE, `No "sources" pattern matched ${describePaths(paths)} in "${normalizePattern(root)}". ${REMEDIES}`);
 }
 
 function readSource(root: string, path: string, diagnostics: CliDiagnostic[]): string | null {
@@ -86,10 +129,11 @@ export function discoverSources(root: string, sources: SourceMapping, excluded: 
         }
     }
 
+    collectRootSources(root, resolver, excluded, files, diagnostics);
     checkLiterals(root, resolver, matched, diagnostics);
 
     if (files.length === 0 && diagnostics.length === 0) {
-        diagnostics.push(cliError(NO_SOURCES, `No "${SOURCE_EXTENSION}" source files matched "sources" in "${normalizePattern(root)}".`));
+        diagnostics.push(reportNothingBuilt(root, excluded));
     }
 
     return { files: files.sort((left, right) => left.path.localeCompare(right.path)), resolver, diagnostics };

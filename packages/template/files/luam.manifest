@@ -7,14 +7,15 @@ compiler = {
     oop = false,
 }
 
+# The layout for a project with folders. A ".luam" file in the project root is built without it.
 sources = {
     server = { 'src/server/**/*.luam' },
     client = { 'src/client/**/*.luam' },
     shared = { 'src/shared/**/*.luam' },
 }
 
-assets = {
-    { from = 'assets/**/*', to = 'assets' },
-}
+# assets = {
+#     { from = 'assets/**/*', to = 'assets' },
+# }
 
 outDir = 'build'

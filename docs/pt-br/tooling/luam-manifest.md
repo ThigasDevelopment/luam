@@ -214,10 +214,15 @@ O lado de um arquivo é o lado que o casou. Uma diretiva `#!server`, `#!client` 
 `#!shared` no arquivo ainda vence, e a divergência é reportada como
 `env-path-directive-conflict`, para ficar visível em vez de silenciosa. Um
 arquivo casado por dois lados é `config-source-side-conflict`; um caminho literal
-que não nomeia arquivo algum é `config-missing-source`; um projeto onde nada casou
-é `config-no-sources`.
+que não nomeia arquivo algum é `config-missing-source`; um projeto que tem
+arquivos `.luam` e nenhum deles casou é `config-unmatched-source`, que os nomeia;
+um projeto sem arquivo `.luam` algum é `config-no-sources`.
 
-Omitir `sources` mantém a estrutura padrão, que são os três padrões acima.
+Omitir `sources` mantém a estrutura padrão, que são os três padrões acima. De
+qualquer forma, um arquivo `.luam` diretamente na raiz do projeto é compilado sem
+padrão, com o lado que sua diretiva `#!` declara e `shared` sem nenhuma. O bloco
+do scaffold e a ausência dele constroem igualmente um resource plano — veja
+[Estrutura do projeto](/pt-br/guide/project-layout).
 
 ## `assets`
 
@@ -238,7 +243,32 @@ previsível.
 `to` é um diretório de destino dentro do resource. Duas entradas que resolvem para
 o mesmo destino são `config-output-collision`, assim como um destino que
 sobrescreveria o `meta.xml` ou o diretório gerado `lib/`. Um `from` literal que não
-nomeia arquivo algum é `config-missing-asset`.
+nomeia arquivo algum é `config-missing-asset`, e um mapeamento que não copia nada
+é o aviso `config-empty-asset` — um build que declarou um mapeamento e não
+entregou nada dele não passa mais em silêncio.
+
+### O que cada `from` casa
+
+Contra um projeto com `assets/readme.txt` e `assets/img/logo.png`, com
+`to = 'assets'`:
+
+| `from` | Copia | Fica em |
+| --- | --- | --- |
+| `assets` | os dois arquivos | `assets/readme.txt`, `assets/img/logo.png` |
+| `assets/**` | os dois arquivos | `assets/readme.txt`, `assets/img/logo.png` |
+| `assets/**/*` | os dois arquivos | `assets/readme.txt`, `assets/img/logo.png` |
+| `assets/*` | só `readme.txt` | `assets/readme.txt` |
+| `assets/**/*.png` | só `logo.png` | `assets/img/logo.png` |
+| `**/*.png` | só `logo.png` | `assets/assets/img/logo.png` |
+
+`assets/*` e `assets/**/*` são o par que vale ler duas vezes: `*` para em um
+segmento, então `assets/*` nunca alcança `img/logo.png`. A última linha também
+não é um defeito — a raiz de um padrão é tudo antes do primeiro curinga, então
+`**/*.png` tem a raiz do projeto e o caminho copiado mantém `assets/` na frente.
+
+O manifesto do scaffold entrega esse bloco comentado com `#`, o comentário de
+linha do manifesto, para que o primeiro build de um projeto novo não declare o que
+ele não tem. `--` não é comentário aqui; é `lex-foreign-comment`.
 
 ## `dependencies`
 
