@@ -11,6 +11,7 @@ import { serverTarget, startMtaServer } from '@cli/server/mta-server-supervisor'
 import { createServerConsole } from '@cli/server/server-console';
 import type { ResourceMap } from '@compiler/project/resource';
 
+import type { PortHolder } from '@cli/server/port-holder';
 import type { ProcessService } from '@cli/server/process-service';
 
 export interface DevOptions extends EnsureOptions {
@@ -21,6 +22,7 @@ export interface DevOptions extends EnsureOptions {
     readinessTimeoutMs?: number | undefined;
     shutdownTimeoutMs?: number | undefined;
     pollIntervalMs?: number | undefined;
+    portHolder?: ((port: number) => PortHolder | null) | undefined;
 }
 
 export function deployedMapAfterBuild(map: ResourceMap | null, outcome: Pick<BuildOutcome, 'build' | 'map'>): ResourceMap | null {
@@ -72,6 +74,8 @@ export async function runDevCommand(context: CommandContext, options: DevOptions
             supervisor = startMtaServer({
                 target,
                 processService: options.processService,
+                checkPorts: true,
+                portHolder: options.portHolder,
                 env: options.env ?? process.env,
                 signal: controller.signal,
                 platform: options.platform,

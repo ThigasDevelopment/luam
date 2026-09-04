@@ -1,6 +1,9 @@
 import { followServerLog, serverLogPath } from '@cli/logging/server-log-follower';
 import { connectSessionConsoleInput } from '@cli/server/session-console-input';
 import { resolveServerExecutable } from '@cli/server/server-executable-resolver';
+import { findPortHolder, type PortHolder } from '@cli/server/port-holder';
+import { busyPortMessage, busyServerPorts } from '@cli/server/server-ports';
+import { exitReason, KEPT_OUTPUT_LINES, startupFailureMessage } from '@cli/server/startup-failure';
 
 import type { DeploymentSettings } from '@cli/config/deployment';
 import type { ProcessExit, ProcessService, OwnedProcess } from '@cli/server/process-service';
@@ -32,6 +35,9 @@ export interface MtaServerSupervisorOptions {
     input?: TerminalInput | undefined;
     echo?: Writable | undefined;
     sessionVerbs?: readonly string[] | undefined;
+    onOutput?: ((line: string) => void) | undefined;
+    checkPorts?: boolean | undefined;
+    portHolder?: ((port: number) => PortHolder | null) | undefined;
     onSessionLine?: ((line: SessionLine) => void) | undefined;
     signal?: AbortSignal | null | undefined;
     platform?: NodeJS.Platform | undefined;
@@ -62,7 +68,14 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
         configured: options.target.executable,
         platform: options.platform,
     });
+    const busy = options.checkPorts === true ? busyServerPorts(resolved.serverRoot, options.portHolder ?? findPortHolder) : [];
+
+    if (busy.length > 0) {
+        throw new Error(busyPortMessage(busy));
+    }
+
     let state: MtaServerState = 'starting';
+    const recentOutput: string[] = [];
     let closePromise: Promise<void> | null = null;
     let consoleInput: ServerConsoleInput | null = null;
     let readyResolve: (() => void) | null = null;
@@ -72,13 +85,29 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
         readyResolve = resolveReady;
         readyReject = rejectReady;
     });
+    const onOutput = options.onOutput;
     const follower = followServerLog(
         logPath,
         (line) => {
-            if (state === 'starting' && isMtaServerReady(line)) {
-                state = 'ready';
+            if (onOutput !== undefined) {
+                recentOutput.push(line);
+
+                if (recentOutput.length > KEPT_OUTPUT_LINES) {
+                    recentOutput.shift();
+                }
+
+                onOutput(line);
+            }
+
+            if (state !== 'starting' || !isMtaServerReady(line)) {
+                return;
+            }
+
+            state = 'ready';
+            readyResolve?.();
+
+            if (onOutput === undefined) {
                 follower.close();
-                readyResolve?.();
             }
         },
         { pollIntervalMs: options.pollIntervalMs },
@@ -89,7 +118,7 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
         child = options.processService.spawn(resolved.executable, {
             cwd: resolved.serverRoot,
             env: options.env,
-            interactive: options.interactive ?? false,
+            interactive: onOutput === undefined && options.interactive === true,
         });
     } catch (error: unknown) {
         follower.close();
@@ -104,7 +133,7 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
             follower.close();
 
             if (previous === 'starting') {
-                readyReject?.(new Error(`MTA server exited before readiness with ${result.code === null ? `signal ${result.signal ?? 'unknown'}` : `code ${result.code}`}.`));
+                readyReject?.(new Error(startupFailureMessage(exitReason(result.code, result.signal), recentOutput)));
             }
 
             return result;

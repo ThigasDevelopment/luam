@@ -51,6 +51,7 @@ describe('server command', () => {
 
         const running = runServerCommand(target ?? { serverRoot: '', executable: null }, test.reporter, {
             processService: test.service,
+            portHolder: (): null => null,
             env: {},
             signal: null,
         });

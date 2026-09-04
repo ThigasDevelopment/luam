@@ -166,12 +166,13 @@ describe('phase timings report', () => {
 describe('rebuild separator', () => {
     it('separates and timestamps each rebuild', () => {
         const target = createMemoryReporter();
-        const at = new Date('2026-08-09T10:11:12.000Z');
+        const at = new Date(2026, 7, 9, 10, 11, 12);
 
         reportRebuildSeparator(target.reporter, at);
         reportRebuildSeparator(target.reporter, at);
 
         expect(formatTimestamp(at)).toBe('10:11:12');
+        expect(formatTimestamp(new Date(2026, 7, 9, 3, 4, 5))).toBe('03:04:05');
         expect(target.logger.lines.filter((line) => line.includes('rebuild at 10:11:12'))).toHaveLength(2);
         expect(target.logger.lines.filter((line) => line === '')).toHaveLength(2);
     });

@@ -2,12 +2,14 @@ import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { startMtaServer, type MtaServerTarget } from '@cli/server/mta-server-supervisor';
 
 import type { Reporter } from '@cli/reporting/reporter';
+import type { PortHolder } from '@cli/server/port-holder';
 import type { ProcessService } from '@cli/server/process-service';
 
 export interface ServerOptions {
     processService: ProcessService;
     env: NodeJS.ProcessEnv;
     signal: AbortSignal | null;
+    portHolder?: ((port: number) => PortHolder | null) | undefined;
 }
 
 export async function runServerCommand(target: MtaServerTarget, reporter: Reporter, options: ServerOptions): Promise<number> {
@@ -21,6 +23,8 @@ export async function runServerCommand(target: MtaServerTarget, reporter: Report
         const supervisor = startMtaServer({
             target,
             processService: options.processService,
+            checkPorts: true,
+            portHolder: options.portHolder,
             env: options.env,
             interactive: true,
             signal: controller.signal,

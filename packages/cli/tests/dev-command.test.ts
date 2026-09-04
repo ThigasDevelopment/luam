@@ -103,6 +103,7 @@ describe('development command', () => {
             signal: null,
             startServer: true,
             processService,
+            portHolder: (): null => null,
             platform: 'win32',
             pollIntervalMs: 5,
             readinessTimeoutMs: 500,
@@ -127,6 +128,7 @@ describe('development command', () => {
             signal: null,
             startServer: true,
             processService,
+            portHolder: (): null => null,
             platform: 'win32',
         });
 
@@ -151,6 +153,7 @@ describe('development command', () => {
             signal: null,
             startServer: true,
             processService,
+            portHolder: (): null => null,
             platform: 'win32',
             pollIntervalMs: 5,
             readinessTimeoutMs: 500,
