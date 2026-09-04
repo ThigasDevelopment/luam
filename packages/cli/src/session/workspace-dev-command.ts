@@ -21,7 +21,7 @@ import type { SessionLine, TerminalInput } from '@cli/server/session-console-inp
 
 export interface WorkspaceDevOptions {
     root: string;
-    resources: readonly string[];
+    listResources: () => readonly string[];
     logger: Logger;
     reporter: Reporter;
     deployment: DeploymentSettings;
@@ -118,7 +118,7 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
 
         const opened = createWorkspaceSession({
             root: options.root,
-            resources: options.resources,
+            listResources: options.listResources,
             reporter,
             serverConsole: createServerConsole(supervisor),
             loadResource: options.loadResource,
