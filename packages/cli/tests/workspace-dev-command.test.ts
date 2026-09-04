@@ -1,4 +1,15 @@
 import { PassThrough } from 'node:stream';
+
+class FakeTerminal extends PassThrough {
+    readonly isTTY = true;
+    isRaw = false;
+
+    setRawMode(mode: boolean): this {
+        this.isRaw = mode;
+
+        return this;
+    }
+}
 import { resolve } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -34,10 +45,11 @@ interface DevHarness {
     logger: MemoryLogger;
     service: FakeProcessService;
     controller: AbortController;
-    terminal: PassThrough;
+    terminal: FakeTerminal;
     run(): Promise<number>;
     ready(): void;
     written(): string;
+    painted(): string;
 }
 
 function harness(): DevHarness {
@@ -47,8 +59,14 @@ function harness(): DevHarness {
     const resolved = createWorkspaceContext(runtime, {});
     const service = new FakeProcessService();
     const controller = new AbortController();
-    const terminal = new PassThrough();
+    const terminal = new FakeTerminal();
+    const echo = new PassThrough();
     let written = '';
+    let painted = '';
+
+    echo.on('data', (chunk: Buffer) => {
+        painted += chunk.toString();
+    });
 
     fixtures.push(fixture);
     service.stdin.on('data', (chunk: Buffer) => {
@@ -72,15 +90,18 @@ function harness(): DevHarness {
         service,
         controller,
         terminal,
+        painted: (): string => painted,
         run: (): Promise<number> =>
             runWorkspaceDevCommand({
                 root: workspace.root,
                 resources: workspace.resources,
+                logger,
                 reporter: runtime.reporter,
                 deployment,
                 loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name).context,
                 processService: service,
                 input: terminal,
+                echo,
                 env: {},
                 signal: controller.signal,
                 pollIntervalMs: 5,
@@ -155,6 +176,28 @@ describe('luam dev at a workspace root', () => {
 
         expect(await running).toBe(EXIT_OK);
         expect(test.written()).toContain('shutdown\n');
+    });
+});
+
+describe('the line being typed', () => {
+    it('survives a log record arriving mid-word', async () => {
+        const test = harness();
+        const running = test.run();
+
+        test.ready();
+        await waitUntil(() => test.logger.text().includes('Watching nothing yet'), 'the session to open');
+        test.terminal.write('ensu');
+        await waitUntil(() => test.painted().includes('ensu'), 'the half-typed line to echo');
+
+        const before = test.painted();
+
+        test.fixture.write('server/mods/deathmatch/logs/server.log', 'Server started and is ready to accept connections!\nsomething happened\n');
+        await waitUntil(() => test.logger.text().includes('something happened'), 'the log record');
+
+        expect(test.painted().slice(before.length)).toContain('ensu');
+
+        test.controller.abort();
+        expect(await running).toBe(EXIT_OK);
     });
 });
 
