@@ -67,6 +67,10 @@ export function loadServerFile(path: string, files: WorkspaceFileSystem = NODE_W
     };
 }
 
+export function workspaceResources(root: string, files: WorkspaceFileSystem = NODE_WORKSPACE_FILES): string[] {
+    return discoverResources(files, root);
+}
+
 export function loadWorkspace(start: string, files: WorkspaceFileSystem = NODE_WORKSPACE_FILES): LoadedWorkspace | null {
     const path = findWorkspaceFile(start, files);
 

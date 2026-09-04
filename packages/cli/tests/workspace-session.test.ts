@@ -179,6 +179,33 @@ describe('a resource whose directory and manifest names differ', () => {
     });
 });
 
+describe('the list of resources', () => {
+    it('sees a resource created after the session opened', async () => {
+        const driver = open();
+
+        await driver.type('ensure resource-c');
+
+        expect(driver.logger.errors.join('\n')).toContain('is not a resource of the workspace');
+
+        driver.fixture.write('resource-c/.luam.manifest', "name = 'resource-c'\noutput = {\n    bundle = false,\n    map = true,\n}\n");
+        driver.fixture.write('resource-c/src/server/main.luam', "outputChatBox('c', root)\n");
+        driver.logger.errors.splice(0);
+        await driver.type('ensure resource-c');
+
+        expect(driver.deployed('resource-c')).toBe(true);
+        expect([...driver.session.attached]).toEqual(['resource-c']);
+    });
+
+    it('forgets a resource whose directory is gone', async () => {
+        const driver = open();
+
+        driver.fixture.remove('resource-b');
+        driver.session.reportOpening();
+
+        expect(driver.logger.text()).toContain('Resources here: "resource-a".');
+    });
+});
+
 describe('drop', () => {
     it('stops watching and says the deployed resource was left alone', async () => {
         const driver = open();

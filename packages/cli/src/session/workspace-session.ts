@@ -31,7 +31,7 @@ export type SessionResourceLoader = (name: string) => CommandContext | null;
 
 export interface WorkspaceSessionOptions {
     root: string;
-    resources: readonly string[];
+    listResources: () => readonly string[];
     reporter: Reporter;
     serverConsole: ServerConsole;
     loadResource: SessionResourceLoader;
@@ -78,7 +78,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
     let closed = false;
 
     const unknownResource = (name: string): string =>
-        `"${name}" is not a resource of the workspace at "${options.root}". The resources there are ${listNames([...options.resources])}.`;
+        `"${name}" is not a resource of the workspace at "${options.root}". The resources there are ${listNames([...options.listResources()])}.`;
     const deploy = (entry: AttachedResource): void => {
         const refreshed = options.serverConsole.refresh();
 
@@ -187,12 +187,12 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
     };
     const ensure = async (name: string | undefined): Promise<void> => {
         if (name === undefined) {
-            reporter.error(`"ensure" takes one resource name. The resources here are ${listNames([...options.resources])}.`);
+            reporter.error(`"ensure" takes one resource name. The resources here are ${listNames([...options.listResources()])}.`);
 
             return;
         }
 
-        if (!options.resources.includes(name)) {
+        if (!options.listResources().includes(name)) {
             reporter.error(unknownResource(name));
 
             return;
@@ -251,7 +251,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
         }
 
         if (!attached.has(name)) {
-            reporter.error(options.resources.includes(name) ? `"${name}" is not attached. Type "ensure ${name}" to attach it.` : unknownResource(name));
+            reporter.error(options.listResources().includes(name) ? `"${name}" is not attached. Type "ensure ${name}" to attach it.` : unknownResource(name));
 
             return;
         }
@@ -326,7 +326,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
         },
         reportOpening: (): void => {
             reporter.info(NOTHING_ATTACHED);
-            reporter.info(`Resources here: ${listNames([...options.resources])}.`);
+            reporter.info(`Resources here: ${listNames([...options.listResources()])}.`);
         },
         run: async (line: SessionLine): Promise<void> => {
             const command = findSessionCommand(line.verb);

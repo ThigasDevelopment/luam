@@ -6,7 +6,7 @@ import { EXIT_USAGE } from '@cli/cli/exit-codes';
 import { MANIFEST_FILE_NAME } from '@cli/config/config-schema';
 import { manifestMode } from '@cli/config/manifest-context';
 import { loadManifest } from '@cli/config/manifest-loader';
-import { loadWorkspace, SERVER_FILE_NAME, type LoadedWorkspace } from '@cli/config/workspace-loader';
+import { loadWorkspace, workspaceResources, SERVER_FILE_NAME, type LoadedWorkspace } from '@cli/config/workspace-loader';
 import { createEditorService } from '@cli/editor/editor-service';
 import { reportManifestDiagnostics } from '@cli/reporting/diagnostic-reporter';
 import { createConsoleLogger } from '@cli/reporting/logger';
@@ -174,8 +174,10 @@ export function resolveCommandTarget(runtime: CliRuntime, command: string, optio
 }
 
 export function resourceContext(runtime: CliRuntime, workspace: WorkspaceContext, command: string, name: string, options: ProjectOptions = {}): ProjectContext {
-    if (!workspace.resources.includes(name)) {
-        runtime.reporter.error(unknownResourceMessage(workspace, name));
+    const present = workspaceResources(workspace.root);
+
+    if (!present.includes(name)) {
+        runtime.reporter.error(unknownResourceMessage(workspace.root, present, name));
 
         return { context: null, error: EXIT_USAGE };
     }
@@ -220,8 +222,8 @@ export function listResources(resources: readonly string[]): string {
     return rest === 0 ? shown.join(', ') : `${shown.join(', ')} and ${rest} more`;
 }
 
-export function unknownResourceMessage(workspace: WorkspaceContext, name: string): string {
-    return `"${name}" is not a resource of the workspace at "${workspace.root}". The resources there are ${listResources(workspace.resources)}.`;
+export function unknownResourceMessage(root: string, resources: readonly string[], name: string): string {
+    return `"${name}" is not a resource of the workspace at "${root}". The resources there are ${listResources(resources)}.`;
 }
 
 export function missingRootMessage(root: string): string {
