@@ -4,6 +4,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { FileChangeType, TextDocuments, type Connection, type FileEvent, type InitializeParams, type InitializeResult } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
+import { deferDocumentation, type DeferredCompletion } from '@lsp/features/completion-documentation';
 import { readInlayHintSettings } from '@lsp/features/inlay-hint-settings';
 import { LanguageService } from '@lsp/server/language-service';
 import { capabilitiesFor, RESCAN_COMMAND } from '@lsp/server/capabilities';
@@ -117,7 +118,14 @@ function registerSemanticTokens(connection: Connection, service: LanguageService
 }
 
 function registerFeatures(connection: Connection, service: LanguageService): void {
-    connection.onCompletion((params) => service.completion(params.textDocument.uri, params.position));
+    let deferred: DeferredCompletion | null = null;
+
+    connection.onCompletion((params) => {
+        deferred = deferDocumentation(service.completion(params.textDocument.uri, params.position));
+
+        return deferred.items;
+    });
+    connection.onCompletionResolve((item) => (deferred === null ? item : deferred.resolve(item)));
     connection.onSignatureHelp((params) => service.signatureHelp(params.textDocument.uri, params.position));
     connection.onHover((params) => service.hover(params.textDocument.uri, params.position));
     connection.onDefinition((params) => service.definition(params.textDocument.uri, params.position));
