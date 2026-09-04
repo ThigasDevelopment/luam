@@ -10,7 +10,7 @@ export const RESCAN_COMMAND = 'luam/rescanWorkspace';
 
 export const SERVER_CAPABILITIES: ServerCapabilities = {
     textDocumentSync: TextDocumentSyncKind.Incremental,
-    completionProvider: { triggerCharacters: ['.', ':', '"', "'", '@'], resolveProvider: false },
+    completionProvider: { triggerCharacters: ['.', ':', '"', "'", '@'], resolveProvider: true },
     signatureHelpProvider: { triggerCharacters: ['(', ','], retriggerCharacters: [')'] },
     hoverProvider: true,
     definitionProvider: true,
