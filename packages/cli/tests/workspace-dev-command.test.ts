@@ -100,6 +100,7 @@ function harness(): DevHarness {
                 deployment,
                 loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name).context,
                 processService: service,
+                portHolder: (): null => null,
                 input: terminal,
                 echo,
                 env: {},
@@ -191,7 +192,10 @@ describe('the line being typed', () => {
 
         const before = test.painted();
 
-        test.fixture.write('server/mods/deathmatch/logs/server.log', 'Server started and is ready to accept connections!\nsomething happened\n');
+        test.fixture.write(
+            'server/mods/deathmatch/logs/server.log',
+            'Server started and is ready to accept connections!\nsomething happened\n',
+        );
         await waitUntil(() => test.logger.text().includes('something happened'), 'the log record');
 
         expect(test.painted().slice(before.length)).toContain('ensu');

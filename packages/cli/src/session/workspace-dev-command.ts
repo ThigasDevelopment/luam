@@ -1,11 +1,11 @@
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import type { CommandContext } from '@cli/commands/command-context';
-import { followServerLog } from '@cli/logging/server-log-follower';
 import { parseWorkspaceLogLine } from '@cli/logging/mta-log-parser';
 import { reportDevelopmentLog } from '@cli/reporting/development-log-reporter';
 import { createReporter, type Reporter } from '@cli/reporting/reporter';
 import { formatDuration } from '@cli/reporting/duration';
 import { serverTarget, startMtaServer, type MtaServerTarget } from '@cli/server/mta-server-supervisor';
+import { exitReason } from '@cli/server/startup-failure';
 import { createServerConsole } from '@cli/server/server-console';
 import { SESSION_VERBS } from '@cli/session/session-commands';
 import { guardedLogger, guardedPaint, type SessionLineGuard } from '@cli/session/session-line-guard';
@@ -14,6 +14,7 @@ import { untilAborted } from '@cli/watch/abort-wait';
 
 import type { DeploymentSettings } from '@cli/config/deployment';
 import type { Logger } from '@cli/reporting/logger';
+import type { PortHolder } from '@cli/server/port-holder';
 import type { ProcessService } from '@cli/server/process-service';
 import type { Writable } from 'node:stream';
 import type { SessionLine, TerminalInput } from '@cli/server/session-console-input';
@@ -35,13 +36,12 @@ export interface WorkspaceDevOptions {
     shutdownTimeoutMs?: number | undefined;
     pollIntervalMs?: number | undefined;
     now?: (() => Date) | undefined;
+    portHolder?: ((port: number) => PortHolder | null) | undefined;
 }
+
+const NOTHING_ATTACHED: ReadonlySet<string> = new Set();
 
 export const START_SERVER_AT_A_WORKSPACE = 'luam dev at a workspace root always owns the server, so "--start-server" says nothing. Run it without the flag.';
-
-function exitReason(code: number | null, signal: string | null): string {
-    return code === null ? `signal ${signal ?? 'unknown'}` : `code ${code}`;
-}
 
 export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Promise<number> {
     let consoleInput: { eraseLine(): void; redrawLine(): void } | null = null;
@@ -69,17 +69,33 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
     const queued: SessionLine[] = [];
     let session: ReturnType<typeof createWorkspaceSession> | null = null;
     let supervisor = null;
-    let follower = null;
 
     try {
         supervisor = startMtaServer({
             target,
             processService: options.processService,
+            checkPorts: true,
+            portHolder: options.portHolder,
             env: options.env,
             interactive: true,
             input: options.input,
             echo: options.echo,
             sessionVerbs: SESSION_VERBS,
+            onOutput: (line: string): void => {
+                const record = parseWorkspaceLogLine(line, session?.deployed ?? NOTHING_ATTACHED);
+
+                if (record === null) {
+                    return;
+                }
+
+                if (record.resource === '') {
+                    reporter.raw(line);
+
+                    return;
+                }
+
+                reportDevelopmentLog(reporter, { ...record, message: `[${record.resource}] ${record.message}` });
+            },
             onSessionLine: (line: SessionLine): void => {
                 if (session === null) {
                     queued.push(line);
@@ -111,19 +127,6 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
         });
 
         session = opened;
-        follower = followServerLog(
-            supervisor.logPath,
-            (line) => {
-                const record = parseWorkspaceLogLine(line, opened.attached);
-
-                if (record === null) {
-                    return;
-                }
-
-                reportDevelopmentLog(reporter, record.resource === '' ? record : { ...record, message: `[${record.resource}] ${record.message}` });
-            },
-            { signal: controller.signal, pollIntervalMs: options.pollIntervalMs },
-        );
 
         reporter.success(`Started the MTA server at "${target.serverRoot}" and waited for readiness in ${formatDuration(Date.now() - startedAt)}.`);
         opened.reportOpening();
@@ -152,7 +155,6 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
         options.signal?.removeEventListener('abort', abort);
         process.off('SIGINT', abort);
         session?.close();
-        follower?.close();
         await supervisor?.close();
     }
 }
