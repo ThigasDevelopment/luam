@@ -14,6 +14,7 @@ linguagem realmente aceita.
 | [Diagnósticos](/pt-br/reference/diagnostics) | Cada código de diagnóstico, agrupado pelo estágio que o produz. |
 | [Formatação](/pt-br/reference/formatting) | O estilo que o language server escreve, e o que ele nunca toca. |
 | [Arquivo do formatador](/pt-br/reference/formatter-file) | Os campos do `.luam.formatter`, seus padrões e qual arquivo vale. |
+| [Arquivo do servidor](/pt-br/reference/server-file) | Os campos do `.luam.server`, o que torna um diretório um workspace, e a precedência sobre o manifesto. |
 | [Limitações](/pt-br/reference/limitations) | O que o compilador deliberadamente não faz. |
 | [Compatibilidade](/pt-br/reference/compatibility) | Lua 5.1, MTA, Node.js e suporte de editores. |
 
@@ -37,3 +38,4 @@ O prefixo nomeia o estágio que rejeitou o arquivo:
 | `project-` | Montagem do resource a partir de vários módulos. |
 | `build-` | Descoberta de fontes e leitura de arquivos. |
 | `config-` | Carregamento do `.luam.manifest`. |
+| `server-` | Carregamento do `.luam.server`. |

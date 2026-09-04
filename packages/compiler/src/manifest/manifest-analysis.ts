@@ -30,6 +30,7 @@ export interface ManifestSchema {
     normalize(raw: ManifestObject, positions: ReadonlyMap<string, SourcePosition>): ManifestNormalization;
     retag?(diagnostic: Diagnostic): Diagnostic;
     unknownName?(name: string): string;
+    missingName?(field: ManifestField): string;
 }
 
 export const MANIFEST_SCHEMA: ManifestSchema = { fields: MANIFEST_FIELDS, removed: REMOVED_FIELDS, normalize: normalizeManifest };
@@ -131,7 +132,9 @@ function readStatement(pass: ManifestPass, statement: Statement, assignments: Ma
 function reportMissing(diagnostics: Diagnostic[], value: ManifestObject, schema: ManifestSchema): void {
     for (const field of requiredFields(schema.fields)) {
         if (value[field.name] === undefined) {
-            diagnostics.push(manifestError(MISSING_FIELD, `The manifest requires a "${field.name}" field. ${field.summary}`, START));
+            const message = schema.missingName === undefined ? `The manifest requires a "${field.name}" field. ${field.summary}` : schema.missingName(field);
+
+            diagnostics.push(manifestError(MISSING_FIELD, message, START));
         }
     }
 }

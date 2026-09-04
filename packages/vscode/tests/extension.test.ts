@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { CLIENT_ID, ENVIRONMENT_PATTERN, FORMATTER_PATTERN, MANIFEST_PATTERN, SERVER_MODULE, SOURCE_PATTERN } from '@vscode-extension/client/language-client';
+import { CLIENT_ID, ENVIRONMENT_PATTERN, FORMATTER_PATTERN, MANIFEST_PATTERN, SERVER_FILE_PATTERN, SERVER_MODULE, SOURCE_PATTERN } from '@vscode-extension/client/language-client';
 import { BUILD_NO_FOLDER_MESSAGE, BUILD_TERMINAL_NAME } from '@vscode-extension/commands/build-command';
 import { ensureCommandLine, NO_FOLDER_MESSAGE, TERMINAL_NAME } from '@vscode-extension/commands/ensure-command';
 import { DEFAULT_SETTINGS, readSettings } from '@vscode-extension/config/settings';
@@ -56,7 +56,7 @@ describe('activation', () => {
         expect(options.run.transport).toBe(1);
     });
 
-    it('selects luam and manifest documents and watches source, manifest, formatter and environment files', () => {
+    it('selects luam, manifest, formatter and server documents and watches every configuration file', () => {
         const { client } = activateExtension();
         const options = client.record.clientOptions as { documentSelector: Array<{ language: string; scheme: string }> };
 
@@ -64,8 +64,9 @@ describe('activation', () => {
             { scheme: 'file', language: 'luam' },
             { scheme: 'file', language: 'luam-manifest' },
             { scheme: 'file', language: 'luam-formatter' },
+            { scheme: 'file', language: 'luam-server' },
         ]);
-        expect(state.watchers).toEqual([SOURCE_PATTERN, MANIFEST_PATTERN, FORMATTER_PATTERN, ENVIRONMENT_PATTERN]);
+        expect(state.watchers).toEqual([SOURCE_PATTERN, MANIFEST_PATTERN, FORMATTER_PATTERN, SERVER_FILE_PATTERN, ENVIRONMENT_PATTERN]);
     });
 
     it('registers the build, ensure, restart and rescan commands', () => {

@@ -3,7 +3,7 @@ import { createPhaseTracker, type PhaseTracker } from '@cli/build/phase-tracker'
 import { writeResource, type WriteResult } from '@cli/build/resource-writer';
 import { trackedWriteOptions } from '@cli/build/write-options';
 import { reportBuildOutcome, reportPhaseTimings, totalDuration } from '@cli/commands/build-report';
-import { commandReporter, commandVersion, type CommandContext } from '@cli/commands/command-context';
+import { commandDeployment, commandReporter, commandVersion, type CommandContext } from '@cli/commands/command-context';
 import { resolveServerTarget } from '@cli/commands/resource-targets';
 import { pluralize } from '@cli/reporting/plural';
 import { createProgressRenderer, type ProgressRenderer } from '@cli/reporting/progress-renderer';
@@ -128,10 +128,10 @@ async function runOnce(scope: RunScope, target: string, cache: ProjectCache, opt
 }
 
 export function createEnsureRunner(context: CommandContext, options: EnsureRunnerOptions = {}): EnsureRunner {
-    const target = resolveServerTarget(context.root, context.config);
+    const target = resolveServerTarget(commandDeployment(context), context.config.name);
 
     if (target === null) {
-        throw new Error('Cannot create an ensure runner without serverPath.');
+        throw new Error('Cannot create an ensure runner without a server path.');
     }
 
     const cache = createProjectCache();

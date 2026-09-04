@@ -92,6 +92,32 @@ trees, manifests, and overrides.
   restarts. It never reaches `meta.xml` — MTA reads a resource's name from its
   folder.
 
+## Several resources in one folder
+
+A resource directory is one project. Put several beside each other and add a
+[`.luam.server`](/en/reference/server-file) at the root, and the folder becomes a
+**workspace** — one MTA installation named once, shared by all of them:
+
+```
+resources/
+  .luam.server            names the MTA installation
+  gamemode-race/
+    .luam.manifest
+    src/
+  scoreboard/
+    .luam.manifest
+    src/
+  notes/                  not a resource: no manifest
+```
+
+A workspace's resources are its **direct children that hold a
+`.luam.manifest`** — one level, never recursive, so a build output tree or a
+vendored copy cannot join by accident and `node_modules` is never walked.
+
+The root itself needs no manifest of its own. `luam dev`, `luam server` and
+`luam ensure <resource>` all run there; inside a single resource directory every
+command behaves as it does on its own.
+
 ## What the CLI writes beside the project
 
 `build` caches the latest MTA release it looked up in `.luam/mta-version.json`, so

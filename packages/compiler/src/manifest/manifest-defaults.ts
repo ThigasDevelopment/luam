@@ -31,6 +31,8 @@ export interface OutputSettings {
     minify: boolean;
 }
 
+export const MANIFEST_FILE_NAME = '.luam.manifest';
+
 export const LATEST_ENGINE_VERSION = 'latest';
 
 export const DEFAULT_ENVIRONMENT_FILE = '.env';

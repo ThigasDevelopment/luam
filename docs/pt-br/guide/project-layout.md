@@ -91,6 +91,33 @@ duas árvores completas, manifestos e sobrescritas.
   reinicia. Ele nunca chega ao `meta.xml` — o MTA lê o nome de um resource a
   partir da pasta.
 
+## Vários resources em uma pasta
+
+Um diretório de resource é um projeto. Coloque vários lado a lado e adicione um
+[`.luam.server`](/pt-br/reference/server-file) na raiz, e a pasta vira um
+**workspace** — uma instalação do MTA nomeada uma vez, compartilhada por todos:
+
+```
+resources/
+  .luam.server            nomeia a instalação do MTA
+  gamemode-race/
+    .luam.manifest
+    src/
+  scoreboard/
+    .luam.manifest
+    src/
+  notes/                  não é resource: sem manifesto
+```
+
+Os resources de um workspace são os **filhos diretos que contêm um
+`.luam.manifest`** — um nível, nunca recursivo, então uma árvore de saída de
+build ou uma cópia vendorizada não entram por acidente e `node_modules` nunca é
+percorrido.
+
+A raiz em si não precisa de manifesto próprio. `luam dev`, `luam server` e
+`luam ensure <resource>` rodam ali; dentro de um único diretório de resource todo
+comando se comporta como se comporta sozinho.
+
 ## O que a CLI escreve ao lado do projeto
 
 O `build` guarda em `.luam/mta-version.json` a última versão do MTA que consultou,

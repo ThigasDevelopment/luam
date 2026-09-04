@@ -1,10 +1,13 @@
-import { createProjectContext, runtimeProcessService } from '@cli/cli/cli-runtime';
+import { resolveCommandTarget, resourceContext, runtimeProcessService } from '@cli/cli/cli-runtime';
+import { EXIT_USAGE } from '@cli/cli/exit-codes';
 import { addProjectOptions, addWatchOptions, noMapOption, offlineOption } from '@cli/cli/shared-options';
 import { runDevCommand } from '@cli/commands/dev-command';
+import { runWorkspaceDevCommand, START_SERVER_AT_A_WORKSPACE } from '@cli/session/workspace-dev-command';
 
 import { Option } from 'commander';
 
 import type { CliRuntime, ProjectOptions } from '@cli/cli/cli-runtime';
+import type { CommandContext } from '@cli/commands/command-context';
 import type { Command } from 'commander';
 
 interface DevOptions extends ProjectOptions {
@@ -22,19 +25,50 @@ export function registerDevCommand(program: Command, runtime: CliRuntime): void 
         .addOption(new Option('--start-server', 'Start and own the configured local MTA server before development.'));
 
     command.action(async (options: DevOptions): Promise<void> => {
-        const project = createProjectContext(runtime, 'dev', options);
+        const target = resolveCommandTarget(runtime, 'dev', options);
 
-        if (project.context === null) {
-            runtime.exitCode = project.error;
+        if (target.kind === null) {
+            runtime.exitCode = target.error;
 
             return;
         }
 
-        runtime.exitCode = await runDevCommand(project.context, {
+        if (target.kind === 'workspace') {
+            if (options.startServer === true) {
+                runtime.reporter.error(START_SERVER_AT_A_WORKSPACE);
+                runtime.exitCode = EXIT_USAGE;
+
+                return;
+            }
+
+            const workspace = target.workspace;
+            const deployment = workspace.workspace.deployment;
+
+            if (deployment === null) {
+                runtime.exitCode = EXIT_USAGE;
+
+                return;
+            }
+
+            runtime.exitCode = await runWorkspaceDevCommand({
+                root: workspace.root,
+                resources: workspace.resources,
+                reporter: runtime.reporter,
+                deployment: { serverRoot: deployment.serverRoot, resourcesDir: deployment.resourcesDir, executable: deployment.executable, logs: deployment.logs },
+                loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name, options).context,
+                processService: runtimeProcessService(runtime),
+                env: runtime.env,
+                signal: runtime.overrides.signal ?? null,
+            });
+
+            return;
+        }
+
+        runtime.exitCode = await runDevCommand(target.project, {
             watch: options.watch ?? true,
             signal: runtime.overrides.signal ?? null,
             layout: 'tree',
-            map: options.map && project.context.config.output.map,
+            map: options.map && target.project.config.output.map,
             startServer: options.startServer ?? false,
             processService: options.startServer === true ? runtimeProcessService(runtime) : undefined,
             env: runtime.env,

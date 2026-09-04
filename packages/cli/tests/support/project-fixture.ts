@@ -114,6 +114,43 @@ export function manifestConfig(config: Readonly<Record<string, unknown>>, env: R
     return validated.config;
 }
 
+export const SERVER_FILE = '.luam.server';
+
+export function serverFileSource(config: Readonly<Record<string, unknown>>): string {
+    return manifestSource(config);
+}
+
+export interface WorkspaceShape {
+    server?: Readonly<Record<string, unknown>>;
+    resources?: readonly string[];
+    manifest?: Readonly<Record<string, unknown>>;
+    executable?: string;
+}
+
+export function workspaceFiles(shape: WorkspaceShape = {}): Record<string, string> {
+    const resources = shape.resources ?? ['resource-a', 'resource-b'];
+    const files: Record<string, string> = {
+        [SERVER_FILE]: serverFileSource({ serverPath: 'server', ...shape.server }),
+    };
+
+    for (const name of resources) {
+        for (const [path, contents] of Object.entries(defaultProjectFiles({ name, ...shape.manifest }))) {
+            files[`${name}/${path}`] = contents;
+        }
+    }
+
+    return files;
+}
+
+export function createWorkspaceFixture(shape: WorkspaceShape = {}): ProjectFixture {
+    const fixture = createProjectFixture(workspaceFiles(shape));
+
+    fixture.executable(shape.executable ?? (process.platform === 'win32' ? 'server/MTA Server.exe' : 'server/mta-server64'), 'binary');
+    fixture.write('server/mods/deathmatch/logs/server.log', '');
+
+    return fixture;
+}
+
 export const DEFAULT_ASSETS = [{ from: 'assets/**/*', to: 'assets' }];
 
 export function defaultProjectFiles(config: Readonly<Record<string, unknown>> = {}): Record<string, string> {

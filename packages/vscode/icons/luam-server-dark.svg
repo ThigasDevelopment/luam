@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+    <defs>
+        <linearGradient id="luamServerDark" x1="3" y1="4" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#8B7BFF" />
+            <stop offset="0.55" stop-color="#5A7FE8" />
+            <stop offset="1" stop-color="#2E9BD6" />
+        </linearGradient>
+        <mask id="luamCrescentServerDark">
+            <circle cx="12" cy="11" r="8.4" fill="#ffffff" />
+            <circle cx="18.4" cy="5.6" r="8" fill="#000000" />
+        </mask>
+    </defs>
+    <rect width="32" height="32" fill="url(#luamServerDark)" mask="url(#luamCrescentServerDark)" />
+    <circle cx="26.5" cy="6" r="2.8" fill="#9B8CFF" />
+    <rect x="4" y="20.8" width="24" height="4.4" rx="1.6" fill="url(#luamServerDark)" />
+    <rect x="4" y="27" width="24" height="4.4" rx="1.6" fill="url(#luamServerDark)" />
+    <circle cx="24.4" cy="23" r="1.1" fill="#0B0B14" />
+    <circle cx="24.4" cy="29.2" r="1.1" fill="#0B0B14" />
+</svg>

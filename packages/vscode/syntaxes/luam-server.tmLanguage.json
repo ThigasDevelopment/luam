@@ -1,0 +1,6 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Luam Server",
+    "scopeName": "source.luam-server",
+    "patterns": [{ "include": "source.luam-manifest" }]
+}

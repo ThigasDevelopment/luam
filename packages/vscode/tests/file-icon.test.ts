@@ -24,6 +24,8 @@ const manifestLanguage = manifest.contributes.languages.find((entry) => entry.id
 
 const formatterLanguage = manifest.contributes.languages.find((entry) => entry.id === 'luam-formatter');
 
+const serverLanguage = manifest.contributes.languages.find((entry) => entry.id === 'luam-server');
+
 function iconSource(relative: string): string {
     return readFileSync(`${packageRoot}${relative.replace('./', '')}`, 'utf8');
 }
@@ -89,6 +91,51 @@ describe('file icon', () => {
             expect(y - radius).toBeGreaterThanOrEqual(0);
             expect(x + radius).toBeLessThanOrEqual(32);
             expect(y + radius).toBeLessThanOrEqual(32);
+        }
+    });
+});
+
+describe('server file icon', () => {
+    it('contributes a dedicated light and dark icon for the server filename', () => {
+        expect(serverLanguage?.filenames).toEqual(['.luam.server']);
+        expect(serverLanguage?.icon?.light).toBe('./icons/luam-server-light.svg');
+        expect(serverLanguage?.icon?.dark).toBe('./icons/luam-server-dark.svg');
+    });
+
+    it('ships both server icon files', () => {
+        for (const relative of [serverLanguage?.icon?.light ?? '', serverLanguage?.icon?.dark ?? '']) {
+            expect(existsSync(`${packageRoot}${relative.replace('./', '')}`), relative).toBe(true);
+        }
+    });
+
+    it('gives the server file its own icon rather than reusing another one', () => {
+        for (const theme of ['light', 'dark'] as const) {
+            expect(serverLanguage?.icon?.[theme]).not.toBe(language?.icon?.[theme]);
+            expect(serverLanguage?.icon?.[theme]).not.toBe(manifestLanguage?.icon?.[theme]);
+            expect(serverLanguage?.icon?.[theme]).not.toBe(formatterLanguage?.icon?.[theme]);
+        }
+    });
+
+    it('draws the same crescent and star as the other icons, with its own mask id', () => {
+        for (const relative of [serverLanguage?.icon?.light ?? '', serverLanguage?.icon?.dark ?? '']) {
+            const source = iconSource(relative);
+
+            expect(source, relative).toContain('viewBox="0 0 32 32"');
+            expect(source, relative).toContain('mask="url(#luamCrescentServer');
+            expect(source, relative).not.toContain('fill-rule="evenodd"');
+        }
+    });
+
+    it('keeps the stacked bars inside the viewport', () => {
+        for (const relative of [serverLanguage?.icon?.light ?? '', serverLanguage?.icon?.dark ?? '']) {
+            const bars = [...iconSource(relative).matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)];
+
+            expect(bars.length, relative).toBe(2);
+
+            for (const bar of bars) {
+                expect(Number(bar[1]) + Number(bar[3]), relative).toBeLessThanOrEqual(32);
+                expect(Number(bar[2]) + Number(bar[4]), relative).toBeLessThanOrEqual(32);
+            }
         }
     });
 });

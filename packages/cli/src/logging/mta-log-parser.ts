@@ -79,6 +79,44 @@ function relayRecord(line: string, at: Date): DevelopmentLogRecord | null {
     }
 }
 
+function attributedRecord(rest: string, at: Date, resource: RegExpMatchArray, name: string): DevelopmentLogRecord {
+    const severity = LEVEL.exec(rest);
+    const level = severity?.[1] === undefined ? 'info' : logLevel(severity[1]) ?? 'info';
+    const message = rest.replace(resource[0], '').replace(severity?.[0] ?? '', '').replace(/^\s*[:|-]?\s*/, '');
+    const sourcePath = resource[2];
+    const sourceLine = resource[3];
+
+    return {
+        timestamp: at,
+        environment: 'server',
+        level,
+        message,
+        resource: name,
+        ...(sourcePath !== undefined && sourceLine !== undefined ? { source: { path: sourcePath, line: Number(sourceLine) } } : {}),
+    };
+}
+
+export function parseWorkspaceLogLine(line: string, attached: ReadonlySet<string>, fallback: Date = new Date()): DevelopmentLogRecord | null {
+    const stamped = timestamp(line, fallback);
+    const relay = relayRecord(stamped.rest, stamped.value);
+
+    if (relay !== null) {
+        return attached.has(relay.resource) ? relay : null;
+    }
+
+    if (stamped.rest.includes(RELAY_MARKER)) {
+        return null;
+    }
+
+    const resource = resourceToken(stamped.rest);
+
+    if (resource?.[1] !== undefined && attached.has(resource[1])) {
+        return attributedRecord(stamped.rest, stamped.value, resource, resource[1]);
+    }
+
+    return { timestamp: stamped.value, environment: 'server', level: 'info', message: stamped.rest, resource: '' };
+}
+
 export function parseMtaLogLine(line: string, activeResource: string, fallback: Date = new Date()): DevelopmentLogRecord | null {
     const stamped = timestamp(line, fallback);
     const relay = relayRecord(stamped.rest, stamped.value);
@@ -92,26 +130,9 @@ export function parseMtaLogLine(line: string, activeResource: string, fallback: 
     }
 
     const resource = resourceToken(stamped.rest);
-    const severity = LEVEL.exec(stamped.rest);
 
     if (resource?.[1] !== undefined) {
-        if (resource[1] !== activeResource) {
-            return null;
-        }
-
-        const level = severity?.[1] === undefined ? 'info' : logLevel(severity[1]) ?? 'info';
-        const message = stamped.rest.replace(resource[0], '').replace(severity?.[0] ?? '', '').replace(/^\s*[:|-]?\s*/, '');
-        const sourcePath = resource[2];
-        const sourceLine = resource[3];
-
-        return {
-            timestamp: stamped.value,
-            environment: 'server',
-            level,
-            message,
-            resource: activeResource,
-            ...(sourcePath !== undefined && sourceLine !== undefined ? { source: { path: sourcePath, line: Number(sourceLine) } } : {}),
-        };
+        return resource[1] === activeResource ? attributedRecord(stamped.rest, stamped.value, resource, activeResource) : null;
     }
 
     return { timestamp: stamped.value, environment: 'server', level: 'info', message: stamped.rest, resource: activeResource };

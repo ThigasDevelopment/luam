@@ -1,12 +1,13 @@
 import type { BuildOutcome } from '@cli/build/build-runner';
 import { EXIT_DIAGNOSTICS } from '@cli/cli/exit-codes';
-import { commandReporter, type CommandContext } from '@cli/commands/command-context';
+import { commandDeployment, commandReporter, type CommandContext } from '@cli/commands/command-context';
 import { runEnsureCommand, type EnsureOptions } from '@cli/commands/ensure-command';
+import { missingServerPathMessage } from '@cli/config/deployment';
 import { resolveDevelopmentLogPosition } from '@cli/commands/trace-position';
 import { parseMtaLogLine } from '@cli/logging/mta-log-parser';
-import { resolveServerLogPath, followServerLog } from '@cli/logging/server-log-follower';
+import { serverLogPath, followServerLog } from '@cli/logging/server-log-follower';
 import { reportDevelopmentLog } from '@cli/reporting/development-log-reporter';
-import { startMtaServer } from '@cli/server/mta-server-supervisor';
+import { serverTarget, startMtaServer } from '@cli/server/mta-server-supervisor';
 import { createServerConsole } from '@cli/server/server-console';
 import type { ResourceMap } from '@compiler/project/resource';
 
@@ -28,15 +29,16 @@ export function deployedMapAfterBuild(map: ResourceMap | null, outcome: Pick<Bui
 
 export async function runDevCommand(context: CommandContext, options: DevOptions): Promise<number> {
     const reporter = commandReporter(context);
+    const deployment = commandDeployment(context);
     let map: ResourceMap | null = null;
 
-    if (context.config.serverPath === null) {
-        reporter.error('luam dev requires "serverPath" in .luam.manifest.');
+    if (deployment.serverRoot === null) {
+        reporter.error(missingServerPathMessage('dev'));
 
         return EXIT_DIAGNOSTICS;
     }
 
-    const path = resolveServerLogPath(context.root, context.config.serverPath);
+    const path = serverLogPath(deployment.serverRoot);
     const follower = followServerLog(
         path,
         (line) => {
@@ -61,9 +63,14 @@ export async function runDevCommand(context: CommandContext, options: DevOptions
                 throw new Error('The MTA process service is unavailable.');
             }
 
+            const target = serverTarget(deployment);
+
+            if (target === null) {
+                throw new Error(missingServerPathMessage('dev'));
+            }
+
             supervisor = startMtaServer({
-                root: context.root,
-                config: context.config,
+                target,
                 processService: options.processService,
                 env: options.env ?? process.env,
                 signal: controller.signal,
@@ -80,7 +87,7 @@ export async function runDevCommand(context: CommandContext, options: DevOptions
             serverConsole: supervisor === null ? null : createServerConsole(supervisor),
             signal: options.startServer === true ? controller.signal : options.signal,
             commandName: 'dev',
-            developmentLogs: context.config.development.logs,
+            developmentLogs: deployment.logs,
             layout: 'tree',
             onBuild: (outcome): void => {
                 map = deployedMapAfterBuild(map, outcome);

@@ -219,15 +219,23 @@ funcionava nunca é substituído por uma saída parcial.
 ```bash
 luam ensure
 luam ensure --no-watch
+luam ensure gamemode-race scoreboard
 ```
 
 Constrói, espelha o resource no seu servidor MTA e repete a cada gravação. Exige
-`serverPath`. Ele sincroniza arquivos e nunca reinicia o resource — use
-`luam dev --start-server`, ou `refresh` no console do servidor, para carregar a
-sincronização. O `ensure`
+um caminho de servidor — `serverPath` no manifesto, ou um
+[`.luam.server`](/pt-br/reference/server-file) acima dele. Ele sincroniza
+arquivos e nunca reinicia o resource — use `luam dev`, ou `refresh` no console do
+servidor, para carregar a sincronização. O `ensure`
 nunca escreve em `<outDir>/<name>` e usa a estrutura em árvore por padrão,
 independentemente de `output.bundle`. Passe `--bundle` para uma sincronização em
 bundle.
+
+Rodado na **raiz de um workspace** — um diretório com um `.luam.server` e sem
+manifesto — ele recebe um ou mais nomes de resource, constrói e sincroniza cada
+um uma vez, e sai. Não há watch nem console possuído ali, então ele sincroniza e
+não reinicia nada; `luam dev` é a forma que faz as duas coisas. Sem nome nenhum é
+um erro de uso que lista os resources encontrados.
 
 Veja [Desenvolvimento diário](/pt-br/guide/daily-development) para o laço
 completo.
@@ -263,7 +271,56 @@ com código `1`. Sem a flag, `dev` nunca inicia nem encerra um processo MTA.
 
 `luam server` e `luam ensure` em terminais separados são processos separados. O
 `ensure` não pode escrever no console possuído pela outra execução, então o
-`ensure` isolado apenas sincroniza arquivos.
+`ensure` isolado apenas sincroniza arquivos. A sessão abaixo é o arranjo que não
+tem esse problema.
+
+### A sessão do workspace
+
+Rode `luam dev` em um diretório com um
+[`.luam.server`](/pt-br/reference/server-file) e ele abre uma **sessão**: um
+servidor MTA para o diretório inteiro, e um terminal que fala dois vocabulários.
+
+```bash
+luam dev
+```
+
+Ele inicia o servidor, espera a prontidão, acompanha o log e não anexa
+**nada**. Uma sessão sem resource anexado não compila e não observa nada, então
+abrir uma não custa o que o diretório contém. Você nomeia os resources em que
+está trabalhando, na hora:
+
+| Verbo | Argumento | O que faz |
+| --- | --- | --- |
+| `ensure` | um nome de resource | Constrói, sincroniza, inicia no servidor e passa a observar as mudanças. |
+| `drop` | um nome anexado | Para de observar e sincronizar. O que está no servidor fica como está. |
+| `rebuild` | nome opcional | Força um ciclo para um resource anexado, ou para todos. |
+| `list` | — | Os resources anexados, cada um com o resultado e a idade do último build. |
+| `help` | — | Os verbos, e o escape abaixo. |
+
+Uma linha cuja **primeira palavra** é um desses cinco é executada pela CLI.
+Qualquer outra linha chega ao console do MTA sem alteração, então `refresh`,
+`start` e `stop` continuam funcionando exatamente como sob `luam server`. A
+correspondência é com a primeira palavra inteira: `ensureing` e `ensure-all` são
+repassados.
+
+Comece uma linha com um **espaço** para repassá-la literalmente mesmo quando a
+primeira palavra é um verbo — esse é o escape para um comando de servidor que
+colide com um deles:
+
+```
+ list
+```
+
+A lista de verbos está fechada em cinco por esse motivo: cada um tira um nome de
+um vocabulário que o MTA possui.
+
+`--start-server` é um erro de uso na raiz de um workspace. A sessão sempre possui
+o servidor, então uma flag dizendo "faça também o que você sempre faz" sugeriria
+que existe um modo em que ela não faz. `Ctrl+C` encerra o servidor e fecha todos
+os watches. Uma saída inesperada do servidor encerra a sessão com código `1`.
+
+`luam dev` dentro de um único diretório de resource continua igual,
+`--start-server` incluído.
 
 ## `luam server`
 
@@ -272,7 +329,9 @@ luam server
 ```
 
 Roda a instalação existente em `serverPath` em primeiro plano com o console
-conectado. No Windows procura `MTA Server.exe`; no Linux procura `mta-server64` e
+conectado. Na raiz de um workspace a instalação vem do
+[`.luam.server`](/pt-br/reference/server-file), então o comando roda em um
+diretório que não contém manifesto nenhum. No Windows procura `MTA Server.exe`; no Linux procura `mta-server64` e
 depois `mta-server`. Defina `development.server.executable` para outro layout. No
 Linux um candidato presente sem permissão de execução é ignorado, e uma procura
 que não achou mais nada o aponta junto com o `chmod +x` que resolve.

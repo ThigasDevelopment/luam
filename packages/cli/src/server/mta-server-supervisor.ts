@@ -1,27 +1,35 @@
-import { followServerLog, resolveServerLogPath } from '@cli/logging/server-log-follower';
-import { connectServerConsoleInput } from '@cli/server/server-console-input';
+import { followServerLog, serverLogPath } from '@cli/logging/server-log-follower';
+import { connectSessionConsoleInput } from '@cli/server/session-console-input';
 import { resolveServerExecutable } from '@cli/server/server-executable-resolver';
 
-import type { LuamConfig } from '@cli/config/config-schema';
+import type { DeploymentSettings } from '@cli/config/deployment';
 import type { ProcessExit, ProcessService, OwnedProcess } from '@cli/server/process-service';
-import type { ServerConsoleInput } from '@cli/server/server-console-input';
+import type { ServerConsoleInput, SessionLine, TerminalInput } from '@cli/server/session-console-input';
 
 export type MtaServerState = 'starting' | 'ready' | 'stopping' | 'exited';
 
 export interface MtaServerSupervisor {
     readonly state: MtaServerState;
+    readonly logPath: string;
     writeCommand(command: string): void;
     waitUntilReady(): Promise<void>;
     waitForExit(): Promise<ProcessExit>;
     close(): Promise<void>;
 }
 
+export interface MtaServerTarget {
+    serverRoot: string;
+    executable: string | null;
+}
+
 export interface MtaServerSupervisorOptions {
-    root: string;
-    config: LuamConfig;
+    target: MtaServerTarget;
     processService: ProcessService;
     env: NodeJS.ProcessEnv;
     interactive?: boolean | undefined;
+    input?: TerminalInput | undefined;
+    sessionVerbs?: readonly string[] | undefined;
+    onSessionLine?: ((line: SessionLine) => void) | undefined;
     signal?: AbortSignal | null | undefined;
     platform?: NodeJS.Platform | undefined;
     readinessTimeoutMs?: number | undefined;
@@ -33,6 +41,10 @@ const DEFAULT_READINESS_TIMEOUT_MS = 30_000;
 
 const DEFAULT_SHUTDOWN_TIMEOUT_MS = 5_000;
 
+export function serverTarget(deployment: DeploymentSettings): MtaServerTarget | null {
+    return deployment.serverRoot === null ? null : { serverRoot: deployment.serverRoot, executable: deployment.executable };
+}
+
 export function isMtaServerReady(line: string): boolean {
     return /server started(?: and is ready to accept connections)?[!.]?$/i.test(line.trim());
 }
@@ -42,14 +54,9 @@ function timeout(milliseconds: number): Promise<void> {
 }
 
 export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSupervisor {
-    if (options.config.serverPath === null) {
-        throw new Error('Local MTA server startup requires "serverPath" in .luam.manifest.');
-    }
-
     const resolved = resolveServerExecutable({
-        root: options.root,
-        serverPath: options.config.serverPath,
-        configured: options.config.development.server.executable,
+        serverRoot: options.target.serverRoot,
+        configured: options.target.executable,
         platform: options.platform,
     });
     let state: MtaServerState = 'starting';
@@ -57,7 +64,7 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
     let consoleInput: ServerConsoleInput | null = null;
     let readyResolve: (() => void) | null = null;
     let readyReject: ((error: Error) => void) | null = null;
-    const logPath = resolveServerLogPath(options.root, options.config.serverPath);
+    const logPath = serverLogPath(resolved.serverRoot);
     const ready = new Promise<void>((resolveReady, rejectReady) => {
         readyResolve = resolveReady;
         readyReject = rejectReady;
@@ -152,7 +159,11 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
     options.signal?.addEventListener('abort', abort, { once: true });
 
     if (options.interactive === true) {
-        consoleInput = connectServerConsoleInput(process.stdin, child.stdin, abort);
+        consoleInput = connectSessionConsoleInput(options.input ?? process.stdin, child.stdin, {
+            interrupt: abort,
+            verbs: options.sessionVerbs ?? [],
+            onSessionLine: options.onSessionLine,
+        });
     }
 
     if (options.signal?.aborted === true) {
@@ -163,6 +174,7 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
         get state(): MtaServerState {
             return state;
         },
+        logPath,
         writeCommand: (command: string): void => {
             if (state !== 'ready') {
                 throw new Error(`Cannot write an MTA console command while the server is ${state}.`);

@@ -24,11 +24,20 @@ cópia local do resource gerado.
 
 ### Conseguindo o restart
 
-O `ensure` escreve arquivos e para por aí. Para que o restart aconteça sozinho,
-rode `luam dev --start-server`: a CLI passa a ser dona do processo do MTA e
-escreve `refresh`, `stop <name>` e `start <name>` no console dele depois de uma
-sincronização que mudou algo. Fora disso, digite esses comandos você mesmo no
-console do servidor.
+O `ensure` escreve arquivos e para por aí. Existem dois arranjos que fazem o
+restart acontecer sozinho, e qual deles você quer depende de quantos resources
+você está tocando.
+
+**Um resource.** Rode `luam dev --start-server` no diretório do resource: a CLI
+passa a ser dona do processo do MTA e escreve `refresh`, `stop <name>` e
+`start <name>` no console dele depois de uma sincronização que mudou algo. Sem a
+flag, digite esses comandos você mesmo no console do servidor.
+
+**Uma pasta de resources.** Uma instalação do MTA ocupa uma porta, então dois
+laços `luam dev --start-server` não podem rodar contra ela ao mesmo tempo.
+Coloque um [`.luam.server`](/pt-br/reference/server-file) na raiz da pasta e rode
+`luam dev` **ali** — veja
+[Um workspace de resources](#um-workspace-de-resources) abaixo.
 
 ### O que acontece a cada gravação
 
@@ -104,7 +113,8 @@ de desenvolvimento, e a próxima sincronização normal os remove.
 Saídas da engine sem identidade de resource podem aparecer como saída simples do
 servidor; registros atribuídos a outros resources são ignorados.
 
-Ajuste o relay no `.luam.manifest`:
+Ajuste o relay no `.luam.manifest`, ou de uma vez para um workspace inteiro no
+`.luam.server`:
 
 ```luam
 development = {
@@ -115,6 +125,48 @@ development = {
     },
 }
 ```
+
+## Um workspace de resources
+
+Um diretório que contém um [`.luam.server`](/pt-br/reference/server-file) e um
+resource por subdiretório é um **workspace**:
+
+```
+resources/
+  .luam.server
+  gamemode-race/
+    .luam.manifest
+  scoreboard/
+    .luam.manifest
+```
+
+O arquivo nomeia a instalação uma vez, então nenhum manifesto repete o
+`serverPath` e mudar o servidor de lugar é uma edição só. O `luam dev` rodado
+nessa raiz inicia **um** servidor MTA, espera a prontidão, acompanha o log e não
+anexa nada:
+
+```
+Started the MTA server at "C:/MTA Server" and waited for readiness in 4.20 s.
+Watching nothing yet. Type "ensure <resource>" to attach one, "help" for the rest.
+Resources here: "gamemode-race", "scoreboard".
+[14:22:09][server][info] Server started and is ready to accept connections
+```
+
+Esse bloco é uma ilustração, não uma captura — os tempos e a linha de log vêm de
+um servidor real, que o build da documentação não executa.
+
+De dentro dessa sessão você nomeia o que está tocando. O `ensure gamemode-race`
+constrói, sincroniza, inicia e pendura o resource no watch; o `drop` tira do
+watch e deixa a cópia publicada como está; o `rebuild` força um ciclo; o `list`
+diz o que está anexado e como foi o último build de cada um; o `help` nomeia os
+cinco verbos. Qualquer outra linha — `refresh`, `stop`, um comando do seu
+gamemode — chega ao console do MTA sem alteração, e uma linha que começa com
+espaço é repassada mesmo quando a primeira palavra é um verbo.
+
+O conjunto de resources em desenvolvimento é descoberto na velocidade em que o
+trabalho muda e nunca é escrito em lugar nenhum. Veja
+[a referência da CLI](/pt-br/tooling/cli#a-sessao-do-workspace) para o
+vocabulário inteiro.
 
 ## Parando e execuções únicas
 

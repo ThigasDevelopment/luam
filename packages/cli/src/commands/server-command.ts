@@ -1,8 +1,7 @@
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
-import { commandReporter } from '@cli/commands/command-context';
-import { startMtaServer } from '@cli/server/mta-server-supervisor';
+import { startMtaServer, type MtaServerTarget } from '@cli/server/mta-server-supervisor';
 
-import type { CommandContext } from '@cli/commands/command-context';
+import type { Reporter } from '@cli/reporting/reporter';
 import type { ProcessService } from '@cli/server/process-service';
 
 export interface ServerOptions {
@@ -11,8 +10,7 @@ export interface ServerOptions {
     signal: AbortSignal | null;
 }
 
-export async function runServerCommand(context: CommandContext, options: ServerOptions): Promise<number> {
-    const reporter = commandReporter(context);
+export async function runServerCommand(target: MtaServerTarget, reporter: Reporter, options: ServerOptions): Promise<number> {
     const controller = new AbortController();
     const abort = (): void => controller.abort();
 
@@ -21,8 +19,7 @@ export async function runServerCommand(context: CommandContext, options: ServerO
 
     try {
         const supervisor = startMtaServer({
-            root: context.root,
-            config: context.config,
+            target,
             processService: options.processService,
             env: options.env,
             interactive: true,

@@ -12,10 +12,12 @@ export interface ServerLogFollowerOptions {
 
 const DEFAULT_POLL_INTERVAL_MS = 100;
 
-export function resolveServerLogPath(root: string, serverPath: string): string {
-    const server = isAbsolute(serverPath) ? serverPath : resolve(root, serverPath);
+export function serverLogPath(serverRoot: string): string {
+    return resolve(serverRoot, 'mods/deathmatch/logs/server.log');
+}
 
-    return resolve(server, 'mods/deathmatch/logs/server.log');
+export function resolveServerLogPath(root: string, serverPath: string): string {
+    return serverLogPath(isAbsolute(serverPath) ? serverPath : resolve(root, serverPath));
 }
 
 function identity(path: string): string {

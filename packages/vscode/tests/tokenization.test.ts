@@ -8,6 +8,8 @@ let source: IGrammar;
 let manifest: IGrammar;
 let formatter: IGrammar;
 
+let server: IGrammar;
+
 function lines(records: readonly TokenRecord[]): string {
     return records
         .map((record) => `${record.text} | ${record.scopes.join(' ')} | ${record.role ?? 'none'} ${record.colour ?? ''}${record.fontStyle ?? ''}`)
@@ -26,6 +28,7 @@ beforeAll(async () => {
     source = await loadGrammar('source.luam');
     manifest = await loadGrammar('source.luam-manifest');
     formatter = await loadGrammar('source.luam-formatter');
+    server = await loadGrammar('source.luam-server');
 });
 
 describe('tokenization', () => {
@@ -96,6 +99,27 @@ describe('tokenization', () => {
 
         expect(tinted).toHaveLength(1);
         expect(tinted[0]?.text).toBe('server');
+    });
+});
+
+describe('the server file grammar', () => {
+    it('paints a server file exactly as the manifest grammar would', () => {
+        const text = fixtureText('theme-sample.luam.server');
+
+        expect(lines(tokenize(server, text, 'dark'))).toBe(lines(tokenize(manifest, text, 'dark')));
+    });
+
+    it('reads every server field as a key, and its value by kind', () => {
+        const records = tokenize(server, fixtureText('theme-sample.luam.server'), 'dark');
+        const roleOf = (text: string): string | null => roleOfText(records, text);
+
+        for (const key of ['serverPath', 'resourcesDir', 'executable', 'logs', 'enabled', 'maxMessageLength', 'rateLimit', 'rateWindowMs']) {
+            expect(roleOf(key), key).toBe('identifier.member');
+        }
+
+        expect(roleOf('mta-server')).toBe('literal.string');
+        expect(roleOf('true')).toBe('literal.constant');
+        expect(roleOf('512')).toBe('literal.constant');
     });
 });
 

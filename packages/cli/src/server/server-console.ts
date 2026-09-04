@@ -7,6 +7,7 @@ export interface ServerConsoleResult {
 
 export interface ServerConsole {
     refresh(): ServerConsoleResult;
+    start(resource: string): ServerConsoleResult;
     restart(resource: string): ServerConsoleResult;
 }
 
@@ -25,6 +26,7 @@ function write(supervisor: MtaServerSupervisor, commands: readonly string[], mes
 export function createServerConsole(supervisor: MtaServerSupervisor): ServerConsole {
     return {
         refresh: (): ServerConsoleResult => write(supervisor, ['refresh'], 'refreshed the resource list'),
+        start: (resource: string): ServerConsoleResult => write(supervisor, [`start ${resource}`], `Started "${resource}"`),
         restart: (resource: string): ServerConsoleResult => write(supervisor, [`stop ${resource}`, `start ${resource}`], `restarted "${resource}"`),
     };
 }

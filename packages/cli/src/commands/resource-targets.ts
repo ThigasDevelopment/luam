@@ -1,17 +1,16 @@
-import { isAbsolute, resolve } from 'node:path';
+import { resolve } from 'node:path';
 
 import type { LuamConfig } from '@cli/config/config-schema';
+import type { DeploymentSettings } from '@cli/config/deployment';
 
 export function resolveBuildTarget(root: string, config: LuamConfig): string {
     return resolve(root, config.outDir, config.name);
 }
 
-export function resolveServerTarget(root: string, config: LuamConfig): string | null {
-    if (config.serverPath === null) {
+export function resolveServerTarget(deployment: DeploymentSettings, name: string): string | null {
+    if (deployment.serverRoot === null) {
         return null;
     }
 
-    const serverRoot = isAbsolute(config.serverPath) ? config.serverPath : resolve(root, config.serverPath);
-
-    return resolve(serverRoot, config.resourcesDir, config.name);
+    return resolve(deployment.serverRoot, deployment.resourcesDir, name);
 }
