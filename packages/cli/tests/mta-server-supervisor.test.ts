@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { resolve } from 'node:path';
 
-import { loadManifest } from '@cli/config/manifest-loader';
 import { startMtaServer } from '@cli/server/mta-server-supervisor';
 
 import { FakeProcessService } from './support/fake-process-service';
@@ -15,13 +14,7 @@ function harness() {
     fixture.write('server/MTA Server.exe', 'binary');
     fixtures.push(fixture);
 
-    const config = loadManifest(fixture.root).config;
-
-    if (config === null) {
-        throw new Error('The fixture configuration is invalid.');
-    }
-
-    return { fixture, config, service: new FakeProcessService() };
+    return { fixture, target: { serverRoot: resolve(fixture.root, 'server'), executable: null }, service: new FakeProcessService() };
 }
 
 afterEach(() => {
@@ -34,8 +27,7 @@ describe('MTA server supervisor', () => {
     it('spawns without a shell and becomes ready from new log output', async () => {
         const test = harness();
         const supervisor = startMtaServer({
-            root: test.fixture.root,
-            config: test.config,
+            target: test.target,
             processService: test.service,
             env: { TEST_VALUE: 'preserved' },
             platform: 'win32',
@@ -60,8 +52,7 @@ describe('MTA server supervisor', () => {
     it('reports an early exit before readiness', async () => {
         const test = harness();
         const supervisor = startMtaServer({
-            root: test.fixture.root,
-            config: test.config,
+            target: test.target,
             processService: test.service,
             env: {},
             platform: 'win32',
@@ -76,8 +67,7 @@ describe('MTA server supervisor', () => {
     it('rejects console commands before readiness and multiline input', async () => {
         const test = harness();
         const supervisor = startMtaServer({
-            root: test.fixture.root,
-            config: test.config,
+            target: test.target,
             processService: test.service,
             env: {},
             platform: 'win32',
@@ -97,8 +87,7 @@ describe('MTA server supervisor', () => {
     it('times out readiness and uses a bounded kill fallback once', async () => {
         const test = harness();
         const supervisor = startMtaServer({
-            root: test.fixture.root,
-            config: test.config,
+            target: test.target,
             processService: test.service,
             env: {},
             platform: 'win32',
@@ -122,8 +111,7 @@ describe('MTA server supervisor', () => {
         });
 
         const supervisor = startMtaServer({
-            root: test.fixture.root,
-            config: test.config,
+            target: test.target,
             processService: test.service,
             env: {},
             platform: 'win32',

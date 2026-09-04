@@ -93,15 +93,22 @@ code --extensionDevelopmentPath=packages/vscode
 ## Activation
 
 The extension activates when the workspace holds a `.luam.manifest`, a
-[`.luam.formatter`](/en/reference/formatter-file) or any `.luam` file, so **open
-your resource folder as the workspace root**. It watches `**/*.luam`,
-`.luam.manifest`, `.luam.formatter` and `.env*`, so files changed outside the
-editor still reach the server.
+[`.luam.formatter`](/en/reference/formatter-file), a
+[`.luam.server`](/en/reference/server-file) or any `.luam` file, so **open your
+resource folder — or the folder of resources above it — as the workspace root**.
+It watches `**/*.luam`, `.luam.manifest`, `.luam.formatter`, `.luam.server` and
+`.env*`, so files changed outside the editor still reach the server.
 
-Each of the three gets its own file icon and its own language: `.luam` sources,
-the manifest, and the formatter file. The manifest and the formatter file share
-the same dialect and the same highlighting; they are separate languages so the
-file tree tells them apart at a glance.
+Each of the four gets its own file icon and its own language: `.luam` sources,
+the manifest, the formatter file, and the server file. The three configuration
+files share the same dialect and the same highlighting; they are separate
+languages so the file tree tells them apart at a glance, and each one's hover,
+completion and diagnostics name its own fields.
+
+Opening a folder that holds several resources is supported: each file is
+analysed against its **nearest** `.luam.manifest`, so one resource's declarations
+are never offered in another and a `compiler` option set in one does not check
+the other.
 
 ## Commands
 

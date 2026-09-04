@@ -19,6 +19,8 @@ import { isDeclarationPath } from '@compiler/project/source-kind';
 
 import { isFormatterPath } from '@compiler/format/formatter-fields';
 import { FORMATTER_SCHEMA } from '@compiler/format/formatter-file';
+import { isServerFilePath } from '@compiler/workspace/workspace-fields';
+import { SERVER_SCHEMA } from '@compiler/workspace/workspace-file';
 import { isManifestPath } from '@lsp/workspace/project-settings';
 
 import { lineStarts } from '@lsp/support/source-text';
@@ -72,6 +74,10 @@ export interface AnalysisInput {
 export function analyzeDocument(input: AnalysisInput): DocumentAnalysis {
     if (isFormatterPath(input.path)) {
         return analyzeManifestDocument(input, FORMATTER_SCHEMA);
+    }
+
+    if (isServerFilePath(input.path)) {
+        return analyzeManifestDocument(input, SERVER_SCHEMA);
     }
 
     if (isManifestPath(input.path)) {

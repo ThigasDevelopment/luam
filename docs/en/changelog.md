@@ -9,8 +9,29 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+### Added
+
+- [Server file](/en/reference/server-file): a new reference page for
+  `.luam.server` — every field with its type and default, which file applies,
+  what makes a child a resource, and the precedence table against the manifest.
+- [CLI](/en/tooling/cli) documents the workspace session under `luam dev`: the
+  five verbs, the leading-space escape, and why `--start-server` is a usage error
+  there. `luam ensure` gains its workspace form and `luam server` its
+  manifest-less one.
+- [Project layout](/en/guide/project-layout) describes the workspace shape — a
+  `.luam.server` beside a resource per directory, one level.
+
 ### Changed
 
+- [Daily development](/en/guide/daily-development) describes both arrangements
+  and names which is which: `dev --start-server` for one resource, the workspace
+  session for a folder of them.
+- [Configuration fields](/en/reference/configuration-fields) marks `serverPath`,
+  `resourcesDir` and `development.server` as superseded by the server file, and
+  lists the workspace file's own fields.
+- [Diagnostics](/en/reference/diagnostics) gains `server-parse-error`,
+  `server-unknown-field`, `server-invalid-value` and the
+  `config-deployment-moved` warning.
 - [CLI](/en/tooling/cli) records how `luam server` treats a Linux executable
   that is missing the execute permission.
 

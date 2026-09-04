@@ -243,6 +243,22 @@ writes nothing.
 | `config-invalid-engine-version` | `engine.minVersion` is neither `'latest'` nor a version. |
 | `config-missing-env-file` | A configured `environment` file does not exist. |
 | `config-unknown-helper` | `helpers` names a helper that does not exist. |
+| `config-deployment-moved` | The manifest sets `serverPath`, `resourcesDir` or `development.server` under a [`.luam.server`](/en/reference/server-file), which answers them for the whole directory and wins. A warning, reported once and naming every overridden field. Delete the lines. `compiler.warningsAsErrors` promotes it to an error. |
+
+## Server file
+
+Reported for [`.luam.server`](/en/reference/server-file). Any of them stops the
+command: `luam dev`, `luam ensure` and `luam server` exit `2` at a workspace root
+and do nothing, because a workspace whose file does not parse is not a workspace.
+
+| Code | Meaning |
+| --- | --- |
+| `server-unknown-field` | A name the server field table does not define. The message lists the fields there are. |
+| `server-invalid-value` | A value outside the field's type, or a path that leaves its boundary — a `resourcesDir` outside `serverPath`, an `executable` outside it. |
+| `server-parse-error` | The file does not parse as the manifest dialect. |
+
+A missing `serverPath` reports `config-missing-field`, with a message naming the
+`.luam.server` rather than a manifest.
 
 ## Formatter file
 

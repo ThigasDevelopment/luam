@@ -121,14 +121,21 @@ projeto com `.env` recebe um `env.lua` gerado no lugar.
 
 ## Sincronização com o servidor
 
+**Substituídos pelo [`.luam.server`](/pt-br/reference/server-file).** Estes campos
+continuam funcionando, e se comportam exatamente como sempre se comportaram
+quando nenhum `.luam.server` é encontrado acima do projeto. Quando existe um, os
+valores dele vencem e o manifesto reporta `config-deployment-moved` uma vez.
+
 | Campo | Tipo | Obrigatório | Padrão | Significado |
 | --- | --- | --- | --- | --- |
-| `serverPath` | `string?` | não | não definido | Raiz do servidor MTA. Exigido por `ensure` e `dev`. |
+| `serverPath` | `string?` | não | não definido | Raiz do servidor MTA. Exigido por `ensure` e `dev`, a menos que um `.luam.server` nomeie uma. |
 | `resourcesDir` | `string` | não | `'mods/deathmatch/resources'` | Diretório de resources relativo a `serverPath`. |
 
 ## Logs de desenvolvimento
 
-Usados apenas pelo `luam dev`.
+Usados apenas pelo `luam dev`. Um [`.luam.server`](/pt-br/reference/server-file)
+fornece o padrão para um workspace inteiro; um valor no manifesto sobrescreve em
+silêncio.
 
 | Campo | Tipo | Obrigatório | Padrão | Significado |
 | --- | --- | --- | --- | --- |
@@ -139,9 +146,27 @@ Usados apenas pelo `luam dev`.
 
 ## Servidor de desenvolvimento
 
+**Substituído pelo [`.luam.server`](/pt-br/reference/server-file)**, nos mesmos
+termos do `serverPath` acima.
+
 | Campo | Tipo | Obrigatório | Padrão | Significado |
 | --- | --- | --- | --- | --- |
 | `development.server.executable` | `string?` | não | busca por plataforma | Executável relativo a `serverPath` e contido nele. Usado apenas por `server` e `dev --start-server`. |
+
+## O arquivo do workspace
+
+Um diretório de resources nomeia a instalação do MTA que compartilha uma vez, no
+[`.luam.server`](/pt-br/reference/server-file):
+
+| Campo | Tipo | Obrigatório | Padrão | Significado |
+| --- | --- | --- | --- | --- |
+| `serverPath` | `string` | **sim** | — | Raiz do servidor MTA, resolvida contra o diretório que contém o arquivo. |
+| `resourcesDir` | `string` | não | `'mods/deathmatch/resources'` | Diretório de resources relativo a `serverPath`. |
+| `executable` | `string?` | não | busca por plataforma | Executável relativo a `serverPath` e contido nele. |
+| `logs.enabled` | `boolean` | não | `false` | Se a sessão transmite os logs. |
+| `logs.maxMessageLength` | `number` | não | `4096` | Registros retransmitidos maiores são rejeitados. |
+| `logs.rateLimit` | `number` | não | `30` | Registros permitidos por cliente por janela. |
+| `logs.rateWindowMs` | `number` | não | `1000` | Duração dessa janela, em milissegundos. |
 
 ## Campos removidos
 

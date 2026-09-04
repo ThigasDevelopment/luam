@@ -136,6 +136,7 @@ describe('command help and version', () => {
         expect(help.test).not.toContain('--bundle');
         expect(help.format).toContain('--check');
         expect(help.format).toContain('[paths...]');
+        expect(help.ensure).toContain('[resources...]');
         expect(help.build).not.toContain('--check');
     });
 

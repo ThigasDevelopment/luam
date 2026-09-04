@@ -24,10 +24,20 @@ local copy of the generated resource.
 
 ### Getting the restart
 
-`ensure` writes files and stops there. To have the restart happen for you, run
-`luam dev --start-server`: the CLI owns the MTA process and writes `refresh`,
-`stop <name>`, and `start <name>` to its console after a sync that changed
-something. Otherwise type those commands in the server console yourself.
+`ensure` writes files and stops there. There are two arrangements that make the
+restart happen for you, and which one you want depends on how many resources you
+are working on.
+
+**One resource.** Run `luam dev --start-server` in the resource directory: the
+CLI owns the MTA process and writes `refresh`, `stop <name>`, and `start <name>`
+to its console after a sync that changed something. Without the flag, type those
+commands in the server console yourself.
+
+**A folder of resources.** An MTA installation binds one port, so two
+`luam dev --start-server` loops cannot both run against it. Put a
+[`.luam.server`](/en/reference/server-file) at the root of the folder and run
+`luam dev` **there** instead — see [A workspace of resources](#a-workspace-of-resources)
+below.
 
 ### What happens on each save
 
@@ -102,7 +112,8 @@ normal sync removes them.
 Engine output with no resource identity can appear as plain server output;
 records attributed to other resources are ignored.
 
-Tune the relay in `.luam.manifest`:
+Tune the relay in `.luam.manifest`, or once for a whole workspace in
+`.luam.server`:
 
 ```luam
 development = {
@@ -113,6 +124,47 @@ development = {
     },
 }
 ```
+
+## A workspace of resources
+
+A directory that holds a [`.luam.server`](/en/reference/server-file) and a
+resource per subdirectory is a **workspace**:
+
+```
+resources/
+  .luam.server
+  gamemode-race/
+    .luam.manifest
+  scoreboard/
+    .luam.manifest
+```
+
+The file names the installation once, so no manifest repeats `serverPath` and
+moving the server is one edit. `luam dev` run at that root starts **one** MTA
+server, waits for readiness, follows the log, and attaches nothing:
+
+```
+Started the MTA server at "C:/MTA Server" and waited for readiness in 4.20 s.
+Watching nothing yet. Type "ensure <resource>" to attach one, "help" for the rest.
+Resources here: "gamemode-race", "scoreboard".
+[14:22:09][server][info] Server started and is ready to accept connections
+```
+
+That block is an illustration rather than a capture — the timings and the log
+line come from a real server, which the documentation build does not run.
+
+From inside that session you name what you are touching. `ensure gamemode-race`
+builds it, syncs it, starts it, and hangs it on the watch; `drop` takes it off
+again and leaves the deployed copy alone; `rebuild` forces a cycle; `list` says
+what is attached and how each one's last build went; `help` names the five verbs.
+Every other line — `refresh`, `stop`, a gamemode command of your own — reaches
+the MTA console unchanged, and a line that begins with a space is forwarded even
+when its first word is a verb.
+
+The set of resources under development is discovered at the speed the work
+changes and is never written down. See
+[the CLI reference](/en/tooling/cli#the-workspace-session) for the whole
+vocabulary.
 
 ## Stopping and one-shot runs
 

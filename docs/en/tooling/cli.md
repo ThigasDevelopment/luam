@@ -218,13 +218,22 @@ replaced with partial output.
 ```bash
 luam ensure
 luam ensure --no-watch
+luam ensure gamemode-race scoreboard
 ```
 
 Builds, mirrors the resource into your MTA server, and repeats on every save.
-Requires `serverPath`. It syncs files and never restarts the resource — use
-`luam dev --start-server`, or `refresh` in the server console, to load the sync.
-`ensure` never writes to `<outDir>/<name>` and uses the tree layout by default,
-regardless of `output.bundle`. Pass `--bundle` for a bundled sync.
+Requires a server path — `serverPath` in the manifest, or a
+[`.luam.server`](/en/reference/server-file) above it. It syncs files and never
+restarts the resource — use `luam dev`, or `refresh` in the server console, to
+load the sync. `ensure` never writes to `<outDir>/<name>` and uses the tree
+layout by default, regardless of `output.bundle`. Pass `--bundle` for a bundled
+sync.
+
+Run at a **workspace root** — a directory holding a `.luam.server` and no
+manifest — it takes one or more resource names, builds and syncs each one once,
+and exits. There is no watch and no owned console there, so it syncs and restarts
+nothing; `luam dev` is the form that does both. With no name it is a usage error
+that lists the resources it found.
 
 See [Daily development](/en/guide/daily-development) for the full loop.
 
@@ -258,7 +267,55 @@ never starts or stops an MTA process.
 
 `luam server` and `luam ensure` in separate terminals are separate processes.
 `ensure` cannot write to a console owned by the other invocation, so standalone
-`ensure` only syncs files.
+`ensure` only syncs files. The session below is the arrangement that does not
+have that problem.
+
+### The workspace session
+
+Run `luam dev` at a directory holding a
+[`.luam.server`](/en/reference/server-file) and it opens a **session** instead:
+one MTA server for the whole directory, and a terminal that speaks two
+vocabularies.
+
+```bash
+luam dev
+```
+
+It starts the server, waits for readiness, follows the log, and attaches
+**nothing**. A session with no resource attached compiles nothing and watches
+nothing, so opening one does not cost what the directory holds. You name the
+resources you are working on, right then:
+
+| Verb | Argument | What it does |
+| --- | --- | --- |
+| `ensure` | one resource name | Builds it, syncs it, starts it on the server, and watches it for changes. |
+| `drop` | one attached name | Stops watching and syncing it. What is on the server is left alone. |
+| `rebuild` | optional name | Forces a cycle for one attached resource, or for every attached resource. |
+| `list` | — | The attached resources, each with the outcome and age of its last build. |
+| `help` | — | The verbs, and the escape below. |
+
+A line whose **first word** is one of those five is executed by the CLI. Every
+other line reaches the MTA console unchanged, so `refresh`, `start` and `stop`
+still work exactly as they do under `luam server`. The match is on the whole
+first word: `ensureing` and `ensure-all` are forwarded.
+
+Begin a line with a **space** to forward it verbatim even when its first word is
+a verb — that is the escape for a server command that collides with one:
+
+```
+ list
+```
+
+The verb list is closed at five for that reason: each one takes a name out of a
+vocabulary MTA owns.
+
+`--start-server` is a usage error at a workspace root. The session always owns
+the server, so a flag saying "also do the thing you always do" would imply there
+is a mode where it does not. `Ctrl+C` shuts the server down and closes every
+watch. An unexpected server exit ends the session with exit code `1`.
+
+`luam dev` inside a single resource directory is untouched, `--start-server` and
+all.
 
 ## `luam server`
 
@@ -267,7 +324,9 @@ luam server
 ```
 
 Runs the existing installation under `serverPath` in the foreground with its
-console attached. Windows probes `MTA Server.exe`; Linux probes `mta-server64`
+console attached. At a workspace root the installation comes from
+[`.luam.server`](/en/reference/server-file) instead, so the command runs in a
+directory that holds no manifest at all. Windows probes `MTA Server.exe`; Linux probes `mta-server64`
 then `mta-server`. Set `development.server.executable` for another layout. On
 Linux a candidate that is present without the execute permission is skipped, and
 an otherwise empty probe names it with the `chmod +x` that fixes it.

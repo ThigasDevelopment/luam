@@ -3365,20 +3365,20 @@ merges every resource's declarations into every other's ambient scope — latent
 today, the default experience the moment a directory of resources is the blessed
 layout.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 50.01 | Add the `.luam.server` file and its schema | ../plans/50.01-luam-server-file.md | architecture-engineer | todo |
-| 50.02 | Give the CLI a workspace context | ../plans/50.02-workspace-context.md | architecture-engineer | todo |
-| 50.03 | Deprecate the deployment fields in the resource manifest | ../plans/50.03-deprecate-manifest-deployment.md | architecture-engineer | todo |
-| 50.04 | Split the owned console into session commands and server input | ../plans/50.04-session-console-input.md | architecture-engineer | todo |
-| 50.05 | Open a workspace session with `luam dev` | ../plans/50.05-workspace-session.md | architecture-engineer | todo |
-| 50.06 | Attach and detach resources from the session | ../plans/50.06-attach-resources.md | architecture-engineer | todo |
-| 50.07 | Scope the language server to the nearest manifest | ../plans/50.07-scope-the-language-server.md | architecture-engineer | todo |
-| 50.08 | Give `.luam.server` its editor surfaces | ../plans/50.08-server-file-editor-surfaces.md | architecture-engineer | todo |
-| 50.09 | Cover the workspace and the session in the tests | ../plans/50.09-workspace-tests.md | test-engineer | todo |
-| 50.10 | Document the workspace and the session | ../plans/50.10-workspace-documentation.md | documentation-engineer | todo |
+| 50.01 | Add the `.luam.server` file and its schema | ../plans/50.01-luam-server-file.md | architecture-engineer | done |
+| 50.02 | Give the CLI a workspace context | ../plans/50.02-workspace-context.md | architecture-engineer | done |
+| 50.03 | Deprecate the deployment fields in the resource manifest | ../plans/50.03-deprecate-manifest-deployment.md | architecture-engineer | done |
+| 50.04 | Split the owned console into session commands and server input | ../plans/50.04-session-console-input.md | architecture-engineer | done |
+| 50.05 | Open a workspace session with `luam dev` | ../plans/50.05-workspace-session.md | architecture-engineer | done |
+| 50.06 | Attach and detach resources from the session | ../plans/50.06-attach-resources.md | architecture-engineer | done |
+| 50.07 | Scope the language server to the nearest manifest | ../plans/50.07-scope-the-language-server.md | architecture-engineer | done |
+| 50.08 | Give `.luam.server` its editor surfaces | ../plans/50.08-server-file-editor-surfaces.md | architecture-engineer | done |
+| 50.09 | Cover the workspace and the session in the tests | ../plans/50.09-workspace-tests.md | test-engineer | done |
+| 50.10 | Document the workspace and the session | ../plans/50.10-workspace-documentation.md | documentation-engineer | done |
 
 Acceptance:
 
