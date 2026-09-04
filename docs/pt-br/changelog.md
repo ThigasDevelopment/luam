@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.4 - 2026-09-04
+
 ### Alterado
 
 - [CLI](/pt-br/tooling/cli) registra como o `luam server` trata um executável
