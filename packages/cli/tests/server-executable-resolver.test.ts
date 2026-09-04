@@ -35,17 +35,17 @@ describe('MTA server executable resolution', () => {
     it('prefers the 64-bit Linux executable and falls back to the standard name', () => {
         const fixture = project();
 
-        fixture.write('server/mta-server', 'binary');
+        fixture.executable('server/mta-server', 'binary');
         expect(resolveServerExecutable({ root: fixture.root, serverPath: 'server', configured: null, platform: 'linux' }).executable).toContain('mta-server');
 
-        fixture.write('server/mta-server64', 'binary');
+        fixture.executable('server/mta-server64', 'binary');
         expect(resolveServerExecutable({ root: fixture.root, serverPath: 'server', configured: null, platform: 'linux' }).executable).toContain('mta-server64');
     });
 
     it('resolves a configured executable under serverPath', () => {
         const fixture = project();
 
-        fixture.write('server/bin/custom-server', 'binary');
+        fixture.executable('server/bin/custom-server', 'binary');
 
         expect(resolveServerExecutable({ root: fixture.root, serverPath: 'server', configured: 'bin/custom-server', platform: 'linux' }).executable).toContain(
             'custom-server',
@@ -59,6 +59,27 @@ describe('MTA server executable resolution', () => {
             'must stay inside serverPath',
         );
         expect(() => resolveServerExecutable({ root: fixture.root, serverPath: 'server', configured: null, platform: 'linux' })).toThrow(/mta-server64.*mta-server/);
+    });
+
+    it('reports a candidate that is missing the execute permission', () => {
+        const fixture = project();
+
+        fixture.write('server/mta-server64', 'binary');
+
+        expect(() => resolveServerExecutable({ root: fixture.root, serverPath: 'server', configured: null, platform: 'linux' })).toThrow(
+            /missing the execute permission.*mta-server64.*chmod \+x/s,
+        );
+    });
+
+    it('falls back to a runnable candidate when the preferred one is not executable', () => {
+        const fixture = project();
+
+        fixture.write('server/mta-server64', 'binary');
+        fixture.executable('server/mta-server', 'binary');
+
+        expect(resolveServerExecutable({ root: fixture.root, serverPath: 'server', configured: null, platform: 'linux' }).executable).toBe(
+            resolve(fixture.root, 'server/mta-server'),
+        );
     });
 
     it('rejects directories and unsupported platforms', () => {

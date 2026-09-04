@@ -14,6 +14,13 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+### Changed
+
+- `luam server` and `luam dev --start-server` skip a Linux server executable that
+  is present without the execute permission and fall through to the next
+  candidate. When nothing else resolves, the error names the file and the
+  `chmod +x` that fixes it instead of failing later with a bare `EACCES`.
+
 ## 1.0.3 - 2026-09-03
 
 ### Added
