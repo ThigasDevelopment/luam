@@ -52,6 +52,9 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   another's scope, checks one resource under another's compiler options, or
   resolves a file's side against the wrong root. A file with no manifest above it
   keeps the default settings.
+- Session output erases the line being typed before it writes and redraws it
+  after, so a log record arriving mid-word no longer wipes what is on screen.
+  Without it a chatty server left only the letters typed since the last record.
 - The owned MTA console reads lines rather than bytes. It buffers to the newline,
   echoes what is typed, handles backspace, and erases a forwarded line so MTA's
   own echo is the single record of it. `Ctrl+C` still interrupts mid-line and

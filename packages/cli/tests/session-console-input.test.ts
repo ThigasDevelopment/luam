@@ -3,7 +3,7 @@ import { PassThrough } from 'node:stream';
 import { describe, expect, it } from 'vitest';
 
 import { SESSION_VERBS } from '@cli/session/session-commands';
-import { connectServerConsoleInput, connectSessionConsoleInput, type SessionLine, type TerminalInput } from '@cli/server/session-console-input';
+import { connectServerConsoleInput, connectSessionConsoleInput, type ServerConsoleInput, type SessionLine, type TerminalInput } from '@cli/server/session-console-input';
 
 class FakeTerminalInput extends PassThrough implements TerminalInput {
     readonly isTTY: boolean;
@@ -25,6 +25,7 @@ class FakeTerminalInput extends PassThrough implements TerminalInput {
 
 interface Session {
     input: FakeTerminalInput;
+    line: ServerConsoleInput;
     forwarded(): string;
     echoed(): string;
     lines: SessionLine[];
@@ -49,6 +50,9 @@ function session(isTTY = true): Session {
 
     const state = {
         input,
+        get line(): ServerConsoleInput {
+            return connection;
+        },
         forwarded: (): string => forwarded,
         echoed: (): string => painted,
         lines,
@@ -210,6 +214,34 @@ describe('the reserved-verb split', () => {
         expect(test.echoed()).toBe('');
         expect(test.forwarded()).toBe('refresh\n');
         expect(test.lines.map((line) => line.verb)).toEqual(['ensure']);
+        test.close();
+    });
+
+    it('erases and redraws the half-typed line around other output', () => {
+        const test = session();
+
+        test.input.write('ensu');
+
+        expect(test.echoed()).toBe('ensu');
+
+        test.line.eraseLine();
+        test.line.redrawLine();
+
+        expect(test.echoed()).toBe(`ensu\r${' '.repeat(4)}\rensu`);
+
+        test.input.write('re resource-a\n');
+
+        expect(test.lines.map((entry) => entry.line)).toEqual(['ensure resource-a']);
+        test.close();
+    });
+
+    it('erases and redraws nothing when no line is being typed', () => {
+        const test = session();
+
+        test.line.eraseLine();
+        test.line.redrawLine();
+
+        expect(test.echoed()).toBe('');
         test.close();
     });
 

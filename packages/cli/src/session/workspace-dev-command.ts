@@ -3,26 +3,31 @@ import type { CommandContext } from '@cli/commands/command-context';
 import { followServerLog } from '@cli/logging/server-log-follower';
 import { parseWorkspaceLogLine } from '@cli/logging/mta-log-parser';
 import { reportDevelopmentLog } from '@cli/reporting/development-log-reporter';
-import type { Reporter } from '@cli/reporting/reporter';
+import { createReporter, type Reporter } from '@cli/reporting/reporter';
 import { formatDuration } from '@cli/reporting/duration';
 import { serverTarget, startMtaServer, type MtaServerTarget } from '@cli/server/mta-server-supervisor';
 import { createServerConsole } from '@cli/server/server-console';
 import { SESSION_VERBS } from '@cli/session/session-commands';
+import { guardedLogger, guardedPaint, type SessionLineGuard } from '@cli/session/session-line-guard';
 import { createWorkspaceSession, type SessionResourceLoader } from '@cli/session/workspace-session';
 import { untilAborted } from '@cli/watch/abort-wait';
 
 import type { DeploymentSettings } from '@cli/config/deployment';
+import type { Logger } from '@cli/reporting/logger';
 import type { ProcessService } from '@cli/server/process-service';
+import type { Writable } from 'node:stream';
 import type { SessionLine, TerminalInput } from '@cli/server/session-console-input';
 
 export interface WorkspaceDevOptions {
     root: string;
     resources: readonly string[];
+    logger: Logger;
     reporter: Reporter;
     deployment: DeploymentSettings;
     loadResource: SessionResourceLoader;
     processService: ProcessService;
     input?: TerminalInput | undefined;
+    echo?: Writable | undefined;
     env: NodeJS.ProcessEnv;
     signal: AbortSignal | null;
     platform?: NodeJS.Platform | undefined;
@@ -39,7 +44,13 @@ function exitReason(code: number | null, signal: string | null): string {
 }
 
 export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Promise<number> {
-    const reporter = options.reporter;
+    let consoleInput: { eraseLine(): void; redrawLine(): void } | null = null;
+
+    const guard: SessionLineGuard = {
+        erase: (): void => consoleInput?.eraseLine(),
+        redraw: (): void => consoleInput?.redrawLine(),
+    };
+    const reporter = createReporter(guardedLogger(options.logger, guard), options.reporter.capability, guardedPaint(options.reporter.paint, guard));
     const target: MtaServerTarget | null = serverTarget(options.deployment);
 
     if (target === null) {
@@ -67,6 +78,7 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
             env: options.env,
             interactive: true,
             input: options.input,
+            echo: options.echo,
             sessionVerbs: SESSION_VERBS,
             onSessionLine: (line: SessionLine): void => {
                 if (session === null) {
@@ -83,6 +95,8 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
             shutdownTimeoutMs: options.shutdownTimeoutMs,
             pollIntervalMs: options.pollIntervalMs,
         });
+
+        consoleInput = supervisor.consoleInput;
 
         await supervisor.waitUntilReady();
 
