@@ -34,7 +34,7 @@ describe('server command', () => {
         const test = harness('server');
         const executable = process.platform === 'win32' ? 'MTA Server.exe' : 'mta-server64';
 
-        test.fixture.write(`server/${executable}`, 'binary');
+        test.fixture.executable(`server/${executable}`, 'binary');
 
         const running = runServerCommand(test.context, { processService: test.service, env: {}, signal: null });
 

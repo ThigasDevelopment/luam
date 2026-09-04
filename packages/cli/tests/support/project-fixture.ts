@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
@@ -10,6 +10,7 @@ import { validateConfig } from '@cli/config/config-validation';
 export interface ProjectFixture {
     root: string;
     write(path: string, contents: string): void;
+    executable(path: string, contents: string): void;
     remove(path: string): void;
     read(path: string): string;
     exists(path: string): boolean;
@@ -52,6 +53,10 @@ export function createProjectFixture(files: Readonly<Record<string, string>> = {
 
             mkdirSync(dirname(absolute), { recursive: true });
             writeFileSync(absolute, contents, 'utf8');
+        },
+        executable: (path: string, contents: string): void => {
+            fixture.write(path, contents);
+            chmodSync(resolve(root, path), 0o755);
         },
         remove: (path: string): void => {
             rmSync(resolve(root, path), { force: true, recursive: true });
