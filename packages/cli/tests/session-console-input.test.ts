@@ -33,10 +33,15 @@ interface Session {
     close(): void;
 }
 
-function session(isTTY = true): Session {
+function session(isTTY = true, columns = 0): Session {
     const input = new FakeTerminalInput(isTTY);
     const output = new PassThrough();
-    const echo = new PassThrough();
+    const echo = new PassThrough() as PassThrough & { columns?: number };
+
+    if (columns > 0) {
+        echo.columns = columns;
+    }
+
     const lines: SessionLine[] = [];
     let forwarded = '';
     let painted = '';
@@ -139,7 +144,7 @@ describe('the reserved-verb split', () => {
 
         expect(test.forwarded()).toBe('refresh\n');
         expect(test.lines).toEqual([]);
-        expect(test.echoed()).toBe(`refresh\r${' '.repeat(7)}\r`);
+        expect(test.echoed()).toBe('refresh\r\u001b[2K');
         test.close();
     });
 
@@ -227,11 +232,24 @@ describe('the reserved-verb split', () => {
         test.line.eraseLine();
         test.line.redrawLine();
 
-        expect(test.echoed()).toBe(`ensu\r${' '.repeat(4)}\rensu`);
+        expect(test.echoed()).toBe('ensu\r\u001b[2Kensu');
 
         test.input.write('re resource-a\n');
 
         expect(test.lines.map((entry) => entry.line)).toEqual(['ensure resource-a']);
+        test.close();
+    });
+
+    it('erases every row a wrapped line occupies', () => {
+        const test = session(true, 10);
+
+        test.input.write('ensure resource-a');
+
+        const typed = test.echoed().length;
+
+        test.line.eraseLine();
+
+        expect(test.echoed().slice(typed)).toBe('\r\u001b[2K\u001b[1A\u001b[2K');
         test.close();
     });
 
