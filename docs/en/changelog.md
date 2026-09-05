@@ -9,6 +9,13 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.6 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records that the session keeps the line being typed on
+  screen while the server writes to the same terminal.
+
 ## 1.0.5 - 2026-09-04
 
 ### Added

@@ -11,6 +11,13 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.6 - 2026-09-04
+
+### Alterado
+
+- [CLI](/pt-br/tooling/cli) registra que a sessão mantém na tela a linha que está
+  sendo digitada enquanto o servidor escreve no mesmo terminal.
+
 ## 1.0.5 - 2026-09-04
 
 ### Adicionado
