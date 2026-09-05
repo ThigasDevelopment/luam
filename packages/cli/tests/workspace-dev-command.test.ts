@@ -18,6 +18,7 @@ import { createRuntime, createWorkspaceContext, resourceContext } from '@cli/cli
 import { EXIT_DIAGNOSTICS, EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 import { runCli } from '@cli/cli/run';
 import type { CommandContext } from '@cli/commands/command-context';
+import { workspaceResources } from '@cli/config/workspace-loader';
 import { runWorkspaceDevCommand, START_SERVER_AT_A_WORKSPACE } from '@cli/session/workspace-dev-command';
 
 import { FakeProcessService } from './support/fake-process-service';
@@ -94,7 +95,7 @@ function harness(): DevHarness {
         run: (): Promise<number> =>
             runWorkspaceDevCommand({
                 root: workspace.root,
-                resources: workspace.resources,
+                listResources: (): readonly string[] => workspaceResources(workspace.root),
                 logger,
                 reporter: runtime.reporter,
                 deployment,

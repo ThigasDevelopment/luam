@@ -9,6 +9,14 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.9 - 2026-09-04
+
+### Changed
+
+- [Server file](/en/reference/server-file) records that the resources under a
+  workspace are read again on every use, so one created while a session runs can
+  be attached without reopening it.
+
 ## 1.0.8 - 2026-09-04
 
 ### Changed

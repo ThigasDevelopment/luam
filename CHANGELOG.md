@@ -14,6 +14,15 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.9 - 2026-09-04
+
+### Changed
+
+- A workspace reads the resources under it again on every use instead of once,
+  when the session opened. A resource created or renamed while "luam dev" ran
+  could not be attached until the session was reopened, which is the opposite of
+  a set discovered at the speed the work changes.
+
 ## 1.0.8 - 2026-09-04
 
 ### Changed

@@ -3,6 +3,7 @@ import { resourceContext } from '@cli/cli/cli-runtime';
 import type { CommandContext } from '@cli/commands/command-context';
 import type { ServerConsole, ServerConsoleResult } from '@cli/server/server-console';
 import { splitSessionLine } from '@cli/server/session-console-input';
+import { workspaceResources } from '@cli/config/workspace-loader';
 import { createWorkspaceSession, type WorkspaceSession } from '@cli/session/workspace-session';
 
 import { createMemoryLogger, type MemoryLogger } from './memory-logger';
@@ -50,7 +51,7 @@ export function openSessionDriver(shape: WorkspaceShape = {}): SessionDriver {
     };
     const session = createWorkspaceSession({
         root: workspace.root,
-        resources: workspace.resources,
+        listResources: (): readonly string[] => workspaceResources(workspace.root),
         reporter: runtime.reporter,
         serverConsole,
         loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name).context,

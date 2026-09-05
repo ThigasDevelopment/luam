@@ -11,6 +11,14 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.9 - 2026-09-04
+
+### Alterado
+
+- [Arquivo do servidor](/pt-br/reference/server-file) registra que os resources
+  de um workspace são lidos de novo a cada uso, então um criado com a sessão
+  aberta pode ser anexado sem reabri-la.
+
 ## 1.0.8 - 2026-09-04
 
 ### Alterado

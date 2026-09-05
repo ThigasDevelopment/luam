@@ -2,6 +2,7 @@ import { resolveCommandTarget, resourceContext, runtimeProcessService } from '@c
 import { EXIT_USAGE } from '@cli/cli/exit-codes';
 import { addProjectOptions, addWatchOptions, noMapOption, offlineOption } from '@cli/cli/shared-options';
 import { runDevCommand } from '@cli/commands/dev-command';
+import { workspaceResources } from '@cli/config/workspace-loader';
 import { runWorkspaceDevCommand, START_SERVER_AT_A_WORKSPACE } from '@cli/session/workspace-dev-command';
 
 import { Option } from 'commander';
@@ -52,7 +53,7 @@ export function registerDevCommand(program: Command, runtime: CliRuntime): void 
 
             runtime.exitCode = await runWorkspaceDevCommand({
                 root: workspace.root,
-                resources: workspace.resources,
+                listResources: (): readonly string[] => workspaceResources(workspace.root),
                 logger: runtime.logger,
                 reporter: runtime.reporter,
                 deployment: { serverRoot: deployment.serverRoot, resourcesDir: deployment.resourcesDir, executable: deployment.executable, logs: deployment.logs },
