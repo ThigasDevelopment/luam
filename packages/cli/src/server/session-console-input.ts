@@ -21,6 +21,8 @@ export interface SessionConsoleInputOptions {
 
 export interface ServerConsoleInput {
     close(): void;
+    eraseLine(): void;
+    redrawLine(): void;
 }
 
 const INTERRUPT = '\u0003';
@@ -54,6 +56,13 @@ export function connectSessionConsoleInput(input: TerminalInput, output: Writabl
         }
 
         echo.write(`\r${' '.repeat(buffer.length)}\r`);
+    };
+    const redraw = (): void => {
+        if (echo === null || buffer.length === 0) {
+            return;
+        }
+
+        echo.write(buffer);
     };
     const dispatch = (line: string): void => {
         erase();
@@ -157,7 +166,7 @@ export function connectSessionConsoleInput(input: TerminalInput, output: Writabl
     input.on('data', forward);
     input.resume();
 
-    return { close };
+    return { close, eraseLine: erase, redrawLine: redraw };
 }
 
 export function connectServerConsoleInput(input: TerminalInput, output: Writable, interrupt: () => void): ServerConsoleInput {

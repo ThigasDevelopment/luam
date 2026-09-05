@@ -14,6 +14,14 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.6 - 2026-09-04
+
+### Changed
+
+- Session output erases the line being typed before it writes and redraws it
+  after, so a log record arriving mid-word no longer wipes what is on screen.
+  Without it a chatty server left only the letters typed since the last record.
+
 ## 1.0.5 - 2026-09-04
 
 ### Added

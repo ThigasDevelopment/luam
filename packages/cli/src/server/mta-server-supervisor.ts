@@ -4,6 +4,7 @@ import { resolveServerExecutable } from '@cli/server/server-executable-resolver'
 
 import type { DeploymentSettings } from '@cli/config/deployment';
 import type { ProcessExit, ProcessService, OwnedProcess } from '@cli/server/process-service';
+import type { Writable } from 'node:stream';
 import type { ServerConsoleInput, SessionLine, TerminalInput } from '@cli/server/session-console-input';
 
 export type MtaServerState = 'starting' | 'ready' | 'stopping' | 'exited';
@@ -11,6 +12,7 @@ export type MtaServerState = 'starting' | 'ready' | 'stopping' | 'exited';
 export interface MtaServerSupervisor {
     readonly state: MtaServerState;
     readonly logPath: string;
+    readonly consoleInput: ServerConsoleInput | null;
     writeCommand(command: string): void;
     waitUntilReady(): Promise<void>;
     waitForExit(): Promise<ProcessExit>;
@@ -28,6 +30,7 @@ export interface MtaServerSupervisorOptions {
     env: NodeJS.ProcessEnv;
     interactive?: boolean | undefined;
     input?: TerminalInput | undefined;
+    echo?: Writable | undefined;
     sessionVerbs?: readonly string[] | undefined;
     onSessionLine?: ((line: SessionLine) => void) | undefined;
     signal?: AbortSignal | null | undefined;
@@ -163,6 +166,7 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
             interrupt: abort,
             verbs: options.sessionVerbs ?? [],
             onSessionLine: options.onSessionLine,
+            echo: options.echo,
         });
     }
 
@@ -173,6 +177,9 @@ export function startMtaServer(options: MtaServerSupervisorOptions): MtaServerSu
     return {
         get state(): MtaServerState {
             return state;
+        },
+        get consoleInput(): ServerConsoleInput | null {
+            return consoleInput;
         },
         logPath,
         writeCommand: (command: string): void => {

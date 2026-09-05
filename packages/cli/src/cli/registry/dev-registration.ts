@@ -53,6 +53,7 @@ export function registerDevCommand(program: Command, runtime: CliRuntime): void 
             runtime.exitCode = await runWorkspaceDevCommand({
                 root: workspace.root,
                 resources: workspace.resources,
+                logger: runtime.logger,
                 reporter: runtime.reporter,
                 deployment: { serverRoot: deployment.serverRoot, resourcesDir: deployment.resourcesDir, executable: deployment.executable, logs: deployment.logs },
                 loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name, options).context,
