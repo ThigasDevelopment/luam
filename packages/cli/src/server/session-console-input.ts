@@ -31,6 +31,10 @@ const BACKSPACE = '\u007f';
 
 const ALTERNATE_BACKSPACE = '\u0008';
 
+const ERASE_LINE = '\u001b[2K';
+
+const MOVE_UP = '\u001b[1A';
+
 export function splitSessionLine(line: string): SessionLine {
     const [verb = '', ...args] = line.trim().split(/\s+/);
 
@@ -50,12 +54,17 @@ export function connectSessionConsoleInput(input: TerminalInput, output: Writabl
         input.setRawMode?.(true);
     }
 
+    const wrappedRows = (): number => {
+        const columns = (echo as NodeJS.WriteStream | null)?.columns ?? 0;
+
+        return columns > 0 ? Math.floor(Math.max(0, buffer.length - 1) / columns) : 0;
+    };
     const erase = (): void => {
         if (echo === null || buffer.length === 0) {
             return;
         }
 
-        echo.write(`\r${' '.repeat(buffer.length)}\r`);
+        echo.write(`\r${ERASE_LINE}${`${MOVE_UP}${ERASE_LINE}`.repeat(wrappedRows())}`);
     };
     const redraw = (): void => {
         if (echo === null || buffer.length === 0) {

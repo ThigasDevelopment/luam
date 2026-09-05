@@ -9,6 +9,13 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.10 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records that the session redraws a typed line of any
+  length, including one that wraps past the width of the terminal.
+
 ## 1.0.9 - 2026-09-04
 
 ### Changed
