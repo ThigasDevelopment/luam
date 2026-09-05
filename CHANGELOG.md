@@ -14,6 +14,34 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.7 - 2026-09-04
+
+### Changed
+
+- A command that owns an MTA server checks the ports the installation asks for
+  before it starts one. The ports come from that installation's
+  "mtaserver.conf", and on Linux the process holding one is named along with the
+  "kill" that frees it — in place of starting a server that exits with code 3 and
+  reporting only the code. A server left behind by an earlier run is the usual
+  cause, and the message says so.
+- The server log follower reads a log that is created after it starts from its
+  first line rather than skipping to the end, and no longer replays an existing
+  log from the beginning when the file is missing at the moment it starts. The
+  replay let a "Server started" line from an earlier run satisfy the readiness
+  wait of the next one.
+- "ensure" in a session starts the resource it attaches even when the sync wrote
+  nothing, so a resource already mirrored into the server by an earlier run is
+  started rather than left stopped until the next edit. The "changed nothing,
+  restart nothing" rule now applies only to a resource the session has already
+  started.
+- A session starts and restarts a resource under the name it deployed as — the
+  manifest's "name" — rather than the name of the directory it was attached
+  from. The two are the same in most projects; where they differ, MTA loaded one
+  name and the console was told the other, so nothing ever started. Log records
+  are attributed by the deployed name for the same reason.
+- Rebuild separators and development log records are stamped in local time
+  rather than UTC, so their clock matches the one the MTA console prints.
+
 ## 1.0.6 - 2026-09-04
 
 ### Changed
@@ -60,33 +88,9 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   another's scope, checks one resource under another's compiler options, or
   resolves a file's side against the wrong root. A file with no manifest above it
   keeps the default settings.
-- A command that owns an MTA server checks the ports the installation asks for
-  before it starts one. The ports come from that installation's
-  "mtaserver.conf", and on Linux the process holding one is named along with the
-  "kill" that frees it — in place of starting a server that exits with code 3 and
-  reporting only the code. A server left behind by an earlier run is the usual
-  cause, and the message says so.
-- The server log follower reads a log that is created after it starts from its
-  first line rather than skipping to the end, and no longer replays an existing
-  log from the beginning when the file is missing at the moment it starts. The
-  replay let a "Server started" line from an earlier run satisfy the readiness
-  wait of the next one.
-- "ensure" in a session starts the resource it attaches even when the sync wrote
-  nothing, so a resource already mirrored into the server by an earlier run is
-  started rather than left stopped until the next edit. The "changed nothing,
-  restart nothing" rule now applies only to a resource the session has already
-  started.
-- A session starts and restarts a resource under the name it deployed as — the
-  manifest's "name" — rather than the name of the directory it was attached
-  from. The two are the same in most projects; where they differ, MTA loaded one
-  name and the console was told the other, so nothing ever started. Log records
-  are attributed by the deployed name for the same reason.
-- Rebuild separators and development log records are stamped in local time
-  rather than UTC, so their clock matches the one the MTA console prints.
 - Session output erases the line being typed before it writes and redraws it
   after, so a log record arriving mid-word no longer wipes what is on screen.
   Without it a chatty server left only the letters typed since the last record.
-
 
 - The owned MTA console reads lines rather than bytes. It buffers to the newline,
   echoes what is typed, handles backspace, and erases a forwarded line so MTA's

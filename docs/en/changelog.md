@@ -9,6 +9,13 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.7 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records that a command owning an MTA server refuses to
+  start one whose ports are already taken, and names the process holding them.
+
 ## 1.0.6 - 2026-09-04
 
 ### Changed

@@ -11,6 +11,13 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.7 - 2026-09-04
+
+### Alterado
+
+- [CLI](/pt-br/tooling/cli) registra que um comando dono de um servidor MTA se
+  recusa a subir um cujas portas já estão ocupadas, e nomeia quem as segura.
+
 ## 1.0.6 - 2026-09-04
 
 ### Alterado
