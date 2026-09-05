@@ -11,6 +11,13 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.10 - 2026-09-04
+
+### Alterado
+
+- [CLI](/pt-br/tooling/cli) registra que a sessão redesenha uma linha digitada de
+  qualquer tamanho, inclusive a que quebra além da largura do terminal.
+
 ## 1.0.9 - 2026-09-04
 
 ### Alterado

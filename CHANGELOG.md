@@ -14,6 +14,16 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.10 - 2026-09-04
+
+### Changed
+
+- The session erases the line it redraws with the sequence the terminal has for
+  it, walking up one row per wrap. It wrote a space per character and a carriage
+  return, which only reaches the start of the row the cursor is on, so a command
+  longer than the terminal left fragments on screen and a prompt that no longer
+  matched what was buffered.
+
 ## 1.0.9 - 2026-09-04
 
 ### Changed
