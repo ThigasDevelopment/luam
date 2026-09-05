@@ -179,7 +179,7 @@ describe('ensure command', () => {
         expect(await runEnsureCommand(context, { watch: true, signal: null })).toBe(EXIT_DIAGNOSTICS);
         expect(fixture.exists('build')).toBe(false);
         expect(serverConsole.calls).toEqual([]);
-        expect(logger.errors).toContain('luam ensure requires "serverPath" in .luam.manifest.');
+        expect(logger.errors.join('\n')).toContain('luam ensure requires "serverPath" in ".luam.manifest"');
     });
 
     it('rebuilds and restarts through an owned server console when a watched source changes', async () => {

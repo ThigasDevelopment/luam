@@ -2,8 +2,7 @@ import { accessSync, constants, realpathSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve } from 'node:path';
 
 export interface ServerExecutableOptions {
-    root: string;
-    serverPath: string;
+    serverRoot: string;
     configured: string | null;
     platform?: NodeJS.Platform | undefined;
 }
@@ -42,7 +41,7 @@ function candidates(platform: NodeJS.Platform): readonly string[] {
 }
 
 export function resolveServerExecutable(options: ServerExecutableOptions): ResolvedServerExecutable {
-    const serverRoot = resolve(options.root, options.serverPath);
+    const serverRoot = resolve(options.serverRoot);
     const platform = options.platform ?? process.platform;
     const names = options.configured === null ? candidates(platform) : [options.configured];
     const attempted: string[] = [];

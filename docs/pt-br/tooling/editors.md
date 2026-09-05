@@ -93,15 +93,23 @@ code --extensionDevelopmentPath=packages/vscode
 ## Ativação
 
 A extensão ativa quando o workspace contém um `.luam.manifest`, um
-[`.luam.formatter`](/pt-br/reference/formatter-file) ou qualquer arquivo `.luam`,
-então **abra a pasta do seu resource como raiz do workspace**. Ela observa
-`**/*.luam`, `.luam.manifest`, `.luam.formatter` e `.env*`, então arquivos
-alterados fora do editor também chegam ao servidor.
+[`.luam.formatter`](/pt-br/reference/formatter-file), um
+[`.luam.server`](/pt-br/reference/server-file) ou qualquer arquivo `.luam`, então
+**abra a pasta do seu resource — ou a pasta de resources acima dela — como raiz
+do workspace**. Ela observa `**/*.luam`, `.luam.manifest`, `.luam.formatter`,
+`.luam.server` e `.env*`, então arquivos alterados fora do editor também chegam
+ao servidor.
 
-Cada um dos três tem ícone de arquivo e linguagem próprios: os fontes `.luam`, o
-manifesto e o arquivo do formatador. O manifesto e o arquivo do formatador
-compartilham o mesmo dialeto e o mesmo destaque; são linguagens separadas para que
-a árvore de arquivos os distinga de relance.
+Cada um dos quatro tem ícone de arquivo e linguagem próprios: os fontes `.luam`,
+o manifesto, o arquivo do formatador e o arquivo do servidor. Os três arquivos de
+configuração compartilham o mesmo dialeto e o mesmo destaque; são linguagens
+separadas para que a árvore de arquivos os distinga de relance, e o hover, a
+completude e os diagnósticos de cada um nomeiam os campos dele.
+
+Abrir uma pasta com vários resources é suportado: cada arquivo é analisado contra
+o `.luam.manifest` **mais próximo**, então as declarações de um resource nunca são
+oferecidas em outro e uma opção de `compiler` definida em um não verifica o
+outro.
 
 ## Comandos
 

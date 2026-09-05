@@ -119,14 +119,20 @@ gets a generated `env.lua` instead.
 
 ## Server sync
 
+**Superseded by [`.luam.server`](/en/reference/server-file).** These fields still
+work, and behave exactly as they always have when no `.luam.server` is found
+above the project. When one is, its values win and the manifest reports
+`config-deployment-moved` once.
+
 | Field | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `serverPath` | `string?` | no | unset | MTA server root. Required by `ensure` and `dev`. |
+| `serverPath` | `string?` | no | unset | MTA server root. Required by `ensure` and `dev` unless a `.luam.server` names one. |
 | `resourcesDir` | `string` | no | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
 
 ## Development logs
 
-Used by `luam dev` only.
+Used by `luam dev` only. A [`.luam.server`](/en/reference/server-file) supplies
+the default for a whole workspace; a manifest value overrides it silently.
 
 | Field | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
@@ -137,9 +143,27 @@ Used by `luam dev` only.
 
 ## Development server
 
+**Superseded by [`.luam.server`](/en/reference/server-file)**, on the same terms
+as `serverPath` above.
+
 | Field | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `development.server.executable` | `string?` | no | platform probe | Executable relative to and contained by `serverPath`. Used only by `server` and `dev --start-server`. |
+
+## The workspace file
+
+A directory of resources names its shared MTA installation once in
+[`.luam.server`](/en/reference/server-file):
+
+| Field | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `serverPath` | `string` | **yes** | — | MTA server root, resolved against the directory holding the file. |
+| `resourcesDir` | `string` | no | `'mods/deathmatch/resources'` | Resource directory relative to `serverPath`. |
+| `executable` | `string?` | no | platform probe | Executable relative to and contained by `serverPath`. |
+| `logs.enabled` | `boolean` | no | `false` | Whether the session streams logs. |
+| `logs.maxMessageLength` | `number` | no | `4096` | Longer relayed records are rejected. |
+| `logs.rateLimit` | `number` | no | `30` | Records allowed per client per window. |
+| `logs.rateWindowMs` | `number` | no | `1000` | Length of that window, in milliseconds. |
 
 ## Removed fields
 

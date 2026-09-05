@@ -243,6 +243,23 @@ erro não escreve nada.
 | `config-invalid-engine-version` | `engine.minVersion` não é `'latest'` nem uma versão. |
 | `config-missing-env-file` | Um arquivo configurado em `environment` não existe. |
 | `config-unknown-helper` | `helpers` nomeia um helper inexistente. |
+| `config-deployment-moved` | O manifesto define `serverPath`, `resourcesDir` ou `development.server` sob um [`.luam.server`](/pt-br/reference/server-file), que responde por eles no diretório inteiro e vence. É um aviso, reportado uma vez e nomeando todos os campos sobrescritos. Apague as linhas. `compiler.warningsAsErrors` promove a erro. |
+
+## Arquivo do servidor
+
+Reportados para o [`.luam.server`](/pt-br/reference/server-file). Qualquer um
+deles interrompe o comando: `luam dev`, `luam ensure` e `luam server` saem com
+`2` na raiz do workspace e não fazem nada, porque um workspace cujo arquivo não é
+lido não é um workspace.
+
+| Código | Significado |
+| --- | --- |
+| `server-unknown-field` | Um nome que a tabela de campos do servidor não define. A mensagem lista os campos que existem. |
+| `server-invalid-value` | Um valor fora do tipo do campo, ou um caminho que sai do limite dele — um `resourcesDir` fora de `serverPath`, um `executable` fora dele. |
+| `server-parse-error` | O arquivo não é lido como o dialeto de manifesto. |
+
+Um `serverPath` ausente reporta `config-missing-field`, com uma mensagem que
+nomeia o `.luam.server` em vez de um manifesto.
 
 ## Arquivo do formatador
 

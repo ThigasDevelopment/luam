@@ -14,6 +14,7 @@ actually accepts.
 | [Diagnostics](/en/reference/diagnostics) | Every diagnostic code, grouped by the stage that produces it. |
 | [Formatting](/en/reference/formatting) | The style the language server writes, and what it never touches. |
 | [Formatter file](/en/reference/formatter-file) | The `.luam.formatter` fields, their defaults, and which file applies. |
+| [Server file](/en/reference/server-file) | The `.luam.server` fields, what makes a directory a workspace, and precedence over the manifest. |
 | [Limitations](/en/reference/limitations) | What the compiler deliberately does not do. |
 | [Compatibility](/en/reference/compatibility) | Lua 5.1, MTA, Node.js, and editor support. |
 
@@ -36,3 +37,4 @@ The prefix names the stage that rejected the file:
 | `project-` | Assembling the resource from several modules. |
 | `build-` | Discovering sources and reading files. |
 | `config-` | Loading `.luam.manifest`. |
+| `server-` | Loading `.luam.server`. |

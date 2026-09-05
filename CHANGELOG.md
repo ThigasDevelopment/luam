@@ -14,10 +14,48 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.5 - 2026-09-04
+
+### Added
+
+- `.luam.server`: a directory of resources names the MTA installation it shares
+  once, in a file written in the manifest dialect. It is found by walking up to
+  the nearest one, its `serverPath` resolves against its own directory, and a
+  workspace's resources are the direct children that hold a `.luam.manifest`.
+- `luam dev` at a workspace root opens a **session**: one MTA server for the
+  whole directory, readiness, the log stream, and no resource attached until one
+  is named. `ensure <resource>` builds, syncs, starts and watches it; `drop`
+  takes it off the watch and leaves the server alone; `rebuild` forces a cycle;
+  `list` reports each attached resource; `help` names the verbs. Every other line
+  reaches the MTA console unchanged, and a leading space forwards a line even
+  when its first word is a verb.
+- `luam server` and `luam ensure <resource>` run at a workspace root, in a
+  directory that holds no `.luam.manifest` at all.
+- `.luam.server` is a language in the editor: its own id, icon and grammar, with
+  hover, completion and diagnostics driven by its field table.
+- `server-parse-error`, `server-unknown-field` and `server-invalid-value` report
+  a workspace file that does not parse, names a field that does not exist, or
+  carries a value outside its type or boundary.
+
 ## 1.0.4 - 2026-09-04
 
 ### Changed
 
+- The deployment fields in `.luam.manifest` — `serverPath`, `resourcesDir` and
+  `development.server` — lose to a `.luam.server` above them and report
+  `config-deployment-moved` once, naming every overridden field and the file that
+  won. `development.logs` takes the workspace value as its default and a manifest
+  value still overrides it. A project with no `.luam.server` behaves exactly as it
+  did before.
+- The language server analyses each file against its **nearest** manifest.
+  Opening a folder of resources no longer leaks one resource's declarations into
+  another's scope, checks one resource under another's compiler options, or
+  resolves a file's side against the wrong root. A file with no manifest above it
+  keeps the default settings.
+- The owned MTA console reads lines rather than bytes. It buffers to the newline,
+  echoes what is typed, handles backspace, and erases a forwarded line so MTA's
+  own echo is the single record of it. `Ctrl+C` still interrupts mid-line and
+  forwards nothing.
 - `luam server` and `luam dev --start-server` skip a Linux server executable that
   is present without the execute permission and fall through to the next
   candidate. When nothing else resolves, the error names the file and the

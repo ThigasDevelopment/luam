@@ -1,16 +1,12 @@
 import type { Diagnostic } from '@compiler/diagnostics/diagnostic';
 import { hasErrors } from '@compiler/diagnostics/diagnostic';
+import { findConfigFile, type ConfigFileSystem } from '@compiler/project/config-file-system';
 
 import { DEFAULT_FORMAT_OPTIONS, type FormatOptions } from './format-options';
 import { analyzeFormatterFile, formatterFileError } from './formatter-file';
 import { FORMATTER_FILE_NAME } from './formatter-fields';
 
-export interface FormatterFileSystem {
-    exists(path: string): boolean;
-    read(path: string): string;
-    join(directory: string, name: string): string;
-    parent(directory: string): string;
-}
+export type FormatterFileSystem = ConfigFileSystem;
 
 export interface ResolvedFormatOptions {
     path: string | null;
@@ -19,36 +15,10 @@ export interface ResolvedFormatOptions {
     valid: boolean;
 }
 
-const LIBRARY_DIRECTORY = 'node_modules';
-
 export const DEFAULT_FORMATTER_OPTIONS: ResolvedFormatOptions = { path: null, options: DEFAULT_FORMAT_OPTIONS, diagnostics: [], valid: true };
 
-function insideLibrary(directory: string): boolean {
-    return directory.split(/[\\/]/).includes(LIBRARY_DIRECTORY);
-}
-
 export function findFormatterFile(files: FormatterFileSystem, start: string): string | null {
-    let directory = start;
-
-    for (;;) {
-        if (insideLibrary(directory)) {
-            return null;
-        }
-
-        const candidate = files.join(directory, FORMATTER_FILE_NAME);
-
-        if (files.exists(candidate)) {
-            return candidate;
-        }
-
-        const parent = files.parent(directory);
-
-        if (parent === directory) {
-            return null;
-        }
-
-        directory = parent;
-    }
+    return findConfigFile(files, start, FORMATTER_FILE_NAME);
 }
 
 export function readFormatterFile(files: FormatterFileSystem, path: string, root: string): ResolvedFormatOptions {

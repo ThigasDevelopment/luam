@@ -1,7 +1,6 @@
 import { dirname } from 'node:path';
 
 import { mergeAmbient, type AmbientDeclarations } from '@compiler/checker/ambient';
-import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 import { TEST_DECLARATIONS } from '@compiler/checker/test-declarations';
 import { canReference, type Environment } from '@compiler/environment/environment';
 import { fingerprintDeclarations } from '@compiler/project/fingerprint';
@@ -10,10 +9,18 @@ import { isTestPath } from '@compiler/project/source-kind';
 import { analyzeDocument, type DocumentAnalysis } from '@lsp/analysis/document-analysis';
 
 import { declaredNames, dependentsOf } from './analysis-graph';
-import { pathKey, pathToUri, relativeToRoots, uriToPath } from './document-uri';
-import { forgetEnvironments, isEnvironmentPath, loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
-import { EMPTY_LIBRARY_INDEX, loadLibraries, type LibraryIndex } from './library-index';
-import { DEFAULT_PROJECT_SETTINGS, settingsFrom, settingsKey, type ProjectSettings } from './project-settings';
+import { normalizeFsPath, pathKey, pathToUri, relativeToRoots, uriToPath } from './document-uri';
+import { forgetEnvironments, isEnvironmentPath } from './project-environment';
+import {
+    createDefaultProjectScope,
+    createProjectScope,
+    DEFAULT_PROJECT_KEY,
+    projectKeyOf,
+    scopeOwning,
+    scopeSignature,
+    type ProjectScope,
+} from './project-scope';
+import { settingsFrom } from './project-settings';
 import { scanSources, type ScannedFile } from './source-scanner';
 
 export interface RescanResult {
@@ -24,108 +31,130 @@ export interface RescanResult {
 export class WorkspaceIndex {
     private readonly analyses = new Map<string, DocumentAnalysis>();
 
+    private readonly lastOwners = new Map<string, string>();
+
+    private scopes = new Map<string, ProjectScope>();
+
     private roots: readonly string[] = [];
 
-    private project: ProjectDeclarations = EMPTY_PROJECT_DECLARATIONS;
+    private defaultScope: ProjectScope = createDefaultProjectScope([]);
 
-    private env: Readonly<Record<string, string>> = {};
+    private scopeFor(path: string): ProjectScope {
+        return scopeOwning(this.scopes.values(), path, this.defaultScope);
+    }
 
-    private settings: ProjectSettings = DEFAULT_PROJECT_SETTINGS;
+    private ownerOf(analysis: DocumentAnalysis): string {
+        return this.scopeFor(analysis.path).key;
+    }
 
-    private libraries: LibraryIndex = EMPTY_LIBRARY_INDEX;
-
-    private key = '';
-
-    private ambientFor(uri: string, environment: Environment, isLibrary: boolean): AmbientDeclarations {
+    private ambientFor(uri: string, environment: Environment, scope: ProjectScope, isLibrary: boolean): AmbientDeclarations {
         const others = this.others(uri).filter((analysis) => canReference(environment, analysis.environment) && !isTestPath(analysis.relative));
-        const visible = isLibrary ? others.filter((analysis) => this.libraries.isLibraryPath(analysis.path)) : others;
+        const visible = isLibrary ? others.filter((analysis) => scope.libraries.isLibraryPath(analysis.path)) : others;
 
         return mergeAmbient(visible.map((analysis) => analysis.own));
     }
 
     private run(uri: string, version: number, text: string): DocumentAnalysis {
         const path = uriToPath(uri);
-        const library = this.libraries.fileFor(path);
-        const relative = library === null ? relativeToRoots(path, this.roots) : library.relative;
+        const scope = this.scopeFor(path);
+        const library = scope.libraries.fileFor(path);
+        const relative = library === null ? relativeToRoots(path, scope.roots) : library.relative;
         const analysis = analyzeDocument({
             uri,
             path,
             relative,
             version,
             text,
-            project: isTestPath(relative) ? { globals: [...this.project.globals, ...TEST_DECLARATIONS] } : this.project,
-            env: this.env,
-            compilerOptions: this.settings.compilerOptions,
-            environment: library === null ? this.settings.resolver.side(relative) : library.environment,
+            project: isTestPath(relative) ? { globals: [...scope.project.globals, ...TEST_DECLARATIONS] } : scope.project,
+            env: scope.env,
+            compilerOptions: scope.settings.compilerOptions,
+            environment: library === null ? scope.settings.resolver.side(relative) : library.environment,
             environmentLocked: library !== null,
-            ambient: (environment) => this.ambientFor(uri, environment, library !== null),
+            ambient: (environment) => this.ambientFor(uri, environment, scope, library !== null),
         });
 
         this.analyses.set(pathKey(path), analysis);
+        this.lastOwners.set(pathKey(path), scope.key);
 
         return analysis;
     }
 
-    private manifest(): DocumentAnalysis | null {
-        return this.all().find((analysis) => analysis.manifest !== null) ?? null;
-    }
+    private manifests(): Map<string, DocumentAnalysis> {
+        const found = new Map<string, DocumentAnalysis>();
 
-    private environmentRoots(): string[] {
-        const manifest = this.manifest();
-
-        return manifest === null ? [...this.roots] : [dirname(manifest.path), ...this.roots];
-    }
-
-    private loadEnvironment(): void {
-        const roots = this.environmentRoots();
-
-        this.project = loadProjectDeclarations(roots, this.settings.environment);
-        this.env = loadProjectEnvironment(roots, this.settings.environment);
-    }
-
-    private applySettings(): boolean {
-        const settings = settingsFrom(this.manifest()?.manifest ?? null);
-        const key = `${settingsKey(settings)}|${this.environmentRoots().join(',')}`;
-
-        if (key === this.key) {
-            return false;
+        for (const analysis of this.all()) {
+            if (analysis.manifest !== null) {
+                found.set(projectKeyOf(analysis.path), analysis);
+            }
         }
 
-        this.settings = settings;
-        this.key = key;
-        this.libraries = this.loadLibraryIndex();
-        this.loadEnvironment();
-
-        return true;
+        return found;
     }
 
-    private loadLibraryIndex(): LibraryIndex {
-        const manifest = this.manifest();
+    private applySettings(): Set<string> {
+        const changed = new Set<string>();
+        const next = new Map<string, ProjectScope>();
 
-        if (manifest === null || this.settings.libraries.length === 0) {
-            return EMPTY_LIBRARY_INDEX;
+        for (const [key, analysis] of this.manifests()) {
+            const settings = settingsFrom(analysis.manifest);
+            const roots = [normalizeFsPath(dirname(analysis.path))];
+            const existing = this.scopes.get(key);
+
+            if (existing !== undefined && existing.signature === scopeSignature(settings, roots)) {
+                next.set(key, existing);
+
+                continue;
+            }
+
+            next.set(key, createProjectScope(key, roots, settings));
+            changed.add(key);
         }
 
-        return loadLibraries(dirname(manifest.path), this.settings.libraries);
+        for (const key of this.scopes.keys()) {
+            if (!next.has(key) && key !== DEFAULT_PROJECT_KEY) {
+                changed.add(key);
+            }
+        }
+
+        if (this.defaultScope.signature !== scopeSignature(this.defaultScope.settings, this.roots)) {
+            this.defaultScope = createDefaultProjectScope(this.roots);
+            changed.add(DEFAULT_PROJECT_KEY);
+        }
+
+        this.scopes = next;
+
+        return changed;
+    }
+
+    private libraryRoots(): string[] {
+        return [...this.scopes.values()].flatMap((scope) => scope.libraries.roots);
+    }
+
+    private isLibraryPath(path: string): boolean {
+        return [...this.scopes.values()].some((scope) => scope.libraries.isLibraryPath(path));
     }
 
     private scanAll(): ScannedFile[] {
         const own = scanSources(this.roots);
-        const libraries = scanSources(this.libraries.roots).filter((file) => this.libraries.isLibraryPath(file.path));
+        const libraries = scanSources(this.libraryRoots()).filter((file) => this.isLibraryPath(file.path));
 
         return [...own, ...libraries];
     }
 
-    private rerunOthers(uri: string): DocumentAnalysis[] {
-        return this.others(uri).map((other) => this.run(other.uri, other.version, other.text));
-    }
-
-    private rerunDependents(names: ReadonlySet<string>, excluded: ReadonlySet<string>): DocumentAnalysis[] {
-        const dependents = dependentsOf(this.all(), names);
+    private rerunAffected(changed: ReadonlySet<string>, uri: string): DocumentAnalysis[] {
+        const excluded = pathKey(uriToPath(uri));
 
         return this.all()
-            .filter((analysis) => analysis.manifest === null && !excluded.has(pathKey(analysis.path)) && dependents.has(pathKey(analysis.path)))
+            .filter((analysis) => analysis.manifest === null && pathKey(analysis.path) !== excluded)
+            .filter((analysis) => changed.has(this.ownerOf(analysis)) || changed.has(this.lastOwners.get(pathKey(analysis.path)) ?? DEFAULT_PROJECT_KEY))
             .map((analysis) => this.run(analysis.uri, analysis.version, analysis.text));
+    }
+
+    private rerunDependents(names: ReadonlySet<string>, excluded: ReadonlySet<string>, scope: string): DocumentAnalysis[] {
+        const inScope = this.all().filter((analysis) => analysis.manifest === null && this.ownerOf(analysis) === scope);
+        const dependents = dependentsOf(inScope, names);
+
+        return inScope.filter((analysis) => !excluded.has(pathKey(analysis.path)) && dependents.has(pathKey(analysis.path))).map((analysis) => this.run(analysis.uri, analysis.version, analysis.text));
     }
 
     private visibleTo(analysis: DocumentAnalysis | null): string {
@@ -139,7 +168,9 @@ export class WorkspaceIndex {
         const analysis = this.run(uri, version, text);
 
         if (analysis.manifest !== null) {
-            return this.applySettings() ? [analysis, ...this.rerunOthers(uri)] : [analysis];
+            const changed = this.applySettings();
+
+            return changed.size === 0 ? [analysis] : [analysis, ...this.rerunAffected(changed, uri)];
         }
 
         if (before === this.visibleTo(analysis)) {
@@ -148,15 +179,18 @@ export class WorkspaceIndex {
 
         const names = new Set([...declared, ...declaredNames(analysis)]);
 
-        return [analysis, ...this.rerunDependents(names, new Set([pathKey(analysis.path)]))];
+        return [analysis, ...this.rerunDependents(names, new Set([pathKey(analysis.path)]), this.ownerOf(analysis))];
     }
 
     isEnvironmentFile(path: string): boolean {
-        return isEnvironmentPath(path, this.settings.environment);
+        return isEnvironmentPath(path, this.scopeFor(path).settings.environment);
     }
 
     remove(uri: string): void {
-        this.analyses.delete(pathKey(uriToPath(uri)));
+        const key = pathKey(uriToPath(uri));
+
+        this.analyses.delete(key);
+        this.lastOwners.delete(key);
     }
 
     refresh(): DocumentAnalysis[] {
@@ -173,34 +207,43 @@ export class WorkspaceIndex {
         const known = this.all().map((analysis) => analysis.uri);
 
         this.analyses.clear();
-        this.key = '';
+        this.lastOwners.clear();
+        this.scopes.clear();
         this.load(this.roots);
 
         return { updated: this.all(), removed: known.filter((uri) => this.get(uri) === null) };
     }
 
     rescan(): RescanResult {
-        if (this.applySettings()) {
+        if (this.applySettings().size > 0) {
             return { updated: this.refresh(), removed: [] };
         }
 
         const scanned = this.scanAll();
         const present = new Set(scanned.map((file) => pathKey(file.path)));
-        const names = new Set<string>();
+        const names = new Map<string, Set<string>>();
         const removed: string[] = [];
         const touched = new Set<string>();
         const updated: DocumentAnalysis[] = [];
+
+        const record = (scope: string, declarations: Iterable<string>): void => {
+            const bucket = names.get(scope) ?? new Set<string>();
+
+            for (const name of declarations) {
+                bucket.add(name);
+            }
+
+            names.set(scope, bucket);
+        };
 
         for (const analysis of this.all()) {
             if (present.has(pathKey(analysis.path))) {
                 continue;
             }
 
-            for (const name of declaredNames(analysis)) {
-                names.add(name);
-            }
-
+            record(this.ownerOf(analysis), declaredNames(analysis));
             this.analyses.delete(pathKey(analysis.path));
+            this.lastOwners.delete(pathKey(analysis.path));
             removed.push(analysis.uri);
         }
 
@@ -211,20 +254,20 @@ export class WorkspaceIndex {
 
             const analysis = this.run(pathToUri(file.path), 0, file.text);
 
-            for (const name of declaredNames(analysis)) {
-                names.add(name);
-            }
-
+            record(this.ownerOf(analysis), declaredNames(analysis));
             touched.add(pathKey(analysis.path));
             updated.push(analysis);
         }
 
-        return { updated: [...updated, ...this.rerunDependents(names, touched)], removed };
+        const dependents = [...names.entries()].flatMap(([scope, declarations]) => this.rerunDependents(declarations, touched, scope));
+
+        return { updated: [...updated, ...dependents], removed };
     }
 
     reloadSettings(): DocumentAnalysis[] {
         forgetEnvironments();
-        this.loadEnvironment();
+        this.scopes.clear();
+        this.defaultScope = createDefaultProjectScope(this.roots);
 
         return this.refresh();
     }
@@ -238,15 +281,18 @@ export class WorkspaceIndex {
     }
 
     others(uri: string): DocumentAnalysis[] {
-        const key = pathKey(uriToPath(uri));
+        const path = uriToPath(uri);
+        const key = pathKey(path);
+        const scope = this.scopeFor(path).key;
 
-        return this.all().filter((analysis) => pathKey(analysis.path) !== key && analysis.manifest === null);
+        return this.all().filter((analysis) => pathKey(analysis.path) !== key && analysis.manifest === null && this.ownerOf(analysis) === scope);
     }
 
     load(roots: readonly string[]): void {
         forgetEnvironments();
         this.roots = roots;
-        this.key = '';
+        this.scopes.clear();
+        this.defaultScope = createDefaultProjectScope(roots);
 
         const loaded: DocumentAnalysis[] = [];
 

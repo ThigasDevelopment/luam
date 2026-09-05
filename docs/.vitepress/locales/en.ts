@@ -95,6 +95,7 @@ export const en: LocaleStrings = {
         'reference/diagnostics': 'Diagnostics',
         'reference/formatting': 'Formatting',
         'reference/formatter-file': 'Formatter file',
+        'reference/server-file': 'Server file',
         'reference/limitations': 'Limitations',
         'reference/compatibility': 'Compatibility',
     },

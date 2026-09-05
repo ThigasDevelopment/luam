@@ -1,6 +1,7 @@
-import { commandReporter, type CommandContext } from '@cli/commands/command-context';
+import { commandDeployment, commandReporter, type CommandContext } from '@cli/commands/command-context';
 import { createEnsureRunner, type EnsureRunner } from '@cli/commands/ensure-runner';
 import type { DevelopmentLogsConfig } from '@cli/config/config-schema';
+import { missingServerPathMessage } from '@cli/config/deployment';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
 import type { ServerConsole } from '@cli/server/server-console';
@@ -59,8 +60,8 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, options:
 }
 
 export async function runEnsureCommand(context: CommandContext, options: EnsureOptions): Promise<number> {
-    if (context.config.serverPath === null) {
-        commandReporter(context).error(`luam ${options.commandName ?? 'ensure'} requires "serverPath" in .luam.manifest.`);
+    if (commandDeployment(context).serverRoot === null) {
+        commandReporter(context).error(missingServerPathMessage(options.commandName ?? 'ensure'));
 
         return EXIT_DIAGNOSTICS;
     }

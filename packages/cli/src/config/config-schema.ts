@@ -1,4 +1,5 @@
 import type { AssetMapping, CompilerOptions, EngineRequirement, EnvironmentFiles, OutputSettings, SourceMapping } from '@compiler/manifest/manifest-contract';
+import { MANIFEST_FILE_NAME } from '@compiler/manifest/manifest-defaults';
 import { isValidResourceName } from '@compiler/manifest/manifest-rules';
 import type { RuntimeHelperName } from '@runtime/helpers';
 
@@ -40,7 +41,7 @@ export interface LuamConfig {
     development: DevelopmentConfig;
 }
 
-export const MANIFEST_FILE_NAME = '.luam.manifest';
+export { MANIFEST_FILE_NAME };
 
 export type { AssetMapping, CompilerOptions, EngineRequirement, EnvironmentFiles, OutputSettings, SourceMapping };
 

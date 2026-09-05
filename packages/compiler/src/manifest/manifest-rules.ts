@@ -198,8 +198,12 @@ export interface NormalizedManifest {
     diagnostics: Diagnostic[];
 }
 
-export function normalizeManifest(value: ManifestObject, positions: PositionLookup): NormalizedManifest {
+export function normalizeFields(fields: readonly ManifestField[], value: ManifestObject, positions: PositionLookup): NormalizedManifest {
     const walk = new RuleWalk(positions);
 
-    return { value: walk.fields(MANIFEST_FIELDS, value, '', ''), diagnostics: walk.diagnostics };
+    return { value: walk.fields(fields, value, '', ''), diagnostics: walk.diagnostics };
+}
+
+export function normalizeManifest(value: ManifestObject, positions: PositionLookup): NormalizedManifest {
+    return normalizeFields(MANIFEST_FIELDS, value, positions);
 }

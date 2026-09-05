@@ -1,0 +1,4 @@
+serverPath = 'mta-server'
+resourcesDir = 'mods/deathmatch/resources'
+executable = 'mta-server64'
+logs = { enabled = true, maxMessageLength = 512, rateLimit = 30, rateWindowMs = 1000 }

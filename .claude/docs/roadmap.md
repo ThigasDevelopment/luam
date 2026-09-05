@@ -3335,3 +3335,115 @@ Deliberately excluded:
   real tree and every one is correct, including the `assets/*` and
   `assets/**/*` difference an author is most likely to guess wrong. The fix is
   a diagnostic and a documented table, not a new matcher.
+
+## Milestone 50 — A Workspace of Resources, One Server, One Session
+
+A developer working on two resources at once has no supported arrangement. An
+MTA installation binds port 22003, so the second `luam dev --start-server`
+refuses to start, and the fallback — `luam ensure` in each resource directory —
+syncs files into a console neither invocation owns and restarts nothing. Every
+manifest that deploys into that installation also repeats `serverPath`, so
+moving the server means editing all of them, and two manifests that disagree
+sync into two places with no diagnostic.
+
+This milestone makes the directory the unit and the terminal the interface. A
+`.luam.server` file at the root of a resources folder describes the installation
+once; each resource keeps its own `.luam.manifest` and stops describing the
+server. `luam dev` run at that root starts one server, attaches nothing, and
+opens a session on the console it owns. From inside that session the developer
+types `ensure resource-a` to hang a resource on the watch, `drop` to take it off,
+`rebuild` to force a cycle and `list` to see what is attached — the set of
+resources under development is discovered at the speed the work changes and is
+never written down anywhere. Every line that is not a session verb still reaches
+the MTA console unchanged.
+
+Two things stand in the way and are settled here. The console input layer is a
+byte pipe that forwards raw stdin to the server process and intercepts only
+`Ctrl+C`; a session that reads commands has to own the line buffer, the echo and
+the erase. And the language server picks one manifest for a whole workspace and
+merges every resource's declarations into every other's ambient scope — latent
+today, the default experience the moment a directory of resources is the blessed
+layout.
+
+Status: done
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 50.01 | Add the `.luam.server` file and its schema | ../plans/50.01-luam-server-file.md | architecture-engineer | done |
+| 50.02 | Give the CLI a workspace context | ../plans/50.02-workspace-context.md | architecture-engineer | done |
+| 50.03 | Deprecate the deployment fields in the resource manifest | ../plans/50.03-deprecate-manifest-deployment.md | architecture-engineer | done |
+| 50.04 | Split the owned console into session commands and server input | ../plans/50.04-session-console-input.md | architecture-engineer | done |
+| 50.05 | Open a workspace session with `luam dev` | ../plans/50.05-workspace-session.md | architecture-engineer | done |
+| 50.06 | Attach and detach resources from the session | ../plans/50.06-attach-resources.md | architecture-engineer | done |
+| 50.07 | Scope the language server to the nearest manifest | ../plans/50.07-scope-the-language-server.md | architecture-engineer | done |
+| 50.08 | Give `.luam.server` its editor surfaces | ../plans/50.08-server-file-editor-surfaces.md | architecture-engineer | done |
+| 50.09 | Cover the workspace and the session in the tests | ../plans/50.09-workspace-tests.md | test-engineer | done |
+| 50.10 | Document the workspace and the session | ../plans/50.10-workspace-documentation.md | documentation-engineer | done |
+
+Acceptance:
+
+- A directory holding `.luam.server` and two resource subdirectories is a
+  workspace. `luam dev` run there starts exactly one MTA server, waits for
+  readiness, streams the log, and reports that no resource is attached. Nothing
+  is compiled and nothing is watched until a resource is attached.
+- `ensure resource-a` typed into that session builds the resource, syncs it into
+  `<serverPath>/<resourcesDir>/resource-a`, starts it through the owned console,
+  and rebuilds and restarts it on every save. `ensure resource-b` adds a second
+  without disturbing the first, and a build that fails syncs nothing and leaves
+  the running resource in place.
+- `drop resource-a` stops watching and syncing it and leaves what is on the
+  server alone. `rebuild` forces a cycle for one resource or all attached ones,
+  `list` reports each attached resource with the outcome and age of its last
+  build, and `help` names the verbs.
+- A line whose first word is not a session verb reaches the MTA console
+  unchanged, and a line that begins with a space is forwarded verbatim even when
+  its first word is a verb. `Ctrl+C` still shuts the server down as it does
+  today.
+- `luam ensure` inside a resource directory behaves exactly as it does today, and
+  finds the server through the upward walk when a `.luam.server` sits above it.
+  `luam ensure resource-a` at a workspace root runs the same cycle once, with no
+  session, for an editor task or a deploy script.
+- `luam server` runs from a workspace root that holds no `.luam.manifest`.
+- A manifest that still sets `serverPath`, `resourcesDir` or `development.server`
+  under a workspace warns `config-deployment-moved` once, naming the file to move
+  the line into, and the workspace value is the one used. With no `.luam.server`
+  above it, those fields behave exactly as they did before this milestone.
+- `.luam.server` is a first-class file in the editor: its own language id, icon
+  and grammar, hover and completion driven by its field table, and diagnostics
+  that name it rather than the manifest.
+- Opening a workspace root in the editor analyses each resource against its own
+  manifest. `resource-a` no longer sees `resource-b`'s declarations, and a
+  `compiler` option set in one manifest does not check the other.
+
+Why now:
+
+- The failure is structural. One port means one server, and the toolchain has no
+  way to express "these resources share it". Every workaround a developer can
+  reach — two terminals, manual `refresh`, a duplicated `serverPath` — is one the
+  documentation already has to apologise for.
+- The parsing machinery exists. `analyzeManifest` takes a schema, `.luam.formatter`
+  proves a second manifest-dialect file costs a field table and a discovery walk,
+  and `findFormatterFile` is the walk this file needs.
+- The editor is already wrong in the layout this milestone blesses. Shipping the
+  folder shape without 50.07 would turn a latent defect into the default
+  experience.
+
+Deliberately excluded:
+
+- Removing `serverPath` from the manifest. The fields keep working under a
+  deprecation warning and join `REMOVED_FIELDS` in a future major, where a
+  breaking change belongs.
+- Nested workspaces and recursive discovery. A workspace's resources are its
+  direct children, one level.
+- Describing two installations in one file. Two servers are two ports and two
+  resource trees; that is two workspace directories.
+- A session verb for anything the MTA console already does. `refresh`, `start`
+  and `stop` reach the server unchanged; the session adds only what the CLI can
+  answer and the server cannot.
+- A workspace-level `luam build`. Producing a release artifact for a directory of
+  resources is a packaging question this milestone does not answer.
+- Cross-resource start ordering. `dependencies` already names other resources for
+  `meta.xml`; ordering a workspace's starts is a separate problem.
+- Line editing beyond a buffer, an echo and an erase. No history, no completion,
+  no cursor movement inside the line — a session prompt that grows into a shell
+  is a shell nobody asked for.

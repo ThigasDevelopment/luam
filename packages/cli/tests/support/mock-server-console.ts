@@ -18,6 +18,11 @@ export function createMockServerConsole(): MockServerConsole {
 
             return result('refresh');
         },
+        start: (resource: string): ServerConsoleResult => {
+            calls.push(`start:${resource}`);
+
+            return result('start');
+        },
         restart: (resource: string): ServerConsoleResult => {
             calls.push(`restart:${resource}`);
 

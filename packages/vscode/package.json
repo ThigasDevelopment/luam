@@ -3,7 +3,7 @@
     "displayName": "Luam",
     "icon": "icon.png",
     "description": "Language support for Luam, a typed Lua that compiles to Multi Theft Auto resources.",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "private": true,
     "type": "module",
     "main": "./dist/extension.cjs",
@@ -34,7 +34,8 @@
     "activationEvents": [
         "workspaceContains:**/*.luam",
         "workspaceContains:.luam.manifest",
-        "workspaceContains:.luam.formatter"
+        "workspaceContains:.luam.formatter",
+        "workspaceContains:.luam.server"
     ],
     "contributes": {
         "languages": [
@@ -86,6 +87,23 @@
                     "light": "./icons/luam-formatter-light.svg",
                     "dark": "./icons/luam-formatter-dark.svg"
                 }
+            },
+            {
+                "id": "luam-server",
+                "aliases": [
+                    "Luam Server"
+                ],
+                "filenames": [
+                    ".luam.server"
+                ],
+                "extensions": [
+                    ".luam.server"
+                ],
+                "configuration": "./manifest-language-configuration.json",
+                "icon": {
+                    "light": "./icons/luam-server-light.svg",
+                    "dark": "./icons/luam-server-dark.svg"
+                }
             }
         ],
         "grammars": [
@@ -103,6 +121,11 @@
                 "language": "luam-formatter",
                 "scopeName": "source.luam-formatter",
                 "path": "./syntaxes/luam-formatter.tmLanguage.json"
+            },
+            {
+                "language": "luam-server",
+                "scopeName": "source.luam-server",
+                "path": "./syntaxes/luam-server.tmLanguage.json"
             }
         ],
         "commands": [

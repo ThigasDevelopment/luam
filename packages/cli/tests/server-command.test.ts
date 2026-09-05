@@ -1,8 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { resolve } from 'node:path';
 
-import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
+import { EXIT_OK } from '@cli/cli/exit-codes';
 import { runServerCommand } from '@cli/commands/server-command';
+import { manifestDeployment } from '@cli/config/deployment';
 import { loadManifest } from '@cli/config/manifest-loader';
+import { createReporter } from '@cli/reporting/reporter';
+import { serverTarget } from '@cli/server/mta-server-supervisor';
 
 import { FakeProcessService } from './support/fake-process-service';
 import { createMemoryLogger } from './support/memory-logger';
@@ -20,7 +24,12 @@ function harness(serverPath?: string) {
 
     fixtures.push(fixture);
 
-    return { fixture, context: { root: fixture.root, config, logger: createMemoryLogger() }, service: new FakeProcessService() };
+    return {
+        fixture,
+        deployment: manifestDeployment(fixture.root, config),
+        reporter: createReporter(createMemoryLogger()),
+        service: new FakeProcessService(),
+    };
 }
 
 afterEach(() => {
@@ -36,7 +45,15 @@ describe('server command', () => {
 
         test.fixture.executable(`server/${executable}`, 'binary');
 
-        const running = runServerCommand(test.context, { processService: test.service, env: {}, signal: null });
+        const target = serverTarget(test.deployment);
+
+        expect(target).not.toBeNull();
+
+        const running = runServerCommand(target ?? { serverRoot: '', executable: null }, test.reporter, {
+            processService: test.service,
+            env: {},
+            signal: null,
+        });
 
         test.fixture.write('server/mods/deathmatch/logs/server.log', 'Server started!\n');
         setTimeout(() => test.service.exit(0), 200);
@@ -45,10 +62,17 @@ describe('server command', () => {
         expect(test.service.calls[0]?.options.interactive).toBe(true);
     });
 
-    it('reports a missing serverPath without spawning', async () => {
+    it('has no server to run when the manifest names no serverPath', () => {
         const test = harness();
 
-        expect(await runServerCommand(test.context, { processService: test.service, env: {}, signal: null })).toBe(EXIT_DIAGNOSTICS);
+        expect(test.deployment.serverRoot).toBeNull();
+        expect(serverTarget(test.deployment)).toBeNull();
         expect(test.service.calls).toEqual([]);
+    });
+
+    it('resolves the server root against the project directory', () => {
+        const test = harness('server');
+
+        expect(serverTarget(test.deployment)?.serverRoot).toBe(resolve(test.fixture.root, 'server'));
     });
 });

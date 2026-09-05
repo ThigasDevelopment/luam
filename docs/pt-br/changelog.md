@@ -11,10 +11,34 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.5 - 2026-09-04
+
+### Adicionado
+
+- [Arquivo do servidor](/pt-br/reference/server-file): uma nova página de
+  referência para o `.luam.server` — cada campo com seu tipo e padrão, qual
+  arquivo vale, o que torna um filho um resource, e a tabela de precedência
+  contra o manifesto.
+- [CLI](/pt-br/tooling/cli) documenta a sessão do workspace sob o `luam dev`: os
+  cinco verbos, o escape do espaço à esquerda, e por que `--start-server` é um
+  erro de uso ali. O `luam ensure` ganha a forma de workspace e o `luam server` a
+  forma sem manifesto.
+- [Estrutura do projeto](/pt-br/guide/project-layout) descreve a forma do
+  workspace — um `.luam.server` ao lado de um resource por diretório, um nível.
+
 ## 1.0.4 - 2026-09-04
 
 ### Alterado
 
+- [Desenvolvimento diário](/pt-br/guide/daily-development) descreve os dois
+  arranjos e diz qual é qual: `dev --start-server` para um resource, a sessão do
+  workspace para uma pasta deles.
+- [Campos de configuração](/pt-br/reference/configuration-fields) marca
+  `serverPath`, `resourcesDir` e `development.server` como substituídos pelo
+  arquivo do servidor, e lista os campos do próprio arquivo do workspace.
+- [Diagnósticos](/pt-br/reference/diagnostics) ganha `server-parse-error`,
+  `server-unknown-field`, `server-invalid-value` e o aviso
+  `config-deployment-moved`.
 - [CLI](/pt-br/tooling/cli) registra como o `luam server` trata um executável
   Linux sem permissão de execução.
 

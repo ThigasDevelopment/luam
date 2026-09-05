@@ -7,13 +7,19 @@ import { manifestError } from '@compiler/manifest/manifest-diagnostics';
 
 import { MANIFEST_FILE_NAME, type LuamConfig } from '@cli/config/config-schema';
 import { validateConfig } from '@cli/config/config-validation';
+import { deploymentMovedWarning, resolveDeployment, EMPTY_POSITIONS, type DeploymentSettings } from '@cli/config/deployment';
 import { manifestEnvironment } from '@cli/config/manifest-context';
 import type { Environment } from '@cli/config/validation-context';
+import type { LoadedWorkspace } from '@cli/config/workspace-loader';
+
+import type { PositionLookup } from '@compiler/manifest/manifest-rules';
 
 export interface LoadedManifest {
     path: string;
     source: string;
     config: LuamConfig | null;
+    positions: PositionLookup;
+    deployment: DeploymentSettings | null;
     diagnostics: Diagnostic[];
 }
 
@@ -21,6 +27,7 @@ export interface ManifestOptions {
     path?: string | null;
     mode?: string;
     env?: Environment;
+    workspace?: LoadedWorkspace | null;
 }
 
 const NOT_FOUND = 'config-not-found';
@@ -46,7 +53,11 @@ export function resolveManifestPath(root: string, explicitPath: string | null): 
 }
 
 function failure(path: string, code: string, message: string): LoadedManifest {
-    return { path, source: '', config: null, diagnostics: [manifestError(code, message, START)] };
+    return { path, source: '', config: null, positions: EMPTY_POSITIONS, deployment: null, diagnostics: [manifestError(code, message, START)] };
+}
+
+function promoteWarning(diagnostic: Diagnostic, promote: boolean): Diagnostic {
+    return promote ? { ...diagnostic, severity: 'error' } : diagnostic;
 }
 
 function readManifest(path: string): string | null {
@@ -77,7 +88,19 @@ export function loadManifest(root: string, options: ManifestOptions = {}): Loade
     const env = options.env ?? {};
     const analysis = analyzeManifest(source, { mode: options.mode ?? DEFAULT_MODE, root, env: manifestEnvironment(env) });
     const validated = validateConfig(analysis.value, analysis.positions);
-    const diagnostics = sortDiagnostics([...analysis.diagnostics, ...validated.diagnostics]);
+    const workspace = options.workspace ?? null;
+    const deployment = workspace === null ? null : workspace.deployment;
+    const moved = workspace === null || deployment === null ? null : deploymentMovedWarning(analysis.positions, workspace.path);
+    const promoted = moved === null ? null : promoteWarning(moved, validated.config?.compilerOptions.warningsAsErrors === true);
+    const diagnostics = sortDiagnostics([...analysis.diagnostics, ...validated.diagnostics, ...(promoted === null ? [] : [promoted])]);
+    const config = hasErrors(diagnostics) ? null : validated.config;
 
-    return { path, source, config: hasErrors(diagnostics) ? null : validated.config, diagnostics };
+    return {
+        path,
+        source,
+        config,
+        positions: analysis.positions,
+        deployment: config === null ? null : resolveDeployment(root, config, deployment, analysis.positions),
+        diagnostics,
+    };
 }
