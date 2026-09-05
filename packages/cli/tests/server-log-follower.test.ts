@@ -32,6 +32,40 @@ afterEach(() => {
 });
 
 describe('server log follower', () => {
+    it('reads a log that is created after it starts from the first line', async () => {
+        const fixture = createProjectFixture();
+        const path = resolve(fixture.root, 'server/mods/deathmatch/logs/server.log');
+        const lines: string[] = [];
+
+        fixtures.push(fixture);
+
+        const follower = followServerLog(path, (line) => lines.push(line), { pollIntervalMs: 5 });
+
+        fixture.write('server/mods/deathmatch/logs/server.log', 'first line\nServer started and is ready to accept connections!\n');
+        await waitFor(() => lines.length >= 2);
+        follower.close();
+
+        expect(lines).toContain('first line');
+        expect(lines).toContain('Server started and is ready to accept connections!');
+    });
+
+    it('skips the history of a log that already existed', async () => {
+        const fixture = createProjectFixture();
+
+        fixtures.push(fixture);
+        fixture.write('server/mods/deathmatch/logs/server.log', 'old history\n');
+
+        const path = resolve(fixture.root, 'server/mods/deathmatch/logs/server.log');
+        const lines: string[] = [];
+        const follower = followServerLog(path, (line) => lines.push(line), { pollIntervalMs: 5 });
+
+        fixture.write('server/mods/deathmatch/logs/server.log', 'old history\nfresh line\n');
+        await waitFor(() => lines.length >= 1);
+        follower.close();
+
+        expect(lines).toEqual(['fresh line']);
+    });
+
     it('resolves the standard MTA server log path', () => {
         const root = posix(resolve('project'));
 

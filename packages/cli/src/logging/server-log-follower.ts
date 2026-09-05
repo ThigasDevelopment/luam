@@ -48,6 +48,8 @@ export function followServerLog(path: string, onLine: (line: string) => void, op
     let initialized = false;
     let closed = false;
 
+    const existedAtStart = existsSync(path);
+
     const poll = (): void => {
         if (closed || !existsSync(path)) {
             return;
@@ -60,10 +62,12 @@ export function followServerLog(path: string, onLine: (line: string) => void, op
             if (!initialized) {
                 initialized = true;
                 currentIdentity = nextIdentity;
-                offset = stats.size;
-                prefix = readFrom(path, 0, Math.min(stats.size, 64));
+                offset = existedAtStart ? stats.size : 0;
+                prefix = readFrom(path, 0, Math.min(offset, 64));
 
-                return;
+                if (offset === stats.size) {
+                    return;
+                }
             }
 
             const comparable = Math.min(offset, 64, stats.size);
@@ -98,7 +102,6 @@ export function followServerLog(path: string, onLine: (line: string) => void, op
     };
 
     poll();
-    initialized = true;
 
     const timer = setInterval(poll, options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS);
     const close = (): void => {

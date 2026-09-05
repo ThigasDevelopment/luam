@@ -70,6 +70,20 @@ describe('ensure', () => {
         expect(driver.logger.text()).toContain('already attached');
     });
 
+    it('starts on the first successful cycle even when a failing build came first', async () => {
+        const driver = open();
+
+        driver.fixture.write('resource-a/src/server/main.luam', BROKEN);
+        await driver.type('ensure resource-a');
+
+        expect(driver.console).toEqual([]);
+
+        driver.fixture.write('resource-a/src/server/main.luam', "outputChatBox('fixed', root)\n");
+        await driver.type('rebuild resource-a');
+
+        expect(driver.console).toEqual(['refresh', 'start resource-a']);
+    });
+
     it('syncs nothing, writes nothing and stays attached when the build fails', async () => {
         const driver = open();
 
@@ -89,6 +103,17 @@ describe('ensure', () => {
         await driver.type('rebuild resource-a');
 
         expect(driver.console).toEqual(['refresh', 'start resource-a', 'refresh', 'stop resource-a', 'start resource-a']);
+    });
+
+    it('starts a resource that is already synced and changed nothing', async () => {
+        const driver = open();
+
+        await driver.type('ensure resource-a');
+        await driver.type('drop resource-a');
+        driver.console.splice(0);
+        await driver.type('ensure resource-a');
+
+        expect(driver.console).toEqual(['refresh', 'start resource-a']);
     });
 
     it('writes nothing to the console when a rebuild changes no output', async () => {
@@ -117,6 +142,40 @@ describe('ensure', () => {
         await driver.type('ensure');
 
         expect(driver.logger.errors.join('\n')).toContain('takes one resource name');
+    });
+});
+
+describe('a resource whose directory and manifest names differ', () => {
+    it('starts the name it deployed under, not the directory name', async () => {
+        const driver = open();
+
+        driver.fixture.write(
+            'resource-a/.luam.manifest',
+            "name = 'deployed-name'\noutput = {\n    bundle = false,\n    map = true,\n}\n",
+        );
+        await driver.type('ensure resource-a');
+
+        expect(driver.deployed('deployed-name')).toBe(true);
+        expect(driver.deployed('resource-a')).toBe(false);
+        expect(driver.console).toEqual(['refresh', 'start deployed-name']);
+        expect(driver.logger.text()).toContain('which deploys as "deployed-name"');
+    });
+
+    it('restarts under the deployed name and attributes its log records to it', async () => {
+        const driver = open();
+
+        driver.fixture.write(
+            'resource-a/.luam.manifest',
+            "name = 'deployed-name'\noutput = {\n    bundle = false,\n    map = true,\n}\n",
+        );
+        await driver.type('ensure resource-a');
+        driver.fixture.write('resource-a/src/client/hud.luam', "dxDrawText('changed', 1, 1)\n");
+        driver.console.splice(0);
+        await driver.type('rebuild resource-a');
+
+        expect(driver.console).toEqual(['refresh', 'stop deployed-name', 'start deployed-name']);
+        expect([...driver.session.attached]).toEqual(['resource-a']);
+        expect([...driver.session.deployed]).toEqual(['deployed-name']);
     });
 });
 

@@ -5,7 +5,7 @@ import { formatDevelopmentLog, reportDevelopmentLog } from '@cli/reporting/devel
 import { createMemoryReporter, createTtyReporter } from './support/memory-logger';
 
 const RECORD = {
-    timestamp: new Date('2026-08-10T14:22:07Z'),
+    timestamp: new Date(2026, 7, 10, 14, 22, 7),
     environment: 'client' as const,
     level: 'warn' as const,
     message: 'Missing vehicle model',
