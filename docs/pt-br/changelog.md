@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.5 - 2026-09-04
+
 ### Adicionado
 
 - [Arquivo do servidor](/pt-br/reference/server-file): uma nova página de

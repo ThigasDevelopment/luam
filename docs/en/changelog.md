@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.5 - 2026-09-04
+
 ### Added
 
 - [Server file](/en/reference/server-file): a new reference page for

@@ -14,6 +14,8 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.5 - 2026-09-04
+
 ### Added
 
 - `.luam.server`: a directory of resources names the MTA installation it shares
