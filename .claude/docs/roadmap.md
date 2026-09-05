@@ -3447,3 +3447,117 @@ Deliberately excluded:
 - Line editing beyond a buffer, an echo and an erase. No history, no completion,
   no cursor movement inside the line — a session prompt that grows into a shell
   is a shell nobody asked for.
+
+## Milestone 51 — The Manifest Is One Table
+
+The manifest cannot describe the order a real resource loads in. `sources` is
+three unordered lists and `loadOrder` is a list of pinned exceptions, so the
+order of a build is stated twice and agreed once. A production `meta.xml` — eight
+ordered blocks that interleave server and client, scripts outside `src/`, and a
+single wildcard for a directory of images — is not reachable from any manifest
+that can be written today: the emitter regroups everything into `shared`,
+`server`, `client` and collapses the last five blocks into one.
+
+This milestone makes the manifest one table constructor whose sections are
+ordered lists. `scripts` replaces `sources` and `loadOrder` together, and each
+entry declares its own side, so position in the file is position in the generated
+file and no path is written twice. `files` replaces `assets` with bare paths that
+reach `<file src>` as written, so a directory is one line rather than one line per
+file. A blank line between entries becomes a group boundary that survives into
+the generated file. `info`, `environment` and `build` take the remaining fields,
+the resource name comes from the folder that holds the manifest, and the root
+element of the generated file carries that name.
+
+The decision is [ADR-047](../docs/adr/047-manifest-table-sections.md), which
+supersedes the load order, root element and section rules of ADR-008, the
+statement allowlist of ADR-015, and the `sources` and `assets` shapes of ADR-017.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 51.01 | Make the manifest one table expression | ../plans/51.01-table-expression-dialect.md | architecture-engineer | todo |
+| 51.02 | Restructure the field catalog into sections | ../plans/51.02-section-field-catalog.md | architecture-engineer | todo |
+| 51.03 | Replace `sources` and `loadOrder` with an ordered `scripts` list | ../plans/51.03-ordered-scripts.md | architecture-engineer | todo |
+| 51.04 | Replace `assets` with an ordered `files` list | ../plans/51.04-ordered-files.md | architecture-engineer | todo |
+| 51.05 | Carry a blank line from the manifest into the generated file | ../plans/51.05-blank-line-groups.md | architecture-engineer | todo |
+| 51.06 | Emit the sectioned resource manifest | ../plans/51.06-sectioned-meta-emitter.md | architecture-engineer | todo |
+| 51.07 | Settle the helper and vendored library placement | ../plans/51.07-helper-and-library-placement.md | architecture-engineer | todo |
+| 51.08 | Migrate every existing manifest | ../plans/51.08-manifest-migration.md | architecture-engineer | todo |
+| 51.09 | Give the table form its editor surfaces | ../plans/51.09-manifest-editor-surfaces.md | architecture-engineer | todo |
+| 51.10 | Cover the reformulated manifest in the tests | ../plans/51.10-manifest-tests.md | test-engineer | todo |
+| 51.11 | Document the reformulated manifest | ../plans/51.11-manifest-documentation.md | documentation-engineer | todo |
+
+Acceptance:
+
+- A manifest that is one table constructor loads, checks, completes and hovers.
+  Anything else in the file is rejected, and a misspelled section or field key is
+  reported with a caret under the key.
+- The `heaven-roleplay` fixture — eight ordered blocks interleaving sides, two
+  scripts at the resource root, helpers under a non-standard directory, and one
+  wildcard for a directory of images — builds to a file that matches the authored
+  one byte for byte, blank lines included.
+- The root element of the generated file is the resource folder name, and a real
+  MTA server starts a resource carrying it.
+- Reordering two entries in `scripts` reorders the two `<script>` elements and
+  changes nothing else. Deleting the blank line between them merges their blocks
+  and changes nothing else.
+- A `scripts` entry declares its own `type`, and a file matched by two entries is
+  `config-script-side-conflict` naming both. A `#!server` directive in a file an
+  entry types `client` warns exactly as it does today.
+- `files = { 'assets/images/**/*.png' }` produces exactly one `<file>` element
+  carrying that pattern, and every matching file reaches the resource at the path
+  the pattern describes.
+- A resource with no `name` field builds into a directory named after its folder,
+  and `ensure` restarts that name.
+- Editing `environment.secret` does not recompile; editing `environment.strict`
+  does. Cache identity is per field, not per section.
+- `luam migrate` rewrites an assignment-form manifest into the table form with the
+  same effective build, and the editor offers the same rewrite as a code action. A
+  manifest still in the old form reports `config-manifest-form` naming the command.
+- `pnpm -r test`, `pnpm typecheck`, `pnpm conventions` and `pnpm docs:verify`
+  pass, and every fixture, snippet, example and template is in the new form.
+
+Why now:
+
+- The gap is structural, not cosmetic. No combination of existing fields produces
+  the interleaved order a real resource has, so the toolchain cannot build the
+  resource that motivated it.
+- The machinery is in place. Table-literal key completion (41.01) is the
+  diagnostic and completion path the table form needs, the glob grammar and the
+  pattern-to-XML rule already exist for `<script>`, and `.luam.server` and
+  `.luam.formatter` proved a second schema over the same dialect.
+- Every breaking change to the manifest that this project intends is on this list.
+  Doing them across three minors would break the same file three times.
+
+Open before the milestone can close:
+
+- The compiler option vocabulary beyond `oop` and `strict`. The four remaining
+  options stay manifest fields; their spelling and arrangement wait on how much
+  of the same ground the language server covers — 51.02 and 51.09 together.
+- The runtime helper directory: `lib/<environment>/` as ADR-008 has it, or `libs/`
+  flat as the sketch has it, with the rule that keeps two helpers of one name
+  apart — 51.07 decides it.
+- The section comment wording, which is cosmetic and the owner's call.
+
+Deliberately excluded:
+
+- `build.details.obfuscate`. ADR-017 forbids a field before its consumer, and Lua
+  obfuscation is its own decision with its own risks.
+- Renaming a file on the way into the resource. `assets[].to` is removed, not
+  reshaped; a destination that differs from the manifest path is what made the
+  generated `<file>` list unreadable against the tree.
+- The MTA elements the manifest still cannot express — `<settings>`,
+  `<aclrequest>`, `<map>`, `<config>`, `<html>`,
+  `<sync_map_element_data>`, `<download_priority_group>`, `download` on `<file>`
+  and `minversion`/`maxversion` on `<include>`. Each needs a field and a consumer.
+- Accepting both manifest forms indefinitely. The old form is read for one minor
+  behind `config-manifest-form` so `luam migrate` has something to migrate, and is
+  then removed.
+- How a library reaches the resource. ADR-038 vendors a library's code into its
+  consumer; the alternative under consideration is that a library is its own MTA
+  resource and a consumer names it in `<include>`, so a library carrying a lot of
+  code and a lot of images is stored and downloaded once rather than once per
+  consumer. It changes deployment, versioning, and whether a library's surface
+  crosses a resource boundary at all, so `environment.libraries` keeps its ADR-038
+  meaning here and the model gets its own record and its own milestone.

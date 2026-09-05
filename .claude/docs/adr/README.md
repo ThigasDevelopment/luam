@@ -55,3 +55,4 @@ Each row links the record; the record itself carries the full status note.
 | 044 | [Merge both sides into the surface of a shared file](044-merged-surface-in-shared-files.md) | Accepted, amended |
 | 045 | [A class registry replaces instantiating a class the code names at runtime](045-runtime-named-instantiation.md) | Accepted |
 | 046 | [A shared MTA server is described by `.luam.server`, not by each resource](046-shared-mta-server-workspace-file.md) | Accepted |
+| 047 | [The manifest is one table of ordered sections](047-manifest-table-sections.md) | Proposed |
