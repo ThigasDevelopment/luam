@@ -268,7 +268,9 @@ luam server
 
 Runs the existing installation under `serverPath` in the foreground with its
 console attached. Windows probes `MTA Server.exe`; Linux probes `mta-server64`
-then `mta-server`. Set `development.server.executable` for another layout.
+then `mta-server`. Set `development.server.executable` for another layout. On
+Linux a candidate that is present without the execute permission is skipped, and
+an otherwise empty probe names it with the `chmod +x` that fixes it.
 `Ctrl+C` writes MTA's `shutdown` command and uses a bounded kill fallback. The
 command owns and stops only the child it launched.
 

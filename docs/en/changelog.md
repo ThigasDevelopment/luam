@@ -9,6 +9,13 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.4 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records how `luam server` treats a Linux executable
+  that is missing the execute permission.
+
 ## 1.0.3 - 2026-09-03
 
 ### Added

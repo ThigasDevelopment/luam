@@ -273,7 +273,9 @@ luam server
 
 Roda a instalação existente em `serverPath` em primeiro plano com o console
 conectado. No Windows procura `MTA Server.exe`; no Linux procura `mta-server64` e
-depois `mta-server`. Defina `development.server.executable` para outro layout.
+depois `mta-server`. Defina `development.server.executable` para outro layout. No
+Linux um candidato presente sem permissão de execução é ignorado, e uma procura
+que não achou mais nada o aponta junto com o `chmod +x` que resolve.
 `Ctrl+C` escreve o comando `shutdown` do MTA e usa um fallback de encerramento
 com tempo limitado. O comando encerra apenas o processo filho que iniciou.
 
