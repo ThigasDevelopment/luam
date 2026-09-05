@@ -11,6 +11,14 @@ da versão atual.
 
 ## Não lançado
 
+## 1.0.8 - 2026-09-04
+
+### Alterado
+
+- [Language server](/pt-br/tooling/language-server) registra que a lista de
+  completude chega sem a documentação de cada item, resolvida apenas para o
+  item que o editor pede.
+
 ## 1.0.7 - 2026-09-04
 
 ### Alterado
