@@ -9,6 +9,14 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.0.8 - 2026-09-04
+
+### Changed
+
+- [Language server](/en/tooling/language-server) records that a completion list
+  arrives without the documentation for every item, which is resolved for the
+  one the editor asks about.
+
 ## 1.0.7 - 2026-09-04
 
 ### Changed

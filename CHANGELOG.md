@@ -14,6 +14,17 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.0.8 - 2026-09-04
+
+### Changed
+
+- The language server hands a completion list over without the documentation for
+  every item and fills in only the item the editor asks about, through
+  "completionItem/resolve". A list of the MTA catalogue carried 483 KB of JSON
+  on every keystroke, 77% of it documentation nothing had asked to read; it now
+  carries 117 KB. What the list itself draws — the label, the detail and the
+  order — still arrives with the list.
+
 ## 1.0.7 - 2026-09-04
 
 ### Changed
@@ -24,18 +35,11 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   won. `development.logs` takes the workspace value as its default and a manifest
   value still overrides it. A project with no `.luam.server` behaves exactly as it
   did before.
-- The language server hands a completion list over without the documentation for
-  every item and fills in only the item the editor asks about, through
-  "completionItem/resolve". A list of the MTA catalogue carried 483 KB of JSON
-  on every keystroke, 77% of it documentation nothing had asked to read; it now
-  carries 117 KB. What the list itself draws — the label, the detail and the
-  order — still arrives with the list.
 - The language server analyses each file against its **nearest** manifest.
   Opening a folder of resources no longer leaks one resource's declarations into
   another's scope, checks one resource under another's compiler options, or
   resolves a file's side against the wrong root. A file with no manifest above it
   keeps the default settings.
-
 
 - A command that owns an MTA server checks the ports the installation asks for
   before it starts one. The ports come from that installation's
