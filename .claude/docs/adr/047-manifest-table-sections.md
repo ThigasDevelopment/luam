@@ -126,16 +126,31 @@ the same way ADR-008 confirmed that MTA expands a wildcard. ADR-008 assumed
 the resource it belongs to, which is the one thing a generated manifest could not
 previously say about itself.
 
-*Order is position.* `scripts` and `files` are ordered lists, and the order in
-the table is the order in the generated file. `loadOrder` is removed rather than
-deprecated: it exists only to reorder a bag, and there is no bag left to reorder.
+*Order is position.* `scripts`, `files`, `libraries` and `info.dependencies` are
+ordered lists, and the order in the table is the order in the generated file.
+`loadOrder` is removed rather than deprecated: it exists only to reorder a bag,
+and there is no bag left to reorder. `dependencies` stops being sorted on the way
+out for the same reason: a list the author ordered and the tool reorders is a
+list the author cannot trust.
+
+*Under a bundle, position is concatenation order.* `build.details.bundle` emits
+one Lua file per non-empty side rather than one entry per source, so the ordered
+`scripts` list stops deciding the order of `<script>` elements and starts
+deciding the order of the members inside each bundle. Helpers and vendored
+libraries are concatenated into the bundle rather than listed. The same manifest
+therefore produces two very different generated files depending on one boolean,
+and both are correct: order is position in each, and only the artifact the
+position orders changes.
 
 *A blank line between entries is a group boundary, and it survives into the
-generated file.* This is the one place the manifest's whitespace is semantic. It
-is what lets the author group entries without inventing a nesting level, and it
-is why the blank-line rule in ADR-008 is reversed. The formatter
-([ADR-042](042-formatter-configuration-file.md)) must preserve blank runs between
-entries and must neither introduce nor collapse them beyond a run of one.
+generated file.* It applies to every ordered list — `scripts`, `files`,
+`libraries` and `info.dependencies` — because the author groups all four the same
+way and reads all four in the same output. This is the one place the manifest's
+whitespace is semantic. It is what lets the author group entries without
+inventing a nesting level, and it is why the blank-line rule in ADR-008 is
+reversed. The formatter ([ADR-042](042-formatter-configuration-file.md)) must
+preserve blank runs between entries and must neither introduce nor collapse them
+beyond a run of one.
 
 *`scripts` replaces `sources` and `loadOrder`, and each entry declares its own
 side.* An entry is `{ path, type }`; `path` is a literal file, a `*` pattern or a
@@ -185,6 +200,28 @@ those attributes back through `getResourceInfo`, so `author.discord` is not
 decoration — it is emitted and is readable at runtime. `name` is the attribute
 MTA itself uses.
 
+*`build.output` may leave the project, and pruning may not follow it.* A build
+written to `/media/storage/` is a legitimate thing to want, so the containment
+rule that governs source patterns does not govern the output directory. The
+guard is on the other side and is not optional: `pruneResource` removes what is
+no longer generated, and pointing it at a directory the build did not create is
+how a stale-file cleanup becomes a data loss. The build therefore prunes only
+inside a resource directory it created, recorded by a marker it writes on
+creation, and refuses to prune — with a message, not silently — anywhere else.
+
+*`build.details.obfuscate` is declared, and its consumer is named.* The field
+exists in the catalog with its default so it completes, hovers and validates. Its
+consumer is compilation to Lua bytecode through `luac`, which MTA loads, and that
+work is not in this milestone.
+
+This is a deliberate exception to ADR-017's rule that a field arrives with an
+implemented consumer, and the reason that rule exists — "a field that documents a
+name but changes no artifact is a field that teaches users to trust something
+that is not enforced" — is answered rather than waived: `obfuscate = true`
+reports `config-unimplemented-option` naming the milestone that will honour it.
+The field never silently does nothing. `obfuscate = false` and an absent
+`obfuscate` are both silent, because both describe what the build already does.
+
 **Still open:**
 
 - *The compiler option vocabulary.* `oop` and `strict` are settled and stay in
@@ -210,9 +247,6 @@ MTA itself uses.
 - *The comment wording.* The sketch writes `INFO's`, `SCRIPT's`, `FILE's` — the
   possessive-plural style ADR-008 rejected in favour of plain English. Cosmetic,
   and the owner's call.
-- *`build.details.obfuscate`.* Present in the sketch with no consumer. ADR-017
-  forbids adding a field before its consumer exists, so it is excluded until Lua
-  obfuscation has its own decision.
 
 **Removed with their reasons:**
 

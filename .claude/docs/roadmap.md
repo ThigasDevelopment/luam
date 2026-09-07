@@ -3508,6 +3508,15 @@ Acceptance:
 - `files = { 'assets/images/**/*.png' }` produces exactly one `<file>` element
   carrying that pattern, and every matching file reaches the resource at the path
   the pattern describes.
+- The same manifest built with `bundle = true` lists the configuration script and
+  one element per non-empty side, names no helper and no library, and orders the
+  bundle members by the `scripts` list.
+- A blank line groups entries in all four ordered lists, and
+  `info.dependencies` emits in written order rather than sorted.
+- An absolute `build.output` builds, and pruning refuses on any directory the
+  build did not create.
+- `obfuscate = true` reports `config-unimplemented-option` naming the milestone
+  that will honour it; `false` and absent report nothing.
 - A resource with no `name` field builds into a directory named after its folder,
   and `ensure` restarts that name.
 - Editing `environment.secret` does not recompile; editing `environment.strict`
@@ -3542,8 +3551,6 @@ Open before the milestone can close:
 
 Deliberately excluded:
 
-- `build.details.obfuscate`. ADR-017 forbids a field before its consumer, and Lua
-  obfuscation is its own decision with its own risks.
 - Renaming a file on the way into the resource. `assets[].to` is removed, not
   reshaped; a destination that differs from the manifest path is what made the
   generated `<file>` list unreadable against the tree.
