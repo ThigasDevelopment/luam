@@ -23,6 +23,47 @@ da versão atual.
   do catálogo do manifesto, então a tabela e a tabela de campos removidos não
   podem divergir do que a ferramenta exige.
 
+## 1.0.10 - 2026-09-04
+
+### Alterado
+
+- [CLI](/pt-br/tooling/cli) registra que a sessão redesenha uma linha digitada de
+  qualquer tamanho, inclusive a que quebra além da largura do terminal.
+
+## 1.0.9 - 2026-09-04
+
+### Alterado
+
+- [Arquivo do servidor](/pt-br/reference/server-file) registra que os resources
+  de um workspace são lidos de novo a cada uso, então um criado com a sessão
+  aberta pode ser anexado sem reabri-la.
+
+## 1.0.8 - 2026-09-04
+
+### Alterado
+
+- [Language server](/pt-br/tooling/language-server) registra que a lista de
+  completude chega sem a documentação de cada item, resolvida apenas para o
+  item que o editor pede.
+
+## 1.0.7 - 2026-09-04
+
+### Alterado
+
+- [CLI](/pt-br/tooling/cli) registra que um comando dono de um servidor MTA se
+  recusa a subir um cujas portas já estão ocupadas, e nomeia quem as segura.
+
+## 1.0.6 - 2026-09-04
+
+### Alterado
+
+- [CLI](/pt-br/tooling/cli) registra que a sessão mantém na tela a linha que está
+  sendo digitada enquanto o servidor escreve no mesmo terminal.
+
+## 1.0.5 - 2026-09-04
+
+### Adicionado
+
 - [Arquivo do servidor](/pt-br/reference/server-file): uma nova página de
   referência para o `.luam.server` — cada campo com seu tipo e padrão, qual
   arquivo vale, o que torna um filho um resource, e a tabela de precedência
@@ -33,6 +74,8 @@ da versão atual.
   forma sem manifesto.
 - [Estrutura do projeto](/pt-br/guide/project-layout) descreve a forma do
   workspace — um `.luam.server` ao lado de um resource por diretório, um nível.
+
+## 1.0.4 - 2026-09-04
 
 ### Alterado
 

@@ -53,6 +53,117 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 - The manifest field reference is generated from the same catalog the checker, the
   editor and the build read, so it cannot drift from what the tool enforces.
 
+### Changed
+
+- The deployment fields in `.luam.manifest` — `serverPath`, `resourcesDir` and
+  `development.server` — are removed and report `config-removed-field` naming
+  `.luam.server`, which is where a directory of resources names the MTA
+  installation it shares. That completes the deprecation the previous release
+  scheduled.
+- `luam init --name demo` scaffolds into a `demo/` directory rather than writing a
+  field, because the folder is the resource name.
+- The generated `meta.xml` carries the section comments `INFO`, `ENVIRONMENT`,
+  `SCRIPTS`, `FILES` and `EXPORTS`, in that order, and a section with no entry
+  emits neither comment nor blank line.
+- `info.dependencies` emits in the order it was written rather than sorted, and a
+  repeated entry is `config-duplicate-dependency` rather than a silent collapse.
+
+### Removed
+
+- The manifest's `name`, `sources`, `loadOrder`, `assets`, `compiler`, `engine`,
+  `outDir`, `output`, `helpers`, `contracts`, `libraries`, `development`,
+  `serverPath` and `resourcesDir`, along with `environment.file` and
+  `environment.localFile`. Each reports `config-removed-field` naming where it
+  went. The assignment form itself still loads for this minor behind
+  `config-manifest-form` and is removed in the next major.
+- The `local` declaration. A manifest has no statements: an intermediate value is
+  written where it is used.
+- The development log relay and the generated Lua behind it, along with the
+  `logs` table `.luam.server` carried to configure it. The position map debugs
+  against the authored file, which is what the relay existed to work around.
+
+## 1.0.10 - 2026-09-04
+
+### Changed
+
+- The session erases the line it redraws with the sequence the terminal has for
+  it, walking up one row per wrap. It wrote a space per character and a carriage
+  return, which only reaches the start of the row the cursor is on, so a command
+  longer than the terminal left fragments on screen and a prompt that no longer
+  matched what was buffered.
+
+## 1.0.9 - 2026-09-04
+
+### Changed
+
+- A workspace reads the resources under it again on every use instead of once,
+  when the session opened. A resource created or renamed while "luam dev" ran
+  could not be attached until the session was reopened, which is the opposite of
+  a set discovered at the speed the work changes.
+
+## 1.0.8 - 2026-09-04
+
+### Changed
+
+- The language server hands a completion list over without the documentation for
+  every item and fills in only the item the editor asks about, through
+  "completionItem/resolve". A list of the MTA catalogue carried 483 KB of JSON
+  on every keystroke, 77% of it documentation nothing had asked to read; it now
+  carries 117 KB. What the list itself draws — the label, the detail and the
+  order — still arrives with the list.
+
+## 1.0.7 - 2026-09-04
+
+### Changed
+
+- The deployment fields in `.luam.manifest` — `serverPath`, `resourcesDir` and
+  `development.server` — lose to a `.luam.server` above them and report
+  `config-deployment-moved` once, naming every overridden field and the file that
+  won. `development.logs` takes the workspace value as its default and a manifest
+  value still overrides it. A project with no `.luam.server` behaves exactly as it
+  did before.
+- The language server analyses each file against its **nearest** manifest.
+  Opening a folder of resources no longer leaks one resource's declarations into
+  another's scope, checks one resource under another's compiler options, or
+  resolves a file's side against the wrong root. A file with no manifest above it
+  keeps the default settings.
+
+- A command that owns an MTA server checks the ports the installation asks for
+  before it starts one. The ports come from that installation's
+  "mtaserver.conf", and on Linux the process holding one is named along with the
+  "kill" that frees it — in place of starting a server that exits with code 3 and
+  reporting only the code. A server left behind by an earlier run is the usual
+  cause, and the message says so.
+- The server log follower reads a log that is created after it starts from its
+  first line rather than skipping to the end, and no longer replays an existing
+  log from the beginning when the file is missing at the moment it starts. The
+  replay let a "Server started" line from an earlier run satisfy the readiness
+  wait of the next one.
+- "ensure" in a session starts the resource it attaches even when the sync wrote
+  nothing, so a resource already mirrored into the server by an earlier run is
+  started rather than left stopped until the next edit. The "changed nothing,
+  restart nothing" rule now applies only to a resource the session has already
+  started.
+- A session starts and restarts a resource under the name it deployed as — the
+  manifest's "name" — rather than the name of the directory it was attached
+  from. The two are the same in most projects; where they differ, MTA loaded one
+  name and the console was told the other, so nothing ever started. Log records
+  are attributed by the deployed name for the same reason.
+- Rebuild separators and development log records are stamped in local time
+  rather than UTC, so their clock matches the one the MTA console prints.
+
+## 1.0.6 - 2026-09-04
+
+### Changed
+
+- Session output erases the line being typed before it writes and redraws it
+  after, so a log record arriving mid-word no longer wipes what is on screen.
+  Without it a chatty server left only the letters typed since the last record.
+
+## 1.0.5 - 2026-09-04
+
+### Added
+
 - `.luam.server`: a directory of resources names the MTA installation it shares
   once, in a file written in the manifest dialect. It is found by walking up to
   the nearest one, its `serverPath` resolves against its own directory, and a
@@ -72,52 +183,25 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   a workspace file that does not parse, names a field that does not exist, or
   carries a value outside its type or boundary.
 
+## 1.0.4 - 2026-09-04
+
 ### Changed
 
 - The deployment fields in `.luam.manifest` — `serverPath`, `resourcesDir` and
-  `development.server` — are removed and report `config-removed-field` naming
-  `.luam.server`, which is where a directory of resources names the MTA
-  installation it shares. That completes the deprecation the previous release
-  scheduled.
-- `luam init --name demo` scaffolds into a `demo/` directory rather than writing a
-  field, because the folder is the resource name.
-- The generated `meta.xml` carries the section comments `INFO`, `ENVIRONMENT`,
-  `SCRIPTS`, `FILES` and `EXPORTS`, in that order, and a section with no entry
-  emits neither comment nor blank line.
-- `info.dependencies` emits in the order it was written rather than sorted, and a
-  repeated entry is `config-duplicate-dependency` rather than a silent collapse.
-- The language server hands a completion list over without the documentation for
-  every item and fills in only the item the editor asks about, through
-  "completionItem/resolve". A list of the MTA catalogue carried 483 KB of JSON
-  on every keystroke, 77% of it documentation nothing had asked to read; it now
-  carries 117 KB. What the list itself draws — the label, the detail and the
-  order — still arrives with the list.
+  `development.server` — lose to a `.luam.server` above them and report
+  `config-deployment-moved` once, naming every overridden field and the file that
+  won. `development.logs` takes the workspace value as its default and a manifest
+  value still overrides it. A project with no `.luam.server` behaves exactly as it
+  did before.
 - The language server analyses each file against its **nearest** manifest.
   Opening a folder of resources no longer leaks one resource's declarations into
   another's scope, checks one resource under another's compiler options, or
   resolves a file's side against the wrong root. A file with no manifest above it
   keeps the default settings.
-- A command that owns an MTA server checks the ports the installation asks for
-  before it starts one. The ports come from that installation's
-  "mtaserver.conf", and on Linux the process holding one is named along with the
-  "kill" that frees it — in place of starting a server that exits with code 3 and
-  reporting only the code. A server left behind by an earlier run is the usual
-  cause, and the message says so.
-- The server log follower reads a log that is created after it starts from its
-  first line rather than skipping to the end, and no longer replays an existing
-  log from the beginning when the file is missing at the moment it starts. The
-  replay let a "Server started" line from an earlier run satisfy the readiness
-  wait of the next one.
-- "ensure" in a session starts the resource it attaches even when the sync wrote
-  nothing, so a resource already mirrored into the server by an earlier run is
-  started rather than left stopped until the next edit. The "changed nothing,
-  restart nothing" rule now applies only to a resource the session has already
-  started.
-- Rebuild separators and development log records are stamped in local time
-  rather than UTC, so their clock matches the one the MTA console prints.
 - Session output erases the line being typed before it writes and redraws it
   after, so a log record arriving mid-word no longer wipes what is on screen.
   Without it a chatty server left only the letters typed since the last record.
+
 - The owned MTA console reads lines rather than bytes. It buffers to the newline,
   echoes what is typed, handles backspace, and erases a forwarded line so MTA's
   own echo is the single record of it. `Ctrl+C` still interrupts mid-line and
@@ -126,20 +210,6 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
   is present without the execute permission and fall through to the next
   candidate. When nothing else resolves, the error names the file and the
   `chmod +x` that fixes it instead of failing later with a bare `EACCES`.
-
-### Removed
-
-- The manifest's `name`, `sources`, `loadOrder`, `assets`, `compiler`, `engine`,
-  `outDir`, `output`, `helpers`, `contracts`, `libraries`, `development`,
-  `serverPath` and `resourcesDir`, along with `environment.file` and
-  `environment.localFile`. Each reports `config-removed-field` naming where it
-  went. The assignment form itself still loads for this minor behind
-  `config-manifest-form` and is removed in the next major.
-- The `local` declaration. A manifest has no statements: an intermediate value is
-  written where it is used.
-- The development log relay and the generated Lua behind it, along with the
-  `logs` table `.luam.server` carried to configure it. The position map debugs
-  against the authored file, which is what the relay existed to work around.
 
 ## 1.0.3 - 2026-09-03
 

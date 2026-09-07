@@ -21,15 +21,46 @@ Every heading below is a released version and the date it shipped, newest first.
   manifest catalog, so the table and the removed-field table cannot drift from
   what the tool enforces.
 
-- [.luam.manifest](/en/tooling/luam-manifest) is rewritten around the table form:
-  the shape, the five sections, one worked example shown next to the `meta.xml` it
-  generates, and the blank line as a group boundary.
-- [Migration](/en/guide/migration) gains a `1.1.0` section: the before and after,
-  the field-by-field table of everything that moved, `luam migrate`, the editor
-  code action, and the one conversion that refuses.
-- [Configuration fields](/en/reference/configuration-fields) is generated from the
-  manifest catalog, so the table and the removed-field table cannot drift from
-  what the tool enforces.
+## 1.0.10 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records that the session redraws a typed line of any
+  length, including one that wraps past the width of the terminal.
+
+## 1.0.9 - 2026-09-04
+
+### Changed
+
+- [Server file](/en/reference/server-file) records that the resources under a
+  workspace are read again on every use, so one created while a session runs can
+  be attached without reopening it.
+
+## 1.0.8 - 2026-09-04
+
+### Changed
+
+- [Language server](/en/tooling/language-server) records that a completion list
+  arrives without the documentation for every item, which is resolved for the
+  one the editor asks about.
+
+## 1.0.7 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records that a command owning an MTA server refuses to
+  start one whose ports are already taken, and names the process holding them.
+
+## 1.0.6 - 2026-09-04
+
+### Changed
+
+- [CLI](/en/tooling/cli) records that the session keeps the line being typed on
+  screen while the server writes to the same terminal.
+
+## 1.0.5 - 2026-09-04
+
+### Added
 
 - [Server file](/en/reference/server-file): a new reference page for
   `.luam.server` — every field with its type and default, which file applies,
@@ -40,6 +71,8 @@ Every heading below is a released version and the date it shipped, newest first.
   manifest-less one.
 - [Project layout](/en/guide/project-layout) describes the workspace shape — a
   `.luam.server` beside a resource per directory, one level.
+
+## 1.0.4 - 2026-09-04
 
 ### Changed
 
