@@ -1,9 +1,9 @@
-<meta>
-    <!-- Resource information -->
+<exported-function>
+    <!-- INFO -->
     <info type="script" description="Functions other resources may call through MTA exports." />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/server.lua" />
-    <!-- Exported functions -->
+    <!-- EXPORTS -->
     <export function="addScore" http="false" />
     <export function="getScore" http="false" />
-</meta>
+</exported-function>

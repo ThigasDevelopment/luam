@@ -15,8 +15,19 @@ luam init
 `init` writes exactly one file, `.luam.manifest`. No framework, no example tree,
 nothing to delete.
 
-```luam
-name = 'my-resource'
+```luam manifest
+{
+    info = {
+        version = '1.0.0',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}
 ```
 
 An existing `.luam.manifest` is kept and reported; pass `--force` to overwrite it.

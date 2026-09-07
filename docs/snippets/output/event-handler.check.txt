@@ -1,5 +1,5 @@
 Discovery: done in 10 ms.
-Compile: 2 files in 17 ms.
+Compile: 2 files in 23 ms.
 Assembly: done in 1 ms.
-Manifest: done in 0 ms.
-Check passed: 2 files, 0 errors, 0 warnings in 29 ms (tree layout).
+Manifest: done in 1 ms.
+Check passed: 2 files, 0 errors, 0 warnings in 35 ms (tree layout).

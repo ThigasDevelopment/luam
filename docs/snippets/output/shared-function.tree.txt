@@ -1,3 +1,4 @@
+.luam-build
 meta.xml
 src/client.lua
 src/server.lua

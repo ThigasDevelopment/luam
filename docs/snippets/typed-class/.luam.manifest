@@ -1,2 +1,12 @@
-name = 'luam-docs-typed-class'
-description = 'A typed class with inheritance, an interface, and accessors.'
+{
+    info = {
+        description = 'A typed class with inheritance, an interface, and accessors.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

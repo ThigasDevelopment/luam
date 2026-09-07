@@ -1,6 +1,6 @@
-<meta>
-    <!-- Resource information -->
+<using-a-library>
+    <!-- INFO -->
     <info type="script" description="A resource that compiles an installed Luam library into its output." />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/shared.lua" type="shared" cache="false" />
-</meta>
+</using-a-library>

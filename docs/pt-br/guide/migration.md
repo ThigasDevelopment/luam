@@ -21,6 +21,7 @@ documenta a forma atual, e o histórico completo está no
 | `0.16.0` | Remover a tabela `transport` e recarregar o resource você mesmo |
 | `0.18.0` | Renomear `compilerOptions` para `compiler` |
 | `0.19.0` | Reler um comportamento de string de template; nenhuma mudança de código |
+| `1.1.0` | Reescrever o manifesto como uma tabela de seções |
 
 ## 0.6.0 - 2026-08-12
 
@@ -196,3 +197,94 @@ chamada. Um segmento `nil` no meio levanta `attempt to index a nil value` onde o
 helper de runtime parava e devolvia o fallback. Se você contava com o fallback
 para absorver um campo intermediário ausente, proteja o caminho. Veja [Strings de
 template](/pt-br/language/template-strings).
+
+## 1.1.0 - 2026-09-06
+
+**O manifesto é uma tabela de seções.** O `.luam.manifest` é um único construtor de
+tabela e nada além disso. Rode `luam migrate` no diretório do projeto, ou aceite a
+mesma reescrita como ação de código no editor. A forma de atribuições ainda carrega
+neste minor, reporta `config-manifest-form` uma vez, e é removida no próximo major.
+
+Antes:
+
+```luam static
+name = 'my-resource'
+author = 'you'
+version = '1.0.0'
+
+compiler = { strict = true, oop = false }
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = { { from = 'assets/**/*', to = 'assets' } }
+
+dependencies = { 'scoreboard' }
+outDir = 'build'
+```
+
+Depois:
+
+```luam manifest
+{
+    info = {
+        author = { name = 'you' },
+
+        version = '1.0.0',
+
+        dependencies = {
+            'scoreboard',
+        },
+    },
+
+    environment = { oop = false, strict = true },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    files = {
+        'assets/**/*',
+    },
+
+    build = { output = 'build' },
+}
+```
+
+**A pasta nomeia o resource.** Não existe campo `name`. O diretório que guarda o
+manifesto é a pasta de saída, o resource que o `ensure` reinicia e o elemento raiz
+do `meta.xml` gerado. Se o seu `name` era diferente da pasta, a migração avisa e
+você renomeia a pasta para manter o nome.
+
+**Para onde foi cada campo removido.** Cada um deles reporta
+`config-removed-field` e nomeia o substituto, então nada muda de forma em silêncio.
+
+| Removido | Substituto |
+| --- | --- |
+| `name` | A pasta que guarda o manifesto |
+| `author`, `version`, `description`, `dependencies` | `info` |
+| `compiler`, `libraries` | `environment` |
+| `engine.minVersion` | `environment.version.server` e `environment.version.client` |
+| `environment.file` | `environment.secret` |
+| `environment.localFile` | Nada. Um resource lê um único arquivo de ambiente |
+| `sources`, `loadOrder` | `scripts`, cuja ordem é a ordem de carga |
+| `assets` | `files`, uma lista de caminhos simples |
+| `outDir` | `build.output` |
+| `output` | `build.details` |
+| `helpers` | Nada. A seleção de helpers segue o código que precisa deles |
+| `contracts` | Nada. O diretório de contratos faz parte da estrutura de build |
+| `serverPath`, `resourcesDir`, `development.server` | [`.luam.server`](/pt-br/reference/server-file) |
+| `development.logs` | Nada. O relay foi removido; o mapa de posições depura contra o arquivo autoral |
+
+**Uma conversão recusa.** O `assets` podia renomear um arquivo no caminho para
+dentro do resource; o `files` não pode. O `luam migrate` nomeia a entrada, detalha
+a mudança e deixa o manifesto em paz. Mova o arquivo no projeto e liste o caminho
+novo.
+
+**`warningsAsErrors` transforma o aviso em falha.** Um projeto que promove avisos e
+que não migrou para de compilar até migrar. Isso é deliberado.

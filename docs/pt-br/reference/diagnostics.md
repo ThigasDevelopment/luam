@@ -193,8 +193,19 @@ erro não escreve nada.
 | `project-environment-import` | Um global de um ambiente incompatível foi usado. |
 | `project-duplicate-export` | Dois arquivos exportam o mesmo nome. |
 | `project-duplicate-output` | Dois fontes produziriam o mesmo caminho de saída. |
-| `project-load-order-missing` | Uma entrada de `loadOrder` não corresponde a nenhum arquivo ou asset. |
-| `project-load-order-library` | Uma entrada de `loadOrder` nomeia um arquivo de biblioteca. Scripts de biblioteca carregam na ordem que `libraries` declara. |
+| `config-missing-script` | Uma entrada literal de `scripts` não nomeia arquivo nenhum. |
+| `config-empty-script-entry` | Um padrão de `scripts` cujo diretório existe não alcançou arquivo nenhum. |
+| `config-script-side-conflict` | Um arquivo é alcançado por duas entradas de `scripts`. |
+| `config-reserved-script-path` | Uma entrada de `scripts` nomeia o diretório gerado de helpers ou de bibliotecas. |
+| `config-empty-file-entry` | Uma entrada de `files` não alcançou arquivo nenhum. |
+| `config-missing-file` | Uma entrada literal de `files` não nomeia arquivo nenhum. |
+| `config-environment-file-entry` | Uma entrada de `files` alcança o arquivo de ambiente. |
+| `config-manifest-form` | O manifesto ainda é uma lista de atribuições. Rode `luam migrate`. |
+| `config-manifest-not-a-table` | O manifesto não é um único construtor de tabela. |
+| `config-trailing-content` | Há algo escrito depois da tabela do manifesto. |
+| `config-unexpected-statement` | O manifesto começa com uma instrução. |
+| `config-duplicate-field` | Uma chave do manifesto foi escrita duas vezes. |
+| `config-unimplemented-option` | Uma opção declarada que nenhum marco honra ainda. |
 | `project-library-collision` | Duas bibliotecas, ou uma biblioteca e um arquivo do projeto, declaram uma global no mesmo lado. |
 | `project-library-shadows-api` | Uma biblioteca declara um nome que a API do MTA define. Reportado como warning. |
 | `project-library-project-reference` | Um arquivo de biblioteca usa uma global que o projeto declara. Uma biblioteca enxerga só os arquivos dela. |

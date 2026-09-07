@@ -1,3 +1,16 @@
-name = 'luam-docs-oop-api'
-description = 'The MTA OOP API enabled through the oop compiler option.'
-compiler = { oop = true }
+{
+    info = {
+        description = 'The MTA OOP API enabled through the oop compiler option.',
+    },
+
+    environment = {
+        oop = true,
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

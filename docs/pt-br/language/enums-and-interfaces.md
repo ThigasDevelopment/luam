@@ -37,7 +37,7 @@ build depender dele.
 
 Um enum que sobrevive é um **global**, não um local, então a ordem de declaração
 entre arquivos importa no carregamento. Coloque-o em um arquivo shared e fixe
-esse arquivo com `loadOrder` quando um arquivo server ou client o ler durante a
+esse arquivo em uma posição anterior de `scripts` quando um arquivo server ou client o ler durante a
 carga.
 
 ### Enums locais
@@ -64,7 +64,7 @@ local enum Weather {
   `local` esconde um global.
 - Como o nome é um local, `noUnusedLocals` reporta um enum local nunca lido como
   `check-unused-local`; um enum global é apagado em silêncio.
-- Não há global para disputar no carregamento, então `loadOrder` nunca importa
+- Não há global para disputar no carregamento, então a posição em `scripts` nunca importa
   para ele.
 
 Os nomes dos membros continuam entre aspas no Lua gerado:

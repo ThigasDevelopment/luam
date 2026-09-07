@@ -19,7 +19,7 @@ Quanto ele faz depende do que o `.luam.manifest` fornece:
 | nada | Reporta um diagnóstico. `serverPath` é obrigatório. |
 | `serverPath` | Escreve o resource dentro do servidor. Você reinicia. |
 
-O `ensure` nunca escreve em `<outDir>/<name>`. Use `luam build` quando quiser uma
+O `ensure` nunca escreve em `<build.output>/<folder>`. Use `luam build` quando quiser uma
 cópia local do resource gerado.
 
 ### Conseguindo o restart
@@ -46,7 +46,7 @@ Coloque um [`.luam.server`](/pt-br/reference/server-file) na raiz da pasta e rod
    que as enxergam.
 2. **Parar no erro.** Se algo for erro, ele é reportado e nada mais roda. Sem
    sincronização, sem restart, e o resource anterior continua no servidor.
-3. **Sincronizar.** Escreve `<serverPath>/<resourcesDir>/<name>`, pulando arquivos
+3. **Sincronizar.** Escreve `<serverPath>/<resourcesDir>/<folder>`, pulando arquivos
    idênticos e apagando arquivos gerados que o projeto não produz mais.
 4. **Reiniciar** — só com `dev --start-server`, e só quando a sincronização
    realmente mudou algum arquivo.

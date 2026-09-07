@@ -75,7 +75,7 @@ prove.
 npx --yes @thigasdevelopment/luam build --offline
 ```
 
-The resource lands in `<outDir>/<name>` — upload that directory as the build
+The resource lands in `<build.output>/<folder>` — upload that directory as the build
 artifact. A build that reports any error writes nothing, so an artifact is either
 complete or absent.
 
@@ -113,7 +113,7 @@ is a separate step: `refresh` and `restart <name>` in the server console — see
 - Never commit a password. Read one from `env` in the manifest, which is what a
   CI secret store provides.
 - `.env` is committed and declares keys and safe defaults; the deployed
-  `<outDir>/<name>/env.lua` is written once, with sensitive-looking keys blanked, and
+  `<build.output>/<folder>/env.lua` is written once, with sensitive-looking keys blanked, and
   is never overwritten by a rebuild.
 - The CLI never opens a connection to a running server. A runner that has to
   reach one needs its own transfer step — SSH or SFTP — outside Luam.

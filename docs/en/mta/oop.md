@@ -6,9 +6,10 @@ configuration flag.
 
 ## Turning it on
 
-```luam
-name = 'my-resource'
-compiler = { oop = true }
+```luam manifest
+{
+    environment = { oop = true },
+}
 ```
 
 `compiler.oop` is `false` by default. With it on the compiler:

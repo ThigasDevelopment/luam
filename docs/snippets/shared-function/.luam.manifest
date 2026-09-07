@@ -1,2 +1,12 @@
-name = 'luam-docs-shared-function'
-description = 'One shared function called from the server and from the client.'
+{
+    info = {
+        description = 'One shared function called from the server and from the client.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

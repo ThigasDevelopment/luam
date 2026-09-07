@@ -3472,21 +3472,21 @@ The decision is [ADR-047](../docs/adr/047-manifest-table-sections.md), which
 supersedes the load order, root element and section rules of ADR-008, the
 statement allowlist of ADR-015, and the `sources` and `assets` shapes of ADR-017.
 
-Status: todo
+Status: done
 
 | ID | Task | Plan | Agent | Status |
 |---|---|---|---|---|
-| 51.01 | Make the manifest one table expression | ../plans/51.01-table-expression-dialect.md | architecture-engineer | todo |
-| 51.02 | Restructure the field catalog into sections | ../plans/51.02-section-field-catalog.md | architecture-engineer | todo |
-| 51.03 | Replace `sources` and `loadOrder` with an ordered `scripts` list | ../plans/51.03-ordered-scripts.md | architecture-engineer | todo |
-| 51.04 | Replace `assets` with an ordered `files` list | ../plans/51.04-ordered-files.md | architecture-engineer | todo |
-| 51.05 | Carry a blank line from the manifest into the generated file | ../plans/51.05-blank-line-groups.md | architecture-engineer | todo |
-| 51.06 | Emit the sectioned resource manifest | ../plans/51.06-sectioned-meta-emitter.md | architecture-engineer | todo |
-| 51.07 | Settle the helper and vendored library placement | ../plans/51.07-helper-and-library-placement.md | architecture-engineer | todo |
-| 51.08 | Migrate every existing manifest | ../plans/51.08-manifest-migration.md | architecture-engineer | todo |
-| 51.09 | Give the table form its editor surfaces | ../plans/51.09-manifest-editor-surfaces.md | architecture-engineer | todo |
-| 51.10 | Cover the reformulated manifest in the tests | ../plans/51.10-manifest-tests.md | test-engineer | todo |
-| 51.11 | Document the reformulated manifest | ../plans/51.11-manifest-documentation.md | documentation-engineer | todo |
+| 51.01 | Make the manifest one table expression | ../plans/51.01-table-expression-dialect.md | architecture-engineer | done |
+| 51.02 | Restructure the field catalog into sections | ../plans/51.02-section-field-catalog.md | architecture-engineer | done |
+| 51.03 | Replace `sources` and `loadOrder` with an ordered `scripts` list | ../plans/51.03-ordered-scripts.md | architecture-engineer | done |
+| 51.04 | Replace `assets` with an ordered `files` list | ../plans/51.04-ordered-files.md | architecture-engineer | done |
+| 51.05 | Carry a blank line from the manifest into the generated file | ../plans/51.05-blank-line-groups.md | architecture-engineer | done |
+| 51.06 | Emit the sectioned resource manifest | ../plans/51.06-sectioned-meta-emitter.md | architecture-engineer | done |
+| 51.07 | Settle the helper and vendored library placement | ../plans/51.07-helper-and-library-placement.md | architecture-engineer | done |
+| 51.08 | Migrate every existing manifest | ../plans/51.08-manifest-migration.md | architecture-engineer | done |
+| 51.09 | Give the table form its editor surfaces | ../plans/51.09-manifest-editor-surfaces.md | architecture-engineer | done |
+| 51.10 | Cover the reformulated manifest in the tests | ../plans/51.10-manifest-tests.md | test-engineer | done |
+| 51.11 | Document the reformulated manifest | ../plans/51.11-manifest-documentation.md | documentation-engineer | done |
 
 Acceptance:
 
@@ -3524,6 +3524,8 @@ Acceptance:
 - `luam migrate` rewrites an assignment-form manifest into the table form with the
   same effective build, and the editor offers the same rewrite as a code action. A
   manifest still in the old form reports `config-manifest-form` naming the command.
+  A `loadOrder` entry a `sources` pattern already reaches has no exact conversion,
+  so the migration refuses it by name and spells out the move.
 - `pnpm -r test`, `pnpm typecheck`, `pnpm conventions` and `pnpm docs:verify`
   pass, and every fixture, snippet, example and template is in the new form.
 
@@ -3539,15 +3541,28 @@ Why now:
 - Every breaking change to the manifest that this project intends is on this list.
   Doing them across three minors would break the same file three times.
 
-Open before the milestone can close:
+Verified by hand, because no test in this repository runs MTA:
 
-- The compiler option vocabulary beyond `oop` and `strict`. The four remaining
-  options stay manifest fields; their spelling and arrangement wait on how much
-  of the same ground the language server covers — 51.02 and 51.09 together.
-- The runtime helper directory: `lib/<environment>/` as ADR-008 has it, or `libs/`
-  flat as the sketch has it, with the rule that keeps two helpers of one name
-  apart — 51.07 decides it.
-- The section comment wording, which is cosmetic and the owner's call.
+- The root element of the generated file is the resource folder name rather than
+  `<meta>`. ADR-047 records that MTA reads the children of the root node and does
+  not check its name, from the project owner's production use. **Start one built
+  resource on a real server before the release ships.** Nothing else in this
+  milestone depends on observed rather than documented behaviour.
+
+Settled while it was built:
+
+- The four remaining compiler options keep their spelling inside `environment`.
+  The language server answers the same ground at the offending line, which is what
+  51.09 delivers, and the manifest keeps the field so a build can still fail on it.
+- Runtime helpers stay flat at `lib/`; `libs/` stays the vendored library
+  directory. The rule that keeps the flat directory safe is an amendment to
+  ADR-008: a helper's file name comes from the one runtime registry, so two
+  helpers of one name cannot exist.
+- The section comments are `INFO`, `ENVIRONMENT`, `SCRIPTS`, `FILES` and
+  `EXPORTS`, in plain English rather than the possessive-plural sketch.
+- The log relay is removed with `development`, and `.luam.server` loses its `logs`
+  table with it: a workspace field configuring a relay that no longer exists would
+  be a field with no consumer.
 
 Deliberately excluded:
 
@@ -3568,3 +3583,35 @@ Deliberately excluded:
   consumer. It changes deployment, versioning, and whether a library's surface
   crosses a resource boundary at all, so `environment.libraries` keeps its ADR-038
   meaning here and the model gets its own record and its own milestone.
+
+## Milestone 52 — Bytecode Output
+
+`build.details.obfuscate` exists in the catalog, completes, hovers and validates,
+and reports `config-unimplemented-option` when it is `true`. It is the one field
+in the manifest that names a behaviour the build does not have, declared that way
+on purpose by [ADR-047](../docs/adr/047-manifest-table-sections.md) so it never
+silently does nothing.
+
+Its consumer is compilation to Lua bytecode through `luac`, which MTA loads. The
+milestone ends when `obfuscate = true` writes bytecode, `false` and absent write
+source, and the option stops reporting anything.
+
+Status: todo
+
+| ID | Task | Plan | Agent | Status |
+|---|---|---|---|---|
+| 52.01 | Compile the generated Lua to bytecode | ../plans/52.01-bytecode-output.md | architecture-engineer | todo |
+
+Acceptance:
+
+- `obfuscate = true` writes bytecode a real MTA server loads, and `obfuscate =
+  false` and an absent `obfuscate` write source.
+- `config-unimplemented-option` no longer exists for this field.
+- The resource map still resolves a production position, or the milestone states
+  in the manual what a bytecode build gives up.
+
+Why not sooner:
+
+- The field arrived with milestone 51 because the catalog it belongs to was being
+  rewritten, and leaving it out would have meant breaking the manifest twice.
+- Nothing else in the build depends on it, so it waits behind work that does.

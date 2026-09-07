@@ -1,4 +1,18 @@
-name = 'luam-docs-using-a-library'
-description = 'A resource that compiles an installed Luam library into its output.'
+{
+    info = {
+        description = 'A resource that compiles an installed Luam library into its output.',
+    },
 
-libraries = { '@luam-example/collections' }
+    environment = {
+        libraries = {
+            '@luam-example/collections',
+        },
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

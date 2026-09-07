@@ -1,2 +1,12 @@
-name = 'luam-docs-environment-configuration'
-description = 'Deployment values declared in .env and read through process.env.'
+{
+    info = {
+        description = 'Deployment values declared in .env and read through process.env.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

@@ -1,7 +1,7 @@
-<meta>
-    <!-- Resource information -->
+<testing-a-module>
+    <!-- INFO -->
     <info type="script" description="A shared module with a test file that luam test runs and luam build ignores." />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/shared.lua" type="shared" cache="false" />
     <script src="src/server.lua" />
-</meta>
+</testing-a-module>

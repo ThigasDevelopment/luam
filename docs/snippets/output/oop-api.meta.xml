@@ -1,7 +1,8 @@
-<meta>
-    <oop>true</oop>
-    <!-- Resource information -->
+<oop-api>
+    <!-- INFO -->
     <info type="script" description="The MTA OOP API enabled through the oop compiler option." />
-    <!-- Source scripts -->
+    <!-- ENVIRONMENT -->
+    <oop>true</oop>
+    <!-- SCRIPTS -->
     <script src="src/server.lua" />
-</meta>
+</oop-api>

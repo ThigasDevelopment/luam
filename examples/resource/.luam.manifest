@@ -1,20 +1,26 @@
-name = 'luam-resource'
-version = '1.0.0'
-description = 'A Luam resource showing the layout luam init scaffolds.'
+{
+    info = {
+        version = '1.0.0',
+        description = 'A Luam resource showing the layout luam init scaffolds.',
+    },
 
-compiler = {
-    strict = true,
-    oop = false,
+    environment = {
+        oop = false,
+        strict = true,
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    # files = {
+    #     'assets/**/*.png',
+    # },
+
+    build = {
+        output = 'build',
+    },
 }
-
-sources = {
-    server = { 'src/server/**/*.luam' },
-    client = { 'src/client/**/*.luam' },
-    shared = { 'src/shared/**/*.luam' },
-}
-
-assets = {
-    { from = 'assets/**/*', to = 'assets' },
-}
-
-outDir = 'build'

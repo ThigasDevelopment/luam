@@ -11,6 +11,26 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ### Added
 
+- [.luam.manifest](/en/tooling/luam-manifest) is rewritten around the table form:
+  the shape, the five sections, one worked example shown next to the `meta.xml` it
+  generates, and the blank line as a group boundary.
+- [Migration](/en/guide/migration) gains a `1.1.0` section: the before and after,
+  the field-by-field table of everything that moved, `luam migrate`, the editor
+  code action, and the one conversion that refuses.
+- [Configuration fields](/en/reference/configuration-fields) is generated from the
+  manifest catalog, so the table and the removed-field table cannot drift from
+  what the tool enforces.
+
+- [.luam.manifest](/en/tooling/luam-manifest) is rewritten around the table form:
+  the shape, the five sections, one worked example shown next to the `meta.xml` it
+  generates, and the blank line as a group boundary.
+- [Migration](/en/guide/migration) gains a `1.1.0` section: the before and after,
+  the field-by-field table of everything that moved, `luam migrate`, the editor
+  code action, and the one conversion that refuses.
+- [Configuration fields](/en/reference/configuration-fields) is generated from the
+  manifest catalog, so the table and the removed-field table cannot drift from
+  what the tool enforces.
+
 - [Server file](/en/reference/server-file): a new reference page for
   `.luam.server` — every field with its type and default, which file applies,
   what makes a child a resource, and the precedence table against the manifest.

@@ -1,2 +1,12 @@
-name = 'luam-docs-language'
-description = 'Snippets rendered by the language section of the manual.'
+{
+    info = {
+        description = 'Snippets rendered by the language section of the manual.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

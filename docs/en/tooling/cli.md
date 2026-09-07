@@ -20,9 +20,10 @@ luam help trace
 | Command | What it does |
 | --- | --- |
 | [`init`](#luam-init) | Scaffolds `.luam.manifest`. |
+| [`migrate`](#luam-migrate) | Rewrites an assignment-form `.luam.manifest` as one table of sections. |
 | [`check`](#luam-check) | Compiles and reports diagnostics. Writes nothing. |
 | [`test`](#luam-test) | Runs the project's `.test.luam` files on a local Lua 5.1 interpreter. |
-| [`build`](#luam-build) | Compiles and writes the resource into `<outDir>/<name>`. |
+| [`build`](#luam-build) | Compiles and writes the resource into `<build.output>/<folder>`. |
 | [`ensure`](#luam-ensure) | Builds, syncs into the MTA server, restarts, and watches. |
 | [`dev`](#luam-dev) | The `ensure` loop plus a live server log stream. |
 | [`server`](#luam-server) | Runs an existing local MTA server in the foreground. |
@@ -41,9 +42,28 @@ luam init --name gamemode-race
 Writes **one file**, `.luam.manifest`, and stops. There is no framework, no example
 tree, and nothing to delete before your first line of code.
 
-The resource name comes from `--name`, or from the project directory when that is
-a valid MTA resource name, or from `luam-resource` as a last resort. An existing
-`.luam.manifest` is kept and reported; `--force` overwrites it.
+The resource is named by the folder that holds the manifest, so `--name` names the
+directory the scaffold is written into. Without it the scaffold lands in the
+project directory and that directory is the name, falling back to `luam-resource`
+when it is not a valid MTA resource name. An existing `.luam.manifest` is kept and
+reported; `--force` overwrites it.
+
+## `luam migrate`
+
+```bash
+luam migrate
+luam migrate --check
+```
+
+Rewrites a `.luam.manifest` written as a list of assignments into the one table of
+sections it is now, and prints the diff. It writes nothing when the manifest is
+already in the table form, and nothing when the conversion would not be exact —
+a renaming `assets[].to`, or a `loadOrder` entry a `sources` pattern already
+reaches. Both are named, with the manual move spelled out.
+
+`--check` reports the rewrite and exits non-zero without writing it, for a pipeline
+that wants to fail on a manifest nobody migrated. The editor offers the same
+rewrite as a code action, so a project can migrate without leaving the file.
 
 ## `luam check`
 
@@ -188,8 +208,8 @@ walks through a complete project.
 luam build
 ```
 
-Compiles and writes the production bundle into `<outDir>/<name>`. The default
-also writes `<outDir>/<name>.luam-map.json`; see
+Compiles and writes the production bundle into `<build.output>/<folder>`. The default
+also writes `<build.output>/<folder>.luam-map.json`; see
 [Output layouts and source maps](/en/reference/output-layouts) for the exact
 resource shape and overrides.
 
@@ -225,8 +245,8 @@ Builds, mirrors the resource into your MTA server, and repeats on every save.
 Requires a server path — `serverPath` in the manifest, or a
 [`.luam.server`](/en/reference/server-file) above it. It syncs files and never
 restarts the resource — use `luam dev`, or `refresh` in the server console, to
-load the sync. `ensure` never writes to `<outDir>/<name>` and uses the tree
-layout by default, regardless of `output.bundle`. Pass `--bundle` for a bundled
+load the sync. `ensure` never writes to `<build.output>/<folder>` and uses the tree
+layout by default, regardless of `build.details.bundle`. Pass `--bundle` for a bundled
 sync.
 
 Run at a **workspace root** — a directory holding a `.luam.server` and no
@@ -433,7 +453,7 @@ returns `2` and runs nothing.
 | `--write` | `config` | Write the declaration file instead of printing it. |
 | `--lua <path>` | `test` | Lua 5.1 interpreter that runs the tests. `LUAM_LUA` does the same. |
 | `--map <path>` | `trace` | Resource map to read. Relative paths resolve from the project directory. |
-| `--name <name>` | `init` | Resource name. |
+| `--name <name>` | `init` | Directory to scaffold into, which is the resource name. |
 | `--force` | `init` | Overwrite a file that exists. |
 | `-y`, `--yes` | `init`, `setup` | Accept the defaults, or install into every detected editor, without prompting. |
 

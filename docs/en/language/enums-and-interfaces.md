@@ -36,7 +36,7 @@ disappears. Read it once from a compiled source when something outside the build
 depends on it.
 
 A surviving enum is a **global**, not a local, so declaration order across files
-matters at load time. Put it in a shared file and pin that file with `loadOrder`
+matters at load time. Put it in a shared file and give that file an earlier position in `scripts`
 when a server or client file reads it while loading.
 
 ### Local enums
@@ -60,7 +60,7 @@ local enum Weather {
   the local wins, exactly as a `local` variable shadows a global.
 - Because the name is a local, `noUnusedLocals` reports an unread local enum as
   `check-unused-local`; a global enum is erased silently instead.
-- There is no global to race at load time, so `loadOrder` never matters for it.
+- There is no global to race at load time, so its position in `scripts` never matters.
 
 Member names stay quoted in the generated Lua:
 

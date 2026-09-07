@@ -1,2 +1,12 @@
-name = 'luam-docs-testing-a-module'
-description = 'A shared module with a test file that luam test runs and luam build ignores.'
+{
+    info = {
+        description = 'A shared module with a test file that luam test runs and luam build ignores.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

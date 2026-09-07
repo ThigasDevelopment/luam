@@ -1,459 +1,359 @@
 # .luam.manifest
 
-`.luam.manifest` sits at the project root. **Only `name` is required.**
+`.luam.manifest` sits at the project root and **is one table constructor**. The
+file is a value, not a program: there is no statement in it, nothing before the
+opening `{`, and nothing after the closing `}`.
 
-```luam
-name = 'luam-demo'
-author = 'Thigas'
-version = '1.0.0'
-description = 'A demo resource'
+The resource is named by the folder that holds the manifest. There is no `name`
+field, because MTA already resolves a resource by its directory and two answers
+to one question can disagree.
 
-compiler = {
-    strict = true,
-    oop = false,
-    noUnusedLocals = false,
-    noUnusedParameters = false,
-    warningsAsErrors = false,
-}
+```luam manifest
+{
+    info = {
+        author = { name = 'dracoN*', discord = 'draconzx' },
 
-sources = {
-    server = { 'src/server/**/*.luam' },
-    client = { 'src/client/**/*.luam' },
-    shared = { 'src/shared/**/*.luam' },
-}
+        version = '1.0.0',
+        description = 'Heaven Roleplay.',
 
-assets = {
-    { from = 'assets/**/*', to = 'assets' },
-}
+        dependencies = {
+            'hr_core',
 
-dependencies = { 'scoreboard' }
-libraries = { '@luam-example/collections' }
+            'hr_admin',
+        },
+    },
 
-engine = {
-    minVersion = '1.6.0',
-}
+    environment = {
+        oop = false,
+        strict = true,
 
-environment = {
-    file = '.env',
-    localFile = '.env.local',
-}
+        version = {
+            server = '1.6.0',
+            client = '1.6.0',
+        },
+    },
 
-outDir = 'build'
-loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
+    scripts = {
+        { path = 'config.lua', type = 'shared' },
+        { path = 'items.lua', type = 'shared' },
 
-output = {
-    bundle = true,
-    map = true,
-    minify = true,
-}
+        { path = 'src/utils/lib/*.luam', type = 'shared' },
 
-helpers = { 'threads' }
-serverPath = 'C:/MTA Server'
-resourcesDir = 'mods/deathmatch/resources'
+        { path = 'src/utils/format.luam', type = 'shared' },
+        { path = 'src/utils/render.luam', type = 'client' },
 
-development = {
-    logs = {
-        enabled = false,
-        maxMessageLength = 4096,
-        rateLimit = 30,
-        rateWindowMs = 1000,
+        { path = 'src/services/**/*.server.luam', type = 'server' },
+        { path = 'src/services/**/*.client.luam', type = 'client' },
+
+        { path = 'src/index.luam', type = 'server' },
+        { path = 'src/interface.luam', type = 'client' },
+    },
+
+    files = {
+        'list.xml',
+
+        'assets/images/**/*.png',
+    },
+
+    build = {
+        output = 'build',
+
+        details = {
+            bundle = false,
+            minify = false,
+            map = false,
+        },
     },
 }
 ```
 
-`--manifest <path>` loads a different file, which is how a project keeps a separate
-manifest for a second server. The path has to end in `.luam.manifest` —
-`deploy.luam.manifest` is accepted, `luam.config.js` is
-`config-unsupported-manifest`.
+That manifest, in a folder called `heaven-roleplay`, generates this `meta.xml`:
 
-## The dialect
+```xml
+<heaven-roleplay>
+    <!-- INFO -->
+    <info author="dracoN*" type="script" version="1.0.0" description="Heaven Roleplay." discord="draconzx" />
+    <include resource="hr_core" />
 
-The manifest is written in Luam, restricted to what a configuration file needs.
-The compiler parses, checks, and evaluates it — the same lexer, the same parser,
-the same diagnostics with carets. There is no separate configuration language to
-learn and no separate process to run it.
+    <include resource="hr_admin" />
+    <!-- ENVIRONMENT -->
+    <oop>false</oop>
+    <min_mta_version server="1.6.0" client="1.6.0" />
+    <!-- SCRIPTS -->
+    <script src="config.lua" type="shared" cache="false" />
+    <script src="items.lua" type="shared" cache="false" />
 
-Two statements are allowed:
+    <script src="src/utils/lib/*.lua" type="shared" cache="false" />
 
-```luam
-local prefix = 'luam'          # a local, to name a value used more than once
-name = prefix .. '-demo'       # an assignment to a configuration field
+    <script src="src/utils/format.lua" type="shared" cache="false" />
+    <script src="src/utils/render.lua" type="client" cache="false" />
+
+    <script src="src/services/**/*.server.lua" />
+    <script src="src/services/**/*.client.lua" type="client" cache="false" />
+
+    <script src="src/index.lua" />
+    <script src="src/interface.lua" type="client" cache="false" />
+    <!-- FILES -->
+    <file src="list.xml" />
+
+    <file src="assets/images/**/*.png" />
+</heaven-roleplay>
 ```
 
-Anything else — a function, a loop, an `if`, a `return`, a call, an environment
-directive — is `config-invalid-statement`. An assignment to a name that is not a
-configuration field is `config-unknown-field`, reported at the name rather than at
-the file:
+Read the two side by side and the rule is visible: **order is position**, and a
+blank line between two entries is a blank line between their elements.
 
-```
-.luam.manifest:2:1 error config-unknown-field: "outdir" is not defined in this
-manifest. Declare it with "local", or read "mode", "env", or "root".
-```
+## The five sections
 
-Every configuration diagnostic carries a line and a column, and an interactive
-terminal underlines the offending text the same way it does for a source file.
-
-A `local` that no field reads is dead configuration, so the manifest reports it as
-`check-unused-local` — a warning, not an error. This does not depend on
-`compiler.noUnusedLocals`, which governs source files; the manifest is
-always checked in its own strict mode. Rename the local with a leading `_` to keep
-it on purpose.
-
-A value is a literal, a table, or those combined with `and`, `or`, `not`,
-comparison, arithmetic, and concatenation:
-
-```luam
-outDir = mode == 'production' and 'build' or 'build-dev'
-serverPath = env.LUAM_MTA_SERVER or 'C:/MTA Server'
-```
-
-Lua truthiness applies, so `a and b or c` reads as a conditional and the checker
-types it precisely: the branch above is a `string`, which is what `serverPath`
-accepts.
-
-### Why there are no calls
-
-The expression language has no calls and no function values. That is the whole
-point: evaluating a manifest is pure and total, so it is safe to run anywhere.
-The compiler evaluates it in process, and so does the language server every time
-you type — opening a folder never executes project code and never spawns
-anything.
-
-There are no hooks and no plugins for the same reason. A manifest declares what
-the project is; it never describes how to build it.
-
-### Injected values
-
-Three names are in scope besides the configuration fields:
-
-| Value | Type | Meaning |
-| --- | --- | --- |
-| `mode` | `string` | `development` for `dev` and `ensure`, `production` for `build`, otherwise the command name — `check`, `trace`. |
-| `env` | table of `string?` | The environment the CLI was given. Read a variable by name; the value never reaches a diagnostic. |
-| `root` | `string` | Absolute project root, for composing paths that do not depend on the working directory. |
-
-`env` members are optional strings, so a missing variable is `nil` rather than an
-error. Comparing or defaulting is the way to use one:
-
-```luam
-local root = env.LUAM_MTA_SERVER
-
-serverPath = root or 'C:/MTA Server'
-```
-
-Nothing else is in scope. There is no `print`, no `os`, no `require` — a name the
-manifest did not declare is `config-unknown-field`, which is also why a typo in a
-field name is caught at the field rather than silently ignored.
-
-### In the editor
-
-The manifest is an ordinary document to the language server. Diagnostics appear
-as you type, completion offers the fields valid at the cursor — with their type,
-whether they are required, and their default — and the closed sets (`helpers`
-and the `mode` values) complete inside the quotes. Hover names the
-field's full path and type.
-
-Because the server reads the file directly, flipping `compiler.oop` takes
-effect on save. There is no snapshot to refresh and no CLI run to wait for;
-`.luam/settings.json` no longer exists.
-
-## Domains
-
-The manifest is a closed set of typed domains. Each one has a single owner and a
-single implemented consumer, so a field never means two things in two places.
-
-| Domain | Owns |
+| Section | What it answers |
 | --- | --- |
-| identity | `name`, `author`, `version`, `description` |
-| `compiler` | How the checker reads the project. |
-| `sources` | Which files belong to the project and to which environment. |
-| `assets` | Which files are copied into the resource and where they land. |
-| `dependencies` | Resources this one requires at run time. |
-| `libraries` | Luam library packages compiled into this resource. |
-| `engine` | The MTA version the resource requires. |
-| `environment` | Which `.env` files supply `env` and `process.env`. |
-| output | `outDir`, `loadOrder`, `output`, `helpers`. |
-| deployment | `serverPath`, `resourcesDir`, `development`. |
+| `info` | What the resource is, who wrote it, and what has to be present beside it |
+| `environment` | The environment the resource runs in and is checked against |
+| `scripts` | Which scripts load, in which order, on which side |
+| `files` | Which files the resource ships |
+| `build` | Where the build writes and what it writes there |
 
-A complete field-by-field table, including every validation rule, is in
-[Configuration fields](/en/reference/configuration-fields).
+Every field of every section is in
+[configuration fields](/en/reference/configuration-fields).
 
-## `compiler`
+## Order is position
 
-| Key | Default | Meaning |
-| --- | --- | --- |
-| `strict` | `true` | Project-wide strict mode. A `#!strict` or `#!nonstrict` directive in a file still wins for that file. |
-| `oop` | `false` | Enables the MTA OOP API and writes `<oop>true</oop>`. |
-| `noUnusedLocals` | `false` | Reports a local that is never read as `check-unused-local`. |
-| `noImplicitGlobals` | `false` | Reports an assignment that creates a global nothing declares as `check-implicit-global`. |
-| `noUnusedParameters` | `false` | Reports a parameter that is never read as `check-unused-parameter`. |
-| `warningsAsErrors` | `false` | Promotes every warning to an error, so a warning fails the build. |
+`scripts`, `files`, `environment.libraries` and `info.dependencies` are ordered
+lists. The order in the table is the order in the generated file, so moving an
+entry up moves its element up and changes nothing else.
 
-A name starting with `_` is never reported as unused, which is the way to keep a
-binding on purpose.
+There is no separate load order to keep in step with a separate list of sources,
+because there is no separate list: a path is written once, where it loads.
 
-With `oop` on, the compiler types the object form of the MTA API, so
-`player:getName()` returns `string`. Off, the same call is `check-oop-disabled`
-and the message names the procedural function to use instead. The emitted Lua is
-identical either way. See [OOP API](/en/mta/oop).
+## A blank line is a group boundary
 
-## `sources`
+A blank line between two entries of an ordered list reaches the generated file at
+the same place. This is the one construct in the manifest whose whitespace
+carries meaning.
 
-Each side lists the patterns that belong to it:
+- One or more blank lines are one boundary, and the generated file gets one.
+- A blank line before the first entry, or after the last, is not a boundary.
+- A comment line between two entries is neither a boundary nor carried across.
 
-```luam
-sources = {
-    server = { 'src/server/**/*.luam' },
-    client = { 'src/client/**/*.luam', 'ui/**/*.luam' },
-    shared = { 'src/shared/**/*.luam' },
+`luam format` preserves a blank run between entries, collapses a longer run to
+one line, and never introduces one. The rule does not read `maxBlankLines` from
+[.luam.formatter](/en/reference/formatter-file): a manifest whose layout depended on a
+formatter setting would generate a different file on two machines.
+
+## `scripts`
+
+An entry is `{ path, type }`. `path` is a file or a `*`, `**` or `?` pattern;
+`type` is `'server'`, `'client'` or `'shared'`.
+
+The side is declared where the path is declared, so the project is free to lay
+itself out however it likes — `src/utils/` is typed by its entry, not by the
+directory it sits in. A `#!server`, `#!client` or `#!shared` directive stays a
+per-file override and still warns when it disagrees with the entry.
+
+A `<script src>` carries the entry's own text with `.luam` rewritten to `.lua`,
+so a directory of scripts is one line in the manifest and one line in `meta.xml`.
+MTA expands the wildcard itself.
+
+A `.lua` path is legal: a native script is copied verbatim and loads at the
+position the list gives it, ahead of or behind the compiled ones.
+
+One file matched by two entries is `config-script-side-conflict`, whatever their
+sides: the file would be written once and loaded twice. Narrow the patterns so
+each file belongs to one entry.
+
+A literal path that names no file is `config-missing-script` and fails the build.
+A pattern whose directory exists and that still matched nothing is
+`config-empty-script-entry`, a warning — an entry naming a directory the project
+has not written yet says nothing at all.
+
+## `files`
+
+An entry is a bare path. Source and destination are the same, so the path reaches
+`<file src>` exactly as written and the generated list reads against the tree.
+
+```luam manifest
+{
+    files = {
+        'list.xml',
+
+        'assets/images/**/*.png',
+        'assets/shader/**/*.fx',
+    },
 }
 ```
 
-A pattern uses `*` (anything inside one segment), `**` (any number of segments),
-and `?` (one character). `/` separates segments. There is no regex, no negation,
-no brace expansion, and no extglob — a value shaped like one is
-`config-invalid-pattern`. `.git`, `.luam`, `node_modules`, and `outDir` are never
-scanned.
+Adding an image to `assets/images/` changes no line of `meta.xml`. Renaming a file
+on the way into the resource is not possible: move the file in the project
+instead.
 
-The side a file gets is the side that matched it. A `#!server`, `#!client`, or
-`#!shared` directive in the file still wins, and the mismatch is reported as
-`env-path-directive-conflict` so the disagreement is visible rather than silent.
-A file matched by two sides is `config-source-side-conflict`; a literal path that
-names no file is `config-missing-source`; a project that holds `.luam` files none
-of which matched is `config-unmatched-source`, which names them; a project with no
-`.luam` file at all is `config-no-sources`.
+An entry that matches nothing is `config-empty-file-entry` and fails the build.
+Two entries claiming one file are `config-output-collision`. An entry that would
+reach `.env` is `config-environment-file-entry`: a client that can download the
+environment file is a resource that leaks its secrets.
 
-Omitting `sources` keeps the default layout, which is the three patterns above.
-Either way, a `.luam` file directly in the project root is compiled without a
-pattern, with the side its `#!` directive declares and `shared` without one. The
-scaffolded block and no block at all both build a flat resource — see
-[Project layout](/en/guide/project-layout).
+## `info`
 
-## `assets`
+`author` is a record. `name` is required and is the attribute MTA itself uses.
+The catalog also names `discord`, `github` and `email`, so the editor offers them,
+but the record is **open**: any other key you write is accepted too.
 
-Each entry names what to copy and where it lands inside the resource:
+```luam manifest
+{
+    info = {
+        author = { name = 'dracoN*', discord = 'draconzx', twitch = 'draconzx' },
 
-```luam
-assets = {
-    { from = 'assets/**/*', to = 'assets' },
-    { from = 'media/logo.png', to = 'images' },
+        version = '1.0.0',
+        description = 'Heaven Roleplay.',
+    },
 }
 ```
 
-Everything a mapping names is copied and declared as `<file>`, so clients
-download it. Nothing else is copied — a data file sitting beside server code
-needs its own mapping, which is what makes the resource contents predictable.
+Every key but `name` is written as an info attribute, in the order you wrote it,
+and each is readable at runtime by its own name:
 
-`to` is a destination directory inside the resource. Two entries that resolve to
-the same destination are `config-output-collision`, and so is a destination that
-would overwrite `meta.xml` or the generated `lib/` directory. A literal `from`
-that names no file is `config-missing-asset`, and a mapping that copies nothing
-is the `config-empty-asset` warning — a build that declared a mapping and shipped
-none of it no longer passes in silence.
-
-### What each `from` matches
-
-Against a project holding `assets/readme.txt` and `assets/img/logo.png`, with
-`to = 'assets'`:
-
-| `from` | Copies | Lands at |
-| --- | --- | --- |
-| `assets` | both files | `assets/readme.txt`, `assets/img/logo.png` |
-| `assets/**` | both files | `assets/readme.txt`, `assets/img/logo.png` |
-| `assets/**/*` | both files | `assets/readme.txt`, `assets/img/logo.png` |
-| `assets/*` | `readme.txt` only | `assets/readme.txt` |
-| `assets/**/*.png` | `logo.png` only | `assets/img/logo.png` |
-| `**/*.png` | `logo.png` only | `assets/assets/img/logo.png` |
-
-`assets/*` and `assets/**/*` are the pair worth reading twice: `*` stops at one
-segment, so `assets/*` never reaches `img/logo.png`. The last row is not a bug
-either — a pattern's root is everything before its first wildcard, so `**/*.png`
-roots at the project and the copied path keeps `assets/` in front of it.
-
-The scaffolded manifest ships this block commented out with `#`, the manifest's
-line comment, so the first build of a new project declares nothing it does not
-have. `--` is not a comment here; it is `lex-foreign-comment`.
-
-## `dependencies`
-
-```luam
-dependencies = { 'scoreboard', 'admin' }
+```lua
+getResourceInfo(getThisResource(), 'discord')   --> 'draconzx'
+getResourceInfo(getThisResource(), 'twitch')    --> 'draconzx'
+getResourceInfo(getThisResource(), 'nothing')   --> false
 ```
 
-Each name is written as `<include resource="..." />` in `meta.xml`, so MTA starts
-the named resource first. Names are deduplicated and sorted. A value that is not
-a valid resource name, or that names this resource, is
-`config-invalid-dependency`. Optional dependencies are not supported — MTA has no
-such concept.
+`getResourceInfo` reads one attribute at a time and returns `false` for one that
+is not there, so an open record costs nothing: a key the catalog does not name
+reaches the resource exactly like one it does.
 
-## `libraries`
-
-```luam
-libraries = { '@luam-example/collections', 'mta-async' }
-```
-
-Each entry names an installed npm package that ships Luam source, described in
-[Libraries](/en/tooling/libraries). The compiler reads the package from
-`node_modules`, compiles it as part of this project, and vendors the result into
-the resource under `libs/`.
-
-The order is the emission order: libraries are written after the runtime library
-and before `config.lua`, the pinned `loadOrder` entries and the source wildcards,
-in the order this list declares.
-
-Nothing is implicit and nothing is fetched. A package installed but absent from
-this list is not compiled; a package listed but not installed is
-`config-library-missing`, which names the install command and leaves the output
-untouched. Installing is the developer's step — `npm install`, `pnpm add`, or
-whatever the project already uses — and a build with a populated `node_modules`
-and no network succeeds.
-
-::: tip `libraries` or `dependencies`?
-They answer different questions.
-
-- `libraries` **obtains code**. The package is compiled into this resource and
-  ships inside it, so its functions and classes are ordinary globals here.
-- `dependencies` **names another resource** that must be running. It is written
-  as `<include>` in `meta.xml`, and its code stays in its own resource, reached
-  through the [export contract](/en/language/exports).
-
-A pure module is a library. A stateful service is a resource with exports.
-:::
-
-A value that is not an npm package name is `config-library-invalid`, and the same
-package listed twice is `config-library-duplicate`.
-
-## `engine`
-
-```luam
-engine = {
-    minVersion = '1.6.0',
-}
-```
-
-`minVersion` becomes `min_mta_version` in `meta.xml`. The default is `'latest'`,
-which asks the MTA release feed for the current version at build time; `--offline`
-and `LUAM_OFFLINE` skip that lookup and the build still succeeds. Pinning an
-explicit version makes the build network-free. A value that is not a version is
-`config-invalid-engine-version`.
-
-`mta.minVersion` is not accepted. The domain is `engine`.
+`dependencies` names other MTA resources and emits one `<include>` each, in the
+order they are written. A repeated entry is `config-duplicate-dependency` rather
+than a silent collapse, and naming this resource is `config-invalid-dependency`.
 
 ## `environment`
 
-```luam
-environment = {
-    file = '.env.development',
-    localFile = '.env.development.local',
+`environment` describes the environment the resource executes in, and holds four
+questions on purpose: whether it is object-oriented, whether it is checked
+strictly, which MTA version it needs, and which libraries it is built with.
+
+```luam manifest
+{
+    environment = {
+        secret = '.env',
+
+        oop = false,
+        strict = true,
+
+        version = {
+            server = '1.6.0',
+            client = 'latest',
+        },
+
+        libraries = {
+            '@luam-example/collections',
+        },
+    },
 }
 ```
 
-`file` declares the keys and their types — it is what `env.X` and
-`process.env.X` are typed against, and what the deployed `env.lua` is
-rendered from. `localFile` overrides the *values* of keys the base file already
-declares; a key only in the local file is ignored, so a machine-local override
-can never change the project's shape. Both default to `.env` and `.env.local`.
+`secret` names the one file that declares the environment keys. See
+[environment configuration](/en/recipes/environment-configuration).
 
-A configured file that does not exist is `config-missing-env-file`; the defaults
-are optional, so a project without a `.env` is not an error. The language server
-watches both files and reanalyzes on save.
+`oop` reaches the generated file whenever it is written: `true` emits
+`<oop>true</oop>` and `false` emits `<oop>false</oop>`, because a resource that
+says `false` is stating a decision. An absent `oop` emits nothing.
 
-## Path safety
+`version.server` and `version.client` are resolved per side. `'latest'` follows
+the newest published MTA release, cached for a day; an offline build with no cache
+leaves the element out and warns.
 
-`outDir`, `resourcesDir`, and every `sources`, `assets`, and `loadOrder` entry
-must stay **inside their base directory**. An absolute path or a `..` segment is
-`config-escaping-path` and the configuration fails to load.
+`libraries` names installed npm packages that ship Luam sources. See
+[libraries](/en/tooling/libraries).
 
-## `loadOrder`
+Cache identity is per field, not per section: editing `secret` does not recompile,
+editing `strict` does, and editing `version` changes only the generated file.
 
-An ordered list of source paths relative to the project root. Each entry is
-emitted ahead of its group in `meta.xml` — a script as its compiled `.lua` path,
-an asset as itself.
+## `build`
 
-Order is meaningful for assets too, since a shader can depend on another. An
-entry that names a file the project does not produce is
-`project-load-order-missing`, so a rename cannot break the order silently.
+```luam manifest
+{
+    build = {
+        output = 'build',
 
-## `output`
+        details = {
+            bundle = true,
+            minify = true,
+            map = true,
+        },
+    },
+}
+```
 
-`output.bundle` sets the `build` default. `--bundle` and `--no-bundle` override
-it. `ensure` defaults to tree unless passed `--bundle`, while `dev` always uses
-tree.
+`output` names the directory the artifact is written under, and the resource
+lands in `<output>/<folder>`. It may be absolute and it may leave the project: a
+build written to another disk is a legitimate thing to want.
 
-`output.map` controls map generation. `build` writes
-`<outDir>/<name>.luam-map.json`; `ensure` and `dev` keep maps in memory and never
-write that file. `--no-map` disables map generation for the current command.
-See [Output layouts and source maps](/en/reference/output-layouts).
+The guard is on the other side. The build writes a `.luam-build` marker when it
+creates a resource directory, prunes only inside a directory carrying that marker,
+and says so and removes nothing anywhere else. A stale-file cleanup pointed at a
+directory the build did not create is how an output path becomes data loss.
 
-`output.minify` controls whether `build` writes each script on one line.
-`--minify` and `--no-minify` override it. `dev` never minifies, so a stack trace
-stays readable while you work.
+`details.bundle` writes one Lua file per side instead of mirroring the tree, and
+the ordered `scripts` list then decides the order of the members inside each
+bundle rather than the order of `<script>` elements. Both shapes are ordered by
+position; only the artifact the position orders changes. See
+[output layouts](/en/reference/output-layouts).
 
-## `helpers`
+`details.obfuscate` is declared and is not honoured yet. Setting it to `true`
+reports `config-unimplemented-option` naming the milestone that will compile the
+generated Lua to bytecode, so the field never silently does nothing.
 
-Names runtime helpers the compiler would not inject on its own.
+## The dialect
 
-- `threads` is opt-in.
-- `env` is injected automatically when the project has an environment file, so
-  listing it is only needed to ship the library without one.
-- Listing an automatic helper is harmless; listing an unknown name is
-  `config-unknown-helper`, and completion offers the known names inside the
-  quotes.
+A manifest value is a literal, a table, or those combined with `and`, `or`, `not`,
+comparison, arithmetic and concatenation. There are no calls, no loops and no
+function expressions, so the file cannot diverge, cannot read a file and cannot
+observe anything but the values it was handed. That is what lets the editor
+evaluate it in process on every keystroke.
 
-`helperDir` was removed. Tree output writes helpers to `lib/<environment>`;
-bundle output includes them in its environment bundles. A `.luam.manifest` that
-still names `helperDir` fails with `config-unknown-field` — delete the line.
+### Injected values
 
-## `development.logs`
+Three names are in scope inside the table:
 
-Used by `luam dev` only. `build` and `ensure` never write the development
-helpers.
-
-| Key | Default | Meaning |
+| Name | Type | What it is |
 | --- | --- | --- |
-| `enabled` | `false` | `dev` enables capture even when this section is omitted. |
-| `maxMessageLength` | `4096` | Longer relayed records are rejected. |
-| `rateLimit` | `30` | Records allowed per client per window. |
-| `rateWindowMs` | `1000` | Length of that window. |
+| `mode` | `string` | `'production'` for `luam build`, `'development'` for `luam dev`, `'check'` for `luam check` |
+| `env` | `Env` | The process environment, every key an optional string |
+| `root` | `string` | The absolute project directory |
 
-## `development.server`
+```luam manifest
+{
+    build = { output = mode == 'production' and 'build' or 'build-dev' },
+}
+```
 
-`executable` is an optional path relative to `serverPath`. It must stay inside
-that directory. When omitted, `luam server` and `luam dev --start-server` probe
-`MTA Server.exe` on Windows, or `mta-server64` then `mta-server` on Linux.
+There is no `local`. An intermediate value is written where it is used, so
+`env.SOME_KEY` may appear once per use.
+
+### In the editor
+
+The language server completes the sections at the top level, the fields of a
+section inside it, and the three sides at `type =`. Hover names the field's full
+path, its type, its default and its rule. A misspelled key puts the caret on the
+key rather than on its value.
 
 ## When the file is wrong
 
-| Problem | Diagnostic |
+| Code | Meaning |
 | --- | --- |
-| No `.luam.manifest` in the directory | `config-not-found` |
-| `--manifest` names a file that is not a manifest | `config-unsupported-manifest` |
-| The file could not be read | `config-unreadable-manifest` |
-| A statement the dialect does not allow | `config-invalid-statement` |
-| A value the expression language does not allow | `config-invalid-expression` |
-| `name`, or `from` inside an `assets` entry, is missing | `config-missing-field` |
-| `name` is not a valid resource name | `config-invalid-name` |
-| A field has the wrong type | `config-invalid-type` |
-| A name is not a configuration field | `config-unknown-field` |
-| A field that no longer exists | `config-removed-field` |
-| A path escapes its base | `config-escaping-path` |
-| A pattern the glob grammar does not allow | `config-invalid-pattern` |
+| `config-manifest-not-a-table` | The file is not one table constructor |
+| `config-trailing-content` | Something is written after the table |
+| `config-unexpected-statement` | The file starts with a statement, `local` included |
+| `config-unknown-field` | A key no section declares, with the caret on the key |
+| `config-duplicate-field` | One key written twice, rather than last-write-wins |
+| `config-missing-field` | A required field of a record is absent |
+| `config-invalid-type` | A value of the wrong type |
+| `config-removed-field` | A field this manifest no longer has, naming where it went |
+| `config-manifest-form` | The file is still a list of assignments |
 
-Every code is listed in [Diagnostics](/en/reference/diagnostics).
+## The assignment form
 
-## Removed fields
-
-These names are rejected rather than aliased, so a stale manifest fails loudly
-instead of building something different from what it says:
-
-| Removed | Replacement |
-| --- | --- |
-| `oop` | `compiler = { oop = true }` |
-| `compilerOptions` | `compiler = { ... }` |
-| `sourceDirs` | `sources = { server = { ... }, client = { ... }, shared = { ... } }` |
-| `assetDirs` | `assets = { { from = 'assets/**/*', to = 'assets' } }` |
-| `mta` | `engine = { minVersion = '1.6.0' }` |
-| `helperDir` | Nothing. Helpers go to `lib/<environment>` or into the bundles. |
-| `transport` | Nothing. `ensure` syncs files; `dev --start-server` restarts the server it owns. |
-
-Each one reports `config-removed-field` and names its replacement in the message.
+A manifest written as a list of assignments still loads for one minor, is
+converted internally, and reports `config-manifest-form` once. Run
+[`luam migrate`](/en/guide/migration) to rewrite it, or take the same rewrite as an
+editor code action. The converter is removed in the next major.

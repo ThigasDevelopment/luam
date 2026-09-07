@@ -13,8 +13,6 @@ const defaultCli = join(repositoryRoot, 'packages', 'cli', 'dist', 'luam.mjs');
 
 const MANIFEST_FILE = '.luam.manifest';
 
-const RESOURCE_NAME = /^name\s*=\s*'([^']+)'/m;
-
 const LOCAL_STATE: readonly string[] = ['.luam', 'build'];
 
 const write = process.argv.includes('--write');
@@ -48,17 +46,6 @@ function run(cli: string, command: string, cwd: string): { output: string; statu
     return { output: `${result.stdout ?? ''}${result.stderr ?? ''}`.trim(), status: result.status ?? 1 };
 }
 
-function resourceName(project: string): string {
-    const source = readFileSync(join(snippetsRoot, project, MANIFEST_FILE), 'utf8');
-    const found = RESOURCE_NAME.exec(source);
-
-    if (found?.[1] === undefined) {
-        throw new Error(`docs/snippets/${project}/${MANIFEST_FILE} declares no resource name.`);
-    }
-
-    return found[1];
-}
-
 function fileTree(root: string): string {
     const walk = (directory: string): string[] =>
         readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -77,11 +64,13 @@ function isCaptured(source: string, entry: string): boolean {
 }
 
 function captureProject(cli: string, project: string): Capture[] {
-    const name = resourceName(project);
+    const name = project.split('/').pop() ?? project;
     const source = join(snippetsRoot, project);
-    const workspace = mkdtempSync(join(tmpdir(), 'luam-docs-'));
+    const created = mkdtempSync(join(tmpdir(), 'luam-docs-'));
+    const workspace = join(created, name);
 
     try {
+        mkdirSync(workspace, { recursive: true });
         cpSync(source, workspace, { recursive: true, dereference: true, filter: (entry) => isCaptured(source, entry) });
 
         const check = run(cli, 'check', workspace);
@@ -106,7 +95,7 @@ function captureProject(cli: string, project: string): Capture[] {
             { file: `${project}.meta.xml`, content: readFileSync(join(resource, 'meta.xml'), 'utf8').trim() },
         ];
     } finally {
-        rmSync(workspace, { recursive: true, force: true });
+        rmSync(created, { recursive: true, force: true });
     }
 }
 

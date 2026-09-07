@@ -1,6 +1,6 @@
-<meta>
-    <!-- Resource information -->
+<server-command>
+    <!-- INFO -->
     <info type="script" description="A chat command handled on the server." />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/server.lua" />
-</meta>
+</server-command>

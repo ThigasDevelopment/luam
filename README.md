@@ -116,11 +116,10 @@ src/client/hud.luam:4:5 error check-environment-api: API "outputChatBox" is serv
 `<MTA Server>/mods/deathmatch/resources/`, then `refresh` and
 `start my-resource` in the server console.
 
-**5. Iterate.** Point `.luam.manifest` at your server and let `dev` build, sync,
-restart and stream logs on every save:
+**5. Iterate.** Name your MTA server once in a `.luam.server` beside the resource
+and let `dev` build, sync, restart and stream logs on every save:
 
 ```luam
-name = 'my-resource'
 serverPath = 'C:/MTA Server'
 ```
 
@@ -140,7 +139,7 @@ luam dev --start-server # also starts and owns the local MTA process
 | --- | --- |
 | `luam init` | Scaffolds `.luam.manifest` and stops |
 | `luam check` | Compiles and prints diagnostics. Writes nothing — this is the CI command |
-| `luam build` | Writes the bundled resource into `<outDir>/<name>`, plus a source map |
+| `luam build` | Writes the bundled resource into `<build.output>/<folder>`, plus a source map |
 | `luam dev` | Build, sync, restart and watch, while following the server log |
 | `luam ensure` | Build, sync and restart on every save |
 | `luam server` | Run an existing local MTA server in the foreground |
@@ -225,17 +224,34 @@ and assets stay at their own paths, and the map stays outside the resource.
 
 ## Configuration
 
-`.luam.manifest` — only `name` is required.
+`.luam.manifest` is one table of five sections, and the folder that holds it names
+the resource.
 
 ```luam
-name = 'my-resource'
-serverPath = 'C:/MTA Server'
+{
+    info = {
+        version = '1.0.0',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    files = {
+        'assets/**/*.png',
+    },
+
+    build = { output = 'build' },
+}
 ```
 
-Optional fields cover `meta.xml` info, `compiler`, `sources`, `assets`,
-`dependencies`, `engine.minVersion`, `environment`, `outDir`, `loadOrder`,
-`output`, `helpers`, `resourcesDir`, `development.logs` and
-`development.server.executable`.
+`info` carries the author, the version, the description and the dependencies;
+`environment` carries `oop`, `strict`, the MTA version and the libraries; `build`
+carries the output directory and the bundle, minify, map and obfuscate switches.
+Order is position, and a blank line between two entries reaches `meta.xml`.
 
 > [.luam.manifest](https://thigasdevelopment.github.io/luam/en/tooling/luam-manifest)
 > and [Configuration fields](https://thigasdevelopment.github.io/luam/en/reference/configuration-fields)

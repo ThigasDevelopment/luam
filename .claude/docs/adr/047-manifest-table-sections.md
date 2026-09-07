@@ -1,6 +1,6 @@
 # ADR-047: The manifest is one table of ordered sections
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Supersedes or amends:**
 [ADR-008](008-generated-manifest-standard.md) (load order, section comments, the
@@ -39,7 +39,7 @@ written where it is used, or is not written. The rule is worth the loss because
 it is the whole specification — a manifest is one object, and there is nothing
 else in the file to describe, check or explain.
 
-```luam
+```luam manifest
 {
     info = {
         author = { name = 'dracoN*', discord = 'draconzx' },
@@ -67,7 +67,7 @@ else in the file to describe, check or explain.
         libraries = {
             '@luam-example/collections',
 
-            '@infobox',
+            'infobox',
         },
     },
 
@@ -221,6 +221,27 @@ that is not enforced" — is answered rather than waived: `obfuscate = true`
 reports `config-unimplemented-option` naming the milestone that will honour it.
 The field never silently does nothing. `obfuscate = false` and an absent
 `obfuscate` are both silent, because both describe what the build already does.
+
+**Settled while it was built:**
+
+- *The helper directory.* Helpers stay flat at `lib/`, and `libs/` stays the
+  vendored library directory. The rule that keeps a flat directory safe is written
+  as an amendment to [ADR-008](008-generated-manifest-standard.md).
+- *`--name` names a directory.* `luam init --name demo` scaffolds into `demo/`
+  rather than writing a field, because the folder is the name.
+- *An empty `scripts` entry is a warning, an empty `files` entry is an error.* A
+  `files` entry that matches nothing is a file the resource promised and does not
+  ship. A `scripts` pattern whose directory does not exist yet is a side the
+  project has not written, which is what the scaffold ships on purpose; the
+  warning is kept for the case that is actually wrong — a directory that exists
+  and a pattern that still reaches nothing inside it.
+- *A source in the project root that no entry names* keeps the behaviour
+  milestone 49 gave it and is emitted after every authored entry, because it has
+  no authored position.
+- *The log relay is removed and `.luam.server` loses its `logs` table with it.*
+  The manifest field and the generated Lua go together; leaving the workspace file
+  configuring a relay that no longer exists would be a field with no consumer,
+  which is the rule ADR-017 exists to keep.
 
 **Still open:**
 

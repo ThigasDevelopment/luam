@@ -20,6 +20,7 @@ form, and the full history is in the
 | `0.16.0` | Remove the `transport` table and reload the resource yourself |
 | `0.18.0` | Rename `compilerOptions` to `compiler` |
 | `0.19.0` | Re-read one template-string behaviour; no source change |
+| `1.1.0` | Rewrite the manifest as one table of sections |
 
 ## 0.6.0 - 2026-08-12
 
@@ -194,3 +195,94 @@ raises `attempt to index a nil value` where the runtime helper used to stop and
 return the fallback. If you relied on the fallback to absorb a missing
 intermediate field, guard the path instead. See
 [Template strings](/en/language/template-strings).
+
+## 1.1.0 - 2026-09-06
+
+**The manifest is one table of sections.** `.luam.manifest` is a single table
+constructor and nothing else. Run `luam migrate` in the project directory, or take
+the same rewrite as a code action in the editor. The assignment form still loads
+for this minor, reports `config-manifest-form` once, and is removed in the next
+major.
+
+Before:
+
+```luam static
+name = 'my-resource'
+author = 'you'
+version = '1.0.0'
+
+compiler = { strict = true, oop = false }
+
+sources = {
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+    shared = { 'src/shared/**/*.luam' },
+}
+
+assets = { { from = 'assets/**/*', to = 'assets' } }
+
+dependencies = { 'scoreboard' }
+outDir = 'build'
+```
+
+After:
+
+```luam manifest
+{
+    info = {
+        author = { name = 'you' },
+
+        version = '1.0.0',
+
+        dependencies = {
+            'scoreboard',
+        },
+    },
+
+    environment = { oop = false, strict = true },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    files = {
+        'assets/**/*',
+    },
+
+    build = { output = 'build' },
+}
+```
+
+**The folder names the resource.** There is no `name` field. The directory that
+holds the manifest is the output folder, the resource `ensure` restarts, and the
+root element of the generated `meta.xml`. If your `name` differed from the folder,
+the migration warns and you rename the folder to keep the name.
+
+**Where every removed field went.** Each of these reports `config-removed-field`
+and names its replacement, so nothing changes shape in silence.
+
+| Removed | Replacement |
+| --- | --- |
+| `name` | The folder that holds the manifest |
+| `author`, `version`, `description`, `dependencies` | `info` |
+| `compiler`, `libraries` | `environment` |
+| `engine.minVersion` | `environment.version.server` and `environment.version.client` |
+| `environment.file` | `environment.secret` |
+| `environment.localFile` | Nothing. A resource reads one environment file |
+| `sources`, `loadOrder` | `scripts`, whose order is load order |
+| `assets` | `files`, a list of bare paths |
+| `outDir` | `build.output` |
+| `output` | `build.details` |
+| `helpers` | Nothing. Helper selection follows the code that needs them |
+| `contracts` | Nothing. The export contract directory is part of the build layout |
+| `serverPath`, `resourcesDir`, `development.server` | [`.luam.server`](/en/reference/server-file) |
+| `development.logs` | Nothing. The relay is removed; the position map debugs against the authored file |
+
+**One conversion refuses.** `assets` could rename a file on the way into the
+resource; `files` cannot. `luam migrate` names the entry, spells out the move, and
+leaves the manifest alone. Move the file in the project, then list its new path.
+
+**`warningsAsErrors` turns the notice into a failure.** A project that promotes
+warnings and has not migrated stops building until it does. That is deliberate.

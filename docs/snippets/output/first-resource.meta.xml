@@ -1,6 +1,6 @@
-<meta>
-    <!-- Resource information -->
+<first-resource>
+    <!-- INFO -->
     <info author="Thigas" type="script" version="1.0.0" description="The smallest resource the manual builds." />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/server.lua" />
-</meta>
+</first-resource>
