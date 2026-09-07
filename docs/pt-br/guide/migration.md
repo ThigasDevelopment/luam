@@ -198,7 +198,7 @@ helper de runtime parava e devolvia o fallback. Se você contava com o fallback
 para absorver um campo intermediário ausente, proteja o caminho. Veja [Strings de
 template](/pt-br/language/template-strings).
 
-## 1.1.0 - 2026-09-06
+## 1.1.0 - 2026-09-07
 
 **O manifesto é uma tabela de seções.** O `.luam.manifest` é um único construtor de
 tabela e nada além disso. Rode `luam migrate` no diretório do projeto, ou aceite a

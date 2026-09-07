@@ -196,7 +196,7 @@ return the fallback. If you relied on the fallback to absorb a missing
 intermediate field, guard the path instead. See
 [Template strings](/en/language/template-strings).
 
-## 1.1.0 - 2026-09-06
+## 1.1.0 - 2026-09-07
 
 **The manifest is one table of sections.** `.luam.manifest` is a single table
 constructor and nothing else. Run `luam migrate` in the project directory, or take

@@ -9,6 +9,8 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.1.0 - 2026-09-07
+
 ### Added
 
 - [.luam.manifest](/en/tooling/luam-manifest) is rewritten around the table form:

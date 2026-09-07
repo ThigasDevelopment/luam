@@ -11,6 +11,8 @@ da versão atual.
 
 ## Não lançado
 
+## 1.1.0 - 2026-09-07
+
 ### Adicionado
 
 - O [.luam.manifest](/pt-br/tooling/luam-manifest) foi reescrito em torno da forma
