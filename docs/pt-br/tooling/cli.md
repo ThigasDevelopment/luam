@@ -20,9 +20,10 @@ luam help trace
 | Comando | O que faz |
 | --- | --- |
 | [`init`](#luam-init) | Cria o `.luam.manifest`. |
+| [`migrate`](#luam-migrate) | Reescreve um `.luam.manifest` em forma de atribuições como uma tabela de seções. |
 | [`check`](#luam-check) | Compila e reporta diagnósticos. Não escreve nada. |
 | [`test`](#luam-test) | Roda os arquivos `.test.luam` do projeto em um Lua 5.1 local. |
-| [`build`](#luam-build) | Compila e escreve o resource em `<outDir>/<name>`. |
+| [`build`](#luam-build) | Compila e escreve o resource em `<build.output>/<folder>`. |
 | [`ensure`](#luam-ensure) | Constrói, sincroniza no servidor MTA, reinicia e observa. |
 | [`dev`](#luam-dev) | O laço do `ensure` mais um fluxo ao vivo do log do servidor. |
 | [`server`](#luam-server) | Roda um servidor MTA local existente em primeiro plano. |
@@ -41,9 +42,29 @@ luam init --name gamemode-race
 Escreve **um arquivo**, `.luam.manifest`, e para. Não há framework, não há árvore de
 exemplo e não há nada para apagar antes da sua primeira linha de código.
 
-O nome do resource vem de `--name`, ou do diretório do projeto quando ele é um
-nome válido de resource do MTA, ou de `luam-resource` como último recurso. Um
-`.luam.manifest` existente é mantido e informado; `--force` o sobrescreve.
+O resource recebe o nome da pasta que guarda o manifesto, então `--name` nomeia o
+diretório em que o scaffold é escrito. Sem ele o scaffold cai no diretório do
+projeto e esse diretório é o nome, com `luam-resource` como último recurso quando
+ele não é um nome válido de resource do MTA. Um `.luam.manifest` existente é
+mantido e informado; `--force` o sobrescreve.
+
+## `luam migrate`
+
+```bash
+luam migrate
+luam migrate --check
+```
+
+Reescreve um `.luam.manifest` escrito como lista de atribuições na tabela de seções
+que ele é agora, e imprime o diff. Não escreve nada quando o manifesto já está na
+forma de tabela, e nada quando a conversão não seria exata — um `assets[].to` que
+renomeia, ou uma entrada de `loadOrder` que um padrão de `sources` já alcança. Os
+dois são nomeados, com a mudança manual detalhada.
+
+O `--check` informa a reescrita e sai com código diferente de zero sem escrevê-la,
+para um pipeline que quer falhar em um manifesto que ninguém migrou. O editor
+oferece a mesma reescrita como ação de código, então um projeto pode migrar sem
+sair do arquivo.
 
 ## `luam check`
 
@@ -189,8 +210,8 @@ quando não há interpretador Lua 5.1 disponível.
 luam build
 ```
 
-Compila e escreve o bundle de produção em `<outDir>/<name>`. O padrão também
-escreve `<outDir>/<name>.luam-map.json`; veja
+Compila e escreve o bundle de produção em `<build.output>/<folder>`. O padrão também
+escreve `<build.output>/<folder>.luam-map.json`; veja
 [Estruturas de saída e mapas de código](/pt-br/reference/output-layouts) para o
 formato exato do resource e as sobrescritas.
 
@@ -227,8 +248,8 @@ um caminho de servidor — `serverPath` no manifesto, ou um
 [`.luam.server`](/pt-br/reference/server-file) acima dele. Ele sincroniza
 arquivos e nunca reinicia o resource — use `luam dev`, ou `refresh` no console do
 servidor, para carregar a sincronização. O `ensure`
-nunca escreve em `<outDir>/<name>` e usa a estrutura em árvore por padrão,
-independentemente de `output.bundle`. Passe `--bundle` para uma sincronização em
+nunca escreve em `<build.output>/<folder>` e usa a estrutura em árvore por padrão,
+independentemente de `build.details.bundle`. Passe `--bundle` para uma sincronização em
 bundle.
 
 Rodado na **raiz de um workspace** — um diretório com um `.luam.server` e sem
@@ -441,7 +462,7 @@ retorna `2` e não executa nada.
 | `--write` | `config` | Escreve o arquivo de declaração em vez de imprimi-lo. |
 | `--lua <path>` | `test` | Interpretador Lua 5.1 que roda os testes. `LUAM_LUA` faz o mesmo. |
 | `--map <path>` | `trace` | Mapa a ler. Caminhos relativos partem do diretório do projeto. |
-| `--name <name>` | `init` | Nome do resource. |
+| `--name <name>` | `init` | Diretório em que o scaffold é escrito, que é o nome do resource. |
 | `--force` | `init` | Sobrescreve um arquivo existente. |
 | `-y`, `--yes` | `init`, `setup` | Aceita os padrões, ou instala em todos os editores detectados, sem perguntar. |
 

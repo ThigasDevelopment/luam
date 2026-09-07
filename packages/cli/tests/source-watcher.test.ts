@@ -3,7 +3,7 @@ import { watch } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { watchSources, type SourceWatcher } from '@cli/watch/source-watcher';
-import type { SourceMapping } from '@compiler/manifest/manifest-contract';
+import type { ScriptEntry } from '@compiler/manifest/manifest-contract';
 
 import { createProjectFixture, type ProjectFixture } from './support/project-fixture';
 
@@ -23,8 +23,10 @@ const fixtures: ProjectFixture[] = [];
 
 const watchers: SourceWatcher[] = [];
 
-function sources(overrides: Partial<SourceMapping> = {}): SourceMapping {
-    return { server: ['src/server/**/*.luam'], client: ['src/client/**/*.luam'], shared: ['src/shared/**/*.luam'], ...overrides };
+function sources(overrides: Partial<Record<'server' | 'client' | 'shared', readonly string[]>> = {}): ScriptEntry[] {
+    const mapping = { shared: ['src/shared/**/*.luam'], server: ['src/server/**/*.luam'], client: ['src/client/**/*.luam'], ...overrides };
+
+    return (['shared', 'server', 'client'] as const).flatMap((type) => (mapping[type] ?? []).map((path) => ({ path, type, group: false })));
 }
 
 function fixture(files: Readonly<Record<string, string>>): ProjectFixture {
@@ -35,7 +37,7 @@ function fixture(files: Readonly<Record<string, string>>): ProjectFixture {
     return created;
 }
 
-function start(root: string, mapping: SourceMapping, onChange: () => void): void {
+function start(root: string, mapping: readonly ScriptEntry[], onChange: () => void): void {
     watchers.push(watchSources(root, mapping, onChange, DEBOUNCE_MS));
 }
 

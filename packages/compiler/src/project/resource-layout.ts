@@ -2,15 +2,8 @@ import { compareLibraryOrigins, libraryFilePath, libraryOutputPath, type Library
 import type { CompiledModule, FileDiagnostic } from './module';
 
 import { createDiagnostic } from '@compiler/diagnostics/diagnostic';
-import { environmentRoot, FILE_START, normalizePath, type Environment } from '@compiler/environment/environment';
-import {
-    DEVELOPMENT_RUNTIME_HELPERS,
-    expandHelpers,
-    helperDepth,
-    RUNTIME_HELPERS,
-    type DevelopmentRuntimeHelperName,
-    type RuntimeHelperName,
-} from '@runtime/helpers';
+import { FILE_START, normalizePath, type Environment } from '@compiler/environment/environment';
+import { expandHelpers, helperDepth, RUNTIME_HELPERS, type RuntimeHelperName } from '@runtime/helpers';
 
 import type { SourceLineMapping } from '@compiler/emitter/source-map';
 
@@ -23,17 +16,11 @@ export interface ResourceScript {
 }
 
 export interface ResourceHelper {
-    helper: RuntimeHelperName | DevelopmentRuntimeHelperName;
+    helper: RuntimeHelperName;
     path: string;
     file: string;
     environment: Environment;
     replacements?: Readonly<Record<string, string>>;
-}
-
-export interface DevelopmentLogHelpers {
-    maxMessageLength: number;
-    rateLimit: number;
-    rateWindowMs: number;
 }
 
 export interface ResourceAsset {
@@ -43,10 +30,6 @@ export interface ResourceAsset {
 }
 
 export const LIBRARY_DIRECTORY = 'lib';
-
-const WILDCARD_SUFFIX = '**/*.lua';
-
-const ENVIRONMENT_ORDER: Readonly<Record<Environment, number>> = { shared: 0, server: 1, client: 2 };
 
 export function outputPath(sourcePath: string): string {
     return normalizePath(sourcePath)
@@ -92,35 +75,23 @@ export function collectHelpers(modules: readonly CompiledModule[], manual: reado
         .sort((left, right) => helperDepth(left.helper) - helperDepth(right.helper) || left.path.localeCompare(right.path));
 }
 
-export function collectDevelopmentLogHelpers(options: DevelopmentLogHelpers | null | undefined): ResourceHelper[] {
-    if (options === null || options === undefined) {
-        return [];
-    }
-
-    const replacements = {
-        __LUAM_MAX_MESSAGE_LENGTH__: String(options.maxMessageLength),
-        __LUAM_RATE_LIMIT__: String(options.rateLimit),
-        __LUAM_RATE_WINDOW_MS__: String(options.rateWindowMs),
-    };
-
-    return Object.values(DEVELOPMENT_RUNTIME_HELPERS).map((helper) => ({
-        helper: helper.name,
-        file: helper.file,
-        path: libraryPath(helper.file),
-        environment: helper.environment,
-        replacements,
-    }));
-}
-
 function emitted(modules: readonly CompiledModule[]): (CompiledModule & { code: string })[] {
     return modules.filter((module): module is CompiledModule & { code: string } => module.code !== null);
 }
 
-export function collectScripts(modules: readonly CompiledModule[]): ResourceScript[] {
+export type ScriptOrder = ReadonlyMap<string, number>;
+
+const UNORDERED = Number.MAX_SAFE_INTEGER;
+
+function orderOf(order: ScriptOrder, source: string): number {
+    return order.get(normalizePath(source)) ?? UNORDERED;
+}
+
+export function collectScripts(modules: readonly CompiledModule[], order: ScriptOrder = new Map()): ResourceScript[] {
     return emitted(modules)
         .filter((module) => module.origin === null)
         .map((module) => ({ path: outputPath(module.path), source: module.path, environment: module.environment, content: module.code, lines: module.lines }))
-        .sort((left, right) => ENVIRONMENT_ORDER[left.environment] - ENVIRONMENT_ORDER[right.environment] || left.path.localeCompare(right.path));
+        .sort((left, right) => orderOf(order, left.source) - orderOf(order, right.source) || left.path.localeCompare(right.path));
 }
 
 interface OrderedScript {
@@ -147,122 +118,6 @@ export function collectLibraryScripts(modules: readonly CompiledModule[], files:
     const verbatim = files.map((file) => libraryScript(file.origin, file.environment, file.content, []));
 
     return [...compiled, ...verbatim].sort((left, right) => compareLibraryOrigins(left.origin, right.origin)).map((entry) => entry.script);
-}
-
-export interface LoadOrder {
-    scripts: ResourceScript[];
-    assets: ResourceAsset[];
-    diagnostics: FileDiagnostic[];
-}
-
-const MISSING_LOAD_ORDER = 'is listed in "loadOrder" but no source file or asset matches it. Remove the entry or correct the path.';
-
-const LIBRARY_LOAD_ORDER = 'is listed in "loadOrder" but belongs to a library. Library scripts load in the order "libraries" declares. Remove the entry.';
-
-function missingEntry(entry: string): FileDiagnostic {
-    return { path: entry, diagnostic: createDiagnostic('project', 'project-load-order-missing', `"${entry}" ${MISSING_LOAD_ORDER}`, FILE_START) };
-}
-
-function libraryEntry(entry: string): FileDiagnostic {
-    return { path: entry, diagnostic: createDiagnostic('project', 'project-load-order-library', `"${entry}" ${LIBRARY_LOAD_ORDER}`, FILE_START) };
-}
-
-export function resolveLoadOrder(
-    entries: readonly string[],
-    scripts: readonly ResourceScript[],
-    assets: readonly ResourceAsset[],
-    libraries: readonly ResourceScript[] = [],
-): LoadOrder {
-    const byScript = new Map(scripts.map((script) => [normalizePath(script.source), script]));
-    const byAsset = new Map(assets.map((asset) => [normalizePath(asset.source), asset]));
-    const byLibrary = new Set(libraries.map((script) => normalizePath(script.source)));
-    const resolved: LoadOrder = { scripts: [], assets: [], diagnostics: [] };
-    const seen = new Set<string>();
-
-    for (const entry of entries) {
-        const path = normalizePath(entry).replace(/^\.\//, '');
-        const script = byScript.get(path);
-        const asset = byAsset.get(path);
-
-        if (seen.has(path)) {
-            continue;
-        }
-
-        seen.add(path);
-
-        if (script === undefined && asset === undefined) {
-            resolved.diagnostics.push(byLibrary.has(path) ? libraryEntry(entry) : missingEntry(entry));
-
-            continue;
-        }
-
-        if (script !== undefined) {
-            resolved.scripts.push(script);
-        }
-
-        if (asset !== undefined) {
-            resolved.assets.push(asset);
-        }
-    }
-
-    return resolved;
-}
-
-export interface SourceEntry {
-    src: string;
-    environment: Environment;
-}
-
-interface WildcardGroup {
-    root: string;
-    environment: Environment;
-    scripts: ResourceScript[];
-}
-
-function groupByRoot(scripts: readonly ResourceScript[]): WildcardGroup[] {
-    const groups = new Map<string, WildcardGroup>();
-
-    for (const script of scripts) {
-        const resolved = environmentRoot(script.path);
-
-        if (resolved === null) {
-            continue;
-        }
-
-        const group = groups.get(resolved.root) ?? { root: resolved.root, environment: resolved.environment, scripts: [] };
-
-        group.scripts.push(script);
-        groups.set(resolved.root, group);
-    }
-
-    return [...groups.values()].sort(
-        (left, right) => ENVIRONMENT_ORDER[left.environment] - ENVIRONMENT_ORDER[right.environment] || left.root.localeCompare(right.root),
-    );
-}
-
-function isWildcardSafe(group: WildcardGroup): boolean {
-    return group.scripts.every((script) => script.environment === group.environment);
-}
-
-function groupEntries(group: WildcardGroup, pinned: ReadonlySet<string>): SourceEntry[] {
-    if (isWildcardSafe(group)) {
-        return [{ src: `${group.root}/${WILDCARD_SUFFIX}`, environment: group.environment }];
-    }
-
-    return group.scripts.filter((script) => !pinned.has(script.path)).map((script) => ({ src: script.path, environment: script.environment }));
-}
-
-export function sourceEntries(scripts: readonly ResourceScript[], pinned: readonly ResourceScript[]): SourceEntry[] {
-    const pinnedPaths = new Set(pinned.map((script) => script.path));
-    const grouped = groupByRoot(scripts);
-    const covered = new Set(grouped.flatMap((group) => group.scripts.map((script) => script.path)));
-    const loose = scripts.filter((script) => !covered.has(script.path) && !pinnedPaths.has(script.path));
-
-    return [
-        ...pinned.map((script) => ({ src: script.path, environment: script.environment })),
-        ...grouped.flatMap((group) => groupEntries(group, pinnedPaths)),
-        ...loose.map((script) => ({ src: script.path, environment: script.environment })),
-    ];
 }
 
 export function findDuplicateOutputs(scripts: readonly ResourceScript[], assets: readonly ResourceAsset[]): FileDiagnostic[] {

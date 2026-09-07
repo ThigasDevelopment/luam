@@ -6,13 +6,14 @@ export interface FenceOptions {
     oop: boolean;
     expectError: boolean;
     live: boolean;
+    manifest: boolean;
 }
 
 const ENVIRONMENTS = new Set(['server', 'client', 'shared']);
 
 export function parseFenceInfo(info: string): FenceOptions {
     const parts = info.trim().split(/\s+/).slice(1);
-    const options: FenceOptions = { environment: 'shared', declaration: false, oop: false, expectError: false, live: true };
+    const options: FenceOptions = { environment: 'shared', declaration: false, oop: false, expectError: false, live: true, manifest: false };
 
     for (const part of parts) {
         const [key, value] = part.split('=');
@@ -27,6 +28,8 @@ export function parseFenceInfo(info: string): FenceOptions {
             options.expectError = true;
         } else if (key === 'static') {
             options.live = false;
+        } else if (key === 'manifest') {
+            options.manifest = true;
         }
     }
 

@@ -184,7 +184,7 @@ describe('workspace loading', () => {
     });
 
     it('rechecks documents after the OOP setting changes', () => {
-        const root = workspace({ '.luam.manifest': "name = 'demo'\ncompiler = { oop = true }\n", 'src/server/main.luam': 'class Player {\n}\n' });
+        const root = workspace({ '.luam.manifest': '{ environment = { oop = true } }\n', 'src/server/main.luam': 'class Player {\n}\n' });
         const service = new LanguageService();
         const uri = uriFor(root, 'src/server/main.luam');
 
@@ -197,7 +197,7 @@ describe('workspace loading', () => {
     });
 
     it('reads the OOP setting from the workspace manifest', () => {
-        const root = workspace({ '.luam.manifest': "name = 'demo'\ncompiler = { oop = true }\n", 'src/server/main.luam': 'class Player {\n}\n' });
+        const root = workspace({ '.luam.manifest': '{ environment = { oop = true } }\n', 'src/server/main.luam': 'class Player {\n}\n' });
         const service = new LanguageService();
 
         service.loadWorkspace([root]);

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import type { Environment } from '@compiler/environment/environment';
@@ -26,6 +26,32 @@ interface ResolvedLibrary {
 const SIDE_ORDER: readonly Environment[] = ['shared', 'server', 'client'];
 
 export const EMPTY_LIBRARY_INDEX: LibraryIndex = { roots: [], fileFor: (): null => null, isLibraryPath: (): boolean => false };
+
+const SCOPE_PREFIX = '@';
+
+function candidateNames(modules: string): string[] {
+    try {
+        return readdirSync(modules, { withFileTypes: true })
+            .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+            .flatMap((entry) => {
+                if (!entry.name.startsWith(SCOPE_PREFIX)) {
+                    return [entry.name];
+                }
+
+                return readdirSync(resolve(modules, entry.name), { withFileTypes: true })
+                    .filter((scoped) => scoped.isDirectory())
+                    .map((scoped) => `${entry.name}/${scoped.name}`);
+            });
+    } catch {
+        return [];
+    }
+}
+
+export function installedLibraryNames(root: string): string[] {
+    return candidateNames(resolve(root, 'node_modules'))
+        .filter((name) => readDeclaration(root, name) !== null)
+        .sort((left, right) => left.localeCompare(right));
+}
 
 function packageRoot(root: string, name: string): string {
     return normalizeFsPath(resolve(root, 'node_modules', ...name.split('/')));

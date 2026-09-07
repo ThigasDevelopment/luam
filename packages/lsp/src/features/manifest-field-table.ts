@@ -17,6 +17,10 @@ function kindOf(path: string): ConfigFileKind | null {
     return CONFIG_FILE_KINDS.find((entry) => entry.matches(path)) ?? null;
 }
 
+export function manifestRoot(path: string): 'table' | 'statements' {
+    return kindOf(path) === null ? 'table' : 'statements';
+}
+
 export function rootFields(path: string): readonly ManifestField[] {
     return kindOf(path)?.fields ?? MANIFEST_FIELDS;
 }

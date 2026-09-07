@@ -102,10 +102,10 @@ completion and argument checking for that call.
 ## `player:getName()` is rejected
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "environment = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Set `compiler = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
+Set `environment = { oop = true }` in `.luam.manifest`. That also writes `<oop>true</oop>` into
 `meta.xml`, which is what makes the object form exist at runtime. See
 [OOP API](/en/mta/oop).
 
@@ -182,10 +182,10 @@ element out, and still produces a complete resource. Pass `--offline` (or set
 
 `luam dev` builds the tree layout and uses the current in-memory map to replace a
 covered generated Lua path and line with the authored `.luam` path and line. It
-prints an unresolvable log record unchanged. Leave `output.map` enabled and do
+prints an unresolvable log record unchanged. Leave `build.details.map` enabled and do
 not pass `--no-map` when you need this resolution.
 
-For a production error, keep the `<outDir>/<name>.luam-map.json` written beside
+For a production error, keep the `<build.output>/<folder>.luam-map.json` written beside
 the deployed resource and run:
 
 ```bash

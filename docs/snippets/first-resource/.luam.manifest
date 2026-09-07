@@ -1,4 +1,15 @@
-name = 'luam-docs-first-resource'
-author = 'Thigas'
-version = '1.0.0'
-description = 'The smallest resource the manual builds.'
+{
+    info = {
+        author = { name = 'Thigas' },
+
+        version = '1.0.0',
+        description = 'The smallest resource the manual builds.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

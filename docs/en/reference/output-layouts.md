@@ -9,12 +9,12 @@ writes. Both are production-only, and neither renames an identifier.
 
 | Command | Default layout | Layout override | Source map |
 | --- | --- | --- | --- |
-| `luam build` | Bundle when `output.bundle` is `true` (the default); tree when it is `false`. Minified in both. | `--bundle` or `--no-bundle` overrides the configuration. | Writes `<outDir>/<name>.luam-map.json` when `output.map` is `true` (the default), marked `minified`. `--no-map` disables and removes that map. |
-| `luam ensure` | Tree, regardless of `output.bundle`. | `--bundle` selects bundle; `--no-bundle` selects tree. | Keeps a map in memory only. It never writes a map file. `--no-map` disables it. |
+| `luam build` | Bundle when `build.details.bundle` is `true` (the default); tree when it is `false`. Minified in both. | `--bundle` or `--no-bundle` overrides the configuration. | Writes `<build.output>/<folder>.luam-map.json` when `build.details.map` is `true` (the default), marked `minified`. `--no-map` disables and removes that map. |
+| `luam ensure` | Tree, regardless of `build.details.bundle`. | `--bundle` selects bundle; `--no-bundle` selects tree. | Keeps a map in memory only. It never writes a map file. `--no-map` disables it. |
 | `luam dev` | Tree, regardless of configuration or bundle flags. | None. `dev` always keeps generated files individually addressable. | Keeps a map in memory to resolve streamed logs. It never writes a map file. `output.map: false` or `--no-map` disables resolution. |
 
 `ensure` and `dev` write directly to
-`<serverPath>/<resourcesDir>/<name>`, never to `<outDir>/<name>`.
+`<serverPath>/<resourcesDir>/<folder>`, never to `<build.output>/<folder>`.
 
 ## Bundle layout
 
@@ -38,7 +38,7 @@ The literal `src/` bundle directory does not follow `sources`. An empty
 environment has no bundle and no `<script>` entry. There is no `lib/` directory
 or mirrored module tree. Runtime helpers and modules are concatenated verbatim
 into one chunk per environment, with no wrapper block; helpers precede modules,
-and `loadOrder` still controls module order. Every module therefore shares the
+and the `scripts` order still controls module order. Every module therefore shares the
 bundle chunk scope, so a file-level `local` is visible to every module after it
 and the Lua 5.1 limit of 200 active locals applies to the bundle as a whole.
 
@@ -90,7 +90,7 @@ one directory per package with its scoped name flattened, and its own source tre
 beneath the side it declares.
 
 The manifest lists helpers, library scripts, `env.lua` and `config.lua`, pinned
-`loadOrder` entries, and then the source groups. This is the normal `ensure` and fixed `dev`
+the vendored libraries, `config.lua`, and then every `scripts` entry in the order it is written. This is the normal `ensure` and fixed `dev`
 shape because a running resource remains easy to inspect. Use
 `luam build --no-bundle` when a local build also needs this shape.
 
@@ -107,7 +107,7 @@ field for it: turning minification off is what asks for readable output.
 | --- | --- |
 | `luam dev` | Always. It never minifies. |
 | `luam ensure` | Always. It never minifies. |
-| `luam build` | When `output.minify` is `false`, or with `--no-minify`. |
+| `luam build` | When `build.details.minify` is `false`, or with `--no-minify`. |
 
 The contract has one measurable shape: **one line of Lua for every line of
 Luam**. A rewritten construct occupies the lines the construct it replaces
@@ -239,7 +239,7 @@ the generated Lua.
 
 ## Resource map file
 
-`luam build` writes `<outDir>/<name>.luam-map.json` beside the resource directory,
+`luam build` writes `<build.output>/<folder>.luam-map.json` beside the resource directory,
 never inside it. The current format version is `1`. It records:
 
 - `version`, `resource`, and `layout` for the build, plus `minified: true` on a
@@ -282,7 +282,7 @@ luam trace src/server.lua:42
 luam trace "ERROR: [my-resource/src/server.lua:42] attempt to index a nil value"
 ```
 
-The command first tries the configured `<outDir>/<name>.luam-map.json`. If that
+The command first tries the configured `<build.output>/<folder>.luam-map.json`. If that
 does not exist, it searches below the project directory and uses the map only
 when exactly one exists. The search skips `node_modules` and directories whose
 name starts with a dot, so a map kept in one of those is only reachable through

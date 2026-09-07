@@ -10,7 +10,9 @@ import {
     INVALID_NAME,
     INVALID_PATTERN,
     INVALID_TYPE,
+    UNIMPLEMENTED_OPTION,
     manifestError,
+    manifestWarning,
 } from './manifest-diagnostics';
 import { LATEST_ENGINE_VERSION } from './manifest-defaults';
 import type { ManifestField } from './manifest-field';
@@ -64,8 +66,24 @@ class RuleWalk {
         this.diagnostics.push(manifestError(code, message, positionAt(this.positions, key)));
     }
 
-    fields(fields: readonly ManifestField[], source: ManifestObject | null, path: string, key: string): ManifestObject {
+    warn(code: string, message: string, key: string): void {
+        this.diagnostics.push(manifestWarning(code, message, positionAt(this.positions, key)));
+    }
+
+    fields(fields: readonly ManifestField[], source: ManifestObject | null, path: string, key: string, open = false): ManifestObject {
         const result: ManifestObject = {};
+
+        if (open && source !== null) {
+            const declared = new Set(fields.map((entry) => entry.name));
+
+            for (const [name, raw] of Object.entries(source)) {
+                if (declared.has(name)) {
+                    result[name] = null;
+                } else if (typeof raw === 'string') {
+                    result[name] = raw;
+                }
+            }
+        }
 
         for (const entry of fields) {
             const raw = source?.[entry.name];
@@ -75,6 +93,8 @@ class RuleWalk {
 
             if (value !== undefined) {
                 result[entry.name] = value;
+            } else {
+                delete result[entry.name];
             }
         }
 
@@ -84,10 +104,10 @@ class RuleWalk {
     private value(entry: ManifestField, raw: ManifestValue | undefined, path: string, key: string): ManifestValue | undefined {
         if (entry.members !== null) {
             if (raw === undefined || raw === null) {
-                return entry.defaultValue === null ? undefined : this.fields(entry.members, null, path, key);
+                return entry.defaultValue === null ? undefined : this.fields(entry.members, null, path, key, entry.open);
             }
 
-            return this.fields(entry.members, isManifestObject(raw) ? raw : null, path, key);
+            return this.fields(entry.members, isManifestObject(raw) ? raw : null, path, key, entry.open);
         }
 
         if (raw === undefined || raw === null) {
@@ -118,6 +138,10 @@ class RuleWalk {
     private scalar(entry: ManifestField, raw: ManifestValue, path: string, key: string): ManifestValue {
         if (typeof raw === 'number' && entry.rule === 'positive-integer' && (!Number.isInteger(raw) || raw <= 0)) {
             this.report(INVALID_TYPE, `"${path}" must be a positive integer but received ${raw}.`, key);
+        }
+
+        if (raw === true && entry.unimplemented !== null) {
+            this.warn(UNIMPLEMENTED_OPTION, `"${path}" is declared but is not honoured yet. ${entry.unimplemented}`, key);
         }
 
         return typeof raw === 'string' ? this.text(entry, raw, path, key) : raw;
@@ -166,6 +190,14 @@ class RuleWalk {
                 const boundary = entry.rule === 'server-contained-path' ? 'the configured serverPath' : 'the project directory';
 
                 this.report(ESCAPING_PATH, `"${path}" must stay inside ${boundary} but received "${value}".`, key);
+            }
+
+            return normalizePattern(value);
+        }
+
+        if (entry.rule === 'output-path') {
+            if (!isLiteralPattern(value)) {
+                this.report(INVALID_PATTERN, `"${path}" must be a plain path but received the pattern "${value}".`, key);
             }
 
             return normalizePattern(value);

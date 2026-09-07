@@ -101,10 +101,10 @@ para `any` em vez de falhar, então uma declaração faltando nunca bloqueia um 
 ## `player:getName()` é rejeitado
 
 ```
-src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.
+src/shared/oop.luam:2:18 error check-oop-disabled: "Player.getName" is part of the MTA OOP API, which this project does not enable. Call "getPlayerName" instead. Set "environment = { oop = true }" in .luam.manifest to enable the MTA OOP API.
 ```
 
-Defina `compiler = { oop = true }` no `.luam.manifest`. Isso também escreve `<oop>true</oop>` no
+Defina `environment = { oop = true }` no `.luam.manifest`. Isso também escreve `<oop>true</oop>` no
 `meta.xml`, que é o que faz a forma de objeto existir em tempo de execução. Veja
 [API OOP](/pt-br/mta/oop).
 
@@ -186,10 +186,10 @@ mesmo assim produz um resource completo. Passe `--offline` (ou defina
 `luam dev` constrói a estrutura em árvore e usa o mapa atual em memória para
 substituir um caminho e linha Lua gerados e cobertos pelo caminho e linha `.luam`
 do autor. Ele imprime sem alterações um registro que não consegue resolver.
-Mantenha `output.map` ligado e não passe `--no-map` quando precisar dessa
+Mantenha `build.details.map` ligado e não passe `--no-map` quando precisar dessa
 resolução.
 
-Para um erro de produção, guarde o `<outDir>/<name>.luam-map.json` escrito ao lado
+Para um erro de produção, guarde o `<build.output>/<folder>.luam-map.json` escrito ao lado
 do resource implantado e rode:
 
 ```bash

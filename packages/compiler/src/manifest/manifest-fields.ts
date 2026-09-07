@@ -1,178 +1,188 @@
-import { BOOLEAN_TYPE, createArray, createOptional, createStringLiteral, createUnion, NUMBER_TYPE, STRING_TYPE, type Type } from '@compiler/checker/types';
-import { RUNTIME_HELPERS } from '@runtime/helpers';
+import { BOOLEAN_TYPE, createArray, createOptional, STRING_TYPE, type Type } from '@compiler/checker/types';
 
-import { elementField, field, findField, recordType, table, type ManifestField } from './manifest-field';
 import {
-    DEFAULT_ASSET_DESTINATION,
+    DEFAULT_BUILD_DETAILS,
     DEFAULT_COMPILER_OPTIONS,
-    DEFAULT_CONTRACTS_DIR,
-    DEFAULT_ENGINE,
-    DEFAULT_ENVIRONMENT_FILES,
+    DEFAULT_ENGINE_VERSIONS,
+    DEFAULT_ENVIRONMENT_FILE,
     DEFAULT_OUT_DIR,
-    DEFAULT_OUTPUT,
-    DEFAULT_RESOURCES_DIR,
-    DEFAULT_SOURCE_MAPPING,
+    SCRIPT_SIDES,
 } from './manifest-defaults';
-
-export const HELPER_NAMES: readonly string[] = Object.keys(RUNTIME_HELPERS).sort();
+import { elementField, field, findField, openField, recordType, table, type ManifestField } from './manifest-field';
 
 export const MANIFEST_MODES: readonly string[] = ['development', 'production'];
+
+export const MANIFEST_SECTIONS: readonly string[] = ['info', 'environment', 'scripts', 'files', 'build'];
 
 const OPTIONAL_STRING = createOptional(STRING_TYPE);
 
 const STRING_LIST = createArray(STRING_TYPE);
 
-const HELPER_LIST = createArray(createUnion(HELPER_NAMES.map((name) => createStringLiteral(name))));
-
-const COMPILER_OPTION_FIELDS: readonly ManifestField[] = [
-    field('strict', BOOLEAN_TYPE, 'Checks the project under the strict rules unless a file directive says otherwise.', {
-        defaultValue: DEFAULT_COMPILER_OPTIONS.strict,
-    }),
-    field('oop', BOOLEAN_TYPE, 'Enables the MTA OOP API in the checker and the generated meta.xml.', { defaultValue: DEFAULT_COMPILER_OPTIONS.oop }),
-    field('noUnusedLocals', BOOLEAN_TYPE, 'Reports local declarations that are never read.', { defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedLocals }),
-    field('noImplicitGlobals', BOOLEAN_TYPE, 'Reports an assignment that creates a global the project never declares.', {
-        defaultValue: DEFAULT_COMPILER_OPTIONS.noImplicitGlobals,
-    }),
-    field('noUnusedParameters', BOOLEAN_TYPE, 'Reports function and method parameters that are never read.', {
-        defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedParameters,
-    }),
-    field('warningsAsErrors', BOOLEAN_TYPE, 'Promotes every compiler warning to an error.', { defaultValue: DEFAULT_COMPILER_OPTIONS.warningsAsErrors }),
+const AUTHOR_FIELDS: readonly ManifestField[] = [
+    field('name', STRING_TYPE, 'Author written to the info element, which MTA reads back through getResourceInfo.', { required: true, owner: 'info' }),
+    field('discord', OPTIONAL_STRING, 'Discord handle written as an info attribute, read at runtime with getResourceInfo(resource, \'discord\').', { owner: 'info' }),
+    field('github', OPTIONAL_STRING, 'GitHub handle written as an info attribute, read at runtime with getResourceInfo(resource, \'github\').', { owner: 'info' }),
+    field('email', OPTIONAL_STRING, 'Contact address written as an info attribute, read at runtime with getResourceInfo(resource, \'email\').', { owner: 'info' }),
 ];
 
-function side(name: string, summary: string, defaultValue: readonly string[]): ManifestField {
-    return field(name, STRING_LIST, summary, { defaultValue: [...defaultValue], rule: 'source-pattern', owner: 'sources', allowEmpty: true });
-}
-
-const SOURCE_FIELDS: readonly ManifestField[] = [
-    side('server', 'Paths and patterns compiled as server sources.', DEFAULT_SOURCE_MAPPING.server),
-    side('client', 'Paths and patterns compiled as client sources.', DEFAULT_SOURCE_MAPPING.client),
-    side('shared', 'Paths and patterns compiled as shared sources.', DEFAULT_SOURCE_MAPPING.shared),
+const INFO_FIELDS: readonly ManifestField[] = [
+    table('author', 'Who wrote the resource. Every extra key is emitted as an info attribute.', AUTHOR_FIELDS, { open: true, owner: 'info' }),
+    field('version', OPTIONAL_STRING, 'Version written to the generated info element.', { owner: 'info' }),
+    field('description', OPTIONAL_STRING, 'Description written to the generated info element.', { owner: 'info' }),
+    field('dependencies', STRING_LIST, 'Resources that must be present, emitted as includes in the order they are written.', {
+        defaultValue: [],
+        rule: 'dependency-name',
+        owner: 'dependencies',
+        allowEmpty: true,
+        ordered: true,
+    }),
 ];
 
-const ASSET_FIELDS: readonly ManifestField[] = [
-    field('from', STRING_TYPE, 'File, directory, or pattern copied from the project.', { required: true, rule: 'source-pattern', owner: 'assets' }),
-    field('to', STRING_TYPE, 'Destination inside the generated resource.', { defaultValue: DEFAULT_ASSET_DESTINATION, rule: 'static-path', owner: 'assets' }),
-];
-
-const ASSET_LIST = createArray(recordType('Asset', ASSET_FIELDS));
-
-const ENGINE_FIELDS: readonly ManifestField[] = [
-    field('minVersion', STRING_TYPE, 'Lowest MTA version the resource declares support for.', {
-        defaultValue: DEFAULT_ENGINE.minVersion,
+const VERSION_FIELDS: readonly ManifestField[] = [
+    field('server', STRING_TYPE, 'Lowest MTA server version the resource declares support for.', {
+        defaultValue: DEFAULT_ENGINE_VERSIONS.server,
+        rule: 'engine-version',
+        owner: 'engine',
+    }),
+    field('client', STRING_TYPE, 'Lowest MTA client version the resource declares support for.', {
+        defaultValue: DEFAULT_ENGINE_VERSIONS.client,
         rule: 'engine-version',
         owner: 'engine',
     }),
 ];
 
 const ENVIRONMENT_FIELDS: readonly ManifestField[] = [
-    field('file', STRING_TYPE, 'File that declares the environment keys and their types.', {
-        defaultValue: DEFAULT_ENVIRONMENT_FILES.file,
+    field('secret', STRING_TYPE, 'File that declares the environment keys and their types.', {
+        defaultValue: DEFAULT_ENVIRONMENT_FILE,
         rule: 'static-path',
-        owner: 'environment',
+        owner: 'secret',
     }),
-    field('localFile', STRING_TYPE, 'File that overrides declared values without adding keys.', {
-        defaultValue: DEFAULT_ENVIRONMENT_FILES.localFile,
-        rule: 'static-path',
-        owner: 'environment',
+    field('oop', BOOLEAN_TYPE, 'Enables the MTA OOP API in the checker and states it in the generated file.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.oop,
+        owner: 'compiler',
     }),
-];
-
-const OUTPUT_FIELDS: readonly ManifestField[] = [
-    field('bundle', BOOLEAN_TYPE, 'Writes one Lua file per side instead of mirroring the source tree.', { defaultValue: DEFAULT_OUTPUT.bundle, owner: 'output' }),
-    field('map', BOOLEAN_TYPE, 'Writes a resource map that traces generated lines back to their source.', { defaultValue: DEFAULT_OUTPUT.map, owner: 'output' }),
-    field('minify', BOOLEAN_TYPE, 'Shrinks the generated Lua before it is written.', { defaultValue: DEFAULT_OUTPUT.minify, owner: 'output' }),
-];
-
-const LOG_FIELDS: readonly ManifestField[] = [
-    field('enabled', BOOLEAN_TYPE, 'Streams server and client logs into "luam dev".', { defaultValue: false, owner: 'development' }),
-    field('maxMessageLength', NUMBER_TYPE, 'Longest log message kept before it is truncated.', { defaultValue: 4096, rule: 'positive-integer', owner: 'development' }),
-    field('rateLimit', NUMBER_TYPE, 'Log messages accepted inside one window.', { defaultValue: 30, rule: 'positive-integer', owner: 'development' }),
-    field('rateWindowMs', NUMBER_TYPE, 'Length of the rate window in milliseconds.', { defaultValue: 1000, rule: 'positive-integer', owner: 'development' }),
-];
-
-const DEVELOPMENT_SERVER_FIELDS: readonly ManifestField[] = [
-    field('executable', OPTIONAL_STRING, 'Executable path relative to serverPath used by "luam server" and "luam dev --start-server".', {
-        rule: 'server-contained-path',
-        owner: 'development',
+    field('strict', BOOLEAN_TYPE, 'Checks the project under the strict rules unless a file directive says otherwise.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.strict,
+        owner: 'compiler',
     }),
-];
-
-const DEVELOPMENT_FIELDS: readonly ManifestField[] = [
-    table('logs', 'Log capture used by "luam dev".', LOG_FIELDS, { defaultValue: {}, owner: 'development' }),
-    table('server', 'Local MTA server process settings.', DEVELOPMENT_SERVER_FIELDS, { defaultValue: {}, owner: 'development' }),
-];
-
-export const MANIFEST_FIELDS: readonly ManifestField[] = [
-    field('name', STRING_TYPE, 'The MTA resource name.', { required: true, rule: 'resource-name', owner: 'identity' }),
-    field('author', OPTIONAL_STRING, 'Author written to the generated meta.xml.', { owner: 'identity' }),
-    field('version', OPTIONAL_STRING, 'Version written to the generated meta.xml.', { owner: 'identity' }),
-    field('description', OPTIONAL_STRING, 'Description written to the generated meta.xml.', { owner: 'identity' }),
-    table('compiler', 'Settings that change how the source is checked and emitted.', COMPILER_OPTION_FIELDS, { defaultValue: {}, owner: 'compiler' }),
-    table('sources', 'Paths and patterns that make up the project, grouped by the side each file runs on.', SOURCE_FIELDS, {
-        defaultValue: {},
-        owner: 'sources',
+    field('noUnusedLocals', BOOLEAN_TYPE, 'Reports local declarations that are never read.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedLocals,
+        owner: 'compiler',
     }),
-    field('assets', ASSET_LIST, 'Files copied into the generated resource, each with a destination.', {
-        defaultValue: [],
-        elements: ASSET_FIELDS,
-        owner: 'assets',
-        allowEmpty: true,
+    field('noImplicitGlobals', BOOLEAN_TYPE, 'Reports an assignment that creates a global the project never declares.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.noImplicitGlobals,
+        owner: 'compiler',
     }),
-    field('dependencies', STRING_LIST, 'Resources that must be present, written as includes in the generated meta.xml.', {
-        defaultValue: [],
-        rule: 'dependency-name',
-        owner: 'dependencies',
-        allowEmpty: true,
+    field('noUnusedParameters', BOOLEAN_TYPE, 'Reports function and method parameters that are never read.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.noUnusedParameters,
+        owner: 'compiler',
     }),
+    field('warningsAsErrors', BOOLEAN_TYPE, 'Promotes every compiler warning to an error.', {
+        defaultValue: DEFAULT_COMPILER_OPTIONS.warningsAsErrors,
+        owner: 'compiler',
+    }),
+    table('version', 'Lowest MTA version the resource declares support for, per side.', VERSION_FIELDS, { defaultValue: {}, owner: 'engine' }),
     field('libraries', STRING_LIST, 'Luam library packages compiled into the resource, in the order they are emitted.', {
         defaultValue: [],
         rule: 'package-name',
         owner: 'libraries',
         allowEmpty: true,
+        ordered: true,
     }),
-    field('contracts', STRING_TYPE, 'Directory the export contract is written to and dependency contracts are read from.', {
-        defaultValue: DEFAULT_CONTRACTS_DIR,
-        rule: 'contained-path',
-        owner: 'dependencies',
+];
+
+const SCRIPT_FIELDS: readonly ManifestField[] = [
+    field('path', STRING_TYPE, 'File or pattern the entry names, relative to the project.', { required: true, rule: 'source-pattern', owner: 'scripts' }),
+    field('type', STRING_TYPE, 'Side the matched files run on.', {
+        required: true,
+        values: SCRIPT_SIDES,
+        valueCode: 'config-unknown-script-type',
+        owner: 'scripts',
     }),
-    table('engine', 'Requirements the MTA server and client must meet.', ENGINE_FIELDS, { defaultValue: {}, owner: 'engine' }),
-    table('environment', 'Files that declare and override the project environment.', ENVIRONMENT_FIELDS, { defaultValue: {}, owner: 'environment' }),
-    field('outDir', STRING_TYPE, 'Directory the built resource is written to.', { defaultValue: DEFAULT_OUT_DIR, rule: 'static-path', owner: 'output' }),
-    field('loadOrder', STRING_LIST, 'Files listed first in the generated meta.xml.', {
+];
+
+const SCRIPT_LIST = createArray(recordType('Script', SCRIPT_FIELDS));
+
+const BUILD_DETAIL_FIELDS: readonly ManifestField[] = [
+    field('bundle', BOOLEAN_TYPE, 'Writes one Lua file per side instead of mirroring the source tree.', {
+        defaultValue: DEFAULT_BUILD_DETAILS.bundle,
+        owner: 'output',
+    }),
+    field('map', BOOLEAN_TYPE, 'Writes a resource map that traces generated lines back to their source.', { defaultValue: DEFAULT_BUILD_DETAILS.map, owner: 'output' }),
+    field('minify', BOOLEAN_TYPE, 'Shrinks the generated Lua before it is written.', { defaultValue: DEFAULT_BUILD_DETAILS.minify, owner: 'output' }),
+    field('obfuscate', BOOLEAN_TYPE, 'Compiles the generated Lua to bytecode with "luac", which MTA loads.', {
+        defaultValue: DEFAULT_BUILD_DETAILS.obfuscate,
+        owner: 'output',
+        unimplemented: 'Milestone 52 compiles the generated Lua to bytecode with "luac" and is what will honour it.',
+    }),
+];
+
+const BUILD_FIELDS: readonly ManifestField[] = [
+    field('output', STRING_TYPE, 'Directory the built resource is written to. It may be absolute and may leave the project.', {
+        defaultValue: DEFAULT_OUT_DIR,
+        rule: 'output-path',
+        owner: 'output',
+    }),
+    table('details', 'Switches for the generated output.', BUILD_DETAIL_FIELDS, { defaultValue: {}, owner: 'output' }),
+];
+
+export const MANIFEST_FIELDS: readonly ManifestField[] = [
+    table('info', 'What the resource is, who wrote it, and what it needs beside it.', INFO_FIELDS, { defaultValue: {}, owner: 'info' }),
+    table('environment', 'The environment the resource runs in and is checked against.', ENVIRONMENT_FIELDS, { defaultValue: {}, owner: 'environment' }),
+    field('scripts', SCRIPT_LIST, 'Scripts the resource loads, in the order it loads them, each declaring its own side.', {
         defaultValue: [],
-        rule: 'static-path',
-        owner: 'assembly',
+        elements: SCRIPT_FIELDS,
+        owner: 'scripts',
         allowEmpty: true,
+        ordered: true,
     }),
-    field('helpers', HELPER_LIST, 'Runtime helpers bundled into the resource.', {
+    field('files', STRING_LIST, 'Files the resource ships, emitted as written, in the order they are listed.', {
         defaultValue: [],
-        values: HELPER_NAMES,
-        valueCode: 'config-unknown-helper',
-        owner: 'assembly',
+        rule: 'source-pattern',
+        owner: 'files',
         allowEmpty: true,
+        ordered: true,
     }),
-    field('serverPath', OPTIONAL_STRING, 'Path to the MTA server installation used by "luam dev".', { owner: 'deployment' }),
-    field('resourcesDir', STRING_TYPE, 'Resource directory inside the server installation.', {
-        defaultValue: DEFAULT_RESOURCES_DIR,
-        rule: 'contained-path',
-        owner: 'deployment',
-    }),
-    table('output', 'Switches for the generated output.', OUTPUT_FIELDS, { defaultValue: {}, owner: 'output' }),
-    table('development', 'Behaviour that only applies while developing.', DEVELOPMENT_FIELDS, { defaultValue: {}, owner: 'development' }),
+    table('build', 'Where the resource is written and what the build writes there.', BUILD_FIELDS, { defaultValue: {}, owner: 'output' }),
 ];
 
 export const MANIFEST_RECORD: Type = recordType('Manifest', MANIFEST_FIELDS);
 
 export const ENV_MEMBER_TYPE: Type = OPTIONAL_STRING;
 
+const SERVER_FILE = 'Move it to ".luam.server", which answers it for every resource in the directory.';
+
 export const REMOVED_FIELDS: Readonly<Record<string, string>> = {
-    oop: 'Move it to "compiler = { oop = true }".',
-    compilerOptions: 'Rename it to "compiler = { ... }".',
-    sourceDirs: 'Replace it with "sources = { server = { ... }, client = { ... }, shared = { ... } }", listing paths or patterns per side.',
-    assetDirs: 'Replace it with "assets = { { from = \'assets/**/*\', to = \'assets\' } }", naming a destination for each entry.',
-    mta: 'Replace it with "engine = { minVersion = \'1.6.0\' }".',
+    name: 'Remove it. The resource name is the folder that holds this manifest, and "build.output" names the directory the artifact is written under.',
+    author: 'Move it to "info = { author = { name = \'you\' } }".',
+    version: 'Move it to "info = { version = \'1.0.0\' }".',
+    description: 'Move it to "info = { description = \'...\' }".',
+    dependencies: 'Move it to "info = { dependencies = { \'other-resource\' } }".',
+    compiler: 'Move its fields to "environment", which now holds "oop", "strict", and the remaining compiler options.',
+    compilerOptions: 'Move its fields to "environment", which now holds "oop", "strict", and the remaining compiler options.',
+    oop: 'Move it to "environment = { oop = true }".',
+    sources: 'Replace it with an ordered "scripts" list of "{ path = \'src/server/**/*.luam\', type = \'server\' }" entries.',
+    sourceDirs: 'Replace it with an ordered "scripts" list of "{ path = \'src/server/**/*.luam\', type = \'server\' }" entries.',
+    loadOrder: 'Remove it. Position in "scripts" is load order, so move the entry instead of pinning it.',
+    assets: 'Replace it with a "files" list of bare paths. A "to" that renames a file has no replacement: move the file in the project instead.',
+    assetDirs: 'Replace it with a "files" list of bare paths.',
+    helpers: 'Remove it. Helper selection follows the code that needs them.',
+    contracts: 'Remove it. The export contract directory is part of the build layout and is no longer configured.',
+    engine: 'Move it to "environment = { version = { server = \'1.6.0\', client = \'1.6.0\' } }".',
+    mta: 'Move it to "environment = { version = { server = \'1.6.0\', client = \'1.6.0\' } }".',
+    outDir: 'Move it to "build = { output = \'build\' }".',
+    output: 'Move it to "build = { details = { bundle = true, minify = true, map = true } }".',
+    libraries: 'Move it to "environment = { libraries = { \'@scope/package\' } }".',
+    development: 'Remove it. Log capture belongs to ".luam.server", and the position mapping replaced the log relay.',
+    serverPath: SERVER_FILE,
+    resourcesDir: SERVER_FILE,
     transport: 'Remove it. "luam ensure" only syncs files, and "luam dev --start-server" restarts the server it owns.',
+    'environment.file': 'Rename it to "environment.secret".',
+    'environment.localFile': 'Remove it. A resource reads one environment file, named by "environment.secret".',
+    'build.details.contracts': 'Remove it. The export contract directory is part of the build layout and is no longer configured.',
 };
+
+export const CONVERTER_REMOVED_IN = '2.0.0';
 
 export function findManifestField(path: readonly string[]): ManifestField | null {
     let fields: readonly ManifestField[] | null = MANIFEST_FIELDS;
@@ -186,7 +196,10 @@ export function findManifestField(path: readonly string[]): ManifestField | null
             continue;
         }
 
-        found = fields === null ? null : findField(fields, segment);
+        const declared = fields === null ? null : findField(fields, segment);
+        const extra: ManifestField | null = declared === null && found !== null && found.open ? openField(found, segment) : null;
+
+        found = declared ?? extra;
 
         if (found === null) {
             return null;

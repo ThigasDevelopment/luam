@@ -9,7 +9,7 @@ import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
-import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, clientSource, createProjectFixture, DEFAULT_SCRIPTS, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
 
 const SIDED_SHARED = [
     '#!shared',
@@ -108,8 +108,8 @@ describe('check command', () => {
         expect(logger.text()).toContain('Check passed: 3 files, 0 errors, 0 warnings');
     });
 
-    it('names the source file no "sources" pattern matched', () => {
-        const files = { [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'tools/helper.luam': 'function helper(): void\nend\n' };
+    it('names the source file no "scripts" entry matched', () => {
+        const files = { [MANIFEST_FILE]: manifestSource({}), 'tools/helper.luam': 'function helper(): void\nend\n' };
         const { context, logger } = harness(files);
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
@@ -118,10 +118,10 @@ describe('check command', () => {
     });
 
     it('reports a project that holds no source file at all', () => {
-        const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'src/shared/notes.md': 'ignored\n' });
+        const { context, logger } = harness({ [MANIFEST_FILE]: manifestSource({}), 'src/shared/notes.md': 'ignored\n' });
 
         expect(runCheckCommand(context)).toBe(EXIT_DIAGNOSTICS);
-        expect(logger.errors[0]).toContain('config-no-sources');
+        expect(logger.errors[0]).toContain('config-no-scripts');
     });
 });
 
@@ -179,14 +179,14 @@ describe('check watch', () => {
 
         await waitFor(() => passes(logger) === 1);
 
-        fixture.write('lib/shared/extra.luam', 'local extra: number = 1\n');
-        fixture.write(MANIFEST_FILE, manifestSource({ name: 'luam-demo', sources: { shared: ['src/shared/**/*.luam', 'lib/shared/**/*.luam'] } }));
+        fixture.write('tools/shared/extra.luam', 'local extra: number = 1\n');
+        fixture.write(MANIFEST_FILE, manifestSource({ scripts: [...DEFAULT_SCRIPTS, { path: 'tools/shared/**/*.luam', type: 'shared' }] }));
 
-        await waitFor(() => logger.text().includes('"lib/shared"'));
+        await waitFor(() => logger.text().includes('"tools/shared"'));
 
         const rechecks = passes(logger);
 
-        fixture.write('lib/shared/extra.luam', 'local extra: number = 2\n');
+        fixture.write('tools/shared/extra.luam', 'local extra: number = 2\n');
 
         await waitFor(() => passes(logger) > rechecks);
 

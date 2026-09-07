@@ -84,7 +84,7 @@ describe('machine-readable diagnostics', () => {
     });
 
     it('keeps every field present, with nulls where a diagnostic has no location', async () => {
-        const fixture = project({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'src/shared/notes.md': 'ignored\n' });
+        const fixture = project({ [MANIFEST_FILE]: manifestSource({}), 'src/shared/notes.md': 'ignored\n' });
         const logger = createMemoryLogger();
 
         await runCli(['check', '--json', '--cwd', fixture.root], { logger, env: OFFLINE });

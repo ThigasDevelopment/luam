@@ -57,7 +57,7 @@ function harness(files: Readonly<Record<string, string>>): Harness {
 
 function consumerFiles(body: string): Record<string, string> {
     return {
-        ...defaultProjectFiles({ dependencies: ['core'] }),
+        ...defaultProjectFiles({ info: { dependencies: ['core'] } }),
         '.luam/contracts/core.abi.json': CORE_CONTRACT,
         'src/server/main.luam': body,
     };
@@ -136,10 +136,10 @@ describe('export contracts', () => {
         expect(logger.text()).toContain('build-invalid-contract');
     });
 
-    it('reads contracts from a directory the manifest names', async () => {
+    it('reads contracts from the directory the build layout fixes', async () => {
         const files = {
-            ...defaultProjectFiles({ dependencies: ['core'], contracts: 'contracts' }),
-            'contracts/core.abi.json': CORE_CONTRACT,
+            ...defaultProjectFiles({ info: { dependencies: ['core'] } }),
+            '.luam/contracts/core.abi.json': CORE_CONTRACT,
             'src/server/main.luam': "call(getResourceFromName('core'), 'getBalance', 1)\n",
         };
         const { context, logger } = harness(files);
@@ -148,13 +148,13 @@ describe('export contracts', () => {
         expect(logger.text()).toContain('check-type-mismatch');
     });
 
-    it('refuses a contracts directory that escapes the project', () => {
-        const fixture = createProjectFixture({ '.luam.manifest': manifestSource({ name: 'luam-demo', contracts: '../outside' }) });
+    it('rejects a manifest that still configures the contract directory', () => {
+        const fixture = createProjectFixture({ '.luam.manifest': manifestSource({ contracts: '../outside' }) });
 
         fixtures.push(fixture);
 
         const loaded = loadManifest(fixture.root);
 
-        expect(loaded.diagnostics.some((entry) => entry.message.includes('must stay inside the project directory'))).toBe(true);
+        expect(loaded.diagnostics.map((entry) => entry.code)).toEqual(['config-removed-field']);
     });
 });

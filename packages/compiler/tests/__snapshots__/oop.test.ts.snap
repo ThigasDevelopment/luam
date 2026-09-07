@@ -65,14 +65,11 @@ end
 `;
 
 exports[`mta oop fixture resource > locks the generated Lua and the manifest 2`] = `
-"<meta>
-    <oop>true</oop>
-    <!-- Resource information -->
+"<mta-oop>
+    <!-- INFO -->
     <info type="script" />
-    <!-- Source scripts -->
-    <script src="src/shared/**/*.lua" type="shared" cache="false" />
-    <script src="src/server/**/*.lua" />
-    <script src="src/client/**/*.lua" type="client" cache="false" />
-</meta>
+    <!-- ENVIRONMENT -->
+    <oop>true</oop>
+</mta-oop>
 "
 `;

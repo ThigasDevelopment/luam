@@ -1,0 +1,3 @@
+function loadGarages(): number
+    return 1
+end

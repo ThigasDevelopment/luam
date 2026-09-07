@@ -7,7 +7,7 @@ A resource carries two settings files, and they have **different owners**.
 | `config.lua` | The resource author | yes | **yes** |
 | `.env` | The deployment | yes | no |
 | `.env.local` | One developer's machine | no | no |
-| `<outDir>/<name>/env.lua` | The server administrator | no | no |
+| `<build.output>/<folder>/env.lua` | The server administrator | no | no |
 
 ## `config.lua`
 
@@ -80,7 +80,7 @@ of keys and safe defaults, not a secret store.
 
 ## The deployed `env.lua`
 
-The first build writes `<outDir>/<name>/env.lua` from the declared keys, blanking
+The first build writes `<build.output>/<folder>/env.lua` from the declared keys, blanking
 any key whose name looks sensitive — `password`, `secret`, `token`, `key`,
 `credential`, `dsn`, or `private`:
 

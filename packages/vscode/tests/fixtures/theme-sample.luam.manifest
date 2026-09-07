@@ -1,11 +1,27 @@
 # The resource manifest.
-name = 'luam-theme-sample'
-description = `Built in ${mode} from ${root}`
-sources = {
-    server = { 'src/server' },
-    client = { 'src/client' },
-    shared = { 'src/shared' },
+{
+    info = {
+        version = '1.0.0',
+        description = `Built in ${mode} from ${root}`,
+    },
+
+    environment = {
+        oop = false,
+        strict = true,
+
+        version = { server = '1.6.0', client = '1.6.0' },
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    build = {
+        output = 'build',
+
+        details = { bundle = true, minify = false, map = nil },
+    },
 }
-engine = { minVersion = '1.6.0' }
-output = { bundle = true, minify = false, map = nil }
-local port = 22003 + 1

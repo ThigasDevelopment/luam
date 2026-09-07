@@ -1,4 +1,4 @@
-import { parse } from '@compiler/parser/parser';
+import { parse, parseExpressionSource } from '@compiler/parser/parser';
 
 import { indentOf } from './format-indent';
 import { indentUnit, newlineOf, resolveFormatOptions, type FormatOptions } from './format-options';
@@ -27,10 +27,22 @@ function signature(pieces: readonly Piece[]): string {
     return JSON.stringify(pieces.map((piece) => [piece.kind, piece.value]));
 }
 
-function render(source: string, options: FormatOptions): Formatted | null {
-    const parsed = parse(source);
+export type FormatForm = 'program' | 'expression';
 
-    if (parsed.diagnostics.length > 0) {
+function parseFor(source: string, form: FormatForm): { tokens: ReturnType<typeof parse>['tokens']; comments: ReturnType<typeof parse>['comments']; erasures: ReturnType<typeof parse>['erasures']; diagnostics: ReturnType<typeof parse>['diagnostics'] } | null {
+    if (form === 'program') {
+        return parse(source);
+    }
+
+    const parsed = parseExpressionSource(source);
+
+    return parsed.expression === null || parsed.trailing !== null ? null : { ...parsed, erasures: [] };
+}
+
+function render(source: string, options: FormatOptions, form: FormatForm): Formatted | null {
+    const parsed = parseFor(source, form);
+
+    if (parsed === null || parsed.diagnostics.length > 0) {
         return null;
     }
 
@@ -61,9 +73,9 @@ function assemble(rendered: readonly Rendered[], newline: string): string {
     return rendered.length === 0 ? '' : `${rendered.map((entry) => entry.text).join(newline)}${newline}`;
 }
 
-function verified(formatted: Formatted, options: FormatOptions): string | null {
+function verified(formatted: Formatted, options: FormatOptions, form: FormatForm): string | null {
     const text = assemble(formatted.rendered, formatted.newline);
-    const round = render(text, options);
+    const round = render(text, options, form);
 
     if (round === null || signature(round.pieces) !== signature(formatted.pieces)) {
         return null;
@@ -72,18 +84,24 @@ function verified(formatted: Formatted, options: FormatOptions): string | null {
     return text;
 }
 
-export function formatSource(source: string, options: Partial<FormatOptions> = {}): string | null {
+export function formatSource(source: string, options: Partial<FormatOptions> = {}, form: FormatForm = 'program'): string | null {
     const resolved = resolveFormatOptions(options);
-    const formatted = render(source, resolved);
+    const formatted = render(source, resolved, form);
 
-    return formatted === null ? null : verified(formatted, resolved);
+    return formatted === null ? null : verified(formatted, resolved, form);
+}
+
+export const MANIFEST_BLANK_LINES = 1;
+
+export function formatManifestSource(source: string, options: Partial<FormatOptions> = {}): string | null {
+    return formatSource(source, { ...options, maxBlankLines: MANIFEST_BLANK_LINES }, 'expression');
 }
 
 export function formatRange(source: string, startLine: number, endLine: number, options: Partial<FormatOptions> = {}): RangeEdit | null {
     const resolved = resolveFormatOptions(options);
-    const formatted = render(source, resolved);
+    const formatted = render(source, resolved, 'program');
 
-    if (formatted === null || verified(formatted, resolved) === null) {
+    if (formatted === null || verified(formatted, resolved, 'program') === null) {
         return null;
     }
 

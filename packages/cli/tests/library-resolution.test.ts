@@ -23,7 +23,7 @@ function codes(diagnostics: readonly { code: string }[]): string[] {
 
 function manifestCodes(config: Readonly<Record<string, unknown>>): string[] {
     const analysis = analyzeManifest(manifestSource(config), { mode: 'check', root: '/project', env: {} });
-    const validated = validateConfig(analysis.value, analysis.positions);
+    const validated = validateConfig('luam-demo', analysis.value, analysis.positions, analysis.groups);
 
     return codes([...analysis.diagnostics, ...validated.diagnostics]);
 }
@@ -86,11 +86,11 @@ describe('library resolution', () => {
     });
 
     it('reports a duplicate entry from the manifest', () => {
-        expect(manifestCodes({ name: 'luam-demo', libraries: [COLLECTIONS, COLLECTIONS] })).toContain('config-library-duplicate');
+        expect(manifestCodes({ environment: { libraries: [COLLECTIONS, COLLECTIONS] } })).toContain('config-library-duplicate');
     });
 
     it('reports an entry that is not a package name', () => {
-        expect(manifestCodes({ name: 'luam-demo', libraries: ['Not A Package'] })).toContain('config-library-invalid');
+        expect(manifestCodes({ environment: { libraries: ['Not A Package'] } })).toContain('config-library-invalid');
     });
 
     it('reports a requirement the manifest does not list', () => {

@@ -1,7 +1,14 @@
-import { emptySourceMapping, SOURCE_SIDES, type SourceMapping } from '@compiler/manifest/manifest-defaults';
-import type { Environment } from '@compiler/environment/environment';
+import { ALL_ENVIRONMENTS, type Environment } from '@compiler/environment/environment';
 
 import { normalizePattern, patternProblem, patternProblemText } from './path-pattern';
+
+export type LibrarySources = Readonly<Record<Environment, readonly string[]>>;
+
+export const LIBRARY_SIDES: readonly Environment[] = ALL_ENVIRONMENTS;
+
+export function emptyLibrarySources(): Record<Environment, string[]> {
+    return { server: [], client: [], shared: [] };
+}
 
 export interface LibraryOrigin {
     package: string;
@@ -23,7 +30,7 @@ export function compareLibraryOrigins(left: LibraryOrigin, right: LibraryOrigin)
 
 export interface LibraryDeclaration {
     name: string;
-    sources: SourceMapping;
+    sources: LibrarySources;
     requires: readonly string[];
 }
 
@@ -104,16 +111,16 @@ function patternProblems(name: string, environment: Environment, patterns: reado
     }
 }
 
-function readSources(name: string, value: unknown, problems: LibraryProblem[]): SourceMapping | null {
+function readSources(name: string, value: unknown, problems: LibraryProblem[]): LibrarySources | null {
     if (!isRecord(value)) {
         problems.push({ code: INVALID_LIBRARY, message: `"${name}" declares no "sources" table in its "${LIBRARY_FIELD}" field. ${SHAPE}` });
 
         return null;
     }
 
-    const mapping = emptySourceMapping();
+    const mapping = emptyLibrarySources();
 
-    for (const environment of SOURCE_SIDES) {
+    for (const environment of LIBRARY_SIDES) {
         const declared = value[environment];
 
         if (declared === undefined) {
@@ -132,7 +139,7 @@ function readSources(name: string, value: unknown, problems: LibraryProblem[]): 
         mapping[environment] = patterns.map(normalizePattern);
     }
 
-    if (SOURCE_SIDES.every((environment) => mapping[environment].length === 0)) {
+    if (LIBRARY_SIDES.every((environment) => mapping[environment].length === 0)) {
         problems.push({ code: INVALID_LIBRARY, message: `"${name}" declares no source patterns for any side. ${SHAPE}` });
 
         return null;

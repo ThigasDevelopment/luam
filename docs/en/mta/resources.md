@@ -40,11 +40,12 @@ non-empty environment in shared, server, client order.
 
 A server entry carries neither `type` nor `cache`, since both equal the MTA
 default; every client and shared entry carries `cache="false"`. Tree output lists
-helpers, `config.lua`, pinned `loadOrder` entries, and source groups instead.
+the helpers, the vendored libraries, `config.lua`, and then every `scripts` entry
+in the order it is written.
 
 `<export>` entries come from [`export` functions](/en/language/exports), and
-`<file>` entries from the `assets` mappings. `<include>` entries come from
-`dependencies`.
+`<file>` entries from the `files` list. `<include>` entries come from
+`info.dependencies`.
 
 ## Runtime helpers
 
@@ -126,16 +127,22 @@ succeed.
 
 ## Load order
 
-`loadOrder` pins source paths ahead of their group:
+`scripts` is an ordered list, so load order is where an entry sits:
 
-```luam
-loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
+```luam manifest
+{
+    scripts = {
+        { path = 'src/server/index.luam', type = 'server' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+    },
+}
 ```
 
-A script is placed before other modules in its environment, and an asset before
-other assets. Order is meaningful for assets too, since a shader can depend on another. An entry
-matching no file fails the build with `project-load-order-missing`, so a rename
-cannot break the order silently.
+Moving an entry up moves its `<script>` element up and changes nothing else, and a
+blank line between two entries reaches the generated file at the same place. A
+literal path naming no file fails the build with `config-missing-script`, so a
+rename cannot break the order silently.
 
 ## Incremental writes and pruning
 

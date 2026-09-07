@@ -53,28 +53,47 @@ export function toContributions(directives: SourceDirectives, environment: Envir
     );
 }
 
+export interface ManifestAuthor {
+    name: string;
+    extra: readonly (readonly [string, string])[];
+}
+
 export interface ManifestInfo {
-    author?: string;
-    version?: string;
-    description?: string;
+    author: ManifestAuthor | null;
+    version: string | null;
+    description: string | null;
 }
 
-export interface ManifestOptions {
-    oop?: boolean;
-    minMtaVersion?: string | null;
-    dependencies?: readonly string[];
+export interface ManifestInclude {
+    resource: string;
+    group: boolean;
 }
 
-export type ScriptGroup = 'library' | 'libraries' | 'configuration' | 'source';
+export interface ManifestEnvironment {
+    oop: boolean | null;
+    minServerVersion: string | null;
+    minClientVersion: string | null;
+}
 
 export interface ManifestScript {
     src: string;
     environment: Environment;
-    group: ScriptGroup;
+    group: boolean;
 }
 
 export interface ManifestFile {
     src: string;
+    group: boolean;
+}
+
+export interface GeneratedManifest {
+    resource: string;
+    info: ManifestInfo;
+    includes: readonly ManifestInclude[];
+    environment: ManifestEnvironment;
+    scripts: readonly ManifestScript[];
+    files: readonly ManifestFile[];
+    exports: readonly ManifestContribution[];
 }
 
 const INDENT = '    ';
@@ -85,24 +104,17 @@ const DEFAULT_SIDE: Environment = 'server';
 
 const SIDE_ORDER: Readonly<Record<Environment, number>> = { shared: 0, server: 1, client: 2 };
 
-const SCRIPT_GROUPS: readonly ScriptGroup[] = ['library', 'libraries', 'configuration', 'source'];
+const INFO_COMMENT = 'INFO';
 
-const GROUP_COMMENTS: Readonly<Record<ScriptGroup, string>> = {
-    library: 'Runtime library',
-    libraries: 'Libraries',
-    configuration: 'Configuration',
-    source: 'Source scripts',
-};
+const ENVIRONMENT_COMMENT = 'ENVIRONMENT';
 
-const INFO_COMMENT = 'Resource information';
+const SCRIPT_COMMENT = 'SCRIPTS';
 
-const EXPORT_COMMENT = 'Exported functions';
+const FILE_COMMENT = 'FILES';
 
-const ASSET_COMMENT = 'Assets';
+const EXPORT_COMMENT = 'EXPORTS';
 
-const VERSION_COMMENT = 'Minimum MTA version';
-
-const DEPENDENCY_COMMENT = 'Required resources';
+const XML_NAME = /^[A-Za-z_][A-Za-z0-9._-]*$/;
 
 const ESCAPES: Readonly<Record<string, string>> = {
     '&': '&amp;',
@@ -111,6 +123,10 @@ const ESCAPES: Readonly<Record<string, string>> = {
     '"': '&quot;',
     "'": '&apos;',
 };
+
+export function isValidElementName(name: string): boolean {
+    return XML_NAME.test(name);
+}
 
 export function escapeXml(value: string): string {
     return value.replace(/[&<>"']/g, (character) => ESCAPES[character] ?? character);
@@ -128,17 +144,25 @@ function section(text: string, entries: readonly string[]): string[] {
     return entries.length === 0 ? [] : [`${INDENT}<!-- ${text} -->`, ...entries];
 }
 
+function grouped<T extends { group: boolean }>(entries: readonly T[], render: (entry: T) => string): string[] {
+    return entries.flatMap((entry, index) => (entry.group && index > 0 ? ['', render(entry)] : [render(entry)]));
+}
+
 function infoElement(info: ManifestInfo): string {
-    const attributes = info.author === undefined ? [] : [attribute('author', info.author)];
+    const attributes = info.author === null ? [] : [attribute('author', info.author.name)];
 
     attributes.push(attribute('type', RESOURCE_TYPE));
 
-    if (info.version !== undefined) {
+    if (info.version !== null) {
         attributes.push(attribute('version', info.version));
     }
 
-    if (info.description !== undefined) {
+    if (info.description !== null) {
         attributes.push(attribute('description', info.description));
+    }
+
+    for (const [name, value] of info.author?.extra ?? []) {
+        attributes.push(attribute(name, value));
     }
 
     return `${INDENT}<info ${attributes.join(' ')} />`;
@@ -168,43 +192,50 @@ function exportElement(contribution: ExportContribution): string {
     return `${INDENT}<export ${attributes.join(' ')} />`;
 }
 
-function includeElement(resource: string): string {
-    return `${INDENT}<include ${attribute('resource', resource)} />`;
+function includeElement(include: ManifestInclude): string {
+    return `${INDENT}<include ${attribute('resource', include.resource)} />`;
 }
 
-function versionElement(version: string): string {
-    return `${INDENT}<min_mta_version ${attribute('server', version)} ${attribute('client', version)} />`;
+function versionElement(environment: ManifestEnvironment): string[] {
+    const attributes: string[] = [];
+
+    if (environment.minServerVersion !== null) {
+        attributes.push(attribute('server', environment.minServerVersion));
+    }
+
+    if (environment.minClientVersion !== null) {
+        attributes.push(attribute('client', environment.minClientVersion));
+    }
+
+    return attributes.length === 0 ? [] : [`${INDENT}<min_mta_version ${attributes.join(' ')} />`];
+}
+
+function environmentElements(environment: ManifestEnvironment): string[] {
+    const oop = environment.oop === null ? [] : [textElement('oop', String(environment.oop))];
+
+    return [...oop, ...versionElement(environment)];
 }
 
 function exportElements(contributions: readonly ManifestContribution[]): string[] {
-    return [...contributions]
-        .sort((left, right) => SIDE_ORDER[left.side] - SIDE_ORDER[right.side] || left.name.localeCompare(right.name))
-        .map(exportElement);
+    const sorted = [...contributions].sort((left, right) => SIDE_ORDER[left.side] - SIDE_ORDER[right.side] || left.name.localeCompare(right.name));
+
+    return sorted.flatMap((contribution, index) => {
+        const previous = sorted[index - 1];
+        const boundary = previous !== undefined && previous.side !== contribution.side;
+
+        return boundary ? ['', exportElement(contribution)] : [exportElement(contribution)];
+    });
 }
 
-function scriptSections(scripts: readonly ManifestScript[]): string[] {
-    return SCRIPT_GROUPS.flatMap((group) => section(GROUP_COMMENTS[group], scripts.filter((script) => script.group === group).map(scriptElement)));
-}
-
-export function generateManifest(
-    info: ManifestInfo,
-    scripts: readonly ManifestScript[],
-    files: readonly ManifestFile[] = [],
-    contributions: readonly ManifestContribution[] = [],
-    options: ManifestOptions = {},
-): string {
-    const version = options.minMtaVersion ?? null;
-    const dependencies = [...new Set(options.dependencies ?? [])].sort();
+export function generateManifest(manifest: GeneratedManifest): string {
     const lines = [
-        '<meta>',
-        ...(options.oop === true ? [textElement('oop', 'true')] : []),
-        ...section(INFO_COMMENT, [infoElement(info)]),
-        ...section(DEPENDENCY_COMMENT, dependencies.map(includeElement)),
-        ...scriptSections(scripts),
-        ...section(EXPORT_COMMENT, exportElements(contributions)),
-        ...section(ASSET_COMMENT, files.map(fileElement)),
-        ...section(VERSION_COMMENT, version === null ? [] : [versionElement(version)]),
-        '</meta>',
+        `<${manifest.resource}>`,
+        ...section(INFO_COMMENT, [infoElement(manifest.info), ...grouped(manifest.includes, includeElement)]),
+        ...section(ENVIRONMENT_COMMENT, environmentElements(manifest.environment)),
+        ...section(SCRIPT_COMMENT, grouped(manifest.scripts, scriptElement)),
+        ...section(FILE_COMMENT, grouped(manifest.files, fileElement)),
+        ...section(EXPORT_COMMENT, exportElements(manifest.exports)),
+        `</${manifest.resource}>`,
         '',
     ];
 

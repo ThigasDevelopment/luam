@@ -1,4 +1,4 @@
-import { manifestSource, MANIFEST_FILE } from './project-fixture';
+import { DEFAULT_SCRIPTS, manifestSource, MANIFEST_FILE } from './project-fixture';
 
 export const COLLECTIONS = '@luam-fixture/collections';
 
@@ -77,7 +77,12 @@ export function asyncPackage(files: Readonly<Record<string, string>> = {}): Reco
 
 export function consumerFiles(libraries: readonly string[], overrides: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     return {
-        [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', libraries: [...libraries], output: { bundle: false, map: false }, ...overrides }),
+        [MANIFEST_FILE]: manifestSource({
+            environment: { libraries: [...libraries] },
+            scripts: DEFAULT_SCRIPTS,
+            build: { details: { bundle: false, map: false } },
+            ...overrides,
+        }),
         'src/shared/main.luam': CONSUMER_SHARED,
         'src/client/hud.luam': CONSUMER_CLIENT,
     };

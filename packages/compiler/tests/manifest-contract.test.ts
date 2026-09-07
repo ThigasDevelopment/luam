@@ -2,148 +2,195 @@ import { describe, expect, it } from 'vitest';
 
 import { analyzeManifest } from '@compiler/manifest/manifest-analysis';
 import {
-    readAssetMappings,
+    names,
+    readAuthor,
+    readBuild,
     readCompilerOptions,
     readDependencies,
-    readEngine,
-    readEnvironmentFiles,
-    readOutputSettings,
-    readSourceMapping,
+    readEngineVersions,
+    readFiles,
+    readLibraries,
+    readScripts,
+    readSecret,
 } from '@compiler/manifest/manifest-contract';
-import { DEFAULT_COMPILER_OPTIONS, DEFAULT_ENVIRONMENT_FILES, DEFAULT_SOURCE_MAPPING } from '@compiler/manifest/manifest-defaults';
+import {
+    DEFAULT_BUILD_DETAILS,
+    DEFAULT_COMPILER_OPTIONS,
+    DEFAULT_ENGINE_VERSIONS,
+    DEFAULT_ENVIRONMENT_FILE,
+    DEFAULT_OUT_DIR,
+} from '@compiler/manifest/manifest-defaults';
+import type { ManifestObject } from '@compiler/manifest/manifest-value';
 
-const NAME = "name = 'luam-demo'\n";
+function analyze(source: string): ReturnType<typeof analyzeManifest> {
+    return analyzeManifest(source, { mode: 'production', root: '/project', env: {} });
+}
 
-function value(source: string) {
-    return analyzeManifest(`${NAME}${source}`, { mode: 'production', root: '/project', env: {} }).value;
+function value(source: string): ManifestObject {
+    return analyze(source).value;
 }
 
 function codes(source: string): string[] {
-    return analyzeManifest(`${NAME}${source}`, { mode: 'production', root: '/project', env: {} }).diagnostics.map((diagnostic) => diagnostic.code);
+    return analyze(source).diagnostics.map((diagnostic) => diagnostic.code);
 }
 
-describe('compiler', () => {
-    it('defaults to strict with every other option off', () => {
-        expect(readCompilerOptions(value(''))).toEqual(DEFAULT_COMPILER_OPTIONS);
+describe('compiler options', () => {
+    it('defaults every option when the section is absent', () => {
+        expect(readCompilerOptions(value('{ }\n'))).toEqual(DEFAULT_COMPILER_OPTIONS);
     });
 
-    it('reads each option independently', () => {
-        const options = readCompilerOptions(value('compiler = { strict = false, noUnusedLocals = true, warningsAsErrors = true }\n'));
+    it('reads the options the environment section carries', () => {
+        const options = readCompilerOptions(value('{ environment = { strict = false, noUnusedLocals = true, warningsAsErrors = true } }\n'));
 
-        expect(options).toEqual({ strict: false, oop: false, noUnusedLocals: true, noUnusedParameters: false, noImplicitGlobals: false, warningsAsErrors: true });
-    });
-
-    it('rejects an unknown option and a wrongly typed one', () => {
-        expect(codes('compiler = { target = 54 }\n')).toEqual(['config-unknown-field']);
-        expect(codes("compiler = { strict = 'yes' }\n")).toEqual(['config-invalid-type']);
+        expect(options).toEqual({ ...DEFAULT_COMPILER_OPTIONS, strict: false, noUnusedLocals: true, warningsAsErrors: true });
     });
 });
 
-describe('sources', () => {
-    it('keeps the default layout when the domain is absent', () => {
-        expect(readSourceMapping(value(''))).toEqual(DEFAULT_SOURCE_MAPPING);
+describe('scripts', () => {
+    it('reads nothing when the section is absent', () => {
+        expect(readScripts(value('{ }\n'))).toEqual([]);
     });
 
-    it('replaces only the sides the manifest writes', () => {
-        const mapping = readSourceMapping(value("sources = { client = { 'ui/**/*.luam' } }\n"));
+    it('keeps the order the manifest wrote', () => {
+        const scripts = readScripts(
+            value("{\n    scripts = {\n        { path = 'config.lua', type = 'shared' },\n        { path = 'src/**/*.luam', type = 'server' },\n    },\n}\n"),
+        );
 
-        expect(mapping.client).toEqual(['ui/**/*.luam']);
-        expect(mapping.server).toEqual([...DEFAULT_SOURCE_MAPPING.server]);
-    });
-
-    it('accepts an empty side', () => {
-        expect(codes('sources = { client = { } }\n')).toEqual([]);
-        expect(readSourceMapping(value('sources = { client = { } }\n')).client).toEqual([]);
-    });
-
-    it('rejects a pattern the grammar does not allow', () => {
-        expect(codes("sources = { server = { 'src/(a|b)/*.luam' } }\n")).toEqual(['config-invalid-pattern']);
-        expect(codes("sources = { server = { '../outside/**/*.luam' } }\n")).toEqual(['config-escaping-path']);
-    });
-
-    it('normalizes separators it accepts', () => {
-        expect(readSourceMapping(value("sources = { server = { 'src\\\\server\\\\**\\\\*.luam' } }\n")).server).toEqual(['src/server/**/*.luam']);
-    });
-});
-
-describe('assets', () => {
-    it('defaults to copying nothing', () => {
-        expect(readAssetMappings(value(''))).toEqual([]);
-    });
-
-    it('reads a list of mappings and defaults the destination to the resource root', () => {
-        const mappings = readAssetMappings(value("assets = { { from = 'assets/**/*', to = 'assets' }, { from = 'logo.png' } }\n"));
-
-        expect(mappings).toEqual([
-            { from: 'assets/**/*', to: 'assets' },
-            { from: 'logo.png', to: '.' },
+        expect(scripts.map((entry) => [entry.path, entry.type])).toEqual([
+            ['config.lua', 'shared'],
+            ['src/**/*.luam', 'server'],
         ]);
     });
 
-    it('requires a source on every entry and rejects an unknown member', () => {
-        expect(codes("assets = { { to = 'assets' } }\n")).toEqual(['config-missing-field']);
-        expect(codes("assets = { { from = 'a', into = 'b' } }\n")).toEqual(['config-unknown-field']);
+    it('normalizes a windows separator in an entry path', () => {
+        const scripts = readScripts(value("{ scripts = { { path = 'src\\\\server\\\\**\\\\*.luam', type = 'server' } } }\n"));
+
+        expect(scripts[0]?.path).toBe('src/server/**/*.luam');
+    });
+
+    it('rejects a side the catalog does not carry', () => {
+        expect(codes("{ scripts = { { path = 'a.luam', type = 'both' } } }\n")).toEqual(['config-unknown-script-type']);
+    });
+
+    it('requires both fields of an entry', () => {
+        expect(codes("{ scripts = { { path = 'a.luam' } } }\n")).toEqual(['config-missing-field']);
+    });
+});
+
+describe('files', () => {
+    it('reads nothing when the section is absent', () => {
+        expect(readFiles(value('{ }\n'))).toEqual([]);
+    });
+
+    it('keeps the order the manifest wrote', () => {
+        const files = readFiles(value("{\n    files = {\n        'list.xml',\n        'assets/**/*.png',\n    },\n}\n"));
+
+        expect(files.map((entry) => entry.path)).toEqual(['list.xml', 'assets/**/*.png']);
     });
 });
 
 describe('dependencies', () => {
-    it('deduplicates and sorts the names', () => {
-        expect(readDependencies(value("dependencies = { 'scoreboard', 'admin', 'scoreboard' }\n"))).toEqual(['admin', 'scoreboard']);
+    it('emits them in the order they were written rather than sorted', () => {
+        const written = value("{ info = { dependencies = { 'scoreboard', 'admin' } } }\n");
+
+        expect(names(readDependencies(written))).toEqual(['scoreboard', 'admin']);
     });
 
-    it('rejects a name MTA cannot resolve', () => {
-        expect(codes("dependencies = { 'not a resource' }\n")).toEqual(['config-invalid-dependency']);
+    it('keeps a repeated entry rather than collapsing it', () => {
+        const written = value("{ info = { dependencies = { 'admin', 'admin' } } }\n");
+
+        expect(names(readDependencies(written))).toEqual(['admin', 'admin']);
     });
 });
 
-describe('engine', () => {
-    it('defaults to the latest published release', () => {
-        expect(readEngine(value(''))).toEqual({ minVersion: 'latest' });
+describe('author', () => {
+    it('reads nothing when the record is absent', () => {
+        expect(readAuthor(value('{ }\n'))).toBeNull();
     });
 
-    it('accepts a pinned version and rejects anything else', () => {
-        expect(readEngine(value("engine = { minVersion = '1.6.0' }\n"))).toEqual({ minVersion: '1.6.0' });
-        expect(codes("engine = { minVersion = 'newest' }\n")).toEqual(['config-invalid-engine-version']);
+    it('reads the name and every extra key', () => {
+        const author = readAuthor(value("{ info = { author = { name = 'dracoN*', discord = 'draconzx' } } }\n"));
+
+        expect(author?.name).toBe('dracoN*');
+        expect(author?.extra).toEqual([['discord', 'draconzx']]);
     });
 
-    it('does not accept the removed mta domain', () => {
-        expect(codes("mta = { minVersion = '1.6.0' }\n")).toEqual(['config-removed-field']);
+    it('requires a name inside the record rather than at the file', () => {
+        const analysis = analyze("{ info = { author = { discord = 'draconzx' } } }\n");
+
+        expect(analysis.diagnostics.map((entry) => entry.code)).toEqual(['config-missing-field']);
+        expect(analysis.diagnostics[0]?.position.line).toBe(1);
     });
 });
 
 describe('environment', () => {
-    it('defaults to .env with a local override', () => {
-        expect(readEnvironmentFiles(value(''))).toEqual(DEFAULT_ENVIRONMENT_FILES);
+    it('defaults the version on both sides', () => {
+        expect(readEngineVersions(value('{ }\n'))).toEqual(DEFAULT_ENGINE_VERSIONS);
     });
 
-    it('reads a per-mode pair', () => {
-        const files = readEnvironmentFiles(value("environment = { file = '.env.development', localFile = '.env.development.local' }\n"));
+    it('reads a pinned version per side', () => {
+        expect(readEngineVersions(value("{ environment = { version = { server = '1.6.0', client = 'latest' } } }\n"))).toEqual({
+            server: '1.6.0',
+            client: 'latest',
+        });
+    });
 
-        expect(files).toEqual({ file: '.env.development', localFile: '.env.development.local' });
+    it('names one environment file', () => {
+        expect(readSecret(value('{ }\n'))).toBe(DEFAULT_ENVIRONMENT_FILE);
+        expect(readSecret(value("{ environment = { secret = '.env.development' } }\n"))).toBe('.env.development');
+    });
+
+    it('keeps the library order the manifest wrote', () => {
+        expect(names(readLibraries(value("{ environment = { libraries = { '@luam-example/collections', '@infobox' } } }\n")))).toEqual([
+            '@luam-example/collections',
+            '@infobox',
+        ]);
     });
 });
 
-describe('output', () => {
-    it('minifies and bundles by default', () => {
-        expect(readOutputSettings(value(''))).toEqual({ bundle: true, map: true, minify: true });
+describe('build', () => {
+    it('defaults the output directory and every switch', () => {
+        expect(readBuild(value('{ }\n'))).toEqual({ output: DEFAULT_OUT_DIR, details: DEFAULT_BUILD_DETAILS });
     });
 
     it('reads each switch independently', () => {
-        expect(readOutputSettings(value('output = { minify = false }\n'))).toEqual({ bundle: true, map: true, minify: false });
+        expect(readBuild(value('{ build = { details = { minify = false } } }\n')).details).toEqual({ ...DEFAULT_BUILD_DETAILS, minify: false });
+    });
+
+    it('accepts an absolute output that leaves the project', () => {
+        expect(codes("{ build = { output = '/media/storage/resources' } }\n")).toEqual([]);
+        expect(readBuild(value("{ build = { output = '/media/storage/resources' } }\n")).output).toBe('/media/storage/resources');
+    });
+
+    it('reports an obfuscate that is on and stays quiet otherwise', () => {
+        expect(codes('{ build = { details = { obfuscate = true } } }\n')).toEqual(['config-unimplemented-option']);
+        expect(codes('{ build = { details = { obfuscate = false } } }\n')).toEqual([]);
+        expect(codes('{ }\n')).toEqual([]);
+    });
+
+    it('names the milestone that will honour obfuscate', () => {
+        expect(analyze('{ build = { details = { obfuscate = true } } }\n').diagnostics[0]?.message).toContain('Milestone 52');
     });
 });
 
 describe('removed fields', () => {
     it.each([
-        ['oop = true\n', 'compiler'],
-        ['compilerOptions = { oop = true }\n', 'compiler'],
-        ["sourceDirs = { 'src' }\n", 'sources'],
-        ["assetDirs = { 'assets' }\n", 'assets'],
-        ["mta = { minVersion = '1.6' }\n", 'engine'],
+        ["{ name = 'demo' }\n", 'folder'],
+        ['{ oop = true }\n', 'environment'],
+        ["{ sourceDirs = { 'src' } }\n", 'scripts'],
+        ["{ assetDirs = { 'assets' } }\n", 'files'],
+        ["{ mta = { minVersion = '1.6' } }\n", 'environment'],
+        ["{ loadOrder = { 'a.luam' } }\n", 'scripts'],
+        ["{ helpers = { 'class' } }\n", 'Helper selection'],
+        ["{ serverPath = 'server' }\n", '.luam.server'],
     ])('rejects %j and names its replacement', (source, replacement) => {
-        const analysis = analyzeManifest(`${NAME}${source}`, { mode: 'production', root: '/project', env: {} });
+        const analysis = analyze(source);
 
         expect(analysis.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['config-removed-field']);
         expect(analysis.diagnostics[0]?.message).toContain(replacement);
+    });
+
+    it('names the assets entry that has no replacement', () => {
+        expect(analyze("{ assets = { { from = 'a', to = 'b' } } }\n").diagnostics[0]?.message).toContain('has no replacement');
     });
 });

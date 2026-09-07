@@ -91,7 +91,6 @@ export async function runDevCommand(context: CommandContext, options: DevOptions
             serverConsole: supervisor === null ? null : createServerConsole(supervisor),
             signal: options.startServer === true ? controller.signal : options.signal,
             commandName: 'dev',
-            developmentLogs: deployment.logs,
             layout: 'tree',
             onBuild: (outcome): void => {
                 map = deployedMapAfterBuild(map, outcome);

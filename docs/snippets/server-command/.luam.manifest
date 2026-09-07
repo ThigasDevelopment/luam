@@ -1,2 +1,12 @@
-name = 'luam-docs-server-command'
-description = 'A chat command handled on the server.'
+{
+    info = {
+        description = 'A chat command handled on the server.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

@@ -4,7 +4,7 @@ import type { Hover } from 'vscode-languageserver';
 
 import type { DocumentAnalysis } from '@lsp/analysis/document-analysis';
 import { fieldDocumentation } from '@lsp/features/manifest-items';
-import { fieldAt } from '@lsp/features/manifest-field-table';
+import { fieldAt, manifestRoot } from '@lsp/features/manifest-field-table';
 import { manifestScopeAt } from '@lsp/features/manifest-scope';
 import { toWordRange } from '@lsp/support/lsp-position';
 import { isIdentifierChar, positionAt, wordAt } from '@lsp/support/source-text';
@@ -38,7 +38,7 @@ export function manifestHover(analysis: DocumentAnalysis, offset: number): Hover
         return { contents: markdown(`env.${name}: ${typeToString(ENV_MEMBER_TYPE)}`, 'Read from the environment, so it may be missing.') };
     }
 
-    const scope = manifestScopeAt(analysis.text, start);
+    const scope = manifestScopeAt(analysis.text, start, manifestRoot(analysis.path));
     const field = fieldAt(analysis.path, [...scope.path, name]);
 
     if (field === null) {

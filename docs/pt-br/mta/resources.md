@@ -41,12 +41,12 @@ ambiente não vazio, na ordem shared, server, client.
 
 Uma entrada de servidor não carrega `type` nem `cache`, já que ambos são o padrão
 do MTA; toda entrada de cliente e compartilhada carrega `cache="false"`. A saída
-em árvore lista helpers, `config.lua`, entradas fixadas por `loadOrder` e grupos
-de código.
+em árvore lista os helpers, as bibliotecas vendorizadas, o `config.lua` e depois
+cada entrada de `scripts` na ordem escrita.
 
 Entradas `<export>` vêm de [funções `export`](/pt-br/language/exports), e entradas
-`<file>` vêm dos mapeamentos de `assets`. Entradas `<include>` vêm de
-`dependencies`.
+`<file>` vêm das entradas de `files`. Entradas `<include>` vêm de
+`info.dependencies`.
 
 ## Helpers de runtime
 
@@ -130,16 +130,22 @@ tenha sucesso.
 
 ## Ordem de carga
 
-`loadOrder` fixa caminhos de código à frente do seu grupo:
+`scripts` é uma lista ordenada, então a ordem de carga é onde a entrada está:
 
-```luam
-loadOrder = { 'src/server/index.luam', 'assets/shaders/base.fx' }
+```luam manifest
+{
+    scripts = {
+        { path = 'src/server/index.luam', type = 'server' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+    },
+}
 ```
 
-Um script é colocado antes dos outros módulos do seu ambiente, e um asset antes
-dos outros assets. A ordem também importa para assets, já que um shader pode depender de outro. Uma
-entrada que não casa com nenhum arquivo falha o build com
-`project-load-order-missing`, então uma renomeação não quebra a ordem em silêncio.
+Mover uma entrada para cima move o elemento `<script>` dela para cima e não muda
+mais nada, e uma linha em branco entre duas entradas chega ao arquivo gerado no
+mesmo lugar. Um caminho literal que não nomeia arquivo nenhum falha o build com
+`config-missing-script`, então uma renomeação não quebra a ordem em silêncio.
 
 ## Escrita incremental e limpeza
 

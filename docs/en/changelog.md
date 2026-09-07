@@ -9,6 +9,20 @@ Every heading below is a released version and the date it shipped, newest first.
 
 ## Unreleased
 
+## 1.1.0 - 2026-09-07
+
+### Added
+
+- [.luam.manifest](/en/tooling/luam-manifest) is rewritten around the table form:
+  the shape, the five sections, one worked example shown next to the `meta.xml` it
+  generates, and the blank line as a group boundary.
+- [Migration](/en/guide/migration) gains a `1.1.0` section: the before and after,
+  the field-by-field table of everything that moved, `luam migrate`, the editor
+  code action, and the one conversion that refuses.
+- [Configuration fields](/en/reference/configuration-fields) is generated from the
+  manifest catalog, so the table and the removed-field table cannot drift from
+  what the tool enforces.
+
 ## 1.0.10 - 2026-09-04
 
 ### Changed

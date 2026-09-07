@@ -40,10 +40,10 @@ afterEach(() => {
 
 describe('build command with the oop api', () => {
     it('writes the manifest tag and accepts an OOP call when the project enables the API', async () => {
-        const { context, fixture } = harness({ ...defaultProjectFiles({ compiler: { oop: true } }), 'src/server/main.luam': OOP_SERVER });
+        const { context, fixture } = harness({ ...defaultProjectFiles({ environment: { oop: true } }), 'src/server/main.luam': OOP_SERVER });
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.read('build/luam-demo/meta.xml')).toContain('    <oop>true</oop>\n    <!-- Resource information -->\n    <info');
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('    <!-- ENVIRONMENT -->\n    <oop>true</oop>');
         expect(fixture.read('build/luam-demo/src/server/main.lua')).toContain('player:getName()');
     });
 
@@ -64,7 +64,7 @@ describe('build command with the oop api', () => {
     });
 
     it('rebuilds the resource when the flag flips', async () => {
-        const { context, fixture } = harness({ ...defaultProjectFiles({ compiler: { oop: true } }), 'src/server/main.luam': OOP_SERVER });
+        const { context, fixture } = harness({ ...defaultProjectFiles({ environment: { oop: true } }), 'src/server/main.luam': OOP_SERVER });
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
 

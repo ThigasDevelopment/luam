@@ -3,8 +3,7 @@ import { resolve } from 'node:path';
 
 import { EXIT_OK } from '@cli/cli/exit-codes';
 import { runServerCommand } from '@cli/commands/server-command';
-import { manifestDeployment } from '@cli/config/deployment';
-import { loadManifest } from '@cli/config/manifest-loader';
+import { emptyDeployment, type DeploymentSettings } from '@cli/config/deployment';
 import { createReporter } from '@cli/reporting/reporter';
 import { serverTarget } from '@cli/server/mta-server-supervisor';
 
@@ -15,18 +14,16 @@ import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from '
 const fixtures: ProjectFixture[] = [];
 
 function harness(serverPath?: string) {
-    const fixture = createProjectFixture(defaultProjectFiles({ serverPath }));
-    const config = loadManifest(fixture.root).config;
-
-    if (config === null) {
-        throw new Error('The fixture configuration is invalid.');
-    }
+    const fixture = createProjectFixture(defaultProjectFiles());
 
     fixtures.push(fixture);
 
+    const deployment: DeploymentSettings =
+        serverPath === undefined ? emptyDeployment() : { ...emptyDeployment(), serverRoot: resolve(fixture.root, serverPath) };
+
     return {
         fixture,
-        deployment: manifestDeployment(fixture.root, config),
+        deployment,
         reporter: createReporter(createMemoryLogger()),
         service: new FakeProcessService(),
     };
@@ -63,7 +60,7 @@ describe('server command', () => {
         expect(test.service.calls[0]?.options.interactive).toBe(true);
     });
 
-    it('has no server to run when the manifest names no serverPath', () => {
+    it('has no server to run when no ".luam.server" names one', () => {
         const test = harness();
 
         expect(test.deployment.serverRoot).toBeNull();
@@ -71,7 +68,7 @@ describe('server command', () => {
         expect(test.service.calls).toEqual([]);
     });
 
-    it('resolves the server root against the project directory', () => {
+    it('resolves the server root against the directory the workspace file sits in', () => {
         const test = harness('server');
 
         expect(serverTarget(test.deployment)?.serverRoot).toBe(resolve(test.fixture.root, 'server'));

@@ -1,2 +1,12 @@
-name = 'luam-docs-error-native-class-inheritance'
-compiler = { oop = true }
+{
+    environment = {
+        oop = true,
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

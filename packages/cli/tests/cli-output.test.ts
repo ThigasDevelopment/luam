@@ -10,6 +10,7 @@ import { runCheckCommand } from '@cli/commands/check-command';
 import type { CommandContext } from '@cli/commands/command-context';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import { loadManifest } from '@cli/config/manifest-loader';
+import { loadWorkspace } from '@cli/config/workspace-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { RICH_CAPABILITY } from '@cli/reporting/output-capability';
 import { createOutputStyle } from '@cli/reporting/output-style';
@@ -17,7 +18,7 @@ import { createProgressRenderer } from '@cli/reporting/progress-renderer';
 
 import { createMemoryReporter, createTtyReporter, type MemoryReporter } from './support/memory-logger';
 import { createMockServerConsole } from './support/mock-server-console';
-import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const ESC = String.fromCharCode(27);
 
@@ -33,15 +34,19 @@ interface Harness {
 
 function harness(files: Readonly<Record<string, string>>, target: MemoryReporter = createMemoryReporter()): Harness {
     const fixture = createProjectFixture(files);
-    const config = loadManifest(fixture.root).config;
+    const loaded = loadManifest(fixture.root, { workspace: loadWorkspace(fixture.root) });
 
-    if (config === null) {
+    if (loaded.config === null) {
         throw new Error('The fixture configuration is invalid.');
     }
 
     fixtures.push(fixture);
 
-    return { fixture, target, context: { root: fixture.root, config, logger: target.logger, reporter: target.reporter } };
+    return {
+        fixture,
+        target,
+        context: { root: fixture.root, config: loaded.config, logger: target.logger, reporter: target.reporter, deployment: loaded.deployment },
+    };
 }
 
 function readTree(root: string): Map<string, string> {
@@ -230,7 +235,7 @@ describe('check output', () => {
 
 describe('watch output', () => {
     it('separates and timestamps each rebuild', async () => {
-        const { context, fixture, target } = harness(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const { context, fixture, target } = harness(withWorkspace(defaultProjectFiles()));
         const serverConsole = createMockServerConsole();
         const controller = new AbortController();
         const command = runEnsureCommand(context, { serverConsole, watch: true, signal: controller.signal });

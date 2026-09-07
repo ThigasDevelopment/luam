@@ -4,12 +4,13 @@ import { deployedMapAfterBuild, runDevCommand } from '@cli/commands/dev-command'
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import type { CommandContext } from '@cli/commands/command-context';
 import { loadManifest } from '@cli/config/manifest-loader';
+import { loadWorkspace } from '@cli/config/workspace-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import type { ResourceMap } from '@compiler/project/resource';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { FakeProcessService } from './support/fake-process-service';
-import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, defaultProjectFiles, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
 
@@ -25,17 +26,19 @@ async function waitUntil(predicate: () => boolean): Promise<void> {
     }
 }
 
-function context(overrides: Readonly<Record<string, unknown>> = {}): { context: CommandContext; fixture: ProjectFixture } {
-    const fixture = createProjectFixture(defaultProjectFiles(overrides));
-    const config = loadManifest(fixture.root).config;
+function context(deployed = false, overrides: Readonly<Record<string, unknown>> = {}): { context: CommandContext; fixture: ProjectFixture } {
+    const files = defaultProjectFiles(overrides);
+    const fixture = createProjectFixture(deployed ? withWorkspace(files) : files);
+    const workspace = loadWorkspace(fixture.root);
+    const loaded = loadManifest(fixture.root, { workspace });
 
-    if (config === null) {
+    if (loaded.config === null) {
         throw new Error('The fixture configuration is invalid.');
     }
 
     fixtures.push(fixture);
 
-    return { fixture, context: { root: fixture.root, config, logger: createMemoryLogger() } };
+    return { fixture, context: { root: fixture.root, config: loaded.config, logger: createMemoryLogger(), deployment: loaded.deployment } };
 }
 
 afterEach(() => {
@@ -45,29 +48,24 @@ afterEach(() => {
 });
 
 describe('development command', () => {
-    it('requires serverPath before writing or following logs', async () => {
+    it('requires a workspace file before writing or following logs', async () => {
         const harness = context();
 
         expect(await runDevCommand(harness.context, { watch: false, signal: null })).toBe(EXIT_DIAGNOSTICS);
         expect(harness.fixture.exists('mta-server')).toBe(false);
     });
 
-    it('writes configured development helpers only to the server resource', async () => {
-        const development = { logs: { maxMessageLength: 300, rateLimit: 4, rateWindowMs: 500 } };
-        const harness = context({ serverPath: 'mta-server', development });
+    it('writes the resource to the server rather than to the output directory', async () => {
+        const harness = context(true);
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
         expect(await runDevCommand(harness.context, { watch: false, signal: null })).toBe(EXIT_OK);
-        expect(harness.fixture.read(`${resource}/lib/development-logs-client.lua`)).toContain('local luamMaximumMessageLength = 300');
-        expect(harness.fixture.read(`${resource}/lib/development-logs-server.lua`)).toContain('local luamRateLimit = 4');
-        expect(harness.fixture.read(`${resource}/meta.xml`).indexOf('development-logs-server.lua')).toBeLessThan(
-            harness.fixture.read(`${resource}/meta.xml`).indexOf('src/server'),
-        );
+        expect(harness.fixture.exists(`${resource}/meta.xml`)).toBe(true);
         expect(harness.fixture.exists('build')).toBe(false);
     });
 
-    it('keeps normal ensure output free of development helpers and prunes prior helpers', async () => {
-        const harness = context({ serverPath: 'mta-server' });
+    it('writes no generated log relay into the resource', async () => {
+        const harness = context(true);
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
         await runDevCommand(harness.context, { watch: false, signal: null });
@@ -85,7 +83,7 @@ describe('development command', () => {
     });
 
     it('waits for an owned server before the first console command', async () => {
-        const harness = context({ serverPath: 'mta-server' });
+        const harness = context(true);
         const processService = new FakeProcessService();
         let input = '';
 
@@ -118,7 +116,7 @@ describe('development command', () => {
     });
 
     it('does not build when the owned server exits during startup', async () => {
-        const harness = context({ serverPath: 'mta-server' });
+        const harness = context(true);
         const processService = new FakeProcessService();
 
         harness.fixture.write('mta-server/MTA Server.exe', 'binary');
@@ -139,7 +137,7 @@ describe('development command', () => {
     });
 
     it('stops watch mode when the owned server exits unexpectedly', async () => {
-        const harness = context({ serverPath: 'mta-server' });
+        const harness = context(true);
         const processService = new FakeProcessService();
         let input = '';
 

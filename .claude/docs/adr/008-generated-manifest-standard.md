@@ -1,6 +1,8 @@
 # ADR-008: The generated `meta.xml` follows an authored standard
 
-**Status:** Accepted
+**Status:** Accepted, amended by
+[ADR-047](047-manifest-table-sections.md) (load order, section comments, the root
+element, the helper directory, and the no-blank-line rule)
 
 **Context:**
 Milestone 3 made the compiler the sole owner of `meta.xml`, and milestone 10
@@ -140,3 +142,28 @@ future directive would reuse. Both words are ordinary identifiers again.
   place a path is still named, and it is checked.
 - Negative: the CLI gains a second outbound HTTP call and an on-disk cache at
   `.luam/mta-version.json`, which the scaffolded `.gitignore` excludes.
+
+**Amendment (milestone 51): the runtime helpers stay flat in `lib/`.**
+
+ADR-008 placed the helpers at `lib/<environment>/`, and the sketch ADR-047 came
+from places them at `libs/`, flat. Neither is what ships: helpers land at
+`lib/<file>`, flat, and `libs/` belongs to the vendored libraries, one directory
+per package and per side.
+
+The per-environment subdirectory existed to keep a shared and a server helper of
+one name apart. The rule that makes it unnecessary is that a helper's file name
+comes from the single `RUNTIME_HELPERS` registry, which is keyed by helper name
+and gives each helper exactly one file: two helpers of one name cannot exist, so
+two helper files of one name cannot either. A helper added with a name already in
+the registry replaces it rather than joining it.
+
+Flattening in the other direction — moving the helpers into `libs/` — is what is
+rejected. `libs/` holds code the project did not write and did not ask for by
+name, one directory per npm package; `lib/` holds the runtime the compiler emits
+because the language needs it. They have different lifetimes and different
+reasons to be pruned, and one directory that mixes them cannot be read.
+
+A `scripts` entry whose path resolves inside either directory is
+`config-reserved-script-path` and writes nothing: both are emitted at the head of
+the `SCRIPTS` section already, and naming one again is how `class.lua` gets loaded
+twice.

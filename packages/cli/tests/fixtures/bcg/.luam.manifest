@@ -1,0 +1,56 @@
+{
+    info = {
+        author = { name = 'dracoN*', discord = 'draconzx' },
+
+        version = '1.0.0',
+        description = 'BCG assets resources.',
+
+        dependencies = {
+            'bcg_core',
+
+            'bcg_example',
+        },
+    },
+
+    environment = {
+        oop = false,
+        strict = true,
+
+        version = {
+            server = '1.6.0',
+            client = '1.6.0',
+        },
+
+        libraries = {
+            'mta-async-fixture',
+
+            'mta-hud-fixture',
+        },
+    },
+
+    scripts = {
+        { path = 'config.lua', type = 'shared' },
+
+        { path = 'src/index.luam', type = 'server' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    files = {
+        'list.xml',
+
+        'assets/images/**/*.png',
+        'assets/shader/**/*.fx',
+    },
+
+    build = {
+        output = 'build',
+
+        details = {
+            bundle = false,
+            minify = false,
+            map = false,
+        },
+    },
+}

@@ -17,164 +17,202 @@ function messages(source: string, context: Partial<ManifestContext> = {}): strin
     return analyze(source, context).diagnostics.map((diagnostic) => diagnostic.message);
 }
 
-const NAME = "name = 'luam-demo'\n";
+function table(...lines: readonly string[]): string {
+    return ['{', ...lines.map((line) => `    ${line}`), '}', ''].join('\n');
+}
 
-describe('manifest subset', () => {
-    it('accepts the two statements the dialect allows', () => {
-        const source = ['local password = env.LUAM_PASSWORD', NAME, "description = password or 'A demo'", "outDir = mode == 'production' and 'build' or 'build-dev'"].join('\n');
+describe('manifest shape', () => {
+    it('accepts one table constructor and nothing else', () => {
+        expect(codes(table("build = { output = mode == 'production' and 'build' or 'build-dev' },"))).toEqual([]);
+    });
+
+    it('reads an environment value where it is used, as often as it is used', () => {
+        const source = table("info = { description = env.LUAM_DESCRIPTION or 'A demo' },", "environment = { secret = env.LUAM_ENV or '.env' },");
 
         expect(codes(source)).toEqual([]);
     });
 
-    it('reports a local that is never read', () => {
-        const diagnostic = analyze(`local password = env.LUAM_PASSWORD\n${NAME}`).diagnostics[0];
+    it('rejects a local and shows the inline form', () => {
+        const diagnostic = analyze(`local password = env.LUAM_PASSWORD\n${table("info = { version = '1.0.0' },")}`).diagnostics[0];
 
-        expect(diagnostic?.code).toBe('check-unused-local');
-        expect(diagnostic?.severity).toBe('warning');
-        expect(diagnostic?.message).toBe('"password" is declared but never read. Read it, remove it, or rename it with a leading "_" to keep it on purpose.');
+        expect(diagnostic?.code).toBe('config-unexpected-statement');
+        expect(diagnostic?.message).toContain('A manifest has no statements.');
+        expect(diagnostic?.message).toContain('env.SOME_KEY');
         expect(diagnostic?.position.line).toBe(1);
     });
 
-    it('keeps a local named with a leading underscore', () => {
-        expect(codes(`local _password = env.LUAM_PASSWORD\n${NAME}`)).toEqual([]);
+    it('rejects a statement the file starts with and names the shape', () => {
+        for (const source of ['function build() end', 'if true then end', 'return 1', 'for index = 1, 2 do end']) {
+            expect(codes(source)).toEqual(['config-unexpected-statement']);
+            expect(messages(source)[0]).toContain('A manifest is one table constructor and nothing else.');
+        }
     });
 
-    it('rejects a function declaration, a call, an if statement and a return', () => {
-        expect(codes(`${NAME}function build() end`)).toEqual(['config-invalid-statement']);
-        expect(codes(`${NAME}print('hello')`)).toEqual(['config-invalid-statement']);
-        expect(codes(`${NAME}if true then end`)).toEqual(['config-invalid-statement']);
-        expect(codes(`${NAME}return 1`)).toEqual(['config-invalid-statement']);
+    it('names every section in the shape it asks for', () => {
+        const message = messages('return 1')[0] ?? '';
+
+        for (const section of ['"info"', '"environment"', '"scripts"', '"files"', '"build"']) {
+            expect(message).toContain(section);
+        }
     });
 
-    it('names what a manifest allows when it rejects a statement', () => {
-        expect(messages(`${NAME}return 1`)[0]).toBe(
-            'A manifest cannot contain a return. A manifest holds only "local" declarations and assignments to configuration fields.',
-        );
+    it('reports a file that is not a table', () => {
+        expect(codes("'a string'\n")).toEqual(['config-manifest-not-a-table']);
+        expect(codes('')).toEqual(['config-manifest-not-a-table']);
     });
 
-    it('points at the rejected statement', () => {
-        const diagnostic = analyze(`${NAME}for index = 1, 2 do end`).diagnostics[0];
+    it('reports anything written after the table', () => {
+        const diagnostic = analyze("{ }\n\nextra = 'value'\n").diagnostics[0];
 
-        expect(diagnostic?.position.line).toBe(2);
-        expect(diagnostic?.position.column).toBe(1);
+        expect(diagnostic?.code).toBe('config-trailing-content');
+        expect(diagnostic?.message).toContain('A manifest ends with its table.');
+        expect(diagnostic?.position.line).toBe(3);
     });
 
     it('rejects a call expression and a function expression inside a value', () => {
-        expect(codes(`${NAME}outDir = tostring(1)`)).toEqual(['config-invalid-expression']);
-        expect(codes(`${NAME}outDir = function() end`)).toEqual(['config-invalid-expression']);
+        expect(codes(table('build = { output = tostring(1) },'))).toEqual(['config-invalid-expression']);
+        expect(codes(table('build = { output = function() end },'))).toEqual(['config-invalid-expression']);
     });
 
     it('rejects a build directive', () => {
-        expect(codes(`#!server\n${NAME}`)).toEqual(['config-invalid-statement']);
+        expect(codes(`#!server\n${table("info = { version = '1.0.0' },")}`)).toEqual(['config-invalid-statement']);
     });
 
-    it('rejects an assignment to a member', () => {
-        expect(codes(`${NAME}output.bundle = true`)).toEqual(['config-invalid-statement']);
+    it('reports a key written twice rather than letting the last one win', () => {
+        const diagnostic = analyze(table("build = { output = 'a' },", "build = { output = 'b' },")).diagnostics[0];
+
+        expect(diagnostic?.code).toBe('config-duplicate-field');
+        expect(diagnostic?.message).toBe('"build" is written more than once. Keep one entry.');
+        expect(diagnostic?.position.line).toBe(3);
     });
 });
 
 describe('manifest checking', () => {
-    it('reports an unknown field with a caret under the field name', () => {
-        const diagnostic = analyze(`${NAME}outdir = 'build'`).diagnostics[0];
+    it('reports an unknown top-level key with a caret under the key', () => {
+        const diagnostic = analyze(table("builds = { output = 'build' },")).diagnostics[0];
 
         expect(diagnostic?.code).toBe('config-unknown-field');
         expect(diagnostic?.position.line).toBe(2);
-        expect(diagnostic?.position.column).toBe(1);
+        expect(diagnostic?.position.column).toBe(5);
+    });
+
+    it('reports an unknown key inside a section and names the section', () => {
+        const diagnostic = analyze(table('environment = {', '    strictly = true,', '},')).diagnostics[0];
+
+        expect(diagnostic?.code).toBe('config-unknown-field');
+        expect(diagnostic?.message).toContain('"environment.strictly" is not a configuration field.');
+        expect(diagnostic?.message).toContain('The "environment" section holds');
+        expect(diagnostic?.position.line).toBe(3);
     });
 
     it('reports a wrong type with a caret under the value', () => {
-        const diagnostic = analyze(`${NAME}outDir = 5`).diagnostics[0];
+        const diagnostic = analyze(table('build = { output = 5 },')).diagnostics[0];
 
         expect(diagnostic?.code).toBe('config-invalid-type');
-        expect(diagnostic?.message).toBe('"outDir" must be a string but received a number.');
-        expect(diagnostic?.position.column).toBe(10);
+        expect(diagnostic?.message).toBe('"build.output" must be a string but received a number.');
     });
 
-    it('reports a missing required field once at the top of the file', () => {
-        const diagnostics = analyze("outDir = 'build'\n").diagnostics;
-
-        expect(diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['config-missing-field']);
-        expect(diagnostics[0]?.position.line).toBe(1);
-    });
-
-    it('checks nested output and development tables', () => {
-        expect(codes(`${NAME}output = { bundle = 'yes' }`)).toEqual(['config-invalid-type']);
-        expect(messages(`${NAME}output = { bundle = 'yes' }`)[0]).toBe('"output.bundle" must be a boolean but received a string.');
-        expect(codes(`${NAME}development = { logs = { enabled = 1 } }`)).toEqual(['config-invalid-type']);
-        expect(codes(`${NAME}development = { logs = { enabled = true, retries = 3 } }`)).toEqual(['config-unknown-field']);
+    it('checks a nested table two levels down', () => {
+        expect(codes(table("build = { details = { bundle = 'yes' } },"))).toEqual(['config-invalid-type']);
+        expect(messages(table("build = { details = { bundle = 'yes' } },"))[0]).toBe('"build.details.bundle" must be a boolean but received a string.');
     });
 
     it('requires every field a nested table declares as required', () => {
-        expect(codes(`${NAME}assets = { { to = 'assets' } }`)).toEqual(['config-missing-field']);
-        expect(codes(`${NAME}assets = { { from = 'assets/**/*', to = 'assets' } }`)).toEqual([]);
-    });
-
-    it('rejects a helper the runtime does not ship', () => {
-        expect(codes(`${NAME}helpers = { 'coroutine' }`)).toEqual(['config-unknown-helper']);
-        expect(messages(`${NAME}helpers = { 'coroutine' }`)[0]).toContain('Known helpers: "async", "class", "env"');
+        expect(codes(table("scripts = { { type = 'server' } },"))).toEqual(['config-missing-field']);
+        expect(codes(table("scripts = { { path = 'src/**/*.luam', type = 'server' } },"))).toEqual([]);
     });
 
     it('types env members as optional strings', () => {
-        expect(codes(`${NAME}outDir = env.OUT_DIR`)).toEqual(['config-invalid-type']);
-        expect(messages(`${NAME}outDir = env.OUT_DIR`)[0]).toBe('"outDir" must be a string but received a string that may be nil.');
-        expect(codes(`${NAME}outDir = env.OUT_DIR or 'build'`)).toEqual([]);
+        expect(codes(table('build = { output = env.OUT_DIR },'))).toEqual(['config-invalid-type']);
+        expect(messages(table('build = { output = env.OUT_DIR },'))[0]).toBe('"build.output" must be a string but received a string that may be nil.');
+        expect(codes(table("build = { output = env.OUT_DIR or 'build' },"))).toEqual([]);
     });
 
     it('rejects arithmetic on an environment value', () => {
-        expect(codes(`${NAME}version = env.PORT + 1`)).toEqual(['config-invalid-type']);
+        expect(codes(table('info = { version = env.PORT + 1 },'))).toEqual(['config-invalid-type']);
     });
 
-    it('closes the global scope', () => {
-        expect(codes(`${NAME}outDir = somewhere`)).toEqual(['config-unknown-field']);
-        expect(messages(`${NAME}outDir = somewhere`)[0]).toBe('"somewhere" is not defined in this manifest. Declare it with "local", or read "mode", "env", or "root".');
+    it('keeps the scope closed around the three names a manifest reads', () => {
+        expect(codes(table('build = { output = somewhere },'))).toEqual(['config-unknown-field']);
+        expect(messages(table('build = { output = somewhere },'))[0]).toBe(
+            '"somewhere" is not defined in this manifest. Declare it with "local", or read "mode", "env", or "root".',
+        );
     });
 });
 
 describe('manifest evaluation', () => {
     it('resolves the conditional idiom for each mode', () => {
-        const source = `${NAME}outDir = mode == 'production' and 'build' or 'build-dev'`;
+        const source = table("build = { output = mode == 'production' and 'build' or 'build-dev' },");
 
-        expect(analyze(source, { mode: 'production' }).value.outDir).toBe('build');
-        expect(analyze(source, { mode: 'development' }).value.outDir).toBe('build-dev');
+        expect(analyze(source, { mode: 'production' }).value['build']).toMatchObject({ output: 'build' });
+        expect(analyze(source, { mode: 'development' }).value['build']).toMatchObject({ output: 'build-dev' });
     });
 
     it('follows lua truthiness', () => {
-        const source = `${NAME}outDir = password and 'build-secret' or 'build'`;
-        const withLocal = `local password = env.LUAM_PASSWORD\n${source}`;
+        const source = table("build = { output = env.LUAM_PASSWORD and 'build-secret' or 'build' },");
 
-        expect(analyze(withLocal, { env: {} }).raw.outDir).toBe('build');
-        expect(analyze(withLocal, { env: { LUAM_PASSWORD: 'secret' } }).raw.outDir).toBe('build-secret');
+        expect(analyze(source, { env: {} }).value['build']).toMatchObject({ output: 'build' });
+        expect(analyze(source, { env: { LUAM_PASSWORD: 'secret' } }).value['build']).toMatchObject({ output: 'build-secret' });
     });
 
     it('evaluates arithmetic, concatenation and comparison', () => {
-        const source = [NAME, "version = '1.' .. 2 .. '.' .. 3", 'compiler = { oop = 2 > 1 }', 'development = { logs = { rateLimit = 10 * 3 } }'].join('\n');
+        const source = table("info = { version = '1.' .. 2 .. '.' .. 3 },", 'environment = { oop = 2 > 1 },');
         const analysis = analyze(source);
 
         expect(analysis.diagnostics).toEqual([]);
-        expect(analysis.value.version).toBe('1.2.3');
-        expect(analysis.value.compiler).toEqual({ strict: true, oop: true, noUnusedLocals: false, noUnusedParameters: false, noImplicitGlobals: false, warningsAsErrors: false });
-        expect(analysis.value.development).toEqual({ logs: { enabled: false, maxMessageLength: 4096, rateLimit: 30, rateWindowMs: 1000 }, server: {} });
+        expect(analysis.value['info']).toMatchObject({ version: '1.2.3' });
+        expect(analysis.value['environment']).toMatchObject({ oop: true });
     });
 
-    it('reads root and a local table member', () => {
-        const source = ['local paths = { out = "dist" }', NAME, 'outDir = paths.out', 'serverPath = root'].join('\n');
-        const analysis = analyze(source, { root: '/srv/mta' });
+    it('reads root and mode', () => {
+        const analysis = analyze(table('build = { output = root },', 'info = { description = mode },'), { root: '/srv/mta' });
 
         expect(analysis.diagnostics).toEqual([]);
-        expect(analysis.value.outDir).toBe('dist');
-        expect(analysis.value.serverPath).toBe('/srv/mta');
+        expect(analysis.value['build']).toMatchObject({ output: '/srv/mta' });
+        expect(analysis.value['info']).toMatchObject({ description: 'production' });
     });
 
     it('keeps every accepted manifest free of environment values in its diagnostics', () => {
-        const source = `${NAME}outDir = 5`;
+        const source = table('build = { output = 5 },');
 
         expect(messages(source, { env: { LUAM_PASSWORD: 'super-secret' } }).join('\n')).not.toContain('super-secret');
     });
 
-    it('records a position for every assigned field', () => {
-        const analysis = analyze(`${NAME}dependencies = { 'scoreboard', 'admin' }`);
+    it('records a position for every written field', () => {
+        const analysis = analyze(table("info = { dependencies = { 'scoreboard', 'admin' } },"));
 
-        expect(analysis.positions.get('name')?.line).toBe(1);
-        expect(analysis.positions.get('dependencies.1')?.column).toBe(32);
+        expect(analysis.positions.get('info')?.line).toBe(2);
+        expect(analysis.positions.get('info.dependencies.1')?.line).toBe(2);
+    });
+});
+
+describe('group boundaries', () => {
+    function groups(...lines: readonly string[]): string[] {
+        return [...analyze(table(...lines)).groups].sort();
+    }
+
+    it('records a blank line between two entries of an ordered list', () => {
+        expect(groups('scripts = {', "    { path = 'a.luam', type = 'server' },", '', "    { path = 'b.luam', type = 'server' },", '},')).toEqual(['scripts.1']);
+    });
+
+    it('records one boundary for a run of blank lines', () => {
+        expect(groups('scripts = {', "    { path = 'a.luam', type = 'server' },", '', '', "    { path = 'b.luam', type = 'server' },", '},')).toEqual(['scripts.1']);
+    });
+
+    it('records nothing before the first entry or after the last', () => {
+        expect(groups('files = {', '', "    'a.png',", "    'b.png',", '', '},')).toEqual([]);
+    });
+
+    it('treats a comment between two entries as no boundary', () => {
+        expect(groups('files = {', "    'a.png',", '    # a note', "    'b.png',", '},')).toEqual([]);
+    });
+
+    it('keeps a boundary a comment line follows', () => {
+        expect(groups('files = {', "    'a.png',", '', '    # a note', "    'b.png',", '},')).toEqual(['files.1']);
+    });
+
+    it('records boundaries in the libraries and dependencies lists', () => {
+        expect(groups('environment = {', '    libraries = {', "        '@a/one',", '', "        '@b/two',", '    },', '},')).toEqual(['environment.libraries.1']);
+        expect(groups('info = {', '    dependencies = {', "        'one',", '', "        'two',", '    },', '},')).toEqual(['info.dependencies.1']);
     });
 });

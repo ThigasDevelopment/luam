@@ -7,22 +7,14 @@ import { loadManifest } from '@cli/config/manifest-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
-import {
-    BROKEN_SERVER,
-    createProjectFixture,
-    DEFAULT_ASSETS,
-    defaultProjectFiles,
-    MANIFEST_FILE,
-    manifestSource,
-    type ProjectFixture,
-} from './support/project-fixture';
+import { BROKEN_SERVER, createProjectFixture, DEFAULT_FILES, DEFAULT_SCRIPTS, defaultProjectFiles, MANIFEST_FILE, manifestSource, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const ROOT_SOURCE = ['function greet(name: string): string', "    return 'hi ' .. name", 'end', ''].join('\n');
 
 function flatFiles(directive: string | null, config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     const source = directive === null ? ROOT_SOURCE : `${directive}\n\n${ROOT_SOURCE}`;
 
-    return { [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', output: { bundle: false, map: true }, ...config }), 'index.luam': source };
+    return { [MANIFEST_FILE]: manifestSource({ build: { details: { bundle: false, map: true } }, ...config }), 'index.luam': source };
 }
 
 const fixtures: ProjectFixture[] = [];
@@ -60,7 +52,7 @@ describe('root level layout', () => {
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
         expect(fixture.exists('build/luam-demo/index.lua')).toBe(true);
         expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="index.lua" type="shared" cache="false" />');
-        expect(logger.text()).not.toContain('config-no-sources');
+        expect(logger.text()).not.toContain('config-no-scripts');
     });
 
     it('lets a directive give the root file its side without reporting a conflict', async () => {
@@ -78,7 +70,7 @@ describe('root level layout', () => {
     });
 
     it('folds the root file into the shared bundle in the bundled layout', async () => {
-        const { context, fixture } = harness(flatFiles(null, { output: { bundle: true, map: true } }));
+        const { context, fixture } = harness(flatFiles(null, { build: { details: { bundle: true, map: true } } }));
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
         expect(fixture.exists('build/luam-demo/index.lua')).toBe(false);
@@ -87,7 +79,7 @@ describe('root level layout', () => {
     });
 
     it('names the unmatched source instead of failing without one', async () => {
-        const files = { [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }), 'tools/helper.luam': ROOT_SOURCE };
+        const files = { [MANIFEST_FILE]: manifestSource({}), 'tools/helper.luam': ROOT_SOURCE };
         const { context, logger } = harness(files);
 
         expect(await runBuildCommand(context)).toBe(EXIT_DIAGNOSTICS);
@@ -132,7 +124,10 @@ describe('build command', () => {
     });
 
     it('honours outDir and the manifest metadata', async () => {
-        const config = { outDir: 'dist', author: 'Thigas', version: '1.2.3', description: 'A demo resource' };
+        const config = {
+            build: { output: 'dist', details: { bundle: false, map: true } },
+            info: { author: { name: 'Thigas' }, version: '1.2.3', description: 'A demo resource' },
+        };
         const { context, fixture } = harness(defaultProjectFiles(config));
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
@@ -140,20 +135,23 @@ describe('build command', () => {
         expect(fixture.read('dist/luam-demo/meta.xml')).toContain('<info author="Thigas" type="script" version="1.2.3" description="A demo resource" />');
     });
 
-    it('writes only to outDir when serverPath is configured', async () => {
-        const { context, fixture } = harness(defaultProjectFiles({ serverPath: 'mta-server' }));
+    it('writes only to the output directory when a workspace names a server', async () => {
+        const { context, fixture } = harness(withWorkspace(defaultProjectFiles()));
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
         expect(fixture.exists('build/luam-demo/meta.xml')).toBe(true);
         expect(fixture.exists('mta-server')).toBe(false);
     });
 
-    it('copies an opt-in runtime helper the sources never trigger', async () => {
-        const { context, fixture } = harness(defaultProjectFiles({ helpers: ['threads'] }));
+    it('copies the runtime helper the sources trigger and names it before the authored entries', async () => {
+        const { context, fixture } = harness(defaultProjectFiles());
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.exists('build/luam-demo/lib/threads.lua')).toBe(true);
-        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<script src="lib/threads.lua" type="shared" cache="false" />');
+        expect(fixture.exists('build/luam-demo/lib/string.lua')).toBe(true);
+
+        const entries: string[] = fixture.read('build/luam-demo/meta.xml').match(/src="[^"]+"/g) ?? [];
+
+        expect(entries.indexOf('src="lib/string.lua"')).toBeLessThan(entries.indexOf('src="src/shared/**/*.lua"'));
     });
 
     it('produces no output when the build fails', async () => {
@@ -209,8 +207,8 @@ describe('build command', () => {
         expect(fixture.exists('build/luam-demo/images/logo.png')).toBe(true);
     });
 
-    it('copies only the files a mapping names and declares them in the manifest', async () => {
-        const files = { ...defaultProjectFiles({ assets: DEFAULT_ASSETS }), 'assets/images/logo.png': 'binary', 'src/server/data/spawns.json': '[]' };
+    it('copies only the files an entry names and declares each entry once', async () => {
+        const files = { ...defaultProjectFiles({ files: DEFAULT_FILES }), 'assets/images/logo.png': 'binary', 'src/server/data/spawns.json': '[]' };
         const { context, fixture } = harness(files);
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
@@ -219,21 +217,21 @@ describe('build command', () => {
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
 
-        expect(manifest).toContain('<file src="assets/images/logo.png" />');
+        expect(manifest).toContain('<file src="assets/**/*" />');
         expect(manifest).not.toContain('spawns.json');
     });
 
-    it('rewrites the destination a mapping names', async () => {
-        const files = defaultProjectFiles({ assets: [{ from: 'media/**/*', to: 'assets/images' }] });
+    it('writes each file at the path its entry names', async () => {
+        const files = defaultProjectFiles({ files: ['media/**/*'] });
         const { context, fixture } = harness({ ...files, 'media/logo.png': 'binary' });
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
-        expect(fixture.read('build/luam-demo/assets/images/logo.png')).toBe('binary');
-        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<file src="assets/images/logo.png" />');
+        expect(fixture.read('build/luam-demo/media/logo.png')).toBe('binary');
+        expect(fixture.read('build/luam-demo/meta.xml')).toContain('<file src="media/**/*" />');
     });
 
-    it('removes a copied asset when its source disappears', async () => {
-        const files = { ...defaultProjectFiles({ assets: DEFAULT_ASSETS }), 'assets/images/logo.png': 'binary' };
+    it('removes a copied file when its source disappears', async () => {
+        const files = { ...defaultProjectFiles({ files: DEFAULT_FILES }), 'assets/images/logo.png': 'binary', 'assets/images/icon.png': 'binary' };
         const { context, fixture } = harness(files);
 
         await runBuildCommand(context);
@@ -315,7 +313,7 @@ describe('build command', () => {
 
     it('points the env reader at the file the manifest selects', async () => {
         const files = {
-            ...defaultProjectFiles({ environment: { file: '.env.production', localFile: '.env.local' } }),
+            ...defaultProjectFiles({ environment: { secret: '.env.production' } }),
             '.env.production': 'MAX_PLAYERS=32\n',
         };
         const { context, fixture } = harness(files);
@@ -346,35 +344,56 @@ describe('build command', () => {
         expect(logger.text()).toContain('Declared keys: "MAX_PLAYERS"');
     });
 
-    it('reports a source pattern that matches nothing', async () => {
+    it('says nothing about an entry naming a directory the project has not written yet', async () => {
         const { fixture } = harness(defaultProjectFiles());
-        const discovered = discoverSources(fixture.root, { server: ['src/server/**/*.luam'], client: ['missing/**/*.luam'], shared: [] });
+        const discovered = discoverSources(fixture.root, [
+            { path: 'src/server/**/*.luam', type: 'server', group: false },
+            { path: 'missing/**/*.luam', type: 'client', group: false },
+        ]);
 
         expect(discovered.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([]);
         expect(discovered.files.every((file) => file.path.startsWith('src/server/'))).toBe(true);
     });
 
-    it('reports a source file listed by a literal pattern that does not exist', async () => {
+    it('reports a script file a literal entry names that does not exist', async () => {
         const { fixture } = harness(defaultProjectFiles());
-        const discovered = discoverSources(fixture.root, { server: ['src/server/missing.luam'], client: [], shared: [] });
+        const discovered = discoverSources(fixture.root, [{ path: 'src/server/missing.luam', type: 'server', group: false }]);
 
-        expect(discovered.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['config-missing-source']);
+        expect(discovered.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['config-missing-script']);
     });
 });
 
 describe('build command load order', () => {
-    it('pins a source file ahead of its environment group', async () => {
-        const { context, fixture } = harness(defaultProjectFiles({ loadOrder: ['src/server/main.luam'] }));
+    function ordered(...paths: readonly string[]): Record<string, unknown>[] {
+        return paths.map((path) => ({ path, type: path.includes('client') ? 'client' : path.includes('shared') ? 'shared' : 'server' }));
+    }
+
+    it('puts an entry where the manifest writes it', async () => {
+        const scripts = ordered('src/server/main.luam', 'src/client/**/*.luam', 'src/shared/**/*.luam');
+        const { context, fixture } = harness(defaultProjectFiles({ scripts }));
 
         expect(await runBuildCommand(context)).toBe(EXIT_OK);
 
         const entries: string[] = fixture.read('build/luam-demo/meta.xml').match(/src="[^"]+"/g) ?? [];
 
-        expect(entries.indexOf('src="src/server/main.lua"')).toBeLessThan(entries.indexOf('src="src/server/**/*.lua"'));
+        expect(entries.filter((entry) => entry.startsWith('src="src/'))).toEqual([
+            'src="src/server/main.lua"',
+            'src="src/client/**/*.lua"',
+            'src="src/shared/**/*.lua"',
+        ]);
+    });
+
+    it('reports one file two entries of one side claim', async () => {
+        const scripts = ordered('src/server/main.luam', 'src/shared/**/*.luam', 'src/server/**/*.luam', 'src/client/**/*.luam');
+        const { context, logger } = harness(defaultProjectFiles({ scripts }));
+
+        expect(await runBuildCommand(context)).toBe(EXIT_DIAGNOSTICS);
+        expect(logger.text()).toContain('config-script-side-conflict');
     });
 
     it('fails the build and writes no manifest when an entry matches no file', async () => {
-        const { context, fixture, logger } = harness(defaultProjectFiles({ loadOrder: ['src/server/missing.luam'] }));
+        const scripts = [...DEFAULT_SCRIPTS, { path: 'src/server/missing.luam', type: 'server' }];
+        const { context, fixture, logger } = harness(defaultProjectFiles({ scripts }));
 
         expect(await runBuildCommand(context)).toBe(EXIT_DIAGNOSTICS);
         expect(logger.text()).toContain('src/server/missing.luam');
@@ -382,7 +401,7 @@ describe('build command load order', () => {
     });
 
     it('keeps the order stable across a warm rebuild', async () => {
-        const { context, fixture } = harness(defaultProjectFiles({ loadOrder: ['src/server/main.luam'] }));
+        const { context, fixture } = harness(defaultProjectFiles());
 
         await runBuildCommand(context);
 
@@ -392,19 +411,43 @@ describe('build command load order', () => {
 
         expect(fixture.read('build/luam-demo/meta.xml')).toBe(first);
     });
+
+    it('carries a blank line between two entries into the generated file', async () => {
+        const manifest = [
+            '{',
+            '    scripts = {',
+            "        { path = 'src/shared/**/*.luam', type = 'shared' },",
+            '',
+            "        { path = 'src/server/**/*.luam', type = 'server' },",
+            "        { path = 'src/client/**/*.luam', type = 'client' },",
+            '    },',
+            '',
+            '    build = { details = { bundle = false, map = true } },',
+            '}',
+            '',
+        ].join('\n');
+        const { context, fixture } = harness({ ...defaultProjectFiles(), [MANIFEST_FILE]: manifest });
+
+        expect(await runBuildCommand(context)).toBe(EXIT_OK);
+
+        const lines = fixture.read('build/luam-demo/meta.xml').split('\n');
+        const index = lines.findIndex((line) => line.includes('src/server/**/*.lua'));
+
+        expect(lines[index - 1]).toBe('');
+    });
 });
 
 describe('build command version element', () => {
     it('writes the resolved version last in the manifest', async () => {
         const { context, fixture } = harness(defaultProjectFiles());
-        const resolved = { ...context, resolveVersion: async () => ({ version: '1.6.0', warning: null }) };
+        const resolved = { ...context, resolveVersion: async () => ({ server: '1.6.0', client: '1.6.0', warning: null }) };
 
         expect(await runBuildCommand(resolved)).toBe(EXIT_OK);
 
         const manifest = fixture.read('build/luam-demo/meta.xml');
 
         expect(manifest).toContain('<min_mta_version server="1.6.0" client="1.6.0" />');
-        expect(manifest.indexOf('<min_mta_version')).toBeGreaterThan(manifest.indexOf('<script'));
+        expect(manifest.indexOf('<min_mta_version')).toBeLessThan(manifest.indexOf('<script'));
     });
 
     it('produces a complete resource when the lookup throws', async () => {
@@ -423,7 +466,7 @@ describe('build command version element', () => {
 
     it('warns, omits the element, and still writes a loadable resource with no version', async () => {
         const { context, fixture, logger } = harness(defaultProjectFiles());
-        const warned = { ...context, resolveVersion: async () => ({ version: null, warning: 'No MTA release could be resolved.' }) };
+        const warned = { ...context, resolveVersion: async () => ({ server: null, client: null, warning: 'No MTA release could be resolved.' }) };
 
         expect(await runBuildCommand(warned)).toBe(EXIT_OK);
         expect(logger.warnings.join('\n')).toContain('No MTA release could be resolved.');
@@ -434,26 +477,25 @@ describe('build command version element', () => {
 
 describe('build command pruning without the manifest enumeration', () => {
     it('removes a compiled script when its source disappears', async () => {
-        const { context, fixture } = harness(defaultProjectFiles());
+        const extra = { ...defaultProjectFiles(), 'src/client/extra.luam': 'local extra: number = 1\n\nprint(extra)\n' };
+        const { context, fixture } = harness(extra);
 
         await runBuildCommand(context);
 
-        expect(fixture.exists('build/luam-demo/src/client/hud.lua')).toBe(true);
+        expect(fixture.exists('build/luam-demo/src/client/extra.lua')).toBe(true);
 
-        fixture.remove('src/client/hud.luam');
+        fixture.remove('src/client/extra.luam');
         await runBuildCommand(context);
 
-        expect(fixture.exists('build/luam-demo/src/client/hud.lua')).toBe(false);
+        expect(fixture.exists('build/luam-demo/src/client/extra.lua')).toBe(false);
     });
 
     it('removes a helper that stopped being required', async () => {
-        const { context, fixture } = harness(defaultProjectFiles({ helpers: ['threads'] }));
+        const { context, fixture } = harness(defaultProjectFiles());
 
         await runBuildCommand(context);
-
-        expect(fixture.exists('build/luam-demo/lib/threads.lua')).toBe(true);
-
-        await runBuildCommand({ ...context, config: { ...context.config, helpers: [] } });
+        fixture.write('build/luam-demo/lib/threads.lua', 'print(1)\n');
+        await runBuildCommand(context);
 
         expect(fixture.exists('build/luam-demo/lib/threads.lua')).toBe(false);
     });

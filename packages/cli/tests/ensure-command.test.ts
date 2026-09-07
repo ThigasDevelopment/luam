@@ -4,11 +4,12 @@ import type { CommandContext } from '@cli/commands/command-context';
 import { runEnsureCommand } from '@cli/commands/ensure-command';
 import { createEnsureRunner } from '@cli/commands/ensure-runner';
 import { loadManifest } from '@cli/config/manifest-loader';
+import { loadWorkspace } from '@cli/config/workspace-loader';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
 import { createMockServerConsole, type MockServerConsole } from './support/mock-server-console';
-import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, clientSource, createProjectFixture, defaultProjectFiles, RESOURCE_NAME, SERVER_FILE, serverFileSource, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
 
@@ -24,19 +25,28 @@ interface Harness {
 function harness(files: Readonly<Record<string, string>>): Harness {
     const fixture = createProjectFixture(files);
     const logger = createMemoryLogger();
-    const config = loadManifest(fixture.root).config;
+    const workspace = loadWorkspace(fixture.root);
+    const loaded = loadManifest(fixture.root, { workspace });
 
-    if (config === null) {
+    if (loaded.config === null) {
         throw new Error('The fixture configuration is invalid.');
     }
 
     fixtures.push(fixture);
 
-    return { fixture, logger, serverConsole: createMockServerConsole(), context: { root: fixture.root, config, logger } };
+    return {
+        fixture,
+        logger,
+        serverConsole: createMockServerConsole(),
+        context: { root: fixture.root, config: loaded.config, logger, deployment: loaded.deployment },
+    };
 }
 
-function syncedProject(overrides: Readonly<Record<string, unknown>> = {}): Record<string, string> {
-    return defaultProjectFiles({ serverPath: 'mta-server', ...overrides });
+function syncedProject(overrides: Readonly<Record<string, unknown>> = {}, server: Readonly<Record<string, unknown>> = {}): Record<string, string> {
+    return {
+        ...defaultProjectFiles(overrides),
+        [`../${SERVER_FILE}`]: serverFileSource({ serverPath: `${RESOURCE_NAME}/mta-server`, ...server }),
+    };
 }
 
 async function waitFor(condition: () => boolean, timeoutMs = 5000): Promise<void> {
@@ -173,13 +183,13 @@ describe('ensure command', () => {
         expect(await runEnsureCommand(context, { watch: false, signal: null })).toBe(EXIT_DIAGNOSTICS);
     });
 
-    it('requires serverPath before building or watching', async () => {
+    it('requires a workspace file before building or watching', async () => {
         const { context, fixture, serverConsole, logger } = harness(defaultProjectFiles());
 
         expect(await runEnsureCommand(context, { watch: true, signal: null })).toBe(EXIT_DIAGNOSTICS);
         expect(fixture.exists('build')).toBe(false);
         expect(serverConsole.calls).toEqual([]);
-        expect(logger.errors.join('\n')).toContain('luam ensure requires "serverPath" in ".luam.manifest"');
+        expect(logger.errors.join('\n')).toContain('luam ensure requires a ".luam.server"');
     });
 
     it('rebuilds and restarts through an owned server console when a watched source changes', async () => {
@@ -200,9 +210,9 @@ describe('ensure command', () => {
         expect(await command).toBe(EXIT_OK);
     });
 
-    it('uses absolute serverPath and custom resourcesDir without writing custom outDir', async () => {
-        const server = createProjectFixture();
-        const { context, fixture } = harness(syncedProject({ outDir: 'dist', resourcesDir: 'resources-custom', serverPath: server.root }));
+    it('uses an absolute serverPath and a custom resourcesDir without writing the output directory', async () => {
+        const server = createProjectFixture(undefined, { resource: null });
+        const { context, fixture } = harness(syncedProject({ build: { output: 'dist' } }, { serverPath: server.root, resourcesDir: 'resources-custom' }));
 
         fixtures.push(server);
 
@@ -213,7 +223,7 @@ describe('ensure command', () => {
     });
 
     it('preserves local output while syncing changes and pruning stale server files', async () => {
-        const files = { ...syncedProject({ outDir: 'dist' }), 'src/client/extra.luam': 'local extra: number = 1\n' };
+        const files = { ...syncedProject({ build: { output: 'dist' } }), 'src/client/extra.luam': 'local extra: number = 1\n' };
         const { context, fixture, serverConsole } = harness(files);
         const localFiles = {
             'dist/luam-demo/meta.xml': '<meta sentinel="true" />\n',

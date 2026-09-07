@@ -4,12 +4,12 @@ import { resolve } from 'node:path';
 import { startMtaServer } from '@cli/server/mta-server-supervisor';
 
 import { FakeProcessService } from './support/fake-process-service';
-import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, defaultProjectFiles, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const fixtures: ProjectFixture[] = [];
 
 function harness() {
-    const fixture = createProjectFixture(defaultProjectFiles({ serverPath: 'server' }));
+    const fixture = createProjectFixture(withWorkspace(defaultProjectFiles(), 'server'));
 
     fixture.write('server/MTA Server.exe', 'binary');
     fixtures.push(fixture);

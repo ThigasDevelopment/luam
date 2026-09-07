@@ -1,9 +1,9 @@
 import { existsSync, watch, type FSWatcher } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
-import type { SourceMapping } from '@compiler/manifest/manifest-contract';
+import type { ScriptEntry } from '@compiler/manifest/manifest-contract';
 import { normalizePattern } from '@compiler/project/path-pattern';
-import { createSourceResolver } from '@compiler/project/source-mapping';
+import { createScriptResolver } from '@compiler/project/source-mapping';
 import { isTestPath, SOURCE_EXTENSION } from '@compiler/project/source-kind';
 
 export interface SourceWatcher {
@@ -12,8 +12,8 @@ export interface SourceWatcher {
 
 export const DEFAULT_DEBOUNCE_MS = 120;
 
-export function watchSources(root: string, sources: SourceMapping, onChange: () => void, debounceMs = DEFAULT_DEBOUNCE_MS): SourceWatcher {
-    const resolver = createSourceResolver(sources);
+export function watchSources(root: string, sources: readonly ScriptEntry[], onChange: () => void, debounceMs = DEFAULT_DEBOUNCE_MS): SourceWatcher {
+    const resolver = createScriptResolver(sources);
     const watchers: FSWatcher[] = [];
     let timer: NodeJS.Timeout | null = null;
 
@@ -74,6 +74,6 @@ export function watchSources(root: string, sources: SourceMapping, onChange: () 
     };
 }
 
-export function watchedRoots(sources: SourceMapping): readonly string[] {
-    return createSourceResolver(sources).roots;
+export function watchedRoots(sources: readonly ScriptEntry[]): readonly string[] {
+    return createScriptResolver(sources).roots;
 }

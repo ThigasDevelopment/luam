@@ -33,7 +33,7 @@ function generatedPosition(map: ResourceMap): { generated: string; source: strin
 const MAP_FILE = 'build/luam-demo.luam-map.json';
 
 async function builtProject(minified = false): Promise<{ fixture: ProjectFixture; map: ResourceMap; position: { generated: string; source: string } }> {
-    const fixture = createProjectFixture(defaultProjectFiles({ output: { bundle: true, map: true } }));
+    const fixture = createProjectFixture(defaultProjectFiles({ build: { details: { bundle: true, map: true } } }));
 
     fixtures.push(fixture);
 

@@ -19,7 +19,7 @@ How much it does depends on what `.luam.manifest` gives it:
 | nothing | Reports a diagnostic. `serverPath` is required. |
 | `serverPath` | Writes the resource into the server. You restart it. |
 
-`ensure` never writes to `<outDir>/<name>`. Use `luam build` when you want a
+`ensure` never writes to `<build.output>/<folder>`. Use `luam build` when you want a
 local copy of the generated resource.
 
 ### Getting the restart
@@ -45,7 +45,7 @@ below.
    only files whose declarations changed invalidate the files that see them.
 2. **Stop on error.** If anything is an error, it is reported and nothing else
    runs. No sync, no restart, and the previous resource stays on the server.
-3. **Sync.** Write `<serverPath>/<resourcesDir>/<name>`, skipping identical files
+3. **Sync.** Write `<serverPath>/<resourcesDir>/<folder>`, skipping identical files
    and deleting generated files the project no longer produces.
 4. **Restart** — only under `dev --start-server`, and only when the sync actually
    changed a file.

@@ -1,38 +1,40 @@
 import type { Environment } from '@compiler/environment/environment';
-import { SOURCE_SIDES, type SourceMapping } from '@compiler/manifest/manifest-defaults';
+import type { ScriptEntry } from '@compiler/manifest/manifest-defaults';
 
 import { createPatternMatcher, normalizePattern, watchRoots, type PatternMatcher } from './path-pattern';
 
-export interface SideMatch {
-    environment: Environment;
+export interface ScriptMatch {
+    index: number;
     pattern: string;
+    environment: Environment;
 }
 
-export interface SideResolution {
+export interface ScriptResolution {
     environment: Environment | null;
-    matches: SideMatch[];
+    matches: ScriptMatch[];
 }
 
-export interface SourceResolver {
+export interface ScriptResolver {
+    readonly entries: readonly ScriptEntry[];
     readonly patterns: readonly string[];
     readonly roots: readonly string[];
-    resolve(path: string): SideResolution;
+    resolve(path: string): ScriptResolution;
     side(path: string): Environment | null;
 }
 
-export function createSourceResolver(mapping: SourceMapping): SourceResolver {
-    const matchers = new Map<Environment, PatternMatcher>(SOURCE_SIDES.map((environment) => [environment, createPatternMatcher(mapping[environment])]));
-    const patterns = SOURCE_SIDES.flatMap((environment) => [...(matchers.get(environment)?.patterns ?? [])]);
+export function createScriptResolver(entries: readonly ScriptEntry[]): ScriptResolver {
+    const matchers: PatternMatcher[] = entries.map((entry) => createPatternMatcher([entry.path]));
+    const patterns = entries.map((entry) => normalizePattern(entry.path));
 
-    function resolve(path: string): SideResolution {
+    function resolve(path: string): ScriptResolution {
         const normalized = normalizePattern(path);
-        const matches: SideMatch[] = [];
+        const matches: ScriptMatch[] = [];
 
-        for (const environment of SOURCE_SIDES) {
-            const pattern = matchers.get(environment)?.match(normalized) ?? null;
+        for (const [index, entry] of entries.entries()) {
+            const pattern = matchers[index]?.match(normalized) ?? null;
 
             if (pattern !== null) {
-                matches.push({ environment, pattern });
+                matches.push({ index, pattern, environment: entry.type });
             }
         }
 
@@ -40,6 +42,7 @@ export function createSourceResolver(mapping: SourceMapping): SourceResolver {
     }
 
     return {
+        entries,
         patterns,
         roots: watchRoots(patterns),
         resolve,
@@ -47,6 +50,6 @@ export function createSourceResolver(mapping: SourceMapping): SourceResolver {
     };
 }
 
-export function describeMatches(matches: readonly SideMatch[]): string {
-    return matches.map((match) => `"${match.environment}" through "${match.pattern}"`).join(' and ');
+export function describeMatches(matches: readonly ScriptMatch[]): string {
+    return matches.map((match) => `"${match.pattern}" as "${match.environment}"`).join(' and ');
 }

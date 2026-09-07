@@ -60,7 +60,6 @@ export const TEXTMATE_MAP: Readonly<Record<string, readonly string[]>> = {
         'storage.type.declare.luam',
         'storage.type.constructor.luam',
         'keyword.operator.new.luam',
-        'storage.modifier.local.luam-manifest',
         'keyword.control.await.luam',
     ],
     'keyword.modifier': ['storage.modifier.luam', 'storage.modifier.extends.luam', 'storage.modifier.export.luam', 'storage.modifier.http.luam', 'storage.modifier.async.luam'],
@@ -71,7 +70,7 @@ export const TEXTMATE_MAP: Readonly<Record<string, readonly string[]>> = {
     'call.library': ['support.function.library.luam', 'support.function.luam'],
     'name.type': ['entity.name.type.class.luam', 'entity.name.type.enum.luam', 'entity.name.type.interface.luam', 'entity.name.type.alias.luam'],
     'name.inherited': ['entity.other.inherited-class.luam', 'entity.other.inherited-interface.luam'],
-    'identifier.local': ['variable.other.luam', 'variable.other.luam-manifest', 'variable.other.readwrite.luam-manifest'],
+    'identifier.local': ['variable.other.luam', 'variable.other.luam-manifest'],
     'identifier.member': [
         'entity.other.attribute.luam',
         'variable.other.enummember.luam',

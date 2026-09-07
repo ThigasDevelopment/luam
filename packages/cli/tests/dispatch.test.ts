@@ -5,7 +5,7 @@ import { EXIT_DIAGNOSTICS, EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 import { VERSION } from '@cli/cli/version';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { BROKEN_SERVER, createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, createProjectFixture, DEFAULT_SCRIPTS, defaultProjectFiles, MANIFEST_FILE, manifestSource, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
@@ -107,15 +107,15 @@ describe('command dispatch', () => {
     it('loads an alternative manifest module', async () => {
         const files = defaultProjectFiles();
         const profile = `dev${MANIFEST_FILE}`;
-        const fixture = project({ ...files, [profile]: manifestSource({ name: 'luam-dev', outDir: 'dist' }) });
+        const fixture = project({ ...files, [profile]: manifestSource({ scripts: DEFAULT_SCRIPTS, build: { output: 'dist' } }) });
         const logger = createMemoryLogger();
 
         expect(await runCli(['build', '--manifest', profile], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-        expect(fixture.exists('dist/luam-dev/meta.xml')).toBe(true);
+        expect(fixture.exists('dist/luam-demo/meta.xml')).toBe(true);
     });
 
     it('gives the manifest the mode of the command that loaded it', async () => {
-        const source = "name = 'luam-demo'\noutDir = 'build-' .. mode\n";
+        const source = ['{', '    scripts = {', ...DEFAULT_SCRIPTS.map((entry) => `        { path = '${entry.path}', type = '${entry.type}' },`), '    },', '', "    build = { output = 'build-' .. mode },", '}', ''].join('\n');
         const fixture = project({ ...defaultProjectFiles(), [MANIFEST_FILE]: source });
         const logger = createMemoryLogger();
 
@@ -124,25 +124,25 @@ describe('command dispatch', () => {
     });
 
     it('runs ensure once with --no-watch', async () => {
-        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const fixture = project(withWorkspace(defaultProjectFiles()));
         const logger = createMemoryLogger();
 
         expect(await runCli(['ensure', '--no-watch'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
         expect(fixture.exists('mta-server/mods/deathmatch/resources/luam-demo/meta.xml')).toBe(true);
     });
 
-    it('routes dev through server sync with development log helpers', async () => {
-        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+    it('routes dev through server sync', async () => {
+        const fixture = project(withWorkspace(defaultProjectFiles()));
         const logger = createMemoryLogger();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
         expect(await runCli(['dev', '--no-watch'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-        expect(fixture.exists(`${resource}/lib/development-logs-client.lua`)).toBe(true);
-        expect(fixture.exists(`${resource}/lib/development-logs-server.lua`)).toBe(true);
+        expect(fixture.exists(`${resource}/meta.xml`)).toBe(true);
+        expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
     });
 
     it('rejects an option that the command does not own', async () => {
-        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const fixture = project(withWorkspace(defaultProjectFiles()));
         const logger = createMemoryLogger();
 
         expect(await runCli(['dev', '--no-watch', '--bundle'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);
@@ -196,15 +196,15 @@ describe('command dispatch', () => {
     it('loads an alternative manifest module', async () => {
         const files = defaultProjectFiles();
         const profile = `dev${MANIFEST_FILE}`;
-        const fixture = project({ ...files, [profile]: manifestSource({ name: 'luam-dev', outDir: 'dist' }) });
+        const fixture = project({ ...files, [profile]: manifestSource({ scripts: DEFAULT_SCRIPTS, build: { output: 'dist' } }) });
         const logger = createMemoryLogger();
 
         expect(await runCli(['build', '--manifest', profile], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-        expect(fixture.exists('dist/luam-dev/meta.xml')).toBe(true);
+        expect(fixture.exists('dist/luam-demo/meta.xml')).toBe(true);
     });
 
     it('gives the manifest the mode of the command that loaded it', async () => {
-        const source = "name = 'luam-demo'\noutDir = 'build-' .. mode\n";
+        const source = ['{', '    scripts = {', ...DEFAULT_SCRIPTS.map((entry) => `        { path = '${entry.path}', type = '${entry.type}' },`), '    },', '', "    build = { output = 'build-' .. mode },", '}', ''].join('\n');
         const fixture = project({ ...defaultProjectFiles(), [MANIFEST_FILE]: source });
         const logger = createMemoryLogger();
 
@@ -213,25 +213,25 @@ describe('command dispatch', () => {
     });
 
     it('runs ensure once with --no-watch', async () => {
-        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const fixture = project(withWorkspace(defaultProjectFiles()));
         const logger = createMemoryLogger();
 
         expect(await runCli(['ensure', '--no-watch'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
         expect(fixture.exists('mta-server/mods/deathmatch/resources/luam-demo/meta.xml')).toBe(true);
     });
 
-    it('routes dev through server sync with development log helpers', async () => {
-        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+    it('routes dev through server sync', async () => {
+        const fixture = project(withWorkspace(defaultProjectFiles()));
         const logger = createMemoryLogger();
         const resource = 'mta-server/mods/deathmatch/resources/luam-demo';
 
         expect(await runCli(['dev', '--no-watch'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-        expect(fixture.exists(`${resource}/lib/development-logs-client.lua`)).toBe(true);
-        expect(fixture.exists(`${resource}/lib/development-logs-server.lua`)).toBe(true);
+        expect(fixture.exists(`${resource}/meta.xml`)).toBe(true);
+        expect(fixture.exists(`${resource}/src/server/main.lua`)).toBe(true);
     });
 
     it('rejects an option that the command does not own', async () => {
-        const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+        const fixture = project(withWorkspace(defaultProjectFiles()));
         const logger = createMemoryLogger();
 
         expect(await runCli(['dev', '--no-watch', '--bundle'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);

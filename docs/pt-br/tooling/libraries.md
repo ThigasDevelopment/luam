@@ -128,7 +128,7 @@ antes dos do próprio projeto.
 
 Scripts de biblioteca são entradas `<script>` enumeradas no `meta.xml`, nunca
 curingas, depois da biblioteca de runtime e antes de `config.lua`, das entradas
-fixadas em `loadOrder` e dos curingas de código. Uma entrada de `loadOrder` que
+e de cada entrada autoral de `scripts`. Uma entrada de `scripts` que
 nomeia um arquivo de biblioteca é `project-load-order-library`: a ordem de emissão
 é a que `libraries` declara.
 

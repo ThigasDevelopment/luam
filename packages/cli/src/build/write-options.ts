@@ -1,6 +1,6 @@
 import type { PhaseTracker } from '@cli/build/phase-tracker';
 import type { WriteOptions } from '@cli/build/resource-writer';
-import type { AssetMapping, LuamConfig } from '@cli/config/config-schema';
+import type { FileEntry, LuamConfig } from '@cli/config/config-schema';
 import { normalizePattern, patternRoot, splitSegments } from '@compiler/project/path-pattern';
 import { bundlePath, LIBRARIES_DIRECTORY, LIBRARY_DIRECTORY } from '@compiler/project/resource';
 
@@ -8,15 +8,12 @@ export function generatedFiles(): string[] {
     return [bundlePath('shared'), bundlePath('server'), bundlePath('client')];
 }
 
-function destinationRoot(mapping: AssetMapping): string {
-    const to = normalizePattern(mapping.to);
-    const base = to.length === 0 || to === '.' ? patternRoot(mapping.from) : to;
-
-    return splitSegments(base)[0] ?? '';
+function destinationRoot(entry: FileEntry): string {
+    return splitSegments(patternRoot(normalizePattern(entry.path)))[0] ?? '';
 }
 
 export function generatedRoots(config: LuamConfig): string[] {
-    const roots = config.assets.map(destinationRoot).filter((root) => root.length > 0);
+    const roots = config.files.map(destinationRoot).filter((root) => root.length > 0);
 
     return [...new Set([...roots, LIBRARY_DIRECTORY, LIBRARIES_DIRECTORY])];
 }

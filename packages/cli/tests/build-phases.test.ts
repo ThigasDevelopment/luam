@@ -147,7 +147,7 @@ describe('build phases', () => {
     });
 
     it('fails discovery when no source directory exists', () => {
-        const { fixture, config } = harness({ [MANIFEST_FILE]: manifestSource({ name: 'luam-demo' }) });
+        const { fixture, config } = harness({ [MANIFEST_FILE]: manifestSource({}) });
         const outcome = runCompile(fixture.root, config);
 
         expect(outcome.phases).toHaveLength(1);

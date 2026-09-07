@@ -1,6 +1,6 @@
-<meta>
-    <!-- Resource information -->
+<typed-class>
+    <!-- INFO -->
     <info type="script" description="A typed class with inheritance, an interface, and accessors." />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/shared.lua" type="shared" cache="false" />
-</meta>
+</typed-class>

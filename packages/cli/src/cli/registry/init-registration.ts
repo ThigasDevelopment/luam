@@ -24,14 +24,15 @@ export function registerInitCommand(program: Command, runtime: CliRuntime): void
 
     command
         .addOption(cwdOption())
-        .addOption(valueOption('--name <name>', 'Resource name. Defaults to the destination directory name.'))
+        .addOption(valueOption('--name <name>', 'Directory to scaffold into, which is the resource name. Defaults to the destination directory.'))
         .addOption(new Option('--force', 'Overwrite files that already exist.'))
         .addOption(new Option('-y, --yes', 'Accept the defaults without prompting.'))
         .addOption(colorOption());
 
     command.action(async (path: string | undefined, options: InitOptions): Promise<void> => {
         const root = commandRoot(runtime, options);
-        const target = path === undefined ? root : resolve(root, path);
+        const destination = path ?? options.name ?? null;
+        const target = destination === null ? root : resolve(root, destination);
 
         runtime.exitCode = await runInitCommand(target, runtime.logger, {
             name: options.name ?? null,

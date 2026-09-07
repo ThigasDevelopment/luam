@@ -6,9 +6,10 @@ opção de configuração.
 
 ## Ligando
 
-```luam
-name = 'my-resource'
-compiler = { oop = true }
+```luam manifest
+{
+    environment = { oop = true },
+}
 ```
 
 `compiler.oop` é `false` por padrão. Com ele ligado, o compilador:

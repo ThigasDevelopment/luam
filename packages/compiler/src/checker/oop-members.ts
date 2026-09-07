@@ -8,7 +8,7 @@ import { isMtaClass, mtaConstructor, mtaMember, mtaStaticMember } from './oop-cl
 import type { DeclarationRegistry, MemberInfo } from './registry';
 import type { FunctionType } from './types';
 
-const OOP_HINT = 'Set "compiler = { oop = true }" in .luam.manifest to enable the MTA OOP API.';
+const OOP_HINT = 'Set "environment = { oop = true }" in .luam.manifest to enable the MTA OOP API.';
 
 export function isMtaElementName(declarations: DeclarationRegistry, className: string): boolean {
     if (!isElementType(className)) {

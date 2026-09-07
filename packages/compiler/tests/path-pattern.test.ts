@@ -10,7 +10,7 @@ import {
     patternRoot,
     watchRoots,
 } from '@compiler/project/path-pattern';
-import { createSourceResolver } from '@compiler/project/source-mapping';
+import { createScriptResolver } from '@compiler/project/source-mapping';
 
 describe('pattern normalization', () => {
     it('canonicalizes separators and strips a leading dot segment', () => {
@@ -105,30 +105,39 @@ describe('matcher', () => {
     });
 });
 
-describe('source resolver', () => {
-    const mapping = {
-        server: ['src/server/**/*.luam'],
-        client: ['src/client/**/*.luam'],
-        shared: ['src/shared/**/*.luam'],
-    };
+describe('script resolver', () => {
+    const entries = [
+        { path: 'src/server/**/*.luam', type: 'server' as const, group: false },
+        { path: 'src/client/**/*.luam', type: 'client' as const, group: false },
+        { path: 'src/shared/**/*.luam', type: 'shared' as const, group: false },
+    ];
 
     it('resolves one side per file', () => {
-        const resolver = createSourceResolver(mapping);
+        const resolver = createScriptResolver(entries);
 
         expect(resolver.side('src/server/main.luam')).toBe('server');
         expect(resolver.side('src/client/hud.luam')).toBe('client');
         expect(resolver.side('docs/notes.luam')).toBeNull();
     });
 
-    it('refuses to pick a side when two patterns claim the same file', () => {
-        const resolver = createSourceResolver({ server: ['src/**/*.luam'], client: ['src/**/*.luam'], shared: [] });
+    it('refuses to pick a side when two entries claim the same file', () => {
+        const resolver = createScriptResolver([
+            { path: 'src/**/*.luam', type: 'server', group: false },
+            { path: 'src/**/*.luam', type: 'client', group: false },
+        ]);
         const resolution = resolver.resolve('src/main.luam');
 
         expect(resolution.environment).toBeNull();
         expect(resolution.matches.map((match) => match.environment)).toEqual(['server', 'client']);
     });
 
+    it('names the entry that matched, in the order the manifest lists them', () => {
+        const resolution = createScriptResolver(entries).resolve('src/client/hud.luam');
+
+        expect(resolution.matches.map((match) => match.index)).toEqual([1]);
+    });
+
     it('derives the roots a watcher has to observe', () => {
-        expect(createSourceResolver(mapping).roots).toEqual(['src/client', 'src/server', 'src/shared']);
+        expect(createScriptResolver(entries).roots).toEqual(['src/client', 'src/server', 'src/shared']);
     });
 });

@@ -52,7 +52,7 @@ const fixtures: ProjectFixture[] = [];
 
 function project(minify: boolean): ProjectFixture {
     const fixture = createProjectFixture({
-        ...defaultProjectFiles({ output: { bundle: false, map: false, minify } }),
+        ...defaultProjectFiles({ build: { details: { bundle: false, map: false, minify } } }),
         'src/server/main.luam': SERVER_SOURCE,
     });
 

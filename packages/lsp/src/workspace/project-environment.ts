@@ -2,8 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 
 import { EMPTY_PROJECT_DECLARATIONS, projectDeclarations, type ProjectDeclarations } from '@compiler/checker/project-declarations';
-import type { EnvironmentFiles } from '@compiler/manifest/manifest-defaults';
-import { EMPTY_ENV_FILE, mergeEnvFiles, parseEnvFile, type EnvFile } from '@compiler/project/env-file';
+import { parseEnvFile, type EnvFile } from '@compiler/project/env-file';
 
 const sources = new Map<string, string | null>();
 
@@ -37,32 +36,30 @@ function parseAt(root: string, file: string): EnvFile | null {
     return source === null ? null : parseEnvFile(source);
 }
 
-export function isEnvironmentPath(path: string, environment: EnvironmentFiles): boolean {
-    const name = basename(path);
-
-    return name === basename(environment.file) || name === basename(environment.localFile);
+export function isEnvironmentPath(path: string, secret: string): boolean {
+    return basename(path) === basename(secret);
 }
 
-function firstRoot(roots: readonly string[], environment: EnvironmentFiles): EnvFile | null {
+function firstRoot(roots: readonly string[], secret: string): EnvFile | null {
     for (const root of roots) {
-        const declared = parseAt(root, environment.file);
+        const declared = parseAt(root, secret);
 
         if (declared !== null) {
-            return mergeEnvFiles(declared, parseAt(root, environment.localFile) ?? EMPTY_ENV_FILE);
+            return declared;
         }
     }
 
     return null;
 }
 
-export function loadProjectDeclarations(roots: readonly string[], environment: EnvironmentFiles): ProjectDeclarations {
-    const declared = firstRoot(roots, environment);
+export function loadProjectDeclarations(roots: readonly string[], secret: string): ProjectDeclarations {
+    const declared = firstRoot(roots, secret);
 
-    return declared === null ? EMPTY_PROJECT_DECLARATIONS : projectDeclarations(declared.entries, environment.file);
+    return declared === null ? EMPTY_PROJECT_DECLARATIONS : projectDeclarations(declared.entries, secret);
 }
 
-export function loadProjectEnvironment(roots: readonly string[], environment: EnvironmentFiles): Record<string, string> {
-    const declared = firstRoot(roots, environment);
+export function loadProjectEnvironment(roots: readonly string[], secret: string): Record<string, string> {
+    const declared = firstRoot(roots, secret);
 
     return declared === null ? {} : Object.fromEntries(declared.entries.map((entry) => [entry.key, entry.value]));
 }

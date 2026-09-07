@@ -1,6 +1,5 @@
 import { commandDeployment, commandReporter, type CommandContext } from '@cli/commands/command-context';
 import { createEnsureRunner, type EnsureRunner } from '@cli/commands/ensure-runner';
-import type { DevelopmentLogsConfig } from '@cli/config/config-schema';
 import { missingServerPathMessage } from '@cli/config/deployment';
 import { EXIT_DIAGNOSTICS, EXIT_OK } from '@cli/cli/exit-codes';
 import { reportRebuildSeparator } from '@cli/reporting/rebuild-separator';
@@ -14,7 +13,6 @@ export interface EnsureOptions {
     serverConsole?: ServerConsole | null;
     watch: boolean;
     signal: AbortSignal | null;
-    developmentLogs?: DevelopmentLogsConfig | null;
     commandName?: 'ensure' | 'dev';
     layout?: OutputLayout;
     map?: boolean;
@@ -48,10 +46,10 @@ async function watchLoop(context: CommandContext, runner: EnsureRunner, options:
         running = false;
     };
 
-    const watcher = watchSources(context.root, context.config.sources, () => {
+    const watcher = watchSources(context.root, context.config.scripts, () => {
         void rebuild();
     });
-    const roots = watchedRoots(context.config.sources).map((entry) => `"${entry.length === 0 ? '.' : entry}"`);
+    const roots = watchedRoots(context.config.scripts).map((entry) => `"${entry.length === 0 ? '.' : entry}"`);
 
     reporter.info(`Watching ${roots.join(', ')} for changes. Press Ctrl+C to stop.`);
 
@@ -68,7 +66,6 @@ export async function runEnsureCommand(context: CommandContext, options: EnsureO
 
     const runner = createEnsureRunner(context, {
         serverConsole: options.serverConsole ?? null,
-        developmentLogs: options.developmentLogs ?? null,
         layout: options.layout ?? 'tree',
         map: options.map ?? context.config.output.map,
     });

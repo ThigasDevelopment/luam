@@ -1,2 +1,12 @@
-name = 'luam-docs-exported-function'
-description = 'Functions other resources may call through MTA exports.'
+{
+    info = {
+        description = 'Functions other resources may call through MTA exports.',
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+}

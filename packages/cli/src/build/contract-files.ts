@@ -18,7 +18,7 @@ export function readDependencyContracts(root: string, config: LuamConfig): Contr
     const contracts: ResourceAbi[] = [];
     const diagnostics: CliDiagnostic[] = [];
 
-    for (const dependency of config.dependencies) {
+    for (const { name: dependency } of config.dependencies) {
         const path = contractPath(root, config, dependency);
 
         let text: string;

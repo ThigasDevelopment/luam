@@ -4,14 +4,18 @@ import { readHelperSource } from '@cli/build/helper-files';
 import { resolveLibraries } from '@cli/build/library-resolution';
 import { createPhaseTracker, type PhaseTracker } from '@cli/build/phase-tracker';
 import { readProjectInputs, type ProjectInputs } from '@cli/build/project-inputs';
-import { discoverSources } from '@cli/build/source-discovery';
+import { discoverSources, type DiscoveredSources } from '@cli/build/source-discovery';
 import type { LuamConfig } from '@cli/config/config-schema';
 import { hasCliErrors, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
 import { projectDeclarations } from '@compiler/checker/project-declarations';
+import { names } from '@compiler/manifest/manifest-contract';
 import type { FileDiagnostic, ProjectFile, ProjectStats } from '@compiler/project/module';
 import { createProjectCache, type ProjectCache } from '@compiler/project/project-cache';
 import { buildResourceAbi, type ResourceAbi } from '@compiler/project/export-abi';
 import type { LibraryFile } from '@compiler/project/library';
+import type { RuntimeHelperName } from '@runtime/helpers';
+import { outputPath } from '@compiler/project/resource-layout';
+import type { ManifestEnvironment, ManifestInclude, ManifestInfo, ManifestScript } from '@compiler/project/manifest';
 import type { AssemblyStep } from '@compiler/project/progress';
 import {
     assembleResource,
@@ -22,7 +26,6 @@ import {
     type ResourceMap,
     type ResourceOptions,
 } from '@compiler/project/resource';
-import type { RuntimeHelperName } from '@runtime/helpers';
 
 export interface BuildOutcome {
     build: ResourceBuild | null;
@@ -42,59 +45,62 @@ export interface CompileOptions {
     additionalFiles?: readonly ProjectFile[];
     cache?: ProjectCache;
     tracker?: PhaseTracker;
-    minMtaVersion?: string | null;
-    developmentLogs?: LuamConfig['development']['logs'] | null;
+    minServerVersion?: string | null;
+    minClientVersion?: string | null;
     development?: boolean;
     layout?: OutputLayout;
     map?: boolean;
 }
 
-function helperList(config: LuamConfig, inputs: ProjectInputs): RuntimeHelperName[] {
-    if (inputs.declared === null || config.helpers.includes('env')) {
-        return config.helpers;
-    }
+function helperList(inputs: ProjectInputs): RuntimeHelperName[] {
+    return inputs.declared === null ? [] : ['env'];
+}
 
-    const helpers: RuntimeHelperName[] = [...config.helpers, 'env'];
+function manifestInfo(config: LuamConfig): ManifestInfo {
+    return { author: config.author, version: config.version, description: config.description };
+}
 
-    return helpers.sort();
+function manifestIncludes(config: LuamConfig): ManifestInclude[] {
+    return config.dependencies.map((entry) => ({ resource: entry.name, group: entry.group }));
+}
+
+function manifestEnvironment(config: LuamConfig, options: CompileOptions): ManifestEnvironment {
+    return {
+        oop: config.oopDeclared ? config.compilerOptions.oop : null,
+        minServerVersion: options.minServerVersion ?? null,
+        minClientVersion: options.minClientVersion ?? null,
+    };
+}
+
+function authoredScripts(config: LuamConfig): ManifestScript[] {
+    return config.scripts.map((entry) => ({ src: outputPath(entry.path), environment: entry.type, group: entry.group }));
 }
 
 function resourceOptions(
     config: LuamConfig,
     inputs: ProjectInputs,
-    minMtaVersion: string | null,
-    developmentLogs: LuamConfig['development']['logs'] | null,
+    sources: DiscoveredSources,
+    options: CompileOptions,
     layout: OutputLayout,
     libraryFiles: readonly LibraryFile[],
 ): ResourceOptions {
-    const options: ResourceOptions = {
-        oop: config.compilerOptions.oop,
-        dependencies: config.dependencies,
-        helpers: helperList(config, inputs),
+    return {
+        resourceName: config.name,
+        info: manifestInfo(config),
+        includes: manifestIncludes(config),
+        environment: manifestEnvironment(config, options),
+        scripts: authoredScripts(config),
+        files: inputs.elements,
+        helpers: helperList(inputs),
+        order: sources.order,
+        libraries: config.libraries,
+        natives: sources.natives,
         assets: inputs.assets,
         configuration: inputs.configuration,
-        environmentFile: config.environment.file,
-        loadOrder: config.loadOrder,
+        environmentFile: config.secret,
         libraryFiles,
-        minMtaVersion,
-        developmentLogs,
         layout,
-        resourceName: config.name,
     };
-
-    if (config.author !== null) {
-        options.author = config.author;
-    }
-
-    if (config.version !== null) {
-        options.version = config.version;
-    }
-
-    if (config.description !== null) {
-        options.description = config.description;
-    }
-
-    return options;
 }
 
 function helperContent(helper: ResourceBuild['helpers'][number]): string {
@@ -131,9 +137,9 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
     tracker.begin('discovery');
 
     const excluded = [config.outDir, config.contracts];
-    const sources = discoverSources(root, config.sources, excluded);
-    const inputs = readProjectInputs(root, { assets: config.assets, environment: config.environment, excluded });
-    const libraries = resolveLibraries(root, config.libraries);
+    const sources = discoverSources(root, config.scripts, excluded);
+    const inputs = readProjectInputs(root, { files: config.files, secret: config.secret, excluded });
+    const libraries = resolveLibraries(root, names(config.libraries));
     const projectFiles = [...sources.files, ...(options.additionalFiles ?? [])].sort((left, right) => left.path.localeCompare(right.path));
     const files = [...libraries.files, ...projectFiles];
     const contracts = readDependencyContracts(root, config);
@@ -159,7 +165,7 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('compile', files.length);
 
-    const declarations = projectDeclarations(inputs.declared?.entries ?? null, config.environment.file);
+    const declarations = projectDeclarations(inputs.declared?.entries ?? null, config.secret);
     const project = cache.compile(files, {
         project: declarations,
         contracts: contracts.contracts,
@@ -170,15 +176,11 @@ export function runCompile(root: string, config: LuamConfig, options: CompileOpt
 
     tracker.begin('assembly');
 
-    const assembly = assembleResource(
-        project,
-        resourceOptions(config, inputs, options.minMtaVersion ?? null, options.developmentLogs ?? null, options.layout ?? 'tree', libraries.verbatim),
-        (step: AssemblyStep) => {
-            if (step === 'assembly') {
-                tracker.begin('manifest');
-            }
-        },
-    );
+    const assembly = assembleResource(project, resourceOptions(config, inputs, sources, options, options.layout ?? 'tree', libraries.verbatim), (step: AssemblyStep) => {
+        if (step === 'assembly') {
+            tracker.begin('manifest');
+        }
+    });
 
     const build = assembly.build === null ? null : materialize(assembly.build, config.name, options.map ?? true);
 

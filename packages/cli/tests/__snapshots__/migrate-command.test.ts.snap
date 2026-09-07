@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`luam migrate > rewrites the file and prints the diff 1`] = `
+"{
+    info = {
+        author = { name = 'Thigas' },
+        version = '1.2.3',
+        description = 'A resource written before ADR-047.',
+        dependencies = {
+            'scoreboard',
+            'admin',
+        },
+    },
+
+    environment = { oop = false, strict = true },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    build = {
+        details = { bundle = false, map = true },
+    },
+}
+"
+`;

@@ -193,8 +193,19 @@ writes nothing.
 | `project-environment-import` | A global from an incompatible environment was used. |
 | `project-duplicate-export` | Two files export the same name. |
 | `project-duplicate-output` | Two sources would produce the same output path. |
-| `project-load-order-missing` | A `loadOrder` entry matches no file or asset. |
-| `project-load-order-library` | A `loadOrder` entry names a library file. Library scripts load in the order `libraries` declares. |
+| `config-missing-script` | A literal `scripts` entry names no file. |
+| `config-empty-script-entry` | A `scripts` pattern whose directory exists matched no file. |
+| `config-script-side-conflict` | One file is matched by two `scripts` entries. |
+| `config-reserved-script-path` | A `scripts` entry names the generated helper or library directory. |
+| `config-empty-file-entry` | A `files` entry matched no file. |
+| `config-missing-file` | A literal `files` entry names no file. |
+| `config-environment-file-entry` | A `files` entry reaches the environment file. |
+| `config-manifest-form` | The manifest is still a list of assignments. Run `luam migrate`. |
+| `config-manifest-not-a-table` | The manifest is not one table constructor. |
+| `config-trailing-content` | Something is written after the manifest table. |
+| `config-unexpected-statement` | The manifest starts with a statement. |
+| `config-duplicate-field` | One manifest key is written twice. |
+| `config-unimplemented-option` | A declared option no milestone honours yet. |
 | `project-library-collision` | Two libraries, or a library and a project file, declare one global on one side. |
 | `project-library-shadows-api` | A library declares a name the MTA API defines. Reported as a warning. |
 | `project-library-project-reference` | A library file uses a global the project declares. A library sees only its own files. |

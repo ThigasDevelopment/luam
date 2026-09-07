@@ -22,6 +22,7 @@ interface Block {
     declaration: boolean;
     oop: boolean;
     expectError: boolean;
+    manifest: boolean;
 }
 
 interface DiagnosticShape {
@@ -31,6 +32,13 @@ interface DiagnosticShape {
 }
 
 type CompileFn = (source: string, options: Record<string, unknown>) => { diagnostics: DiagnosticShape[] };
+
+type AnalyzeManifestFn = (source: string, context: { mode: string; root: string; env: Record<string, string> }) => { diagnostics: DiagnosticShape[] };
+
+interface Checkers {
+    compile: CompileFn;
+    analyzeManifest: AnalyzeManifestFn;
+}
 
 function compileOptions(block: Block): Record<string, unknown> {
     const base = { environment: block.environment, compilerOptions: { oop: block.oop } };
@@ -64,15 +72,20 @@ function blocksIn(file: string): Block[] {
             declaration: options.declaration,
             oop: options.oop,
             expectError: options.expectError,
+            manifest: options.manifest,
         });
     }
 
     return found;
 }
 
-async function loadCompiler(outfile: string): Promise<CompileFn> {
+async function loadCompiler(outfile: string): Promise<Checkers> {
     await build({
-        stdin: { contents: "export { compile } from '@compiler/index';", resolveDir: repositoryRoot, loader: 'ts' },
+        stdin: {
+            contents: "export { compile } from '@compiler/index';\nexport { analyzeManifest } from '@compiler/manifest/manifest-analysis';",
+            resolveDir: repositoryRoot,
+            loader: 'ts',
+        },
         bundle: true,
         format: 'esm',
         platform: 'neutral',
@@ -86,7 +99,7 @@ async function loadCompiler(outfile: string): Promise<CompileFn> {
         logLevel: 'silent',
     });
 
-    return ((await import(pathToFileURL(outfile).href)) as { compile: CompileFn }).compile;
+    return (await import(pathToFileURL(outfile).href)) as Checkers;
 }
 
 const workspace = mkdtempSync(join(tmpdir(), 'luam-examples-'));
@@ -96,13 +109,13 @@ let checked = 0;
 let deliberate = 0;
 
 try {
-    const compile = await loadCompiler(join(workspace, 'compiler.mjs'));
+    const { compile, analyzeManifest } = await loadCompiler(join(workspace, 'compiler.mjs'));
 
     for (const file of documentedRoots.flatMap((root) => markdownFiles(root))) {
         for (const block of blocksIn(file)) {
             checked += 1;
 
-            const result = compile(block.source, compileOptions(block));
+            const result = block.manifest ? analyzeManifest(block.source, { mode: 'production', root: '.', env: {} }) : compile(block.source, compileOptions(block));
             const errors = result.diagnostics.filter((entry) => entry.severity === 'error');
             const where = `${block.file}:${block.line}`;
 

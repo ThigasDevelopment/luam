@@ -17,11 +17,7 @@ export interface InitOptions {
 export const FALLBACK_RESOURCE_NAME = 'luam-resource';
 
 export function resolveResourceName(root: string, requested: string | null): string {
-    if (requested !== null) {
-        return requested;
-    }
-
-    const folder = basename(root);
+    const folder = basename(requested ?? root);
 
     return isValidResourceName(folder) ? folder : FALLBACK_RESOURCE_NAME;
 }

@@ -135,7 +135,7 @@ describe('mta oop gate', () => {
     it('reports check-oop-disabled and names the procedural function', () => {
         expect(codes(`${PLAYER}player:getName()\n`, SERVER_FILE, false)).toEqual(['check-oop-disabled']);
         expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Call "getPlayerName" instead.');
-        expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Set "compiler = { oop = true }" in .luam.manifest');
+        expect(messages(`${PLAYER}player:getName()\n`, SERVER_FILE, false)[0]).toContain('Set "environment = { oop = true }" in .luam.manifest');
     });
 
     it('reports check-oop-disabled for a property too', () => {
@@ -209,18 +209,21 @@ describe('mta oop manifest', () => {
 
     it('puts <oop>true</oop> immediately above <info> when enabled', () => {
         const project = compileProject(files);
-        const manifest = assembleResource(project, { oop: true }).build?.manifest ?? '';
+        const order = new Map(project.modules.map((module, index) => [module.path, index]));
+        const manifest = assembleResource(project, { resourceName: 'demo', environment: { oop: true, minServerVersion: null, minClientVersion: null }, order }).build?.manifest ?? '';
 
-        expect(manifest.split('\n').slice(0, 3)).toEqual(['<meta>', '    <oop>true</oop>', '    <!-- Resource information -->']);
+        expect(manifest).toContain('    <!-- ENVIRONMENT -->\n    <oop>true</oop>');
+        expect(manifest.indexOf('<info')).toBeLessThan(manifest.indexOf('<oop>'));
     });
 
-    it('emits no element when the flag is off or absent', () => {
+    it('states the decision either way and emits nothing when the field is absent', () => {
         const project = compileProject(files);
-        const off = assembleResource(project, { oop: false }).build?.manifest ?? '';
-        const absent = assembleResource(project, {}).build?.manifest ?? '';
+        const order = new Map(project.modules.map((module, index) => [module.path, index]));
+        const off = assembleResource(project, { resourceName: 'demo', environment: { oop: false, minServerVersion: null, minClientVersion: null }, order }).build?.manifest ?? '';
+        const absent = assembleResource(project, { resourceName: 'demo', order }).build?.manifest ?? '';
 
-        expect(off).not.toContain('<oop>');
-        expect(off).toBe(absent);
+        expect(off).toContain('<oop>false</oop>');
+        expect(absent).not.toContain('<oop>');
     });
 });
 
@@ -253,7 +256,8 @@ describe('mta oop fixture resource', () => {
     });
 
     it('locks the generated Lua and the manifest', () => {
-        const assembly = assembleResource(project, { oop: true });
+        const order = new Map(project.modules.map((module, index) => [module.path, index]));
+        const assembly = assembleResource(project, { resourceName: 'mta-oop', environment: { oop: true, minServerVersion: null, minClientVersion: null }, order });
 
         expect(project.modules.map((module) => `${module.path}\n${module.code ?? ''}`)).toMatchSnapshot();
         expect(assembly.build?.manifest).toMatchSnapshot();

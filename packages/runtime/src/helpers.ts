@@ -1,7 +1,5 @@
 export type RuntimeHelperName = 'async' | 'class' | 'env' | 'math' | 'promise' | 'string' | 'table' | 'threads' | 'validate';
 
-export type DevelopmentRuntimeHelperName = 'development-logs-client' | 'development-logs-server';
-
 export type RuntimeInjection = 'automatic' | 'manual' | 'reference';
 
 export type RuntimeHelperEnvironment = 'server' | 'client' | 'shared';
@@ -28,12 +26,6 @@ export interface RuntimeHelperModule {
     globals?: string[];
     requires?: RuntimeHelperName[];
     environment?: RuntimeHelperEnvironment;
-}
-
-export interface DevelopmentRuntimeHelperModule {
-    name: DevelopmentRuntimeHelperName;
-    file: string;
-    environment: 'server' | 'client';
 }
 
 export const RUNTIME_HELPERS: Readonly<Record<RuntimeHelperName, RuntimeHelperModule>> = {
@@ -64,19 +56,6 @@ export const RUNTIME_HELPERS: Readonly<Record<RuntimeHelperName, RuntimeHelperMo
     table: { name: 'table', file: 'table.lua', injection: 'automatic', features: ['table-extension'] },
     threads: { name: 'threads', file: 'threads.lua', injection: 'reference', features: ['thread'], globals: ['Threads'], requires: ['promise'] },
     validate: { name: 'validate', file: 'validate.lua', injection: 'automatic', features: ['boundary-validation'] },
-};
-
-export const DEVELOPMENT_RUNTIME_HELPERS: Readonly<Record<DevelopmentRuntimeHelperName, DevelopmentRuntimeHelperModule>> = {
-    'development-logs-client': {
-        name: 'development-logs-client',
-        file: 'development-logs-client.lua',
-        environment: 'client',
-    },
-    'development-logs-server': {
-        name: 'development-logs-server',
-        file: 'development-logs-server.lua',
-        environment: 'server',
-    },
 };
 
 export const FEATURE_HELPERS: Readonly<Record<RuntimeFeature, RuntimeHelperName>> = {
@@ -151,10 +130,6 @@ export function helperDepth(name: RuntimeHelperName): number {
 
 export function resolveHelperUrl(name: RuntimeHelperName): URL {
     return new URL(`../lua/${RUNTIME_HELPERS[name].file}`, import.meta.url);
-}
-
-export function resolveDevelopmentHelperUrl(name: DevelopmentRuntimeHelperName): URL {
-    return new URL(`../lua/${DEVELOPMENT_RUNTIME_HELPERS[name].file}`, import.meta.url);
 }
 
 export function referenceHelpers(): RuntimeHelperName[] {

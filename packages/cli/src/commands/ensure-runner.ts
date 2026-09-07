@@ -26,7 +26,6 @@ export interface EnsureRunner {
 
 export interface EnsureRunnerOptions {
     serverConsole?: ServerConsole | null;
-    developmentLogs?: CommandContext['config']['development']['logs'] | null;
     layout?: OutputLayout;
     map?: boolean;
 }
@@ -86,8 +85,8 @@ async function runOnce(scope: RunScope, target: string, cache: ProjectCache, opt
     const outcome = runCompile(context.root, context.config, {
         cache,
         tracker,
-        minMtaVersion: version.version,
-        developmentLogs: options.developmentLogs ?? null,
+        minServerVersion: version.server,
+        minClientVersion: version.client,
         development: true,
         layout: options.layout ?? 'tree',
         map: options.map ?? context.config.output.map,
@@ -117,6 +116,11 @@ async function runOnce(scope: RunScope, target: string, cache: ProjectCache, opt
     tracker.end();
     renderer.clear();
     reporter.info(`Synced ${pluralize(sync.written.length, 'file')} to "${target}" (${sync.removed.length} removed).`);
+
+    if (sync.refusal !== null) {
+        reporter.warn(sync.refusal);
+    }
+
 
     const serverConsole = options.serverConsole ?? null;
 

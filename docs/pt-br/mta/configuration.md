@@ -8,7 +8,7 @@ diferentes**.
 | `config.lua` | O autor do resource | sim | **sim** |
 | `.env` | A implantação | sim | não |
 | `.env.local` | A máquina de um desenvolvedor | não | não |
-| `<outDir>/<name>/env.lua` | O administrador do servidor | não | não |
+| `<build.output>/<folder>/env.lua` | O administrador do servidor | não | não |
 
 ## `config.lua`
 
@@ -80,7 +80,7 @@ declaração de chaves e padrões seguros, não um cofre de segredos.
 
 ## O `env.lua` implantado
 
-O primeiro build escreve `<outDir>/<name>/env.lua` a partir das chaves declaradas,
+O primeiro build escreve `<build.output>/<folder>/env.lua` a partir das chaves declaradas,
 esvaziando qualquer chave cujo nome pareça sensível — `password`, `secret`,
 `token`, `key`, `credential`, `dsn` ou `private`:
 

@@ -8,15 +8,7 @@ import { runCli } from '@cli/cli/run';
 import { loadWorkspace } from '@cli/config/workspace-loader';
 
 import { createMemoryLogger, type MemoryLogger } from './support/memory-logger';
-import {
-    createProjectFixture,
-    createWorkspaceFixture,
-    defaultProjectFiles,
-    manifestSource,
-    serverFileSource,
-    SERVER_FILE,
-    type ProjectFixture,
-} from './support/project-fixture';
+import { createProjectFixture, createWorkspaceFixture, defaultProjectFiles, manifestSource, SERVER_FILE, serverFileSource, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
@@ -190,73 +182,43 @@ describe('luam server at a workspace root', () => {
 });
 
 describe('a manifest under a workspace', () => {
-    it('loses its deployment fields to the workspace and warns once naming all three', async () => {
+    it('rejects a manifest that still carries the deployment fields and names the file that owns them', async () => {
         const fixture = workspace();
         const logger = createMemoryLogger();
 
         fixture.write(
             'resource-a/.luam.manifest',
-            manifestSource({
-                name: 'resource-a',
-                output: { bundle: false, map: true },
-                serverPath: 'other-server',
-                resourcesDir: 'mods/deathmatch/other',
-                development: { server: { executable: 'other' } },
-            }),
+            manifestSource({ build: { details: { bundle: false, map: true } }, serverPath: 'other-server' }),
         );
 
-        expect(await runCli(['ensure', 'resource-a'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-
-        const warnings = logger.text().split('\n').filter((line) => line.includes('config-deployment-moved'));
-
-        expect(warnings).toHaveLength(1);
-        expect(warnings[0]).toContain('"serverPath", "resourcesDir" and "development.server"');
-        expect(warnings[0]).toContain(SERVER_FILE);
-        expect(fixture.exists('server/mods/deathmatch/resources/resource-a/meta.xml')).toBe(true);
+        expect(await runCli(['ensure', 'resource-a'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);
+        expect(logger.text()).toContain('config-removed-field');
+        expect(logger.text()).toContain(SERVER_FILE);
         expect(fixture.exists('other-server')).toBe(false);
     });
 
-    it('warns nothing when it sets none of them', async () => {
+    it('warns nothing when the manifest carries none of them', async () => {
         const fixture = workspace();
         const logger = createMemoryLogger();
 
         expect(await runCli(['ensure', 'resource-a'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-        expect(logger.text()).not.toContain('config-deployment-moved');
+        expect(logger.text()).not.toContain('config-removed-field');
     });
 
-    it('keeps its own development.logs and takes the workspace value when it states none', () => {
-        const fixture = workspace({ server: { serverPath: 'server', logs: { enabled: true, rateLimit: 7 } } });
-
-        fixture.write(
-            'resource-b/.luam.manifest',
-            manifestSource({ name: 'resource-b', output: { bundle: false, map: true }, development: { logs: { enabled: false, rateLimit: 3 } } }),
-        );
+    it('gives every resource the deployment the workspace file states', () => {
+        const fixture = workspace({ server: { serverPath: 'server' } });
 
         const { runtime } = runtimeAt(fixture.root);
         const resolved = createWorkspaceContext(runtime, {});
         const own = resolved.context === null ? null : resourceContext(runtime, resolved.context, 'ensure', 'resource-b').context;
         const inherited = resolved.context === null ? null : resourceContext(runtime, resolved.context, 'ensure', 'resource-a').context;
 
-        expect(own?.deployment?.logs).toMatchObject({ enabled: false, rateLimit: 3 });
-        expect(inherited?.deployment?.logs).toMatchObject({ enabled: true, rateLimit: 7 });
-    });
-
-    it('promotes the warning to an error under warningsAsErrors', async () => {
-        const fixture = workspace();
-        const logger = createMemoryLogger();
-
-        fixture.write(
-            'resource-a/.luam.manifest',
-            manifestSource({ name: 'resource-a', compiler: { warningsAsErrors: true }, output: { bundle: false, map: true }, serverPath: 'other-server' }),
-        );
-
-        expect(await runCli(['ensure', 'resource-a'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);
-        expect(logger.text()).toContain('config-deployment-moved');
-        expect(logger.text()).toContain('Delete the line from the manifest');
+        expect(own?.deployment?.serverRoot).toBe(inherited?.deployment?.serverRoot);
+        expect(own?.deployment?.resourcesDir).toBe(inherited?.deployment?.resourcesDir);
     });
 
     it('behaves exactly as before with no workspace file above it', async () => {
-        const fixture = createProjectFixture(defaultProjectFiles({ serverPath: 'server' }));
+        const fixture = createProjectFixture(withWorkspace(defaultProjectFiles(), 'server'));
         const logger = createMemoryLogger();
 
         fixtures.push(fixture);
@@ -266,14 +228,14 @@ describe('a manifest under a workspace', () => {
         expect(fixture.exists('server/mods/deathmatch/resources/luam-demo/meta.xml')).toBe(true);
     });
 
-    it('reports the warning from luam check as well', async () => {
+    it('rejects it from luam check as well', async () => {
         const fixture = workspace();
         const logger = createMemoryLogger();
 
-        fixture.write('resource-a/.luam.manifest', manifestSource({ name: 'resource-a', output: { bundle: false, map: true }, serverPath: 'other-server' }));
+        fixture.write('resource-a/.luam.manifest', manifestSource({ build: { details: { bundle: false, map: true } }, serverPath: 'other-server' }));
 
-        expect(await runCli(['check', '--cwd', 'resource-a'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_OK);
-        expect(logger.text()).toContain('config-deployment-moved');
+        expect(await runCli(['check', '--cwd', 'resource-a'], { logger, cwd: fixture.root, env: OFFLINE })).toBe(EXIT_USAGE);
+        expect(logger.text()).toContain('config-removed-field');
     });
 });
 

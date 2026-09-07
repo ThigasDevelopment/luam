@@ -76,7 +76,7 @@ teste consegue e o que não consegue provar.
 npx --yes @thigasdevelopment/luam build --offline
 ```
 
-O resource aparece em `<outDir>/<name>` — envie esse diretório como artefato do
+O resource aparece em `<build.output>/<folder>` — envie esse diretório como artefato do
 build. Um build que reporta qualquer erro não escreve nada, então um artefato ou
 está completo ou não existe.
 
@@ -114,7 +114,7 @@ servidor — veja [Fronteiras de segurança](/pt-br/mta/security).
 - Nunca versione uma senha. Leia uma de `env` no manifesto, que é o que um cofre
   de segredos de CI fornece.
 - O `.env` é versionado e declara chaves e padrões seguros; o
-  `<outDir>/<name>/env.lua` implantado é escrito uma vez, com chaves de aparência
+  `<build.output>/<folder>/env.lua` implantado é escrito uma vez, com chaves de aparência
   sensível esvaziadas, e nunca é sobrescrito por um rebuild.
 - A CLI nunca abre conexão com um servidor em execução. Um runner que precise
   alcançar um precisa da sua própria etapa de transferência — SSH ou SFTP — fora

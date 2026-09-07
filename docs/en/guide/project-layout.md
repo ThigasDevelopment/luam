@@ -83,14 +83,14 @@ trees, manifests, and overrides.
 
 ## Naming and path rules
 
-- `outDir`, `resourcesDir`, and every `sources`, `assets`, and `loadOrder`
-  entry must stay inside their base directory. An absolute path or a `..`
-  segment is rejected with `config-escaping-path`.
+- Every `scripts` and `files` entry must stay inside the project directory. An
+  absolute path or a `..` segment is rejected with `config-escaping-path`.
+  `build.output` is the exception: it may be absolute and may leave the project.
 - Two sources that would produce the same output path fail the build with
   `project-duplicate-output`. Rename one of them.
-- `name` in `.luam.manifest` names the output folder and the resource `ensure`
-  restarts. It never reaches `meta.xml` — MTA reads a resource's name from its
-  folder.
+- The folder that holds `.luam.manifest` names the resource. It is the directory
+  the build writes under `build.output`, the name `ensure` restarts, and the root
+  element of the generated `meta.xml`. There is no `name` field.
 
 ## Several resources in one folder
 
@@ -122,29 +122,30 @@ command behaves as it does on its own.
 
 `build` caches the latest MTA release it looked up in `.luam/mta-version.json`, so
 a later build with no network still succeeds. That is the only thing the CLI
-writes outside `outDir`, and it is generated — ignore `.luam/` in version control.
+writes outside `build.output`, and it is generated — ignore `.luam/` in version
+control.
 
 There is no settings snapshot. The language server reads `.luam.manifest`
-directly, so a change to `compiler` takes effect as soon as the file is
-saved.
+directly, so a change to `environment` takes effect as soon as the file is saved.
 
 ## Configuring the layout
 
 Every directory above is a default you can change in
 [`.luam.manifest`](/en/tooling/luam-manifest):
 
-```luam
-name = 'my-resource'
+```luam manifest
+{
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
 
-sources = {
-    server = { 'src/server/**/*.luam' },
-    client = { 'src/client/**/*.luam' },
-    shared = { 'src/shared/**/*.luam' },
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    files = {
+        'assets/**/*',
+    },
+
+    build = { output = 'build' },
 }
-
-assets = {
-    { from = 'assets/**/*', to = 'assets' },
-}
-
-outDir = 'build'
 ```

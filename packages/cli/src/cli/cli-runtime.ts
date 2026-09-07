@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { resolveEngineVersion } from '@cli/build/mta-release';
+import { resolveEngineVersions } from '@cli/build/mta-release';
 import { EXIT_USAGE } from '@cli/cli/exit-codes';
 import { MANIFEST_FILE_NAME } from '@cli/config/config-schema';
 import { manifestMode } from '@cli/config/manifest-context';
@@ -120,7 +120,7 @@ export function createProjectContext(runtime: CliRuntime, command: string, optio
     }
 
     const skip = options.offline === true || runtime.env.LUAM_OFFLINE !== undefined;
-    const engine = loaded.config.engine.minVersion;
+    const engine = loaded.config.engine;
 
     return {
         context: {
@@ -129,7 +129,7 @@ export function createProjectContext(runtime: CliRuntime, command: string, optio
             deployment: loaded.deployment,
             logger: runtime.logger,
             reporter: runtime.reporter,
-            resolveVersion: () => resolveEngineVersion(root, engine, { skip }),
+            resolveVersion: () => resolveEngineVersions(root, engine, { skip }),
         },
         error: null,
     };
@@ -194,7 +194,7 @@ export function resourceContext(runtime: CliRuntime, workspace: WorkspaceContext
     }
 
     const skip = options.offline === true || runtime.env.LUAM_OFFLINE !== undefined;
-    const engine = loaded.config.engine.minVersion;
+    const engine = loaded.config.engine;
 
     return {
         context: {
@@ -203,7 +203,7 @@ export function resourceContext(runtime: CliRuntime, workspace: WorkspaceContext
             deployment: loaded.deployment,
             logger: runtime.logger,
             reporter: runtime.reporter,
-            resolveVersion: () => resolveEngineVersion(root, engine, { skip }),
+            resolveVersion: () => resolveEngineVersions(root, engine, { skip }),
         },
         error: null,
     };

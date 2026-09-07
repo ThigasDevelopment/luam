@@ -1,0 +1,3 @@
+function renderLabel(text: string): void
+    dxDrawText(text, 10, 10)
+end

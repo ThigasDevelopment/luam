@@ -43,8 +43,18 @@ export const VALID_CLIENT = clientSource('Luam');
 
 export const BROKEN_SERVER = ['function broken(value: string): number', '    return value', 'end', ''].join('\n');
 
-export function createProjectFixture(files: Readonly<Record<string, string>> = {}): ProjectFixture {
-    const root = mkdtempSync(join(tmpdir(), 'luam-cli-'));
+export const RESOURCE_NAME = 'luam-demo';
+
+export interface FixtureOptions {
+    resource?: string | null;
+}
+
+export function createProjectFixture(files: Readonly<Record<string, string>> = {}, options: FixtureOptions = {}): ProjectFixture {
+    const created = mkdtempSync(join(tmpdir(), 'luam-cli-'));
+    const resource = options.resource === undefined ? RESOURCE_NAME : options.resource;
+    const root = resource === null ? created : join(created, resource);
+
+    mkdirSync(root, { recursive: true });
 
     const fixture: ProjectFixture = {
         root,
@@ -64,7 +74,7 @@ export function createProjectFixture(files: Readonly<Record<string, string>> = {
         read: (path: string): string => readFileSync(resolve(root, path), 'utf8'),
         exists: (path: string): boolean => existsSync(resolve(root, path)),
         dispose: (): void => {
-            rmSync(root, { force: true, recursive: true });
+            rmSync(created, { force: true, recursive: true });
         },
     };
 
@@ -83,29 +93,37 @@ function manifestValue(value: unknown, indent: string): string {
     }
 
     if (Array.isArray(value)) {
-        return `{ ${value.map((entry) => manifestValue(entry, indent)).join(', ')} }`;
+        const inner = `${indent}    `;
+
+        return value.length === 0 ? '{ }' : ['{', ...value.map((entry) => `${inner}${manifestValue(entry, inner)},`), `${indent}}`].join('\n');
     }
 
     if (typeof value === 'object' && value !== null) {
-        const inner = `${indent}    `;
-        const fields = Object.entries(value).map(([key, entry]) => `${inner}${key} = ${manifestValue(entry, inner)},`);
+        const entries = Object.entries(value).filter(([, entry]) => entry !== undefined);
 
-        return ['{', ...fields, `${indent}}`].join('\n');
+        if (entries.length <= 2 && entries.every(([, entry]) => typeof entry !== 'object')) {
+            return `{ ${entries.map(([key, entry]) => `${key} = ${manifestValue(entry, indent)}`).join(', ')} }`;
+        }
+
+        const inner = `${indent}    `;
+
+        return ['{', ...entries.map(([key, entry]) => `${inner}${key} = ${manifestValue(entry, inner)},`), `${indent}}`].join('\n');
     }
 
     return String(value);
 }
 
 export function manifestSource(config: Readonly<Record<string, unknown>>): string {
-    return `${Object.entries(config)
+    const entries = Object.entries(config)
         .filter(([, value]) => value !== undefined)
-        .map(([key, value]) => `${key} = ${manifestValue(value, '')}`)
-        .join('\n')}\n`;
+        .map(([key, value]) => `    ${key} = ${manifestValue(value, '    ')},`);
+
+    return ['{', ...entries, '}', ''].join('\n');
 }
 
 export function manifestConfig(config: Readonly<Record<string, unknown>>, env: Readonly<Record<string, string>> = {}): LuamConfig {
     const analysis = analyzeManifest(manifestSource(config), { mode: 'check', root: '/project', env });
-    const validated = validateConfig(analysis.value, analysis.positions);
+    const validated = validateConfig(RESOURCE_NAME, analysis.value, analysis.positions, analysis.groups);
 
     if (validated.config === null) {
         throw new Error(`The fixture manifest is invalid: ${[...analysis.diagnostics, ...validated.diagnostics].map((entry) => entry.message).join(' ')}`);
@@ -117,7 +135,14 @@ export function manifestConfig(config: Readonly<Record<string, unknown>>, env: R
 export const SERVER_FILE = '.luam.server';
 
 export function serverFileSource(config: Readonly<Record<string, unknown>>): string {
-    return manifestSource(config);
+    return `${Object.entries(config)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => `${key} = ${manifestValue(value, '')}`)
+        .join('\n')}\n`;
+}
+
+export function withWorkspace(files: Readonly<Record<string, string>>, serverPath = 'mta-server'): Record<string, string> {
+    return { ...files, [`../${SERVER_FILE}`]: serverFileSource({ serverPath: `${RESOURCE_NAME}/${serverPath}` }) };
 }
 
 export interface WorkspaceShape {
@@ -134,7 +159,7 @@ export function workspaceFiles(shape: WorkspaceShape = {}): Record<string, strin
     };
 
     for (const name of resources) {
-        for (const [path, contents] of Object.entries(defaultProjectFiles({ name, ...shape.manifest }))) {
+        for (const [path, contents] of Object.entries(defaultProjectFiles(shape.manifest ?? {}))) {
             files[`${name}/${path}`] = contents;
         }
     }
@@ -143,7 +168,7 @@ export function workspaceFiles(shape: WorkspaceShape = {}): Record<string, strin
 }
 
 export function createWorkspaceFixture(shape: WorkspaceShape = {}): ProjectFixture {
-    const fixture = createProjectFixture(workspaceFiles(shape));
+    const fixture = createProjectFixture(workspaceFiles(shape), { resource: null });
 
     fixture.executable(shape.executable ?? (process.platform === 'win32' ? 'server/MTA Server.exe' : 'server/mta-server64'), 'binary');
     fixture.write('server/mods/deathmatch/logs/server.log', '');
@@ -151,13 +176,19 @@ export function createWorkspaceFixture(shape: WorkspaceShape = {}): ProjectFixtu
     return fixture;
 }
 
-export const DEFAULT_ASSETS = [{ from: 'assets/**/*', to: 'assets' }];
+export const DEFAULT_FILES = ['assets/**/*'];
+
+export const DEFAULT_SCRIPTS: readonly Readonly<Record<string, string>>[] = [
+    { path: 'src/shared/**/*.luam', type: 'shared' },
+    { path: 'src/server/**/*.luam', type: 'server' },
+    { path: 'src/client/**/*.luam', type: 'client' },
+];
 
 export function defaultProjectFiles(config: Readonly<Record<string, unknown>> = {}): Record<string, string> {
     return {
         [MANIFEST_FILE]: manifestSource({
-            name: 'luam-demo',
-            output: { bundle: false, map: true },
+            scripts: DEFAULT_SCRIPTS,
+            build: { details: { bundle: false, map: true } },
             ...config,
         }),
         'src/shared/config.luam': VALID_SHARED,

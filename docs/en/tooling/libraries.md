@@ -124,8 +124,8 @@ no nested directory reaches an MTA path. In bundle layout its modules are
 concatenated into the environment bundle ahead of the project's own.
 
 Library scripts are enumerated `<script>` entries in `meta.xml`, never wildcards,
-after the runtime library and before `config.lua`, the pinned `loadOrder` entries
-and the source wildcards. A `loadOrder` entry that names a library file is
+after the runtime library and before `config.lua` and every authored `scripts`
+entry. A `scripts` entry that names the library directory is
 `project-load-order-library`: the emission order is the one `libraries` declares.
 
 A helper a library needs — the class runtime, the string extensions — is emitted

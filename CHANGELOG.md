@@ -14,6 +14,76 @@ Releases before `0.2.0` were never published, so the work of milestones 1 to
 
 ## Unreleased
 
+## 1.1.0 - 2026-09-07
+
+### Added
+
+- `.luam.manifest` is **one table constructor** whose five sections — `info`,
+  `environment`, `scripts`, `files` and `build` — are the whole file. Order is
+  position: `scripts`, `files`, `environment.libraries` and `info.dependencies`
+  emit in the order they are written, so moving an entry moves its element and
+  nothing else.
+- A blank line between two entries of an ordered list reaches the generated
+  `meta.xml` at the same place. One or more blank lines are one boundary; a blank
+  line before the first entry or after the last is not one; a comment between two
+  entries is neither carried nor a boundary. `luam format` preserves a run,
+  collapses a longer one to a single line, and never introduces one.
+- `scripts` replaces `sources` and `loadOrder`. An entry is `{ path, type }` and
+  declares its own side, so a project may lay itself out however it likes and a
+  file is typed by the entry that matched it rather than by the directory it sits
+  in. A `.lua` path is legal and loads at its written position.
+- `files` replaces `assets` with bare paths. An entry reaches `<file src>` exactly
+  as written, so a directory of images is one line in the manifest and one line in
+  the generated file, and adding an image changes no line of it.
+- The root element of the generated `meta.xml` is the resource name, which is the
+  folder that holds the manifest. There is no `name` field.
+- `info.author` is a record with a required `name`, the named keys `discord`,
+  `github` and `email` that the editor offers, and an open set beyond them. Every
+  key but `name` is emitted as an info attribute in the order it was written, and
+  each is readable at runtime through `getResourceInfo(resource, key)`.
+- `environment.version.server` and `environment.version.client` pin the MTA
+  version per side, and `<oop>` is written whenever `environment.oop` is, `true`
+  or `false`.
+- `build.output` may be absolute and may leave the project. The build writes a
+  `.luam-build` marker when it creates a resource directory, prunes only inside a
+  directory carrying it, and says so and removes nothing anywhere else.
+- `build.details.obfuscate` is declared with its default. It reports
+  `config-unimplemented-option` when it is `true`, naming the milestone that will
+  compile the generated Lua to bytecode, so the field never silently does nothing.
+- `luam migrate` rewrites an assignment-form manifest as one table of sections and
+  prints the diff, and the editor offers the same rewrite as a code action.
+- The manifest field reference is generated from the same catalog the checker, the
+  editor and the build read, so it cannot drift from what the tool enforces.
+
+### Changed
+
+- The deployment fields in `.luam.manifest` — `serverPath`, `resourcesDir` and
+  `development.server` — are removed and report `config-removed-field` naming
+  `.luam.server`, which is where a directory of resources names the MTA
+  installation it shares. That completes the deprecation the previous release
+  scheduled.
+- `luam init --name demo` scaffolds into a `demo/` directory rather than writing a
+  field, because the folder is the resource name.
+- The generated `meta.xml` carries the section comments `INFO`, `ENVIRONMENT`,
+  `SCRIPTS`, `FILES` and `EXPORTS`, in that order, and a section with no entry
+  emits neither comment nor blank line.
+- `info.dependencies` emits in the order it was written rather than sorted, and a
+  repeated entry is `config-duplicate-dependency` rather than a silent collapse.
+
+### Removed
+
+- The manifest's `name`, `sources`, `loadOrder`, `assets`, `compiler`, `engine`,
+  `outDir`, `output`, `helpers`, `contracts`, `libraries`, `development`,
+  `serverPath` and `resourcesDir`, along with `environment.file` and
+  `environment.localFile`. Each reports `config-removed-field` naming where it
+  went. The assignment form itself still loads for this minor behind
+  `config-manifest-form` and is removed in the next major.
+- The `local` declaration. A manifest has no statements: an intermediate value is
+  written where it is used.
+- The development log relay and the generated Lua behind it, along with the
+  `logs` table `.luam.server` carried to configure it. The position map debugs
+  against the authored file, which is what the relay existed to work around.
+
 ## 1.0.10 - 2026-09-04
 
 ### Changed

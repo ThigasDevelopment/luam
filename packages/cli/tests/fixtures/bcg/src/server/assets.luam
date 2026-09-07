@@ -1,0 +1,3 @@
+function loadAssets(): number
+    return 1
+end

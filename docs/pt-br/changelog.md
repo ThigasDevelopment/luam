@@ -11,6 +11,20 @@ da versão atual.
 
 ## Não lançado
 
+## 1.1.0 - 2026-09-07
+
+### Adicionado
+
+- O [.luam.manifest](/pt-br/tooling/luam-manifest) foi reescrito em torno da forma
+  de tabela: o formato, as cinco seções, um exemplo completo mostrado ao lado do
+  `meta.xml` que ele gera, e a linha em branco como limite de grupo.
+- A [migração](/pt-br/guide/migration) ganha uma seção `1.1.0`: o antes e o
+  depois, a tabela campo a campo de tudo que mudou de lugar, o `luam migrate`, a
+  ação de código do editor e a única conversão que recusa.
+- Os [campos de configuração](/pt-br/reference/configuration-fields) são gerados
+  do catálogo do manifesto, então a tabela e a tabela de campos removidos não
+  podem divergir do que a ferramenta exige.
+
 ## 1.0.10 - 2026-09-04
 
 ### Alterado

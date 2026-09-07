@@ -10,12 +10,12 @@ renomeia um identificador.
 
 | Comando | Estrutura padrão | Sobrescrita da estrutura | Mapa de código |
 | --- | --- | --- | --- |
-| `luam build` | Bundle quando `output.bundle` é `true` (o padrão); árvore quando é `false`. Minificado nos dois casos. | `--bundle` ou `--no-bundle` sobrescreve a configuração. | Escreve `<outDir>/<name>.luam-map.json` quando `output.map` é `true` (o padrão), marcado como `minified`. `--no-map` desliga e remove esse mapa. |
-| `luam ensure` | Árvore, independentemente de `output.bundle`. | `--bundle` seleciona bundle; `--no-bundle` seleciona árvore. | Mantém um mapa apenas em memória. Nunca escreve o arquivo de mapa. `--no-map` o desliga. |
+| `luam build` | Bundle quando `build.details.bundle` é `true` (o padrão); árvore quando é `false`. Minificado nos dois casos. | `--bundle` ou `--no-bundle` sobrescreve a configuração. | Escreve `<build.output>/<folder>.luam-map.json` quando `build.details.map` é `true` (o padrão), marcado como `minified`. `--no-map` desliga e remove esse mapa. |
+| `luam ensure` | Árvore, independentemente de `build.details.bundle`. | `--bundle` seleciona bundle; `--no-bundle` seleciona árvore. | Mantém um mapa apenas em memória. Nunca escreve o arquivo de mapa. `--no-map` o desliga. |
 | `luam dev` | Árvore, independentemente da configuração ou das flags de bundle. | Nenhuma. O `dev` sempre mantém os arquivos gerados individualmente acessíveis. | Mantém um mapa em memória para resolver os logs acompanhados. Nunca escreve o arquivo. `output.map: false` ou `--no-map` desliga a resolução. |
 
 `ensure` e `dev` escrevem diretamente em
-`<serverPath>/<resourcesDir>/<name>`, nunca em `<outDir>/<name>`.
+`<serverPath>/<resourcesDir>/<folder>`, nunca em `<build.output>/<folder>`.
 
 ## Estrutura de bundle
 
@@ -39,7 +39,7 @@ O diretório literal `src/` dos bundles não segue `sources`. Um ambiente vazio
 não tem bundle nem entrada `<script>`. Não existe diretório `lib/` nem árvore de
 módulos espelhada. Helpers de runtime e módulos são concatenados literalmente em
 um chunk por ambiente, sem bloco em volta; helpers vêm antes dos módulos, e
-`loadOrder` ainda controla a ordem dos módulos. Todo módulo compartilha o escopo
+a ordem de `scripts` ainda controla a ordem dos módulos. Todo módulo compartilha o escopo
 do chunk do bundle, então um `local` de nível de arquivo fica visível para todos
 os módulos seguintes e o limite de 200 locals ativos do Lua 5.1 vale para o
 bundle inteiro.
@@ -88,7 +88,7 @@ Uma [biblioteca](/pt-br/tooling/libraries) que o manifesto lista é gravada sob
 código dela por baixo do lado que ela declara.
 
 O manifesto lista helpers, scripts de biblioteca, `config.lua`, entradas fixadas
-por `loadOrder` e então os grupos de código. Este é o formato normal do `ensure` e fixo do `dev`, pois um
+as bibliotecas vendorizadas, o `config.lua` e então cada entrada de `scripts` na ordem escrita. Este é o formato normal do `ensure` e fixo do `dev`, pois um
 resource em execução permanece fácil de inspecionar. Use
 `luam build --no-bundle` quando um build local também precisar desse formato.
 
@@ -105,7 +105,7 @@ campo no manifesto para isso: desligar a minificação é o que pede saída leg�
 | --- | --- |
 | `luam dev` | Sempre. Ele nunca minifica. |
 | `luam ensure` | Sempre. Ele nunca minifica. |
-| `luam build` | Quando `output.minify` é `false`, ou com `--no-minify`. |
+| `luam build` | Quando `build.details.minify` é `false`, ou com `--no-minify`. |
 
 O contrato tem uma forma mensurável: **uma linha de Lua para cada linha de
 Luam**. Uma construção reescrita ocupa as linhas que a construção substituída
@@ -237,7 +237,7 @@ gerado.
 
 ## Arquivo de mapa do resource
 
-`luam build` escreve `<outDir>/<name>.luam-map.json` ao lado do diretório do
+`luam build` escreve `<build.output>/<folder>.luam-map.json` ao lado do diretório do
 resource, nunca dentro dele. A versão atual do formato é `1`. Ele registra:
 
 - `version`, `resource` e `layout` do build, mais `minified: true` em um mapa
@@ -281,7 +281,7 @@ luam trace src/server.lua:42
 luam trace "ERROR: [my-resource/src/server.lua:42] attempt to index a nil value"
 ```
 
-O comando tenta primeiro o `<outDir>/<name>.luam-map.json` configurado. Se ele não
+O comando tenta primeiro o `<build.output>/<folder>.luam-map.json` configurado. Se ele não
 existir, procura abaixo do diretório do projeto e usa o mapa apenas quando encontra
 exatamente um. A busca ignora `node_modules` e diretórios cujo nome começa com
 ponto, então um mapa guardado em um deles só é alcançável por `--map`. Selecione

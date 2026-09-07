@@ -55,6 +55,7 @@ export interface DocumentAnalysis {
     index: SymbolIndex;
     generatedMembers: ReadonlyMap<ClassDeclaration, ClassMethodDeclaration[]>;
     manifest: ManifestAnalysis | null;
+    installedLibraries: readonly string[];
 }
 
 export interface AnalysisInput {
@@ -68,6 +69,7 @@ export interface AnalysisInput {
     environment?: Environment | null;
     environmentLocked?: boolean;
     env?: Readonly<Record<string, string>>;
+    installedLibraries?: readonly string[];
     ambient?: (environment: Environment) => AmbientDeclarations;
 }
 
@@ -130,6 +132,7 @@ function analyzeSourceDocument(input: AnalysisInput): DocumentAnalysis {
         index: buildSymbolIndex(input.text, starts, parsed.program, checked.types, checked.declarations, checked.generatedMembers),
         generatedMembers: checked.generatedMembers,
         manifest: null,
+        installedLibraries: input.installedLibraries ?? [],
     };
 }
 
@@ -164,5 +167,6 @@ function analyzeManifestDocument(input: AnalysisInput, schema: ManifestSchema = 
         index: buildSymbolIndex(input.text, starts, EMPTY_PROGRAM, new Map(), declarations),
         generatedMembers: new Map(),
         manifest,
+        installedLibraries: input.installedLibraries ?? [],
     };
 }
