@@ -1,19 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`directive manifest > locks the manifest for a project using every directive 1`] = `
-"<meta>
-    <!-- Resource information -->
+"<directives>
+    <!-- INFO -->
     <info type="script" />
-    <!-- Source scripts -->
+    <!-- SCRIPTS -->
     <script src="src/shared/**/*.lua" type="shared" cache="false" />
     <script src="src/server/**/*.lua" />
     <script src="src/client/**/*.lua" type="client" cache="false" />
-    <!-- Exported functions -->
-    <export function="formatScore" type="shared" http="false" />
-    <export function="getScore" http="false" />
-    <export function="refreshHud" type="client" http="false" />
-    <!-- Assets -->
+    <!-- FILES -->
     <file src="assets/logo.png" />
-</meta>
+    <!-- EXPORTS -->
+    <export function="formatScore" type="shared" http="false" />
+
+    <export function="getScore" http="false" />
+
+    <export function="refreshHud" type="client" http="false" />
+</directives>
 "
 `;

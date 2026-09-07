@@ -88,7 +88,7 @@ describe('manifest grammar', () => {
     });
 
     it('highlights a configuration field and a table key', () => {
-        expect(matchesAny('field', "outDir = 'build'")).toBe(true);
+        expect(matchesAny('field', "output = 'build'")).toBe(true);
         expect(matchesAny('field', "    kind = 'http',")).toBe(true);
         expect(matchesAny('field', 'mode == "production"')).toBe(false);
     });
@@ -97,17 +97,21 @@ describe('manifest grammar', () => {
         expect(rulePatterns('field')[0]?.captures?.['1']?.name).toBe('support.type.property-name.luam-manifest');
     });
 
-    it('highlights local declarations and the injected values', () => {
-        expect(matchesAny('declaration', "local target = 'build'")).toBe(true);
-        expect(matchesAny('injected', "outDir = 'build-' .. mode")).toBe(true);
+    it('carries no rule for a statement the dialect no longer has', () => {
+        expect(grammar.repository['declaration']).toBeUndefined();
+        expect(JSON.stringify(grammar)).not.toContain('storage.modifier.local');
+    });
+
+    it('highlights the injected values', () => {
+        expect(matchesAny('injected', "output = 'build-' .. mode")).toBe(true);
         expect(matchesAny('injected', 'password = env.MTA_PASSWORD')).toBe(true);
-        expect(matchesAny('injected', 'resourcesDir = root')).toBe(true);
+        expect(matchesAny('injected', 'output = root')).toBe(true);
     });
 
     it('highlights the expressions the dialect allows', () => {
-        expect(matchesAny('operator', "outDir = mode == 'production' and 'dist' or 'build'")).toBe(true);
+        expect(matchesAny('operator', "output = mode == 'production' and 'dist' or 'build'")).toBe(true);
         expect(matchesAny('operator', 'port = 22000 + 5')).toBe(true);
-        expect(matchesAny('operator', "name = 'luam' .. '-demo'")).toBe(true);
+        expect(matchesAny('operator', "description = 'luam' .. '-demo'")).toBe(true);
         expect(matchesAny('constant', 'oop = true')).toBe(true);
     });
 });

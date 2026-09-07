@@ -1,33 +1,26 @@
 import { basename } from 'node:path';
 
 import type { ManifestAnalysis } from '@compiler/manifest/manifest-analysis';
-import { readCompilerOptions, readEnvironmentFiles, readLibraries, readSourceMapping, sourcePatterns } from '@compiler/manifest/manifest-contract';
-import {
-    DEFAULT_COMPILER_OPTIONS,
-    DEFAULT_ENVIRONMENT_FILES,
-    DEFAULT_SOURCE_MAPPING,
-    type CompilerOptions,
-    type EnvironmentFiles,
-    type SourceMapping,
-} from '@compiler/manifest/manifest-defaults';
-import { createSourceResolver, type SourceResolver } from '@compiler/project/source-mapping';
+import { names, readCompilerOptions, readLibraries, readScripts, readSecret, scriptPatterns } from '@compiler/manifest/manifest-contract';
+import { DEFAULT_COMPILER_OPTIONS, DEFAULT_ENVIRONMENT_FILE, type CompilerOptions, type ScriptEntry } from '@compiler/manifest/manifest-defaults';
+import { createScriptResolver, type ScriptResolver } from '@compiler/project/source-mapping';
 
 export interface ProjectSettings {
     compilerOptions: CompilerOptions;
-    sources: SourceMapping;
+    scripts: readonly ScriptEntry[];
     libraries: string[];
-    environment: EnvironmentFiles;
-    resolver: SourceResolver;
+    secret: string;
+    resolver: ScriptResolver;
 }
 
 export const MANIFEST_FILE_NAME = '.luam.manifest';
 
 export const DEFAULT_PROJECT_SETTINGS: ProjectSettings = {
     compilerOptions: DEFAULT_COMPILER_OPTIONS,
-    sources: DEFAULT_SOURCE_MAPPING,
+    scripts: [],
     libraries: [],
-    environment: DEFAULT_ENVIRONMENT_FILES,
-    resolver: createSourceResolver(DEFAULT_SOURCE_MAPPING),
+    secret: DEFAULT_ENVIRONMENT_FILE,
+    resolver: createScriptResolver([]),
 };
 
 export function isManifestPath(path: string): boolean {
@@ -39,14 +32,14 @@ export function settingsFrom(manifest: ManifestAnalysis | null): ProjectSettings
         return DEFAULT_PROJECT_SETTINGS;
     }
 
-    const sources = readSourceMapping(manifest.value);
+    const scripts = readScripts(manifest.value);
 
     return {
         compilerOptions: readCompilerOptions(manifest.value),
-        sources,
-        libraries: readLibraries(manifest.value),
-        environment: readEnvironmentFiles(manifest.value),
-        resolver: createSourceResolver(sources),
+        scripts,
+        libraries: names(readLibraries(manifest.value)),
+        secret: readSecret(manifest.value),
+        resolver: createScriptResolver(scripts),
     };
 }
 
@@ -54,6 +47,7 @@ export function settingsKey(settings: ProjectSettings): string {
     const options = Object.entries(settings.compilerOptions)
         .map(([name, value]) => `${name}=${String(value)}`)
         .join(',');
+    const scripts = settings.scripts.map((entry) => `${entry.path}:${entry.type}`);
 
-    return `${options}|${sourcePatterns(settings.sources).join(',')}|${settings.libraries.join(',')}|${settings.environment.file}|${settings.environment.localFile}`;
+    return `${options}|${scriptPatterns(settings.scripts).length}:${scripts.join(',')}|${settings.libraries.join(',')}|${settings.secret}`;
 }

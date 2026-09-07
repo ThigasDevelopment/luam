@@ -5,11 +5,11 @@ import { runCli } from '@cli/cli/run';
 import { VERSION } from '@cli/cli/version';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createProjectFixture, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, defaultProjectFiles, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
-const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'format', 'init', 'server', 'setup', 'test', 'trace'];
+const COMMANDS: readonly string[] = ['build', 'check', 'config', 'dev', 'doctor', 'ensure', 'format', 'init', 'migrate', 'server', 'setup', 'test', 'trace'];
 
 const ACCEPTED: readonly [string, readonly string[]][] = [
     ['build', ['--manifest', '.luam.manifest', '--bundle', '--no-map', '--offline', '--no-color']],
@@ -28,6 +28,7 @@ const ACCEPTED: readonly [string, readonly string[]][] = [
     ['trace', ['src/server.lua:1', '--map', 'build/luam-demo.luam-map.json', '--manifest', '.luam.manifest']],
     ['init', ['--name', 'demo', '--force', '--yes']],
     ['init', ['-y']],
+    ['migrate', ['--check', '--manifest', '.luam.manifest', '--no-color']],
     ['setup', ['--yes']],
     ['doctor', ['--no-color']],
     ['test', ['--lua', 'definitely-not-lua', '--manifest', '.luam.manifest', '--no-color']],
@@ -159,7 +160,7 @@ describe('command help and version', () => {
 describe('command option matrix', () => {
     it('accepts every option its command owns', async () => {
         for (const [command, options] of ACCEPTED) {
-            const fixture = project(defaultProjectFiles({ serverPath: 'mta-server' }));
+            const fixture = project(withWorkspace(defaultProjectFiles()));
             const logger = createMemoryLogger();
             const argv = [command, ...options, '--cwd', fixture.root];
             const code = await runCli(argv, {

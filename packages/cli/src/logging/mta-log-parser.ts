@@ -1,23 +1,10 @@
-import {
-    type DevelopmentLogEnvironment,
-    type DevelopmentLogLevel,
-    type DevelopmentLogRecord,
-} from '@cli/logging/log-record';
-
-const RELAY_MARKER = '__LUAM_DEV_LOG__';
+import { type DevelopmentLogLevel, type DevelopmentLogRecord } from '@cli/logging/log-record';
 
 const TIMESTAMP = /^\[(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2})\]\s*/;
 
 const RESOURCE = /\[([A-Za-z0-9._-]+)(?:[\/:]([^\]]+?):(\d+))?\]/g;
 
 const LEVEL = /\b(DEBUG|INFO|WARNING|WARN|ERROR)\b:?/i;
-
-interface RelayRecord {
-    environment?: unknown;
-    level?: unknown;
-    message?: unknown;
-    resource?: unknown;
-}
 
 const RESERVED_RECORD_NAMES = new Set(['debug', 'error', 'info', 'output', 'script', 'warn', 'warning']);
 
@@ -57,28 +44,6 @@ function logLevel(value: string | number): DevelopmentLogLevel | null {
     return normalized === 'debug' || normalized === 'info' || normalized === 'warn' || normalized === 'error' ? normalized : null;
 }
 
-function relayRecord(line: string, at: Date): DevelopmentLogRecord | null {
-    const marker = line.indexOf(RELAY_MARKER);
-
-    if (marker < 0) {
-        return null;
-    }
-
-    try {
-        const parsed = JSON.parse(line.slice(marker + RELAY_MARKER.length)) as RelayRecord;
-        const level = typeof parsed.level === 'string' || typeof parsed.level === 'number' ? logLevel(parsed.level) : null;
-        const environment: DevelopmentLogEnvironment | null = parsed.environment === 'client' || parsed.environment === 'server' ? parsed.environment : null;
-
-        if (environment === null || level === null || typeof parsed.message !== 'string' || typeof parsed.resource !== 'string') {
-            return null;
-        }
-
-        return { timestamp: at, environment, level, message: parsed.message, resource: parsed.resource };
-    } catch {
-        return null;
-    }
-}
-
 function attributedRecord(rest: string, at: Date, resource: RegExpMatchArray, name: string): DevelopmentLogRecord {
     const severity = LEVEL.exec(rest);
     const level = severity?.[1] === undefined ? 'info' : logLevel(severity[1]) ?? 'info';
@@ -98,16 +63,6 @@ function attributedRecord(rest: string, at: Date, resource: RegExpMatchArray, na
 
 export function parseWorkspaceLogLine(line: string, attached: ReadonlySet<string>, fallback: Date = new Date()): DevelopmentLogRecord | null {
     const stamped = timestamp(line, fallback);
-    const relay = relayRecord(stamped.rest, stamped.value);
-
-    if (relay !== null) {
-        return attached.has(relay.resource) ? relay : null;
-    }
-
-    if (stamped.rest.includes(RELAY_MARKER)) {
-        return null;
-    }
-
     const resource = resourceToken(stamped.rest);
 
     if (resource?.[1] !== undefined && attached.has(resource[1])) {
@@ -119,16 +74,6 @@ export function parseWorkspaceLogLine(line: string, attached: ReadonlySet<string
 
 export function parseMtaLogLine(line: string, activeResource: string, fallback: Date = new Date()): DevelopmentLogRecord | null {
     const stamped = timestamp(line, fallback);
-    const relay = relayRecord(stamped.rest, stamped.value);
-
-    if (relay !== null) {
-        return relay.resource === activeResource ? relay : null;
-    }
-
-    if (stamped.rest.includes(RELAY_MARKER)) {
-        return null;
-    }
-
     const resource = resourceToken(stamped.rest);
 
     if (resource?.[1] !== undefined) {

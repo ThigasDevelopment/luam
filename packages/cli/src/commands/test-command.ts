@@ -28,7 +28,7 @@ function testEnvironments(build: ResourceBuild, paths: ReadonlySet<string>): Env
 export function runTestCommand(context: CommandContext, options: TestCommandOptions = {}): number {
     const reporter = commandReporter(context);
     const excluded = [context.config.outDir, context.config.contracts];
-    const discovered = discoverTests(context.root, context.config.sources, excluded);
+    const discovered = discoverTests(context.root, context.config.scripts, excluded);
 
     reportCliDiagnostics(reporter, discovered.diagnostics);
 

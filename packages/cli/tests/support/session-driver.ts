@@ -55,7 +55,6 @@ export function openSessionDriver(shape: WorkspaceShape = {}): SessionDriver {
         reporter: runtime.reporter,
         serverConsole,
         loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name).context,
-        developmentLogs: workspace.workspace.deployment?.logs ?? null,
     });
 
     return {

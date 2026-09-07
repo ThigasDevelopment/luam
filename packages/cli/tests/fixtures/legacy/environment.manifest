@@ -1,0 +1,7 @@
+local suffix = env.LUAM_SUFFIX
+
+name = 'luam-demo'
+description = suffix or 'A resource that reads its environment'
+outDir = mode == 'production' and 'build' or 'build-dev'
+
+output = { bundle = false, map = true }

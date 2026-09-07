@@ -1,30 +1,32 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { resolveAssets } from '@cli/build/asset-resolution';
+import { resolveFiles } from '@cli/build/file-resolution';
 import { cliError, cliWarning, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
-import type { AssetMapping, EnvironmentFiles } from '@compiler/manifest/manifest-contract';
-import { DEFAULT_ENVIRONMENT_FILE, DEFAULT_LOCAL_ENVIRONMENT_FILE } from '@compiler/manifest/manifest-defaults';
-import { EMPTY_ENV_FILE, mergeEnvFiles, parseEnvFile, type EnvFile } from '@compiler/project/env-file';
+import type { FileEntry } from '@compiler/manifest/manifest-contract';
+import { DEFAULT_ENVIRONMENT_FILE } from '@compiler/manifest/manifest-defaults';
+import { parseEnvFile, type EnvFile } from '@compiler/project/env-file';
+import type { ManifestFile } from '@compiler/project/manifest';
 import type { ResourceAsset, ResourceConfiguration } from '@compiler/project/resource';
 
 export interface ProjectInputs {
     configuration: ResourceConfiguration | null;
     assets: ResourceAsset[];
+    elements: ManifestFile[];
     declared: EnvFile | null;
     deployed: EnvFile | null;
     diagnostics: CliDiagnostic[];
 }
 
 export interface ProjectInputOptions {
-    assets: readonly AssetMapping[];
-    environment: EnvironmentFiles;
+    files: readonly FileEntry[];
+    secret: string;
     excluded?: readonly string[];
 }
 
 export const CONFIGURATION_FILE = 'config.lua';
 
-export { DEFAULT_ENVIRONMENT_FILE as ENVIRONMENT_FILE, DEFAULT_LOCAL_ENVIRONMENT_FILE as LOCAL_ENVIRONMENT_FILE };
+export { DEFAULT_ENVIRONMENT_FILE as ENVIRONMENT_FILE };
 
 const MALFORMED_ENV = 'build-env-malformed';
 
@@ -39,7 +41,7 @@ function readEnvironment(root: string, file: string, required: boolean, diagnost
 
     if (source === null) {
         if (required) {
-            diagnostics.push(cliError(MISSING_ENV, `"${file}" is configured under "environment" but does not exist. Create it or remove the setting.`));
+            diagnostics.push(cliError(MISSING_ENV, `"${file}" is configured as "environment.secret" but does not exist. Create it or remove the setting.`));
         }
 
         return null;
@@ -69,11 +71,16 @@ function readConfiguration(root: string, diagnostics: CliDiagnostic[]): Resource
 }
 
 export function readProjectInputs(root: string, options: ProjectInputOptions): ProjectInputs {
-    const resolved = resolveAssets(root, options.assets, options.excluded ?? []);
+    const resolved = resolveFiles(root, options.files, options.excluded ?? []);
     const diagnostics: CliDiagnostic[] = [...resolved.diagnostics];
-    const base = readEnvironment(root, options.environment.file, options.environment.file !== DEFAULT_ENVIRONMENT_FILE, diagnostics);
-    const local = readEnvironment(root, options.environment.localFile, false, diagnostics);
-    const declared = base === null ? null : mergeEnvFiles(base, local ?? EMPTY_ENV_FILE);
+    const declared = readEnvironment(root, options.secret, options.secret !== DEFAULT_ENVIRONMENT_FILE, diagnostics);
 
-    return { configuration: readConfiguration(root, diagnostics), assets: resolved.assets, declared, deployed: base, diagnostics };
+    return {
+        configuration: readConfiguration(root, diagnostics),
+        assets: resolved.assets,
+        elements: resolved.elements,
+        declared,
+        deployed: declared,
+        diagnostics,
+    };
 }

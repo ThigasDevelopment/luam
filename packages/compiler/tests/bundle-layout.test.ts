@@ -10,7 +10,11 @@ describe('bundle resource layout', () => {
             { path: 'src/server/a.luam', source: "print('a')\n" },
             { path: 'src/server/z.luam', source: "print('z')\n" },
         ]);
-        const build = assembleResource(project, { layout: 'bundle', loadOrder: ['src/server/z.luam'] }).build;
+        const order = new Map([
+            ['src/server/z.luam', 0],
+            ['src/server/a.luam', 1],
+        ]);
+        const build = assembleResource(project, { resourceName: 'demo', layout: 'bundle', order }).build;
         const shared = build?.bundles.find((bundle) => bundle.environment === 'shared');
         const server = build?.bundles.find((bundle) => bundle.environment === 'server');
 
@@ -127,7 +131,7 @@ describe('bundle resource layout', () => {
         expect(bundled.diagnostics.map((entry) => entry.diagnostic.code)).toEqual(['project-bundle-toplevel-return']);
         expect(bundled.diagnostics[0]?.diagnostic.position.line).toBe(2);
         expect(bundled.diagnostics[0]?.diagnostic.message).toBe(
-            '"src/server/main.luam" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "output = { bundle = false }" in .luam.manifest.',
+            '"src/server/main.luam" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "build = { details = { bundle = false } }" in .luam.manifest.',
         );
     });
 

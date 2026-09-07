@@ -6,14 +6,15 @@ import { runCli } from '@cli/cli/run';
 import { EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
 
 import { createMemoryLogger } from './support/memory-logger';
-import { createProjectFixture, defaultProjectFiles, MANIFEST_FILE, manifestSource, type ProjectFixture } from './support/project-fixture';
+import { createProjectFixture, DEFAULT_SCRIPTS, defaultProjectFiles, MANIFEST_FILE, manifestSource, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 const OFFLINE = { LUAM_OFFLINE: '1' };
 
 const fixtures: ProjectFixture[] = [];
 
-function project(output: { bundle: boolean; map: boolean }, serverPath?: string): ProjectFixture {
-    const fixture = createProjectFixture(defaultProjectFiles({ output, ...(serverPath === undefined ? {} : { serverPath }) }));
+function project(details: { bundle: boolean; map: boolean }, serverPath?: string): ProjectFixture {
+    const files = defaultProjectFiles({ build: { details } });
+    const fixture = createProjectFixture(serverPath === undefined ? files : withWorkspace(files, serverPath));
 
     fixtures.push(fixture);
 
@@ -28,7 +29,7 @@ afterEach(() => {
 
 describe('bundle and map output', () => {
     it('uses config defaults and materializes helper bytes into bundles', async () => {
-        const fixture = createProjectFixture(defaultProjectFiles({ output: undefined }));
+        const fixture = createProjectFixture(defaultProjectFiles({ build: undefined }));
         const logger = createMemoryLogger();
 
         fixtures.push(fixture);
@@ -67,7 +68,7 @@ describe('bundle and map output', () => {
 
     it('uses fixed bundle paths for custom source directories and omits an empty client bundle', async () => {
         const fixture = createProjectFixture({
-            [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', sources: { server: ['code/server/**/*.luam'], client: ['code/client/**/*.luam'], shared: ['code/shared/**/*.luam'] }, output: { bundle: true, map: true } }),
+            [MANIFEST_FILE]: manifestSource({ scripts: [{ path: 'code/shared/**/*.luam', type: 'shared' }, { path: 'code/server/**/*.luam', type: 'server' }, { path: 'code/client/**/*.luam', type: 'client' }], build: { details: { bundle: true, map: true } } }),
             'code/shared/config.luam': "#!shared\nlocal name: string = 'demo'\n",
             'code/server/main.luam': '#!server\nprint(1)\n',
         });
@@ -115,7 +116,7 @@ describe('bundle and map output', () => {
         fixture.write('code/server/main.luam', `#!server\n${fixture.read('src/server/main.luam')}`);
         fixture.write('code/client/hud.luam', `#!client\n${fixture.read('src/client/hud.luam')}`);
         fixture.remove('src');
-        fixture.write(MANIFEST_FILE, manifestSource({ name: 'luam-demo', sources: { server: ['code/server/**/*.luam'], client: ['code/client/**/*.luam'], shared: ['code/shared/**/*.luam'] }, output: { bundle: false, map: true } }));
+        fixture.write(MANIFEST_FILE, manifestSource({ scripts: [{ path: 'code/shared/**/*.luam', type: 'shared' }, { path: 'code/server/**/*.luam', type: 'server' }, { path: 'code/client/**/*.luam', type: 'client' }], build: { details: { bundle: false, map: true } } }));
 
         await runCli(['build', '--bundle'], { cwd: fixture.root, env: OFFLINE, logger });
 
@@ -151,12 +152,12 @@ describe('bundle and map output', () => {
             name: 'authored output collision',
             source: '#!server\nprint(1)\n',
             path: 'src/server.luam',
-            sources: { server: ['src/*.luam'], client: [], shared: [] },
+            scripts: [{ path: 'src/*.luam', type: 'server' }],
             message: 'produces "src/server.lua", which is reserved for the server bundle. Rename the source output or build the tree layout with "--no-bundle".',
         },
-    ])('reports the $name and leaves no build output', async ({ message, path = 'src/server/main.luam', source, sources = undefined }) => {
+    ])('reports the $name and leaves no build output', async ({ message, path = 'src/server/main.luam', source, scripts = DEFAULT_SCRIPTS }) => {
         const fixture = createProjectFixture({
-            [MANIFEST_FILE]: manifestSource({ name: 'luam-demo', sources, output: { bundle: true, map: true } }),
+            [MANIFEST_FILE]: manifestSource({ scripts, build: { details: { bundle: true, map: true } } }),
             [path]: source,
         });
         const logger = createMemoryLogger();

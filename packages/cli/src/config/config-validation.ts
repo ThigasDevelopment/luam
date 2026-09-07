@@ -1,21 +1,23 @@
 import type { Diagnostic } from '@compiler/diagnostics/diagnostic';
 import {
-    readAssetMappings,
+    readAuthor,
+    readBuild,
     readCompilerOptions,
     readDependencies,
-    readEngine,
-    readEnvironmentFiles,
+    readEngineVersions,
+    readFiles,
     readLibraries,
-    readOutputSettings,
-    readSourceMapping,
+    readScripts,
+    readSecret,
+    type GroupBreaks,
 } from '@compiler/manifest/manifest-contract';
+import { DEFAULT_CONTRACTS_DIR } from '@compiler/manifest/manifest-defaults';
 import { DUPLICATE_LIBRARY, INVALID_DEPENDENCY } from '@compiler/manifest/manifest-diagnostics';
-import { readBoolean, readNumber, readString, readStrings, readTable } from '@compiler/manifest/manifest-readers';
+import { readString, readTable } from '@compiler/manifest/manifest-readers';
 import type { PositionLookup } from '@compiler/manifest/manifest-rules';
 import type { ManifestObject } from '@compiler/manifest/manifest-value';
-import { isRuntimeHelperName, type RuntimeHelperName } from '@runtime/helpers';
 
-import type { LuamConfig, DevelopmentConfig } from '@cli/config/config-schema';
+import type { LuamConfig, OrderedName } from '@cli/config/config-schema';
 import { ValidationContext } from '@cli/config/validation-context';
 
 export interface ValidatedConfig {
@@ -23,74 +25,66 @@ export interface ValidatedConfig {
     diagnostics: Diagnostic[];
 }
 
-const EMPTY: ManifestObject = {};
+const DUPLICATE_DEPENDENCY = 'config-duplicate-dependency';
 
-function readDevelopment(source: ManifestObject | null): DevelopmentConfig {
-    const logs = readTable(source ?? EMPTY, 'logs') ?? EMPTY;
-    const server = readTable(source ?? EMPTY, 'server') ?? EMPTY;
+function checkDependencies(name: string, dependencies: readonly OrderedName[], context: ValidationContext): void {
+    const seen = new Set<string>();
 
-    return {
-        logs: {
-            enabled: readBoolean(logs, 'enabled') ?? false,
-            maxMessageLength: readNumber(logs, 'maxMessageLength') ?? 0,
-            rateLimit: readNumber(logs, 'rateLimit') ?? 0,
-            rateWindowMs: readNumber(logs, 'rateWindowMs') ?? 0,
-        },
-        server: {
-            executable: readString(server, 'executable'),
-        },
-    };
-}
-
-function readHelpers(source: ManifestObject): RuntimeHelperName[] {
-    return [...new Set(readStrings(source, 'helpers').filter(isRuntimeHelperName))].sort();
-}
-
-function checkDependencies(name: string, dependencies: readonly string[], context: ValidationContext): void {
     for (const [index, dependency] of dependencies.entries()) {
-        if (dependency === name) {
-            context.error(INVALID_DEPENDENCY, `"dependencies" lists "${dependency}", which is this resource. Remove the entry.`, `dependencies.${index}`);
+        if (dependency.name === name) {
+            context.error(INVALID_DEPENDENCY, `"info.dependencies" lists "${dependency.name}", which is this resource. Remove the entry.`, `info.dependencies.${index}`);
         }
+
+        if (seen.has(dependency.name)) {
+            context.error(
+                DUPLICATE_DEPENDENCY,
+                `"info.dependencies" lists "${dependency.name}" more than once. Keep one entry, in the position it should load.`,
+                `info.dependencies.${index}`,
+            );
+        }
+
+        seen.add(dependency.name);
     }
 }
 
-function checkLibraries(libraries: readonly string[], context: ValidationContext): void {
+function checkLibraries(libraries: readonly OrderedName[], context: ValidationContext): void {
     const seen = new Set<string>();
 
     for (const [index, library] of libraries.entries()) {
-        if (seen.has(library)) {
-            context.error(DUPLICATE_LIBRARY, `"libraries" lists "${library}" more than once. Keep one entry.`, `libraries.${index}`);
+        if (seen.has(library.name)) {
+            context.error(DUPLICATE_LIBRARY, `"environment.libraries" lists "${library.name}" more than once. Keep one entry.`, `environment.libraries.${index}`);
         }
 
-        seen.add(library);
+        seen.add(library.name);
     }
 }
 
-export function validateConfig(value: ManifestObject, positions: PositionLookup): ValidatedConfig {
+function isWritten(positions: PositionLookup, key: string): boolean {
+    return positions.has(key);
+}
+
+export function validateConfig(name: string, value: ManifestObject, positions: PositionLookup, groups: GroupBreaks = new Set()): ValidatedConfig {
     const context = new ValidationContext(positions);
-    const name = readString(value, 'name') ?? '';
-    const dependencies = readDependencies(value);
-    const libraries = readLibraries(value);
+    const dependencies = readDependencies(value, groups);
+    const libraries = readLibraries(value, groups);
+    const build = readBuild(value);
+    const info = readTable(value, 'info') ?? {};
     const config: LuamConfig = {
         name,
-        author: readString(value, 'author'),
-        version: readString(value, 'version'),
-        description: readString(value, 'description'),
-        compilerOptions: readCompilerOptions(value),
-        sources: readSourceMapping(value),
-        assets: readAssetMappings(value),
+        author: readAuthor(value),
+        version: readString(info, 'version'),
+        description: readString(info, 'description'),
         dependencies,
+        secret: readSecret(value),
+        compilerOptions: readCompilerOptions(value),
+        oopDeclared: isWritten(positions, 'environment.oop'),
+        engine: readEngineVersions(value),
         libraries,
-        contracts: readString(value, 'contracts') ?? '',
-        engine: readEngine(value),
-        environment: readEnvironmentFiles(value),
-        outDir: readString(value, 'outDir') ?? '',
-        loadOrder: readStrings(value, 'loadOrder'),
-        helpers: readHelpers(value),
-        serverPath: readString(value, 'serverPath'),
-        resourcesDir: readString(value, 'resourcesDir') ?? '',
-        output: readOutputSettings(value),
-        development: readDevelopment(readTable(value, 'development')),
+        scripts: readScripts(value, groups),
+        files: readFiles(value, groups),
+        contracts: DEFAULT_CONTRACTS_DIR,
+        outDir: build.output,
+        output: build.details,
     };
 
     checkDependencies(name, dependencies, context);

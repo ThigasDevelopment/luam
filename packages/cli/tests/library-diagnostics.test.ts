@@ -191,14 +191,14 @@ describe('library diagnostics', () => {
         expect(result.built).toBe(true);
     });
 
-    it('reports a "loadOrder" entry that names a library file', () => {
+    it('refuses a "scripts" entry that names the vendored library directory', () => {
         const result = compileFixture({
-            ...consumerFiles([ASYNC], { loadOrder: [`${ASYNC}/src/async.luam`] }),
+            ...consumerFiles([ASYNC], { scripts: [{ path: 'libs/**/*.luam', type: 'shared' }] }),
             ...asyncPackage(),
             'src/shared/main.luam': "function report(): string\n    return 'plain'\nend\n",
             'src/client/hud.luam': "dxDrawText('hud', 10, 10)\n",
         });
 
-        expect(codes(result.diagnostics)).toContain('project-load-order-library');
+        expect(result.built).toBe(false);
     });
 });

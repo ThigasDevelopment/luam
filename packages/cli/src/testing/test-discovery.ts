@@ -4,9 +4,9 @@ import { resolve } from 'node:path';
 import { listProjectFiles } from '@cli/build/project-files';
 import { cliError, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
 import type { Environment } from '@compiler/environment/environment';
-import type { SourceMapping } from '@compiler/manifest/manifest-contract';
+import type { ScriptEntry } from '@compiler/manifest/manifest-contract';
 import type { ProjectFile } from '@compiler/project/module';
-import { createSourceResolver, describeMatches } from '@compiler/project/source-mapping';
+import { createScriptResolver, describeMatches } from '@compiler/project/source-mapping';
 import { isTestPath, TEST_EXTENSION } from '@compiler/project/source-kind';
 
 export interface DiscoveredTests {
@@ -30,8 +30,8 @@ function readTest(root: string, path: string, diagnostics: CliDiagnostic[]): str
     }
 }
 
-export function discoverTests(root: string, sources: SourceMapping, excluded: readonly string[] = []): DiscoveredTests {
-    const resolver = createSourceResolver(sources);
+export function discoverTests(root: string, sources: readonly ScriptEntry[], excluded: readonly string[] = []): DiscoveredTests {
+    const resolver = createScriptResolver(sources);
     const tree = listProjectFiles(root, ['.'], excluded);
     const diagnostics = tree.errors.map((message) => cliError(UNREADABLE_TEST, message));
     const files: ProjectFile[] = [];

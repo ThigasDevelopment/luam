@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { SESSION_VERBS } from '@cli/session/session-commands';
 
+import { DEFAULT_SCRIPTS, manifestSource } from './support/project-fixture';
 import { openSessionDriver, type SessionDriver } from './support/session-driver';
 
 const drivers: SessionDriver[] = [];
@@ -145,40 +146,6 @@ describe('ensure', () => {
     });
 });
 
-describe('a resource whose directory and manifest names differ', () => {
-    it('starts the name it deployed under, not the directory name', async () => {
-        const driver = open();
-
-        driver.fixture.write(
-            'resource-a/.luam.manifest',
-            "name = 'deployed-name'\noutput = {\n    bundle = false,\n    map = true,\n}\n",
-        );
-        await driver.type('ensure resource-a');
-
-        expect(driver.deployed('deployed-name')).toBe(true);
-        expect(driver.deployed('resource-a')).toBe(false);
-        expect(driver.console).toEqual(['refresh', 'start deployed-name']);
-        expect(driver.logger.text()).toContain('which deploys as "deployed-name"');
-    });
-
-    it('restarts under the deployed name and attributes its log records to it', async () => {
-        const driver = open();
-
-        driver.fixture.write(
-            'resource-a/.luam.manifest',
-            "name = 'deployed-name'\noutput = {\n    bundle = false,\n    map = true,\n}\n",
-        );
-        await driver.type('ensure resource-a');
-        driver.fixture.write('resource-a/src/client/hud.luam', "dxDrawText('changed', 1, 1)\n");
-        driver.console.splice(0);
-        await driver.type('rebuild resource-a');
-
-        expect(driver.console).toEqual(['refresh', 'stop deployed-name', 'start deployed-name']);
-        expect([...driver.session.attached]).toEqual(['resource-a']);
-        expect([...driver.session.deployed]).toEqual(['deployed-name']);
-    });
-});
-
 describe('the list of resources', () => {
     it('sees a resource created after the session opened', async () => {
         const driver = open();
@@ -187,7 +154,7 @@ describe('the list of resources', () => {
 
         expect(driver.logger.errors.join('\n')).toContain('is not a resource of the workspace');
 
-        driver.fixture.write('resource-c/.luam.manifest', "name = 'resource-c'\noutput = {\n    bundle = false,\n    map = true,\n}\n");
+        driver.fixture.write('resource-c/.luam.manifest', manifestSource({ scripts: DEFAULT_SCRIPTS, build: { details: { bundle: false, map: true } } }));
         driver.fixture.write('resource-c/src/server/main.luam', "outputChatBox('c', root)\n");
         driver.logger.errors.splice(0);
         await driver.type('ensure resource-c');

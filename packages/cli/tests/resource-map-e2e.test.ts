@@ -20,7 +20,10 @@ afterEach(() => {
 describe('built resource maps', () => {
     it.each<OutputLayout>(['tree', 'bundle'])('resolves an authored line and enclosing symbol in the %s layout', async (layout) => {
         const fixture = createProjectFixture({
-            [MANIFEST_FILE]: manifestSource({ name: 'demo', output: { bundle: layout === 'bundle', map: true } }),
+            [MANIFEST_FILE]: manifestSource({
+                scripts: [{ path: 'src/server/**/*.luam', type: 'server' }],
+                build: { details: { bundle: layout === 'bundle', map: true } },
+            }),
             'src/server/main.luam': ['function announce(): void', "    print('ready')", 'end', ''].join('\n'),
         });
 
@@ -28,7 +31,7 @@ describe('built resource maps', () => {
 
         expect(await runCli(['build'], { cwd: fixture.root, env: OFFLINE, logger: createMemoryLogger() })).toBe(EXIT_OK);
 
-        const map = JSON.parse(fixture.read('build/demo.luam-map.json')) as ResourceMap;
+        const map = JSON.parse(fixture.read('build/luam-demo.luam-map.json')) as ResourceMap;
         const file = map.files.find((entry) => entry.segments.some((segment) => segment.source === 'src/server/main.luam'));
         const segment = file?.segments.find((entry) => entry.source === 'src/server/main.luam');
         const mapping = segment?.lines.find((entry) => entry.symbol === 'announce');

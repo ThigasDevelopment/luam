@@ -1,18 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`resource assembly > generates a manifest that matches the authored standard 1`] = `
-"<meta>
-    <!-- Resource information -->
+"<luam-demo>
+    <!-- INFO -->
     <info author="Thigas" type="script" version="1.0.0" />
-    <!-- Runtime library -->
+    <!-- SCRIPTS -->
     <script src="lib/class.lua" type="shared" cache="false" />
     <script src="lib/string.lua" type="client" cache="false" />
     <script src="lib/table.lua" type="shared" cache="false" />
-    <!-- Source scripts -->
     <script src="src/shared/**/*.lua" type="shared" cache="false" />
     <script src="src/server/**/*.lua" />
     <script src="src/client/**/*.lua" type="client" cache="false" />
-</meta>
+</luam-demo>
 "
 `;
 

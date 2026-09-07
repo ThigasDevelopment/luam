@@ -419,7 +419,6 @@
             "scope": [
                 "variable.other.luam",
                 "variable.other.luam-manifest",
-                "variable.other.readwrite.luam-manifest",
                 "variable",
                 "variable.other",
                 "source"
@@ -453,7 +452,6 @@
                 "storage.type.declare.luam",
                 "storage.type.constructor.luam",
                 "keyword.operator.new.luam",
-                "storage.modifier.local.luam-manifest",
                 "keyword.control.await.luam",
                 "keyword",
                 "keyword.control",

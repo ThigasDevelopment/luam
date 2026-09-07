@@ -1,14 +1,27 @@
-name = 'microservice'
-author = 'Luam'
-version = '1.0.0'
-description = 'A request and response bus that crosses an event with a promise.'
+{
+    info = {
+        author = { name = 'Luam' },
 
-compiler = {
-    strict = true,
-    oop = false,
-}
+        version = '1.0.0',
+        description = 'A request and response bus that crosses an event with a promise.',
+    },
 
-output = {
-    bundle = false,
-    map = true,
+    environment = {
+        oop = false,
+        strict = true,
+    },
+
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    build = {
+        details = {
+            bundle = false,
+            map = true,
+        },
+    },
 }

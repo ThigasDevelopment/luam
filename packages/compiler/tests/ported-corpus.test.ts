@@ -66,7 +66,15 @@ describe('the ported resource corpus', () => {
     });
 
     it('generates a manifest naming every module on its side', () => {
-        const assembly = assembleResource(project, { author: 'Luam', version: '1.0.0' });
+        const assembly = assembleResource(project, {
+            resourceName: 'ported-resource',
+            info: { author: { name: 'Luam', extra: [] }, version: '1.0.0', description: null },
+            scripts: [
+                { src: 'src/shared/**/*.lua', environment: 'shared', group: false },
+                { src: 'src/server/**/*.lua', environment: 'server', group: false },
+                { src: 'src/client/**/*.lua', environment: 'client', group: false },
+            ],
+        });
 
         expect(assembly.build?.manifest).toContain('<script src="src/shared/**/*.lua" type="shared" cache="false" />');
         expect(assembly.build?.manifest).toContain('type="client"');

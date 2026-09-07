@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_RESOURCES_DIR } from '@compiler/manifest/manifest-defaults';
 import type { ConfigFileSystem } from '@compiler/project/config-file-system';
 import { discoverResources, findServerFile, readServerFile, type WorkspaceFileSystem } from '@compiler/workspace/workspace-discovery';
-import { DEFAULT_SERVER_LOGS, isServerFilePath, SERVER_FIELD_NAMES } from '@compiler/workspace/workspace-fields';
+import { isServerFilePath, SERVER_FIELD_NAMES } from '@compiler/workspace/workspace-fields';
 import { analyzeServerFile } from '@compiler/workspace/workspace-file';
 
 const MINIMAL = "serverPath = 'server'\n";
@@ -51,7 +51,6 @@ describe('the server file', () => {
             serverPath: 'server',
             resourcesDir: DEFAULT_RESOURCES_DIR,
             executable: null,
-            logs: DEFAULT_SERVER_LOGS,
         });
     });
 
@@ -60,7 +59,6 @@ describe('the server file', () => {
             "serverPath = '/opt/mta'",
             "resourcesDir = 'mods/deathmatch/resources/[luam]'",
             "executable = 'bin/mta-server64'",
-            'logs = { enabled = true, maxMessageLength = 512, rateLimit = 5, rateWindowMs = 250 }',
         ].join('\n');
         const result = analysis(source);
 
@@ -69,7 +67,6 @@ describe('the server file', () => {
             serverPath: '/opt/mta',
             resourcesDir: 'mods/deathmatch/resources/[luam]',
             executable: 'bin/mta-server64',
-            logs: { enabled: true, maxMessageLength: 512, rateLimit: 5, rateWindowMs: 250 },
         });
     });
 
@@ -93,8 +90,7 @@ describe('the server file', () => {
 
         expect(diagnostic?.code).toBe('server-invalid-value');
         expect(diagnostic?.position.line).toBe(1);
-        expect(codes(`${MINIMAL}logs = { enabled = 'yes' }\n`)).toEqual(['server-invalid-value']);
-        expect(codes(`${MINIMAL}logs = { rateLimit = 0 }\n`)).toEqual(['server-invalid-value']);
+        expect(codes(`${MINIMAL}resourcesDir = 3\n`)).toEqual(['server-invalid-value']);
     });
 
     it('keeps a path inside its boundary', () => {

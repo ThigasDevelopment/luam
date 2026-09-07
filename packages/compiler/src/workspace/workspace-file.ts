@@ -2,11 +2,11 @@ import { createPosition, type Diagnostic } from '@compiler/diagnostics/diagnosti
 import { analyzeManifest, type ManifestSchema } from '@compiler/manifest/manifest-analysis';
 import { manifestError, MISSING_FIELD, UNKNOWN_FIELD } from '@compiler/manifest/manifest-diagnostics';
 import { normalizeFields, type PositionLookup } from '@compiler/manifest/manifest-rules';
-import { readBoolean, readNumber, readString, readTable } from '@compiler/manifest/manifest-readers';
+import { readString } from '@compiler/manifest/manifest-readers';
 import type { ManifestField } from '@compiler/manifest/manifest-field';
 import type { ManifestObject } from '@compiler/manifest/manifest-value';
 
-import { DEFAULT_SERVER_LOGS, SERVER_FIELDS, SERVER_FIELD_NAMES, SERVER_FILE_NAME, type ServerLogsSettings } from './workspace-fields';
+import { SERVER_FIELDS, SERVER_FIELD_NAMES, SERVER_FILE_NAME } from './workspace-fields';
 
 export const SERVER_UNKNOWN_FIELD = 'server-unknown-field';
 
@@ -18,7 +18,6 @@ export interface ServerFileSettings {
     serverPath: string;
     resourcesDir: string;
     executable: string | null;
-    logs: ServerLogsSettings;
 }
 
 export interface ServerFileAnalysis {
@@ -62,17 +61,6 @@ export const SERVER_SCHEMA: ManifestSchema = {
     missingName: missingFieldMessage,
 };
 
-function readLogs(source: ManifestObject | null): ServerLogsSettings {
-    const logs = source ?? {};
-
-    return {
-        enabled: readBoolean(logs, 'enabled') ?? DEFAULT_SERVER_LOGS.enabled,
-        maxMessageLength: readNumber(logs, 'maxMessageLength') ?? DEFAULT_SERVER_LOGS.maxMessageLength,
-        rateLimit: readNumber(logs, 'rateLimit') ?? DEFAULT_SERVER_LOGS.rateLimit,
-        rateWindowMs: readNumber(logs, 'rateWindowMs') ?? DEFAULT_SERVER_LOGS.rateWindowMs,
-    };
-}
-
 export function analyzeServerFile(source: string, root: string): ServerFileAnalysis {
     const analysis = analyzeManifest(source, { mode: SERVER_MODE, root, env: {} }, SERVER_SCHEMA);
     const value = analysis.value;
@@ -82,7 +70,6 @@ export function analyzeServerFile(source: string, root: string): ServerFileAnaly
             serverPath: readString(value, 'serverPath') ?? '',
             resourcesDir: readString(value, 'resourcesDir') ?? '',
             executable: readString(value, 'executable'),
-            logs: readLogs(readTable(value, 'logs')),
         },
         positions: analysis.positions,
         diagnostics: analysis.diagnostics,

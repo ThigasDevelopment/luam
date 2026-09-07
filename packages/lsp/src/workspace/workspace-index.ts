@@ -67,6 +67,7 @@ export class WorkspaceIndex {
             text,
             project: isTestPath(relative) ? { globals: [...scope.project.globals, ...TEST_DECLARATIONS] } : scope.project,
             env: scope.env,
+            installedLibraries: scope.installedLibraries,
             compilerOptions: scope.settings.compilerOptions,
             environment: library === null ? scope.settings.resolver.side(relative) : library.environment,
             environmentLocked: library !== null,
@@ -183,7 +184,7 @@ export class WorkspaceIndex {
     }
 
     isEnvironmentFile(path: string): boolean {
-        return isEnvironmentPath(path, this.scopeFor(path).settings.environment);
+        return isEnvironmentPath(path, this.scopeFor(path).settings.secret);
     }
 
     remove(uri: string): void {

@@ -3,7 +3,7 @@ import { dirname } from 'node:path';
 import { EMPTY_PROJECT_DECLARATIONS, type ProjectDeclarations } from '@compiler/checker/project-declarations';
 
 import { normalizeFsPath, pathKey } from './document-uri';
-import { EMPTY_LIBRARY_INDEX, loadLibraries, type LibraryIndex } from './library-index';
+import { EMPTY_LIBRARY_INDEX, installedLibraryNames, loadLibraries, type LibraryIndex } from './library-index';
 import { loadProjectDeclarations, loadProjectEnvironment } from './project-environment';
 import { DEFAULT_PROJECT_SETTINGS, settingsKey, type ProjectSettings } from './project-settings';
 
@@ -16,6 +16,7 @@ export interface ProjectScope {
     project: ProjectDeclarations;
     env: Readonly<Record<string, string>>;
     libraries: LibraryIndex;
+    installedLibraries: readonly string[];
     signature: string;
 }
 
@@ -35,9 +36,10 @@ export function createProjectScope(key: string, roots: readonly string[], settin
         key,
         roots,
         settings,
-        project: roots.length === 0 ? EMPTY_PROJECT_DECLARATIONS : loadProjectDeclarations(roots, settings.environment),
-        env: roots.length === 0 ? {} : loadProjectEnvironment(roots, settings.environment),
+        project: roots.length === 0 ? EMPTY_PROJECT_DECLARATIONS : loadProjectDeclarations(roots, settings.secret),
+        env: roots.length === 0 ? {} : loadProjectEnvironment(roots, settings.secret),
         libraries,
+        installedLibraries: owner === undefined ? [] : installedLibraryNames(owner),
         signature: scopeSignature(settings, roots),
     };
 }

@@ -270,7 +270,7 @@ describe('project settings', () => {
     }
 
     it('reads the oop flag from the manifest', () => {
-        expect(oopOf("name = 'demo'\ncompiler = { oop = true }\n")).toBe(true);
+        expect(oopOf('{ environment = { oop = true } }\n')).toBe(true);
         expect(oopOf("name = 'demo'\ncompiler = { oop = false }\n")).toBe(false);
     });
 

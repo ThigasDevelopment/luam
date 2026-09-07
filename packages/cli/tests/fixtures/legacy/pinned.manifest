@@ -1,0 +1,15 @@
+name = 'luam-demo'
+
+compiler = { oop = true }
+
+sources = {
+    shared = { 'src/shared/**/*.luam' },
+    server = { 'src/server/**/*.luam' },
+    client = { 'src/client/**/*.luam' },
+}
+
+loadOrder = { 'src/server/main.luam' }
+
+environment = { file = '.env' }
+
+output = { bundle = false, map = false }

@@ -10,7 +10,7 @@ import { runCli } from '@cli/cli/run';
 
 import { createMemoryLogger } from './support/memory-logger';
 import { parsesAsLua51, tokenTexts } from './support/lua-check';
-import { BROKEN_SERVER, createProjectFixture, DEFAULT_ASSETS, defaultProjectFiles, type ProjectFixture } from './support/project-fixture';
+import { BROKEN_SERVER, createProjectFixture, DEFAULT_FILES, defaultProjectFiles, withWorkspace, type ProjectFixture } from './support/project-fixture';
 
 import type { ResourceBuild } from '@compiler/project/resource';
 
@@ -24,12 +24,12 @@ const fixtures: ProjectFixture[] = [];
 
 function projectFiles(bundle: boolean): Record<string, string> {
     return {
-        ...defaultProjectFiles({
-            assets: DEFAULT_ASSETS,
-            serverPath: 'mta-server',
-            output: { bundle, map: true },
-            loadOrder: ['src/shared/config.luam'],
-        }),
+        ...withWorkspace(
+            defaultProjectFiles({
+                files: DEFAULT_FILES,
+                build: { details: { bundle, map: true } },
+            }),
+        ),
         'config.lua': 'Config = { greeting = "hi" } -- authored\n',
         '.env': 'TOKEN=secret\n',
         [ASSET]: 'binary-bytes\n',
@@ -204,6 +204,7 @@ describe('production output', () => {
         const broken: ResourceBuild = {
             manifest: '<meta />\n',
             scripts: [{ path: 'src/server.lua', source: 'src/server.luam', environment: 'server', content: 'local s = "open\n', lines: [] }],
+            natives: [],
             helpers: [],
             configuration: null,
 

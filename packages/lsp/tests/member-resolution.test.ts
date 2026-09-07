@@ -124,7 +124,7 @@ describe('member resolution under a name collision', () => {
 
     it('resolves a member of an MTA element past a colliding field', () => {
         const source = ['class Label {', '    getName: string', '}', '', "local player = getPlayerFromName('bob')", 'local who = player:getName()'].join('\n');
-        const root = createWorkspace({ '.luam.manifest': "name = 'demo'\ncompiler = { oop = true }\n", [SERVER_PATH]: source });
+        const root = createWorkspace({ '.luam.manifest': '{ environment = { oop = true } }\n', [SERVER_PATH]: source });
         const service = new LanguageService();
 
         roots.push(root);

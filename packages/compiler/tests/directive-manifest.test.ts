@@ -30,12 +30,20 @@ function readProject(name: string): ProjectFile[] {
     return files.sort((left, right) => left.path.localeCompare(right.path));
 }
 
+const SCRIPTS = [
+    { src: 'src/shared/**/*.lua', environment: 'shared' as const, group: false },
+    { src: 'src/server/**/*.lua', environment: 'server' as const, group: false },
+    { src: 'src/client/**/*.lua', environment: 'client' as const, group: false },
+];
+
 function manifestOf(files: readonly ProjectFile[], assets: readonly ResourceAsset[] = []): string {
     const project = compileProject(files);
 
     expect(project.diagnostics).toEqual([]);
 
-    const assembly = assembleResource(project, { assets });
+    const list = assets.map((asset) => ({ src: asset.path, group: false }));
+    const order = new Map(project.modules.map((module, index) => [module.path, index]));
+    const assembly = assembleResource(project, { resourceName: 'directives', scripts: SCRIPTS, assets, files: list, order });
 
     expect(assembly.build).not.toBeNull();
 
@@ -66,7 +74,7 @@ describe('directive manifest', () => {
     });
 
     it('orders info, scripts, exports, and files', () => {
-        expect(elements(manifestOf(files, [LOGO]))).toEqual(['meta', 'info', 'script', 'script', 'script', 'export', 'export', 'export', 'file']);
+        expect(elements(manifestOf(files, [LOGO]))).toEqual(['directives', 'info', 'script', 'script', 'script', 'file', 'export', 'export', 'export']);
     });
 
     it('types an export by the environment of its file', () => {

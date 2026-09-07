@@ -41,7 +41,7 @@ function corpusFiles(name: string): Record<string, string> {
 }
 
 function harness(name: string): Harness {
-    const fixture = createProjectFixture(corpusFiles(name));
+    const fixture = createProjectFixture(corpusFiles(name), { resource: name });
     const logger = createMemoryLogger();
     const config = loadManifest(fixture.root).config;
 

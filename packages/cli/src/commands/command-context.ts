@@ -1,12 +1,12 @@
-import type { MtaVersion } from '@cli/build/mta-release';
+import { resolveEngineVersions, type MtaVersionPair } from '@cli/build/mta-release';
 import type { LuamConfig } from '@cli/config/config-schema';
-import { manifestDeployment, type DeploymentSettings } from '@cli/config/deployment';
+import { emptyDeployment, type DeploymentSettings } from '@cli/config/deployment';
 import type { Logger } from '@cli/reporting/logger';
 import { createReporter, type Reporter } from '@cli/reporting/reporter';
 
-export type VersionResolver = () => Promise<MtaVersion>;
+export type VersionResolver = () => Promise<MtaVersionPair>;
 
-export const NO_VERSION: MtaVersion = { version: null, warning: null };
+export const NO_VERSION: MtaVersionPair = { server: null, client: null, warning: null };
 
 export interface CommandContext {
     root: string;
@@ -18,13 +18,13 @@ export interface CommandContext {
 }
 
 export function commandDeployment(context: CommandContext): DeploymentSettings {
-    return context.deployment ?? manifestDeployment(context.root, context.config);
+    return context.deployment ?? emptyDeployment();
 }
 
 export function commandReporter(context: CommandContext): Reporter {
     return context.reporter ?? createReporter(context.logger);
 }
 
-export async function commandVersion(context: CommandContext): Promise<MtaVersion> {
-    return context.resolveVersion === undefined ? NO_VERSION : context.resolveVersion();
+export async function commandVersion(context: CommandContext): Promise<MtaVersionPair> {
+    return context.resolveVersion === undefined ? resolveEngineVersions(context.root, context.config.engine, { skip: true }) : context.resolveVersion();
 }

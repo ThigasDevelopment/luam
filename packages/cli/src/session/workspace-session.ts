@@ -16,7 +16,6 @@ export type AttachedOutcome = 'pending' | 'built' | 'failed';
 
 export interface AttachedResource {
     name: string;
-    deployedName: string;
     context: CommandContext;
     runner: EnsureRunner;
     watcher: SourceWatcher;
@@ -35,7 +34,6 @@ export interface WorkspaceSessionOptions {
     reporter: Reporter;
     serverConsole: ServerConsole;
     loadResource: SessionResourceLoader;
-    developmentLogs?: CommandContext['config']['development']['logs'] | null;
     now?: (() => Date) | undefined;
 }
 
@@ -89,7 +87,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
         }
 
         const first = !entry.started;
-        const written = first ? options.serverConsole.start(entry.deployedName) : options.serverConsole.restart(entry.deployedName);
+        const written = first ? options.serverConsole.start(entry.name) : options.serverConsole.restart(entry.name);
 
         if (!written.ok) {
             reporter.error(`${first ? 'Start' : 'Restart'} failed: ${written.message}`);
@@ -98,7 +96,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
         }
 
         entry.started = true;
-        reporter.success(`${first ? 'Started' : 'Restarted'} "${entry.deployedName}" through the owned server console.`);
+        reporter.success(`${first ? 'Started' : 'Restarted'} "${entry.name}" through the owned server console.`);
     };
     const cycle = async (entry: AttachedResource): Promise<void> => {
         if (!existsSync(entry.context.root)) {
@@ -163,15 +161,13 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
 
         const entry: AttachedResource = {
             name,
-            deployedName: context.config.name,
             context,
             runner: createEnsureRunner(context, {
                 serverConsole: null,
-                developmentLogs: options.developmentLogs ?? null,
                 layout: 'tree',
                 map: context.config.output.map,
             }),
-            watcher: watchSources(context.root, context.config.sources, () => {
+            watcher: watchSources(context.root, context.config.scripts, () => {
                 void schedule(name, true);
             }),
             started: false,
@@ -211,7 +207,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
             return;
         }
 
-        reporter.info(name === entry.deployedName ? `Attached "${name}" and watching it for changes.` : `Attached "${name}", which deploys as "${entry.deployedName}", and watching it for changes.`);
+        reporter.info(`Attached "${name}" and watching it for changes.`);
         await schedule(name, false);
     };
     const drop = (name: string | undefined): void => {
@@ -322,7 +318,7 @@ export function createWorkspaceSession(options: WorkspaceSessionOptions): Worksp
             return new Set(attached.keys());
         },
         get deployed(): ReadonlySet<string> {
-            return new Set([...attached.values()].map((entry) => entry.deployedName));
+            return new Set([...attached.values()].map((entry) => entry.name));
         },
         reportOpening: (): void => {
             reporter.info(NOTHING_ATTACHED);

@@ -28,6 +28,16 @@ export const INVALID_ENGINE_VERSION = 'config-invalid-engine-version';
 
 export const REMOVED_FIELD = 'config-removed-field';
 
+export const UNIMPLEMENTED_OPTION = 'config-unimplemented-option';
+
+export const DUPLICATE_FIELD = 'config-duplicate-field';
+
+export const NOT_A_TABLE = 'config-manifest-not-a-table';
+
+export const TRAILING_CONTENT = 'config-trailing-content';
+
+export const UNEXPECTED_STATEMENT = 'config-unexpected-statement';
+
 export const ALLOWED_STATEMENTS = 'A manifest holds only "local" declarations and assignments to configuration fields.';
 
 export const ALLOWED_EXPRESSIONS = 'A manifest value is a literal, a table, or those combined with "and", "or", "not", comparison, arithmetic, and concatenation.';

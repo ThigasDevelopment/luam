@@ -9,26 +9,42 @@ export interface CompilerOptions {
     warningsAsErrors: boolean;
 }
 
-export type SourceMapping = Readonly<Record<Environment, readonly string[]>>;
-
-export interface AssetMapping {
-    from: string;
-    to: string;
+export interface ScriptEntry {
+    path: string;
+    type: Environment;
+    group: boolean;
 }
 
-export interface EngineRequirement {
-    minVersion: string;
+export interface FileEntry {
+    path: string;
+    group: boolean;
 }
 
-export interface EnvironmentFiles {
-    file: string;
-    localFile: string;
+export interface OrderedName {
+    name: string;
+    group: boolean;
 }
 
-export interface OutputSettings {
+export interface AuthorInfo {
+    name: string;
+    extra: readonly (readonly [string, string])[];
+}
+
+export interface EngineVersions {
+    server: string;
+    client: string;
+}
+
+export interface BuildDetails {
     bundle: boolean;
     map: boolean;
     minify: boolean;
+    obfuscate: boolean;
+}
+
+export interface BuildSettings {
+    output: string;
+    details: BuildDetails;
 }
 
 export const MANIFEST_FILE_NAME = '.luam.manifest';
@@ -37,15 +53,13 @@ export const LATEST_ENGINE_VERSION = 'latest';
 
 export const DEFAULT_ENVIRONMENT_FILE = '.env';
 
-export const DEFAULT_LOCAL_ENVIRONMENT_FILE = '.env.local';
-
-export const DEFAULT_ASSET_DESTINATION = '.';
-
 export const DEFAULT_OUT_DIR = 'build';
 
 export const DEFAULT_CONTRACTS_DIR = '.luam/contracts';
 
 export const DEFAULT_RESOURCES_DIR = 'mods/deathmatch/resources';
+
+export const SCRIPT_SIDES: readonly Environment[] = ALL_ENVIRONMENTS;
 
 export const DEFAULT_COMPILER_OPTIONS: CompilerOptions = {
     strict: true,
@@ -56,24 +70,16 @@ export const DEFAULT_COMPILER_OPTIONS: CompilerOptions = {
     warningsAsErrors: false,
 };
 
-export const DEFAULT_SOURCE_MAPPING: SourceMapping = {
-    server: ['src/server/**/*.luam'],
-    client: ['src/client/**/*.luam'],
-    shared: ['src/shared/**/*.luam'],
-};
+export const DEFAULT_ENGINE_VERSIONS: EngineVersions = { server: LATEST_ENGINE_VERSION, client: LATEST_ENGINE_VERSION };
 
-export const DEFAULT_ENGINE: EngineRequirement = { minVersion: LATEST_ENGINE_VERSION };
+export const DEFAULT_BUILD_DETAILS: BuildDetails = { bundle: true, map: true, minify: true, obfuscate: false };
 
-export const DEFAULT_ENVIRONMENT_FILES: EnvironmentFiles = { file: DEFAULT_ENVIRONMENT_FILE, localFile: DEFAULT_LOCAL_ENVIRONMENT_FILE };
-
-export const DEFAULT_OUTPUT: OutputSettings = { bundle: true, map: true, minify: true };
-
-export const SOURCE_SIDES: readonly Environment[] = ALL_ENVIRONMENTS;
+export const DEFAULT_BUILD: BuildSettings = { output: DEFAULT_OUT_DIR, details: DEFAULT_BUILD_DETAILS };
 
 export function compilerOptions(overrides: Partial<CompilerOptions> = {}): CompilerOptions {
     return { ...DEFAULT_COMPILER_OPTIONS, ...overrides };
 }
 
-export function emptySourceMapping(): Record<Environment, string[]> {
-    return { server: [], client: [], shared: [] };
+export function isScriptSide(value: string): value is Environment {
+    return (SCRIPT_SIDES as readonly string[]).includes(value);
 }

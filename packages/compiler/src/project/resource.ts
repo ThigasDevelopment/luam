@@ -1,20 +1,26 @@
 import { collectBundles, type ResourceBundle } from './bundle-layout';
-import type { LibraryFile } from './library';
-import { generateManifest, type ManifestContribution, type ManifestFile, type ManifestScript } from './manifest';
+import { libraryDirectory, LIBRARIES_DIRECTORY, type LibraryFile } from './library';
+import {
+    generateManifest,
+    type GeneratedManifest,
+    type ManifestContribution,
+    type ManifestEnvironment,
+    type ManifestFile,
+    type ManifestInclude,
+    type ManifestInfo,
+    type ManifestScript,
+} from './manifest';
 import { sortFileDiagnostics, type FileDiagnostic, type ProjectResult } from './module';
 import type { AssemblyReporter } from './progress';
 import {
     collectHelpers,
-    collectDevelopmentLogHelpers,
     collectLibraryScripts,
     collectScripts,
     findDuplicateOutputs,
-    resolveLoadOrder,
-    sourceEntries,
     type ResourceAsset,
-    type DevelopmentLogHelpers,
     type ResourceHelper,
     type ResourceScript,
+    type ScriptOrder,
 } from './resource-layout';
 import { RESOURCE_MAP_VERSION, type OutputLayout, type ResourceMap } from './resource-map';
 
@@ -23,7 +29,7 @@ import { FILE_START } from '@compiler/environment/environment';
 
 import type { RuntimeHelperName } from '@runtime/helpers';
 
-export { LIBRARY_DIRECTORY, libraryPath, outputPath, type ResourceAsset, type ResourceHelper, type ResourceScript } from './resource-layout';
+export { LIBRARY_DIRECTORY, libraryPath, outputPath, type ResourceAsset, type ResourceHelper, type ResourceScript, type ScriptOrder } from './resource-layout';
 export {
     LIBRARIES_DIRECTORY,
     libraryDirectory,
@@ -54,26 +60,27 @@ export interface ResourceConfiguration {
 }
 
 export interface ResourceOptions {
-    author?: string;
-    version?: string;
-    description?: string;
-    oop?: boolean;
-    dependencies?: readonly string[];
+    resourceName?: string;
+    info?: ManifestInfo;
+    includes?: readonly ManifestInclude[];
+    environment?: ManifestEnvironment;
+    scripts?: readonly ManifestScript[];
+    files?: readonly ManifestFile[];
+    order?: ScriptOrder;
+    libraries?: readonly LibraryGroup[];
+    natives?: readonly ResourceScript[];
     helpers?: readonly RuntimeHelperName[];
     assets?: readonly ResourceAsset[];
     configuration?: ResourceConfiguration | null;
     environmentFile?: string | null;
-    loadOrder?: readonly string[];
     libraryFiles?: readonly LibraryFile[];
-    minMtaVersion?: string | null;
-    developmentLogs?: DevelopmentLogHelpers | null;
     layout?: OutputLayout;
-    resourceName?: string;
 }
 
 export interface ResourceBuild {
     manifest: string;
     scripts: ResourceScript[];
+    natives: ResourceScript[];
     helpers: ResourceHelper[];
     configuration: ResourceScript | null;
     assets: ResourceAsset[];
@@ -93,10 +100,14 @@ export const ENVIRONMENT_FILE = '.env';
 
 export const ENVIRONMENT_FILE_PLACEHOLDER = '__LUAM_ENV_FILE__';
 
-type ResourceInfo = { author?: string; version?: string; description?: string };
+export const DEFAULT_RESOURCE_ELEMENT = 'meta';
 
-function configurationScript(configuration: ResourceConfiguration | null | undefined): ResourceScript | null {
-    if (configuration === null || configuration === undefined) {
+export const EMPTY_INFO: ManifestInfo = { author: null, version: null, description: null };
+
+export const EMPTY_ENVIRONMENT: ManifestEnvironment = { oop: null, minServerVersion: null, minClientVersion: null };
+
+function configurationScript(configuration: ResourceConfiguration | null | undefined, natives: readonly ResourceScript[]): ResourceScript | null {
+    if (configuration === null || configuration === undefined || natives.some((native) => native.path === configuration.path)) {
         return null;
     }
 
@@ -109,51 +120,53 @@ function withEnvironmentFile(helpers: readonly ResourceHelper[], file: string | 
     );
 }
 
-function helperEntry(helper: ResourceHelper): ManifestScript {
-    return { src: helper.path, environment: helper.environment, group: 'library' };
+export interface LibraryGroup {
+    name: string;
+    group: boolean;
+}
+
+function headEntry(src: string, environment: ResourceScript['environment'], group = false): ManifestScript {
+    return { src, environment, group };
+}
+
+function libraryEntries(libraries: readonly ResourceScript[], groups: readonly LibraryGroup[]): ManifestScript[] {
+    const opened = new Set<string>();
+
+    return libraries.map((script) => {
+        const grouped = groups.find((entry) => script.path.startsWith(`${LIBRARIES_DIRECTORY}/${libraryDirectory(entry.name)}/`));
+        const opens = grouped !== undefined && grouped.group && !opened.has(grouped.name);
+
+        if (grouped !== undefined) {
+            opened.add(grouped.name);
+        }
+
+        return headEntry(script.path, script.environment, opens);
+    });
+}
+
+function isDeclared(scripts: readonly ManifestScript[], src: string): boolean {
+    return scripts.some((script) => script.src === src);
+}
+
+function looseScripts(scripts: readonly ResourceScript[], order: ScriptOrder): ManifestScript[] {
+    return scripts.filter((script) => !order.has(script.source)).map((script) => headEntry(script.path, script.environment));
 }
 
 function manifestScripts(
     helpers: readonly ResourceHelper[],
     libraries: readonly ManifestScript[],
     configuration: ResourceScript | null,
-    sources: readonly ManifestScript[],
+    authored: readonly ManifestScript[],
+    loose: readonly ManifestScript[],
 ): ManifestScript[] {
-    const settings: ManifestScript[] = configuration === null ? [] : [{ src: configuration.path, environment: 'shared', group: 'configuration' }];
+    const head = [...helpers.map((helper) => headEntry(helper.path, helper.environment)), ...libraries];
+    const settings = configuration === null || isDeclared(authored, configuration.path) ? [] : [headEntry(configuration.path, 'shared')];
 
-    return [...helpers.map(helperEntry), ...libraries, ...settings, ...sources];
+    return [...head, ...settings, ...authored, ...loose];
 }
 
 function collectContributions(project: ProjectResult): ManifestContribution[] {
     return project.modules.flatMap((module) => module.contributions);
-}
-
-function orderAssets(assets: readonly ResourceAsset[], pinned: readonly ResourceAsset[]): ResourceAsset[] {
-    const pinnedPaths = new Set(pinned.map((asset) => asset.path));
-
-    return [...pinned, ...assets.filter((asset) => !pinnedPaths.has(asset.path))];
-}
-
-function manifestFiles(assets: readonly ResourceAsset[]): ManifestFile[] {
-    return assets.filter((asset) => asset.isDownloaded && asset.path !== ENVIRONMENT_FILE).map((asset) => ({ src: asset.path }));
-}
-
-function manifestInfo(options: ResourceOptions): ResourceInfo {
-    const info: ResourceInfo = {};
-
-    if (options.author !== undefined) {
-        info.author = options.author;
-    }
-
-    if (options.version !== undefined) {
-        info.version = options.version;
-    }
-
-    if (options.description !== undefined) {
-        info.description = options.description;
-    }
-
-    return info;
 }
 
 function lineCount(content: string): number {
@@ -192,7 +205,7 @@ function bundleDiagnostics(
 
     for (const module of project.modules) {
         if (module.code !== null && module.topLevelReturn !== null) {
-            const message = `"${module.path}" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "output = { bundle = false }" in .luam.manifest.`;
+            const message = `"${module.path}" contains a top-level return and cannot be included in a bundle. Remove the return or build the tree layout with "--no-bundle" or "build = { details = { bundle = false } }" in .luam.manifest.`;
 
             diagnostics.push({ path: module.path, diagnostic: createDiagnostic('project', 'project-bundle-toplevel-return', message, module.topLevelReturn) });
         }
@@ -216,48 +229,53 @@ export function assembleResource(project: ProjectResult, options: ResourceOption
         return { build: null, diagnostics: project.diagnostics };
     }
 
-    const collected = [...collectHelpers(project.modules, options.helpers ?? []), ...collectDevelopmentLogHelpers(options.developmentLogs)];
-    const helpers = withEnvironmentFile(collected, options.environmentFile);
-    const scripts = collectScripts(project.modules);
+    const order = options.order ?? new Map();
+    const helpers = withEnvironmentFile(collectHelpers(project.modules, options.helpers ?? []), options.environmentFile);
+    const natives = [...(options.natives ?? [])];
+    const scripts = collectScripts(project.modules, order);
     const libraries = collectLibraryScripts(project.modules, options.libraryFiles ?? []);
-    const configuration = configurationScript(options.configuration);
+    const configuration = configurationScript(options.configuration, natives);
     const deployment = configuration === null ? [] : [configuration];
-    const sorted = [...(options.assets ?? [])].sort((left, right) => left.path.localeCompare(right.path));
-    const order = resolveLoadOrder(options.loadOrder ?? [], scripts, sorted, libraries);
+    const assets = [...(options.assets ?? [])];
     const layout = options.layout ?? 'tree';
-    const bundles = layout === 'bundle' ? collectBundles(helpers, scripts, order.scripts, libraries) : [];
+    const bundles = layout === 'bundle' ? collectBundles(helpers, scripts, libraries) : [];
     const duplicates =
         layout === 'tree'
-            ? findDuplicateOutputs([...libraries, ...scripts, ...deployment], sorted)
-            : [...findDuplicateOutputs([...libraries, ...scripts], []), ...findDuplicateOutputs(deployment, sorted)];
-    const collisions = layout === 'bundle' ? bundleDiagnostics(project, bundles, scripts, sorted) : [];
-    const diagnostics = sortFileDiagnostics([...project.diagnostics, ...duplicates, ...collisions, ...order.diagnostics]);
+            ? findDuplicateOutputs([...libraries, ...scripts, ...natives, ...deployment], assets)
+            : [...findDuplicateOutputs([...libraries, ...scripts], []), ...findDuplicateOutputs([...natives, ...deployment], assets)];
+    const collisions = layout === 'bundle' ? bundleDiagnostics(project, bundles, scripts, assets) : [];
+    const diagnostics = sortFileDiagnostics([...project.diagnostics, ...duplicates, ...collisions]);
 
-    if (duplicates.length > 0 || collisions.length > 0 || order.diagnostics.length > 0) {
+    if (duplicates.length > 0 || collisions.length > 0) {
         return { build: null, diagnostics };
     }
 
     onStep?.('assembly');
 
-    const assets = orderAssets(sorted, order.assets);
-    const sources =
-        layout === 'tree'
-            ? sourceEntries(scripts, order.scripts).map((entry): ManifestScript => ({ ...entry, group: 'source' }))
-            : bundles.map((bundle): ManifestScript => ({ src: bundle.path, environment: bundle.environment, group: 'source' }));
-    const manifestHelpers = layout === 'tree' ? helpers : [];
-    const vendored = layout === 'tree' ? libraries.map((script): ManifestScript => ({ src: script.path, environment: script.environment, group: 'libraries' })) : [];
-    const manifest = generateManifest(
-        manifestInfo(options),
-        manifestScripts(manifestHelpers, vendored, configuration, sources),
-        manifestFiles(assets),
-        collectContributions(project),
-        { oop: options.oop === true, minMtaVersion: options.minMtaVersion ?? null, dependencies: options.dependencies ?? [] },
-    );
+    const bundled = bundles.map((bundle): ManifestScript => ({ src: bundle.path, environment: bundle.environment, group: false }));
+    const verbatim = natives.map((native): ManifestScript => headEntry(native.path, native.environment));
+    const authored = layout === 'tree' ? (options.scripts ?? []) : [...verbatim, ...bundled];
+    const generated: GeneratedManifest = {
+        resource: options.resourceName ?? DEFAULT_RESOURCE_ELEMENT,
+        info: options.info ?? EMPTY_INFO,
+        includes: options.includes ?? [],
+        environment: options.environment ?? EMPTY_ENVIRONMENT,
+        scripts: manifestScripts(
+            layout === 'tree' ? helpers : [],
+            layout === 'tree' ? libraryEntries(libraries, options.libraries ?? []) : [],
+            configuration,
+            authored,
+            layout === 'tree' ? looseScripts(scripts, order) : [],
+        ),
+        files: options.files ?? [],
+        exports: collectContributions(project),
+    };
+    const manifest = generateManifest(generated);
 
     onStep?.('manifest');
 
     const written = [...libraries, ...scripts];
     const map = layout === 'tree' ? treeResourceMap(options.resourceName ?? '', written) : null;
 
-    return { build: { manifest, scripts: layout === 'tree' ? written : [], helpers, configuration, assets, bundles, layout, map }, diagnostics };
+    return { build: { manifest, scripts: layout === 'tree' ? written : [], natives, helpers, configuration, assets, bundles, layout, map }, diagnostics };
 }

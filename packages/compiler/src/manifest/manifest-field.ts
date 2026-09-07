@@ -1,4 +1,4 @@
-import { createOptional, createRecord, type Type } from '@compiler/checker/types';
+import { createOptional, createRecord, STRING_TYPE, type Type } from '@compiler/checker/types';
 
 import type { ManifestValue } from './manifest-value';
 
@@ -9,6 +9,7 @@ export type ManifestRuleKind =
     | 'contained-path'
     | 'server-contained-path'
     | 'static-path'
+    | 'output-path'
     | 'source-pattern'
     | 'engine-version'
     | 'positive-integer';
@@ -26,6 +27,9 @@ export interface ManifestField {
     members: readonly ManifestField[] | null;
     elements: readonly ManifestField[] | null;
     allowEmpty: boolean;
+    open: boolean;
+    ordered: boolean;
+    unimplemented: string | null;
 }
 
 const RULE_TEXT: Readonly<Record<ManifestRuleKind, string>> = {
@@ -35,6 +39,7 @@ const RULE_TEXT: Readonly<Record<ManifestRuleKind, string>> = {
     'contained-path': 'A relative path that stays inside the project directory.',
     'server-contained-path': 'A relative path that stays inside the configured serverPath.',
     'static-path': 'A relative path with no wildcards that stays inside the project directory.',
+    'output-path': 'A path with no wildcards. It may be absolute and may leave the project directory.',
     'source-pattern': 'A relative path or a "*", "**", and "?" pattern that stays inside the project directory.',
     'engine-version': 'A version such as "1.6.0", or "latest" to follow the newest published release.',
     'positive-integer': 'A positive integer.',
@@ -54,6 +59,9 @@ export function field(name: string, type: Type, summary: string, options: Partia
         members: null,
         elements: null,
         allowEmpty: false,
+        open: false,
+        ordered: false,
+        unimplemented: null,
         ...options,
     };
 }
@@ -103,5 +111,9 @@ export function requiredFields(fields: readonly ManifestField[]): ManifestField[
 }
 
 export function elementField(entry: ManifestField, type: Type): ManifestField {
-    return { ...entry, type, members: entry.elements, elements: null, defaultValue: null, required: false };
+    return { ...entry, type, members: entry.elements, elements: null, defaultValue: null, required: false, ordered: false };
+}
+
+export function openField(entry: ManifestField, name: string): ManifestField {
+    return field(name, STRING_TYPE, `Extra "${entry.name}" key written to the generated file as an attribute.`, { owner: entry.owner });
 }

@@ -27,21 +27,23 @@ describe('template catalog', () => {
         expect(paths.length).toBe(new Set(paths).size);
     });
 
-    it('ships the starter manifest in the manifest dialect', () => {
+    it('ships the starter manifest as one table of sections', () => {
         const source = read('luam.manifest');
 
         expect(source).not.toContain('export default');
-        expect(source).toContain("name = 'luam-resource'");
-        expect(source).toContain("outDir = 'build'");
+        expect(source.trimStart().startsWith('{')).toBe(true);
+        expect(source.trimEnd().endsWith('}')).toBe(true);
+        expect(source).not.toContain('name = ');
+        expect(source).toContain("output = 'build'");
     });
 
-    it('declares the sources and assets a new project builds from', () => {
+    it('declares the scripts and files a new project builds from', () => {
         const source = read('luam.manifest');
 
-        expect(source).toContain("server = { 'src/server/**/*.luam' },");
-        expect(source).toContain("client = { 'src/client/**/*.luam' },");
-        expect(source).toContain("shared = { 'src/shared/**/*.luam' },");
-        expect(source).toContain("{ from = 'assets/**/*', to = 'assets' },");
+        expect(source).toContain("{ path = 'src/shared/**/*.luam', type = 'shared' },");
+        expect(source).toContain("{ path = 'src/server/**/*.luam', type = 'server' },");
+        expect(source).toContain("{ path = 'src/client/**/*.luam', type = 'client' },");
+        expect(source).toContain("#     'assets/**/*.png',");
         expect(source).not.toContain('transport');
     });
 });

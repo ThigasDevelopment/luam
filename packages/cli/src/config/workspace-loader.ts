@@ -11,7 +11,6 @@ export interface WorkspaceDeployment {
     serverRoot: string;
     resourcesDir: string;
     executable: string | null;
-    logs: ServerFileSettings['logs'];
 }
 
 export interface LoadedWorkspace {
@@ -60,7 +59,6 @@ export function loadServerFile(path: string, files: WorkspaceFileSystem = NODE_W
                       serverRoot: resolveServerRoot(read.root, settings.serverPath),
                       resourcesDir: settings.resourcesDir,
                       executable: settings.executable,
-                      logs: settings.logs,
                   },
         resources: discoverResources(files, read.root),
         diagnostics: read.diagnostics,

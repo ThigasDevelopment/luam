@@ -78,8 +78,8 @@ afterEach(() => {
 describe('test discovery', () => {
     it('keeps test files out of the build and finds them for the test command', () => {
         const { context } = harness({ ...defaultProjectFiles(), 'src/server/main.test.luam': PASSING_TEST });
-        const sources = discoverSources(context.root, context.config.sources, [context.config.outDir, context.config.contracts]);
-        const tests = discoverTests(context.root, context.config.sources, [context.config.outDir, context.config.contracts]);
+        const sources = discoverSources(context.root, context.config.scripts, [context.config.outDir, context.config.contracts]);
+        const tests = discoverTests(context.root, context.config.scripts, [context.config.outDir, context.config.contracts]);
 
         expect(sources.files.map((file) => file.path)).not.toContain('src/server/main.test.luam');
         expect(tests.files.map((file) => file.path)).toEqual(['src/server/main.test.luam']);

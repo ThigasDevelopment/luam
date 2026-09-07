@@ -1,0 +1,60 @@
+{
+    info = {
+        author = { name = 'dracoN*', discord = 'draconzx' },
+
+        version = '1.0.0',
+        description = 'Heaven Roleplay.',
+
+        dependencies = {
+            'hr_core',
+
+            'hr_admin',
+        },
+    },
+
+    environment = {
+        oop = false,
+        strict = true,
+
+        version = {
+            server = '1.6.0',
+            client = '1.6.0',
+        },
+    },
+
+    scripts = {
+        { path = 'config.lua', type = 'shared' },
+        { path = 'items.lua', type = 'shared' },
+
+        { path = 'src/utils/lib/*.luam', type = 'shared' },
+
+        { path = 'src/utils/format.luam', type = 'shared' },
+        { path = 'src/utils/render.luam', type = 'client' },
+
+        { path = 'src/services/**/*.server.luam', type = 'server' },
+        { path = 'src/services/**/*.client.luam', type = 'client' },
+
+        { path = 'src/events/**/*.luam', type = 'shared' },
+
+        { path = 'src/entities/**/*.luam', type = 'shared' },
+
+        { path = 'src/index.luam', type = 'server' },
+        { path = 'src/interface.luam', type = 'client' },
+    },
+
+    files = {
+        'list.xml',
+
+        'assets/images/**/*.png',
+    },
+
+    build = {
+        output = 'build',
+
+        details = {
+            bundle = false,
+            minify = false,
+            map = false,
+        },
+    },
+}

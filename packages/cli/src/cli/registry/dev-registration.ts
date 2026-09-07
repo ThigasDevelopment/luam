@@ -56,7 +56,7 @@ export function registerDevCommand(program: Command, runtime: CliRuntime): void 
                 listResources: (): readonly string[] => workspaceResources(workspace.root),
                 logger: runtime.logger,
                 reporter: runtime.reporter,
-                deployment: { serverRoot: deployment.serverRoot, resourcesDir: deployment.resourcesDir, executable: deployment.executable, logs: deployment.logs },
+                deployment: { serverRoot: deployment.serverRoot, resourcesDir: deployment.resourcesDir, executable: deployment.executable },
                 loadResource: (name: string): CommandContext | null => resourceContext(runtime, workspace, 'dev', name, options).context,
                 processService: runtimeProcessService(runtime),
                 env: runtime.env,

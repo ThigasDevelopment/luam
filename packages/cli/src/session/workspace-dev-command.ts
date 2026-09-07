@@ -122,7 +122,6 @@ export async function runWorkspaceDevCommand(options: WorkspaceDevOptions): Prom
             reporter,
             serverConsole: createServerConsole(supervisor),
             loadResource: options.loadResource,
-            developmentLogs: options.deployment.logs,
             now: options.now,
         });
 

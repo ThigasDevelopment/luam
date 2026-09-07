@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { readProjectInputs } from '@cli/build/project-inputs';
 import { generatedRoots } from '@cli/build/write-options';
 import type { LuamConfig } from '@cli/config/config-schema';
-import { DEFAULT_ENVIRONMENT_FILES, type AssetMapping } from '@compiler/manifest/manifest-defaults';
+import { DEFAULT_ENVIRONMENT_FILE, type FileEntry } from '@compiler/manifest/manifest-defaults';
 import { parseEnvFile } from '@compiler/project/env-file';
 import { renderEnvironmentTemplate } from '@compiler/project/resource';
 
@@ -12,7 +12,11 @@ import { createProjectFixture, defaultProjectFiles, manifestConfig, type Project
 const fixtures: ProjectFixture[] = [];
 
 function defaultConfig(): LuamConfig {
-    return manifestConfig({ name: 'luam-demo' });
+    return manifestConfig({});
+}
+
+function entries(...paths: readonly string[]): FileEntry[] {
+    return paths.map((path) => ({ path, group: false }));
 }
 
 function fixture(files: Readonly<Record<string, string>>): ProjectFixture {
@@ -29,14 +33,14 @@ afterEach(() => {
     }
 });
 
-const ASSETS: AssetMapping[] = [{ from: 'assets/**/*', to: 'assets' }];
+const FILES: FileEntry[] = entries('assets/**/*');
 
-function inputsOf(root: string, assets: readonly AssetMapping[] = ASSETS) {
-    return readProjectInputs(root, { assets, environment: DEFAULT_ENVIRONMENT_FILES });
+function inputsOf(root: string, files: readonly FileEntry[] = FILES) {
+    return readProjectInputs(root, { files, secret: DEFAULT_ENVIRONMENT_FILE });
 }
 
 describe('project inputs', () => {
-    it('declares the files a mapping names and keeps their destination', () => {
+    it('declares every file an entry names at the path the entry describes', () => {
         const files = { ...defaultProjectFiles(), 'assets/logo.png': 'binary', 'assets/ui/panel.png': 'binary' };
         const inputs = inputsOf(fixture(files).root);
 
@@ -46,13 +50,20 @@ describe('project inputs', () => {
         ]);
     });
 
-    it('rewrites the destination when the mapping renames it', () => {
-        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), 'media/logo.png': 'binary' }).root, [{ from: 'media/**/*', to: 'images' }]);
+    it('writes each file at the path the manifest names rather than a renamed one', () => {
+        const inputs = inputsOf(fixture({ ...defaultProjectFiles(), 'media/logo.png': 'binary' }).root, entries('media/**/*'));
 
-        expect(inputs.assets).toEqual([{ path: 'images/logo.png', source: 'media/logo.png', isDownloaded: true }]);
+        expect(inputs.assets).toEqual([{ path: 'media/logo.png', source: 'media/logo.png', isDownloaded: true }]);
     });
 
-    it('declares nothing when no mapping is listed', () => {
+    it('emits one element per entry rather than one per resolved file', () => {
+        const files = { ...defaultProjectFiles(), 'assets/logo.png': 'binary', 'assets/ui/panel.png': 'binary' };
+        const inputs = inputsOf(fixture(files).root);
+
+        expect(inputs.elements).toEqual([{ src: 'assets/**/*', group: false }]);
+    });
+
+    it('declares nothing when no entry is listed', () => {
         const inputs = inputsOf(fixture({ ...defaultProjectFiles(), 'assets/logo.png': 'binary' }).root, []);
 
         expect(inputs.assets).toEqual([]);
@@ -94,13 +105,7 @@ describe('deployment env template', () => {
 
 describe('generated roots', () => {
     it('covers asset destinations, the runtime library, and vendored libraries without owning source directories', () => {
-        const config: LuamConfig = {
-            ...defaultConfig(),
-            assets: [
-                { from: 'assets/**/*', to: 'assets' },
-                { from: 'media/**/*', to: 'media' },
-            ],
-        };
+        const config: LuamConfig = { ...defaultConfig(), files: entries('assets/**/*', 'media/**/*') };
 
         expect(generatedRoots(config)).toEqual(['assets', 'media', 'lib', 'libs']);
     });

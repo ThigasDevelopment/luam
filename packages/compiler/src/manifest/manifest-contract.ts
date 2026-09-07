@@ -1,30 +1,48 @@
 import {
-    DEFAULT_ASSET_DESTINATION,
+    DEFAULT_BUILD_DETAILS,
     DEFAULT_COMPILER_OPTIONS,
-    DEFAULT_ENGINE,
-    DEFAULT_ENVIRONMENT_FILES,
-    DEFAULT_OUTPUT,
-    DEFAULT_SOURCE_MAPPING,
-    emptySourceMapping,
-    SOURCE_SIDES,
-    type AssetMapping,
+    DEFAULT_ENGINE_VERSIONS,
+    DEFAULT_ENVIRONMENT_FILE,
+    DEFAULT_OUT_DIR,
+    isScriptSide,
+    type AuthorInfo,
+    type BuildDetails,
+    type BuildSettings,
     type CompilerOptions,
-    type EngineRequirement,
-    type EnvironmentFiles,
-    type OutputSettings,
-    type SourceMapping,
+    type EngineVersions,
+    type FileEntry,
+    type OrderedName,
+    type ScriptEntry,
 } from './manifest-defaults';
 import { readBoolean, readString, readStrings, readTable, readTables } from './manifest-readers';
 import type { ManifestObject } from './manifest-value';
 
+export type GroupBreaks = ReadonlySet<string>;
+
 const EMPTY: ManifestObject = {};
+
+export const NO_GROUPS: GroupBreaks = new Set();
+
+const INFO_ATTRIBUTES: readonly string[] = ['name'];
 
 function flag(source: ManifestObject, name: string, fallback: boolean): boolean {
     return readBoolean(source, name) ?? fallback;
 }
 
+function section(value: ManifestObject, name: string): ManifestObject {
+    return readTable(value, name) ?? EMPTY;
+}
+
+function ordered(names: readonly string[], groups: GroupBreaks, key: string): OrderedName[] {
+    return names.map((name, index) => ({ name, group: groups.has(`${key}.${index}`) }));
+}
+
+export function names(entries: readonly OrderedName[]): string[] {
+    return entries.map((entry) => entry.name);
+}
+
 export function readCompilerOptions(value: ManifestObject): CompilerOptions {
-    const source = readTable(value, 'compiler') ?? EMPTY;
+    const source = section(value, 'environment');
 
     return {
         strict: flag(source, 'strict', DEFAULT_COMPILER_OPTIONS.strict),
@@ -36,64 +54,86 @@ export function readCompilerOptions(value: ManifestObject): CompilerOptions {
     };
 }
 
-export function readSourceMapping(value: ManifestObject): SourceMapping {
-    const source = readTable(value, 'sources');
+export function readScripts(value: ManifestObject, groups: GroupBreaks = NO_GROUPS): ScriptEntry[] {
+    return readTables(value, 'scripts').flatMap((entry, index) => {
+        const path = readString(entry, 'path');
+        const type = readString(entry, 'type');
 
-    if (source === null) {
-        return DEFAULT_SOURCE_MAPPING;
+        if (path === null || type === null || !isScriptSide(type)) {
+            return [];
+        }
+
+        return [{ path, type, group: groups.has(`scripts.${index}`) }];
+    });
+}
+
+export function readFiles(value: ManifestObject, groups: GroupBreaks = NO_GROUPS): FileEntry[] {
+    return readStrings(value, 'files').map((path, index) => ({ path, group: groups.has(`files.${index}`) }));
+}
+
+export function readAuthor(value: ManifestObject): AuthorInfo | null {
+    const info = section(value, 'info');
+    const source = readTable(info, 'author');
+    const name = source === null ? null : readString(source, 'name');
+
+    if (source === null || name === null) {
+        return null;
     }
 
-    const mapping = emptySourceMapping();
+    const extra = Object.entries(source)
+        .filter(([key, entry]) => !INFO_ATTRIBUTES.includes(key) && typeof entry === 'string')
+        .map(([key, entry]) => [key, entry as string] as const);
 
-    for (const environment of SOURCE_SIDES) {
-        mapping[environment] = source[environment] === undefined ? [...DEFAULT_SOURCE_MAPPING[environment]] : readStrings(source, environment);
-    }
-
-    return mapping;
+    return { name, extra };
 }
 
-export function readAssetMappings(value: ManifestObject): AssetMapping[] {
-    return readTables(value, 'assets').map((entry) => ({
-        from: readString(entry, 'from') ?? '',
-        to: readString(entry, 'to') ?? DEFAULT_ASSET_DESTINATION,
-    }));
+export function readDependencies(value: ManifestObject, groups: GroupBreaks = NO_GROUPS): OrderedName[] {
+    return ordered(readStrings(section(value, 'info'), 'dependencies'), groups, 'info.dependencies');
 }
 
-export function readDependencies(value: ManifestObject): string[] {
-    return [...new Set(readStrings(value, 'dependencies'))].sort();
+export function readLibraries(value: ManifestObject, groups: GroupBreaks = NO_GROUPS): OrderedName[] {
+    return ordered(readStrings(section(value, 'environment'), 'libraries'), groups, 'environment.libraries');
 }
 
-export function readLibraries(value: ManifestObject): string[] {
-    return readStrings(value, 'libraries');
-}
-
-export function readEngine(value: ManifestObject): EngineRequirement {
-    const source = readTable(value, 'engine') ?? EMPTY;
-
-    return { minVersion: readString(source, 'minVersion') ?? DEFAULT_ENGINE.minVersion };
-}
-
-export function readEnvironmentFiles(value: ManifestObject): EnvironmentFiles {
-    const source = readTable(value, 'environment') ?? EMPTY;
+export function readEngineVersions(value: ManifestObject): EngineVersions {
+    const source = readTable(section(value, 'environment'), 'version') ?? EMPTY;
 
     return {
-        file: readString(source, 'file') ?? DEFAULT_ENVIRONMENT_FILES.file,
-        localFile: readString(source, 'localFile') ?? DEFAULT_ENVIRONMENT_FILES.localFile,
+        server: readString(source, 'server') ?? DEFAULT_ENGINE_VERSIONS.server,
+        client: readString(source, 'client') ?? DEFAULT_ENGINE_VERSIONS.client,
     };
 }
 
-export function readOutputSettings(value: ManifestObject): OutputSettings {
-    const source = readTable(value, 'output') ?? EMPTY;
+export function readSecret(value: ManifestObject): string {
+    return readString(section(value, 'environment'), 'secret') ?? DEFAULT_ENVIRONMENT_FILE;
+}
+
+export function readBuild(value: ManifestObject): BuildSettings {
+    const source = section(value, 'build');
+    const details = readTable(source, 'details') ?? EMPTY;
 
     return {
-        bundle: flag(source, 'bundle', DEFAULT_OUTPUT.bundle),
-        map: flag(source, 'map', DEFAULT_OUTPUT.map),
-        minify: flag(source, 'minify', DEFAULT_OUTPUT.minify),
+        output: readString(source, 'output') ?? DEFAULT_OUT_DIR,
+        details: {
+            bundle: flag(details, 'bundle', DEFAULT_BUILD_DETAILS.bundle),
+            map: flag(details, 'map', DEFAULT_BUILD_DETAILS.map),
+            minify: flag(details, 'minify', DEFAULT_BUILD_DETAILS.minify),
+            obfuscate: flag(details, 'obfuscate', DEFAULT_BUILD_DETAILS.obfuscate),
+        },
     };
 }
 
-export function sourcePatterns(mapping: SourceMapping): string[] {
-    return SOURCE_SIDES.flatMap((environment) => [...mapping[environment]]);
+export function scriptPatterns(scripts: readonly ScriptEntry[]): string[] {
+    return scripts.map((entry) => entry.path);
 }
 
-export type { AssetMapping, CompilerOptions, EngineRequirement, EnvironmentFiles, OutputSettings, SourceMapping } from './manifest-defaults';
+export type {
+    AuthorInfo,
+    BuildDetails,
+    BuildSettings,
+    CompilerOptions,
+    EngineVersions,
+    FileEntry,
+    OrderedName,
+    ScriptEntry,
+} from './manifest-defaults';

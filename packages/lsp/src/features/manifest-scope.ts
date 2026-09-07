@@ -70,7 +70,10 @@ function skipComment(text: string, start: number): number {
     return end === -1 ? text.length : end;
 }
 
-export function manifestScopeAt(text: string, offset: number): ManifestScope {
+export type ManifestRoot = 'table' | 'statements';
+
+export function manifestScopeAt(text: string, offset: number, root: ManifestRoot = 'statements'): ManifestScope {
+    const depth = root === 'table' ? 2 : 1;
     const stack: Frame[] = [{ field: null, assigned: new Set() }];
     let lastName: string | null = null;
     let pending: string | null = null;
@@ -84,7 +87,7 @@ export function manifestScopeAt(text: string, offset: number): ManifestScope {
             const end = skipComment(text, index);
 
             if (end >= offset) {
-                return { path: framePath(stack), assigned: current(stack).assigned, pending, inString: false, inComment: true, stringStart: null };
+                return { path: framePath(stack, depth), assigned: current(stack).assigned, pending, inString: false, inComment: true, stringStart: null };
             }
 
             index = end;
@@ -96,7 +99,7 @@ export function manifestScopeAt(text: string, offset: number): ManifestScope {
             const end = skipString(text, index, character);
 
             if (end > offset) {
-                return { path: framePath(stack), assigned: current(stack).assigned, pending, inString: true, inComment: false, stringStart: index };
+                return { path: framePath(stack, depth), assigned: current(stack).assigned, pending, inString: true, inComment: false, stringStart: index };
             }
 
             lastName = null;
@@ -155,13 +158,13 @@ export function manifestScopeAt(text: string, offset: number): ManifestScope {
         index += 1;
     }
 
-    return { path: framePath(stack), assigned: current(stack).assigned, pending, inString: false, inComment: false, stringStart: null };
+    return { path: framePath(stack, depth), assigned: current(stack).assigned, pending, inString: false, inComment: false, stringStart: null };
 }
 
 function current(stack: readonly Frame[]): Frame {
     return stack[stack.length - 1] ?? { field: null, assigned: new Set() };
 }
 
-function framePath(stack: readonly Frame[]): string[] {
-    return stack.slice(1).map((frame) => frame.field ?? ELEMENT_SEGMENT);
+function framePath(stack: readonly Frame[], depth: number): string[] {
+    return stack.slice(depth).map((frame) => frame.field ?? ELEMENT_SEGMENT);
 }

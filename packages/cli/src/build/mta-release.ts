@@ -1,12 +1,18 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
-import { LATEST_ENGINE_VERSION } from '@compiler/manifest/manifest-defaults';
+import { LATEST_ENGINE_VERSION, type EngineVersions } from '@compiler/manifest/manifest-defaults';
 
 export type ReleaseFetch = (input: string, init: RequestInit) => Promise<Response>;
 
 export interface MtaVersion {
     version: string | null;
+    warning: string | null;
+}
+
+export interface MtaVersionPair {
+    server: string | null;
+    client: string | null;
     warning: string | null;
 }
 
@@ -128,4 +134,11 @@ export async function resolveMtaVersion(root: string, options: ReleaseOptions = 
     }
 
     return cached === null ? { version: null, warning: MISSING_VERSION } : { version: cached.version, warning: null };
+}
+
+export async function resolveEngineVersions(root: string, engine: EngineVersions, options: ReleaseOptions = {}): Promise<MtaVersionPair> {
+    const latest = engine.server === LATEST_ENGINE_VERSION || engine.client === LATEST_ENGINE_VERSION ? await resolveMtaVersion(root, options) : null;
+    const resolve = (declared: string): string | null => (declared === LATEST_ENGINE_VERSION ? (latest?.version ?? null) : normalizeTag(declared));
+
+    return { server: resolve(engine.server), client: resolve(engine.client), warning: latest?.warning ?? null };
 }

@@ -3,7 +3,7 @@ import { dirname, isAbsolute, relative, resolve } from 'node:path';
 
 import { readHelperSource } from '@cli/build/helper-files';
 import { minifyLuaFiles } from '@cli/build/lua-minifier';
-import { pruneResource } from '@cli/build/resource-prune';
+import { markBuildDirectory, ownsBuildDirectory, pruneResource } from '@cli/build/resource-prune';
 import type { ProgressReporter } from '@compiler/project/progress';
 import { ENVIRONMENT_FILE, type ResourceBuild } from '@compiler/project/resource';
 
@@ -11,6 +11,7 @@ export interface WriteResult {
     written: string[];
     removed: string[];
     unchanged: number;
+    refusal: string | null;
 }
 
 export interface WriteOptions {
@@ -45,6 +46,10 @@ export function resourceFiles(build: ResourceBuild): Map<string, string> {
 
     if (build.configuration !== null) {
         files.set(build.configuration.path, build.configuration.content);
+    }
+
+    for (const native of build.natives) {
+        files.set(native.path, native.content);
     }
 
     for (const script of build.scripts) {
@@ -98,6 +103,10 @@ function writeEnvironmentFile(targetDir: string, template: string | null): boole
 export function writeResource(targetDir: string, build: ResourceBuild, options: WriteOptions): WriteResult {
     const assembled = resourceFiles(build);
     const files = options.minify === true ? minifyLuaFiles(assembled) : assembled;
+    const owned = ownsBuildDirectory(targetDir);
+
+    markBuildDirectory(targetDir);
+
     const written: string[] = [];
     const total = files.size + build.assets.length + (options.environmentTemplate === null ? 0 : 1);
     let index = 0;
@@ -141,7 +150,7 @@ export function writeResource(targetDir: string, build: ResourceBuild, options: 
     }
 
     const keep = new Set([...files.keys(), ...build.assets.map((asset) => asset.path), ENVIRONMENT_FILE]);
-    const removed = pruneResource(targetDir, keep, { generatedFiles: options.generatedFiles, generatedRoots: options.generatedRoots });
+    const pruned = pruneResource(targetDir, keep, { generatedFiles: options.generatedFiles, generatedRoots: options.generatedRoots }, owned);
 
-    return { written: written.sort((left, right) => left.localeCompare(right)), removed, unchanged };
+    return { written: written.sort((left, right) => left.localeCompare(right)), removed: pruned.removed, unchanged, refusal: pruned.refusal };
 }

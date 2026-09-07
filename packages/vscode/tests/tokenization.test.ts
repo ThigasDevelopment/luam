@@ -86,11 +86,11 @@ describe('tokenization', () => {
     it('reads every manifest key as a key, environment named or not', () => {
         const records = tokenize(manifest, fixtureText('theme-sample.luam.manifest'), 'dark');
 
-        for (const key of ['name', 'server', 'client', 'shared', 'engine', 'minVersion']) {
+        for (const key of ['info', 'environment', 'scripts', 'build', 'path', 'type', 'server', 'client']) {
             expect(roleOfText(records, key), key).toBe('identifier.member');
         }
 
-        expect(new Set(['name', 'server', 'client', 'shared'].map((key) => records.find((r) => r.text === key)?.colour)).size).toBe(1);
+        expect(new Set(['info', 'scripts', 'server', 'client'].map((key) => records.find((r) => r.text === key)?.colour)).size).toBe(1);
     });
 
     it('spends the environment tint only on the directive it was reserved for', () => {
@@ -113,13 +113,12 @@ describe('the server file grammar', () => {
         const records = tokenize(server, fixtureText('theme-sample.luam.server'), 'dark');
         const roleOf = (text: string): string | null => roleOfText(records, text);
 
-        for (const key of ['serverPath', 'resourcesDir', 'executable', 'logs', 'enabled', 'maxMessageLength', 'rateLimit', 'rateWindowMs']) {
+        for (const key of ['serverPath', 'resourcesDir', 'executable']) {
             expect(roleOf(key), key).toBe('identifier.member');
         }
 
         expect(roleOf('mta-server')).toBe('literal.string');
-        expect(roleOf('true')).toBe('literal.constant');
-        expect(roleOf('512')).toBe('literal.constant');
+        expect(roleOf('mods/deathmatch/resources')).toBe('literal.string');
     });
 });
 

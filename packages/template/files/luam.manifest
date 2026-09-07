@@ -1,21 +1,28 @@
-name = 'luam-resource'
-version = '1.0.0'
-description = 'A Luam resource scaffolded by luam init.'
+{
+    info = {
+        version = '1.0.0',
+        description = 'A Luam resource scaffolded by luam init.',
+    },
 
-compiler = {
-    strict = true,
-    oop = false,
+    environment = {
+        oop = false,
+        strict = true,
+    },
+
+    # Position in this list is load order, and every entry declares the side its files run on.
+    # A blank line between two entries is a group boundary, and the generated meta.xml keeps it.
+    scripts = {
+        { path = 'src/shared/**/*.luam', type = 'shared' },
+
+        { path = 'src/server/**/*.luam', type = 'server' },
+        { path = 'src/client/**/*.luam', type = 'client' },
+    },
+
+    # files = {
+    #     'assets/**/*.png',
+    # },
+
+    build = {
+        output = 'build',
+    },
 }
-
-# The layout for a project with folders. A ".luam" file in the project root is built without it.
-sources = {
-    server = { 'src/server/**/*.luam' },
-    client = { 'src/client/**/*.luam' },
-    shared = { 'src/shared/**/*.luam' },
-}
-
-# assets = {
-#     { from = 'assets/**/*', to = 'assets' },
-# }
-
-outDir = 'build'

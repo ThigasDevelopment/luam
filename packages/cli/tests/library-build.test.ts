@@ -76,7 +76,7 @@ describe('library output', () => {
 
         const manifest = output(fixture, 'meta.xml');
 
-        expect(manifest).toContain('<!-- Libraries -->');
+        expect(manifest).toContain('<!-- SCRIPTS -->');
         expect(scriptOrder(manifest)).toEqual([
             'lib/class.lua',
             'lib/string.lua',
@@ -85,6 +85,7 @@ describe('library output', () => {
             `${COLLECTIONS_ROOT}/client/client/hud.lua`,
             'libs/mta-async-fixture/shared/src/async.lua',
             'src/shared/**/*.lua',
+            'src/server/**/*.lua',
             'src/client/**/*.lua',
         ]);
     });
@@ -102,7 +103,7 @@ describe('library output', () => {
     });
 
     it('concatenates library modules ahead of project modules in the bundle layout', async () => {
-        const { context, fixture } = harness(libraryProject([COLLECTIONS, ASYNC], { output: { bundle: true, map: false } }));
+        const { context, fixture } = harness(libraryProject([COLLECTIONS, ASYNC], { build: { details: { bundle: true, map: false } } }));
 
         await runBuildCommand(context);
 

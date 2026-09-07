@@ -52,7 +52,7 @@ export async function runCheckWatch(context: CommandContext, options: CheckWatch
     let queued = false;
 
     const announce = (): void => {
-        const roots = watchedRoots(config.sources).map((entry) => `"${entry.length === 0 ? '.' : entry}"`);
+        const roots = watchedRoots(config.scripts).map((entry) => `"${entry.length === 0 ? '.' : entry}"`);
 
         reporter.info(`Watching ${roots.join(', ')} for changes. Press Ctrl+C to stop.`);
     };
@@ -81,7 +81,7 @@ export async function runCheckWatch(context: CommandContext, options: CheckWatch
             watcher.close();
         }
 
-        sources.push(watchSources(context.root, config.sources, recheck));
+        sources.push(watchSources(context.root, config.scripts, recheck));
     };
 
     const reconfigure = (): void => {

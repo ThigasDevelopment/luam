@@ -1,3 +1,5 @@
+import { isAbsolute } from 'node:path';
+
 import { runCompile, type BuildOutcome } from '@cli/build/build-runner';
 import { writeResourceContract } from '@cli/build/contract-files';
 import { createPhaseTracker } from '@cli/build/phase-tracker';
@@ -23,6 +25,16 @@ function writtenMap(map: ResourceMap | null, minified: boolean): ResourceMap | n
     return map === null ? null : { ...map, minified };
 }
 
+function writeFailure(output: string, target: string, error: unknown): string {
+    const reason = error instanceof Error ? error.message : String(error);
+    const detail = /[.!?]$/.test(reason) ? reason : `${reason}.`;
+    const outside = isAbsolute(output)
+        ? ` "build.output" is "${output}", which starts at the filesystem root rather than inside the project. Write it without the leading separator to mean a directory beside the manifest.`
+        : '';
+
+    return `Build wrote nothing to "${target}". ${detail}${outside}`;
+}
+
 export async function runBuildCommand(context: CommandContext, options: BuildCommandOptions = {}): Promise<number> {
     const reporter = commandReporter(context);
     const renderer = createProgressRenderer(reporter);
@@ -35,7 +47,8 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
     const minify = options.minify ?? context.config.output.minify;
     const outcome = runCompile(context.root, context.config, {
         tracker,
-        minMtaVersion: version.version,
+        minServerVersion: version.server,
+        minClientVersion: version.client,
         development: !minify,
         layout,
         map: options.map ?? context.config.output.map,
@@ -67,7 +80,7 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
     } catch (error: unknown) {
         tracker.end('failed');
         renderer.clear();
-        reporter.error(`Build wrote nothing to "${target}". ${error instanceof Error ? error.message : String(error)}`);
+        reporter.error(writeFailure(context.config.outDir, target, error));
         options.onOutcome?.(outcome);
 
         return EXIT_DIAGNOSTICS;
@@ -86,6 +99,11 @@ export async function runBuildCommand(context: CommandContext, options: BuildCom
     const counts = `${result.unchanged} unchanged, ${result.removed.length} removed`;
 
     reporter.info(`Wrote ${pluralize(result.written.length, 'file')} to "${target}" (${counts}).`);
+
+    if (result.refusal !== null) {
+        reporter.warn(result.refusal);
+    }
+
     reportPhaseTimings(reporter, tracker.durations(), totalDuration(tracker.durations()));
     options.onOutcome?.(outcome);
 

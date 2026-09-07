@@ -70,16 +70,15 @@ describe('the server file in the editor', () => {
     it('completes exactly the server fields at the top level', () => {
         const offered = labels('', '');
 
-        expect(offered).toEqual(expect.arrayContaining(['serverPath', 'resourcesDir', 'executable', 'logs']));
+        expect(offered).toEqual(expect.arrayContaining(['serverPath', 'resourcesDir', 'executable']));
         expect(offered).not.toContain('outDir');
         expect(offered).not.toContain('name');
     });
 
-    it('completes exactly the log fields inside logs', () => {
-        const text = "serverPath = 'server'\nlogs = {  }\n";
-        const offered = labels(text, 'logs = { ');
+    it('offers nothing from the manifest inside the server file', () => {
+        const offered = labels('', '');
 
-        expect(offered).toEqual(expect.arrayContaining(['enabled', 'maxMessageLength', 'rateLimit', 'rateWindowMs']));
-        expect(offered).not.toContain('serverPath');
+        expect(offered).not.toContain('scripts');
+        expect(offered).not.toContain('build');
     });
 });

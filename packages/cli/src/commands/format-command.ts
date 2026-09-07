@@ -2,14 +2,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { EXIT_DIAGNOSTICS, EXIT_OK, EXIT_USAGE } from '@cli/cli/exit-codes';
-import { selectPathFiles, selectProjectFiles, type FormatSelection } from '@cli/format/format-selection';
+import { isManifestFile, selectPathFiles, selectProjectFiles, type FormatSelection } from '@cli/format/format-selection';
 import { NODE_FORMATTER_FILES } from '@cli/format/formatter-file-system';
 import { cliError, cliWarning, hasCliErrors, type CliDiagnostic } from '@cli/reporting/cli-diagnostic';
 import { reportCliDiagnostics, reportManifestDiagnostics } from '@cli/reporting/diagnostic-reporter';
 import { formatDuration } from '@cli/reporting/duration';
 import { pluralize } from '@cli/reporting/plural';
 import { createReporter, type Reporter } from '@cli/reporting/reporter';
-import { formatSource } from '@compiler/format/format';
+import { formatManifestSource, formatSource } from '@compiler/format/format';
 import type { FormatOptions } from '@compiler/format/format-options';
 import { resolveFormatterOptions } from '@compiler/format/formatter-discovery';
 
@@ -62,7 +62,7 @@ function formatFile(context: FormatContext, path: string, check: boolean, style:
         return false;
     }
 
-    const formatted = formatSource(source, style);
+    const formatted = isManifestFile(path) ? formatManifestSource(source, style) : formatSource(source, style);
 
     if (formatted === null) {
         diagnostics.push(cliWarning(UNPARSEABLE_SOURCE, `"${path}" could not be parsed and was left unchanged. Run "luam check" to see why.`));

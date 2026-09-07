@@ -2,20 +2,22 @@ import { createArray, createRecord, createUnion, isAssignable, STRING_TYPE, type
 import type { Diagnostic, SourcePosition } from '@compiler/diagnostics/diagnostic';
 import type { Expression, TableExpression } from '@compiler/parser/ast';
 
-import { ALLOWED_EXPRESSIONS, INVALID_EXPRESSION, INVALID_TYPE, MISSING_FIELD, UNKNOWN_FIELD, manifestError } from './manifest-diagnostics';
+import { ALLOWED_EXPRESSIONS, DUPLICATE_FIELD, INVALID_EXPRESSION, INVALID_TYPE, MISSING_FIELD, REMOVED_FIELD, UNKNOWN_FIELD, manifestError } from './manifest-diagnostics';
 import { booleanValue, errorValue, nilValue, numberValue, resolved, stringValue, type Evaluated } from './manifest-evaluated';
-import { elementField, findField, type ManifestField } from './manifest-field';
+import { elementField, findField, openField, type ManifestField } from './manifest-field';
 import { ENV_MEMBER_TYPE } from './manifest-fields';
 import { ManifestLocals } from './manifest-locals';
 import { closedSetMessage, missingMessage, typeMessage, unknownNameMessage } from './manifest-messages';
 import { applyBinary, applyUnary } from './manifest-operators';
-import { describeReceived, isManifestObject, type ManifestObject, type ManifestValue } from './manifest-value';
+import { describeReceived, isManifestObject, quoteList, type ManifestObject, type ManifestValue } from './manifest-value';
 
 export interface ManifestContext {
     mode: string;
     root: string;
     env: Readonly<Record<string, string | undefined>>;
 }
+
+export type GapOracle = (offset: number) => boolean;
 
 export interface FieldTarget {
     field: ManifestField;
@@ -27,17 +29,33 @@ export const ENV_TYPE: Type = createRecord('Env', new Map());
 
 const MIXED_TABLE = `A manifest table holds either named fields or a list, not both. ${ALLOWED_EXPRESSIONS}`;
 
+function join(prefix: string, name: string): string {
+    return prefix.length === 0 ? name : `${prefix}.${name}`;
+}
+
+function openTarget(target: FieldTarget, name: string, path: string): FieldTarget {
+    return { field: openField(target.field, name), path, key: join(target.key, name) };
+}
+
 export class ManifestPass {
     readonly diagnostics: Diagnostic[] = [];
 
     readonly positions = new Map<string, SourcePosition>();
 
+    readonly groups = new Set<string>();
+
     readonly locals = new ManifestLocals();
 
     private readonly context: ManifestContext;
 
-    constructor(context: ManifestContext) {
+    private readonly removed: Readonly<Record<string, string>>;
+
+    private readonly opensGroup: GapOracle;
+
+    constructor(context: ManifestContext, removed: Readonly<Record<string, string>> = {}, opensGroup: GapOracle = () => false) {
         this.context = context;
+        this.removed = removed;
+        this.opensGroup = opensGroup;
     }
 
     report(code: string, message: string, position: SourcePosition): void {
@@ -191,6 +209,7 @@ export class ManifestPass {
         const value: ManifestObject = {};
         const members = new Map<string, Type>();
         const fields = target?.field.members ?? null;
+        const seen = new Set<string>();
 
         for (const entry of node.fields) {
             if (entry.name === null) {
@@ -199,15 +218,34 @@ export class ManifestPass {
                 continue;
             }
 
-            const member = fields === null ? null : findField(fields, entry.name);
+            const path = join(target?.path ?? '', entry.name);
 
-            if (fields !== null && member === null) {
-                this.report(UNKNOWN_FIELD, `"${target?.path ?? ''}.${entry.name}" is not a configuration field.`, entry.position);
+            if (seen.has(entry.name)) {
+                this.report(DUPLICATE_FIELD, `"${path}" is written more than once. Keep one entry.`, entry.position);
 
                 continue;
             }
 
-            const nested = member === null || target === null ? null : { field: member, path: `${target.path}.${entry.name}`, key: `${target.key}.${entry.name}` };
+            seen.add(entry.name);
+
+            const member = fields === null ? null : findField(fields, entry.name);
+
+            if (fields !== null && member === null) {
+                if (target?.field.open !== true) {
+                    this.unknownKey(target, entry.name, path, entry.position);
+
+                    continue;
+                }
+
+                const extra = this.expression(entry.value, openTarget(target, entry.name, path));
+
+                value[entry.name] = extra.value;
+                members.set(entry.name, extra.type);
+
+                continue;
+            }
+
+            const nested = member === null || target === null ? null : { field: member, path, key: join(target.key, entry.name) };
             const evaluated = this.expression(entry.value, nested);
 
             value[entry.name] = evaluated.value;
@@ -217,6 +255,20 @@ export class ManifestPass {
         this.reportMissing(node.position, target, value);
 
         return resolved(value, target === null ? createRecord('table', members) : target.field.type);
+    }
+
+    private unknownKey(target: FieldTarget | null, name: string, path: string, position: SourcePosition): void {
+        const replacement = this.removed[path] ?? this.removed[name];
+
+        if (replacement !== undefined) {
+            this.report(REMOVED_FIELD, `"${path}" is no longer a manifest field. ${replacement}`, position);
+
+            return;
+        }
+
+        const owner = target === null || target.path.length === 0 ? '' : ` The "${target.path}" section holds ${quoteList((target.field.members ?? []).map((entry) => entry.name))}.`;
+
+        this.report(UNKNOWN_FIELD, `"${path}" is not a configuration field.${owner}`, position);
     }
 
     private reportMissing(position: SourcePosition, target: FieldTarget | null, value: ManifestObject): void {
@@ -237,6 +289,10 @@ export class ManifestPass {
                 this.report(INVALID_EXPRESSION, MIXED_TABLE, entry.position);
 
                 continue;
+            }
+
+            if (index > 0 && target?.field.ordered === true && this.opensGroup(entry.position.offset)) {
+                this.groups.add(`${target.key}.${index}`);
             }
 
             const nested = element === null || target === null ? null : { field: elementField(target.field, element), path: target.path, key: `${target.key}.${index}` };
