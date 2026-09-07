@@ -1151,18 +1151,6 @@ the blank hints on the rest, however current the checkout is.
 
 #### Removed
 
-- The manifest's `name`, `sources`, `loadOrder`, `assets`, `compiler`, `engine`,
-  `outDir`, `output`, `helpers`, `contracts`, `libraries`, `development`,
-  `serverPath` and `resourcesDir`, along with `environment.file` and
-  `environment.localFile`. Each reports `config-removed-field` naming where it
-  went. The assignment form itself still loads for this minor behind
-  `config-manifest-form` and is removed in the next major.
-- The `local` declaration. A manifest has no statements: an intermediate value is
-  written where it is used.
-- The development log relay and the generated Lua behind it, along with the
-  `logs` table `.luam.server` carried to configure it. The position map debugs
-  against the authored file, which is what the relay existed to work around.
-
 - **Breaking.** The `transport` manifest table, the `http` transport, and every
   field, diagnostic, and environment variable that served them. A manifest that
   still writes `transport` reports `config-removed-field` and names what replaced
