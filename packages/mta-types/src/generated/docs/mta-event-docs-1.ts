@@ -49,6 +49,18 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnChatMessage',
     },
+    onClientBrowserConsoleMessage: {
+        summary: 'This event is triggered when a browser outputs a console message, such as a JavaScript error or a message written using console.log().',
+        parameters: [
+            { name: 'message', isOptional: false, isVariadic: false, summary: 'the console message.' },
+            { name: 'source', isOptional: false, isVariadic: false, summary: 'the URL or source identifier where the message originated.' },
+            { name: 'line', isOptional: false, isVariadic: false, summary: 'the line number where the message originated.' },
+            { name: 'level', isOptional: false, isVariadic: false, summary: 'the severity level of the message:' },
+        ],
+        source: 'The source of this event is the browser element that generated the console message.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientBrowserConsoleMessage',
+    },
     onClientBrowserCreated: {
         summary: 'This event is triggered when the CEF browser instance has been created. If you want to load a specific website right after creating the browser (using createBrowser or guiCreateBrowser), this event will be the convenient place.',
         parameters: [],
@@ -221,14 +233,5 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         source: 'The source of this event is the localPlayer player element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientConsole',
-    },
-    onClientCoreCommand: {
-        summary: 'This event is triggered when a built-in client command is used, check Client Commands.',
-        parameters: [
-            { name: 'command', isOptional: false, isVariadic: false, summary: 'The command that was executed.' },
-        ],
-        source: 'The source of this event is the localPlayer player element.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientCoreCommand',
     },
 };

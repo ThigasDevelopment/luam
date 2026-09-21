@@ -1,6 +1,14 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_48: ApiDocumentationCatalog = {
+    setSunSize: {
+        summary: 'This function is used to set the size of the sun.',
+        parameters: [
+            { name: 'Size', isOptional: false, isVariadic: false, summary: 'The size you want the sun to be in the sky.' },
+        ],
+        returns: 'Returns true if the size of the sun was set, false otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSunSize',
+    },
     setTeamColor: {
         summary: 'This function is for setting the color of a specified team. This color is shown, for example, in the team players\' nametags.',
         parameters: [
@@ -231,14 +239,5 @@ export const MTA_DOCS_48: ApiDocumentationCatalog = {
         ],
         returns: 'Returns *true* if the vehicle was set damage proof succesfully, *false* if the arguments are invalid or it failed.',
         wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDamageProof',
-    },
-    setVehicleDirtLevel: {
-        summary: 'This function sets the dirt level on a vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the dirt level from' },
-            { name: 'dirtLevel', isOptional: false, isVariadic: false, summary: 'The dirt level' },
-        ],
-        returns: 'returns true if the dirt level was set on the vehicle, false if the dirt level was not set or if invalid arguments are specified.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDirtLevel',
     },
 };

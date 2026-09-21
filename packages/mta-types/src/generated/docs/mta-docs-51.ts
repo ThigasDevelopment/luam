@@ -1,6 +1,17 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_51: ApiDocumentationCatalog = {
+    setWeaponAmmo: {
+        summary: 'Sets the ammo to a certain amount for a specified weapon (if they already have it), regardless of current ammo.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
+            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a weapon ID.' },
+            { name: 'totalAmmo', isOptional: false, isVariadic: false, summary: 'A whole number integer serving as the total ammo amount for the given weapon (including ammo in clip).' },
+            { name: 'ammoInClip', isOptional: true, isVariadic: false, summary: 'The amount of ammo to set in the player\'s clip. This will be taken from the main ammo. If left unspecified or set to 0, the current clip will remain.' },
+        ],
+        returns: 'Returns a boolean value *true* or *false* that tells you if it was successful or not.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeaponAmmo',
+    },
     setWeaponClipAmmo: {
         summary: 'This function sets the ammo left in a custom weapon\'s magazine/clip.',
         parameters: [
@@ -220,21 +231,5 @@ export const MTA_DOCS_51: ApiDocumentationCatalog = {
         parameters: [],
         returns: '',
         wiki: '',
-    },
-    spawnPlayer: {
-        summary: 'This function spawns the player at an arbitrary point on the map.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you want to spawn.' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'The x co-ordinate to spawn the player at.' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'The y co-ordinate to spawn the player at.' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'The z co-ordinate to spawn the player at.' },
-            { name: 'rotation', isOptional: true, isVariadic: false, summary: 'rotation of the player on spawn.' },
-            { name: 'skinID', isOptional: true, isVariadic: false, summary: 'player\'s skin on spawn. Character Skins' },
-            { name: 'interior', isOptional: true, isVariadic: false, summary: 'interior the player will spawn into. Interior IDs' },
-            { name: 'dimension', isOptional: true, isVariadic: false, summary: 'The ID of the dimension that the player should be in.' },
-            { name: 'theTeam', isOptional: true, isVariadic: false, summary: 'the team the player will join.' },
-        ],
-        returns: 'Returns *true* if the player was spawned successfully, *false* otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SpawnPlayer',
     },
 };

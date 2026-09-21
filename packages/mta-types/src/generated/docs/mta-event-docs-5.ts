@@ -1,6 +1,15 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
+    onClientPlayerVoicePause: {
+        summary: 'This event is triggered when a player\'s voice sound is paused using setSoundPaused.',
+        parameters: [
+            { name: 'reason', isOptional: false, isVariadic: false, summary: 'the reason for the pause, this can be only "paused".' },
+        ],
+        source: 'The source of this event is the player whose voice got paused.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoicePause',
+    },
     onClientPlayerVoiceResumed: {
         summary: 'This event is triggered when a player\'s voice sound is resumed using setSoundPaused.',
         parameters: [
