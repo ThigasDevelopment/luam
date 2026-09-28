@@ -28,6 +28,15 @@ export const MTA_DOCS_47: ApiDocumentationCatalog = {
         returns: 'Returns *true* if the rule value was set, *false* if invalid arguments were specified.',
         wiki: 'https://wiki.multitheftauto.com/wiki/SetRuleValue',
     },
+    setSearchLightColor: {
+        summary: 'This function sets the color of a searchlight element.',
+        parameters: [
+            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: 'the searchlight to set the color of.' },
+            { name: 'color', isOptional: false, isVariadic: false, summary: 'the color to apply, created using tocolor.' },
+        ],
+        returns: 'This function does not return any values. Invalid arguments raise an error.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetSearchLightColor',
+    },
     setSearchLightEndPosition: {
         summary: 'This function sets the end position of a searchlight element.',
         parameters: [
@@ -225,13 +234,5 @@ export const MTA_DOCS_47: ApiDocumentationCatalog = {
         ],
         returns: 'Returns true if the color of the sun was set, false otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/SetSunColor',
-    },
-    setSunSize: {
-        summary: 'This function is used to set the size of the sun.',
-        parameters: [
-            { name: 'Size', isOptional: false, isVariadic: false, summary: 'The size you want the sun to be in the sky.' },
-        ],
-        returns: 'Returns true if the size of the sun was set, false otherwise.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetSunSize',
     },
 };

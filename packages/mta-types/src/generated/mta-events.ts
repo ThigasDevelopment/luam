@@ -101,6 +101,7 @@ const SERVER_EVENTS: readonly string[] = [
 ];
 
 const CLIENT_EVENTS: readonly string[] = [
+    'onClientBrowserConsoleMessage',
     'onClientBrowserCreated',
     'onClientBrowserCursorChange',
     'onClientBrowserDocumentReady',
