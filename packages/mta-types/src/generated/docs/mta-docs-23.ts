@@ -1,6 +1,14 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_23: ApiDocumentationCatalog = {
+    getSoundMaxDistance: {
+        summary: 'Gets a custom sound max distance at which the sound stops.',
+        parameters: [
+            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
+        ],
+        returns: 'Returns an *integer* of the max distance, *false* if invalid arguments where passed.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMaxDistance',
+    },
     getSoundMetaTags: {
         summary: 'Used to get the meta tags attached to a sound. These provide information about the sound, for instance the title or the artist.',
         parameters: [

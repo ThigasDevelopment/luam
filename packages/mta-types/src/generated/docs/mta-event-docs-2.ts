@@ -1,6 +1,15 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
+    onClientCoreCommand: {
+        summary: 'This event is triggered when a built-in client command is used, check Client Commands.',
+        parameters: [
+            { name: 'command', isOptional: false, isVariadic: false, summary: 'The command that was executed.' },
+        ],
+        source: 'The source of this event is the localPlayer player element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientCoreCommand',
+    },
     onClientCursorMove: {
         summary: 'This event is called by the root element whenever the cursor is moved over the screen, by the player. It returns information about the world coordinates as well as the screen coordinates of where the player moved the cursor.\n\nThe difference between this event and onClientMouseMove, is that the latter is actually called by GUI elements. This is to prevent double calling of onClientCursorMove, as onClientCursorMove is always called.',
         parameters: [
@@ -226,16 +235,5 @@ export const MTA_EVENT_DOCS_2: EventDocumentationCatalog = {
         source: 'The source of this event is the GUI element that was clicked.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseDown',
-    },
-    onClientGUIMouseUp: {
-        summary: 'This event is fired when the user releases his mouse button when on top of a GUI element.',
-        parameters: [
-            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the mouse button that was released on a GUI element, can be *left*, *right*, or *middle*.' },
-            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
-            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
-        ],
-        source: 'The source of this event is the GUI element on top of which the mouse button was released.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseUp',
     },
 };

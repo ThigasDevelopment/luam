@@ -1,6 +1,22 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_52: ApiDocumentationCatalog = {
+    spawnPlayer: {
+        summary: 'This function spawns the player at an arbitrary point on the map.',
+        parameters: [
+            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'The player you want to spawn.' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'The x co-ordinate to spawn the player at.' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'The y co-ordinate to spawn the player at.' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'The z co-ordinate to spawn the player at.' },
+            { name: 'rotation', isOptional: true, isVariadic: false, summary: 'rotation of the player on spawn.' },
+            { name: 'skinID', isOptional: true, isVariadic: false, summary: 'player\'s skin on spawn. Character Skins' },
+            { name: 'interior', isOptional: true, isVariadic: false, summary: 'interior the player will spawn into. Interior IDs' },
+            { name: 'dimension', isOptional: true, isVariadic: false, summary: 'The ID of the dimension that the player should be in.' },
+            { name: 'theTeam', isOptional: true, isVariadic: false, summary: 'the team the player will join.' },
+        ],
+        returns: 'Returns *true* if the player was spawned successfully, *false* otherwise.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SpawnPlayer',
+    },
     spawnVehicle: {
         summary: 'Spawns a vehicle at any given position and rotation',
         parameters: [
@@ -222,11 +238,5 @@ export const MTA_DOCS_52: ApiDocumentationCatalog = {
         ],
         returns: 'The **modelID**, **lodID**, **worldModelPositionX,Y,Z**, **worldModelRotationX,Y,Z** and **entityType** parameters are returned even if **hitElement** is **nil**. ***hit:** *true* if there is a collision, *false* otherwise. ***hitElement:** the MTA element hit if any, *nil* otherwise. ***modelID:** The ID of the element. ***worldModelPositionX,Y,Z:** World position of the detected element. ***worldModelRotationX,Y,Z:** World rotation of the detected element. ***lodID:** The ID of the element\'s LOD (or 0). ***entityType:** The type of the element (building, vehicle, ped, object, dummy).',
         wiki: 'https://wiki.multitheftauto.com/wiki/TestSphereAgainstWorld',
-    },
-    textCreateDisplay: {
-        summary: 'A text display is like a canvas that can contain many items of text. Each display can be seen by multiple observers (players) and each player can see multiple displays.',
-        parameters: [],
-        returns: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/TextCreateDisplay',
     },
 };

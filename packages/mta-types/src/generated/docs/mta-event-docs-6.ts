@@ -232,7 +232,7 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
             { name: 'newValue', isOptional: false, isVariadic: false, summary: 'the new value of this entry after it changed. This will be equivalent to getElementData(source, theKey).' },
         ],
         source: 'The source of this event is the element whose element data changed.',
-        cancel: 'This event cannot be cancelled using cancelEvent. To reverse the effect, use setElementData with the old value. See Example. This event can be cancelled using cancelEvent. If a client sent the cancelled change to the server, the server will send the client the server\'s version of the element data. |25731',
+        cancel: 'This event cannot be cancelled using cancelEvent. To reverse the effect, use setElementData with the old value. See Example. As of 1.7, this event can be cancelled using cancelEvent. If a client sent the cancelled change to the server, the server will send the client the server\'s version of the element data. |25731',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDataChange',
     },
 };

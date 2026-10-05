@@ -1,8 +1,23 @@
-import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
 
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_4: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientMouseEnter: fn(
+        [
+            NUMBER,
+            NUMBER,
+            named('Element'),
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'absoluteX',
+            'absoluteY',
+            'leftGUI',
+        ],
+    ),
     onClientMouseLeave: fn(
         [
             NUMBER,
@@ -202,23 +217,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_4: Readonly<Record<string, FunctionDesc
         [
             'theVehicle',
             'seat',
-        ],
-    ),
-    onClientPedWasted: fn(
-        [
-            named('Element'),
-            NUMBER,
-            NUMBER,
-            ANY,
-        ],
-        VOID,
-        4,
-        false,
-        [
-            'killer',
-            'weapon',
-            'bodypart',
-            'lossOrStealth',
         ],
     ),
 };
