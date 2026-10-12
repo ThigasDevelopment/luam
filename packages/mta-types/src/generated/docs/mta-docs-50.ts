@@ -1,6 +1,15 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_50: ApiDocumentationCatalog = {
+    setVehicleRespawnDelay: {
+        summary: 'This function sets the time delay (in milliseconds) the vehicle will remain wrecked before respawning.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to change the respawn delay of.' },
+            { name: 'timeDelay', isOptional: false, isVariadic: false, summary: 'The amount of milliseconds to delay.' },
+        ],
+        returns: 'Returns *true* if the vehicle was found and edited.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleRespawnDelay',
+    },
     setVehicleRespawnPosition: {
         summary: 'This function sets the position (and rotation) the vehicle will respawn to.',
         parameters: [
@@ -224,16 +233,5 @@ export const MTA_DOCS_50: ApiDocumentationCatalog = {
         ],
         returns: 'Returns a boolean value *true* or *false* that tells you if it was successful or not.',
         wiki: 'https://wiki.multitheftauto.com/wiki/SetWaveHeight',
-    },
-    setWeaponAmmo: {
-        summary: 'Sets the ammo to a certain amount for a specified weapon (if they already have it), regardless of current ammo.',
-        parameters: [
-            { name: 'thePlayer', isOptional: false, isVariadic: false, summary: 'A player object referencing the specified player' },
-            { name: 'weapon', isOptional: false, isVariadic: false, summary: 'A whole number integer that refers to a weapon ID.' },
-            { name: 'totalAmmo', isOptional: false, isVariadic: false, summary: 'A whole number integer serving as the total ammo amount for the given weapon (including ammo in clip).' },
-            { name: 'ammoInClip', isOptional: true, isVariadic: false, summary: 'The amount of ammo to set in the player\'s clip. This will be taken from the main ammo. If left unspecified or set to 0, the current clip will remain.' },
-        ],
-        returns: 'Returns a boolean value *true* or *false* that tells you if it was successful or not.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetWeaponAmmo',
     },
 };

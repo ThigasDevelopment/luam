@@ -5,6 +5,7 @@ const SHARED_EVENTS: readonly string[] = [];
 const SERVER_EVENTS: readonly string[] = [
     'onAccountCreate',
     'onAccountDataChange',
+    'onAccountNameChange',
     'onAccountRemove',
     'onBan',
     'onChatMessage',
@@ -101,6 +102,7 @@ const SERVER_EVENTS: readonly string[] = [
 ];
 
 const CLIENT_EVENTS: readonly string[] = [
+    'onClientBrowserConsoleMessage',
     'onClientBrowserCreated',
     'onClientBrowserCursorChange',
     'onClientBrowserDocumentReady',
