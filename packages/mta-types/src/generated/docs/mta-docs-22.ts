@@ -67,6 +67,14 @@ export const MTA_DOCS_22: ApiDocumentationCatalog = {
         returns: 'Returns two *x*, *y* floats indicating the screen position and float distance between screen and given position if successful, *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetScreenFromWorldPosition',
     },
+    getSearchLightColor: {
+        summary: 'This function gets the color of a searchlight element.',
+        parameters: [
+            { name: 'theSearchLight', isOptional: false, isVariadic: false, summary: 'the searchlight to get the color of.' },
+        ],
+        returns: 'Returns four integers representing the red, green, blue and alpha components of the searchlight\'s color, each ranging from 0 to 255. Invalid arguments raise an error. The default color is red 200, green 200, blue 255 and alpha 0.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/GetSearchLightColor',
+    },
     getSearchLightEndPosition: {
         summary: 'This function gets the end position of a searchlight element.',
         parameters: [
@@ -225,13 +233,5 @@ export const MTA_DOCS_22: ApiDocumentationCatalog = {
         ],
         returns: 'Returns a two *integers* in range from 0 to 32768.',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundLevelData',
-    },
-    getSoundMaxDistance: {
-        summary: 'Gets a custom sound max distance at which the sound stops.',
-        parameters: [
-            { name: 'sound', isOptional: false, isVariadic: false, summary: 'a sound element.' },
-        ],
-        returns: 'Returns an *integer* of the max distance, *false* if invalid arguments where passed.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/GetSoundMaxDistance',
     },
 };
