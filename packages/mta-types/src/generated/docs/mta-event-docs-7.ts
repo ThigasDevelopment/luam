@@ -1,6 +1,17 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
+    onElementDataChange: {
+        summary: 'This event is triggered *after* an element\'s data entry is changed. Such changes can be made on the client or the server using setElementData.',
+        parameters: [
+            { name: 'theKey', isOptional: false, isVariadic: false, summary: 'The name of the element data entry that has changed.' },
+            { name: 'oldValue', isOptional: false, isVariadic: false, summary: 'The old value of this entry before it changed. See element data for a list of possible datatypes.' },
+            { name: 'newValue', isOptional: false, isVariadic: false, summary: 'the new value of this entry after it changed. This will be equivalent to getElementData(source, theKey).' },
+        ],
+        source: 'The source of this event is the element whose element data changed.',
+        cancel: 'This event cannot be cancelled using cancelEvent. To reverse the effect, use setElementData with the old value. See Example. As of 1.7, this event can be cancelled using cancelEvent. If a client sent the cancelled change to the server, the server will send the client the server\'s version of the element data. |25731',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDataChange',
+    },
     onElementDestroy: {
         summary: 'This event is triggered when an element gets destroyed by destroyElement or when the creator resource is stopping. It is also triggered when a parent element of this element is destroyed.',
         parameters: [],
@@ -222,16 +233,5 @@ export const MTA_EVENT_DOCS_7: EventDocumentationCatalog = {
         source: 'The source of this event is the player that changed his nick',
         cancel: 'Cancelling this event depends on how it is called, if it is called by the scripting event then it is NOT cancelable. If it is called from the /nick command it IS cancelable. If this event is cancelled and can be cancelled then the name will not change.',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerChangeNick',
-    },
-    onPlayerChangesProtectedData: {
-        summary: 'This event is triggered when a player tries to change protected element data. The server protects element data with using elementdata_whitelisted from **mtaserver.conf** and the **clientChangesPolicy** parameter in setElementData.',
-        parameters: [
-            { name: 'element', isOptional: false, isVariadic: false, summary: 'The affected element.' },
-            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the element data entry that has changed.' },
-            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value that the player sends.' },
-        ],
-        source: 'The source of this event is the player who changes protected element data.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerChangesProtectedData',
     },
 };

@@ -1,6 +1,26 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_9: EventDocumentationCatalog = {
+    onPlayerProjectileCreation: {
+        summary: 'This event is triggered every time a projectile is created by a player - either through a weapon, a vehicle weapon or createProjectile.',
+        parameters: [
+            { name: 'weaponType', isOptional: false, isVariadic: false, summary: 'ID, see below' },
+            { name: 'x', isOptional: false, isVariadic: false, summary: 'X coordinate of where the projectile was created' },
+            { name: 'y', isOptional: false, isVariadic: false, summary: 'Y coordinate of where the projectile was created' },
+            { name: 'z', isOptional: false, isVariadic: false, summary: 'Z coordinate of where the projectile was created' },
+            { name: 'force', isOptional: false, isVariadic: false, summary: 'force of thrown projectile. Valid for ID 16, 17, 18, 39.' },
+            { name: 'target', isOptional: false, isVariadic: false, summary: 'element the projectile is targeting. Valid for ID 19, 20.' },
+            { name: 'rotX', isOptional: false, isVariadic: false, summary: 'X rotation. Valid for ID 19, 20.' },
+            { name: 'rotY', isOptional: false, isVariadic: false, summary: 'Y rotation. Valid for ID 19, 20.' },
+            { name: 'rotZ', isOptional: false, isVariadic: false, summary: 'Z rotation. Valid for ID 19, 20.' },
+            { name: 'velX', isOptional: false, isVariadic: false, summary: 'X axis velocity. Valid for ID 16, 17, 18, 19, 20, 39.' },
+            { name: 'velY', isOptional: false, isVariadic: false, summary: 'Y axis velocity. Valid for ID 16, 17, 18, 19, 20, 39.' },
+            { name: 'velZ', isOptional: false, isVariadic: false, summary: 'Z axis velocity. Valid for ID 16, 17, 18, 19, 20, 39.' },
+        ],
+        source: 'The source of this event is the player who created the projectile.',
+        cancel: 'If this event is canceled, the projectile will not be created for other players on the server.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerProjectileCreation',
+    },
     onPlayerQuit: {
         summary: 'This event is triggered when a player disconnects from the server.',
         parameters: [
@@ -218,23 +238,5 @@ export const MTA_EVENT_DOCS_9: EventDocumentationCatalog = {
         source: 'The source of this event is the root element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnResourceLoadStateChange',
-    },
-    onResourcePreStart: {
-        summary: 'Analogous to onResourceStart, but triggered before script files are initialised.',
-        parameters: [
-            { name: 'startingResource', isOptional: false, isVariadic: false, summary: 'the resource that is starting.' },
-        ],
-        source: 'The source of this event is the root element.',
-        cancel: 'If this event is cancelled, the resource won\'t begin starting.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnResourcePreStart',
-    },
-    onResourceStart: {
-        summary: 'This event is triggered when a resource is started.\n\n**Important:** If you attach this event to the root element it will called when *any* resource starts, not just the resource your script is running inside. As such, most of the time you will want to check that the resource passed to this event matches your resource (compare with the value returned by getThisResource before doing anything. Alternatively you can attach the event to resourceRoot.',
-        parameters: [
-            { name: 'startedResource', isOptional: false, isVariadic: false, summary: 'the resource that was started.' },
-        ],
-        source: 'The source of this event is the root element in the resource that started.',
-        cancel: 'If this event is canceled, the resource starting is aborted and is stopped again.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnResourceStart',
     },
 };
