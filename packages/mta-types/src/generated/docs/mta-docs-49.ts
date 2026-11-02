@@ -1,6 +1,15 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_49: ApiDocumentationCatalog = {
+    setVehicleDirtLevel: {
+        summary: 'This function sets the dirt level on a vehicle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you want to set the dirt level from' },
+            { name: 'dirtLevel', isOptional: false, isVariadic: false, summary: 'The dirt level' },
+        ],
+        returns: 'returns true if the dirt level was set on the vehicle, false if the dirt level was not set or if invalid arguments are specified.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleDirtLevel',
+    },
     setVehicleDoorOpenRatio: {
         summary: 'This function sets how much a vehicle\'s door is open. Doors include the boot/trunk and the bonnet of the vehicle.',
         parameters: [
@@ -228,14 +237,5 @@ export const MTA_DOCS_49: ApiDocumentationCatalog = {
         ],
         returns: 'Returns *true* if the numberplate was changed successfully, or *false* if invalid arguments were passed',
         wiki: 'https://wiki.multitheftauto.com/wiki/SetVehiclePlateText',
-    },
-    setVehicleRespawnDelay: {
-        summary: 'This function sets the time delay (in milliseconds) the vehicle will remain wrecked before respawning.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to change the respawn delay of.' },
-            { name: 'timeDelay', isOptional: false, isVariadic: false, summary: 'The amount of milliseconds to delay.' },
-        ],
-        returns: 'Returns *true* if the vehicle was found and edited.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/SetVehicleRespawnDelay',
     },
 };

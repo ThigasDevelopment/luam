@@ -1,6 +1,25 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_4: EventDocumentationCatalog = {
+    onClientPedStep: {
+        summary: 'This event is called when a peds foot has come on to the ground after jumping or taking a full step.',
+        parameters: [
+            { name: 'leftFoot', isOptional: false, isVariadic: false, summary: 'a bool representing if it was the left foot that moved.' },
+        ],
+        source: 'The source of this event is the ped who stepped.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedStep',
+    },
+    onClientPedVehicleEnter: {
+        summary: 'This event is fired when a ped has entered a vehicle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that the ped entered.' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'The seat that the ped now is on. Driver\'s seat = 0, higher numbers are passenger seats.' },
+        ],
+        source: 'The source of this event is the ped that entered the vehicle.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedVehicleEnter',
+    },
     onClientPedVehicleExit: {
         summary: 'This event is fired when a ped has exited a vehicle.',
         parameters: [
@@ -218,24 +237,5 @@ export const MTA_EVENT_DOCS_4: EventDocumentationCatalog = {
         source: 'The source of this event is the player that entered the vehicle.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVehicleEnter',
-    },
-    onClientPlayerVehicleExit: {
-        summary: 'This event is triggered when a player has exited a vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle that the player exited.' },
-            { name: 'seat', isOptional: false, isVariadic: false, summary: 'the number of the seat that the player was sitting on.' },
-        ],
-        source: 'The source of this event is the player that exited the vehicle.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVehicleExit',
-    },
-    onClientPlayerVoicePause: {
-        summary: 'This event is triggered when a player\'s voice sound is paused using setSoundPaused.',
-        parameters: [
-            { name: 'reason', isOptional: false, isVariadic: false, summary: 'the reason for the pause, this can be only "paused".' },
-        ],
-        source: 'The source of this event is the player whose voice got paused.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoicePause',
     },
 };

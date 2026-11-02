@@ -3,6 +3,32 @@ import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descri
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_6: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientPlayerStuntFinish: fn(
+        [
+            STRING,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'stuntType',
+            'stuntTime',
+            'stuntDistance',
+        ],
+    ),
+    onClientPlayerStuntStart: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'stuntType',
+        ],
+    ),
     onClientPlayerTarget: fn(
         [
             named('Element'),
@@ -200,28 +226,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_6: Readonly<Record<string, FunctionDesc
         false,
         [
             'startedResource',
-        ],
-    ),
-    onClientResourceStop: fn(
-        [
-            named('Resource'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'stoppedResource',
-        ],
-    ),
-    onClientRestore: fn(
-        [
-            BOOLEAN,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'didClearRenderTargets',
         ],
     ),
 };

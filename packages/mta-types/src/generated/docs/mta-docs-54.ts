@@ -1,6 +1,15 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_54: ApiDocumentationCatalog = {
+    toggleVehicleRespawn: {
+        summary: 'This function toggles whether or not the vehicle will be respawned after blown or idle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to toggle the respawning of.' },
+            { name: 'Respawn', isOptional: false, isVariadic: false, summary: 'A boolean determining if the vehicle will respawn or not.' },
+        ],
+        returns: 'Returns *true* if the vehicle was found and edited.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/ToggleVehicleRespawn',
+    },
     toJSON: {
         summary: 'This function converts a **single** value (preferably a Lua table) into a JSON encoded string. You can use this to store the data and then load it again using fromJSON.',
         parameters: [
@@ -226,14 +235,5 @@ export const MTA_DOCS_54: ApiDocumentationCatalog = {
         ],
         returns: 'Returns the root xmlnode object of an xml string if successful, or *false* otherwise (invalid XML string).',
         wiki: 'https://wiki.multitheftauto.com/wiki/XmlLoadString',
-    },
-    xmlNodeGetAttribute: {
-        summary: 'This function is used to return an attribute of a node in a configuration file.',
-        parameters: [
-            { name: 'node', isOptional: false, isVariadic: false, summary: 'The node from which you wish to return the attribute' },
-            { name: 'name', isOptional: false, isVariadic: false, summary: 'The name of the attribute.' },
-        ],
-        returns: 'Returns the attribute in string form or *false*, if the attribute is not defined.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetAttribute',
     },
 };

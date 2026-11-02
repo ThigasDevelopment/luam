@@ -1,8 +1,25 @@
-import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
+import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descriptor';
 
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_5: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientPedWasted: fn(
+        [
+            named('Element'),
+            NUMBER,
+            NUMBER,
+            ANY,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'killer',
+            'weapon',
+            'bodypart',
+            'lossOrStealth',
+        ],
+    ),
     onClientPedWeaponFire: fn(
         [
             NUMBER,
@@ -205,32 +222,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_5: Readonly<Record<string, FunctionDesc
         false,
         [
             'targetPlayer',
-        ],
-    ),
-    onClientPlayerStuntFinish: fn(
-        [
-            STRING,
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'stuntType',
-            'stuntTime',
-            'stuntDistance',
-        ],
-    ),
-    onClientPlayerStuntStart: fn(
-        [
-            STRING,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'stuntType',
         ],
     ),
 };
