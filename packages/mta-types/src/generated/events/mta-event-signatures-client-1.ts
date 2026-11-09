@@ -3,6 +3,23 @@ import { BOOLEAN, fn, named, NUMBER, STRING, TABLE, VOID } from '@mta-types/type
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_1: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientBrowserConsoleMessage: fn(
+        [
+            STRING,
+            STRING,
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        4,
+        false,
+        [
+            'message',
+            'source',
+            'line',
+            'level',
+        ],
+    ),
     onClientBrowserCreated: fn(
         [
         ],
@@ -206,30 +223,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_1: Readonly<Record<string, FunctionDesc
         [
             'theElement',
             'matchingDimension',
-        ],
-    ),
-    onClientColShapeLeave: fn(
-        [
-            named('Element'),
-            BOOLEAN,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'theElement',
-            'matchingDimension',
-        ],
-    ),
-    onClientConsole: fn(
-        [
-            STRING,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'text',
         ],
     ),
 };

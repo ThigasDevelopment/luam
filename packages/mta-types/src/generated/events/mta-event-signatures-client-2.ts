@@ -3,6 +3,30 @@ import { ANY, BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-d
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_2: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientColShapeLeave: fn(
+        [
+            named('Element'),
+            BOOLEAN,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'theElement',
+            'matchingDimension',
+        ],
+    ),
+    onClientConsole: fn(
+        [
+            STRING,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'text',
+        ],
+    ),
     onClientCoreCommand: fn(
         [
             STRING,
@@ -205,32 +229,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_2: Readonly<Record<string, FunctionDesc
             'y',
             'z',
             'theType',
-        ],
-    ),
-    onClientFileDownloadComplete: fn(
-        [
-            STRING,
-            BOOLEAN,
-            named('Resource'),
-        ],
-        VOID,
-        3,
-        false,
-        [
-            'fileName',
-            'success',
-            'requestResource',
-        ],
-    ),
-    onClientGUIAccepted: fn(
-        [
-            named('Element'),
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'editBox',
         ],
     ),
 };

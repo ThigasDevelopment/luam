@@ -21,6 +21,17 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnAccountDataChange',
     },
+    onAccountNameChange: {
+        summary: 'This event is triggered before an account name is changed using setAccountName.\n|25351',
+        parameters: [
+            { name: 'theAccount', isOptional: false, isVariadic: false, summary: 'The account being renamed.' },
+            { name: 'previousName', isOptional: false, isVariadic: false, summary: 'The account\'s current name.' },
+            { name: 'newName', isOptional: false, isVariadic: false, summary: 'The proposed new account name.' },
+        ],
+        source: 'The source of this event is the root element.',
+        cancel: 'If this event is canceled, the account name will not change and setAccountName will return false.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnAccountNameChange',
+    },
     onAccountRemove: {
         summary: 'This event is triggered every time an account is removed',
         parameters: [
@@ -48,6 +59,18 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         source: 'The source of this event is the root element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnChatMessage',
+    },
+    onClientBrowserConsoleMessage: {
+        summary: 'This event is triggered when a browser outputs a console message, such as a JavaScript error or a message written using console.log().',
+        parameters: [
+            { name: 'message', isOptional: false, isVariadic: false, summary: 'the console message.' },
+            { name: 'source', isOptional: false, isVariadic: false, summary: 'the URL or source identifier where the message originated.' },
+            { name: 'line', isOptional: false, isVariadic: false, summary: 'the line number where the message originated.' },
+            { name: 'level', isOptional: false, isVariadic: false, summary: 'the severity level of the message:' },
+        ],
+        source: 'The source of this event is the browser element that generated the console message.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientBrowserConsoleMessage',
     },
     onClientBrowserCreated: {
         summary: 'This event is triggered when the CEF browser instance has been created. If you want to load a specific website right after creating the browser (using createBrowser or guiCreateBrowser), this event will be the convenient place.',
@@ -212,23 +235,5 @@ export const MTA_EVENT_DOCS_1: EventDocumentationCatalog = {
         source: 'The source of this event is the colshape that the element left.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientColShapeLeave',
-    },
-    onClientConsole: {
-        summary: 'This event is triggered when the local player enters text in the console. Note that, if you want to add custom console commands, it is easier to use the addCommandHandler function.',
-        parameters: [
-            { name: 'text', isOptional: false, isVariadic: false, summary: 'the text line that was entered.' },
-        ],
-        source: 'The source of this event is the localPlayer player element.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientConsole',
-    },
-    onClientCoreCommand: {
-        summary: 'This event is triggered when a built-in client command is used, check Client Commands.',
-        parameters: [
-            { name: 'command', isOptional: false, isVariadic: false, summary: 'The command that was executed.' },
-        ],
-        source: 'The source of this event is the localPlayer player element.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientCoreCommand',
     },
 };

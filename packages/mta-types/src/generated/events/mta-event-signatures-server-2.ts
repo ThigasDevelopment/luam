@@ -3,6 +3,19 @@ import { BOOLEAN, fn, named, NUMBER, VOID } from '@mta-types/type-descriptor';
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_SERVER_2: Readonly<Record<string, FunctionDescriptor>> = {
+    onElementInteriorChange: fn(
+        [
+            NUMBER,
+            NUMBER,
+        ],
+        VOID,
+        2,
+        false,
+        [
+            'oldInterior',
+            'newInterior',
+        ],
+    ),
     onElementModelChange: fn(
         [
             NUMBER,

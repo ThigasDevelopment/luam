@@ -1,6 +1,15 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_55: ApiDocumentationCatalog = {
+    xmlNodeGetAttribute: {
+        summary: 'This function is used to return an attribute of a node in a configuration file.',
+        parameters: [
+            { name: 'node', isOptional: false, isVariadic: false, summary: 'The node from which you wish to return the attribute' },
+            { name: 'name', isOptional: false, isVariadic: false, summary: 'The name of the attribute.' },
+        ],
+        returns: 'Returns the attribute in string form or *false*, if the attribute is not defined.',
+        wiki: 'https://wiki.multitheftauto.com/wiki/XmlNodeGetAttribute',
+    },
     xmlNodeGetAttributes: {
         summary: 'Returns all the attributes of a specific XML node.',
         parameters: [
