@@ -1,6 +1,12 @@
 import type { ApiDocumentationCatalog } from '@mta-types/api-documentation';
 
 export const MTA_DOCS_53: ApiDocumentationCatalog = {
+    textCreateDisplay: {
+        summary: 'A text display is like a canvas that can contain many items of text. Each display can be seen by multiple observers (players) and each player can see multiple displays.',
+        parameters: [],
+        returns: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/TextCreateDisplay',
+    },
     textCreateTextItem: {
         summary: 'This function creates a text item. A text item represents a single area of text, much like a label does in standard GUI programming. A text item can only be seen by players if it is added to a textdisplay using textDisplayAddText. Each text item can be added to multiple displays, if need be.',
         parameters: [
@@ -227,14 +233,5 @@ export const MTA_DOCS_53: ApiDocumentationCatalog = {
         ],
         returns: '* *true* when the it was changed successfully. * *false* otherwise.',
         wiki: 'https://wiki.multitheftauto.com/wiki/ToggleObjectRespawn',
-    },
-    toggleVehicleRespawn: {
-        summary: 'This function toggles whether or not the vehicle will be respawned after blown or idle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle you wish to toggle the respawning of.' },
-            { name: 'Respawn', isOptional: false, isVariadic: false, summary: 'A boolean determining if the vehicle will respawn or not.' },
-        ],
-        returns: 'Returns *true* if the vehicle was found and edited.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/ToggleVehicleRespawn',
     },
 };

@@ -216,7 +216,7 @@ export const MTA_DOCS_25: ApiDocumentationCatalog = {
             { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that you wish to get the wheel friction state.' },
             { name: 'wheel', isOptional: false, isVariadic: false, summary: 'The wheel you want to check. (0: front left, 1: rear left, 2: front right, 3: rear right)' },
         ],
-        returns: 'Returns a int indicating the wheel friction state. This value can be: * **0:** Normal friction * **1:** Slip with acceleration (only for driving wheels) * **2:** Slip without acceleration * **3:** Locked wheel (on brake or handbrake).',
+        returns: 'Returns an int indicating the wheel friction state. This value can be: * **0:** Normal friction * **1:** Slip with acceleration (only for driving wheels) * **2:** Slip without acceleration * **3:** Locked wheel (on brake or handbrake).',
         wiki: 'https://wiki.multitheftauto.com/wiki/GetVehicleWheelFrictionState',
     },
     getVehicleWheelScale: {

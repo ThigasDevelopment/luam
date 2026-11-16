@@ -1,6 +1,25 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
+    onClientPlayerVehicleExit: {
+        summary: 'This event is triggered when a player has exited a vehicle.',
+        parameters: [
+            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'the vehicle that the player exited.' },
+            { name: 'seat', isOptional: false, isVariadic: false, summary: 'the number of the seat that the player was sitting on.' },
+        ],
+        source: 'The source of this event is the player that exited the vehicle.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVehicleExit',
+    },
+    onClientPlayerVoicePause: {
+        summary: 'This event is triggered when a player\'s voice sound is paused using setSoundPaused.',
+        parameters: [
+            { name: 'reason', isOptional: false, isVariadic: false, summary: 'the reason for the pause, this can be only "paused".' },
+        ],
+        source: 'The source of this event is the player whose voice got paused.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPlayerVoicePause',
+    },
     onClientPlayerVoiceResumed: {
         summary: 'This event is triggered when a player\'s voice sound is resumed using setSoundPaused.',
         parameters: [
@@ -214,14 +233,5 @@ export const MTA_EVENT_DOCS_5: EventDocumentationCatalog = {
         source: 'The source of this event is the root element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientTransferBoxProgressChange',
-    },
-    onClientTransferBoxVisibilityChange: {
-        summary: 'This event is triggered every time the resource file downloader (aka. transfer box) is shown or hidden by MTA.',
-        parameters: [
-            { name: 'isVisible', isOptional: false, isVariadic: false, summary: 'A boolean, indicating the new visibility status of the transfer box.' },
-        ],
-        source: 'The source of this event is the root element.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientTransferBoxVisibilityChange',
     },
 };

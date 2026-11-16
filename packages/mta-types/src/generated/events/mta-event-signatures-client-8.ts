@@ -1,8 +1,28 @@
-import { fn, named, NUMBER, VOID } from '@mta-types/type-descriptor';
+import { BOOLEAN, fn, named, NUMBER, VOID } from '@mta-types/type-descriptor';
 
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_8: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientVehicleNitroStateChange: fn(
+        [
+            BOOLEAN,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'state',
+        ],
+    ),
+    onClientVehicleRespawn: fn(
+        [
+        ],
+        VOID,
+        0,
+        false,
+        [
+        ],
+    ),
     onClientVehicleStartEnter: fn(
         [
             named('Ped'),

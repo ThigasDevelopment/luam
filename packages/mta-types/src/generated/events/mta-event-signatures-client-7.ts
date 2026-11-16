@@ -3,6 +3,28 @@ import { BOOLEAN, fn, named, NUMBER, STRING, VOID } from '@mta-types/type-descri
 import type { FunctionDescriptor } from '@mta-types/type-descriptor';
 
 export const MTA_EVENT_SIGNATURES_CLIENT_7: Readonly<Record<string, FunctionDescriptor>> = {
+    onClientResourceStop: fn(
+        [
+            named('Resource'),
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'stoppedResource',
+        ],
+    ),
+    onClientRestore: fn(
+        [
+            BOOLEAN,
+        ],
+        VOID,
+        1,
+        false,
+        [
+            'didClearRenderTargets',
+        ],
+    ),
     onClientSoundBeat: fn(
         [
             NUMBER,
@@ -202,26 +224,6 @@ export const MTA_EVENT_SIGNATURES_CLIENT_7: Readonly<Record<string, FunctionDesc
         ],
     ),
     onClientVehicleExplode: fn(
-        [
-        ],
-        VOID,
-        0,
-        false,
-        [
-        ],
-    ),
-    onClientVehicleNitroStateChange: fn(
-        [
-            BOOLEAN,
-        ],
-        VOID,
-        1,
-        false,
-        [
-            'state',
-        ],
-    ),
-    onClientVehicleRespawn: fn(
         [
         ],
         VOID,

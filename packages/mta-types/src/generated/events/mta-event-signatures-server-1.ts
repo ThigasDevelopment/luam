@@ -29,6 +29,21 @@ export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDesc
             'theValue',
         ],
     ),
+    onAccountNameChange: fn(
+        [
+            named('Account'),
+            STRING,
+            STRING,
+        ],
+        VOID,
+        3,
+        false,
+        [
+            'theAccount',
+            'previousName',
+            'newName',
+        ],
+    ),
     onAccountRemove: fn(
         [
             named('Account'),
@@ -206,19 +221,6 @@ export const MTA_EVENT_SIGNATURES_SERVER_1: Readonly<Record<string, FunctionDesc
         [
             'oldDimension',
             'newDimension',
-        ],
-    ),
-    onElementInteriorChange: fn(
-        [
-            NUMBER,
-            NUMBER,
-        ],
-        VOID,
-        2,
-        false,
-        [
-            'oldInterior',
-            'newInterior',
         ],
     ),
 };

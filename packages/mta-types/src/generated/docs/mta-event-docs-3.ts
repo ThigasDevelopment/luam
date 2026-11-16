@@ -1,6 +1,28 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
+    onClientGUIMouseDown: {
+        summary: 'This event is fired when the user clicks certain mouse button on a GUI element.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the mouse button that the GUI element was clicked with, can be *left*, *right*, or *middle*.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
+        ],
+        source: 'The source of this event is the GUI element that was clicked.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseDown',
+    },
+    onClientGUIMouseUp: {
+        summary: 'This event is fired when the user releases his mouse button when on top of a GUI element.',
+        parameters: [
+            { name: 'button', isOptional: false, isVariadic: false, summary: 'the name of the mouse button that was released on a GUI element, can be *left*, *right*, or *middle*.' },
+            { name: 'absoluteX', isOptional: false, isVariadic: false, summary: 'the X position of the mouse cursor, in pixels, measured from the left side of the screen.' },
+            { name: 'absoluteY', isOptional: false, isVariadic: false, summary: 'the Y position of the mouse cursor, in pixels, measured from the top of the screen.' },
+        ],
+        source: 'The source of this event is the GUI element on top of which the mouse button was released.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientGUIMouseUp',
+    },
     onClientGUIMove: {
         summary: 'This event is triggered each time the user moves a GUI element.',
         parameters: [],
@@ -215,24 +237,5 @@ export const MTA_EVENT_DOCS_3: EventDocumentationCatalog = {
         source: 'The source of this event is the client\'s root element.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedsProcessed',
-    },
-    onClientPedStep: {
-        summary: 'This event is called when a peds foot has come on to the ground after jumping or taking a full step.',
-        parameters: [
-            { name: 'leftFoot', isOptional: false, isVariadic: false, summary: 'a bool representing if it was the left foot that moved.' },
-        ],
-        source: 'The source of this event is the ped who stepped.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedStep',
-    },
-    onClientPedVehicleEnter: {
-        summary: 'This event is fired when a ped has entered a vehicle.',
-        parameters: [
-            { name: 'theVehicle', isOptional: false, isVariadic: false, summary: 'The vehicle that the ped entered.' },
-            { name: 'seat', isOptional: false, isVariadic: false, summary: 'The seat that the ped now is on. Driver\'s seat = 0, higher numbers are passenger seats.' },
-        ],
-        source: 'The source of this event is the ped that entered the vehicle.',
-        cancel: '',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientPedVehicleEnter',
     },
 };

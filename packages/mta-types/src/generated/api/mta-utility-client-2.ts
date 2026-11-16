@@ -1,7 +1,12 @@
 import type { ApiCatalog } from '@mta-types/api-declaration';
 import { ANY, BOOLEAN, fn, literal, named, NIL, NUMBER, STRING, TABLE, tupleOf, unionOf } from '@mta-types/type-descriptor';
 
-export const MTA_ENGINE_CLIENT: ApiCatalog = {
+export const MTA_UTILITY_CLIENT_2: ApiCatalog = {
+    dxSetShaderValue: fn([named('Element'), STRING, ANY], BOOLEAN, 3),
+    dxSetTestMode: fn([STRING], BOOLEAN, 1),
+    dxSetTextureEdge: fn([named('DxTexture'), STRING, NUMBER], BOOLEAN, 2),
+    dxSetTexturePixels: fn([NUMBER, named('Element'), STRING, NUMBER, NUMBER, NUMBER, NUMBER], BOOLEAN, 2),
+    dxUpdateScreenSource: fn([named('Element'), BOOLEAN], BOOLEAN, 1),
     engineAddClothingModel: fn([named('EngineDFF'), STRING], BOOLEAN, 2),
     engineAddClothingTXD: fn([named('EngineTXD'), STRING], BOOLEAN, 2),
     engineAddImage: fn([ANY], BOOLEAN, 1),
