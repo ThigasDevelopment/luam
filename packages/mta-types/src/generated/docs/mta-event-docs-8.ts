@@ -1,6 +1,17 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
+    onPlayerChangesProtectedData: {
+        summary: 'This event is triggered when a player tries to change protected element data. The server protects element data with using elementdata_whitelisted from **mtaserver.conf** and the **clientChangesPolicy** parameter in setElementData.',
+        parameters: [
+            { name: 'element', isOptional: false, isVariadic: false, summary: 'The affected element.' },
+            { name: 'key', isOptional: false, isVariadic: false, summary: 'The name of the element data entry that has changed.' },
+            { name: 'value', isOptional: false, isVariadic: false, summary: 'The value that the player sends.' },
+        ],
+        source: 'The source of this event is the player who changes protected element data.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerChangesProtectedData',
+    },
     onPlayerChangesWorldSpecialProperty: {
         summary: 'This event is triggered every time a player calls setWorldSpecialPropertyEnabled.',
         parameters: [
@@ -210,25 +221,5 @@ export const MTA_EVENT_DOCS_8: EventDocumentationCatalog = {
         source: 'The source of this event is the player who sent the private message.',
         cancel: 'If this event is canceled, the game\'s chat system won\'t deliver the message. You may use outputChatBox to send the messages then.',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerPrivateMessage',
-    },
-    onPlayerProjectileCreation: {
-        summary: 'This event is triggered every time a projectile is created by a player - either through a weapon, a vehicle weapon or createProjectile.',
-        parameters: [
-            { name: 'weaponType', isOptional: false, isVariadic: false, summary: 'ID, see below' },
-            { name: 'x', isOptional: false, isVariadic: false, summary: 'X coordinate of where the projectile was created' },
-            { name: 'y', isOptional: false, isVariadic: false, summary: 'Y coordinate of where the projectile was created' },
-            { name: 'z', isOptional: false, isVariadic: false, summary: 'Z coordinate of where the projectile was created' },
-            { name: 'force', isOptional: false, isVariadic: false, summary: 'force of thrown projectile. Valid for ID 16, 17, 18, 39.' },
-            { name: 'target', isOptional: false, isVariadic: false, summary: 'element the projectile is targeting. Valid for ID 19, 20.' },
-            { name: 'rotX', isOptional: false, isVariadic: false, summary: 'X rotation. Valid for ID 19, 20.' },
-            { name: 'rotY', isOptional: false, isVariadic: false, summary: 'Y rotation. Valid for ID 19, 20.' },
-            { name: 'rotZ', isOptional: false, isVariadic: false, summary: 'Z rotation. Valid for ID 19, 20.' },
-            { name: 'velX', isOptional: false, isVariadic: false, summary: 'X axis velocity. Valid for ID 16, 17, 18, 19, 20, 39.' },
-            { name: 'velY', isOptional: false, isVariadic: false, summary: 'Y axis velocity. Valid for ID 16, 17, 18, 19, 20, 39.' },
-            { name: 'velZ', isOptional: false, isVariadic: false, summary: 'Z axis velocity. Valid for ID 16, 17, 18, 19, 20, 39.' },
-        ],
-        source: 'The source of this event is the player who created the projectile.',
-        cancel: 'If this event is canceled, the projectile will not be created for other players on the server.',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnPlayerProjectileCreation',
     },
 };

@@ -1,6 +1,15 @@
 import type { EventDocumentationCatalog } from '@mta-types/event-documentation';
 
 export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
+    onClientTransferBoxVisibilityChange: {
+        summary: 'This event is triggered every time the resource file downloader (aka. transfer box) is shown or hidden by MTA.',
+        parameters: [
+            { name: 'isVisible', isOptional: false, isVariadic: false, summary: 'A boolean, indicating the new visibility status of the transfer box.' },
+        ],
+        source: 'The source of this event is the root element.',
+        cancel: '',
+        wiki: 'https://wiki.multitheftauto.com/wiki/OnClientTransferBoxVisibilityChange',
+    },
     onClientVehicleCollision: {
         summary: 'This event is triggered when a vehicle collides with an element or a world object.\n\nNote that the collision reported by this event doesn\'t always damage the vehicle by default (this event triggers when hitting lamp posts, but the vehicle isn\'t damaged by them automatically, for example). If you want to deal with real damage, please refer to onClientVehicleDamage.',
         parameters: [
@@ -223,16 +232,5 @@ export const MTA_EVENT_DOCS_6: EventDocumentationCatalog = {
         source: 'The source of this event is the player or vehicle that left colshape.',
         cancel: '',
         wiki: 'https://wiki.multitheftauto.com/wiki/OnElementColShapeLeave',
-    },
-    onElementDataChange: {
-        summary: 'This event is triggered *after* an element\'s data entry is changed. Such changes can be made on the client or the server using setElementData.',
-        parameters: [
-            { name: 'theKey', isOptional: false, isVariadic: false, summary: 'The name of the element data entry that has changed.' },
-            { name: 'oldValue', isOptional: false, isVariadic: false, summary: 'The old value of this entry before it changed. See element data for a list of possible datatypes.' },
-            { name: 'newValue', isOptional: false, isVariadic: false, summary: 'the new value of this entry after it changed. This will be equivalent to getElementData(source, theKey).' },
-        ],
-        source: 'The source of this event is the element whose element data changed.',
-        cancel: 'This event cannot be cancelled using cancelEvent. To reverse the effect, use setElementData with the old value. See Example. This event can be cancelled using cancelEvent. If a client sent the cancelled change to the server, the server will send the client the server\'s version of the element data. |25731',
-        wiki: 'https://wiki.multitheftauto.com/wiki/OnElementDataChange',
     },
 };
